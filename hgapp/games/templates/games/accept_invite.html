@@ -1,0 +1,61 @@
+{% extends "site_base.html" %}
+
+
+{% load i18n %}
+{% load bootstrap %}
+
+{% block extra_head %}
+    {{ form.media }}
+{% endblock %}
+
+{% block head_title %}Accepting game invite{% endblock %}
+
+{% load account_tags %}
+{% block body_class %}home{% endblock %}
+
+{% block body_base %}
+    <section>
+        <div class="container">
+            {{ form.about.errors }}
+            <h1>Accepting invite for {{game.title}} in <a href="{% url 'cells:cells_view_cell' game.cell.id %}">{{ game.cell.name }}</a></h1>
+            <form action="{% url 'games:games_accept_invite' game.id %}" method="post">
+            {{ form.non_field_errors }}
+            {% csrf_token %}
+            {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+            {% if invite.as_ringer %}
+                <div class="container">
+                    <h3>You have been invited to play this game as a ringer (an NPC).</h3>
+                    <p>If you accept this invitaiton, the Scenario will be revealed to you, and you will be unable to
+                        play it as a player character in the future. If you succeed in your mission as a ringer, you
+                        will receive an Improvement for the Character of your choice.
+                    </p>
+                </div>
+            {% endif %}
+                {% if invite.invite_text %}
+                    <div class="container">
+                        <h3>Message from <a href="{% url 'profiles:profiles_view_profile' game.creator.id %}">{% user_display game.creator %}:</a></h3>
+                        {{invite.invite_text|linebreaks}}
+                    </div>
+                {% endif %}
+                <div class="container">
+                    <h4>Required Character Status: <b>{{invite.relevant_game.get_required_character_status_display}}</b></h4>
+                </div>
+            <div class="container">
+                {% if not form.fields.attending_character.choices %}
+                    <h3 class="text-danger">You do not have any valid characters.</h3>
+                {% else %}
+                    {{ form.attending_character | bootstrap}}
+                {% endif %}
+            </div>
+        </div>
+    </section>
+        <div class="container">
+            {% if not form.fields.attending_character.choices %}
+                <input class="btn btn-primary" type="submit" value="I'll be there!" disabled />
+            {% else %}
+                <input class="btn btn-primary" type="submit" value="I'll be there!" />
+            {% endif %}
+            <a href="{% url 'games:games_decline_invite' game.id %}"><input class="btn" type="button" value="I can't make it"/></a>
+        </div>
+    </form>
+{% endblock %}

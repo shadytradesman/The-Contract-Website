@@ -1,0 +1,39 @@
+{% extends "site_base.html" %}
+
+
+{% load i18n %}
+{% load bootstrap %}
+
+{% block extra_head %}
+    {{ form.media }}
+{% endblock %}
+
+{% block head_title %}Inviting Players{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% block body_base %}
+    <section>
+        <div class="container">
+            {{ form.about.errors }}
+            <h1>Inviting players to {{game.title}}</h1>
+            <form action="{% url 'games:games_invite_players' game.id %}" method="post">
+            {{ form.non_field_errors }}
+            {% csrf_token %}
+            {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+            <div class="container">
+                {{ form.username | bootstrap}}
+            </div>
+            <div class="container">
+                {{ form.message | bootstrap}}
+            </div>
+            <div class="container">
+                {{ form.invite_as_ringer | bootstrap }}
+            </div>
+        </div>
+    </section>
+        <div class="container">
+            <input class="btn btn-primary" type="submit" value="Done!" />
+        </div>
+    </form>
+{% endblock %}

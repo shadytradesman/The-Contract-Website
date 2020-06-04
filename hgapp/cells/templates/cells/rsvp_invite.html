@@ -1,0 +1,55 @@
+{% extends "site_base.html" %}
+
+
+{% load account_tags %}
+{% load i18n %}
+{% load bootstrap %}
+
+{% block extra_head %}
+    {{ form.media }}
+{% endblock %}
+
+{% block head_title %}
+    RSVP?
+{% endblock %}
+
+{% block body_class %}home{% endblock %}
+{% load tz %}
+
+
+{% block body_base %}
+    <br>
+    <div class="container">
+        <br>
+        <h3 class="text-center">You have been invited to join  <a href="{% url 'cells:cells_view_cell' cell_id=cell.id %}">{{cell.name}}</a></h3>
+        <br>
+        <h1 class="text-center">What do you do?</h1>
+        <br>
+        <div class="row">
+            <div class="col-md-2 col-md-offset-4">
+                {% if secret_key %}
+                    <form action="{% url 'cells:cells_rsvp_invite' cell_id=cell.id secret_key=secret_key accept='y' %}" method="post">
+                {% else %}
+                    <form action="{% url 'cells:cells_rsvp_invite' cell_id=cell.id accept='y' %}" method="post">
+                {% endif %}
+                {{ form.non_field_errors }}
+                {% csrf_token %}
+                {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+                <input class="btn btn-primary" type="submit" value="Accept" />
+                </form>
+            </div>
+            <div class="col-md-2 col-md-offset-1">
+                {% if secret_key %}
+                    <form action="{% url 'cells:cells_rsvp_invite' cell_id=cell.id secret_key=secret_key accept='n' %}" method="post">
+                {% else %}
+                    <form action="{% url 'cells:cells_rsvp_invite' cell_id=cell.id accept='n' %}" method="post">
+                {% endif %}
+                {{ form.non_field_errors }}
+                {% csrf_token %}
+                {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+                <input class="btn btn-danger" type="submit" value="Decline" />
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+
+{% block head_title %}Powers Tutorial{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% load staticfiles %}
+
+{% block styles %}
+    <link href="{% static "css/site.css" %}" rel="stylesheet" />
+    <link rel="stylesheet"  href="{% static 'powers/tutorial_style.css' %}" />
+{% endblock %}
+
+{% block body_base %}
+            <div id="main_content">
+                <iframe src="https://docs.google.com/document/d/1nWj7STOc0LAUD2RmXjMGQfJwKotlSp-E7Ryt1h2Zlmk/edit?usp=sharing"></iframe>
+            </div>
+{% endblock %}

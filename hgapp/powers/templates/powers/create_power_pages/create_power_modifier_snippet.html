@@ -1,0 +1,14 @@
+{% load bootstrap %}
+
+{{mod.errors}}
+{{mod.is_selected }}
+<span>
+    {% if mod.eratta %}
+        <span title="{{mod.eratta}}"><i class="fa fa-question-circle fa-1x"></i> </span>
+    {% endif %}
+    {{mod.label}}
+    <div class="detail_text_form">
+        {{mod.detail_text.label_tag}}
+        {{mod.detail_text}}
+    </div>
+</span>

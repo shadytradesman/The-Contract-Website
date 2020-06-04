@@ -1,0 +1,92 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+
+{% block head_title %}Viewing Character{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% load account_tags %}
+
+{% load staticfiles %}
+
+{% block body_base %}
+	<div class="container">
+        <h1>
+            Assigning powers to <a href="{% url 'characters:characters_view' character.id %}">{{ character.name }}</a>
+        </h1>
+        <p>Played by <a href="{% url 'profiles:profiles_view_profile' character.player.id %}">{% user_display character.player %}</a></p>
+            <h4><b>Rewards: </b>{{character.unspent_rewards|length}} available ({{character.active_spent_rewards|length}} assigned) </h4>
+            {% if character.get_power_cost_total != character.active_spent_rewards|length %}
+            <p class="text-warning">Character's power value does not match number of spent gifts! </br>
+                <b>Power Value: </b>{{character.get_power_cost_total}}</p>
+            {% endif %}
+        <div class="container">
+            <h3>
+                Click the power to assign or unassign it
+            </h3>
+        </div>
+	</div>
+
+	<div class="container">
+        <div class="double-columns">
+            <div class="container">
+                <h2>{{character.name}}'s Powers</h2>
+                {% for power in assigned_powers %}
+                <div class="row">
+                    <a href="{% url 'characters:characters_power_toggle' character.id power.id %}">
+                        <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
+                            <div class="thumbnail">
+                            <p>
+                                <b>{{ power.name }} - </b> {{power.get_point_value}} point {{power.base.name}} power</p>
+                                {% if power.get_point_value > power.reward_list|length %}
+                                    <p class="text-danger">
+                                        {{power.reward_list|length}} Rewards assigned
+                                    </p>
+                                {% endif %}
+                                {% if power.character and not power.at_least_one_gift_assigned %}
+                                    <p class="text-danger">
+                                        No Gifts assigned!
+                                    </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </a>
+                    <a href="{% url 'powers:powers_view_power_full' power.id %}">
+                        <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                            <div class="thumbnail">
+                            <p>View Power</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="container-fluid">
+                <h2>Available Powers</h2>
+                {% for power in unassigned_powers %}
+                <div class="row">
+                    <a href="{% url 'characters:characters_power_toggle' character.id power.id %}">
+                        <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
+                            <div class="thumbnail">
+                            <p>
+                                <b>{{ power.name }} - </b> {{power.get_point_value}} gift {{power.base.name}}  power <br>
+
+                            </p>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="{% url 'powers:powers_view_power_full' power.id %}">
+                        <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                            <div class="thumbnail">
+                            <p>View Power</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

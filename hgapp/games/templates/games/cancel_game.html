@@ -1,0 +1,44 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+
+{% block head_title %}Viewing Scenario{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% block body_base %}
+    {% if game.is_scheduled or game.is_active %}
+	<div class="container">
+        <h1>
+            Are you sure you would like to cancel {{ game.title }}?
+        </h1>
+    </div>
+    <div class="container">
+        <h3>
+            All invitations, attendences, and records of this game will be erased.
+        </h3>
+    </div>
+    <div class="container">
+        <form action="{% url 'games:games_cancel_game' game.id %}" method="post">
+            {% csrf_token %}
+            <input class="btn btn-primary" type="submit" value="Cancel Game" />
+        </form>
+    </div>
+    {% endif %}
+
+    {% if game.is_finished or game.is_archived %}
+    <div class="container">
+        <h1>
+            {{ game.title }} can no longer be canceled. You must move for a void. (remember to put a link here)
+        </h1>
+    </div>
+    {% endif %}
+
+    {% if game.is_canceled %}
+    <div class="container">
+        <h1>
+            {{ game.title }} Successfully canceled!
+        </h1>
+    </div>
+    {% endif %}
+{% endblock %}

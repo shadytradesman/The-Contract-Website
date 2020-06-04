@@ -1,0 +1,44 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+
+{% block head_title %}Viewing Character{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% load account_tags %}
+{% load markdown_deux_tags %}
+{% load staticfiles %}
+
+{% block body_base %}
+    <div class="container text-center">
+        <h1>
+            Graveyard
+        </h1>
+        <h3>
+            {{header|linebreaks}}
+        </h3>
+    </div>
+    <div class="container">
+        <div class="panel-group" id="accordion">
+            {% for death in character_deaths %}
+            <div class="panel panel-default">
+                <a data-toggle="collapse" data-parent="#accordion" href="#collapse{{forloop.counter}}">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            {{death.relevant_character.name}} <small>({{death.relevant_character.number_of_victories }} gift {{death.relevant_character.get_status_display}}) - {{death.cause_of_death}}</small>
+                        </h4>
+                    </div>
+                </a>
+                <div id="collapse{{forloop.counter}}" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        {{death.obituary|linebreaks}} <hr>
+                        <small><a href="{% url 'characters:characters_view' death.relevant_character.id %}">View Character Sheet</a></small>
+
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

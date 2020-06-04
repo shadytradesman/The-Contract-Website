@@ -1,0 +1,41 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+
+{% block head_title %}Create a {{ base_power.name }} Power{% endblock %}
+
+{% load staticfiles %}
+
+{% block scripts %}
+<script src="{% static "js/site.js" %}"></script>
+    {% include "powers/create_power_pages/create_power_form.js" %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% block body_base %}
+{% if character %}
+    <form action="{% url 'powers:powers_create_power_for_char' base_power.slug character.id %}" method="post">
+{% else %}
+    <form action="{% url 'powers:powers_create_power' base_power.slug %}" method="post">
+{% endif %}
+    <div class="container">
+        {% include "powers/create_power_pages/create_power_form_snippet.html" %}
+    </div>
+</form>
+<div class="container">
+    {% if base_power.example_powers.all %}
+        <button data-toggle="collapse" data-target="#examplepowers">Toggle Example Powers</button>
+        <div id="examplepowers" class="collapse">
+            {% for power_full in base_power.example_powers.all %}
+                {% with power=power_full.power_set.first%}
+                    {% include "powers/view_power_snippet.html" %}
+                {% endwith %}
+            {% empty %}
+            <h2>No Example Powers Yet</h2>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

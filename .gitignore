@@ -1,0 +1,13 @@
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
+hgapp/node_modules/*
+hgapp/static/dist/*
+hgapp/static/*
+env/*
+hgapp/.package*
+*.idea/*
+*__pycache__*
+*~
+*.log

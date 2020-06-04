@@ -1,0 +1,15 @@
+{% load account_tags %}
+<div class="thumbnail">
+    <h4>
+        <a href="{% url 'games:games_view_scenario' scenario.id %}">
+                {{ scenario.title }}
+        </a>
+        <small>
+            - for {{scenario.min_players}} to {{ scenario.max_players }} {{ scenario.get_suggested_status_display }} level Characters
+        </small>
+    </h4>
+    <h5>
+        Created by <a href="{% url 'profiles:profiles_view_profile' scenario.creator.id %}"><b>{% user_display scenario.creator %}</b></a> and played {{scenario.num_finished_games}} times
+    </h5>
+    <p>{{scenario.summary}}</p>
+</div>

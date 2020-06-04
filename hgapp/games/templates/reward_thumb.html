@@ -1,0 +1,33 @@
+<div class="thumbnail">
+        {% if reward.is_void %}
+            <strike>
+        {% endif %}
+        <b>
+            {{ reward.type_text }}
+        </b>
+        from
+        {% if reward.relevant_game %}
+            <a href="{% url 'games:games_view_game' reward.relevant_game.id %}">
+                {% if reward.relevant_game.creator.id == reward.rewarded_player.id %}
+                    running
+                {% else %}
+                    playing in
+                {% endif %}
+                {{ reward.relevant_game.scenario.title }}
+            </a>
+        {% endif %}
+        {% if reward.relevant_power %}
+            spent on
+            <a href="{% url 'powers:powers_view_power' reward.relevant_power.id %}">
+                {{ reward.relevant_power.creation_reason_action_text }} power: {{ reward.relevant_power.name }}
+            </a>
+            {% if reward.relevant_power.creation_reason_expanded_text %}
+                <span title="{{reward.relevant_power.creation_reason_expanded_text}}"><i class="fa fa-question-circle fa-1x"></i> </span>
+            {% endif %}
+        {% else %}
+                : Unspent
+        {% endif %}
+        {% if reward.is_void %}
+            </strike> &nbsp;&nbsp; Refunded
+        {% endif %}
+</div>

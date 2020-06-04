@@ -1,0 +1,23 @@
+{% load account_tags %}
+
+<div class="container">
+    <h4>
+        Players who Attended:
+    </h4>
+    <ul>
+        {% for invitation in game.game_invite_set.all %}
+            <li>
+                <a href="{% url 'profiles:profiles_view_profile' invitation.invited_player.id %}"><b>{% user_display invitation.invited_player %}</b></a>
+                {% if invitation.attendance.attending_character %}
+                    Played <a href="{% url 'characters:characters_view' invitation.attendance.attending_character.id %}">{{invitation.attendance.attending_character.name}}</a>
+                {% else %}
+                    Played a ringer
+                {% endif %}
+            </li>
+        {% empty %}
+            <p>
+                No players attended this game?!??!?! <br>
+            </p>
+        {% endfor %}
+    </ul>
+</div>

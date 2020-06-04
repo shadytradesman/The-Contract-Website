@@ -1,0 +1,69 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+{% load bootstrap %}
+{% load games_tags %}
+
+{% block head_title %}Editing Obituary{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% block body_base %}
+    <form action="{% url 'characters:characters_power_toggle' character.id power_full.id %}" method="post">
+        <section>
+            <div class="container text-center">
+                {{ assignment_form.about.errors }}
+                {{ assignment_form.non_field_errors }}
+                {% csrf_token %}
+                {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+                {% if power_full.character.id != character.id %}
+                    <div class="container">
+                        <h1>Confirm Assigning {{power_full.name}} to {{character.name}}</h1>
+                        </br>
+                        {% if insufficient_gifts %}
+                            <h4 class="text-danger">Your character does not have a sufficient number of Gifts to assign to this power.</h4>
+                            <p>All powers cost at least one Gift. Gifts are only obtained by playing a Character in a Game and winning.</p>
+                            <h5>You can still assign this power, but it will put your character in bad standing.</h5>
+                        {% endif %}
+                        {% if reward_deficit > 0 %}
+                            <h4 class="text-danger">Your character does not have a sufficient number of Gifts and Improvements to assign to this power.</h4>
+                            <p>You require <b>{{reward_deficit}}</b> more Gifts or Improvements</br>
+                            <b class="text-danger">You can still assign this power, but it will put your character in bad standing.</b></p>
+                        {% endif %}
+                        </br>
+                        <div class="container">
+                            <h4>
+                                Assigning this power will cost the following:
+                            </h4>
+                            <ul class="list-unstyled">
+                                {% for reward in rewards_to_spend %}
+                                    <li>{% render_reward reward %}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="container">
+                        <h1>Confirm removing {{power_full.name}} from {{character.name}}</h1>
+                        </br>
+                        <div class="container">
+                            <h4>
+                                Removing this power will refund the following Gifts and Improvements:
+                            </h4>
+                            <ul class="list-unstyled">
+                                {% for reward in power_full.reward_list %}
+                                    <li>{% render_reward reward %}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+
+                {% endif %}
+            </div>
+
+            <div class="container  text-center">
+                <input class="btn btn-primary" type="submit" value="Okay" />
+            </div>
+        </section>
+    </form>
+{% endblock %}

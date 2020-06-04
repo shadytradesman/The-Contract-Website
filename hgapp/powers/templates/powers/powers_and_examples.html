@@ -1,0 +1,31 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+
+{% block head_title %}The Contract{% endblock %}
+
+{% block body_base %}
+<div class="container">
+    <div class="page-header">
+        <h1> Powers and Examples</h1>
+    </div>
+<div class="row">
+    {% if base_powers_list %}
+    {% for base_power in base_powers_list %}
+        <div class="col-lg-4 col-sm-6">
+            <div class="thumbnail">
+                <div class="label">
+                         <a class="btn btn-default" href="{% url 'powers:powers_view_base' base_power.slug %}" role="button"><h3>{{base_power.name}}:</h3></a>
+                         {% for example in base_power.example_powers.all %}
+                            <li><a class="btn btn-default" href="{% url 'powers:powers_view_power_full' example.id %}" role="button">{{example.name}}</a></li>
+                         {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    {% else %}
+        <p>No available base powers. . .</p>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

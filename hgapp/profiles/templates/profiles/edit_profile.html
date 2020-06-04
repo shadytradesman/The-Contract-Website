@@ -1,0 +1,29 @@
+{% extends "site_base.html" %}
+
+
+{% load i18n %}
+{% load bootstrap %}
+
+{% block extra_head %}
+    {{ form.media }}
+{% endblock %}
+
+{% block head_title %}Editing Profile{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% block body_base %}
+<div class="container">
+    <section>
+        <h1>{{profile.user.username}}'s Profile</h1>
+         {{ form.about.errors }}
+         <form action="{% url 'profiles:profiles_edit' %}" method="post">
+            {{ form.non_field_errors }}
+            {% csrf_token %}
+            {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+            {{ form.about | bootstrap }}
+            <input class="btn btn-primary" type="submit" value="Done!" />
+        </form>
+    </section>
+</div>
+{% endblock %}

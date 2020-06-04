@@ -1,0 +1,52 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+
+{% block head_title %}The Contract{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% block body_base %}
+
+<section class="jumbotron">
+    <div class="container">
+        {% include "_messages.html" %}
+        <h1 class="text-center">{% blocktrans %}Powers{% endblocktrans %}</h1>
+        <div class="feature-columns">
+                <div>
+                    <i class="fa fa-snowflake-o fa-3x"></i><br>
+                    <a class="btn btn-default" href="{% url 'powers:powers_create' %}" role="button">Create a New Power</a>
+                </div>
+            <div>
+                    <i class="fa fa-question-circle-o  fa-3x"></i><br>
+                    <a class="btn btn-default" href="{% url 'powers:powers_tutorial' %}" role="button">Tutorial</a>
+                </div>
+            <div>
+                    <i class="fa fa-book fa-3x"></i><br>
+                    <a class="btn btn-default" href="{% url 'powers:powers_browse_powers' %}" role="button">Browse Completed Powers</a>
+                </div>
+        </div>
+    </div>
+</section>
+<section>
+    <div class="container">
+        {% if latest_power_list %}
+        <h3>Check out some recently created powers:</h3>
+        <hr class="styled">
+        <div class="row">
+            {% for power in latest_power_list %}
+                <div class="col-lg-4 col-md-6">
+                    <div class="thumbnail">
+                        <a href="{% url 'powers:powers_view_power' power.id %}">
+                            {{ power.name }} created {{ power.pub_date }}
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p>No recently created powers..</p>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

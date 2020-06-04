@@ -1,0 +1,15 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+
+{% block head_title %}The Contract{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% block body_base %}
+{% if not user.is_authenticated %}
+    {% include "logged_out_homepage_snippet.html" %}
+{% else %}
+    {% include "logged_in_homepage_snippet.html" %}
+{% endif %}
+{% endblock %}

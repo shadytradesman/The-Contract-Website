@@ -1,0 +1,57 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+
+{% load games_tags %}
+
+{% block head_title %}Viewing Power{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% block body_base %}
+	<div class="container">
+		{% include "powers/view_power_snippet.html" %}
+	</div>
+    {% if power_full %}
+        <div class="container">
+            {% if power_list.0.id == power.id %}
+                {% if power_full.reward_list %}
+                    <h2>Invested Rewards</h2>
+                    {% for reward in power_full.reward_list %}
+                        {% render_reward reward %}
+                    {% endfor %}
+                {% endif %}
+            {% endif %}
+            <h2>Edit History</h2>
+            {% if power.id != power_list.0.id %}
+                <h3>You are viewing an old version of this power.</h3>
+                <p>To view the most recent version <a href="{% url 'powers:powers_view_power_full' power_full.id %}">Click Here</a></p>
+            {% endif %}
+            {% for curr_power in power_list %}
+                <div class="container">
+                    <p>
+                        {% if curr_power.id == power.id %}
+                                <b><i class="fa fa-caret-right fa-1x"></i> -</b>
+                        {% endif %}
+                        {%if curr_power.id == power_list.0.id %}
+                                <a href="{% url 'powers:powers_view_power_full' power_full.id %}">
+                        {% else %}
+                                <a href="{% url 'powers:powers_view_power' curr_power.id %}">
+                        {% endif %}
+                        <b>{{ curr_power.pub_date }}</b> - {{ curr_power.creation_reason }} Cost: {{ curr_power.get_point_value }}. Change: {{curr_power.creation_reason_expanded_text}}</a>
+                    </p>
+                </div>
+                {% if curr_power.relevant_power.all %}
+                    <div class="container" style="margin-left: 50px">
+                        Revision purchased with:
+                        <div class="small">
+                            {% for reward in curr_power.relevant_power.all %}
+                                {% render_reward  reward %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+
+{% block head_title %}Rewarding Character{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% load account_tags %}
+{% load markdown_deux_tags %}
+{% load staticfiles %}
+{% load games_tags %}
+
+{% block body_base %}
+    {% if character.unspent_rewards|length > 0 %}
+        <div class="container text-center">
+            <h1>
+                You've done well, <a href="{% url 'characters:characters_view' character.id %}">{{ character.name }}</a>
+            </h1>
+            <h3>
+                Please accept my Gift
+            </h3>
+        </div>
+        {% if character.unspent_gifts|length > 0 %}
+            <div class = "container">
+                <h4>{{ character.name }} has {{character.unspent_rewards|length}} unspent rewards</h4>
+                <div class="container">
+                    <ul >
+                        {% for reward in character.unspent_rewards %}
+                            <li>{% render_reward reward %}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <div class = "container">
+                <a href="{% url 'powers:powers_create_for_char' character.id %}"><h2>Get a New Power</h2></a>
+            </div>
+        {% endif %}
+        <div class = "container">
+            <h2>Improve an Existing Power</h2>
+            <div class="container">
+            {% for power_full in character.power_full_set.all %}
+                <div class="row">
+                    {% if request.user.is_authenticated and request.user.id == character.player.id and character.unspent_rewards|length > 0 %}
+                        <div class= "col-sm-1 container">
+                            <a href="{% url 'powers:powers_edit_power' power_full.id %}" class="btn btn-success"><i class="fa fa-plus-square fa-4x"></i></a>
+                        </div>
+                        <div class= "col-sm-11">
+                    {% else %}
+                        <div class= "col-sm-12">
+                    {% endif %}
+                    {% include "powers/power_badge_snippet.html" %}
+                </div>
+                </div>
+
+            {% empty %}
+                <h4>{{character.name}} doesn't have any powers yet. What a noob :(</h4>
+            {% endfor %}
+            </div>
+        </div>
+    <div class="container">
+        <a href="{% url 'characters:characters_power_picker' character.id %}"><h2>Assign Already Created Powers to {{ character.name }}</h2></a>
+    </div>
+    {% else %}
+        <h1>
+            <a href="{% url 'characters:characters_view' character.id %}">{{ character.name }}</a> does not have any Gifts or Improvements to spend.
+        </h1>
+    {% endif %}
+
+{% endblock %}

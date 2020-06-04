@@ -1,0 +1,56 @@
+{% extends "site_base.html" %}
+
+
+{% load i18n %}
+{% load bootstrap %}
+
+{% block extra_head %}
+    {{ form.media }}
+{% endblock %}
+
+{% block head_title %}
+    {% if cell %}
+        Edit Cell
+    {% else %}
+        Create Cell
+    {% endif %}
+{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% block body_base %}
+    <section>
+        <div class="container">
+            {{ form.about.errors }}
+            {% if cell %}
+                <h1>Editing {{cell.title}}</h1>
+                <form action="{% url 'cells:cells_edit_cell' cell.id %}" method="post">
+            {% else %}
+                <h1>Create a new cell</h1>
+                <form action="{% url 'cells:cells_create' %}" method="post">
+            {% endif %}
+                {{ form.non_field_errors }}
+                {% csrf_token %}
+                {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+                    {% if not cell or can_admin %}
+                        <div class="container">
+                            {{ form.name | bootstrap}}
+                        </div>
+                    {% else %}
+                        {{ form.name.as_hidden}}
+                    {% endif %}
+
+                    <div class="container">
+                        {{ form.setting_name | bootstrap}}
+                    </div>
+                    <div class="container">
+                        {{ form.setting_description | bootstrap }}
+                    </div>
+                    <div class="container">
+                        <input class="btn btn-primary" type="submit" value="Done!" />
+                    </div>
+                </form>
+            </div>
+    </section>
+
+{% endblock %}

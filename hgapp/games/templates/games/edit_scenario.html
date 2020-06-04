@@ -1,0 +1,62 @@
+{% extends "site_base.html" %}
+
+
+{% load i18n %}
+{% load bootstrap %}
+
+{% block extra_head %}
+    {{ form.media }}
+{% endblock %}
+
+{% block head_title %}Editing Scenario{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% block body_base %}
+    <section>
+        <div class="container">
+            {{ form.about.errors }}
+            {% if scenario %}
+                <h1>Editing {{scenario.title}}</h1>
+                <form action="{% url 'games:games_scenario_edit' scenario.id %}" method="post">
+            {% else %}
+                <h1>Create a new scenario</h1>
+                <form action="{% url 'games:games_create_scenario' %}" method="post">
+            {% endif %}
+                {{ form.non_field_errors }}
+                {% csrf_token %}
+                {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+                    <div class="container">
+                        {{ form.title | bootstrap}}
+                    </div>
+                    <div class="container">
+                        {{ form.summary | bootstrap}}
+                    </div>
+                    <div class="container">
+                        {{ form.suggested_character_status | bootstrap }}
+                    </div>
+                    <div class="container">
+                        {{ form.description | bootstrap}}
+                    </div>
+                    <div class="container">
+                        {{ form.min_players | bootstrap }}
+                    </div>
+                    <div class="container">
+                        {{ form.max_players | bootstrap}}
+                    </div>
+                    <div class="container">
+                        {{ form.is_highlander | bootstrap }}
+                    </div>
+                    <div class="container">
+                        {{ form.is_rivalry | bootstrap }}
+                    </div>
+                    <div class="container">
+                        {{ form.requires_ringer | bootstrap }}
+                    </div>
+            </div>
+        </section>
+        <div class="container">
+            <input class="btn btn-primary" type="submit" value="Done!" />
+        </div>
+    </form>
+{% endblock %}

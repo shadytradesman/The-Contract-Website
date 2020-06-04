@@ -1,0 +1,47 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+
+{% block head_title %}Viewing Scenario{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% load account_tags %}
+{% load markdown_deux_tags %}
+
+{% block body_base %}
+	<div class="container">
+        <h1>My Scenario Gallery</h1>
+        <div class="container">
+            <p>
+                This gallery contains a list of each Scenario you have access to. You can gain access to new Scenarios by:
+                <ul>
+                    <li><a href="{% url 'games:games_create_scenario' ">Creating your own</a></li>
+                    <li>Accepting a Game invite as an NPC Ringer</li>
+                    <li>Finishing playing the Scenario in a Game</li>
+                    <li>(coming soon) Having one shared with you</li>
+                </ul>
+            </p>
+        </div>
+        <div class="container">
+            <h2>Scenarios I Wrote</h2>
+            {% for scenario in owned_scenarios %}
+                    {% include "games/scenario_badge_snippet.html" %}
+            {% empty %}
+                <p>You haven't written any Scenarios yet! Try <a href="{% url 'games:games_create_scenario' ">creating your own!</a></p>
+            {% endfor %}
+        </div>
+        <div class="container">
+            <h2>Scenarios I've Discovered</h2>
+            {% for scenario_discovery in scenario_discoveries %}
+                {% with scenario=scenario_discovery.relevant_scenario %}
+                    {% include "games/scenario_badge_snippet.html" %}
+                {% endwith %}
+            {% empty %}
+                <p>You haven't discovered any Scenarios yet!</p>
+            {% endfor %}
+        </div>
+
+    </div>
+
+{% endblock %}

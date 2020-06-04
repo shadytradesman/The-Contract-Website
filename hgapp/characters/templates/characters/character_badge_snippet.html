@@ -1,0 +1,22 @@
+{% load account_tags %}
+
+<div class="thumbnail">
+    <a href="{% url 'characters:characters_view' character.id %}">
+
+        <h4>
+            {%if character.private %}
+                <i class="fa fa-user-secret fa-1x"></i>
+            {% endif %}
+            {{ character.name }}
+            <small>
+                - a {{character.number_of_victories }} Gift {{ character.get_status_display }} Character
+            </small>
+        </h4>
+        <h5>
+            Played by <a href="{% url 'profiles:profiles_view_profile' character.player.id %}"><b>{% user_display character.player %}</b></a>
+        </h5>
+        <p>
+            {{ character.concept_summary }}
+        </p>
+    </a>
+</div>

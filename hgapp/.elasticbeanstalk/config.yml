@@ -1,0 +1,17 @@
+branch-defaults:
+  default:
+    environment: Default-Environment
+  master:
+    environment: Hgapp-env-contract
+    group_suffix: null
+environment-defaults:
+  Default-Environment:
+    branch: null
+    repository: null
+global:
+  application_name: hgapp
+  default_ec2_keyname: null
+  default_platform: 64bit Amazon Linux 2016.09 v2.2.0 running Python 3.4
+  default_region: us-west-2
+  profile: eb-cli
+  sc: git

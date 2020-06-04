@@ -1,0 +1,86 @@
+{% extends "site_base.html" %}
+
+
+{% load i18n %}
+{% load bootstrap %}
+{% load staticfiles %}
+
+{% block extra_head %}
+    {{ form.media }}
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="{% static "js/site.js" %}"></script>
+    {% include "games/datepicker.js" %}
+{% endblock %}
+
+
+{% block head_title %}Editing Scenario{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% block body_base %}
+    <section>
+        <div class="container">
+            {{ form.about.errors }}
+            {% if game %}
+                <h1>Editing {{game.title}}</h1>
+                <form action="{% url 'games:games_game_edit' game.id %}" method="post">
+            {% else %}
+                <h1>Create a new Game Event</h1>
+                <form action="{% url 'games:games_create_game' %}" method="post">
+                <div class="container">
+                   <p>
+                       Once this form is submitted, Players may RSVP and declare which Character they wish to attend with. <br>
+                       When you are ready, you may then start the Game and confirm which Players and Characters are attending.<br>
+                       When the Game is over, you can transition its status to Finished and declare winners, losers, and leave feedback on the scenario.
+                   </p>
+                </div>
+            {% endif %}
+            {{ form.non_field_errors }}
+            {% csrf_token %}
+            {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+            <div class="container">
+                {{ form.title | bootstrap}}
+                {{ form.hook | bootstrap}}
+
+                {{ form.cell | bootstrap}}
+            {% if not form.cell.field.choices.queryset.all|length %}
+                <div class="row">
+                    <div class="alert-danger col-xs-7 col-xs-offset-2">
+                        <h4>You are not a part of any cells</h4>
+                        <p>
+                            All Games must take place inside a Cell. Ask your friends for an invite or
+                            <a href="{% url 'cells:cells_create' %}">make your own</a>!
+                        </p>
+                    </div>
+                </div>
+                <br>
+            {% endif %}
+            {{ form.invite_all_members | bootstrap}}
+            {{ form.scenario | bootstrap }}
+            {% if not form.scenario.field.choices.queryset.all|length %}
+                <div class="row">
+                    <div class="alert-warning col-xs-7 col-xs-offset-2">
+                        <h4>You do not have access to any scenarios</h4>
+                        <p>
+                            You discover Scenarios by playing in games or <a href="{% url 'games:games_create_scenario' %}">writing them yourself</a>!
+                            Scheduling this game will create a placeholder Scenario that you can edit later.
+                        </p>
+                    </div>
+                </div>
+                <br>
+            {% endif %}
+            {{ form.required_character_status | bootstrap }}
+
+            {{ form.open_invitations | bootstrap }}
+            {{ form.scheduled_start_time | bootstrap }}
+            </div>
+        </div>
+    </section>
+        <div class="container">
+            <input class="btn btn-primary" type="submit" value="Done!" />
+        </div>
+    </form>
+{% endblock %}

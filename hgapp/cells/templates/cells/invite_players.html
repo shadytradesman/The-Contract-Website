@@ -1,0 +1,84 @@
+{% extends "site_base.html" %}
+{% load static staticfiles %}
+
+{% load account_tags %}
+{% load i18n %}
+{% load bootstrap %}
+
+{% block extra_head %}
+    {{ form.media }}
+{% endblock %}
+
+{% block head_title %}
+    Invite Players
+{% endblock %}
+
+{% block body_class %}home{% endblock %}
+{% load tz %}
+
+
+{% block body_base %}
+    <br>
+    <div class="container">
+        {{ form.about.errors }}
+        <h1>Invite players to <a href="{% url 'cells:cells_view_cell' cell.id %}">{{cell.name}}</a></h1>
+        <h3>By username</h3>
+        <div class="row">
+            <form action="{% url 'cells:cells_invite_players' cell.id %}" method="post">
+            {{ form.non_field_errors }}
+            {% csrf_token %}
+            {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+            <div class="col-xs-4">{{ form.username | bootstrap }}</div>
+            <div class="col-xs-4"><input class="btn btn-primary" type="submit" value="Send Invitation" /></div>
+            </form>
+        </div>
+        <h3>Using invite link</h3>
+        <p>Anyone with this link will be able to join your cell.</p>
+        <div class="row">
+            <div class="col-xs-1">
+                <button class="btn btn-secondary" id="copySecretLink"><i class="fa fa-copy"></i> copy</button>
+            </div>
+            <div class="col-xs-9">
+                <input id="secretCopyField"
+                       class="form-control"
+                       type="text"
+                       value="https://{{ request.META.HTTP_HOST }}{% url 'cells:cells_rsvp_invite' cell.id cell.invite_link_secret_key %}"
+                       id="secretLinkInput">
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        </br>
+        <p>Sent the invite link to the worng person? Reset the link to create a new URL and invalidate all previous invite links.</p>
+        <form action="{% url 'cells:cells_reset_invite_link' cell.id %}" method="post">
+            {{ form.non_field_errors }}
+            {% csrf_token %}
+            {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+            <input class="btn btn-primary" type="submit" value="Reset Link"/>
+        </form>
+        <h2>Open Invitations</h2>
+        <ul>
+            {% for invite in cell.open_invitations %}
+            <div style="padding: 5px">
+                <li>
+                    <strong><a href="{% url 'profiles:profiles_view_profile' invite.invited_player.profile.id %}">{% user_display invite.invited_player %}</a></strong>
+                    {% localtime on %}
+                        - {{ invite.created_date }}
+                    {% endlocaltime %}
+                    <a href="{%url 'cells:cells_revoke_invite' cell.id invite.id%}"><button class="btn btn-xs">Revoke</button></a>
+                </li>
+                </div>
+            {% endfor %}
+        </ul>
+        <p>Invited players can RSVP by visiting this url:</p>
+        <div class="row">
+            <div class="col-xs-1"><button class="btn btn-secondary" id="copyRsvpLink"><i class="fa fa-copy"></i> Copy</button></div>
+            <div class="col-xs-4"><input class="form-control" id="rsvpCopyField" type="text" value="https://{{ request.META.HTTP_HOST }}{% url 'cells:cells_rsvp_invite' cell.id %}" id="rsvpLinkInput"> </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block scripts %}
+    <script src="{% static 'js/invite.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+{% load postman_tags %}
+
+{% block body_base %}
+    <section id="content_body">
+        <div class="container">
+         {% include "_messages.html" %}
+            <div class="row">
+                <div class="col-md-3 columns">
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><strong>{% trans "Messages" %}</strong></div>
+                        <div class="list-group">
+                            <a class="list-group-item" href="{% url "postman:write" %}">
+                                {% trans "Write message" %}
+                            </a>
+                            <a class="list-group-item" href="{% url "postman:inbox" %}">
+                                {% trans "Inbox" %}{% if unread_count %} <strong>({{ unread_count }})</strong>{% endif %}
+                            </a>
+                            <a class="list-group-item" href="{% url "postman:sent" %}">
+                                {% trans "Sent" %}
+                            </a>
+                            <a class="list-group-item" href="{% url "postman:archives" %}">
+                                {% trans "Archives" %}
+                            </a>
+                            <a class="list-group-item" href="{% url "postman:trash" %}">
+                                {% trans "Trash" %}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-9 columns">
+                    {% block content %}
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+
+
+{% block title %}{% trans "Messaging" %}{% endblock %}
+{% block extrahead %}{{ block.super }}
+<link type="text/css" media="all" rel="stylesheet" href="
+{# dj v1.4 #}{% load static %}{% static 'postman/css/postman.css' %}
+{# dj v1.3 #}{# {{ STATIC_URL }}postman/css/postman.css #}
+{# dj v1.2 #}{# {{ MEDIA_URL }}postman/css/postman.css #}
+" />{% endblock %}
+{% block postman_menu %}
+<ul id="postman_menu">{% postman_unread as unread_count %}
+ <li><a href="{% url 'postman:inbox' %}">&raquo;&nbsp;{% trans "Inbox" %}{% if unread_count %} <strong>({{ unread_count }})</strong>{% endif %}</a></li>
+ <li><a href="{% url 'postman:sent' %}">&raquo;&nbsp;{% trans "Sent Messages" %}</a></li>
+ <li><a href="{% url 'postman:write' %}">&raquo;&nbsp;{% trans "Write" %}</a></li>
+ <li><a href="{% url 'postman:archives' %}">&raquo;&nbsp;{% trans "Archives" %}</a></li>
+ <li><a href="{% url 'postman:trash' %}">&raquo;&nbsp;{% trans "Trash" %}</a></li>
+</ul>
+{% endblock %}

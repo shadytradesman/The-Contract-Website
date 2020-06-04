@@ -1,0 +1,127 @@
+{% load bootstrap %}
+
+{% include "powers/create_power_pages/create_power_enhancement_script_snippet.html" %}
+{% include "powers/create_power_pages/create_power_drawback_script_snippet.html" %}
+<div class="page-header">
+    {% if og_power %}
+        <h1> Edit {{ og_power.name }}</h1>
+    {% else %}
+        <h1> Create a {{ base_power.name }} Power
+        {% if character %}
+            For {{character.name}}
+        {% endif %}
+        </h1>
+    {% endif %}
+    <div class="double-columns">
+        <div class="container">
+            {{ form.non_field_errors }}
+            {% csrf_token %}
+            {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+            {{ form.power_name.errors }}
+            {{ form.power_name | bootstrap}}
+            <p class="help">{{ form.power_name.help_text|safe }}</p>
+            <h4><span>
+                Current Gift Cost: <b><span id="current_gift_cost_number">1</span></b>
+                {% if og_power %}
+                    ({{og_power.get_point_value}} <span id="gift_cost_delta">+0</span>)
+                {% endif %}
+            </span></h4>
+            {% if character %}
+                <h5>{{character.name}} has <b>{{character.unspent_rewards|length}}</b> Points to spend on this power!</h5>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<div class="double-columns">
+    <div class="container">
+        <h3>Base Power: <a href="{% url 'powers:powers_view_base' base_power.slug %}">{{ base_power.name }}</a></h3>
+        <h4>{{ base_power.summary }}</h4>
+        <p>
+            {% if base_power.required_status != "ANY" %}
+            Requires: {{base_power.required_status}}
+            {% endif %}
+        </p>
+        {{ base_power.description|linebreaks }}
+
+    </div>
+    <div class="container">
+        {{ form.description.errors }}
+        {{ form.description | bootstrap}}
+    </div>
+    <div class="container">
+        <h4>System</h4>
+        {{ power_system.system_text|linebreaks }}
+
+        <h3>Parameters</h3>
+        {% for parameter_formset in parameters %}
+            {% for param in parameter_formset %}
+                {{ param.label }}
+                {{ param.level_picker }}
+                {{ param.errors }}
+                <br>
+            {% endfor %}
+        {% endfor %}
+    </div>
+    <div class="container">
+        {{ form.system.errors }}
+        {{ form.system | bootstrap}}
+    </div>
+    <div class="container">
+        <div class="enhancements">
+            <h3>Enhancements:</h3>
+            {% for modifier_form in enhancements %}
+            {% if modifier_form.empty_form.multiplicity_allowed %}
+            <div id="{{modifier_form.empty_form.enhancement_slug}}">
+                <div id="{{modifier_form.empty_form.enhancement_slug}}-base">
+                    {% for mod in modifier_form %}
+                    {% include "powers/create_power_pages/create_power_modifier_snippet.html" %}
+                    {% endfor %}
+                </div>
+            </div>
+            {% else %}
+            <div class="non-multiple">
+                {% for mod in modifier_form %}
+                {% include "powers/create_power_pages/create_power_modifier_snippet.html" %}
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    <div class="container">
+        <div class="drawbacks">
+            <h3>Drawbacks:</h3>
+            {% for modifier_form in drawbacks %}
+            {% if modifier_form.empty_form.multiplicity_allowed %}
+            <div id="{{modifier_form.empty_form.drawback_slug}}">
+                <div id="{{modifier_form.empty_form.drawback_slug}}-base">
+                    {% for mod in modifier_form %}
+                    {% include "powers/create_power_pages/create_power_modifier_snippet.html" %}
+                    {% endfor %}
+                </div>
+            </div>
+            {% else %}
+            <div class="non-multiple">
+                {% for mod in modifier_form %}
+                {% include "powers/create_power_pages/create_power_modifier_snippet.html" %}
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    <div class="container">
+        {{ form.flavor | bootstrap}}
+    </div>
+</div>
+<div  id="reward_changes">
+    <div class="container">
+        <h4><div id="gift_cost_summary"></div></h4>
+        <ol id="gifts_affected"></ol>
+    </div>
+</div>
+<div class="col-md-2 col-md-offset-5">
+    <div class="container">
+        <input class="btn btn-lg btn-default" type="submit" value="Done!" />
+    </div>
+</div>

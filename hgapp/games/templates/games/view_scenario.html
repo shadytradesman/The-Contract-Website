@@ -1,0 +1,90 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+
+{% block head_title %}Viewing Scenario{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% load account_tags %}
+{% load markdown_deux_tags %}
+
+{% block body_base %}
+	<div class="container">
+        <h1>
+		{{ scenario.title }}
+        </h1>
+        <div class="container">
+            <h3>
+                {{ scenario.summary }}
+            </h3>
+        </div>
+        <h4>Created by <a href="{% url 'profiles:profiles_view_profile' scenario.creator.profile.id %}">{% user_display scenario.creator %}</a></h4>
+	</div>
+    {% if request.user.is_authenticated and request.user.id == scenario.creator.id %}
+        <div class="container">
+            <p>
+                <a href="{% url 'games:games_scenario_edit' scenario.id %}">Edit Scenario</a>
+            </p>
+        </div>
+    {% endif %}
+    <div class="container">
+        <h4>
+            Number of runs: <b>{{ scenario.num_finished_games }}</b>
+        </h4>
+    </div>
+    {% if scenario.requires_ringer %}
+        <div class="container">
+            <h5>
+                * Requires Ringer
+            </h5>
+        </div>
+    {% endif %}
+    {% if scenario.is_rivalry %}
+        <div class="container">
+            <h5>
+                * Rivalry
+            </h5>
+        </div>
+    {% endif %}
+    {% if scenario.is_highlander %}
+        <div class="container">
+            <h5>
+                * Highlander
+            </h5>
+        </div>
+    {% endif %}
+    <div class="container">
+            <p>
+                Suggested for <b>{{scenario.get_suggested_status_display}}</b> level characters
+            </p>
+    </div>
+    <div class="container">
+            <p>
+                {{scenario.description | markdown | linebreaks}}
+            </p>
+    </div>
+    <div class="container">
+            <h3>
+                GM Feedback
+            </h3>
+            {% for game in scenario.finished_games %}
+                {% if game.scenario_notes %}
+                <div class="thumbnail">
+                     <a href="{% url 'profiles:profiles_view_profile' game.creator.id %}">{% user_display game.creator %}</a> says. . .
+                    <div class="container">
+                        <p class="text-info">
+                            {{game.scenario_notes}}
+                        </p>
+                    </div>
+                </div>
+                {% endif %}
+            {% empty %}
+                <div class="container">
+                    <h3>No GMs have left feedback!</h3>
+                </div>
+            {% endfor %}
+
+    </div>
+
+{% endblock %}

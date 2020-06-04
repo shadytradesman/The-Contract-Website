@@ -1,0 +1,107 @@
+{% extends "site_base.html" %}
+
+
+{% load i18n %}
+{% load bootstrap %}
+{% load postman_tags %}
+{% load markdown_deux_tags %}
+
+{% block head_title %}Viewing Profile{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% block body_base %}
+    <section>
+        <div class="container">
+            <h1>{{profile.user.username}}'s Profile</h1>
+            {% if profile.user == request.user %}
+                <a href="{% url 'profiles:profiles_edit' %}"><i class="fa fa-edit"></i> {% trans "Edit Profile" %}</a>
+            {% else %}
+                <small><i class="fa fa-envelope-o fa-1x"></i> <a href="{% url 'postman:write' profile.user.username %}">send a private message</a></small>
+            {% endif %}
+            <p>{{profile.about | markdown}}</p>
+        </div>
+    </section>
+        {% if profile.user == request.user %}
+            <section>
+                <div class="container">
+                   <small><p><i class="fa fa-user-secret fa-3x"></i> signifies that the element is private, and cannot be viewed publicly.</p></small>
+                </div>
+            </section>
+        {% endif %}
+    <section>
+        <div class="container">
+            {% if profile.user == request.user %}
+                <h3>My Characters</h3>
+                <div class = "container">
+                    <a href="{%url 'characters:characters_create' %}" class="btn btn-primary">Create a New Character</a> <br><br>
+                </div>
+            {% else %}
+                <h3>{{profile.user.username}}'s Characters</h3>
+            {% endif %}
+            <hr class="styled">
+            {% if characters %}
+                <div class="row">
+                    {% for character in characters %}
+                        {% if not character.is_dead %}
+                            {% include "characters/character_badge_snippet.html" %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <h3><small>Dead Characters</small></h3>
+                <div class="row">
+                    {% for character in characters %}
+                        {% if character.is_dead %}
+                            {% include "characters/character_badge_snippet.html" %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+            {% else %}
+                {% if profile.user == request.user %}
+                    <p>You haven't created any characters yet! <a href="{%url 'characters:characters_create' %}">Click Here</a> to create one.</p>
+                {% else %}
+                    <p>{{profile.user.username}} has no public characters.</p>
+                {% endif %}
+            {% endif %}
+        </div>
+    </section>
+    <section>
+        <div class="container">
+            {% if profile.user == request.user %}
+                    <h3>My recently edited Powers</h3>
+            {% else %}
+                    <h3>{{profile.user.username}}'s Powers</h3>
+            {% endif %}
+            <hr class="styled">
+            {% if powers %}
+                <div class = "container">
+                    <a href="{%url 'powers:powers_create' %}" class="btn btn-primary">Create a New Power</a> <br><br>
+                </div>
+                <div class="row">
+                    {% for power in powers %}
+                        <div class="thumbnail">
+                            <a href="{% url 'powers:powers_view_power_full' power.id %}">
+                                {%if power.private %}
+                                    <i class="fa fa-user-secret fa-1x"></i>
+                                {% endif %}
+                                {{ power.name }} created {{ power.pub_date }}
+                            </a>
+                            <p>
+                                {% if power.character %}
+                                Assigned to <a href="{% url 'characters:characters_view' power.character.id %}">{{ power.character.name }}</a>
+                                {% endif %}
+                            </p>
+                        </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {% if profile.user == request.user %}
+                    <p> You haven't created any powers yet! <a href="{%url 'powers:powers_create' %}" >Click Here</a> to create one.</p>
+                {% else %}
+                    <p>{{profile.user.username}} has no public powers.</p>
+                {% endif %}
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}

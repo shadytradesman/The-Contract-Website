@@ -1,0 +1,152 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+
+{% block head_title %}Viewing Cell{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% load account_tags %}
+{% load markdown_deux_tags %}
+
+{% block body_base %}
+<div class="container">
+    <div class="text-center jumbotron">
+        <h1>
+        {{ cell.name }}
+        </h1>
+        Founded by <a href="{% url 'profiles:profiles_view_profile' cell.creator.profile.id %}">{% user_display cell.creator %}</a>
+    </div>
+    <ul class="nav nav-pills nav-justified navbar-default">
+        {% if request.user.is_authenticated and can_manage_memberships %}
+            <li>
+                <a href="{% url 'cells:cells_invite_players' cell.id %}">Invite Players</a>
+            </li>
+            <li>
+                <a href="{% url 'cells:cells_manage_members' cell.id %}">Manage Memberships</a>
+            </li>
+        {% endif %}
+        {% if request.user.is_authenticated and can_edit_world %}
+            <li>
+                <a href="{% url 'cells:cells_edit_cell' cell.id %}">
+                    {% if can_administer %}
+                        Edit Cell and Setting
+                    {% else %}
+                        Edit Setting
+                    {% endif %}
+                </a>
+            </li>
+        {% endif %}
+        {% if request.user.is_authenticated and user_membership %}
+            <li>
+                <a href="{% url 'cells:cells_leave_cell' cell.id %}">Leave Cell</a>
+            </li>
+        {% endif %}
+    </ul>
+    <br>
+    {% if invite %}
+        <div class="alert alert-success text-center">
+            <h2>You have been invited to join this cell</h2>
+            <br>
+            <h4><a href="{% url 'cells:cells_rsvp_invite' cell.id %}">Click here to RSVP</a></h4>
+        </div>
+    {% endif %}
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+        <div class=" panel panel-default">
+            <h3 class = "panel-heading" role="tab" id="settingHeading">
+                <a role="button" data-toggle="collapse" href="#collapseSetting" aria-expanded="false" aria-controls="collapseSetting">
+                    Setting - <b>{{ cell.setting_name }}</b>
+                </a>
+            </h3>
+            <div id="collapseSetting" class="panel-collapse collapse" role="tabpanel" aria-labelledby="settingHeading">
+            <div class="container">
+                <p>
+                    {{cell.setting_description | markdown | linebreaks}}
+                </p>
+            </div>
+            </div>
+        </div>
+        <div class = "panel panel-default">
+            <h3 class = "panel-heading" role="tab" id="rosterHeading">
+                <a role="button" data-toggle="collapse" href="#collapseRoster" aria-expanded="true" aria-controls="collapseRoster">
+                    Roster
+                </a>
+            </h3>
+            <div id="collapseRoster" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="rosterHeading">
+                <ul>
+                    {% for membership_and_characters in memberships_and_characters %}
+                        <li class = "panel-heading">
+                            <span class = "lead">
+                                <strong>
+                                    <a href="{% url 'profiles:profiles_view_profile' membership_and_characters.0.member_player.id %}">
+                                        {% user_display membership_and_characters.0.member_player %}
+                                    </a>
+                                </strong>
+                                - {{ membership_and_characters.0.get_role_display }}
+                            </span>
+                            {% if membership_and_characters.1 %}
+                                <br>
+                                Playing
+                                <ul>
+                                {% for character in membership_and_characters.1 %}
+                                    <li>
+                                        <a href="{% url 'characters:characters_view' character.id %}">
+                                            {{ character.name }}
+                                        </a>
+                                        <small>
+                                            - a {{character.number_of_victories }} Gift {{ character.get_status_display }} Character
+                                        </small>
+                                        {% if character.unspent_rewards|length > 0 and can_edit_characters %}
+                                            <ul><li>
+                                                <a class="btn-success"
+                                                   href="{% url 'characters:characters_spend_reward' character.id %}">
+                                                    Allocate {{ character.name }}'s rewards on behalf of {% user_display membership_and_characters.0.member_player %}
+                                                </a>
+                                            </li></ul>
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% if upcoming_games %}
+            <div class=" panel panel-default">
+                <h3 class="panel-heading">
+                    Upcoming Games
+                </h3>
+                <ul>
+                    {% for game in upcoming_games %}
+                    <li>
+                        <a href="{% url 'games:games_view_game' game.id %}">
+                            {{ game.title }}
+                        </a>
+                        for <b>{{game.get_required_character_status_display}}</b> level characters
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        {% if completed_games %}
+            <div class=" panel panel-default">
+                <h3 class="panel-heading">
+                    Completed Games
+                </h3>
+                <ul>
+                    {% for game in completed_games %}
+                    <li>
+                        <a href="{% url 'games:games_view_game' game.id %}">
+                            {{ game.title }}
+                        </a>
+                        - occurred {{ game.end_time }}
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

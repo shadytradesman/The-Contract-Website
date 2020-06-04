@@ -1,0 +1,75 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+
+{% block head_title %}Viewing Scenario{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% load account_tags %}
+{% load markdown_deux_tags %}
+
+{% block body_base %}
+	<div class="container">
+        <h1>
+            {{ game.title }}
+        </h1>
+        <h4>
+            In <a href="{% url 'cells:cells_view_cell' game.cell.id %}">{{ game.cell.name }}</a>
+        </h4>
+    </div>
+    <div class="container">
+        <ul class="nav nav-pills nav-justified">
+            {% if request.user.is_authenticated and request.user.id == game.creator.id  %}
+                {% if game.is_scheduled or game.is_active %}
+                    <li><a href="{% url 'games:games_game_edit' game.id %}">Edit Game</a></li>
+                {% endif %}
+                {% if game.is_active or game.is_scheduled %}
+                    <li><a href="{% url 'games:games_cancel_game' game.id %}">Cancel Game</a></li>
+                {% endif %}
+                {% if game.is_scheduled %}
+                    <li><a href="{% url 'games:games_invite_players' game.id %}">Invite Players</a></li>
+                    <li class="active"><a href="{% url 'games:games_start_game' game.id %}">Start Game</a></li>
+                {% endif %}
+                {% if game.is_active %}
+                    <li class="active"><a href="{% url 'games:games_end_game' game.id %}">Finish Game</a></li>
+                {% endif %}
+            {% endif %}
+        </ul>
+    </div>
+    <div class="container">
+        <h4>
+            {{game.get_status_blurb}}
+        </h4>
+    </div>
+    <div class="container">
+            <h4>
+                {{ game.hook }}
+            </h4>
+        <h4>Run by <a href="{% url 'profiles:profiles_view_profile' game.creator.id %}">{% user_display game.creator %}</a></h4>
+	</div>
+    {% if view_scenario %}
+        <div class="container">
+            <p>
+                Playing <a href="{% url 'games:games_view_scenario' game.scenario.id %}">{{game.scenario.title}}</a>
+            </p>
+        </div>
+    {% endif %}
+    <div class="container">
+            <p>
+                For <b>{{game.get_required_character_status_display}}</b> level characters
+            </p>
+    </div>
+    <div class="container">
+            <p>
+                {{game.description | markdown}}
+            </p>
+    </div>
+    {% if game.is_scheduled %}
+        {% include "games/view_game_pages/scheduled_invitation_snippet.html" %}
+    {% elif game.is_active %}
+        {% include "games/view_game_pages/active_attending_snippet.html" %}
+    {% elif game.is_finished or game.is_archived or game.is_void %}
+        {% include "games/view_game_pages/finished_attended_snippet.html" %}
+    {% endif %}
+{% endblock %}

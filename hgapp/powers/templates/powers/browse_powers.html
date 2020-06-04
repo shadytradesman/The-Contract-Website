@@ -1,0 +1,29 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+
+{% block head_title %}Choose a Category{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% block body_base %}
+<div class="container">
+    <div class="page-header">
+        <h1> Browsing Powers <small>See something you like?</small></h1>
+    </div>
+    <hr class="styled">
+    <div class="row">
+        {% for power in object_list %}
+            <div class="col-lg-4 col-sm-6">
+                <div class="thumbnail">
+                    <a href="{% url 'powers:powers_view_power' power.id %}">
+                        {{ power.name }} created {{ power.pub_date }}
+                    </a>
+                </div>
+            </div>
+        {% empty %}
+        <li>No powers.</li>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,4 @@
+iframe, html, body, #main_content, body > div {
+    height: 100%;
+    width: 100%;
+}

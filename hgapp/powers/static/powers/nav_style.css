@@ -1,0 +1,22 @@
+body {
+    min-height: 100%;
+    display: flex; 
+    flex-flow: row wrap;
+}
+
+#main_content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.nav_bar {
+  flex: 1 170px;
+  background: lightgray;
+  margin: 0 15px;
+}
+
+.nav_content {
+    padding: 10px 10px 15px 10px;
+    font-family: Arial, Helvetica, sans-serif;
+}

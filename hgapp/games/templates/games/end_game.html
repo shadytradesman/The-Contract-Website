@@ -1,0 +1,58 @@
+{% extends "site_base.html" %}
+
+
+{% load i18n %}
+{% load bootstrap %}
+
+{% block extra_head %}
+    {{ form.media }}
+{% endblock %}
+
+{% block head_title %}Accepting game invite{% endblock %}
+
+{% load account_tags %}
+{% block body_class %}home{% endblock %}
+
+{% block body_base %}
+        <div class="container">
+            {{ form.about.errors }}
+            <h1>Declare Game End Outcomes for {{game.title}}</h1>
+            <form action="{% url 'games:games_end_game' game.id %}" method="post" class="form-inline">
+            {{ formset.non_field_errors }}
+            {{ formset.management_form }}
+            {% csrf_token %}
+            {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+            {% for form in formset %}
+                {{ form.hidden_attendance }}
+                <div class="container">
+                    <h4>Outcome for <b>{% user_display form.attendance.game_invite.invited_player %}</b> </h4>
+                    <h5>
+                        Playing
+                        {% if form.attendance.attending_character %}
+                                {{form.attendance.attending_character.name}}
+                        {% else %}
+                                an NPC Ringer
+                        {% endif %}
+                    </h5>
+                    <div class="container">
+                        {{ form.outcome | bootstrap }}
+                    </div>
+                    <div class="container">
+                        {{ form.notes | bootstrap }}
+                    </div>
+                </div>
+            {% endfor %}
+                <div class="container">
+                    {{feedback_form | bootstrap}}
+                </div>
+                <p>
+                    Once the game has ended, it can no longer be canceled. The outcome you give characters in this screen is final.
+                    The players' characters will be unlocked for editing and any private characters will once again be unviewable.
+                    The Scenario will be revealed to the players.
+                </p>
+            <div class="container">
+                <input class="btn btn-primary" type="submit" value="End Game" />
+            </div>
+        </div>
+    </form>
+{% endblock %}

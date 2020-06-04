@@ -1,0 +1,60 @@
+{% load i18n %}
+{% load account_tags %}
+{% load postman_tags %}
+
+{% postman_unread as unread_count %}
+<ul class="nav navbar-nav pull-right">
+    {% if request.user.is_authenticated %}
+        <li>
+            <a href="{% url 'profiles:profiles_view_profile' request.user.id %}"><i class="fa fa-user"></i> {% user_display request.user %}</a>
+        </li>
+        <li>
+            <a href="{% url 'profiles:profiles_edit' %}"><i class="fa fa-edit"></i> {% trans "Edit Profile" %}</a>
+        </li>
+        <li>
+            <a href="{% url 'account_settings' %}"><i class="fa fa-cog"></i> {% trans "Settings" %}</a>
+        </li>
+        <li>
+            {% if unread_count %}
+                <a href="{% url 'postman:inbox' %}"><i class="fa fa-envelope"></i> ({{ unread_count }}) Mail</a>
+            {% else %}
+                <a href="{% url 'postman:inbox' %}"><i class="fa fa-envelope-o"></i> Mail</a>
+            {% endif %}
+        </li>
+        <li>
+            <a id="account_logout" href="{% url 'account_logout' %}"><i class="fa fa-power-off"></i> {% trans "Log out" %}</a>
+        </li>
+    {% else %}
+        <li><a href="{% url 'account_login' %}">{% trans "Log in" %}</a></li>
+        {% if ACCOUNT_OPEN_SIGNUP %}
+            <li><a href="{% url 'account_signup' %}">{% trans "Sign up" %}</a></li>
+        {% endif %}
+    {% endif %}
+    <form class="navbar-form navbar-right" id="wiki-search-form" method="GET" action="{% spaceless %}
+              {% if article or urlpath %}
+                {% url 'wiki:search' article_id=article.id path=urlpath.path %}
+              {% else %}
+                {% url 'wiki:search' %}
+              {% endif %}
+            {% endspaceless %}"
+          >
+            <div class="input-group">
+              <input type="search" class="form-control search-query" style="width: 150px;" name="q" placeholder="{% spaceless %}
+                {% if article or urlpath %}
+                   {% trans "Search Sub-pages" %}
+                {% else %}
+                  {% trans "Search the Wiki..." %}
+                {% endif %}
+              {% endspaceless %}" />
+              <span class="input-group-btn">
+                <button class="btn btn-default" type="submit">
+                  <span class="fa fa-search"></span>
+                </button>
+              </span>
+            </div><!-- /input-group -->
+          </form>
+</ul>
+
+<form id="accountLogOutForm" style="display: none;" action="{% url 'account_logout' %}" method="POST">
+    {% csrf_token %}
+</form>

@@ -1,0 +1,76 @@
+{% extends "site_base.html" %}
+
+
+{% load i18n %}
+{% load bootstrap %}
+
+{% block extra_head %}
+    {{ form.media }}
+{% endblock %}
+
+{% block head_title %}Accepting game invite{% endblock %}
+
+{% load account_tags %}
+{% block body_class %}home{% endblock %}
+
+{% block body_base %}
+    <section>
+        <div class="container">
+            {{ form.about.errors }}
+            <h1>Starting {{game.title}} in {{game.cell.name}}</h1>
+            <h3>Choose which players will be attending.</h3>
+            <h5>Uncheck the box to deny attendance</h5>
+            {% for player in player_errors %}
+            <div class="container">
+                <p class="text-danger"><b>{% user_display player %} has canceled their attendance!</b></p>
+            </div>
+            {% endfor %}
+            {% for player in char_errors %}
+            <div class="container">
+                <p class="text-danger"><b>{% user_display player %} has changed their character!</b></p>
+            </div>
+            {% endfor %}
+            <form action="{% url 'games:games_start_game' game.id %}" method="post" class="form-inline">
+            {{ formset.non_field_errors }}
+            {{ formset.management_form }}
+            {% csrf_token %}
+            {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+            {% for form in formset %}
+                <div class="container">
+                    <p>
+                        {{ form.attending | bootstrap }} <b>{{ form.attendance.game_invite.invited_player.username}}</b> Playing
+                        <b>
+                            {% if form.attendance.attending_character %}
+                                {{form.attendance.attending_character.name}}
+                            {% else %}
+                                an NPC Ringer
+                            {% endif %}
+                        </b>
+                        {{ form.player}} {{ form.character }}
+                    </p>
+                </div>
+            {% empty %}
+                <div class="container">
+                    <h4 class="text-danger">
+                        No players attending! Games must have a minimum of two Player Characters (or one if the attending Character is a Veteran)
+                    </h4>
+                </div>
+            {% endfor %}
+                <p>
+                    Once the game has started, all Players will be unable to edit their characters for the duration.
+                    If the game hasn't been finished in 24 hours, each Player will be given the ability to cancel the game, wiping the history of it,
+                    and unlocking their Characters.
+                </p>
+            {% if formset.forms %}
+                <div class="container">
+                    <input class="btn btn-primary" type="submit" value="Start!" />
+                </div>
+            {% else %}
+                <div class="container">
+                    <input class="btn btn-primary" type="submit" value="Start!" disabled />
+                </div>
+            {% endif %}
+        </div>
+    </section>
+    </form>
+{% endblock %}
