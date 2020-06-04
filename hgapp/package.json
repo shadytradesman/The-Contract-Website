@@ -40,7 +40,7 @@
     "cssnano-cli": "1.0.5",
     "envify": "4.0.0",
     "eonasdan-bootstrap-datetimepicker": "^4.17.47",
-    "eslint": "3.19.0",
+    "eslint": "7.1.0",
     "eslint-plugin-babel": "4.1.1",
     "exorcist": "0.4.0",
     "font-awesome": "4.7.0",
