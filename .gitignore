@@ -5,6 +5,7 @@
 hgapp/node_modules/*
 hgapp/static/dist/*
 hgapp/static/*
+!hgapp/static/src/*
 env/*
 hgapp/.package*
 *.idea/*
