@@ -8,9 +8,12 @@ class TimezoneMiddleware:
 
     def __call__(self, request):
         if request.user.is_authenticated:
-            tzname = request.user.account.timezone
-            if tzname:
-                timezone.activate(pytz.timezone(tzname))
+            if request.user.account:
+                tzname = request.user.account.timezone
+                if tzname:
+                    timezone.activate(pytz.timezone(tzname))
+                else:
+                    timezone.deactivate()
             else:
                 timezone.deactivate()
         return self.get_response(request)
