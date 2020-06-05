@@ -21,7 +21,6 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=200)),
                 ('created_date', models.DateTimeField(auto_now_add=True, verbose_name='date created')),
-                ('invite_link_secret_key', models.CharField(default=cells.models.random_string, max_length=64)),
                 ('setting_name', models.CharField(max_length=200)),
                 ('setting_description', models.TextField(blank=True, max_length=40000, null=True)),
                 ('creator', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='cell_creator', to=settings.AUTH_USER_MODEL)),
@@ -59,7 +58,6 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('invite_text', models.TextField(blank=True, max_length=1000, null=True)),
-                ('created_date', models.DateTimeField(auto_now_add=True, verbose_name='date created')),
                 ('is_declined', models.BooleanField(default=False)),
                 ('invited_player', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
                 ('membership', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='cells.CellMembership')),
