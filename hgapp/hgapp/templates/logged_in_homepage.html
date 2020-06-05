@@ -25,6 +25,20 @@
                     {% endfor %}
                 </ul>
             </div>
+        {% elif not cells %}
+            <div class="alert alert-warning text-center">
+                <h3>You aren't in any Cells</h3>
+                <ul class="nav nav-pills nav-stacked">
+                        <li>Ask your friends to invite you or <a href="{% url 'cells:cells_create' %}"><h4>Start your own!</h4></a></li>
+                </ul>
+            </div>
+        {% elif not characters %}
+            <div class="alert alert-warning text-center">
+                <h3>Who will you become?</h3>
+                <ul class="nav nav-pills nav-stacked">
+                        <li>You haven't made any characters yet! <a href="{% url 'characters:characters_create' %}"><h4>Time to change that</h4></a></li>
+                </ul>
+            </div>
         {% endif %}
         {% if active_games %}
             <div class="alert alert-danger text-center">
