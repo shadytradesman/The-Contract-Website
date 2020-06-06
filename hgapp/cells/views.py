@@ -88,6 +88,7 @@ def view_cell(request, cell_id):
         user_membership = cell.get_player_membership(request.user)
     can_edit_characters = cell.player_can_edit_characters(request.user)
     can_administer = cell.player_can_admin(request.user)
+    can_manage_games = cell.player_can_manage_games(request.user)
     memberships_and_characters = ()
     for role in ROLE:
         for membership in cell.cellmembership_set.filter(role = role[0]):
@@ -108,6 +109,7 @@ def view_cell(request, cell_id):
         'can_edit_characters': can_edit_characters,
         'user_membership': user_membership,
         'can_administer': can_administer,
+        'can_manage_games': can_manage_games,
         'memberships_and_characters': memberships_and_characters,
         'upcoming_games': upcoming_games,
         'completed_games': completed_games,

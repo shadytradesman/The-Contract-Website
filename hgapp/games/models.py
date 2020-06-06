@@ -99,7 +99,6 @@ class Game(models.Model):
                                       null=True,
                                       blank=True)
     open_invitations = models.BooleanField(default=True)
-
     cell = models.ForeignKey(Cell,
                              null=True, # for migration reasons. All games should have cells.
                              blank=True, # for migration reasons. All games should have cells.
@@ -167,21 +166,7 @@ class Game(models.Model):
             print("Game is not finished: " + str(self.id))
             return
         for game_attendance in self.game_attendance_set.all():
-            if game_attendance.outcome is None:
-                print("Error, game attendane has no outcome when game is being transitioned to finished.")
-                print("Game id: " + str(self.id))
-                return
-            if game_attendance.is_victory():
-                player_reward = Reward(relevant_game=self,
-                                    rewarded_character=game_attendance.attending_character,
-                                    rewarded_player=game_attendance.attending_character.player,
-                                    is_improvement=False)
-                player_reward.save()
-            if game_attendance.is_ringer_victory():
-                ringer_reward = Reward(relevant_game=self,
-                                    rewarded_player=game_attendance.game_invite.invited_player,
-                                    is_improvement=True)
-                ringer_reward.save()
+            game_attendance.give_reward()
         gm_reward = Reward(relevant_game=self,
                            rewarded_player=self.creator,
                            is_improvement=True)
@@ -246,6 +231,22 @@ class Game_Attendance(models.Model):
 
     def associated_active_reward(self):
         return self.attending_character.reward_set.filter(relevant_game=self.relevant_game.id).filter(is_void=False).first()
+
+    def give_reward(self):
+        if self.outcome is None:
+            raise ValueError("Error, game attendane has no outcome when game is being transitioned to finished.",
+                             str(self.id))
+        if self.is_victory():
+            player_reward = Reward(relevant_game=self.relevant_game,
+                                   rewarded_character=self.attending_character,
+                                   rewarded_player=self.attending_character.player,
+                                   is_improvement=False)
+            player_reward.save()
+        if self.is_ringer_victory():
+            ringer_reward = Reward(relevant_game=self.relevant_game,
+                                   rewarded_player=self.game_invite.invited_player,
+                                   is_improvement=True)
+            ringer_reward.save()
 
     def save(self, *args, **kwargs):
         if self.pk is not None:

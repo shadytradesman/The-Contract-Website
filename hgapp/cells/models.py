@@ -70,6 +70,9 @@ class Cell(models.Model):
     def player_can_manage_memberships(self, player):
         return player.has_perm(CELL_PERMISSIONS[1][0], self)
 
+    def player_can_manage_games(self, player):
+        return player.has_perm(CELL_PERMISSIONS[6][0], self)
+
     def get_player_membership(self, player):
         return get_object_or_none(self.cellmembership_set.filter(member_player=player))
 
@@ -196,6 +199,9 @@ class CellMembership(models.Model):
             character.cell = None
             character.save()
 
+    def __str__(self):
+        return self.member_player.username
+
     # prevent double membership
     class Meta:
         unique_together = (("relevant_cell", "member_player"))
@@ -290,7 +296,6 @@ class CellInvite(models.Model):
         self.is_declined = False
         self.save()
         self.relevant_cell.addPlayer(player=self.invited_player, role=ROLE[2])
-
 
     def reject(self):
         if self.membership:

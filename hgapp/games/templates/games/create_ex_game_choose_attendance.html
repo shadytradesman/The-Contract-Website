@@ -1,0 +1,72 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+
+{% load bootstrap %}
+{% block head_title %}Declaring Game{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% load account_tags %}
+{% load markdown_deux_tags %}
+
+{% block body_base %}
+<div class="container">
+    <br>
+    <div class="panel-group">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h1>
+                    Declaring a completed game in <a href="{% url 'cells:cells_view_cell' cell.id %}">{{cell.name}}</a>
+                </h1>
+                <h3><small>
+                    If you would like schedule an upcoming game, <a href="{% url 'games:games_create_game' %}">Click Here</a>
+                </small></h3>
+            </div>
+            <form action="{% url 'games:games_create_ex_game_for_cell' cell_id=cell.id %}" method="post">
+                {% csrf_token %}
+                {{ gm_form.about.errors }}
+                {{ gm_form.management_form }}
+                {{ gm_form.non_field_errors }}
+                {{ outsider_formset.about.errors }}
+                {{ outsider_formset.management_form }}
+                {{ outsider_formset.non_field_errors }}
+                {{ member_formset.about.errors }}
+                {{ member_formset.management_form }}
+                {{ member_formset.non_field_errors }}
+                <div class="container">
+                    <h2>Who was the Game Master?</h2>
+                    <div class="col-xs-9">
+                        {{ gm_form |bootstrap }}
+                    </div>
+                </div>
+                <div class="container">
+                    <h2>Which Cell Members Attended?</h2>
+                    <small>The GM cannot attend their own game</small>
+                    <ul>
+                        {% for form in member_formset %}
+                            <li>
+                                {{form | bootstrap}}
+                                {{form.player_id.as_hidden}}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="container">
+                    <h2>Any out-of-cell attendees?</h2>
+                    <ul>
+                        {% for form in outsider_formset %}
+                            <li class="col-xs-9">
+                                {{form.username | bootstrap}}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class = "panel-footer">
+                    <input class="btn btn-primary" type="submit" value="Continue"/>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -2,25 +2,19 @@ from django.contrib.auth.models import User
 from django.forms import formset_factory
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
-from django.shortcuts import render, get_object_or_404, _get_queryset
+from django.shortcuts import render, get_object_or_404
 from django.db import transaction
 
 # Create your views here.
 from django.urls import reverse
 from django.utils import timezone
-from games.forms import CreateScenarioForm
+from games.forms import CreateScenarioForm, CellMemberAttendedForm, make_game_form, make_allocate_improvement_form, \
+    CustomInviteForm, make_accept_invite_form, ValidateAttendanceForm, DeclareOutcomeForm, GameFeedbackForm, \
+    OutsiderAttendedForm, make_who_was_gm_form,make_archive_game_general_info_form, ArchivalOutcomeForm
 
-from games.models import Scenario, Game, GAME_STATUS, DISCOVERY_REASON
+from games.models import Scenario, Game, GAME_STATUS, DISCOVERY_REASON, Game_Invite, Game_Attendance, Reward
 
-from games.forms import make_game_form, make_allocate_improvement_form, CustomInviteForm, make_accept_invite_form, ValidateAttendanceForm, DeclareOutcomeForm, GameFeedbackForm
-
-from games.models import Game_Invite
-
-from hgapp.utilities import get_queryset_size
-
-from games.models import Game_Attendance, Reward
-
-from hgapp.utilities import get_object_or_none
+from hgapp.utilities import get_queryset_size, get_object_or_none
 
 from cells.models import Cell
 
@@ -510,11 +504,82 @@ def allocate_improvement(request, improvement_id):
         }
         return render(request, 'games/allocate_improvement.html', context)
 
-
+# Select which players attended and who was GM
 def create_ex_game_for_cell(request, cell_id):
+    if not request.user.is_authenticated:
+        return HttpResponseForbidden()
     cell = get_object_or_404(Cell, id = cell_id)
-    pass
-
+    if not cell.player_can_manage_games(request.user):
+        return HttpResponseForbidden()
+    MemberFormSet = formset_factory(CellMemberAttendedForm, extra=0)
+    OutsiderFormSet = formset_factory(OutsiderAttendedForm, extra=3)
+    WhoWasGm = make_who_was_gm_form(cell)
+    cell_members = cell.cellmembership_set.all()
+    if request.method == 'POST':
+        gm_form = WhoWasGm(request.POST, prefix="gm")
+        member_formset = MemberFormSet(request.POST, prefix="member",initial=[{'player_id': x.member_player.id,
+                                                 'username': x.member_player}
+                                                for x in cell_members])
+        outsider_formset = OutsiderFormSet(request.POST, prefix="outsider")
+        if gm_form.is_valid() and member_formset.is_valid() and outsider_formset.is_valid():
+            gm =  get_object_or_404(User, username=gm_form.cleaned_data['gm'])
+            players = []
+            for form in member_formset:
+                if form.cleaned_data['attended']:
+                    players.append(form.cleaned_data['player_id'])
+            for form in outsider_formset:
+                if 'username' in form.cleaned_data:
+                    user = get_object_or_404(User, username=form.cleaned_data['username'])
+                    players.append(str(user.id))
+            return HttpResponseRedirect(
+                reverse('games:games_edit_ex_game_add_players', args=(cell.id, gm.id, '+'.join(players),)))
+        else:
+            #TODO: better error handling.
+            raise ValueError("Player filled out the form wrong")
+    else:
+        gm_form = WhoWasGm(prefix="gm")
+        member_formset = MemberFormSet(prefix="member",
+                                       initial=[{'player_id': x.member_player.id,
+                                                 'username': x.member_player}
+                                                for x in cell_members])
+        outsider_form_set = OutsiderFormSet(prefix="outsider")
+        context = {
+            'gm_form': gm_form,
+            'member_formset': member_formset,
+            'outsider_formset': outsider_form_set,
+            'cell': cell,
+        }
+        return render(request, 'games/create_ex_game_choose_attendance.html', context)
 
 def finalize_create_ex_game_for_cell(request, cell_id, gm_user_id, players):
-    pass
+    if not request.user.is_authenticated:
+        return HttpResponseForbidden()
+    cell = get_object_or_404(Cell, id = cell_id)
+    if not cell.player_can_manage_games(request.user):
+        return HttpResponseForbidden()
+    gm = get_object_or_404(User, id=gm_user_id)
+    player_list = [get_object_or_404(User, id=player_id) for player_id in players.split('+') if not player_id == str(gm.id)]
+    GenInfoForm = make_archive_game_general_info_form(gm)
+    ArchivalOutcomeFormSet = formset_factory(ArchivalOutcomeForm, extra=0)
+    if request.method == 'POST':
+        general_form = GenInfoForm(request.POST, prefix="general")
+        outcome_formset = ArchivalOutcomeFormSet(request.POST, prefix="outcome")
+        if general_form.is_valid() and outcome_formset.is_valid():
+            pass
+            # create a game
+            # for each attendance, create an attendance for them if they're in the cell or create an rsvp
+        else:
+            print(general_form.errors + outcome_formset.errors)
+            return None
+    else:
+        general_form = GenInfoForm(prefix="general")
+        outcome_formset = ArchivalOutcomeFormSet(prefix="outcome",
+                                                 initial=[{'player_id': x.id,
+                                                           'invited_player': x}
+                                                          for x in player_list])
+        context = {
+            'general_form': general_form,
+            'outcome_formset': outcome_formset,
+            'cell': cell,
+        }
+        return render(request, 'games/edit_archive_game.html', context)
