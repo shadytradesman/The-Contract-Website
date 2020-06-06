@@ -42,6 +42,11 @@
                 <a href="{% url 'cells:cells_leave_cell' cell.id %}">Leave Cell</a>
             </li>
         {% endif %}
+        {% if request.user.is_authenticated and can_manage_games %}
+            <li>
+                <a href="{% url 'games:games_create_ex_game_for_cell' cell.id %}">Declare a Completed Game</a>
+            </li>
+        {% endif %}
     </ul>
     <br>
     {% if invite %}

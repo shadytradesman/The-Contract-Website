@@ -1,0 +1,68 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+
+{% load bootstrap %}
+{% block head_title %}Declaring Game{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% load staticfiles %}
+{% load account_tags %}
+{% load markdown_deux_tags %}
+{% block scripts %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="{% static 'js/site.js' %}"></script>
+    {% include "games/datepicker.js" %}
+{% endblock %}
+{% block body_base %}
+<div class="container">
+    <br>
+    <div class="panel-group">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h1>
+                    Declaring a completed game in <a href="{% url 'cells:cells_view_cell' cell.id %}">{{cell.name}}</a>
+                </h1>
+                <h3><small>
+                    If you would like schedule an upcoming game, <a href="{% url 'games:games_create_game' %}">Click Here</a>
+                </small></h3>
+            </div>
+            <form action="{% url 'games:games_create_ex_game_for_cell' cell_id=cell.id %}" method="post">
+                {% csrf_token %}
+                {{ general_form.about.errors }}
+                {{ general_form.management_form }}
+                {{ general_form.non_field_errors }}
+                {{ outcome_formset.about.errors }}
+                {{ outcome_formset.management_form }}
+                {{ outcome_formset.non_field_errors }}
+                <div class="container">
+                    <div class="col-xs-9">
+                        <ul class="list-unstyled">
+                        {% for field in general_form %}
+                            <li>{{ field |bootstrap }} <br></li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="container">
+                    <h2>How did it go down?</h2>
+                    <ul class="list-unstyled">
+                        {% for form in outcome_formset %}
+                            <div class="col-xs-9">
+                                <h3>{% user_display form.initial.invited_player %}</h3>
+                                <li class ="col-xs-offset-1">
+                                    {{form | bootstrap}}
+                                </li>
+                            </div>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class = "panel-footer">
+                    <input class="btn btn-primary" type="submit" value="Submit Completed Game"/>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -23,16 +23,16 @@ urlpatterns = [
     # ex: .com/games/edit/g/112
     url(r'^edit/g/(?P<game_id>[\d]+)/$', views.edit_game, name='games_game_edit'),
 
-    # TODO: implement these
-    # # ex: .com/games/create/game/ex/cell/1
-    # url(r'^create/game/ex/cell/(?P<cell_id>[\d]+)/$',
-    #     views.create_ex_game_for_cell,
-    #     name='games_create_ex_game_for_cell'),
-    #
-    # # ex: .com/games/create/game/ex/cell/1/gm/1241/p/9520+323+412/
-    # url(r'^create/game/ex/cell/(?P<cell_id>[\d]+)/gm/(?P<gm_user_id>[\d]+)/p/(?P<players>[\d\+]+)/$',
-    #     views.finalize_create_ex_game_for_cell,
-    #     name='games_finalize_create_ex_game_for_cell'),
+
+    # ex: .com/games/create/game/ex/cell/1
+    url(r'^create/game/ex/cell/(?P<cell_id>[\d]+)/$',
+        views.create_ex_game_for_cell,
+        name='games_create_ex_game_for_cell'),
+
+    # ex: .com/games/create/game/ex/cell/1/gm/1241/p/9520+323+412/
+    url(r'^create/game/ex/cell/(?P<cell_id>[\d]+)/gm/(?P<gm_user_id>[\d]+)/p/(?P<players>[\d\+]+)/$',
+        views.finalize_create_ex_game_for_cell,
+        name='games_edit_ex_game_add_players'),
 
     # ex: .com/games/start/g/112
     # ex: .com/games/start/g/112/char_error=21,1,3

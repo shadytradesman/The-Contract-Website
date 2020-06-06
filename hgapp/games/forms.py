@@ -193,7 +193,6 @@ class DeclareOutcomeForm(forms.Form):
                             max_length=500,
                             required=False,
                             help_text='Spoiler-free notes about the character\'s experience in the game (eg. They lost their hand, went insane, found a million bucks, etc)')
-
     def attendance(self):
         return self.initial['game_attendance']
 
@@ -216,3 +215,67 @@ def make_allocate_improvement_form(user):
                                                                "NOTE: only living characters that have less than twice as many rewards as victories appear in this list.",
                                                      required=True)
     return AllocateImprovementForm
+
+def make_who_was_gm_form(cell):
+    class WhoWasGMForm(forms.Form):
+        queryset = cell.cellmembership_set.all()
+        gm = forms.ModelChoiceField(queryset=queryset,
+                                      label="Which Cell member ran the Game?",
+                                      empty_label="Select a GM",
+                                      required=True)
+    return WhoWasGMForm
+
+class CellMemberAttendedForm(forms.Form):
+    player_id = forms.CharField(label=None,
+                            max_length=200,
+                            widget=forms.HiddenInput(),
+                            required=True,)
+    attended = forms.BooleanField(required=False)
+
+    def __init__(self, *args, **kwargs):
+        super(CellMemberAttendedForm, self).__init__(*args, **kwargs)
+        self.fields['attended'].label = self.initial["username"]
+
+class OutsiderAttendedForm(forms.Form):
+    username = forms.CharField(label=None,
+                               max_length=200,
+                               required=False,)
+
+def make_archive_game_general_info_form(gm):
+    class ArchiveGeneralInfoForm(forms.Form):
+        scenario = ScenarioModelChoiceField(queryset=gm.scenario_set.all(),
+                                            empty_label="Create New Scenario",
+                                            required=False,
+                                            help_text='Select the Scenario that the GM used.')
+        date_format = '%m/%d/%Y %I:%M %p'
+        title = forms.CharField(label='Game Title',
+                                max_length=100,
+                                help_text='This game\'s title')
+        occurred_time = forms.DateTimeField(label='Date Played',
+                                            widget=DateTimePicker(options=False),
+                                            input_formats=[date_format],
+                                            help_text='When did this Game occur?')
+    return ArchiveGeneralInfoForm
+
+class ArchivalOutcomeForm(forms.Form):
+    player_id = forms.CharField(label=None,
+                            max_length=200,
+                            widget=forms.HiddenInput(),
+                            required=True,)
+
+    attending_character = CharacterModelChoiceField(queryset=Character.objects.all(),
+                                                    empty_label="Played a Ringer",
+                                                    help_text="Declare which character this player brought.",
+                                                    required=True)
+    outcome = forms.ChoiceField(choices=OUTCOME)
+    notes = forms.CharField(label='Notes',
+                            max_length=500,
+                            required=False,
+                            help_text='Spoiler-free notes about the character\'s experience in the game (eg. They lost '
+                                      'their hand, went insane, found a million bucks, etc)')
+
+    def __init__(self, *args, **kwargs):
+        super(ArchivalOutcomeForm, self).__init__(*args, **kwargs)
+        # user may have declared character dead after the game ended, so allow selecting dead characters
+        queryset = self.initial["invited_player"].character_set.all()
+        self.fields['attending_character'].queryset = queryset
