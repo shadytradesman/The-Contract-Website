@@ -146,6 +146,7 @@ def create_game(request):
                                                   invite_text=invite,
                                                   as_ringer=False)
                         game_invite.save()
+                        game_invite.notify_invitee(request, game)
             return HttpResponseRedirect(reverse('games:games_invite_players', args=(game.id,)))
         else:
             print(form.errors)
@@ -255,6 +256,7 @@ def invite_players(request, game_id):
                                       invite_text=form.cleaned_data['message'],
                                       as_ringer=form.cleaned_data['invite_as_ringer'])
             game_invite.save()
+            game_invite.notify_invitee(request, game)
             #Do invite shit, notify player in the model create method.
             return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
         else:
