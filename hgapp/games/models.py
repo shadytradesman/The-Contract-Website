@@ -5,6 +5,9 @@ from powers.models import Power
 from cells.models import Cell
 from django.utils import timezone
 from guardian.shortcuts import assign_perm
+from postman.api import pm_write
+from django.urls import reverse
+from django.utils.safestring import SafeText
 
 from hgapp.utilities import get_object_or_none
 
@@ -290,6 +293,22 @@ class Game_Invite(models.Model):
     #prevent double invitations.
     class Meta:
         unique_together = (("invited_player", "relevant_game"))
+
+    def notify_invitee(self, request, game):
+        message_body = SafeText('###{0} has invited you to join {1}\n\n{2}\n\n [Click Here]({3}) to respond.'
+                                .format(self.relevant_game.creator.get_username(),
+                                        self.relevant_game.title,
+                                        self.invite_text,
+                                        request.build_absolute_uri(reverse("games:games_view_game", args=[game.id])),
+                                        ))
+        pm_write(sender=self.relevant_game.creator,
+                 recipient=self.invited_player,
+                 subject= self.relevant_game.creator.get_username() + " has invited you to join " + self.relevant_game.title,
+                 body=message_body,
+                 skip_notification=False,
+                 auto_archive=True,
+                 auto_delete=False,
+                 auto_moderators=None)
 
     def save(self, *args, **kwargs):
         if self.pk is None:
