@@ -216,7 +216,7 @@ class Game(models.Model):
             self.gm = self.creator
         if not hasattr(self, 'scenario'):
             scenario = Scenario(creator=self.gm,
-                                title="Temporary Scenario for " + str(self.scheduled_start_time) + "'s session",
+                                title="Temporary Scenario for " + str(self.title) + " played on " + str(self.scheduled_start_time),
                                 description="Put details of the scenario here",
                                 suggested_status=HIGH_ROLLER_STATUS[0][0],
                                 max_players=99,
