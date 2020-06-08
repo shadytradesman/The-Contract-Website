@@ -41,7 +41,11 @@
                     <div class="col-xs-9">
                         <ul class="list-unstyled">
                         {% for field in general_form %}
-                            <li>{{ field |bootstrap }} <br></li>
+                            {% if field.label == "Gm id"  %}
+                                {{field.as_hidden}}
+                            {% else %}
+                                <li>{{ field | bootstrap }} <br></li>
+                            {% endif %}
                         {% endfor %}
                         </ul>
                     </div>
@@ -60,6 +64,9 @@
                     </ul>
                 </div>
                 <div class = "panel-footer">
+                    <div class="alert alert-warning" role="alert">
+                        Warning: Once you confirm this game, you will be unable to edit or delete it.
+                    </div>
                     <input class="btn btn-primary" type="submit" value="Submit Completed Game"/>
                 </div>
             </form>

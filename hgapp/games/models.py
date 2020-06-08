@@ -58,6 +58,15 @@ DISCOVERY_REASON = (
     ('SHARED', 'Shared'),
 )
 
+def migrate_add_gms(apps, schema_editor):
+    Game = apps.get_model('games', 'Game')
+    for game in Game.objects.all().iterator():
+        game.gm = game.creator
+        game.save()
+
+def reverse_add_gms_migration(apps, schema_editor):
+    pass
+
 class Game(models.Model):
     creator = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -66,9 +75,7 @@ class Game(models.Model):
     gm = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         related_name='game_gm',
-        on_delete=models.PROTECT,
-        null=True, # nullable for migration purposes. Should never be blank in practice.
-        blank=True) # nullable for migration purposes. Should never be blank in practice.
+        on_delete=models.PROTECT)
     scenario = models.ForeignKey(
         "Scenario",
         on_delete=models.PROTECT)
@@ -158,7 +165,7 @@ class Game(models.Model):
     def transition_to_finished(self):
         assert(self.is_active())
         for character in self.attended_by.all():
-            character.default_perms_char_and_powers_to_player(self.creator)
+            character.default_perms_char_and_powers_to_player(self.gm)
         self.status = GAME_STATUS[2][0]
         self.end_time = timezone.now()
         self.save()
@@ -171,7 +178,7 @@ class Game(models.Model):
         for game_attendance in self.game_attendance_set.all():
             game_attendance.give_reward()
         gm_reward = Reward(relevant_game=self,
-                           rewarded_player=self.creator,
+                           rewarded_player=self.gm,
                            is_improvement=True)
         gm_reward.save()
 
@@ -194,6 +201,8 @@ class Game(models.Model):
 
 
     def save(self, *args, **kwargs):
+        if not hasattr(self, 'gm'):
+            self.gm = self.creator
         if not hasattr(self, 'scenario'):
             scenario = Scenario(creator=self.gm,
                                 title="Temporary Scenario for " + str(self.scheduled_start_time) + "'s session",
@@ -206,12 +215,13 @@ class Game(models.Model):
         if self.pk is None:
             super(Game, self).save(*args, **kwargs)
             assign_perm('view_game', self.creator, self)
+            assign_perm('view_game', self.gm, self)
             assign_perm('edit_game', self.creator, self)
         else:
             super(Game, self).save(*args, **kwargs)
 
     def __str__(self):
-        return "[" + self.status + "] " + self.scenario.title + " run by: " + self.creator.username
+        return "[" + self.status + "] " + self.scenario.title + " run by: " + self.gm.username
 
 
 class Game_Attendance(models.Model):
@@ -233,6 +243,7 @@ class Game_Attendance(models.Model):
                                            null=True,
                                            blank=True,
                                            on_delete=models.CASCADE)
+    is_confirmed = models.BooleanField(default=True)
 
 
     def is_victory(self):
@@ -244,7 +255,14 @@ class Game_Attendance(models.Model):
     def associated_active_reward(self):
         return self.attending_character.reward_set.filter(relevant_game=self.relevant_game.id).filter(is_void=False).first()
 
+    def confirm_and_reward(self):
+        self.is_confirmed=True
+        self.save()
+        self.give_reward()
+
     def give_reward(self):
+        if not self.is_confirmed:
+            return None
         if self.outcome is None:
             raise ValueError("Error, game attendane has no outcome when game is being transitioned to finished.",
                              str(self.id))
@@ -261,24 +279,24 @@ class Game_Attendance(models.Model):
             ringer_reward.save()
 
     def save(self, *args, **kwargs):
+        if self.outcome and self.attending_character and self.is_confirmed:
+            # if game is finished, reveal scenario to those who brought characters.
+            self.relevant_game.scenario.played_discovery(self.attending_character.player)
         if self.pk is not None:
             orig = Game_Attendance.objects.get(pk=self.pk)
             if orig.attending_character != self.attending_character:
                 #if attending character has changed
-                orig.attending_character.default_perms_char_and_powers_to_player(self.relevant_game.creator)
-            if not orig.outcome and self.outcome and self.attending_character:
-                #if game is finished, reveal scenario to those who brought characters.
-                self.relevant_game.scenario.played_discovery(self.attending_character.player)
-        if self.outcome == OUTCOME[2][0] and self.character_death is None:
+                orig.attending_character.default_perms_char_and_powers_to_player(self.relevant_game.gm)
+        if self.outcome == OUTCOME[2][0] and self.character_death is None and self.is_confirmed:
             new_death = Character_Death(relevant_character=self.attending_character,
                                         date_of_death=timezone.now())
             new_death.save()
             self.character_death = new_death
         super(Game_Attendance, self).save(*args, **kwargs)
-        if (self.relevant_game.is_scheduled() or self.relevant_game.is_active() ) and self.attending_character:
-            self.attending_character.reveal_char_and_powers_to_player(self.relevant_game.creator)
+        if (self.relevant_game.is_scheduled() or self.relevant_game.is_active()) and self.attending_character:
+            self.attending_character.reveal_char_and_powers_to_player(self.relevant_game.gm)
         elif self.attending_character:
-            self.attending_character.default_perms_char_and_powers_to_player(self.relevant_game.creator)
+            self.attending_character.default_perms_char_and_powers_to_player(self.relevant_game.gm)
 
     # prevent double attendance
     class Meta:
@@ -501,7 +519,7 @@ class Reward(models.Model):
     def reason_text(self):
         if self.relevant_game is not None:
             reason = ""
-            if self.relevant_game.creator.id == self.rewarded_player.id:
+            if self.relevant_game.gm.id == self.rewarded_player.id:
                 reason = "running "
             else:
                 reason = "playing in "

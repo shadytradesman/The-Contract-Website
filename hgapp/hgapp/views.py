@@ -35,6 +35,7 @@ def home(request):
         avail_improvements = request.user.rewarded_player.filter(rewarded_character=None).filter(is_void=False).all()
         cells = request.user.cell_set.all()
         cell_invites = request.user.cellinvite_set.filter(membership=None).filter(is_declined=False).all()
+        attendance_invites_to_confirm = request.user.game_invite_set.filter(attendance__is_confirmed=False).exclude(is_declined=True).all()
 
         context = {
             'characters': my_characters,
@@ -49,5 +50,6 @@ def home(request):
             'avail_improvements': avail_improvements,
             'cells': cells,
             'cell_invites': cell_invites,
+            'attendance_invites_to_confirm': attendance_invites_to_confirm
         }
         return render(request, 'logged_in_homepage.html', context)

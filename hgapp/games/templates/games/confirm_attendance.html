@@ -1,0 +1,70 @@
+{% extends "site_base.html" %}
+
+
+{% load account_tags %}
+{% load i18n %}
+{% load bootstrap %}
+
+{% block extra_head %}
+    {{ form.media }}
+{% endblock %}
+
+{% block head_title %}
+    RSVP?
+{% endblock %}
+
+{% block body_class %}home{% endblock %}
+{% load tz %}
+
+
+{% block body_base %}
+    <br>
+    <div class="container panel">
+        <br>
+        <h2 class="text-center">
+            <a href="{% url 'profiles:profiles_view_profile' attendance.relevant_game.creator.id %}">
+                {% user_display attendance.relevant_game.creator %}
+            </a>
+            claims. . .
+        </h2>
+        <br>
+        <p>
+            That you played in
+            <a href="{% url 'games:games_view_game' attendance.relevant_game.id %}">
+                {{ attendance.relevant_game.title }}
+            </a>
+            on {{ attendance.relevant_game.end_time }}
+            <br>
+            They say you played
+            {% if attendance.attending_character %}
+                    <a href="{% url 'characters:characters_view' attendance.attending_character.id %}">
+                        {{ attendance.attending_character.name }},
+                    </a>
+            {% else %}
+                    an NPC Ringer,
+            {% endif %}
+             and that the outcome was a {{ attendance.get_outcome_display }}.
+        </p>
+        <h3 class="text-center">How do you respond?</h3>
+        <br>
+        <div class="row">
+            <div class="col-md-2 col-md-offset-4">
+                <form action="{% url 'games:games_confirm_attendance' attendance.id 'y' %}" method="post">
+                {{ form.non_field_errors }}
+                {% csrf_token %}
+                {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+                <input class="btn btn-primary" type="submit" value="It's True" />
+                </form>
+            </div>
+            <div class="col-md-2 col-md-offset-1">
+                <form action="{% url 'games:games_confirm_attendance' attendance.id 'n' %}" method="post">
+                {{ form.non_field_errors }}
+                {% csrf_token %}
+                {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+                <input class="btn btn-primary" type="submit" value="Lies!" />
+                </form>
+                <br>
+            </div>
+        </div>
+    </div>
+{% endblock %}

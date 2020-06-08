@@ -247,7 +247,7 @@ def make_archive_game_general_info_form(gm):
                                     max_length=200,
                                     widget=forms.HiddenInput(),
                                     required=True,
-                                initial=gm.id)
+                                    initial=gm.id)
         scenario = ScenarioModelChoiceField(queryset=gm.scenario_set.all(),
                                             empty_label="Create New Scenario",
                                             required=False,
@@ -284,3 +284,6 @@ class ArchivalOutcomeForm(forms.Form):
         # user may have declared character dead after the game ended, so allow selecting dead characters
         queryset = self.initial["invited_player"].character_set.all()
         self.fields['attending_character'].queryset = queryset
+
+class RsvpAttendanceForm(forms.Form):
+    pass

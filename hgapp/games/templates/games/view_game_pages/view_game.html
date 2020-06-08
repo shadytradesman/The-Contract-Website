@@ -46,7 +46,7 @@
             <h4>
                 {{ game.hook }}
             </h4>
-        <h4>Run by <a href="{% url 'profiles:profiles_view_profile' game.creator.id %}">{% user_display game.creator %}</a></h4>
+        <h4>Run by <a href="{% url 'profiles:profiles_view_profile' game.creator.id %}">{% user_display game.gm %}</a></h4>
 	</div>
     {% if view_scenario %}
         <div class="container">
