@@ -10,16 +10,14 @@ from django.urls import reverse
 from django.utils import timezone
 from games.forms import CreateScenarioForm, CellMemberAttendedForm, make_game_form, make_allocate_improvement_form, \
     CustomInviteForm, make_accept_invite_form, ValidateAttendanceForm, DeclareOutcomeForm, GameFeedbackForm, \
-    OutsiderAttendedForm, make_who_was_gm_form,make_archive_game_general_info_form, ArchivalOutcomeForm
+    OutsiderAttendedForm, make_who_was_gm_form,make_archive_game_general_info_form, ArchivalOutcomeForm, \
+    RsvpAttendanceForm
 
 from games.models import Scenario, Game, GAME_STATUS, DISCOVERY_REASON, Game_Invite, Game_Attendance, Reward
 
 from hgapp.utilities import get_queryset_size, get_object_or_none
 
 from cells.models import Cell
-
-from characters.models import HIGH_ROLLER_STATUS
-
 
 def create_scenario(request):
     if request.method == 'POST':
@@ -127,19 +125,10 @@ def create_game(request):
             )
             if form.cleaned_data['scenario']:
                 game.scenario = form.cleaned_data['scenario']
-            else:
-                scenario = Scenario(creator=request.user,
-                                    title="Temporary Scenario for " + game.title,
-                                    description="Put details of the scenario here",
-                                    suggested_status=HIGH_ROLLER_STATUS[0][0],
-                                    max_players=99,
-                                    min_players=0)
-                scenario.save()
-                game.scenario = scenario
             with transaction.atomic():
                 game.save()
                 if form.cleaned_data['invite_all_members']:
-                    for member in game.cell.cellmembership_set.exclude(member_player = game.creator):
+                    for member in game.cell.cellmembership_set.exclude(member_player = game.gm):
                         invite = str(game.creator) + " has invited you to a Game in " + game.cell.name
                         game_invite = Game_Invite(invited_player=member.member_player,
                                                   relevant_game=game,
@@ -179,7 +168,7 @@ def edit_game(request, game_id):
             with transaction.atomic():
                 game.save()
                 if form.cleaned_data['invite_all_members']:
-                    for member in game.cell.cellmembership_set.exclude(member_player=game.creator):
+                    for member in game.cell.cellmembership_set.exclude(member_player=game.gm):
                         invite = game.creator.name + " has invited you to a Game in " + game.cell.name
                         game_invite = Game_Invite(invited_player=member.member_player,
                                                   relevant_game=game,
@@ -249,7 +238,7 @@ def invite_players(request, game_id):
             if get_queryset_size(player.game_invite_set.filter(relevant_game=game)) > 0:
                 #player is already invited. Maybe update invitation instead?
                 return HttpResponseForbidden()
-            if player == game.creator:
+            if player == game.creator or player == game.gm:
                 return HttpResponseForbidden()
             game_invite = Game_Invite(invited_player=player,
                                       relevant_game=game,
@@ -274,7 +263,7 @@ def accept_invite(request, game_id):
     if not request.user.is_authenticated or request.user.is_anonymous:
         return HttpResponseForbidden()
     game = get_object_or_404(Game, id=game_id)
-    if not game.is_scheduled() or game.creator.id == request.user.id:
+    if not game.is_scheduled() or game.creator.id == request.user.id or game.gm.id == request.user.id:
         return HttpResponseForbidden()
     invite = get_object_or_none(request.user.game_invite_set.filter(relevant_game=game))
     if not invite and not game.open_invitations:
@@ -565,13 +554,63 @@ def finalize_create_ex_game_for_cell(request, cell_id, gm_user_id, players):
     ArchivalOutcomeFormSet = formset_factory(ArchivalOutcomeForm, extra=0)
     if request.method == 'POST':
         general_form = GenInfoForm(request.POST, prefix="general")
-        outcome_formset = ArchivalOutcomeFormSet(request.POST, prefix="outcome")
+        outcome_formset = ArchivalOutcomeFormSet(request.POST, prefix="outcome", initial=[{'player_id': x.id,
+                                                           'invited_player': x}
+                                                          for x in player_list])
         if general_form.is_valid() and outcome_formset.is_valid():
-            pass
-            # create a game
-            # for each attendance, create an attendance for them if they're in the cell or create an rsvp
+            form_gm = get_object_or_404(User, id=general_form.cleaned_data['gm_id'])
+            if not cell.get_player_membership(form_gm):
+                return HttpResponseForbidden()
+            with transaction.atomic():
+                #TODO: check to see if the game has the exact same time as existing game and fail.
+                game = Game(
+                    title = general_form.cleaned_data['title'],
+                    creator = request.user,
+                    gm = form_gm,
+                    created_date = timezone.now(),
+                    scheduled_start_time = general_form.cleaned_data['occurred_time'],
+                    actual_start_time = general_form.cleaned_data['occurred_time'],
+                    end_time = general_form.cleaned_data['occurred_time'],
+                    status = GAME_STATUS[6][0],
+                    cell = cell,
+                )
+                if general_form.cleaned_data['scenario']:
+                    game.scenario = general_form.cleaned_data['scenario']
+                game.save()
+                for form in outcome_formset:
+                    player = get_object_or_404(User, id=form.cleaned_data['player_id'])
+
+                    attendance = Game_Attendance(
+                        relevant_game=game,
+                        notes=form.cleaned_data['notes'],
+                        outcome=form.cleaned_data['outcome'],
+                    )
+                    game_invite = Game_Invite(invited_player=player,
+                                              relevant_game=game,
+                                              as_ringer=False,
+                                              )
+                    game_invite.save()
+                    if 'attending_character' in form.cleaned_data \
+                            and not form.cleaned_data['attending_character'] is None:
+                        if hasattr(form.cleaned_data['attending_character'], 'cell'):
+                            attendance.attending_character=form.cleaned_data['attending_character']
+                            if not form.cleaned_data['attending_character'].cell == cell:
+                                attendance.is_confirmed = False
+                        else:
+                            attendance.is_confirmed = False
+                    else:
+                        game_invite.as_ringer=True
+                        attendance.is_confirmed = False
+                    if game.creator.id == player.id:
+                        attendance.is_confirmed = True
+                    attendance.save()
+                    game_invite.attendance=attendance
+                    game_invite.save()
+                    attendance.give_reward()
+                return HttpResponseRedirect(reverse('cells:cells_view_cell', args=(cell.id,)))
         else:
-            print(general_form.errors + outcome_formset.errors)
+            print(general_form.errors)
+            print(outcome_formset.errors)
             return None
     else:
         general_form = GenInfoForm(prefix="general")
@@ -583,5 +622,40 @@ def finalize_create_ex_game_for_cell(request, cell_id, gm_user_id, players):
             'general_form': general_form,
             'outcome_formset': outcome_formset,
             'cell': cell,
+            'cell_id': cell_id,
+            'gm_user_id': gm_user_id,
+            'players': players,
         }
         return render(request, 'games/edit_archive_game.html', context)
+
+def confirm_attendance(request, attendance_id, confirmed=None):
+    if not request.user.is_authenticated:
+        return HttpResponseForbidden()
+    attendance = get_object_or_404(Game_Attendance, id=attendance_id)
+    if not request.user.id == attendance.game_invite.invited_player.id:
+        return HttpResponseForbidden()
+    if request.method == 'POST':
+        if confirmed is None:
+            return render_confirm_attendance_page(request, attendance)
+        form = RsvpAttendanceForm(request.POST)
+        if form.is_valid():
+            with transaction.atomic():
+                if confirmed == 'y':
+                    attendance.confirm_and_reward()
+                else:
+                    invite = attendance.game_invite
+                    invite.is_declined = True
+                    invite.save()
+        else:
+            print(form.errors)
+        return HttpResponseRedirect(reverse('games:games_view_game', args=(attendance.relevant_game.id,)))
+    else:
+        return render_confirm_attendance_page(request, attendance)
+
+def render_confirm_attendance_page(request, attendance):
+    form = RsvpAttendanceForm()
+    context = {
+        'form': form,
+        'attendance': attendance,
+    }
+    return render(request, 'games/confirm_attendance.html', context)

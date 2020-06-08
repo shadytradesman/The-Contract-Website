@@ -13,6 +13,30 @@
                 {% else %}
                     Played a ringer
                 {% endif %}
+                {% if not invitation.attendance.is_confirmed %}
+                    {% if invitation.is_declined %}
+                        <div class="alert alert-danger" role="alert">
+                            <p>
+                                This player denied their attendance in this game.
+                            </p>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning" role="alert">
+                            {% if invitation.invited_player.id is request.user.id  %}
+                                <p>
+                                    <a href="{% url 'games:games_confirm_attendance' invitation.attendance.id %}">
+                                        Click Here
+                                    </a>
+                                    to confirm or deny your attendance in this game.
+                                </p>
+                            {% else %}
+                                <p>
+                                    This player has not yet confirmed their attendance.
+                                </p>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                {% endif %}
             </li>
         {% empty %}
             <p>

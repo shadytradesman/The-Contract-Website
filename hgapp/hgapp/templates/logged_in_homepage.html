@@ -52,6 +52,23 @@
                 </ul>
             </div>
         {% endif %}
+        {% if attendance_invites_to_confirm %}
+            <div class="alert alert-warning text-center">
+                <h3>A GM has declared that you attended a Game</h3>
+                <h4>
+                    Confirm or deny your attendance
+                </h4>
+                <ul class="nav nav-pills nav-stacked">
+                    {% for invite in attendance_invites_to_confirm %}
+                        <li>
+                            <a href="{% url 'games:games_confirm_attendance' invite.attendance.id %}">
+                                <b>{{invite.attendance.relevant_game.title}}</b> at {{invite.attendance.relevant_game.scheduled_start_time}}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
         {% if upcoming_games_running %}
             <div class="alert alert-info text-center">
                 <h3>Upcoming Games I'm Running</h3>

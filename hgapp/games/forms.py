@@ -243,6 +243,11 @@ class OutsiderAttendedForm(forms.Form):
 
 def make_archive_game_general_info_form(gm):
     class ArchiveGeneralInfoForm(forms.Form):
+        gm_id = forms.CharField(label=None,
+                                    max_length=200,
+                                    widget=forms.HiddenInput(),
+                                    required=True,
+                                    initial=gm.id)
         scenario = ScenarioModelChoiceField(queryset=gm.scenario_set.all(),
                                             empty_label="Create New Scenario",
                                             required=False,
@@ -266,7 +271,7 @@ class ArchivalOutcomeForm(forms.Form):
     attending_character = CharacterModelChoiceField(queryset=Character.objects.all(),
                                                     empty_label="Played a Ringer",
                                                     help_text="Declare which character this player brought.",
-                                                    required=True)
+                                                    required=False)
     outcome = forms.ChoiceField(choices=OUTCOME)
     notes = forms.CharField(label='Notes',
                             max_length=500,
@@ -279,3 +284,6 @@ class ArchivalOutcomeForm(forms.Form):
         # user may have declared character dead after the game ended, so allow selecting dead characters
         queryset = self.initial["invited_player"].character_set.all()
         self.fields['attending_character'].queryset = queryset
+
+class RsvpAttendanceForm(forms.Form):
+    pass

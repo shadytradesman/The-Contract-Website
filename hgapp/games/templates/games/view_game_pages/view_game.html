@@ -46,7 +46,7 @@
             <h4>
                 {{ game.hook }}
             </h4>
-        <h4>Run by <a href="{% url 'profiles:profiles_view_profile' game.creator.id %}">{% user_display game.creator %}</a></h4>
+        <h4>Run by <a href="{% url 'profiles:profiles_view_profile' game.creator.id %}">{% user_display game.gm %}</a></h4>
 	</div>
     {% if view_scenario %}
         <div class="container">
@@ -69,7 +69,7 @@
         {% include "games/view_game_pages/scheduled_invitation_snippet.html" %}
     {% elif game.is_active %}
         {% include "games/view_game_pages/active_attending_snippet.html" %}
-    {% elif game.is_finished or game.is_archived or game.is_void %}
+    {% elif game.is_finished or game.is_archived or game.is_void or game.is_recorded %}
         {% include "games/view_game_pages/finished_attended_snippet.html" %}
     {% endif %}
 {% endblock %}

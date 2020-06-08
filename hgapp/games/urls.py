@@ -43,6 +43,12 @@ urlpatterns = [
         views.start_game,
         name='games_start_game'),
 
+    # ex: .com/games/confirm_attendance/g/110
+    url(r'^confirm_attendance/g/(?P<attendance_id>[\d]+)/$', views.confirm_attendance, name='games_confirm_attendance'),
+
+    # ex: .com/games/confirm_attendance/g/110/y
+    url(r'^confirm_attendance/g/(?P<attendance_id>[\d]+)/(?P<confirmed>[yn])/$', views.confirm_attendance, name='games_confirm_attendance'),
+
     # ex: .com/games/end/g/110
     url(r'^end/g/(?P<game_id>[\d]+)/$', views.end_game, name='games_end_game'),
 

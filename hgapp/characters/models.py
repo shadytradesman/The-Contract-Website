@@ -146,10 +146,10 @@ class Character(models.Model):
         return total
 
     def number_of_victories(self):
-        return get_queryset_size(self.game_attendance_set.filter(outcome="WIN"))
+        return get_queryset_size(self.game_attendance_set.exclude(is_confirmed=False).filter(outcome="WIN"))
 
     def number_of_losses(self):
-        return get_queryset_size(self.game_attendance_set.filter(outcome="LOSS"))
+        return get_queryset_size(self.game_attendance_set.exclude(is_confirmed=False).filter(outcome="LOSS"))
 
     def calculate_status(self):
         num_victories = self.number_of_victories()
@@ -184,7 +184,7 @@ class Character(models.Model):
         return not self.private or player.has_perm("view_private_character", self) or self.player_has_cell_edit_perms(player)
 
     def completed_games(self):
-        return self.game_attendance_set.exclude(outcome=None).order_by("relevant_game__end_time").all()
+        return self.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).order_by("relevant_game__end_time").all()
 
     def is_dead(self):
         return len(self.character_death_set.filter(is_void=False).all()) > 0

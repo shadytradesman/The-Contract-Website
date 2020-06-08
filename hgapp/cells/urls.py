@@ -18,7 +18,7 @@ urlpatterns = [
     url(r'^invite/c/(?P<cell_id>[\d]+)/$', views.invite_players, name='cells_invite_players'),
 
     # ex: .com/cells/invite/c/123/link-reset
-    url(r'^invite/c/(?P<cell_id>[\d]+)/link-reset$', views.reset_invite_link, name='cells_reset_invite_link'),
+    url(r'^invite/c/(?P<cell_id>[\d]+)/link-reset/$', views.reset_invite_link, name='cells_reset_invite_link'),
 
     # ex: .com/cells/invite/c/123/revoke/i/2352
     url(r'^invite/c/(?P<cell_id>[\d]+)/revoke/i/(?P<invite_id>[\d]+)$', views.revoke_invite, name='cells_revoke_invite'),
@@ -27,10 +27,10 @@ urlpatterns = [
     url(r'^invite/rsvp/c/(?P<cell_id>[\d]+)/$', views.rsvp_invite, name='cells_rsvp_invite'),
 
     # ex: .com/cells/invite/rsvp/c/123/y
-    url(r'^invite/rsvp/c/(?P<cell_id>[\d]+)/(?P<accept>[yn])$', views.rsvp_invite, name='cells_rsvp_invite'),
+    url(r'^invite/rsvp/c/(?P<cell_id>[\d]+)/(?P<accept>[yn])/$', views.rsvp_invite, name='cells_rsvp_invite'),
 
     # ex: .com/cells/invite/rsvp/c/123/code/6db20aef104038d363eca31985142c08daa82be57e29e53ad3c8171b9d46083f
-    url(r'^invite/rsvp/c/(?P<cell_id>[\d]+)/code/(?P<secret_key>[\da-z]+)$', views.rsvp_invite, name='cells_rsvp_invite'),
+    url(r'^invite/rsvp/c/(?P<cell_id>[\d]+)/code/(?P<secret_key>[\da-z]+)/$', views.rsvp_invite, name='cells_rsvp_invite'),
 
     # ex: .com/cells/invite/rsvp/c/123/code/6db20aef104038d363eca31985142c08daa82be57e29e53ad3c8171b9d46083f/n
     url(r'^invite/rsvp/c/(?P<cell_id>[\d]+)/code/(?P<secret_key>[\da-z]+)/(?P<accept>[yn])$', views.rsvp_invite,

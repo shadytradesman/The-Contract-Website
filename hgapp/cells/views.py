@@ -7,7 +7,7 @@ from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
 
 from hgapp.utilities import get_object_or_none
-from .models import Cell, CELL_PERMISSIONS, ROLE, CellInvite
+from .models import Cell, ROLE, CellInvite
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from games.models import GAME_STATUS
@@ -136,8 +136,14 @@ def invite_players(request, cell_id):
                                             request.build_absolute_uri(reverse("cells:cells_view_cell", args=[cell.id])),
                                             request.build_absolute_uri(reverse("cells:cells_rsvp_invite", args=[cell.id])),
                                             ))
-            pm_write(sender=request.user, recipient=player, subject="You have been invited to join a Cell", body=message_body, skip_notification=False,
-                auto_archive=True, auto_delete=False, auto_moderators=None)
+            pm_write(sender=request.user,
+                     recipient=player,
+                     subject="You have been invited to join a Cell",
+                     body=message_body,
+                     skip_notification=False,
+                     auto_archive=True,
+                     auto_delete=False,
+                     auto_moderators=None)
             return HttpResponseRedirect(reverse('cells:cells_invite_players', args=(cell.id,)))
         else:
             print(form.errors)
@@ -190,7 +196,6 @@ def rsvp_invite(request, cell_id, secret_key = None, accept = None):
         return render(request, 'cells/rsvp_invite.html', context)
 
 
-
 #TODO: use a form like in rsvp_invite to prevent cross site scripting attacks
 def reset_invite_link(request, cell_id):
     if not request.user.is_authenticated:
@@ -214,8 +219,6 @@ def revoke_invite(request, cell_id, invite_id):
         invite.reject()
     return HttpResponseRedirect(reverse("cells:cells_invite_players", args=(cell.id,)))
 
-
-
 def leave_cell(request, cell_id):
     if not request.user.is_authenticated:
         return HttpResponseForbidden()
@@ -238,7 +241,6 @@ def leave_cell(request, cell_id):
             'cell': cell,
         }
         return render(request, 'cells/leave_cell.html', context)
-
 
 def manage_members(request, cell_id):
     if not request.user.is_authenticated:
