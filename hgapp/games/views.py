@@ -127,15 +127,6 @@ def create_game(request):
             )
             if form.cleaned_data['scenario']:
                 game.scenario = form.cleaned_data['scenario']
-            else:
-                scenario = Scenario(creator=request.user,
-                                    title="Temporary Scenario for " + game.title,
-                                    description="Put details of the scenario here",
-                                    suggested_status=HIGH_ROLLER_STATUS[0][0],
-                                    max_players=99,
-                                    min_players=0)
-                scenario.save()
-                game.scenario = scenario
             with transaction.atomic():
                 game.save()
                 if form.cleaned_data['invite_all_members']:
@@ -565,13 +556,61 @@ def finalize_create_ex_game_for_cell(request, cell_id, gm_user_id, players):
     ArchivalOutcomeFormSet = formset_factory(ArchivalOutcomeForm, extra=0)
     if request.method == 'POST':
         general_form = GenInfoForm(request.POST, prefix="general")
-        outcome_formset = ArchivalOutcomeFormSet(request.POST, prefix="outcome")
+        outcome_formset = ArchivalOutcomeFormSet(request.POST, prefix="outcome", initial=[{'player_id': x.id,
+                                                           'invited_player': x}
+                                                          for x in player_list])
         if general_form.is_valid() and outcome_formset.is_valid():
-            pass
-            # create a game
-            # for each attendance, create an attendance for them if they're in the cell or create an rsvp
+            form_gm = get_object_or_404(User, id=general_form.cleaned_data['gm_id'])
+            if not cell.get_player_membership(form_gm):
+                return HttpResponseForbidden()
+            with transaction.atomic():
+                #TODO: check to see if the game has the exact same time as existing game and fail.
+                game = Game(
+                    title = general_form.cleaned_data['title'],
+                    creator = request.user,
+                    gm = form_gm,
+                    created_date = timezone.now(),
+                    scheduled_start_time = general_form.cleaned_data['occurred_time'],
+                    actual_start_time = general_form.cleaned_data['occurred_time'],
+                    end_time = general_form.cleaned_data['occurred_time'],
+                    status = GAME_STATUS[6][0],
+                    cell = cell,
+                )
+                if general_form.cleaned_data['scenario']:
+                    game.scenario = general_form.cleaned_data['scenario']
+                game.save()
+                for form in outcome_formset:
+                    player = get_object_or_404(User, id=form.cleaned_data['player_id'])
+
+                    attendance = Game_Attendance(
+                        relevant_game=game,
+                        notes=form.cleaned_data['notes'],
+                        outcome=form.cleaned_data['outcome'],
+                    )
+                    game_invite = Game_Invite(invited_player=player,
+                                              relevant_game=game,
+                                              as_ringer=False,
+                                              )
+                    game_invite.save()
+                    if 'attending_character' in form.cleaned_data \
+                            and not form.cleaned_data['attending_character'] is None:
+                        if hasattr(form.cleaned_data['attending_character'], 'cell')\
+                            and form.cleaned_data['attending_character'].cell == cell:
+                            attendance.attending_character=form.cleaned_data['attending_character']
+                        else:
+                            pass
+                            #send RSVP I WAS IN A GAME FORM
+                    else:
+                        game_invite.as_ringer=True
+                    attendance.save()
+                    game_invite.attendance=attendance
+                    game_invite.save()
+                    attendance.give_reward()
+                return HttpResponseRedirect(
+                    reverse('cells:cells_view_cell', args=(cell.id,)))
         else:
-            print(general_form.errors + outcome_formset.errors)
+            print(general_form.errors)
+            print(outcome_formset.errors)
             return None
     else:
         general_form = GenInfoForm(prefix="general")
@@ -583,5 +622,8 @@ def finalize_create_ex_game_for_cell(request, cell_id, gm_user_id, players):
             'general_form': general_form,
             'outcome_formset': outcome_formset,
             'cell': cell,
+            'cell_id': cell_id,
+            'gm_user_id': gm_user_id,
+            'players': players,
         }
         return render(request, 'games/edit_archive_game.html', context)

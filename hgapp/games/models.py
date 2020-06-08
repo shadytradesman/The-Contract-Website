@@ -131,7 +131,7 @@ class Game(models.Model):
         return self.status == GAME_STATUS[4][0]
 
     def is_recorded(self):
-        return self.status == GAME_STATUS[5][0]
+        return self.status == GAME_STATUS[6][0]
 
     def transition_to_canceled(self):
         assert(self.is_scheduled() or self.is_active())
@@ -194,6 +194,15 @@ class Game(models.Model):
 
 
     def save(self, *args, **kwargs):
+        if not hasattr(self, 'scenario'):
+            scenario = Scenario(creator=self.gm,
+                                title="Temporary Scenario for " + str(self.scheduled_start_time) + "'s session",
+                                description="Put details of the scenario here",
+                                suggested_status=HIGH_ROLLER_STATUS[0][0],
+                                max_players=99,
+                                min_players=0)
+            scenario.save()
+            self.scenario = scenario
         if self.pk is None:
             super(Game, self).save(*args, **kwargs)
             assign_perm('view_game', self.creator, self)
@@ -223,7 +232,7 @@ class Game_Attendance(models.Model):
     character_death = models.OneToOneField(Character_Death,
                                            null=True,
                                            blank=True,
-                                            on_delete=models.CASCADE)
+                                           on_delete=models.CASCADE)
 
 
     def is_victory(self):

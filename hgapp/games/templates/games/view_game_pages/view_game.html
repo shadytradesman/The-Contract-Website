@@ -69,7 +69,7 @@
         {% include "games/view_game_pages/scheduled_invitation_snippet.html" %}
     {% elif game.is_active %}
         {% include "games/view_game_pages/active_attending_snippet.html" %}
-    {% elif game.is_finished or game.is_archived or game.is_void %}
+    {% elif game.is_finished or game.is_archived or game.is_void or game.is_recorded %}
         {% include "games/view_game_pages/finished_attended_snippet.html" %}
     {% endif %}
 {% endblock %}

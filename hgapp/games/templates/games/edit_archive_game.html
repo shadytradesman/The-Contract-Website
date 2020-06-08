@@ -14,6 +14,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script src="{% static 'js/site.js' %}"></script>
     {% include "games/datepicker.js" %}
+    {% include "games/edit_archive_game.js" %}
 {% endblock %}
 {% block body_base %}
 <div class="container">
@@ -22,13 +23,13 @@
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h1>
-                    Declaring a completed game in <a href="{% url 'cells:cells_view_cell' cell.id %}">{{cell.name}}</a>
+                    Declaring a completed Game in <a href="{% url 'cells:cells_view_cell' cell.id %}">{{cell.name}}</a>
                 </h1>
                 <h3><small>
                     If you would like schedule an upcoming game, <a href="{% url 'games:games_create_game' %}">Click Here</a>
                 </small></h3>
             </div>
-            <form action="{% url 'games:games_create_ex_game_for_cell' cell_id=cell.id %}" method="post">
+            <form action="{% url 'games:games_edit_ex_game_add_players' cell_id=cell.id gm_user_id=gm_user_id players=players%}" method="post">
                 {% csrf_token %}
                 {{ general_form.about.errors }}
                 {{ general_form.management_form }}

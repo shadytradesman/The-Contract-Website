@@ -58,6 +58,7 @@ def edit_character(request, character_id):
             stats_form.save()
             char_form.save(commit=False)
             character.edit_date = timezone.now()
+            character.cell=char_form.cleaned_data['cell']
             character.save()
             if character.private != char_form.cleaned_data['private']:
                 for power_full in character.power_full_set.all():
