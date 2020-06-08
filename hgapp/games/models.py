@@ -177,10 +177,21 @@ class Game(models.Model):
             return
         for game_attendance in self.game_attendance_set.all():
             game_attendance.give_reward()
-        gm_reward = Reward(relevant_game=self,
-                           rewarded_player=self.gm,
-                           is_improvement=True)
-        gm_reward.save()
+        if self.achieves_golden_ratio():
+            gm_reward = Reward(relevant_game=self,
+                               rewarded_player=self.gm,
+                               is_improvement=True)
+            gm_reward.save()
+
+    def achieves_golden_ratio(self):
+        death = False
+        win = False
+        for attendance in self.game_attendance_set:
+            if attendance.is_victory():
+                win = True
+            if attendance.is_death():
+                death = True
+        return win and death
 
     def not_attending(self, player):
         invite = get_object_or_none(self.game_invite_set.filter(invited_player=player))
