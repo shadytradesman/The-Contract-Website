@@ -19,12 +19,12 @@
                     Manage Memberships for <a href="{% url 'cells:cells_view_cell' cell.id %}">{{cell.name}}</a>
                 </h1>
                 <h3><small>
-                    If you would like to invite players <a href="{% url 'cells:cells_invite_players' cell.id %}">Click Here</a>
+                    If you would like to invite players
+                    <a href="{% url 'cells:cells_invite_players' cell.id %}">
+                        Click Here
+                    </a>
                 </small></h3>
-
-
             </div>
-
             {% for form in formset %}
                 <form id="kick-{{form.initial.player_id}}"
                       action="{% url 'cells:cells_kick_player' cell_id=cell.id user_id=form.initial.player_id %}"

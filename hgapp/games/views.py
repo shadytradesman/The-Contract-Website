@@ -196,16 +196,16 @@ def edit_game(request, game_id):
 
 def view_game(request, game_id):
     game = get_object_or_404(Game, id=game_id)
-    view_scenario = False
-    invitation = None
+    can_view_scenario = False
+    my_invitation = None
     if request.user.is_authenticated:
-        invitation = get_object_or_none(request.user.game_invite_set.filter(relevant_game=game_id))
+        my_invitation = get_object_or_none(request.user.game_invite_set.filter(relevant_game=game_id))
     if request.user.has_perm("view_scenario", game.scenario):
-        view_scenario = True
+        can_view_scenario = True
     context = {
         'game': game,
-        'view_scenario': view_scenario,
-        'invitation': invitation,
+        'can_view_scenario': can_view_scenario,
+        'my_invitation': my_invitation,
     }
     return render(request, 'games/view_game_pages/view_game.html', context)
 

@@ -40,13 +40,13 @@ GAME_STATUS = (
     ('VOID', 'Void'),
 
     # Finalized games that were entered after-the-fact.
-    ('RECORDED', 'Recorded'),
+    ('RECORDED', 'Archived'),
 )
 
 OUTCOME = (
-    ('WIN', 'Win'),
+    ('WIN', 'Victory'),
     ('LOSS', 'Loss'),
-    ('DEATH', 'Death'),
+    ('DEATH', 'Died'),
     ('DECLINED', 'Declined Harbinger Invite'),
     ('RINGER_VICTORY', 'Ringer Victory'),
     ('RINGER_FAILURE', 'Ringer Failure'),
@@ -216,7 +216,7 @@ class Game(models.Model):
             self.gm = self.creator
         if not hasattr(self, 'scenario'):
             scenario = Scenario(creator=self.gm,
-                                title="Temporary Scenario for " + str(self.title) + " played on " + str(self.scheduled_start_time),
+                                title="Placeholder Scenario for " + str(self.title) + " played on " + str(self.scheduled_start_time),
                                 description="Put details of the scenario here",
                                 suggested_status=HIGH_ROLLER_STATUS[0][0],
                                 max_players=99,
@@ -270,6 +270,15 @@ class Game_Attendance(models.Model):
         self.is_confirmed=True
         self.save()
         self.give_reward()
+
+    def get_reward(self):
+        return get_object_or_none(Reward, rewarded_player=self.get_player(), relevant_game=self.relevant_game)
+
+    def get_player(self):
+        if self.attending_character:
+            return self.attending_character.player
+        else:
+            return self.game_invite.invited_player
 
     def give_reward(self):
         if not self.is_confirmed:

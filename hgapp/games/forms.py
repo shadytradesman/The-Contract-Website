@@ -35,8 +35,8 @@ class CreateScenarioForm(forms.Form):
                             widget=CustomStylePagedown(),
                             max_length=40000,
                             help_text='Describe the Scenario in detail. Win conditions, enemies, background, etc.')
-    max_players = forms.IntegerField(label = "Suggested Maximum number of players")
-    min_players = forms.IntegerField(label = "Suggested Minimum number of players")
+    max_players = forms.IntegerField(label = "Suggested Maximum number of players", initial=4)
+    min_players = forms.IntegerField(label = "Suggested Minimum number of players", initial=2)
     suggested_character_status = forms.ChoiceField(choices=HIGH_ROLLER_STATUS,
                                                    help_text='Must be this tall to ride')
     is_highlander = forms.BooleanField(label = "Is Highlander",

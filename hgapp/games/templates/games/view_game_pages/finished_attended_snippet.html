@@ -1,17 +1,56 @@
 {% load account_tags %}
-
+{% load guardian_tags %}
+{% load games_tags %}
 <div class="container">
-    <h4>
-        Players who Attended:
-    </h4>
+    <h2>
+        Attendance
+    </h2>
     <ul>
         {% for invitation in game.game_invite_set.all %}
             <li>
-                <a href="{% url 'profiles:profiles_view_profile' invitation.invited_player.id %}"><b>{% user_display invitation.invited_player %}</b></a>
-                {% if invitation.attendance.attending_character %}
-                    Played <a href="{% url 'characters:characters_view' invitation.attendance.attending_character.id %}">{{invitation.attendance.attending_character.name}}</a>
-                {% else %}
-                    Played a ringer
+                <span class = "lead">
+                    <strong>
+                        {% if invitation.attendance.attending_character %}
+                            <a href="{% url 'characters:characters_view' invitation.attendance.attending_character.id %}">{{invitation.attendance.attending_character.name}}</a>
+                        {% else %}
+                            An NPC ringer
+                        {% endif %}
+                    </strong>
+                    -
+                    {{ invitation.attendance.get_outcome_display }}
+                </span>
+                <br>
+                Played by
+                 <a href="{% url 'profiles:profiles_view_profile' invitation.invited_player.id %}">
+                    <b>{% user_display invitation.invited_player %}</b>
+                </a>
+                <br>
+                {% with reward=invitation.attendance.get_reward %}
+                    {% if reward %}
+                        {% get_obj_perms request.user for invitation.attendance.attending_character as "char_perms" %}
+                        {% if reward.relevant_power %}
+                             <div class="col-xs-11">
+                                {% render_reward reward %}
+                             </div>
+                            <br><br>
+                        {% else %}
+                            {{invitation.attendance.attending_character.name}} has not yet spent their Gift for this game.
+                            {% if "edit_character" in char_perms %}
+                                <a href="{% url 'characters:characters_spend_reward' invitation.attendance.attending_character.id %}" class="btn btn-success">
+                                    Spend Available Gifts!
+                                </a>
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                {% endwith %}
+                {% if invitation.attendance.character_death.cause_of_death %}
+                    {{ invitation.attendance.character_death.cause_of_death }}
+                    <br>
+                {% endif %}
+                {% if invitation.attendance.notes %}
+                    <p>
+                        {{invitation.attendance.notes}}
+                    </p>
                 {% endif %}
                 {% if not invitation.attendance.is_confirmed %}
                     {% if invitation.is_declined %}
@@ -21,7 +60,8 @@
                             </p>
                         </div>
                     {% else %}
-                        <div class="alert alert-warning" role="alert">
+                        <br>
+                        <div class="alert row alert-warning col-xs-11" role="alert">
                             {% if invitation.invited_player.id is request.user.id  %}
                                 <p>
                                     <a href="{% url 'games:games_confirm_attendance' invitation.attendance.id %}">
@@ -35,12 +75,14 @@
                                 </p>
                             {% endif %}
                         </div>
+                        <br><br><br>
                     {% endif %}
                 {% endif %}
             </li>
+        <br>
         {% empty %}
             <p>
-                No players attended this game?!??!?! <br>
+                No players attended this game. <br>
             </p>
         {% endfor %}
     </ul>
