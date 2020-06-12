@@ -625,6 +625,7 @@ def finalize_create_ex_game_for_cell(request, cell_id, gm_user_id, players):
             'cell_id': cell_id,
             'gm_user_id': gm_user_id,
             'players': players,
+            'gm': gm,
         }
         return render(request, 'games/edit_archive_game.html', context)
 
