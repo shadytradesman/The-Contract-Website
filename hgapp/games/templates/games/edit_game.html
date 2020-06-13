@@ -21,8 +21,9 @@
 {% block body_class %}home{% endblock %}
 
 {% block body_base %}
-    <section>
-        <div class="container">
+<div class="container">
+    <div class="backdropped">
+        <section>
             {{ form.about.errors }}
             {% if game %}
                 <h1>Editing {{game.title}}</h1>
@@ -41,11 +42,10 @@
             {{ form.non_field_errors }}
             {% csrf_token %}
             {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-            <div class="container">
-                {{ form.title | bootstrap}}
-                {{ form.hook | bootstrap}}
+            {{ form.title | bootstrap}}
+            {{ form.hook | bootstrap}}
 
-                {{ form.cell | bootstrap}}
+            {{ form.cell | bootstrap}}
             {% if not form.cell.field.choices.queryset.all|length %}
                 <div class="row">
                     <div class="alert-danger col-xs-7 col-xs-offset-2">
@@ -76,11 +76,11 @@
 
             {{ form.open_invitations | bootstrap }}
             {{ form.scheduled_start_time | bootstrap }}
+        </section>
+            <div class="container">
+                <input class="btn btn-primary" type="submit" value="Done!" />
             </div>
-        </div>
-    </section>
-        <div class="container">
-            <input class="btn btn-primary" type="submit" value="Done!" />
-        </div>
-    </form>
+        </form>
+</div>
+</div>
 {% endblock %}

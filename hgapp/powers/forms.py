@@ -45,10 +45,11 @@ def make_enhancement_form(enhancement, enhancement_instance=None):
         enhancement_slug=str(enhancement.slug)
         eratta = enhancement.eratta
         multiplicity_allowed=enhancement.multiplicity_allowed;
-        is_selected = forms.BooleanField(required=True)
+        is_selected = forms.BooleanField(required=True, label=label)
+        form_name = enhancement.form_name()
         if enhancement_instance:
             is_selected.initial=True
-        set_field_html_name(is_selected, enhancement.form_name())
+        set_field_html_name(is_selected, form_name)
         if enhancement.detail_field_label is not "" and enhancement.detail_field_label is not None:
             detail_text = forms.CharField(required=False,
                                           label=enhancement.detail_field_label)
@@ -72,7 +73,7 @@ def make_drawback_form(drawback):
         eratta = drawback.eratta
         drawback_slug=str(drawback.slug)
         multiplicity_allowed=drawback.multiplicity_allowed;
-        is_selected = forms.BooleanField(required=True)
+        is_selected = forms.BooleanField(required=True, label=label)
         set_field_html_name(is_selected, drawback.form_name())
         if drawback.detail_field_label is not "" and drawback.detail_field_label is not None:
             detail_text = forms.CharField(required=False,

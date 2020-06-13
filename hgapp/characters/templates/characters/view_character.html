@@ -12,7 +12,9 @@
 {% load games_tags %}
 
 {% block body_base %}
-	<div class="container text-center">
+<div class="container">
+    <div class="backdropped">
+	<div class="text-center">
         <h1>
 		{{ character.name }}
         </h1>
@@ -69,7 +71,7 @@
             <b>Power Value: </b>{{character.get_power_cost_total}}</p>
         {% endif %}
     </div>
-    <div class="container text-center">
+    <div class="text-center">
         <div class ="row">
             <p>
                 <b>
@@ -286,4 +288,7 @@
             </ul>
         </div>
     {% endif %}
+    </div>
+    </div>
+
 {% endblock %}

@@ -17,11 +17,11 @@
 // Enhancement checkbox creation / deletion for multiplicity
 var checkbox_incrementer=0;
 $(document).on('change','[id$=-is_selected]', function(ev){
-        if (this.parentElement.className == "non-multiple") {
+        if (this.parentElement.parentElement.parentElement.className == "non-multiple") {
             return true;
         }
         ev.preventDefault();
-        var parent = this.parentElement;
+        var parent = this.parentElement.parentElement.parentElement;
         var count = parent.parentElement.children.length;
         var modifierSlug = parent.parentElement.id;
         var tmplMarkup = $('#'+modifierSlug+"-template").html();
@@ -33,7 +33,7 @@ $(document).on('change','[id$=-is_selected]', function(ev){
             $("#" + modifierSlug).append(compiledTmpl);
             $('#id_item_items-TOTAL_FORMS').attr('value', count+1);
         } else if (!this.checked && (count > 1)) {
-            $("#" + this.parentElement.id).remove();
+            $("#" + parent.id).remove();
             $('#id_item_items-TOTAL_FORMS').attr('value', count-1);
         }
 });
