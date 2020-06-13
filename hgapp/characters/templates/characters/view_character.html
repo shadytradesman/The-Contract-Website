@@ -181,9 +181,7 @@
             </div>
         </div>
     </div>
-   <div class="container">
         <h2>Game History</h2>
-        <div class="container">
             <p><b>{{ character.number_of_victories }}</b> Victories - <b>{{ character.number_of_losses }}</b> Losses</p>
             {% for attendance in character.completed_games %}
                     {% include "games/game_attendance_badge_snippet.html" %}
@@ -194,11 +192,8 @@
                 <h3>Advancement History</h3>
                 <p>{{character.basic_stats.advancement_history |linebreaks}}</p>
             {% endif %}
-        </div>
-    </div>
-    <div class="container">
+
         <h2>Equipment</h2>
-        <div class="container">
             <div class ="row">
                 {% if character.basic_stats.movement %}
                     <div class="col-md-6">
@@ -224,33 +219,24 @@
             {% if character.equipment %}
                 <p>{{character.equipment | markdown | linebreaks}}</p>
             {% endif %}
-        </div>
-    </div>
-    <div class="container">
+
         <h2>Gifts and Improvements</h2>
-        <div class="container">
             {% if character.unspent_rewards|length > 0 %}
                 <h4>Character has {{character.unspent_rewards|length}} unspent rewards</h4>
-                <div class="container">
                     <ul >
                         {% for reward in character.unspent_rewards %}
                             <li>{% render_reward reward %}</li>
                         {% endfor %}
                     </ul>
-                </div>
             {% endif %}
             {% if character.spent_rewards|length > 0 %}
                 <h4>Gift / Reward History</h4>
-                <div class="container">
                     <ul >
                         {% for reward in character.spent_rewards %}
                             <li>{% render_reward reward %}</li>
                         {% endfor %}
                     </ul>
-                </div>
             {% endif %}
-        </div>
-    </div>
     {% if character.wish_list %}
         <div class="container">
             <h3>Wish List</h3>

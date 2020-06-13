@@ -97,7 +97,7 @@ def create_power_from_existing(request, power_id):
             print("ERROR CREATING POWER")
     else:
         # Build a power form.
-        if not extant_power.player_can_veiw(request.user):
+        if not extant_power.player_can_view(request.user):
             return HttpResponseForbidden()
         context = get_create_power_context_from_power(extant_power)
         return render(request, 'powers/create_power_pages/createpower.html', context)
