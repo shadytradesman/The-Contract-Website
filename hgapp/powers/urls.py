@@ -8,9 +8,6 @@ urlpatterns = [
     # ex: .com/powers/
     url(r'^$', views.index, name='powers_index'),
 
-    # ex: .com/powers/tutorial
-    url(r'^tutorial$', views.tutorial, name='powers_tutorial'),
-
     # ex: .com/powers/create/
     url(r'^create/$', views.create, name='powers_create'),
 

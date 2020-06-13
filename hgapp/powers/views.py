@@ -20,9 +20,6 @@ def index(request):
     }
     return render(request, 'powers/index.html', context)
 
-def tutorial(request):
-    return render(request, 'powers/tutorial.html')
-
 def create(request, character_id=None):
     category_list = Base_Power_Category.objects.order_by('name')
     character=None
