@@ -9,8 +9,12 @@ def set_field_html_name(cls, new_name):
     allowing for a custom field name (new_name).
     """
     old_render = cls.widget.render
-    def _widget_render_wrapper(name, value, attrs=None, renderer=None):
-        return old_render(new_name, value, attrs, renderer=None)
+    def _widget_render_wrapper(name=None, attrs=None, *args, **kwargs):
+        new_attrs = None
+        if type(cls.widget) is forms.widgets.Select:
+            new_attrs = {"class": "form-control"}
+        attrs = {**(attrs or {}), **(new_attrs or {})}
+        return old_render(new_name, attrs=attrs, *args, **kwargs)
 
     cls.widget.render = _widget_render_wrapper
 

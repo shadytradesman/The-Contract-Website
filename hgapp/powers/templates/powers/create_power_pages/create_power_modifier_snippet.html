@@ -1,9 +1,10 @@
 {% load bootstrap %}
 
 {{mod.errors}}
-<div class="checkbox">
+<div class="checkbox thumbnail">
 {% for field in mod.visible_fields|slice:":1"%}
-    <label>
+    <label class="thumbnail" style="border:none">
+        &ensp;
         {{ field}}
         {% if mod.eratta %}
         <span title="{{mod.eratta}}"><i class="fa fa-question-circle fa-1x"></i></span>

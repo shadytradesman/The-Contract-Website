@@ -5,7 +5,10 @@
 {% block head_title %}Edit {{ og_power.name }}{% endblock %}
 
 {% load staticfiles %}
-
+{% block styles %}
+    <link href="{% static "css/site.css" %}" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="{% static 'powers/create_power.css' %}" />
+{% endblock %}
 {% block scripts %}
 <script src="{% static "js/site.js" %}"></script>
     {% include "powers/create_power_pages/create_power_form.js" %}

@@ -5,33 +5,32 @@
 <div class="backdropped">
     <div class="page-header">
         {% if og_power %}
-            <h1> Edit {{ og_power.name }}</h1>
+            <h1> Editing {{ og_power.name }}</h1>
         {% else %}
-            <h1> Create a {{ base_power.name }} Power
+            <h1> Creating a New {{ base_power.name }} Power
             {% if character %}
                 For {{character.name}}
             {% endif %}
             </h1>
         {% endif %}
-        <div class="double-columns">
-            <div class="container">
-                {{ form.non_field_errors }}
+            {{ form.non_field_errors }}
                 {% csrf_token %}
                 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
                 {{ form.power_name.errors }}
                 {{ form.power_name | bootstrap}}
-                <p class="help">{{ form.power_name.help_text|safe }}</p>
-                <h4><span>
-                    Current Gift Cost: <b><span id="current_gift_cost_number">1</span></b>
-                    {% if og_power %}
-                        ({{og_power.get_point_value}} <span id="gift_cost_delta">+0</span>)
-                    {% endif %}
-                </span></h4>
+                <span data-spy="affix" data-offset-top="250">
+                    <h4 class="nav navbar-nav">
+                        Current Gift Cost: <b><span id="current_gift_cost_number">1</span></b>
+                        {% if og_power %}
+                            ({{og_power.get_point_value}} <span id="gift_cost_delta">+0</span>)
+                        {% endif %}
+                    </h4>
+                </span>
+                <br>
                 {% if character %}
                     <h5>{{character.name}} has <b>{{character.unspent_rewards|length}}</b> Points to spend on this power!</h5>
                 {% endif %}
-            </div>
-        </div>
+
     </div>
     <div class="double-columns">
         <div class="container">
@@ -39,63 +38,58 @@
             <h4>{{ base_power.summary }}</h4>
             <p>
                 {% if base_power.required_status != "ANY" %}
-                Requires: {{base_power.required_status}}
+                    Requires: {{base_power.required_status}}
                 {% endif %}
             </p>
-            {{ base_power.description|linebreaks }}
-
+            <p>{{ base_power.description|linebreaks }}</p>
+            <p>{{ power_system.system_text|linebreaks }}</p>
         </div>
         <div class="container">
+            <br>
             {{ form.description.errors }}
             {{ form.description | bootstrap}}
         </div>
-        <div class="container">
-            <h4>System</h4>
-            {{ power_system.system_text|linebreaks }}
-
-            <h3>Parameters</h3>
-            <dl class="dl-horizontal">
-            {% for parameter_formset in parameters %}
-                {% for param in parameter_formset %}
-                    <dt><b>{{ param.label }}</b></dt>
-                    <dd>{{ param.level_picker }}
-                        {{ param.errors }}</dd>
-                    <br>
-                {% endfor %}
+    </div>
+    {% if parameters %}
+        <h3>Parameters</h3>
+        <ul class="list-unstyled">
+        {% for parameter_formset in parameters %}
+            {% for param in parameter_formset %}
+                <br>
+                <li>
+                    <b>{{ param.label }}</b>
+                    {{ param.level_picker  }}
+                    {{ param.errors }}
+                </li>
             {% endfor %}
-            </dl>
-        </div>
-        <div class="container">
-            {{ form.system.errors }}
-            {{ form.system | bootstrap}}
-        </div>
-        <div class="container">
-            <div class="enhancements">
-                <h3>Enhancements:</h3>
-                {% for modifier_form in enhancements %}
-                {% if modifier_form.empty_form.multiplicity_allowed %}
-                <div id="{{modifier_form.empty_form.enhancement_slug}}">
-                    <div id="{{modifier_form.empty_form.enhancement_slug}}-base">
-                        {% for mod in modifier_form %}
-                            {% include "powers/create_power_pages/create_power_modifier_snippet.html" %}
-                        {% endfor %}
-                    </div>
-                </div>
-                {% else %}
-                <div class="non-multiple">
+        {% endfor %}
+        </ul>
+    {% endif %}
+   <div class="double-columns">
+        <div class="enhancements">
+            <h3 class="text-center">Enhancements</h3>
+            {% for modifier_form in enhancements %}
+            {% if modifier_form.empty_form.multiplicity_allowed %}
+            <div id="{{modifier_form.empty_form.enhancement_slug}}">
+                <div id="{{modifier_form.empty_form.enhancement_slug}}-base">
                     {% for mod in modifier_form %}
-                    {% include "powers/create_power_pages/create_power_modifier_snippet.html" %}
+                        {% include "powers/create_power_pages/create_power_modifier_snippet.html" %}
                     {% endfor %}
                 </div>
-                {% endif %}
+            </div>
+            {% else %}
+            <div class="non-multiple">
+                {% for mod in modifier_form %}
+                {% include "powers/create_power_pages/create_power_modifier_snippet.html" %}
                 {% endfor %}
             </div>
+            {% endif %}
+            {% endfor %}
         </div>
-        <div class="container">
-            <div class="drawbacks">
-                <h3>Drawbacks:</h3>
-                {% for modifier_form in drawbacks %}
-                {% if modifier_form.empty_form.multiplicity_allowed %}
+        <div class="drawbacks">
+            <h3 class="text-center">Drawbacks</h3>
+            {% for modifier_form in drawbacks %}
+            {% if modifier_form.empty_form.multiplicity_allowed %}
                 <div id="{{modifier_form.empty_form.drawback_slug}}">
                     <div id="{{modifier_form.empty_form.drawback_slug}}-base">
                         {% for mod in modifier_form %}
@@ -103,29 +97,28 @@
                         {% endfor %}
                     </div>
                 </div>
-                {% else %}
+            {% else %}
                 <div class="non-multiple">
                     {% for mod in modifier_form %}
                     {% include "powers/create_power_pages/create_power_modifier_snippet.html" %}
                     {% endfor %}
                 </div>
-                {% endif %}
-                {% endfor %}
-            </div>
+            {% endif %}
+            {% endfor %}
         </div>
-        <div class="container">
-            {{ form.flavor | bootstrap}}
-        </div>
-    </div>
+   </div>
+    {{ form.system.errors }}
+    {{ form.system | bootstrap}}
+
+    <br>
+    <h3 >Put a ribbon on it</h3>
+    {{ form.flavor | bootstrap}}
+
     <div  id="reward_changes">
-        <div class="container">
-            <h4><div id="gift_cost_summary"></div></h4>
-            <ol id="gifts_affected"></ol>
-        </div>
+        <h4><div id="gift_cost_summary"></div></h4>
+        <ol id="gifts_affected"></ol>
     </div>
     <div class="col-md-2 col-md-offset-5">
-        <div class="container">
-            <input class="btn btn-lg btn-default" type="submit" value="Done!" />
-        </div>
+        <input class="btn btn-lg btn-default" type="submit" value="Done!" />
     </div>
 </div>
