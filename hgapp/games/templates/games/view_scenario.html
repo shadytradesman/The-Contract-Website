@@ -112,26 +112,24 @@
             <div class="panel-row">
             {% for game in scenario.finished_games %}
                 <div class="thumbnail">
-                    <div class="container">
-                        <h4>
-                        <a href="{% url 'profiles:profiles_view_profile' game.creator.id %}">{% user_display game.gm %}</a>
-                        {% if game.cell %}
-                            ran for
-                            <a href="{% url 'cells:cells_view_cell' game.cell.id %}">
-                                {{game.cell}}
-                            </a>
-                        {% endif %}
-                        on
-                        <a href="{% url 'games:games_view_game' game.id %}">
-                             {{game.end_time}}
+                    <h4>
+                    <a href="{% url 'profiles:profiles_view_profile' game.creator.id %}">{% user_display game.gm %}</a>
+                    {% if game.cell %}
+                        ran for
+                        <a href="{% url 'cells:cells_view_cell' game.cell.id %}">
+                            {{game.cell}}
                         </a>
-                        </h4>
-                        {% if game.scenario_notes %}
-                            <p>
-                                {{game.scenario_notes}}
-                            </p>
-                        {% endif %}
-                    </div>
+                    {% endif %}
+                    on
+                    <a href="{% url 'games:games_view_game' game.id %}">
+                         {{game.end_time}}
+                    </a>
+                    </h4>
+                    {% if game.scenario_notes %}
+                        <p>
+                            {{game.scenario_notes|linebreaks}}
+                        </p>
+                    {% endif %}
                 </div>
             {% empty %}
                 <div class="alert-warning">
