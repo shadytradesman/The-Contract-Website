@@ -271,7 +271,7 @@ class Game_Attendance(models.Model):
         self.save()
         self.give_reward()
 
-    def get_rewards(self):
+    def get_reward(self):
         return get_object_or_none(Reward, rewarded_player=self.get_player(), relevant_game=self.relevant_game, is_void=False)
 
     def get_player(self):
