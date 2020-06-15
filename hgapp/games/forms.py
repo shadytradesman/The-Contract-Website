@@ -198,10 +198,10 @@ class DeclareOutcomeForm(forms.Form):
 
 class GameFeedbackForm(forms.Form):
     scenario_notes = forms.CharField(label='Scenario Notes',
-                            max_length=1000,
+                            max_length=10000,
                             widget=forms.Textarea,
                             required=False,
-                            help_text='Notes about how your running of the scenario went, geared toward other GMs. Spoilers A-OK')
+                            help_text='Notes about your experience running this Scenario. Geared toward other GMs. Spoilers A-OK')
 
 def make_allocate_improvement_form(user):
     class AllocateImprovementForm(forms.Form):

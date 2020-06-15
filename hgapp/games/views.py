@@ -87,14 +87,32 @@ def edit_scenario(request, scenario_id):
         }
         return render(request, 'games/edit_scenario.html', context)
 
-def view_scenario(request, scenario_id):
+def view_scenario(request, scenario_id, game_id=None):
     scenario = get_object_or_404(Scenario, id=scenario_id)
     if not request.user.has_perm("view_scenario", scenario):
         return HttpResponseForbidden()
-    context = {
-        'scenario': scenario,
-    }
-    return render(request, 'games/view_scenario.html', context)
+    if request.method == 'POST':
+        form = GameFeedbackForm(request.POST)
+        if form.is_valid() and game_id:
+            with transaction.atomic():
+                game = get_object_or_404(Game, id=game_id)
+                if game.gm.id == request.user.id:
+                    game.scenario_notes = form.cleaned_data['scenario_notes']
+                    game.save()
+        return HttpResponseRedirect(reverse('games:games_view_scenario', args=(scenario.id,)))
+    else:
+        game_feedback = None
+        games_run = Game.objects.filter(gm_id=request.user.id, scenario_id=scenario.id).all()
+        games_run_no_feedback = Game.objects.filter(gm_id=request.user.id, scenario_id=scenario.id, scenario_notes=None).all()
+        if games_run_no_feedback:
+            game_feedback = GameFeedbackForm()
+        context = {
+            'scenario': scenario,
+            'games_run': games_run,
+            'games_run_no_feedback': games_run_no_feedback,
+            'game_feedback_form': game_feedback,
+        }
+        return render(request, 'games/view_scenario.html', context)
 
 def view_scenario_gallery(request):
     if not request.user.is_authenticated:

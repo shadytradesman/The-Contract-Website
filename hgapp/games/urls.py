@@ -14,6 +14,9 @@ urlpatterns = [
     # ex: .com/games/view/s/110
     url(r'^view/s/(?P<scenario_id>[\d]+)/$', views.view_scenario, name='games_view_scenario'),
 
+    # ex: .com/games/view/s/110/g/1231
+    url(r'^view/s/(?P<scenario_id>[\d]+)/g/(?P<game_id>[\d]+)/$', views.view_scenario, name='games_view_scenario_feedback'),
+
     # ex: .com/games/view/s/gallery
     url(r'^view/s/gallery/$', views.view_scenario_gallery, name='games_view_scenario_gallery'),
 

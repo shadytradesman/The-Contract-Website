@@ -105,7 +105,7 @@ class Game(models.Model):
                                         through_fields=('relevant_game','attending_character'))
     invitations = models.ManyToManyField(settings.AUTH_USER_MODEL,
                                          through="Game_Invite")
-    scenario_notes = models.TextField(max_length=1000,
+    scenario_notes = models.TextField(max_length=10000,
                                       null=True,
                                       blank=True)
     open_invitations = models.BooleanField(default=True)
@@ -216,11 +216,11 @@ class Game(models.Model):
             self.gm = self.creator
         if not hasattr(self, 'scenario'):
             scenario = Scenario(creator=self.gm,
-                                title="Placeholder Scenario for " + str(self.title) + " played on " + str(self.scheduled_start_time),
+                                title="Scenario for " + str(self.title),
                                 description="Put details of the scenario here",
                                 suggested_status=HIGH_ROLLER_STATUS[0][0],
-                                max_players=99,
-                                min_players=0)
+                                max_players=5,
+                                min_players=2)
             scenario.save()
             self.scenario = scenario
         if self.pk is None:
@@ -400,7 +400,7 @@ class Scenario(models.Model):
         return "{} ({}, {}-{} players)".format(self.title, self.get_suggested_status_display(), self.min_players, self.max_players)
 
     def finished_games(self):
-        return self.game_set.filter(status__in=[GAME_STATUS[2][0], GAME_STATUS[3][0]]).all()
+        return self.game_set.filter(status__in=[GAME_STATUS[2][0], GAME_STATUS[3][0], GAME_STATUS[6][0]]).all()
 
     def num_finished_games(self):
         return len(self.finished_games())

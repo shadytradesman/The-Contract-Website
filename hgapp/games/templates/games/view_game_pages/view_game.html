@@ -48,7 +48,9 @@
                         {% else %}
                             took place
                         {% endif %}
-                        in <a href="{% url 'cells:cells_view_cell' game.cell.id %}">{{ game.cell.name }}</a>
+                        {% if game.cell %}
+                            in <a href="{% url 'cells:cells_view_cell' game.cell.id %}">{{ game.cell.name }}</a>
+                        {% endif %}
                         {% if game.is_scheduled %}
                             on {{ game.scheduled_start_time |date:'b d, Y r:Mp' }}
                         {% elif game.is_active%}
