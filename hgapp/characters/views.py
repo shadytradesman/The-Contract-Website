@@ -2,47 +2,51 @@ from random import randint
 
 from django.http import HttpResponseRedirect, HttpResponseForbidden, HttpResponse
 from django.shortcuts import render, get_object_or_404
-
-
-# Create your views here.
 from django.urls import reverse
 from django.utils import timezone
+from django.db import transaction
+from django.forms import formset_factory
 
-from characters.models import Character, BasicStats, Character_Death, Graveyard_Header
-from guardian.shortcuts import assign_perm
-
+from characters.models import Character, BasicStats, Character_Death, Graveyard_Header, Attribute, Ability
 from powers.models import Power_Full
-
-from characters.forms import make_character_form, BasicStatsForm, CharacterDeathForm, ConfirmAssignmentForm
+from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, AbilityForm
 
 
 def create_character(request):
     if not request.user.is_authenticated:
         return HttpResponseForbidden()
+    AttributeFormSet = formset_factory(AttributeForm, extra=0)
+    AbilityFormSet = formset_factory(AbilityForm, extra=1)
     if request.method == 'POST':
         char_form = make_character_form(request.user)(request.POST)
         stats_form = BasicStatsForm(request.POST)
         if char_form.is_valid() and stats_form.is_valid():
-            new_stats = stats_form.save()
-            new_character = char_form.save(commit=False)
-            new_character.basic_stats = new_stats
-            new_character.player = request.user
-            new_character.pub_date = timezone.now()
-            new_character.edit_date = timezone.now()
-            cell = char_form.cleaned_data['cell']
-            if cell != "free":
-                new_character.cell = cell
-            new_character.save()
+            with transaction.atomic():
+                new_stats = stats_form.save()
+                new_character = char_form.save(commit=False)
+                new_character.basic_stats = new_stats
+                new_character.player = request.user
+                new_character.pub_date = timezone.now()
+                new_character.edit_date = timezone.now()
+                cell = char_form.cleaned_data['cell']
+                if cell != "free":
+                    new_character.cell = cell
+                new_character.save()
             return HttpResponseRedirect(reverse('characters:characters_view', args=(new_character.id,)))
         else:
             print(char_form.errors + stats_form.errors)
             return None
     else:
         char_form = make_character_form(request.user)()
-        stats_form = BasicStatsForm(initial={'stats': BasicStatsForm.hg15_stats_template})
+        attributes = Attribute.objects.order_by('name')
+        default_abilities = Ability.objects.filter(is_primary=True).order_by('name')
+        attribute_formset = AttributeFormSet(initial=[{'attribute_id': x.id, 'value': 1, 'attribute': x} for x in attributes])
+        ability_formset = AbilityFormSet(initial=[{'ability_id': x.id, 'value': 0, 'ability': x} for x in default_abilities])
         context = {
             'char_form' : char_form,
-            'stats_form': stats_form,
+            'attribute_formset': attribute_formset,
+            'ability_formset': ability_formset,
+            'sec_ability_tooltip': "test",
         }
         return render(request, 'characters/edit_character.html', context)
 
@@ -55,14 +59,15 @@ def edit_character(request, character_id):
         char_form = make_character_form(request.user)(request.POST, instance=character)
         stats_form = BasicStatsForm(request.POST, instance=character.basic_stats)
         if char_form.is_valid() and stats_form.is_valid():
-            stats_form.save()
-            char_form.save(commit=False)
-            character.edit_date = timezone.now()
-            character.cell=char_form.cleaned_data['cell']
-            character.save()
-            if character.private != char_form.cleaned_data['private']:
-                for power_full in character.power_full_set.all():
-                    power_full.set_self_and_children_privacy(is_private=char_form.cleaned_data['private'])
+            with transaction.atomic():
+                stats_form.save()
+                char_form.save(commit=False)
+                character.edit_date = timezone.now()
+                character.cell=char_form.cleaned_data['cell']
+                character.save()
+                if character.private != char_form.cleaned_data['private']:
+                    for power_full in character.power_full_set.all():
+                        power_full.set_self_and_children_privacy(is_private=char_form.cleaned_data['private'])
             return HttpResponseRedirect(reverse('characters:characters_view', args=(character.id,)))
         else:
             print(char_form.errors + stats_form.errors)
@@ -89,9 +94,10 @@ def edit_obituary(request, character_id):
         if existing_death:
             obit_form = CharacterDeathForm(request.POST, instance=existing_death)
             if obit_form.is_valid():
-                edited_death = obit_form.save(commit=False)
-                edited_death.is_void = obit_form.cleaned_data['is_void']
-                edited_death.save()
+                with transaction.atomic():
+                    edited_death = obit_form.save(commit=False)
+                    edited_death.is_void = obit_form.cleaned_data['is_void']
+                    edited_death.save()
             else:
                 print(obit_form.errors)
                 return None
@@ -101,7 +107,8 @@ def edit_obituary(request, character_id):
                 new_character_death = obit_form.save(commit=False)
                 new_character_death.relevant_character = character
                 new_character_death.date_of_death = timezone.now()
-                new_character_death.save()
+                with transaction.atomic():
+                    new_character_death.save()
             else:
                 print(obit_form.errors)
                 return None

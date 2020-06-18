@@ -36,6 +36,7 @@ class KickForm(forms.Form):
     pass
 
 class PlayerRoleForm(forms.Form):
+    # attrs must be set to allow forms with other submit target urls to exist within other forms in template.
     player_id = forms.CharField(label=None,
                             max_length=200,
                             widget=forms.TextInput(attrs={'form': 'manage_form'}))

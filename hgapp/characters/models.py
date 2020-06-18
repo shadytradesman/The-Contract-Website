@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.datetime_safe import datetime
+from django.utils import timezone
 from guardian.shortcuts import assign_perm, remove_perm
 
 from hgapp.utilities import get_queryset_size
@@ -12,6 +13,13 @@ HIGH_ROLLER_STATUS = (
     ('NOVICE', 'Novice'),
     ('SEASONED', 'Seasoned'),
     ('VETERAN', 'Veteran'),
+)
+
+QUIRK_CATEGORY = (
+    ('PHYSICAL', 'Physical'),
+    ('BACKGROUND', 'Background'),
+    ('MENTAL', 'Mental'),
+    ('RESTRICTED', 'Restricted'),
 )
 
 class Character(models.Model):
@@ -190,12 +198,16 @@ class Character(models.Model):
         return len(self.character_death_set.filter(is_void=False).all()) > 0
 
     def real_death(self):
-        return self.character_death_set.filter(is_void=False).all()[0]
+        non_void_deaths = self.character_death_set.filter(is_void=False).all()
+        if len(non_void_deaths) > 0:
+            return non_void_deaths[0]
+        else:
+            return None
 
     def void_deaths(self):
         return self.character_death_set.filter(is_void=True).all()
 
-    def handle_death(self):
+    def delete_upcoming_attendances(self):
         scheduled_game_attendances = self.scheduled_game_attendances()
         for game_attendance in scheduled_game_attendances:
             game_attendance.delete()
@@ -244,9 +256,15 @@ class Character(models.Model):
     def improvement_ok(self):
         return self.number_of_victories() * 2 >  len(self.active_rewards())
 
-
     def __str__(self):
         return self.name + " [" + self.player.username + "]"
+
+    def kill(self):
+        if self.is_dead():
+            raise ValueError("cannot kill a dead character")
+        new_death = Character_Death(relevant_character=self,
+                                    date_of_death=timezone.now())
+        new_death.save()
 
     def archive_txt(self):
         output = "{}\nPlayed by: {}\nArchived on {}\n{} with {} wins and {} losses\n"
@@ -274,6 +292,110 @@ class BasicStats(models.Model):
                                 null=True,
                                 blank=True)
 
+## ADVANCED STATS
+
+class Trait(models.Model):
+    name = models.CharField(max_length=50)
+    tutorialText = models.CharField(max_length=250,
+                              null=True,
+                              blank=True)
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        abstract = True
+
+class Attribute(Trait):
+    pass
+
+class Ability(Trait):
+    is_primary = models.BooleanField(default=False)
+
+class Quirk(models.Model):
+    name = models.CharField(max_length=150)
+    value = models.PositiveIntegerField()
+    description = models.CharField(max_length=2000)
+    system = models.CharField(max_length=2000) # A "just the facts" summary
+    category = models.CharField(choices=QUIRK_CATEGORY,
+                              max_length=50,
+                              default=QUIRK_CATEGORY[1][0])
+    eratta = models.CharField(max_length=2500,
+                              blank = True,
+                              null = True)
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        abstract = True
+
+class Asset(Quirk):
+    pass
+
+class Liability(Quirk):
+    pass
+
+class Limit(models.Model):
+    name = models.CharField(max_length=50)
+    description = models.CharField(max_length=1000)
+    is_default = models.BooleanField(default=False)
+
+class ContractStats(models.Model):
+    attributes = models.ManyToManyField(Attribute,
+                                       blank=True,
+                                       through="AttributeValue",
+                                       through_fields=('relevant_stats', 'relevant_attribute'))
+    abilities = models.ManyToManyField(Ability,
+                                       blank=True,
+                                       through="AbilityValue",
+                                       through_fields=('relevant_stats', 'relevant_ability'))
+    assets = models.ManyToManyField(Asset,
+                                   blank=True,
+                                   through="AssetDetails",
+                                   through_fields=('relevant_stats', 'relevant_asset'))
+    liabilities = models.ManyToManyField(Liability,
+                                   blank=True,
+                                   through="LiabilityDetails",
+                                   through_fields=('relevant_stats', 'relevant_liability'))
+    limits = models.ManyToManyField(Limit,
+                                    blank=True)
+
+
+class QuirkDetails(models.Model):
+    relevant_stats = models.ForeignKey(ContractStats,
+                                       on_delete=models.CASCADE)
+    details = models.CharField(max_length=2000)
+
+    class Meta:
+        abstract = True
+
+class AssetDetails(QuirkDetails):
+    relevant_asset = models.ForeignKey(Asset,
+                                       on_delete=models.CASCADE)
+
+class LiabilityDetails(QuirkDetails):
+    relevant_liability = models.ForeignKey(Liability,
+                                       on_delete=models.CASCADE)
+
+class TraitValue(models.Model):
+    relevant_stats = models.ForeignKey(ContractStats,
+                                             on_delete=models.CASCADE)
+    value = models.PositiveIntegerField()
+
+    class Meta:
+        abstract = True
+
+class AttributeValue(TraitValue):
+    relevant_attribute = models.ForeignKey(Attribute,
+                                       on_delete=models.CASCADE)
+
+class AbilityValue(TraitValue):
+    relevant_ability = models.ForeignKey(Ability,
+                                       on_delete=models.CASCADE)
+
+
+
+
+
 class Character_Death(models.Model):
     relevant_character = models.ForeignKey(Character,
                                            on_delete=models.CASCADE)
@@ -287,7 +409,7 @@ class Character_Death(models.Model):
                                      blank=True)
     def save(self, *args, **kwargs):
         if self.pk is None:
-            self.relevant_character.handle_death()
+            self.relevant_character.delete_upcoming_attendances()
         super(Character_Death, self).save(*args, **kwargs)
 
 class Graveyard_Header(models.Model):

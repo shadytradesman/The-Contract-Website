@@ -1,9 +1,62 @@
 from django import forms
 from django.forms import ModelForm
 from django.utils.translation import ugettext_lazy as _
+from django.core.validators import MaxValueValidator, MinValueValidator
 from overrides.widgets import CustomStylePagedown
 
 from characters.models import Character, BasicStats, Character_Death
+
+ATTRIBUTE_VALUES = {
+    "Brawn": (
+        ('1', '1 - Puny'),
+        ('2', '2 - Average'),
+        ('3', '3 - Solid'),
+        ('4', '4 - Musclebound'),
+        ('5', '5 - Giant'),
+    ),
+    "Charisma": (
+        ('1', '1 - Off-putting'),
+        ('2', '2 - Average'),
+        ('3', '3 - Outgoing'),
+        ('4', '4 - Magnetic'),
+        ('5', '5 - Unhatable'),
+    ),
+    "Dexterity": (
+        ('1', '1 - Clumsy'),
+        ('2', '2 - Average'),
+        ('3', '3 - Nimble'),
+        ('4', '4 - Quick'),
+        ('5', '5 - Lightning-fast'),
+    ),
+    "Intelligence": (
+        ('1', '1 - Dumb'),
+        ('2', '2 - Average'),
+        ('3', '3 - Bright'),
+        ('4', '4 - Intellectual'),
+        ('5', '5 - Genius'),
+    ),
+    "Perception": (
+        ('1', '1 - Oblivious'),
+        ('2', '2 - Average'),
+        ('3', '3 - Attentive'),
+        ('4', '4 - Vigilant'),
+        ('5', '5 - Informed'),
+    ),
+    "Wits": (
+        ('1', '1 - Dull'),
+        ('2', '2 - Average'),
+        ('3', '3 - Resourceful'),
+        ('4', '4 - Decisive'),
+        ('5', '5 - Reflexive'),
+    ),
+    "default": (
+        ('1', '1 - Below Average'),
+        ('2', '2 - Average'),
+        ('3', '3 - Above Average'),
+        ('4', '4 - Exceptional'),
+        ('5', '5 - World Class'),
+    ),
+}
 
 def make_character_form(user):
     class CharacterForm(ModelForm):
@@ -76,72 +129,37 @@ class CharacterDeathForm(ModelForm):
 class ConfirmAssignmentForm(forms.Form):
     pass
 
-class BasicStatsForm(ModelForm):
-    class Meta:
-        model = BasicStats
-        fields = ('stats', 'advancement_history', 'movement', 'armor')
-        help_texts = {
-            'stats': _('Attributes, skills, etc'),
-            'advancement_history':  _('History of experience, skillpoints, or similar'),
-            'movement': _('Information about how quickly the character can move, climb, swim'),
-            'armor': _('Armor rating (if applicable)')
-        }
-        widgets = {
-            'stats': CustomStylePagedown(),
-            'advancement_history': CustomStylePagedown(),
-        }
 
-    hg15_stats_template = """Attributes
-----------
-**Strength**: 1
-**Dexterity**: 1
-**Stamina**:  1
-**Charisma**: 1
-**Perception**: 1
-**Intelligence**: 1
-**Wits**: 1
+#Advanced stat forms
 
-Abilities
----------
-**Academics**: 
-**Alertness**: 
-**Animal Ken**: 
-**Athletics**: 
-**Brawl**: 
-**Computer**: 
-**Crafts**: 
-**Dodge**: 
-**Endurance**: 
-**Firearms**: 
-**Investigation**: 
-**Legerdemain**: 
-**Linguistics**: 
-**Medicine**: 
-**Meditation**: 
-**Melee**: 
-**Occult**: 
-**Performance**: 
-**Pilot**: 
-**Science**: 
-**Stealth**: 
-**Survival**: 
+class AttributeForm(forms.Form):
+    value = forms.ChoiceField(choices=(()))
+    attribute_id = forms.IntegerField(label=None, widget=forms.HiddenInput(),) # hidden field to track which attribute we are editing.
 
-Merits
-------
-none
+    def __init__(self, *args, **kwargs):
+        super(AttributeForm, self).__init__(*args, **kwargs)
+        attribute = self.initial["attribute"]
+        self.fields['value'].label = attribute.name
+        if attribute.name in ATTRIBUTE_VALUES:
+            self.fields['value'].choices = ATTRIBUTE_VALUES[attribute.name]
+        else:
+            self.fields['value'].choices = ATTRIBUTE_VALUES["default"]
 
-Flaws
------
-none
+class AbilityForm(forms.Form):
+    ability_id = forms.IntegerField(label=None, widget=forms.HiddenInput(),) # hidden field to track which abilities we are editing.
+    value = forms.IntegerField(initial=0,
+                               validators=[MaxValueValidator(5), MinValueValidator(0)],
+                               widget=forms.NumberInput(attrs={'class': 'ability-value-input form-control'}))
+    name = forms.CharField(max_length=50,
+                           widget=forms.TextInput(attrs={'class': 'form-control sec-ability-name'}))
+    description = forms.CharField(max_length=250,
+                                  widget=forms.TextInput(attrs={'class': 'form-control sec-ability-desc'}))
 
-Traumas
--------
-**Murder:** Kill a human for any reason other than immediate self defense.
-**Humanity:** Witnessing a humanitarian atrocity (torture, massacre, mutilation, rape)
-**Torture:** Being tortured (solitary confinement for an extended period, physical torture)
-
-Pools
------
-
-**Willpower:** 1"""
-
+    def __init__(self, *args, **kwargs):
+        super(AbilityForm, self).__init__(*args, **kwargs)
+        if 'ability' in self.initial:
+            ability = self.initial["ability"]
+            self.fields['name'].initial = ability.name
+            self.fields['ability_id'].initial = ability.id
+            self.fields['description'].widget = forms.HiddenInput()
+            self.fields['name'].widget = forms.HiddenInput()

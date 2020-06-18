@@ -5,12 +5,10 @@
 {% block head_title %}Create a {{ base_power.name }} Power{% endblock %}
 
 {% load staticfiles %}
-{% block styles %}
-    <link href="{% static "css/site.css" %}" rel="stylesheet" />
+{% block extra_styles %}
     <link rel="stylesheet" type="text/css" href="{% static 'powers/create_power.css' %}" />
 {% endblock %}
-{% block scripts %}
-<script src="{% static "js/site.js" %}"></script>
+{% block extra_scripts %}
     {% include "powers/create_power_pages/create_power_form.js" %}
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 {% endblock %}

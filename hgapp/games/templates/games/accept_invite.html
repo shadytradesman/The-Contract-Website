@@ -34,7 +34,7 @@
                 {% if invite.invite_text %}
                     <div class="container">
                         <h3>Message from <a href="{% url 'profiles:profiles_view_profile' game.creator.id %}">{% user_display game.creator %}:</a></h3>
-                        {{invite.invite_text|linebreaks}}
+                        {{ invite.invite_text|linebreaks }}
                     </div>
                 {% endif %}
                 <div class="container">
@@ -44,7 +44,7 @@
                 {% if not form.fields.attending_character.choices %}
                     <h3 class="text-danger">You do not have any valid characters.</h3>
                 {% else %}
-                    {{ form.attending_character | bootstrap}}
+                    {{ form.attending_character | bootstrap }}
                 {% endif %}
             </div>
         </div>

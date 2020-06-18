@@ -307,11 +307,9 @@ class Game_Attendance(models.Model):
             if orig.attending_character != self.attending_character:
                 #if attending character has changed
                 orig.attending_character.default_perms_char_and_powers_to_player(self.relevant_game.gm)
-        if self.outcome == OUTCOME[2][0] and self.character_death is None and self.is_confirmed:
-            new_death = Character_Death(relevant_character=self.attending_character,
-                                        date_of_death=timezone.now())
-            new_death.save()
-            self.character_death = new_death
+        if self.outcome == OUTCOME[2][0] and self.character_death is None and self.is_confirmed and self.attending_character:
+            self.attending_character.kill()
+            self.character_death = self.attending_character.real_death()
         super(Game_Attendance, self).save(*args, **kwargs)
         if (self.relevant_game.is_scheduled() or self.relevant_game.is_active()) and self.attending_character:
             self.attending_character.reveal_char_and_powers_to_player(self.relevant_game.gm)
