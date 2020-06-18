@@ -7,7 +7,7 @@ from django.utils import timezone
 from django.db import transaction
 from django.forms import formset_factory
 
-from characters.models import Character, BasicStats, Character_Death, Graveyard_Header, Attribute, Ability
+from characters.models import Character, BasicStats, Character_Death, Graveyard_Header, Attribute, Ability, CharacterTutorial
 from powers.models import Power_Full
 from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, AbilityForm
 
@@ -39,6 +39,7 @@ def create_character(request):
     else:
         char_form = make_character_form(request.user)()
         attributes = Attribute.objects.order_by('name')
+        tutorial = get_object_or_404(CharacterTutorial)
         default_abilities = Ability.objects.filter(is_primary=True).order_by('name')
         attribute_formset = AttributeFormSet(initial=[{'attribute_id': x.id, 'value': 1, 'attribute': x} for x in attributes])
         ability_formset = AbilityFormSet(initial=[{'ability_id': x.id, 'value': 0, 'ability': x} for x in default_abilities])
@@ -46,7 +47,7 @@ def create_character(request):
             'char_form' : char_form,
             'attribute_formset': attribute_formset,
             'ability_formset': ability_formset,
-            'sec_ability_tooltip': "test",
+            'tutorial': tutorial,
         }
         return render(request, 'characters/edit_character.html', context)
 

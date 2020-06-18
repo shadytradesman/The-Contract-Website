@@ -71,7 +71,7 @@ def make_character_form(user):
                 'private': _("If checked, character will not be publicly viewable."),
                 'tagline': _('A subtitle that introduces the character in a flavorful way'),
                 'appearance': _('A brief description of the character\'s outward appearance'),
-                'concept': _('A very brief overview of the primary concept, themes, and archetypes'),
+                'concept_summary': _('A very brief overview of the primary concept, themes, and archetypes'),
                 'ambition': _('Why does this character risk their lives and participate in the games?'),
                 'paradigm': _('How do the character\'s powers work?'),
                 'residence': _('Where the character lives'),
@@ -94,6 +94,7 @@ def make_character_form(user):
             widgets = {
                 'equipment': CustomStylePagedown(),
                 'notes': CustomStylePagedown(),
+                'appearance': forms.TextInput(),
             }
 
     form = CharacterForm

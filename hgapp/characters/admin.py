@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from characters.models import Character, Graveyard_Header, Character_Death, Attribute, Ability, Asset, Liability
+from characters.models import Character, Graveyard_Header, Character_Death, Attribute, Ability, Asset, Liability, CharacterTutorial
 
 admin.site.register(Character)
 admin.site.register(Character_Death)
@@ -10,3 +10,4 @@ admin.site.register(Attribute)
 admin.site.register(Ability)
 admin.site.register(Asset)
 admin.site.register(Liability)
+admin.site.register(CharacterTutorial)

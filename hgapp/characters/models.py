@@ -392,10 +392,6 @@ class AbilityValue(TraitValue):
     relevant_ability = models.ForeignKey(Ability,
                                        on_delete=models.CASCADE)
 
-
-
-
-
 class Character_Death(models.Model):
     relevant_character = models.ForeignKey(Character,
                                            on_delete=models.CASCADE)
@@ -417,3 +413,9 @@ class Graveyard_Header(models.Model):
 
     def _str_(self):
         return self.header
+
+
+class CharacterTutorial(models.Model):
+    abilities = models.TextField(max_length=3000)
+    secondary_abilities = models.TextField(max_length=3000)
+    attributes = models.TextField(max_length=3000)

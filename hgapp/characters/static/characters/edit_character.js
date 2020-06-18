@@ -26,7 +26,9 @@ $(document).on("click", ".val-adjuster", function() {
 });
 
 $(document).ready(function(){
-  $('[data-toggle="tooltip"]').tooltip();
+    $('[data-toggle="tooltip"]').tooltip({
+        trigger : 'hover'
+    });
 });
 
 $(document).on('keypress','[class~=sec-ability-name]', function(ev){

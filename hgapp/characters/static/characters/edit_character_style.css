@@ -22,3 +22,7 @@ input[type="number"] {
 .sec-ability-name {
     width: 150px !important;
 }
+
+.thumbnail {
+    padding: 10px;
+}

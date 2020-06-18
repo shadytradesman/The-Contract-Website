@@ -21,78 +21,78 @@
 {% block body_class %}home{% endblock %}
 
 {% block body_base %}
-<section>
-    <div class="container">
-        {{ attribute_formset.about.errors }}
-        {{ char_form.about.errors }}
-        {% if character %}
-            <h1>Editing {{character.name}}</h1>
-            <form action="{% url 'characters:characters_edit' character.id %}" method="post">
-            <h4>If you'd rather assign powers,
-                <a href="{% url 'characters:characters_power_picker' character.id %}">Click Here!</a>
-            </h4>
-        {% else %}
-            <h1>Create a new character</h1>
-            <form action="{% url 'characters:characters_create' %}" method="post">
-        {% endif %}
-        <div class="container">
-            <h3>Basic Information</h3>
-            <h4>These fields are required</h4>
-        </div>
-        {{ char_form.non_field_errors }}
-        {{ attribute_formset.non_field_errors }}
-        {% csrf_token %}
-        {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-        <div class="container">
-            {{ char_form.name | bootstrap}}
-        </div>
-        <div class="container">
-            {{ char_form.tagline | bootstrap}}
-        </div>
-        <div class="container">
-           <div class="row">
-                <div class="col-xs-3">
-                    {{ char_form.private | bootstrap}}
-                </div>
-                <div class="col-xs-7">
-                    {{ char_form.cell | bootstrap}}
-                </div>
-           </div>
-
-        </div>
-        <div class="container">
-            {{ char_form.appearance | bootstrap }}
-        </div>
-        <div class="container">
-            <div class ="row">
-                <div class="col-sm-6">
-                    {{ char_form.age | bootstrap}}
-                </div>
-                <div class="col-sm-6">
-                    {{ char_form.sex | bootstrap }}
-                </div>
+<div class="container"><div class="backdropped">
+    {{ attribute_formset.about.errors }}
+    {{ char_form.about.errors }}
+    {% if character %}
+        <h1 class = "text-center">Editing {{character.name}}</h1>
+        <form action="{% url 'characters:characters_edit' character.id %}" method="post">
+        <h4 class = "text-center">If you'd rather assign powers,
+            <a href="{% url 'characters:characters_power_picker' character.id %}">Click Here!</a>
+        </h4>
+    {% else %}
+        <h1 class = "text-center">New Character</h1>
+        <form action="{% url 'characters:characters_create' %}" method="post">
+    {% endif %}
+    {{ char_form.non_field_errors }}
+    {{ attribute_formset.non_field_errors }}
+    {% csrf_token %}
+    {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+    <div class="thumbnail">
+        <h2 class = "text-center">Core Info</h2>
+        <div class="row">
+            <div class="col-sm-4">
+                {{ char_form.name | bootstrap}}
+            </div>
+            <div class="col-sm-8">
+                {{ char_form.tagline | bootstrap}}
             </div>
         </div>
-        <div class="container">
-            {{ char_form.concept_summary | bootstrap }}
+       <div class="row">
+            <div class="col-xs-3">
+                {{ char_form.private | bootstrap}}
+            </div>
+            <div class="col-xs-7">
+                {{ char_form.cell | bootstrap}}
+            </div>
+       </div>
+        <div class ="row">
+            <div class="col-sm-2">
+                {{ char_form.age | bootstrap}}
+            </div>
+            <div class="col-sm-2">
+                {{ char_form.sex | bootstrap }}
+            </div>
+            <div class="col-sm-8">
+                {{ char_form.appearance | bootstrap}}
+            </div>
         </div>
-        <div class="container">
-            {{ char_form.ambition | bootstrap }}
+        <div class ="row">
+            <div class="col-sm-6">
+                {{ char_form.concept_summary | bootstrap }}
+            </div>
+            <div class="col-sm-6">
+                {{ char_form.ambition | bootstrap }}
+            </div>
         </div>
-        <h2 class = "row text-center">Attributes</h2>
+    </div>
+    <div class="thumbnail">
+        <h2 class = "row text-center" data-toggle="tooltip" title='{{tutorial.attributes}}'>Attributes</h2>
         <div class="row">
             {% for form in attribute_formset %}
                 {% if forloop.counter0 == 3 %}
                 </div><div class="row">
                 {% endif %}
-                <div class="col-sm-4">
+                <div class="col-sm-4" data-toggle="tooltip" title='{{form.initial.attribute.tutorialText}}'>
                     {{form.value | bootstrap}}
                     {{ form.attribute_id.as_hidden}}
                 </div>
                 <div class="clearfix visible-xs-block"></div>
             {% endfor %}
         </div>
-        <h2 class = "row text-center">Abilities</h2>
+    </div>
+    <div class="thumbnail">
+        <h2 class = "row text-center" data-toggle="tooltip" title='{{tutorial.abilities}}'>Abilities</h2>
         <div class="row">
             {% for form in ability_formset %}
                 {% if forloop.counter0|divisibleby:4 %}
@@ -107,7 +107,7 @@
                         <b>{{form.initial.ability.name}}</b>
                     </div>
                 {% else %}
-                    <div class="col-sm-6 form-inline" data-toggle="tooltip" title='{{sec_ability_tooltip}}' >
+                    <div class="col-sm-6 form-inline" data-toggle="tooltip" title='{{tutorial.secondary_abilities}}' >
                         <span id="ability-form-{{forloop.counter0}}" class="ability-form">
                             {{ form.value }}
                             {{ form.attribute_id.as_hidden }}
@@ -121,81 +121,80 @@
                 <div class="clearfix visible-xs-block"></div>
             {% endfor %}
         </div>
-        <div class="container">
-            <h3>Additional Information</h3>
-            <h4>These fields are optional</h4>
-        </div>
-        <div class="container">
-            <div class ="row">
-                <div class="col-sm-6">
-                    {{ char_form.total_encumbrance | bootstrap}}
-                </div>
-                <div class="col-sm-6">
-                    {{ char_form.max_encumbrance | bootstrap }}
-                </div>
+    </div>
+    <div class="container">
+        <h3>Additional Information</h3>
+        <h4>These fields are optional</h4>
+    </div>
+    <div class="container">
+        <div class ="row">
+            <div class="col-sm-6">
+                {{ char_form.total_encumbrance | bootstrap}}
             </div>
-        </div>
-        <div class="container">
-            {{ char_form.equipment | bootstrap}}
-        </div>
-        <div class="container">
-            <div class ="row">
-                <div class="col-sm-6">
-                    {{ char_form.current_alias | bootstrap}}
-                </div>
-                <div class="col-sm-6">
-                    {{ char_form.previous_aliases | bootstrap }}
-                </div>
+            <div class="col-sm-6">
+                {{ char_form.max_encumbrance | bootstrap }}
             </div>
-        </div>
-        <div class="container">
-            <div class ="row">
-                <div class="col-sm-6">
-                    {{ char_form.paradigm | bootstrap}}
-                </div>
-                <div class="col-sm-6">
-                    {{ char_form.residence | bootstrap }}
-                </div>
-            </div>
-        </div>
-        <div class="container">
-            {{ char_form.languages | bootstrap}}
-        </div>
-        <div class="container">
-            {{ char_form.insanities | bootstrap}}
-        </div>
-        <div class="container">
-            {{ char_form.disabilities | bootstrap}}
-        </div>
-        <div class="container">
-            <div class ="row">
-                <div class="col-sm-6">
-                    {{ char_form.resources | bootstrap}}
-                </div>
-                <div class="col-sm-6">
-                    {{ char_form.contacts | bootstrap }}
-                </div>
-            </div>
-        </div>
-        <div class="container">
-            {{ char_form.wish_list | bootstrap}}
-        </div>
-        <div class="container">
-            {{ char_form.to_do_list | bootstrap}}
-        </div>
-        <div class="container">
-            {{ char_form.contracts | bootstrap}}
-        </div>
-        <div class="container">
-            {{ char_form.background | bootstrap}}
-        </div>
-        <div class="container">
-            {{ char_form.notes | bootstrap}}
         </div>
     </div>
-</section>
-<div class="container">
-<input class="btn btn-primary" type="submit" value="Done!" />
+    <div class="container">
+        {{ char_form.equipment | bootstrap}}
     </div>
-</form>
+    <div class="container">
+        <div class ="row">
+            <div class="col-sm-6">
+                {{ char_form.current_alias | bootstrap}}
+            </div>
+            <div class="col-sm-6">
+                {{ char_form.previous_aliases | bootstrap }}
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class ="row">
+            <div class="col-sm-6">
+                {{ char_form.paradigm | bootstrap}}
+            </div>
+            <div class="col-sm-6">
+                {{ char_form.residence | bootstrap }}
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        {{ char_form.languages | bootstrap}}
+    </div>
+    <div class="container">
+        {{ char_form.insanities | bootstrap}}
+    </div>
+    <div class="container">
+        {{ char_form.disabilities | bootstrap}}
+    </div>
+    <div class="container">
+        <div class ="row">
+            <div class="col-sm-6">
+                {{ char_form.resources | bootstrap}}
+            </div>
+            <div class="col-sm-6">
+                {{ char_form.contacts | bootstrap }}
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        {{ char_form.wish_list | bootstrap}}
+    </div>
+    <div class="container">
+        {{ char_form.to_do_list | bootstrap}}
+    </div>
+    <div class="container">
+        {{ char_form.contracts | bootstrap}}
+    </div>
+    <div class="container">
+        {{ char_form.background | bootstrap}}
+    </div>
+    <div class="container">
+        {{ char_form.notes | bootstrap}}
+    </div>
+            <input class="btn btn-primary" type="submit" value="Done!" />
+    </div>
+    </form>
+ </div></div>
 {% endblock %}
