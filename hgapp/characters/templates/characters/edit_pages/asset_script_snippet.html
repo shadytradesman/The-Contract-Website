@@ -1,0 +1,12 @@
+{% for asset_formset in asset_formsets %}
+    <script type="text/html" id="asset-{{asset_formset.0.initial.quirk.id}}-template">
+            {% with asset_formset.empty_form as form %}
+                {% with asset_formset.0.initial.quirk as quirk %}
+                    <div id="asset-{{quirk.id}}-__prefix__">
+                        {% include "characters/edit_pages/quirk_snippet.html" %}
+                    </div>
+                {% endwith %}
+            {% endwith %}
+        </div>
+    </script>
+{% endfor %}

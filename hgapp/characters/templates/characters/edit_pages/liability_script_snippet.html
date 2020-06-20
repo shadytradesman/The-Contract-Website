@@ -1,0 +1,12 @@
+{% for liability_formset in liability_formsets %}
+    <script type="text/html" id="liability-{{liability_formset.0.initial.quirk.id}}-template">
+            {% with liability_formset.empty_form as form %}
+                {% with liability_formset.0.initial.quirk as quirk %}
+                    <div id="liability-{{quirk.id}}-__prefix__">
+                        {% include "characters/edit_pages/quirk_snippet.html" %}
+                    </div>
+                {% endwith %}
+            {% endwith %}
+        </div>
+    </script>
+{% endfor %}

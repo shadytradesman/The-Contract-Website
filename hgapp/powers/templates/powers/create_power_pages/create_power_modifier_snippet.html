@@ -1,22 +1,18 @@
 {% load bootstrap %}
-
 {{mod.errors}}
 <div class="checkbox thumbnail">
-{% for field in mod.visible_fields|slice:":1"%}
-    <label class="thumbnail" style="border:none">
-        &ensp;
-        {{ field}}
-        {% if mod.eratta %}
-        <span title="{{mod.eratta}}"><i class="fa fa-question-circle fa-1x"></i></span>
-        {% endif %}
-        {{field.label}}</label>
-     <div class="detail_text_form">
-        {{mod.detail_text.label_tag}}
-        {{mod.detail_text}}
-     </div>
-{% endfor %}
-
-<span>
-
-</span>
-    </div>
+    {% for field in mod.visible_fields|slice:":1"%}
+        <label class="thumbnail" style="border:none">
+            &ensp;
+            {{ field}}
+            {% if mod.eratta %}
+            <span title="{{mod.eratta}}"><i class="fa fa-question-circle fa-1x"></i></span>
+            {% endif %}
+            {{field.label}}
+        </label>
+         <div class="detail_text_form">
+            {{mod.detail_text.label_tag}}
+            {{mod.detail_text}}
+         </div>
+    {% endfor %}
+</div>

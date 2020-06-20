@@ -164,3 +164,23 @@ class AbilityForm(forms.Form):
             self.fields['ability_id'].initial = ability.id
             self.fields['description'].widget = forms.HiddenInput()
             self.fields['name'].widget = forms.HiddenInput()
+
+class QuirkForm(forms.Form):
+    id = forms.IntegerField(label=None, widget=forms.HiddenInput(),) # hidden field to track which quirks we are editing.
+    is_selected = forms.BooleanField()
+    details = forms.CharField(max_length=600,
+                           widget=forms.TextInput(attrs={'class': 'form-control'}))
+
+    def __init__(self, *args, **kwargs):
+        super(QuirkForm, self).__init__(*args, **kwargs)
+        if 'quirk' in self.initial:
+            quirk = self.initial["quirk"]
+            self.fields['id'].initial = quirk.id
+            self.fields['is_selected'].label = quirk.name
+            self.fields['is_selected'].widget = forms.CheckboxInput(attrs={'class': 'quirk-multiple-' + str(quirk.multiplicity_allowed)})
+
+class LiabilityForm(QuirkForm):
+    pass
+
+class AssetForm(QuirkForm):
+    pass

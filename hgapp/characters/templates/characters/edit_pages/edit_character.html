@@ -9,6 +9,7 @@
 {% endblock %}
 {% block extra_scripts %}
     <script src="{% static 'characters/edit_character.js' %}"></script>
+    <script src="{% static 'overrides/wiki-macro-scripts.js' %}"></script>
 {% endblock %}
 
 {% block extra_head %}
@@ -16,11 +17,20 @@
     {{ char_form.media }}
 {% endblock %}
 
-{% block head_title %}Editing Character{% endblock %}
+{% block head_title %}
+    {% if character %}
+        Editing Character
+    {% else %}
+        Creating a Character
+    {% endif %}
+{% endblock %}
 
 {% block body_class %}home{% endblock %}
 
 {% block body_base %}
+{% include "characters/edit_pages/secondary_ability_script_snippet.html" %}
+{% include "characters/edit_pages/asset_script_snippet.html" %}
+{% include "characters/edit_pages/liability_script_snippet.html" %}
 <div class="container"><div class="backdropped">
     {{ attribute_formset.about.errors }}
     {{ char_form.about.errors }}
@@ -39,7 +49,7 @@
     {% csrf_token %}
     {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
     <div class="thumbnail">
-        <h2 class = "text-center">Core Info</h2>
+        <h2 class = "text-center" data-toggle="tooltip" title='{{tutorial.core_info}}'>Core Info</h2>
         <div class="row">
             <div class="col-sm-4">
                 {{ char_form.name | bootstrap}}
@@ -107,19 +117,111 @@
                         <b>{{form.initial.ability.name}}</b>
                     </div>
                 {% else %}
-                    <div class="col-sm-6 form-inline" data-toggle="tooltip" title='{{tutorial.secondary_abilities}}' >
-                        <span id="ability-form-{{forloop.counter0}}" class="ability-form">
-                            {{ form.value }}
-                            {{ form.attribute_id.as_hidden }}
-                        </span>
-                        {{ form.name}}
-                        <span class="pull-right">
-                            Detail: {{ form.description}}
-                        </span>
-                    </div>
+                    {% include "characters/edit_pages/secondary_ability_snippet.html" %}
                 {% endif %}
-                <div class="clearfix visible-xs-block"></div>
             {% endfor %}
+            </div>
+        <br>
+        <div id="extra-secondaries" class="row">
+        </div>
+    </div>
+    <div class="thumbnail">
+        <h2 class = "row text-center" data-toggle="tooltip" title='{{tutorial.assets_and_liabilities}}'>Assets and Liabilities</h2>
+        <ul class="nav nav-pills text-center center-pills">
+            <li class="active"><a data-toggle="pill" href="#physical">Physical</a></li>
+            <li><a data-toggle="pill" href="#background">Background</a></li>
+            <li><a data-toggle="pill" href="#mental">Mental/Emotional</a></li>
+            <li><a data-toggle="pill" href="#restricted">Restricted</a></li>
+        </ul>
+        <div class="tab-content">
+            <div id="physical" class="tab-pane fade in active">
+                <div class="col-md-6">
+                    <h3 id="physical-assets">Physical Assets</h3>
+                    {% for formset in asset_formsets %}
+                        {% for form in formset %}
+                            {% if form.initial.quirk.is_physical %}
+                                {% include "characters/edit_pages/quirk_outer_snippet.html" %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+                <div class="col-md-6">
+                    <h3 id="physical-flaws">Physical Liabilities</h3>
+                    {% for formset in liability_formsets %}
+                        {% for form in formset %}
+                            {% if form.initial.quirk.is_physical %}
+                                    {% include "characters/edit_pages/quirk_outer_snippet.html" %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+            </div>
+            <div id="background" class="tab-pane fade">
+                <div class="col-md-6">
+                    <h3 id="background-assets">Background Assets</h3>
+                        {% for formset in asset_formsets %}
+                            {% for form in formset %}
+                                {% if form.initial.quirk.is_background %}
+                                        {% include "characters/edit_pages/quirk_outer_snippet.html" %}
+                                {% endif %}
+                            {% endfor %}
+                    {% endfor %}
+                </div>
+                <div class="col-md-6">
+                    <h3 id="background-liabilities">Background Liabilities</h3>
+                    {% for formset in liability_formsets %}
+                        {% for form in formset %}
+                            {% if form.initial.quirk.is_background %}
+                                {% include "characters/edit_pages/quirk_outer_snippet.html" %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+            </div>
+            <div id="mental" class="tab-pane fade">
+                <div class="col-md-6">
+                    <h3 id="mental-assets">Mental Assets</h3>
+                    {% for formset in asset_formsets %}
+                        {% for form in formset %}
+                            {% if form.initial.quirk.is_mental %}
+                                {% include "characters/edit_pages/quirk_outer_snippet.html" %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+                <div class="col-md-6">
+                    <h3 id="mental-liabilities">Mental Liabilities</h3>
+                    {% for formset in liability_formsets %}
+                        {% for form in formset %}
+                            {% if form.initial.quirk.is_mental %}
+                                {% include "characters/edit_pages/quirk_outer_snippet.html" %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+            </div>
+            <div id="restricted" class="tab-pane fade">
+                <div class="col-md-6">
+                    <h3 id="restricted-assets">Restricted Assets</h3>
+                    {% for formset in asset_formsets %}
+                        {% for form in formset %}
+                            {% if form.initial.quirk.is_restricted %}
+                                {% include "characters/edit_pages/quirk_outer_snippet.html" %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+                <div class="col-md-6">
+                    <h3 id="restricted-liabilities">Restricted Liabilities</h3>
+                    {% for formset in liability_formsets %}
+                        {% for form in formset %}
+                            {% if form.initial.quirk.is_restricted %}
+                                {% include "characters/edit_pages/quirk_outer_snippet.html" %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+            </div>
         </div>
     </div>
     <div class="container">

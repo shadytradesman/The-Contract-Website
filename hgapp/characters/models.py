@@ -322,6 +322,23 @@ class Quirk(models.Model):
     eratta = models.CharField(max_length=2500,
                               blank = True,
                               null = True)
+    details_field_name = models.CharField(max_length=150,
+                              blank = True,
+                              null = True)
+    multiplicity_allowed = models.BooleanField(default=False)
+
+    def is_physical(self):
+        return self.category == QUIRK_CATEGORY[0][0]
+
+    def is_background(self):
+        return self.category == QUIRK_CATEGORY[1][0]
+
+    def is_mental(self):
+        return self.category == QUIRK_CATEGORY[2][0]
+
+    def is_restricted(self):
+        return self.category == QUIRK_CATEGORY[3][0]
+
     def __str__(self):
         return self.name
 
@@ -329,10 +346,13 @@ class Quirk(models.Model):
         abstract = True
 
 class Asset(Quirk):
-    pass
+    def is_liability(self):
+        return False
 
 class Liability(Quirk):
-    pass
+    def is_liability(self):
+        return True
+
 
 class Limit(models.Model):
     name = models.CharField(max_length=50)
@@ -416,6 +436,8 @@ class Graveyard_Header(models.Model):
 
 
 class CharacterTutorial(models.Model):
+    core_info = models.TextField(max_length=3000)
+    attributes = models.TextField(max_length=3000)
     abilities = models.TextField(max_length=3000)
     secondary_abilities = models.TextField(max_length=3000)
-    attributes = models.TextField(max_length=3000)
+    assets_and_liabilities = models.TextField(max_length=3000)

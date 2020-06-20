@@ -7,9 +7,11 @@ from django.utils import timezone
 from django.db import transaction
 from django.forms import formset_factory
 
-from characters.models import Character, BasicStats, Character_Death, Graveyard_Header, Attribute, Ability, CharacterTutorial
+from characters.models import Character, BasicStats, Character_Death, Graveyard_Header, Attribute, Ability, \
+    CharacterTutorial, Asset, Liability
 from powers.models import Power_Full
-from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, AbilityForm
+from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, AbilityForm, \
+    AssetForm, LiabilityForm
 
 
 def create_character(request):
@@ -17,6 +19,8 @@ def create_character(request):
         return HttpResponseForbidden()
     AttributeFormSet = formset_factory(AttributeForm, extra=0)
     AbilityFormSet = formset_factory(AbilityForm, extra=1)
+    AssetFormSet = formset_factory(AssetForm, extra=0)
+    LiabilityFormSet = formset_factory(LiabilityForm, extra=0)
     if request.method == 'POST':
         char_form = make_character_form(request.user)(request.POST)
         stats_form = BasicStatsForm(request.POST)
@@ -43,13 +47,21 @@ def create_character(request):
         default_abilities = Ability.objects.filter(is_primary=True).order_by('name')
         attribute_formset = AttributeFormSet(initial=[{'attribute_id': x.id, 'value': 1, 'attribute': x} for x in attributes])
         ability_formset = AbilityFormSet(initial=[{'ability_id': x.id, 'value': 0, 'ability': x} for x in default_abilities])
+        asset_formsets = []
+        for asset in Asset.objects.order_by('value').all():
+            asset_formsets.append(AssetFormSet(initial=[{'id': asset.id, 'quirk': asset}]))
+        liability_formsets = []
+        for liability in Liability.objects.order_by('value').all():
+            liability_formsets.append(LiabilityFormSet(initial=[{'id': liability.id, 'quirk': liability}]))
         context = {
             'char_form' : char_form,
             'attribute_formset': attribute_formset,
             'ability_formset': ability_formset,
+            'asset_formsets': asset_formsets,
+            'liability_formsets': liability_formsets,
             'tutorial': tutorial,
         }
-        return render(request, 'characters/edit_character.html', context)
+        return render(request, 'characters/edit_pages/edit_character.html', context)
 
 
 def edit_character(request, character_id):
@@ -81,7 +93,7 @@ def edit_character(request, character_id):
             'char_form' : char_form,
             'stats_form': stats_form,
         }
-        return render(request, 'characters/edit_character.html', context)
+        return render(request, 'characters/edit_pages/edit_character.html', context)
 
 
 def edit_obituary(request, character_id):

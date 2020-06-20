@@ -26,3 +26,53 @@ input[type="number"] {
 .thumbnail {
     padding: 10px;
 }
+
+.tab-content>.active {
+    display: flex;
+}
+
+.quirk-btn-cont {
+  background-color: #EFEFEF;
+  border-radius: 4px;
+}
+
+.quirk-btn-inner {
+  text-align: left;
+  white-space: normal;
+  font-weight: 200;
+}
+
+.quirk-btn.active {
+  background-color: #CFCFCF;
+  box-shadow: inset 0px 0px 0px 0px rgba(0,0,0,.125);
+}
+
+.quirk-collapse {
+  background-color: #CFCFCF;
+  padding-right: 5px;
+  padding-bottom: 5px;
+  border-radius: 4px;
+  margin-top:-8px;
+  white-space: noWrap;
+}
+
+.quirk-details {
+  position-relative: 0;
+  top: 7px;
+}
+
+.quirk-btn:hover {
+  background-color: #E1E1E1;
+}
+
+.quirk-btn.focus {
+      outline: none !important;
+
+}
+
+.nav-tabs > li, .nav-pills > li {
+    float:none;
+    display:inline-block;
+    *display:inline; /* ie7 fix */
+     zoom:1; /* hasLayout ie7 trigger */
+}

@@ -1,0 +1,11 @@
+<div class = "quirk-group-container" id="quirk-{{form.initial.quirk.id}}">
+    {% with form.initial.quirk as quirk %}
+        {% if quirk.is_liability %}
+            <div id="liability-{{form.initial.quirk.id}}-0">
+        {% else %}
+            <div id="asset-{{form.initial.quirk.id}}-0">
+        {% endif %}
+        {% include "characters/edit_pages/quirk_snippet.html" %}
+        </div>
+    {% endwith %}
+</div>

@@ -1,0 +1,40 @@
+{% load bootstrap %}
+<div class="quirk-btn-cont">
+    {% if quirk.details_field_name %}
+        <div class="wiki-entry-collapsible">
+    {% else %}
+            <div>
+    {% endif %}
+    <label class="btn btn-outline btn-block quirk-btn btn-{{quirk.is_liability}}-{{quirk.id}}" data-toggle="buttons">
+        <div class="quirk-btn-inner">
+            <h4>
+                {{form.is_selected}}
+                &ensp;
+                <b>{{quirk.value}}</b>
+                -
+                {{quirk.name}}
+            </h4>
+            <p>
+                {{quirk.description}}
+                {{quirk.system}}
+                {% if quirk.eratta %}
+                    <span data-toggle="tooltip" title='{{quirk.eratta}}' data-placement="right">
+                        <i class="fa fa-question-circle fa-1x"></i>
+                    </span>
+                {% endif %}
+            </p>
+        </div>
+    </label>
+    </div>
+    {% if quirk.details_field_name %}
+        <div class="collapse-content clearfix quirk-collapse" style="display:none;">
+            <label class="col-sm-3 text-center quirk-details">
+                <b>{{quirk.details_field_name}}</b>
+            </label>
+            <div class="col-sm-9">
+                {{form.details}}
+            </div>
+        </div>
+    {% endif %}
+    </div>
+<br>
