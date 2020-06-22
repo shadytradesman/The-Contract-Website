@@ -89,11 +89,12 @@
     <div class="thumbnail">
         <h2 class = "row text-center" data-toggle="tooltip" title='{{tutorial.attributes}}'>Attributes</h2>
         <div class="row">
+            {{ attribute_formset.management_form }}
             {% for form in attribute_formset %}
                 {% if forloop.counter0 == 3 %}
                 </div><div class="row">
                 {% endif %}
-                <div class="col-sm-4" data-toggle="tooltip" title='{{form.initial.attribute.tutorialText}}'>
+                <div class="col-sm-4" data-toggle="tooltip" title='{{form.initial.attribute.tutorial_text}}'>
                     {{form.value | bootstrap}}
                     {{ form.attribute_id.as_hidden}}
                 </div>
@@ -103,30 +104,36 @@
     </div>
     <div class="thumbnail">
         <h2 class = "row text-center" data-toggle="tooltip" title='{{tutorial.abilities}}'>Abilities</h2>
-        <div class="row">
+        <div class="row" id="abilities-forms">
+            {{ ability_formset.management_form }}
             {% for form in ability_formset %}
-                {% if forloop.counter0|divisibleby:4 %}
-                </div><br><div class="row">
-                {% endif %}
                 {% if form.initial.ability %}
-                    <div class="col-sm-3 form-inline" data-toggle="tooltip" title='{{form.initial.ability.tutorialText}}'>
+                    <div class="col-sm-3 form-inline" data-toggle="tooltip" title='{{form.initial.ability.tutorial_text}}'>
                         <span id="ability-form-{{forloop.counter0}}" class="ability-form">
                             {{ form.value }}
-                            {{ form.ability_id.as_hidden }}
                         </span>
+                        {{ form.ability_id }}
                         <b>{{form.initial.ability.name}}</b>
                     </div>
                 {% else %}
                     {% include "characters/edit_pages/secondary_ability_snippet.html" %}
                 {% endif %}
             {% endfor %}
-            </div>
-        <br>
-        <div id="extra-secondaries" class="row">
+
         </div>
+        <br>
     </div>
     <div class="thumbnail">
         <h2 class = "row text-center" data-toggle="tooltip" title='{{tutorial.assets_and_liabilities}}'>Assets and Liabilities</h2>
+
+        {# asset and liability management forms #}
+        {% for formset in asset_formsets %}
+            {{ formset.management_form }}
+        {% endfor %}
+        {% for formset in liability_formsets %}
+            {{ formset.management_form }}
+        {% endfor %}
+
         <ul class="nav nav-pills text-center center-pills">
             <li class="active"><a data-toggle="pill" href="#physical">Physical</a></li>
             <li><a data-toggle="pill" href="#background">Background</a></li>

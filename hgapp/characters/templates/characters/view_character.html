@@ -147,38 +147,85 @@
             {% endif %}
         </div>
     </div>
-    <div class="container">
-        <div class ="row">
-            <div class="col-md-6">
-                <h2>Stats</h2>
+    <div class ="row text-center">
+        <h2>Attributes</h2>
+        {% for attribute_value in character.stats.attributevalue_set.all %}
+            <div class="col-md-4">
                 <p>
-                    {{character.basic_stats.stats |markdown |linebreaks}}
+                    <b>{{attribute_value.relevant_attribute.name}}:</b>
+                    {{attribute_value.value}}
                 </p>
             </div>
-            <div class="col-md-6">
-                <h2>Powers</h2>
-                <p><b>Power Value: </b>{{character.get_power_cost_total}}</p>
-                <p><b>Rewards invested: </b>{{character.active_spent_rewards|length}}</p>
-                {% if character.paradigm %}
-                    <p><b>Paradigm: </b> {{character.paradigm}}</p>
-                {% endif %}
-                {% for power_full in character.power_full_set.all %}
-                    <div class="row">
-                        {% if request.user.is_authenticated and request.user.id == character.player.id and character.unspent_rewards|length > 0 %}
-                            <div class= "col-md-2 container">
-                                <a href="{% url 'powers:powers_edit_power' power_full.id %}" class="btn btn-success"><i class="fa fa-plus-square fa-4x"></i></a>
-                            </div>
-                            <div class= "col-md-10">
-                        {% else %}
-                            <div class= "col-md-12">
-                        {% endif %}
-                        {% include "powers/power_badge_snippet.html" %}
-                        </div>
-                    </div>
-                {% empty %}
-                    <h4>{{character.name}} doesn't have any powers yet. What a noob :(</h4>
-                {% endfor %}
+        {% endfor %}
+    </div>
+    <div class ="row text-center">
+        <h2>Abilities</h2>
+        {% for ability_value in character.stats.abilityvalue_set.all %}
+            <div class="col-md-3">
+                <p>
+                    <b>{{ability_value.relevant_ability.name}}:</b>
+                    {{ability_value.value}}
+                </p>
             </div>
+        {% endfor %}
+    </div>
+    <div class ="row">
+        <div class="col-md-6">
+        <h2>Assets</h2>
+        {% for asset_details in character.stats.assetdetails_set.all %}
+            <div class="ul">
+                <li>
+                    <b>[+{{asset_details.relevant_asset.value}}] {{asset_details.relevant_asset.name}}:</b>
+                    {{asset_details.relevant_asset.system}}
+                    {% if asset_details.details %}
+                        <br>
+                        <b>{{asset_details.relevant_asset.details_field_name}}</b>
+                        {{asset_details.details}}
+                    {% endif %}
+                </li>
+            </div>
+        {% endfor %}
+        </div>
+        <div class="col-md-6">
+        <h2>Liabilities</h2>
+        {% for liability_details in character.stats.liabilitydetails_set.all %}
+            <div class="ul">
+                <li>
+                    <b>[+{{liability_details.relevant_liability.value}}] {{liability_details.relevant_liability.name}}:</b>
+                    {{liability_details.relevant_liability.system}}
+                    {% if liability_details.details %}
+                        <br>
+                        <b>{{liability_details.relevant_liability.details_field_name}}</b>
+                        {{liability_details.details}}
+                    {% endif %}
+                </li>
+            </div>
+        {% endfor %}
+        </div>
+    </div>
+        <div class="row">
+            <h2>Powers</h2>
+            <p><b>Power Value: </b>{{character.get_power_cost_total}}</p>
+            <p><b>Rewards invested: </b>{{character.active_spent_rewards|length}}</p>
+            {% if character.paradigm %}
+                <p><b>Paradigm: </b> {{character.paradigm}}</p>
+            {% endif %}
+            {% for power_full in character.power_full_set.all %}
+                <div class="row">
+                    {% if request.user.is_authenticated and request.user.id == character.player.id and character.unspent_rewards|length > 0 %}
+                        <div class= "col-md-2 container">
+                            <a href="{% url 'powers:powers_edit_power' power_full.id %}" class="btn btn-success"><i class="fa fa-plus-square fa-4x"></i></a>
+                        </div>
+                        <div class= "col-md-10">
+                    {% else %}
+                        <div class= "col-md-12">
+                    {% endif %}
+                    {% include "powers/power_badge_snippet.html" %}
+                    </div>
+                </div>
+            {% empty %}
+                <h4>{{character.name}} doesn't have any powers yet. What a noob :(</h4>
+            {% endfor %}
         </div>
     </div>
         <h2>Game History</h2>

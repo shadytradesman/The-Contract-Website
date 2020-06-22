@@ -7,8 +7,8 @@
         <span id="secondary-ability-form-{{forloop.counter0}}__prefix__" class="ability-form">
      {% endif %}
         {{ form.value }}
-        {{ form.attribute_id.as_hidden }}
     </span>
+    {{ form.ability_id }}
     {{ form.name}}
     <span class="pull-right">
         Detail: {{ form.description}}

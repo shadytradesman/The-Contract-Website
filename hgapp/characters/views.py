@@ -12,16 +12,15 @@ from characters.models import Character, BasicStats, Character_Death, Graveyard_
 from powers.models import Power_Full
 from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, AbilityForm, \
     AssetForm, LiabilityForm
+from characters.form_utilities import get_edit_context, character_from_post
 
 
 def create_character(request):
     if not request.user.is_authenticated:
         return HttpResponseForbidden()
-    AttributeFormSet = formset_factory(AttributeForm, extra=0)
-    AbilityFormSet = formset_factory(AbilityForm, extra=1)
-    AssetFormSet = formset_factory(AssetForm, extra=0)
-    LiabilityFormSet = formset_factory(LiabilityForm, extra=0)
     if request.method == 'POST':
+        character = character_from_post(request.user, request.POST)
+
         char_form = make_character_form(request.user)(request.POST)
         stats_form = BasicStatsForm(request.POST)
         if char_form.is_valid() and stats_form.is_valid():
@@ -41,26 +40,7 @@ def create_character(request):
             print(char_form.errors + stats_form.errors)
             return None
     else:
-        char_form = make_character_form(request.user)()
-        attributes = Attribute.objects.order_by('name')
-        tutorial = get_object_or_404(CharacterTutorial)
-        default_abilities = Ability.objects.filter(is_primary=True).order_by('name')
-        attribute_formset = AttributeFormSet(initial=[{'attribute_id': x.id, 'value': 1, 'attribute': x} for x in attributes])
-        ability_formset = AbilityFormSet(initial=[{'ability_id': x.id, 'value': 0, 'ability': x} for x in default_abilities])
-        asset_formsets = []
-        for asset in Asset.objects.order_by('value').all():
-            asset_formsets.append(AssetFormSet(initial=[{'id': asset.id, 'quirk': asset}]))
-        liability_formsets = []
-        for liability in Liability.objects.order_by('value').all():
-            liability_formsets.append(LiabilityFormSet(initial=[{'id': liability.id, 'quirk': liability}]))
-        context = {
-            'char_form' : char_form,
-            'attribute_formset': attribute_formset,
-            'ability_formset': ability_formset,
-            'asset_formsets': asset_formsets,
-            'liability_formsets': liability_formsets,
-            'tutorial': tutorial,
-        }
+        context = get_edit_context(user=request.user)
         return render(request, 'characters/edit_pages/edit_character.html', context)
 
 

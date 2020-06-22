@@ -139,21 +139,26 @@ class AttributeForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(AttributeForm, self).__init__(*args, **kwargs)
-        attribute = self.initial["attribute"]
-        self.fields['value'].label = attribute.name
-        if attribute.name in ATTRIBUTE_VALUES:
-            self.fields['value'].choices = ATTRIBUTE_VALUES[attribute.name]
-        else:
-            self.fields['value'].choices = ATTRIBUTE_VALUES["default"]
+        if "attribute" in self.initial:
+            attribute = self.initial["attribute"]
+            self.fields['value'].label = attribute.name
+            if attribute.name in ATTRIBUTE_VALUES:
+                self.fields['value'].choices = ATTRIBUTE_VALUES[attribute.name]
+            else:
+                self.fields['value'].choices = ATTRIBUTE_VALUES["default"]
 
 class AbilityForm(forms.Form):
-    ability_id = forms.IntegerField(label=None, widget=forms.HiddenInput(),) # hidden field to track which abilities we are editing.
+    ability_id = forms.IntegerField(label=None,
+                                    widget=forms.HiddenInput(),
+                                    required=False) # hidden field to track which abilities we are editing.
     value = forms.IntegerField(initial=0,
                                validators=[MaxValueValidator(5), MinValueValidator(0)],
                                widget=forms.NumberInput(attrs={'class': 'ability-value-input form-control'}))
     name = forms.CharField(max_length=50,
+                           required=False,
                            widget=forms.TextInput(attrs={'class': 'form-control sec-ability-name'}))
     description = forms.CharField(max_length=250,
+                                  required=False,
                                   widget=forms.TextInput(attrs={'class': 'form-control sec-ability-desc'}))
 
     def __init__(self, *args, **kwargs):

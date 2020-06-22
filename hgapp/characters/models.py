@@ -102,6 +102,12 @@ class Character(models.Model):
         null=True,
         blank=True)
 
+    stats = models.OneToOneField(
+        'ContractStats',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True)
+
     class Meta:
         permissions = (
             ('view_private_character', 'View private character'),
@@ -296,7 +302,7 @@ class BasicStats(models.Model):
 
 class Trait(models.Model):
     name = models.CharField(max_length=50)
-    tutorialText = models.CharField(max_length=250,
+    tutorial_text = models.CharField(max_length=250,
                               null=True,
                               blank=True)
     def __str__(self):
@@ -383,7 +389,9 @@ class ContractStats(models.Model):
 class QuirkDetails(models.Model):
     relevant_stats = models.ForeignKey(ContractStats,
                                        on_delete=models.CASCADE)
-    details = models.CharField(max_length=2000)
+    details = models.CharField(max_length=2000,
+                                null=True,
+                                blank=True)
 
     class Meta:
         abstract = True

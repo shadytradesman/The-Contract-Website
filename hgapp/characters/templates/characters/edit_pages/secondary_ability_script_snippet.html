@@ -1,7 +1,5 @@
 <script type="text/html" id="sec-ability-template">
-    <div id="enhancement-__prefix__">
-        {% with ability_formset.empty_form as form %}
-            {% include "characters/edit_pages/secondary_ability_snippet.html" %}
-        {% endwith %}
-    </div>
+    {% with ability_formset.empty_form as form %}
+        {% include "characters/edit_pages/secondary_ability_snippet.html" %}
+    {% endwith %}
 </script>
