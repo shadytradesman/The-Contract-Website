@@ -19,31 +19,13 @@ def create_character(request):
     if not request.user.is_authenticated:
         return HttpResponseForbidden()
     if request.method == 'POST':
-        character = character_from_post(request.user, request.POST)
-
-        char_form = make_character_form(request.user)(request.POST)
-        stats_form = BasicStatsForm(request.POST)
-        if char_form.is_valid() and stats_form.is_valid():
-            with transaction.atomic():
-                new_stats = stats_form.save()
-                new_character = char_form.save(commit=False)
-                new_character.basic_stats = new_stats
-                new_character.player = request.user
-                new_character.pub_date = timezone.now()
-                new_character.edit_date = timezone.now()
-                cell = char_form.cleaned_data['cell']
-                if cell != "free":
-                    new_character.cell = cell
-                new_character.save()
-            return HttpResponseRedirect(reverse('characters:characters_view', args=(new_character.id,)))
-        else:
-            print(char_form.errors + stats_form.errors)
-            return None
+        new_character = character_from_post(request.user, request.POST)
+        return HttpResponseRedirect(reverse('characters:characters_view', args=(new_character.id,)))
     else:
         context = get_edit_context(user=request.user)
         return render(request, 'characters/edit_pages/edit_character.html', context)
 
-
+#TODO: update meta fields so that the traits can't be more than one to a stats.
 def edit_character(request, character_id):
     character = get_object_or_404(Character, id=character_id)
     if not character.player_can_edit(request.user):

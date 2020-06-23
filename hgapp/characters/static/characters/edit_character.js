@@ -24,7 +24,7 @@ $(document).on("click", ".val-adjuster", function() {
       newValue = 0;
     }
   }
-  button.parent().find("input").val(newValue);
+  button.parent().find("input").val(newValue); // NOTE: this causes issues if there is more than one input child.
 });
 
 $(document).ready(function(){
@@ -67,27 +67,33 @@ $(document).on('change','[id$=-is_selected]', function(ev) {
         }
         var checkboxGroup = checkbox.closest(".quirk-group-container");
         var isLiability = checkboxGroup.children("[id^=liability]").length > 0;
+        var quirkWord = isLiability ? 'liability' : 'asset';
 
-        var count = checkboxGroup.children().length;
         var quirkId = checkboxGroup.attr('id').slice(6);
-        var emptyCheckboxes = $('[class~=btn-'+ (isLiability ? "True" : "False") +'-'+ quirkId + ']:not([class~=active])')
-        console.log(quirkId);
-        console.log(emptyCheckboxes);
-        if (isLiability) {
-            var tmplMarkup = $('#liability-'+quirkId+"-template").html();
-        } else {
-            var tmplMarkup = $('#asset-'+quirkId+"-template").html();
-        }
-        var compiledTmpl = tmplMarkup.replace(/__prefix__/g, count);
-        var maxOfOneQuirk = 4;
-        if (this.checked && count < maxOfOneQuirk) {
-            var newBox = checkboxGroup.append(compiledTmpl);
-            if(compiledTmpl.includes("wiki-entry-collapsible")) {
-                    var collapsibleContainer = newBox.find('[class~=wiki-entry-collapsible]').get(count-1);
+        var count = $('[class~=btn-'+ (isLiability ? "True" : "False") +'-'+ quirkId + ']').length;
+        var allThisQuirksButtons = $('[class~=btn-'+ (isLiability ? "True" : "False") +'-'+ quirkId + ']');
+        var emptyCheckboxes = allThisQuirksButtons
+                .filter(function() {return !$(this).is(".active") && !$(this.parentElement).is(":hidden");});
+        var visibleCount =  allThisQuirksButtons
+                .filter(function() {return !$(this.parentElement).is(":hidden");})
+                .length;
+        if (this.checked && visibleCount < 4) {
+            if (isLiability) {
+                var tmplMarkup = $('#liability-'+quirkId+"-template").html();
+            } else {
+                var tmplMarkup = $('#asset-'+quirkId+"-template").html();
+            }
+            var compiledTmpl = tmplMarkup.replace(/__prefix__/g, count);
+
+            checkboxGroup.append(compiledTmpl);
+            if (compiledTmpl.includes("wiki-entry-collapsible")) {
+                    var collapsibleContainer = checkboxGroup.find('[class~=wiki-entry-collapsible]').get(count);
                     setupCollapsibles(collapsibleContainer);
             }
-            $('#id_item_items-TOTAL_FORMS').attr('value', count+1);
+//            id_liability-6-1-id
+            $('#id_' + quirkWord + '-' + quirkId + '-' + count + '-id').attr('value', quirkId)
+            $('#id_' + quirkWord + '-' + quirkId + '-TOTAL_FORMS').attr('value', count+1);
         } else if (!this.checked && (count > 1) && emptyCheckboxes.length>1) {
-            checkbox.closest('[id^=' + (isLiability ? 'liability' : 'asset') + '-'+quirkId+']').hide();
+            checkbox.closest('[id^=' + quirkWord + '-'+quirkId+']').hide();
         }
 });

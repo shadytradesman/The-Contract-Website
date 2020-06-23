@@ -132,7 +132,6 @@ class ConfirmAssignmentForm(forms.Form):
 
 
 #Advanced stat forms
-
 class AttributeForm(forms.Form):
     value = forms.ChoiceField(choices=(()))
     attribute_id = forms.IntegerField(label=None, widget=forms.HiddenInput(),) # hidden field to track which attribute we are editing.
@@ -172,9 +171,10 @@ class AbilityForm(forms.Form):
 
 class QuirkForm(forms.Form):
     id = forms.IntegerField(label=None, widget=forms.HiddenInput(),) # hidden field to track which quirks we are editing.
-    is_selected = forms.BooleanField()
+    is_selected = forms.BooleanField(required=False)
     details = forms.CharField(max_length=600,
-                           widget=forms.TextInput(attrs={'class': 'form-control'}))
+                           widget=forms.TextInput(attrs={'class': 'form-control'}),
+                              required=False)
 
     def __init__(self, *args, **kwargs):
         super(QuirkForm, self).__init__(*args, **kwargs)
