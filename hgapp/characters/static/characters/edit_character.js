@@ -74,6 +74,8 @@ $(document).on('change','[id$=-is_selected]', function(ev) {
         var allThisQuirksButtons = $('[class~=btn-'+ (isLiability ? "True" : "False") +'-'+ quirkId + ']');
         var emptyCheckboxes = allThisQuirksButtons
                 .filter(function() {return !$(this).is(".active") && !$(this.parentElement).is(":hidden");});
+        console.log(allThisQuirksButtons)
+        console.log(emptyCheckboxes)
         var visibleCount =  allThisQuirksButtons
                 .filter(function() {return !$(this.parentElement).is(":hidden");})
                 .length;
@@ -90,7 +92,6 @@ $(document).on('change','[id$=-is_selected]', function(ev) {
                     var collapsibleContainer = checkboxGroup.find('[class~=wiki-entry-collapsible]').get(count);
                     setupCollapsibles(collapsibleContainer);
             }
-//            id_liability-6-1-id
             $('#id_' + quirkWord + '-' + quirkId + '-' + count + '-id').attr('value', quirkId)
             $('#id_' + quirkWord + '-' + quirkId + '-TOTAL_FORMS').attr('value', count+1);
         } else if (!this.checked && (count > 1) && emptyCheckboxes.length>1) {

@@ -22,6 +22,19 @@ QUIRK_CATEGORY = (
     ('RESTRICTED', 'Restricted'),
 )
 
+# EXPERIENCE CONSTANTS
+# These can be changed at will as the historical values are all dynamically calculated.
+EXP_MVP = 2
+EXP_LOSS = 2
+EXP_WIN = 4
+EXP_GM = 4
+EXP_NEW_CHAR = 150
+EXP_COST_QUIRK_MULTIPLIER = 3
+EXP_ADV_COST_ATTR_MULTIPLIER = 4
+EXP_ADV_COST_SKILL_MULTIPLIER = 2
+EXP_COST_SKILL_INITIAL = 2
+
+
 class Character(models.Model):
     name = models.CharField(max_length=100)
     tagline = models.CharField(max_length=200)
@@ -102,7 +115,7 @@ class Character(models.Model):
         null=True,
         blank=True)
 
-    stats = models.OneToOneField(
+    stats_snapshot = models.OneToOneField(
         'ContractStats',
         on_delete=models.CASCADE,
         null=True,
@@ -285,6 +298,79 @@ class Character(models.Model):
             output = output.format(power_full.latest_archive_txt())
         return output
 
+    def unspent_experience(self):
+        rewards = self.experiencereward_set.all()
+        total_exp = EXP_NEW_CHAR
+        for reward in rewards:
+            total_exp = total_exp + reward.get_value()
+        exp_cost = self.stats.exp_cost()
+        return total_exp - exp_cost
+
+    def regen_stats_snapshot(self):
+        stat_diffs = self.contractstats_set.filter(is_snapshot=False).order_by("created_time").all()
+        asset_details = []
+        liability_details = []
+        ability_values = []
+        attribute_values = []
+        for diff in stat_diffs:
+            for detail in diff.assetdetails_set.all():
+                if detail.previous_revision:
+                    asset_details.remove(detail.previous_revision)
+                    if not detail.is_deleted:
+                        asset_details.append(detail)
+                else:
+                    asset_details.append(detail)
+            for detail in diff.liabilitydetails_set.all():
+                if detail.previous_revision:
+                    liability_details.remove(detail.previous_revision)
+                    if not detail.is_deleted:
+                        liability_details.append(detail)
+                else:
+                    liability_details.append(detail)
+            for value in diff.attributevalue_set.all():
+                if value.previous_revision:
+                    attribute_values.remove(value.previous_revision)
+                attribute_values.append(value)
+            for value in diff.abilityvalue_set.all():
+                if value.previous_revision:
+                    ability_values.remove(value.previous_revision)
+                if value.value != 0:
+                    ability_values.append(value)
+
+        self.stats_snapshot.clear()
+        for deet in asset_details:
+            snapshot_deet = AssetDetails(
+                relevant_stats=self.stats_snapshot,
+                relevant_asset=deet.relevant_asset,
+                details=deet.details,
+                previous_revision=deet,
+            )
+            snapshot_deet.save()
+        for deet in liability_details:
+            snapshot_deet = LiabilityDetails(
+                relevant_stats=self.stats_snapshot,
+                relevant_liability=deet.relevant_liability,
+                details=deet.details,
+                previous_revision=deet,
+            )
+            snapshot_deet.save()
+        for value in ability_values:
+            snapshot_value = AbilityValue(
+                relevant_stats=self.stats_snapshot,
+                relevant_ability=value.relevant_ability,
+                value=value.value,
+                previous_revision=value,
+            )
+            snapshot_value.save()
+        for value in attribute_values:
+            snapshot_value = AttributeValue(
+                relevant_stats=self.stats_snapshot,
+                relevant_attribute=value.relevant_attribute,
+                value=value.value,
+                previous_revision=value,
+            )
+            snapshot_value.save()
+        self.stats_snapshot.save()
 
 class BasicStats(models.Model):
     stats = models.CharField(max_length=10000)
@@ -297,6 +383,39 @@ class BasicStats(models.Model):
     armor = models.CharField(max_length=300,
                                 null=True,
                                 blank=True)
+
+## EXPERIENCE
+class ExperienceReward(models.Model):
+    created_time = models.DateTimeField(default=timezone.now)
+    rewarded_character = models.ForeignKey(Character,
+                                           blank=True,
+                                           null=True,
+                                           on_delete=models.CASCADE)
+    rewarded_player = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                        on_delete=models.CASCADE)
+
+    # returns one of several potential classes. Intended to be used with visitor pattern
+    def get_source(self):
+        if hasattr(self, 'game_attendance'):
+            return self.game_attendance
+        if hasattr(self, 'game'):
+            return self.game
+        raise ValueError("Experience reward has no source")
+
+    def get_value(self):
+        if hasattr(self, 'game_attendance'):
+            attendance = self.game_attendance
+            value = 0
+            if attendance.is_mvp:
+                value = value + EXP_MVP
+            if attendance.is_victory():
+                value = value + EXP_WIN
+            else:
+                value = value + EXP_LOSS
+            return value
+        if hasattr(self, 'game'):
+            return EXP_GM
+        raise ValueError("Experience reward has no source")
 
 ## ADVANCED STATS
 
@@ -366,6 +485,10 @@ class Limit(models.Model):
     is_default = models.BooleanField(default=False)
 
 class ContractStats(models.Model):
+    created_time = models.DateTimeField(default=timezone.now)
+    is_snapshot = models.BooleanField(default=False)
+    assigned_character = models.ForeignKey(Character, on_delete=models.CASCADE)
+
     attributes = models.ManyToManyField(Attribute,
                                        blank=True,
                                        through="AttributeValue",
@@ -385,6 +508,24 @@ class ContractStats(models.Model):
     limits = models.ManyToManyField(Limit,
                                     blank=True)
 
+    def exp_cost(self):
+        if self.is_snapshot:
+            pass # don't account for history
+        else:
+            pass # just find the diff
+
+    def clear(self): #TODO clear other things
+        if not self.is_snapshot:
+            raise ValueError("should only clear snapshots")
+        for asset in self.assetdetails_set.all():
+            asset.delete()
+        for liability in self.liabilitydetails_set.all():
+            liability.delete()
+        for ability in self.abilityvalue_set.all():
+            ability.delete()
+        for attribute in self.attributevalue_set.all():
+            attribute.delete()
+
 
 class QuirkDetails(models.Model):
     relevant_stats = models.ForeignKey(ContractStats,
@@ -392,9 +533,20 @@ class QuirkDetails(models.Model):
     details = models.CharField(max_length=2000,
                                 null=True,
                                 blank=True)
+    previous_revision = models.ForeignKey('self', # Used in revisioning to determine if this quirk is an edit or an add
+                               null=True,
+                               blank=True,
+                               on_delete=models.CASCADE)
+    is_deleted = models.BooleanField(default=False) # used in revisioning to determine if this quirk was deleted.
 
     class Meta:
         abstract = True
+
+    def save(self, *args, **kwargs):
+        if self.previous_revision:
+            if self.previous_revision.relevant_stats.is_snapshot:
+                raise ValueError("A Quirk's parent revision cannot be owned by a snapshot.")
+        super(QuirkDetails, self).save(*args, **kwargs)
 
 class AssetDetails(QuirkDetails):
     relevant_asset = models.ForeignKey(Asset,
@@ -408,17 +560,31 @@ class TraitValue(models.Model):
     relevant_stats = models.ForeignKey(ContractStats,
                                              on_delete=models.CASCADE)
     value = models.PositiveIntegerField()
-
+    previous_revision = models.ForeignKey('self',
+                                           null=True,
+                                           blank=True,
+                                           on_delete=models.CASCADE) # Used in revisioning to determine value change.
     class Meta:
         abstract = True
+
+    def save(self, *args, **kwargs):
+        if self.previous_revision:
+            if self.previous_revision.relevant_stats.is_snapshot:
+                raise ValueError("A Trait's parent revision cannot be owned by a snapshot.")
+        super(TraitValue, self).save(*args, **kwargs)
 
 class AttributeValue(TraitValue):
     relevant_attribute = models.ForeignKey(Attribute,
                                        on_delete=models.CASCADE)
+    class Meta:
+        unique_together = (("relevant_attribute", "relevant_stats"))
 
 class AbilityValue(TraitValue):
     relevant_ability = models.ForeignKey(Ability,
                                        on_delete=models.CASCADE)
+    class Meta:
+        unique_together = (("relevant_ability", "relevant_stats"))
+
 
 class Character_Death(models.Model):
     relevant_character = models.ForeignKey(Character,
@@ -449,3 +615,4 @@ class CharacterTutorial(models.Model):
     abilities = models.TextField(max_length=3000)
     secondary_abilities = models.TextField(max_length=3000)
     assets_and_liabilities = models.TextField(max_length=3000)
+    limits = models.TextField(max_length=3000)

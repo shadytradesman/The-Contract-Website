@@ -12,49 +12,31 @@ from characters.models import Character, BasicStats, Character_Death, Graveyard_
 from powers.models import Power_Full
 from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, AbilityForm, \
     AssetForm, LiabilityForm
-from characters.form_utilities import get_edit_context, character_from_post
+from characters.form_utilities import get_edit_context, character_from_post, update_character_from_post
 
 
 def create_character(request):
     if not request.user.is_authenticated:
         return HttpResponseForbidden()
     if request.method == 'POST':
-        new_character = character_from_post(request.user, request.POST)
+        with transaction.atomic():
+            new_character = character_from_post(request.user, request.POST)
         return HttpResponseRedirect(reverse('characters:characters_view', args=(new_character.id,)))
     else:
         context = get_edit_context(user=request.user)
         return render(request, 'characters/edit_pages/edit_character.html', context)
 
-#TODO: update meta fields so that the traits can't be more than one to a stats.
 def edit_character(request, character_id):
     character = get_object_or_404(Character, id=character_id)
     if not character.player_can_edit(request.user):
         return HttpResponseForbidden()
     if request.method == 'POST':
-        char_form = make_character_form(request.user)(request.POST, instance=character)
-        stats_form = BasicStatsForm(request.POST, instance=character.basic_stats)
-        if char_form.is_valid() and stats_form.is_valid():
-            with transaction.atomic():
-                stats_form.save()
-                char_form.save(commit=False)
-                character.edit_date = timezone.now()
-                character.cell=char_form.cleaned_data['cell']
-                character.save()
-                if character.private != char_form.cleaned_data['private']:
-                    for power_full in character.power_full_set.all():
-                        power_full.set_self_and_children_privacy(is_private=char_form.cleaned_data['private'])
-            return HttpResponseRedirect(reverse('characters:characters_view', args=(character.id,)))
-        else:
-            print(char_form.errors + stats_form.errors)
-            return None
+        with transaction.atomic():
+            update_character_from_post(request.user, existing_character=character, POST=request.POST)
+        return HttpResponseRedirect(reverse('characters:characters_view', args=(character.id,)))
     else:
-        char_form = make_character_form(request.user)(instance=character)
-        stats_form = BasicStatsForm(instance=character.basic_stats)
-        context = {
-            'character': character,
-            'char_form' : char_form,
-            'stats_form': stats_form,
-        }
+        with transaction.atomic(): # necessary because call may create stats snapshot for legacy chars
+            context = get_edit_context(user=request.user, existing_character=character)
         return render(request, 'characters/edit_pages/edit_character.html', context)
 
 

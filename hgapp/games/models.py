@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from characters.models import Character, HIGH_ROLLER_STATUS, Character_Death
+from characters.models import Character, HIGH_ROLLER_STATUS, Character_Death, ExperienceReward
 from powers.models import Power
 from cells.models import Cell
 from django.utils import timezone
@@ -113,6 +113,10 @@ class Game(models.Model):
                              null=True, # for migration reasons. All games should have cells.
                              blank=True, # for migration reasons. All games should have cells.
                              on_delete=models.CASCADE)
+    gm_experience_reward = models.ForeignKey(ExperienceReward,
+                                          null=True,
+                                          blank=True,
+                                          on_delete=models.CASCADE)
 
     class Meta:
         permissions = (
@@ -255,6 +259,10 @@ class Game_Attendance(models.Model):
                                            blank=True,
                                            on_delete=models.CASCADE)
     is_confirmed = models.BooleanField(default=True)
+    experience_reward = models.ForeignKey(ExperienceReward,
+                                          null=True,
+                                          blank=True,
+                                          on_delete=models.CASCADE)
 
 
     def is_victory(self):

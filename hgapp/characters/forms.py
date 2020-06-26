@@ -171,6 +171,7 @@ class AbilityForm(forms.Form):
 
 class QuirkForm(forms.Form):
     id = forms.IntegerField(label=None, widget=forms.HiddenInput(),) # hidden field to track which quirks we are editing.
+    details_id = forms.IntegerField(label=None, widget=forms.HiddenInput(),required=False)
     is_selected = forms.BooleanField(required=False)
     details = forms.CharField(max_length=600,
                            widget=forms.TextInput(attrs={'class': 'form-control'}),
@@ -183,6 +184,12 @@ class QuirkForm(forms.Form):
             self.fields['id'].initial = quirk.id
             self.fields['is_selected'].label = quirk.name
             self.fields['is_selected'].widget = forms.CheckboxInput(attrs={'class': 'quirk-multiple-' + str(quirk.multiplicity_allowed)})
+        if 'details' in self.initial:
+            self.fields['details'].initial = self.initial['details']
+        if 'is_selected' in self.initial:
+            self.fields['is_selected'].initial = self.initial['is_selected']
+        if 'details_id' in self.initial:
+            self.fields['details_id'].initial = self.initial['details']
 
 class LiabilityForm(QuirkForm):
     pass

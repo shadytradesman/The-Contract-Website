@@ -5,23 +5,37 @@ from characters.models import Character, BasicStats, Character_Death, Graveyard_
 from powers.models import Power_Full
 from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, AbilityForm, \
     AssetForm, LiabilityForm
+from collections import defaultdict
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
+
+# logic for Character creation and editing
+# TRANSACTIONS HAPPEN IN VIEW LAYER
 
 def get_edit_context(user, existing_character=None):
     char_form = make_character_form(user)()
     AttributeFormSet = formset_factory(AttributeForm, extra=0)
     AbilityFormSet = formset_factory(AbilityForm, extra=1)
-    AssetFormSet = formset_factory(AssetForm, extra=0)# 1 if edit?? idk
-    LiabilityFormSet = formset_factory(LiabilityForm, extra=0)
     attributes = Attribute.objects.order_by('name')
     tutorial = get_object_or_404(CharacterTutorial)
-    attribute_formset = None
-    ability_formset = None
-    asset_formsets = None
-    liability_formsets = None
+    asset_formsets = __get_asset_formsets(existing_character)
+    liability_formsets = __get_liability_formsets(existing_character)
     if existing_character:
-        pass
+        if not existing_character.stats_snapshot: # legacy character
+            stats_snapshot = ContractStats(assigned_character=existing_character,
+                                           is_snapshot=True)
+            stats_snapshot.save()
+            existing_character.stats_snapshot = stats_snapshot
+            existing_character.save()
+        char_form = make_character_form(user)(instance=existing_character)
+        attribute_formset = AttributeFormSet(
+            initial=[{'attribute_id': x.relevant_attribute.id, 'value': x.value, 'attribute': x.relevant_attribute}
+                     for x in existing_character.stats_snapshot.attributevalue_set.all()],
+            prefix="attributes")
+        ability_formset = AbilityFormSet(
+            initial=[{'ability_id': x.relevant_ability.id, 'value': x.value, 'ability': x.relevant_ability}
+                     for x in existing_character.stats_snapshot.abilityvalue_set.all()],
+            prefix="abilities")
     else:
         attribute_formset = AttributeFormSet(
             initial=[{'attribute_id': x.id, 'value': 1, 'attribute': x} for x in attributes],
@@ -30,14 +44,6 @@ def get_edit_context(user, existing_character=None):
         ability_formset = AbilityFormSet(
             initial=[{'ability_id': x.id, 'value': 0, 'ability': x} for x in default_abilities],
             prefix="abilities")
-        asset_formsets = []
-        for asset in Asset.objects.order_by('value').all():
-            asset_formsets.append(AssetFormSet(initial=[{'id': asset.id, 'quirk': asset}],
-                                               prefix="asset-" + str(asset.id)))
-        liability_formsets = []
-        for liability in Liability.objects.order_by('value').all():
-            liability_formsets.append(LiabilityFormSet(initial=[{'id': liability.id, 'quirk': liability}],
-                                                       prefix="liability-" + str(liability.id)))
     context = {
         'char_form': char_form,
         'attribute_formset': attribute_formset,
@@ -45,43 +51,99 @@ def get_edit_context(user, existing_character=None):
         'asset_formsets': asset_formsets,
         'liability_formsets': liability_formsets,
         'tutorial': tutorial,
+        'character': existing_character,
     }
     return context
 
-# TRANSACTIONS HAPPEN IN VIEW LAYER
-def character_from_post(user, POST, existing_character=None):
+def character_from_post(user, POST):
     char_form = make_character_form(user)(POST)
-    stats = __stats_from_post(user, POST, existing_character)
-    stats.save()
-    if existing_character:
-        pass # edit
+    if char_form.is_valid():
+        new_character = char_form.save(commit=False)
+        new_character.pub_date = timezone.now()
+        new_character.edit_date = timezone.now()
+        new_character.player = user
+        new_character.save()
+        # Create the character's stats snapshot and save.
+        stats_snapshot = ContractStats(assigned_character=new_character,
+                              is_snapshot=True)
+        stats_snapshot.save()
+        __stats_from_post(POST, new_character=new_character)
+        new_character.regen_stats_snapshot()
+        cell = char_form.cleaned_data['cell']
+        if cell != "free":
+            new_character.cell = cell
+        new_character.save()
+        return new_character
     else:
-        if char_form.is_valid():
-            new_character = char_form.save(commit=False)
-            new_character.stats = stats
-            new_character.player = user
-            new_character.pub_date = timezone.now()
-            new_character.edit_date = timezone.now()
-            cell = char_form.cleaned_data['cell']
-            if cell != "free":
-                new_character.cell = cell
-            new_character.save()
-            return new_character
-        else:
-            raise ValueError("Invalid char_form")
+        raise ValueError("Invalid char_form")
 
-
+def update_character_from_post(user, POST, existing_character):
+    char_form = make_character_form(user)(POST, instance=existing_character)
+    if char_form.is_valid():
+        char_form.save(commit=False)
+        existing_character.edit_date = timezone.now()
+        existing_character.cell = char_form.cleaned_data['cell']
+        existing_character.save()
+        if existing_character.private != char_form.cleaned_data['private']:
+            for power_full in existing_character.power_full_set.all():
+                power_full.set_self_and_children_privacy(is_private=char_form.cleaned_data['private'])
+        stats_diff = __stats_from_post(POST=POST, existing_character=existing_character)
+        existing_character.regen_stats_snapshot()
+    else:
+        raise ValueError("invalid edit char_form")
 
 # __private methods
-def __stats_from_post(user, POST, existing_character=None):
+
+def __stats_from_post(POST, existing_character=None, new_character=None):
     AttributeFormSet = formset_factory(AttributeForm, extra=0)
     AbilityFormSet = formset_factory(AbilityForm, extra=1)
-    AssetFormSet = formset_factory(AssetForm, extra=0)  # 1 if edit?? idk
-    LiabilityFormSet = formset_factory(LiabilityForm, extra=0)
     attributes = Attribute.objects.order_by('name')
+    asset_formsets = __get_asset_formsets(existing_character, POST=POST)
+    liability_formsets = __get_liability_formsets(existing_character, POST=POST)
+    stats = ContractStats(assigned_character=new_character)
+    stats.save()
     if existing_character:
-        pass # edit
-    else:
+        for asset_formset in asset_formsets:
+            if asset_formset.is_valid():
+                asset = get_object_or_404(Asset, id=asset_formset.initial[0]["id"])
+                for form in asset_formset:
+                    if 'details_id' in form.cleaned_data:
+                        details_id = form.cleaned_data['details_id']
+                        prev_details = get_object_or_404(AssetDetails, id=details_id)
+                        if form.changed_data:
+                            new_details = AssetDetails(
+                                relevant_stats = stats,
+                                relevant_asset = asset,
+                                # we only show selected quirks, so if the selection status has changed, they unselected it
+                                is_deleted= 'is_selected' in form.changed_data,
+                                details=form.cleaned_data['details'],
+                                previous_revision=prev_details,
+                            )
+                            new_details.save()
+                    else:
+                        # No pre-existing details_id means this is a new quirk.
+                        if form.cleaned_data['is_selected']:
+                            new_asset_deets = AssetDetails(
+                                relevant_stats=stats,
+                                relevant_asset=asset,
+                                details=form.cleaned_data['details'] if 'details' in form.cleaned_data else "",
+                            )
+                            new_asset_deets.save()
+
+            else:
+                raise ValueError("invalid asset_formset")
+        # if form has no details_id and no changed data, it is a new quirk
+        # if form has details_id and changed data, it is an edit / deletion, check is_selected for deletion status.
+        attribute_formset = AttributeFormSet(POST,
+                                             initial=[{'attribute_id': x.id, 'value': 1, 'attribute': x} for x in
+                                                      attributes],
+                                             prefix="attributes")
+        default_abilities = Ability.objects.filter(is_primary=True).order_by('name')
+        ability_formset = AbilityFormSet(POST,
+                                         initial=[{'ability_id': x.id, 'value': 0, 'ability': x} for x in
+                                                  default_abilities],
+                                         prefix="abilities")
+    else: # new character
         attribute_formset = AttributeFormSet(POST,
                                              initial=[{'attribute_id': x.id, 'value': 1, 'attribute': x} for x in attributes],
                                              prefix="attributes")
@@ -90,19 +152,6 @@ def __stats_from_post(user, POST, existing_character=None):
                                          initial=[{'ability_id': x.id, 'value': 0, 'ability': x} for x in
                                                   default_abilities],
                                          prefix="abilities")
-
-        asset_formsets = []
-        for asset in Asset.objects.order_by('value').all():
-            asset_formsets.append(AssetFormSet(POST,
-                                               initial=[{'id': asset.id, 'quirk': asset}],
-                                               prefix="asset-" + str(asset.id)))
-        liability_formsets = []
-        for liability in Liability.objects.order_by('value').all():
-            liability_formsets.append(LiabilityFormSet(POST,
-                                                     initial=[{'id': liability.id, 'quirk': liability}],
-                                                     prefix="liability-" + str(liability.id)))
-        stats = ContractStats()
-        stats.save()
         attribute_values = __attributes_from_form(attribute_formset, stats)
         ability_values = __abilities_from_form(ability_formset, stats)
         liabilities = __liabilities_from_formsets(liability_formsets, stats)
@@ -174,7 +223,7 @@ def __abilities_from_form(ability_formset, stats):
                     tutorial_text= form.cleaned_data['description'] if 'description' in form.cleaned_data else "",
                 )
                 ability.save()
-            if 'value' in form.cleaned_data:
+            if 'value' in form.cleaned_data and form.cleaned_data['value'] > 0:
                 ability_value = AbilityValue(
                     relevant_ability=ability,
                     value=form.cleaned_data['value'],
@@ -185,3 +234,69 @@ def __abilities_from_form(ability_formset, stats):
         return ability_values
     else:
         raise ValueError("Invalid Ability Formset")
+
+def __get_asset_formsets(existing_character = None, POST = None):
+    asset_formsets = []
+    AssetFormSet = formset_factory(AssetForm, extra=0)
+    if existing_character:
+        asset_details = existing_character.stats_snapshot.assetdetails_set.order_by('relevant_asset__value', 'id').all()
+        details_by_asset_id = defaultdict(list)
+        for details in asset_details:
+            details_by_asset_id[details.relevant_asset.id].append(details)
+        asset_formsets = __get_quirk_formsets_for_edit_context(POST=POST,
+                                                               details_by_quirk_id=details_by_asset_id,
+                                                               is_asset=True,
+                                                               all_quirks=Asset.objects.order_by('value').all())
+    else:
+        for asset in Asset.objects.order_by('value').all():
+            asset_formsets.append(AssetFormSet(POST,
+                                               initial=[{'id': asset.id, 'quirk': asset}],
+                                               prefix="asset-" + str(asset.id)))
+    return asset_formsets
+
+def __get_liability_formsets(existing_character = None, POST = None):
+    liability_formsets = []
+    LiabilityFormSet = formset_factory(LiabilityForm, extra=0)
+    if existing_character:
+        liability_details = existing_character.stats_snapshot.liabilitydetails_set.order_by('relevant_liability__value', 'id').all()
+        details_by_liability_id = defaultdict(list)
+        for details in liability_details:
+            details_by_liability_id[details.relevant_liability.id].append(details)
+        liability_formsets = __get_quirk_formsets_for_edit_context(POST=POST,
+                                                                   details_by_quirk_id=details_by_liability_id,
+                                                                   is_asset=False,
+                                                                   all_quirks=Liability.objects.order_by('value').all())
+    else:
+        for liability in Liability.objects.order_by('value').all():
+            liability_formsets.append(LiabilityFormSet(POST,
+                                                       initial=[{'id': liability.id, 'quirk': liability}],
+                                                       prefix="liability-" + str(liability.id)))
+    return liability_formsets
+
+
+def __get_quirk_formsets_for_edit_context(details_by_quirk_id, is_asset, all_quirks, POST = None):
+    FormSet = formset_factory(AssetForm, extra=0) if is_asset else formset_factory(LiabilityForm, extra=0)
+    prefix = "asset" if is_asset else "liability"
+    quirk_formsets = []
+    for quirk in all_quirks:
+        if quirk.id in details_by_quirk_id:
+            initial_data = [{'id': quirk.id,
+                             'quirk': quirk,
+                             'details': detail.details,
+                             # the stat snapshot details point to stat diff details using the previous_revision field
+                             # It is important to point to the diff details because snapshot details may be deleted.
+                             'details_id': detail.previous_revision.id,
+                             'is_selected': True,
+                             } for detail in details_by_quirk_id[quirk.id]]
+            # additional empty form if multiplicity is allowed.
+            if quirk.multiplicity_allowed and len(details_by_quirk_id[quirk.id]) < 4:
+                initial_data.append({'id': quirk.id,
+                                     'quirk': quirk,})
+            quirk_formsets.append(FormSet(POST,
+                                          initial=initial_data,
+                                          prefix=prefix + str(quirk.id)))
+        else:
+            quirk_formsets.append(FormSet(POST,
+                                          initial=[{'id': quirk.id, 'quirk': quirk}],
+                                          prefix=prefix + str(quirk.id)))
+    return quirk_formsets
