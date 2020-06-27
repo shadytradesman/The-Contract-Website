@@ -34,7 +34,6 @@ EXP_ADV_COST_ATTR_MULTIPLIER = 4
 EXP_ADV_COST_SKILL_MULTIPLIER = 2
 EXP_COST_SKILL_INITIAL = 2
 
-
 class Character(models.Model):
     name = models.CharField(max_length=100)
     tagline = models.CharField(max_length=200)
@@ -316,16 +315,12 @@ class Character(models.Model):
             for detail in diff.assetdetails_set.all():
                 if detail.previous_revision:
                     asset_details.remove(detail.previous_revision)
-                    if not detail.is_deleted:
-                        asset_details.append(detail)
-                else:
+                if not detail.is_deleted:
                     asset_details.append(detail)
             for detail in diff.liabilitydetails_set.all():
                 if detail.previous_revision:
                     liability_details.remove(detail.previous_revision)
-                    if not detail.is_deleted:
-                        liability_details.append(detail)
-                else:
+                if not detail.is_deleted:
                     liability_details.append(detail)
             for value in diff.attributevalue_set.all():
                 if value.previous_revision:
@@ -334,7 +329,7 @@ class Character(models.Model):
             for value in diff.abilityvalue_set.all():
                 if value.previous_revision:
                     ability_values.remove(value.previous_revision)
-                if value.value != 0:
+                if value.value > 0:
                     ability_values.append(value)
 
         self.stats_snapshot.clear()

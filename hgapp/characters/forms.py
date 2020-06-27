@@ -153,6 +153,7 @@ class AbilityForm(forms.Form):
     value = forms.IntegerField(initial=0,
                                validators=[MaxValueValidator(5), MinValueValidator(0)],
                                widget=forms.NumberInput(attrs={'class': 'ability-value-input form-control'}))
+    value_id = forms.IntegerField(label=None, widget=forms.HiddenInput(),required=False)
     name = forms.CharField(max_length=50,
                            required=False,
                            widget=forms.TextInput(attrs={'class': 'form-control sec-ability-name'}))
@@ -168,6 +169,8 @@ class AbilityForm(forms.Form):
             self.fields['ability_id'].initial = ability.id
             self.fields['description'].widget = forms.HiddenInput()
             self.fields['name'].widget = forms.HiddenInput()
+        if 'value_id' in self.initial and self.initial['value_id']:
+            self.fields['value_id'].initial = self.initial['value_id']
 
 class QuirkForm(forms.Form):
     id = forms.IntegerField(label=None, widget=forms.HiddenInput(),) # hidden field to track which quirks we are editing.
