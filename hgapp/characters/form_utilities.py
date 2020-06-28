@@ -13,29 +13,30 @@ from django.shortcuts import get_object_or_404
 # TRANSACTIONS HAPPEN IN VIEW LAYER
 # See tests.py for hints on how revisioning works.
 
+def __get_attribute_formset_for_edit(existing_character, AttributeFormSet, POST=None):
+    return AttributeFormSet(
+        POST,
+        initial=[{'attribute_id': x.relevant_attribute.id,
+                  'value': x.value,
+                  'attribute': x.relevant_attribute,
+                  'previous_value_id': x.previous_revision.id if x.previous_revision else None}
+                 for x in existing_character.stats_snapshot.attributevalue_set.order_by('relevant_attribute__name').all()],
+        prefix="attributes")
+
 def get_edit_context(user, existing_character=None):
-    char_form = make_character_form(user)()
+    char_form = make_character_form(user)(instance=existing_character)
     AttributeFormSet = formset_factory(AttributeForm, extra=0)
     AbilityFormSet = formset_factory(AbilityForm, extra=1)
     attributes = Attribute.objects.order_by('name')
     tutorial = get_object_or_404(CharacterTutorial)
-    asset_formsets = __get_asset_formsets(existing_character)
-    liability_formsets = __get_liability_formsets(existing_character)
-    if existing_character:
-        if not existing_character.stats_snapshot: # legacy character
-            stats_snapshot = ContractStats(assigned_character=existing_character,
-                                           is_snapshot=True)
-            stats_snapshot.save()
-            existing_character.stats_snapshot = stats_snapshot
-            existing_character.save()
-        char_form = make_character_form(user)(instance=existing_character)
+    if existing_character and existing_character.stats_snapshot:
+        asset_formsets = __get_asset_formsets(existing_character)
+        liability_formsets = __get_liability_formsets(existing_character)
         ability_formset = __get_ability_formset_for_edit(existing_character, AbilityFormSet)
-        attribute_formset = AttributeFormSet(
-            initial=[{'attribute_id': x.relevant_attribute.id, 'value': x.value, 'attribute': x.relevant_attribute}
-                     for x in existing_character.stats_snapshot.attributevalue_set.all()],
-            prefix="attributes")
-
+        attribute_formset = __get_attribute_formset_for_edit(existing_character, AttributeFormSet)
     else:
+        asset_formsets = __get_asset_formsets()
+        liability_formsets = __get_liability_formsets()
         attribute_formset = AttributeFormSet(
             initial=[{'attribute_id': x.id, 'value': 1, 'attribute': x} for x in attributes],
             prefix="attributes")
@@ -62,12 +63,6 @@ def character_from_post(user, POST):
         new_character.edit_date = timezone.now()
         new_character.player = user
         new_character.save()
-        # Create the character's stats snapshot and save.
-        stats_snapshot = ContractStats(assigned_character=new_character,
-                              is_snapshot=True)
-        stats_snapshot.save()
-        new_character.stats_snapshot = stats_snapshot
-        new_character.save()
         __save_stats_diff_from_post(POST, new_character=new_character)
         new_character.regen_stats_snapshot()
         cell = char_form.cleaned_data['cell']
@@ -88,7 +83,10 @@ def update_character_from_post(user, POST, existing_character):
         if existing_character.private != char_form.cleaned_data['private']:
             for power_full in existing_character.power_full_set.all():
                 power_full.set_self_and_children_privacy(is_private=char_form.cleaned_data['private'])
-        __save_stats_diff_from_post(POST=POST, existing_character=existing_character)
+        if existing_character.stats_snapshot:
+            __save_stats_diff_from_post(POST=POST, existing_character=existing_character)
+        else:
+            __save_stats_diff_from_post(POST=POST, new_character=existing_character)
         existing_character.regen_stats_snapshot()
     else:
         raise ValueError("invalid edit char_form")
@@ -96,6 +94,13 @@ def update_character_from_post(user, POST, existing_character):
 # __private methods
 
 def __save_stats_diff_from_post(POST, existing_character=None, new_character=None):
+    if new_character:
+        # Create the character's stats snapshot and save.
+        stats_snapshot = ContractStats(assigned_character=new_character,
+                                       is_snapshot=True)
+        stats_snapshot.save()
+        new_character.stats_snapshot = stats_snapshot
+        new_character.save()
     AttributeFormSet = formset_factory(AttributeForm, extra=0)
     AbilityFormSet = formset_factory(AbilityForm, extra=1)
     attributes = Attribute.objects.order_by('name')
@@ -110,12 +115,28 @@ def __save_stats_diff_from_post(POST, existing_character=None, new_character=Non
             __save_edit_quirks_from_formset(formset=liability_formset, stats=stats, is_asset=False)
         ability_formset = __get_ability_formset_for_edit(existing_character, AbilityFormSet, POST)
         __save_edit_abilities_from_formset(formset=ability_formset, stats=stats)
+        attribute_formset = __get_attribute_formset_for_edit(existing_character, AttributeFormSet, POST)
+        attribute_formset.is_valid
+        for form in attribute_formset:
+            if form.is_valid():
+                attribute = get_object_or_404(Attribute, id=form.cleaned_data['attribute_id'])
+                if "previous_value_id" in form.cleaned_data and form.cleaned_data["previous_value_id"]:
+                    value_id = form.cleaned_data['previous_value_id']
+                    prev_val = get_object_or_404(AttributeValue, id=value_id)
+                    if form.changed_data and form.cleaned_data['value'] != str(prev_val.value):
+                        new_val = AttributeValue(
+                            relevant_stats=stats,
+                            relevant_attribute=attribute,
+                            value=form.cleaned_data['value'],
+                            previous_revision=prev_val,
+                        )
+                        new_val.save()
+                else:
+                    raise ValueError("The site doesn't support adding attribute until you implement this.")
+            else:
+                raise ValueError("invalid attribute form in edit")
 
 
-        attribute_formset = AttributeFormSet(POST,
-                                             initial=[{'attribute_id': x.id, 'value': 1, 'attribute': x} for x in
-                                                      attributes],
-                                             prefix="attributes")
     else: # new character
         stats = ContractStats(assigned_character=new_character)
         stats.save()

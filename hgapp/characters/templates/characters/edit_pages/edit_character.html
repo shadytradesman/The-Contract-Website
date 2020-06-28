@@ -96,7 +96,8 @@
                 {% endif %}
                 <div class="col-sm-4" data-toggle="tooltip" title='{{form.initial.attribute.tutorial_text}}'>
                     {{form.value | bootstrap}}
-                    {{ form.attribute_id.as_hidden}}
+                    {{ form.attribute_id}}
+                    {{ form.previous_value_id}}
                 </div>
                 <div class="clearfix visible-xs-block"></div>
             {% endfor %}

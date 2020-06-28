@@ -228,10 +228,25 @@
             {% endfor %}
         </div>
     </div>
-        <h2>Game History</h2>
+        <h2>Character Timeline</h2>
             <p><b>{{ character.number_of_victories }}</b> Victories - <b>{{ character.number_of_losses }}</b> Losses</p>
-            {% for attendance in character.completed_games %}
-                    {% include "games/game_attendance_badge_snippet.html" %}
+            {% for date, event_list in timeline.items %}
+                <h4>{{ date }}</h4>
+                <ul>
+                {% for event in event_list %}
+                    {% if event.0 == "game"%}
+                        {% with event.1 as attendance %}
+                            {% include "games/game_attendance_badge_snippet.html" %}
+                        {% endwith %}
+                    {% else %}
+                        {% for phrase in event.1.get_change_phrases %}
+                            <li>
+                                <b>{{phrase.0}} Exp:</b> {{phrase.1}}
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}
+                </ul>
             {% empty %}
                 <h4>{{character.name}} Still hasn't been invited on their first game! Awww</h4>
             {% endfor %}

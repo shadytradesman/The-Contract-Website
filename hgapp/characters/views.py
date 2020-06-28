@@ -5,7 +5,8 @@ from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.utils import timezone
 from django.db import transaction
-from django.forms import formset_factory
+from collections import defaultdict
+from heapq import merge
 
 from characters.models import Character, BasicStats, Character_Death, Graveyard_Header, Attribute, Ability, \
     CharacterTutorial, Asset, Liability
@@ -35,8 +36,7 @@ def edit_character(request, character_id):
             update_character_from_post(request.user, existing_character=character, POST=request.POST)
         return HttpResponseRedirect(reverse('characters:characters_view', args=(character.id,)))
     else:
-        with transaction.atomic(): # necessary because call may create stats snapshot for legacy chars
-            context = get_edit_context(user=request.user, existing_character=character)
+        context = get_edit_context(user=request.user, existing_character=character)
         return render(request, 'characters/edit_pages/edit_character.html', context)
 
 
@@ -101,9 +101,17 @@ def view_character(request, character_id):
     user_can_edit = request.user.is_authenticated and character.player_can_edit(request.user)
     if not character.player_can_view(request.user):
         return HttpResponseForbidden()
+    completed_games = [(x.relevant_game.end_time, "game", x) for x in character.completed_games()]
+    character_edit_history = [(x.created_time, "edit", x) for x in
+                              character.contractstats_set.filter(is_snapshot=False).order_by("created_time").all()[1:]]
+    events_by_date = list(merge(completed_games, character_edit_history))
+    timeline = defaultdict(list)
+    for event in events_by_date:
+        timeline[event[0].strftime("%b %m %Y")].append((event[1], event[2]))
     context = {
         'character': character,
         'user_can_edit': user_can_edit,
+        'timeline': dict(timeline),
     }
     return render(request, 'characters/view_character.html', context)
 

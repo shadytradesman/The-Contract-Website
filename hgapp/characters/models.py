@@ -509,7 +509,73 @@ class ContractStats(models.Model):
         else:
             pass # just find the diff
 
-    def clear(self): #TODO clear other things
+    def calc_attr_change_ex_cost(self, old_value, new_value):
+        return ((new_value - old_value) * (old_value + new_value - 1) / 2) * EXP_ADV_COST_ATTR_MULTIPLIER
+
+    def calc_quirk_ex_cost(self, quirk_details):
+        if quirk_details.is_deleted:
+            return - EXP_COST_QUIRK_MULTIPLIER * quirk_details.relevant_quirk().value
+        if quirk_details.previous_revision:
+            return 0
+        else:
+            return EXP_COST_QUIRK_MULTIPLIER * quirk_details.relevant_quirk().value
+
+    def calc_ability_change_ex_cost(self, old_value, new_value):
+        if old_value == 0 and new_value != 0:
+            initial_cost = 2
+        elif old_value != 0 and new_value == 0:
+            initial_cost = -2
+        else:
+            initial_cost = 0
+        return ((new_value - old_value) * (old_value + new_value - 1) / 2) * EXP_ADV_COST_SKILL_MULTIPLIER + initial_cost
+
+
+    def get_exp_phrase(self, exp_cost):
+        change_sign = "+" if exp_cost < 0 else "-"
+        return  "{0}{1:d}:".format(change_sign, abs(int(exp_cost)))
+
+    def get_trait_value_change_phrase(self, trait_name, exp_cost, prev_value, new_value):
+        return "{0} {1} from {2} to {3}".format(
+            trait_name,
+            "raised" if exp_cost > 0 else "lowered",
+            str(prev_value),
+            str(new_value))
+
+    def get_change_phrases(self):
+        change_phrases = []
+        for attribute in self.attributevalue_set.all():
+            exp_cost = self.calc_attr_change_ex_cost(attribute.previous_revision.value, attribute.value)
+            exp_phrase = self.get_exp_phrase(exp_cost)
+            phrase = self.get_trait_value_change_phrase(attribute.relevant_attribute.name,
+                                                        exp_cost,
+                                                        attribute.previous_revision.value,
+                                                        attribute.value)
+            change_phrases.append((exp_phrase, phrase,))
+        for ability in self.abilityvalue_set.all():
+            prev_value = ability.previous_revision.value if ability.previous_revision else 0
+            exp_cost = self.calc_ability_change_ex_cost(prev_value, ability.value)
+            exp_phrase = self.get_exp_phrase(exp_cost)
+            phrase = self.get_trait_value_change_phrase(ability.relevant_ability.name,
+                                                        exp_cost,
+                                                        prev_value,
+                                                        ability.value)
+            change_phrases.append((exp_phrase, phrase,))
+        for asset in self.assetdetails_set.all():
+            exp_cost = self.calc_quirk_ex_cost(asset)
+            exp_phrase = self.get_exp_phrase(exp_cost)
+            change_word = "removed" if asset.is_deleted else \
+                "changed {0} of ".format(asset.relevant_quirk().details_field_name) if asset.previous_revision else "purchased"
+            phrase = "{0} asset {1} {2}".format(
+                change_word,
+                asset.relevant_quirk().name,
+                "(from \"{0}\" to \"{1}\")".format(asset.previous_revision.details, asset.details) \
+                    if asset.previous_revision and not asset.is_deleted else \
+                    "({0})".format(asset.details) if asset.details else ""
+            )
+            change_phrases.append((exp_phrase, phrase,))
+        return change_phrases
+
+    def clear(self):
         if not self.is_snapshot:
             raise ValueError("should only clear snapshots")
         for asset in self.assetdetails_set.all():
@@ -546,10 +612,15 @@ class QuirkDetails(models.Model):
 class AssetDetails(QuirkDetails):
     relevant_asset = models.ForeignKey(Asset,
                                        on_delete=models.CASCADE)
+    def relevant_quirk(self):
+        return self.relevant_asset
 
 class LiabilityDetails(QuirkDetails):
     relevant_liability = models.ForeignKey(Liability,
                                        on_delete=models.CASCADE)
+    def relevant_quirk(self):
+        return self.relevant_liability
+
 
 class TraitValue(models.Model):
     relevant_stats = models.ForeignKey(ContractStats,

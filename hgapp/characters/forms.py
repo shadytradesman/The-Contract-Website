@@ -135,6 +135,7 @@ class ConfirmAssignmentForm(forms.Form):
 class AttributeForm(forms.Form):
     value = forms.ChoiceField(choices=(()))
     attribute_id = forms.IntegerField(label=None, widget=forms.HiddenInput(),) # hidden field to track which attribute we are editing.
+    previous_value_id = forms.IntegerField(label=None, widget=forms.HiddenInput(),required=False)
 
     def __init__(self, *args, **kwargs):
         super(AttributeForm, self).__init__(*args, **kwargs)
@@ -145,6 +146,9 @@ class AttributeForm(forms.Form):
                 self.fields['value'].choices = ATTRIBUTE_VALUES[attribute.name]
             else:
                 self.fields['value'].choices = ATTRIBUTE_VALUES["default"]
+        if 'previous_value_id' in self.initial:
+            self.fields['previous_value_id'].initial = self.initial['previous_value_id']
+
 
 class AbilityForm(forms.Form):
     ability_id = forms.IntegerField(label=None,
