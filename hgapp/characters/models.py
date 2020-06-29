@@ -491,7 +491,7 @@ class ContractStats(models.Model):
     abilities = models.ManyToManyField(Ability,
                                        blank=True,
                                        through="AbilityValue",
-                                       through_fields=('relevant_stats', 'relevant_ability'))
+                                       through_fields= ('relevant_stats', 'relevant_ability'))
     assets = models.ManyToManyField(Asset,
                                    blank=True,
                                    through="AssetDetails",
@@ -505,7 +505,16 @@ class ContractStats(models.Model):
 
     def exp_cost(self):
         if self.is_snapshot:
-            pass # don't account for history
+            cost = 0
+            for attribute in self.attributevalue_set.all():
+                cost = cost + self.calc_attr_change_ex_cost(1, attribute.value)
+            for ability in self.abilityvalue_set.all():
+                cost = cost + self.calc_ability_change_ex_cost(0, ability.value)
+            for asset in self.assetdetails_set.all():
+                cost = cost + self.calc_quirk_ex_cost(asset)
+            for liability in self.liabilitydetails_set.all():
+                cost = cost - self.calc_quirk_ex_cost(liability)
+            return cost
         else:
             pass # just find the diff
 
@@ -571,6 +580,19 @@ class ContractStats(models.Model):
                 "(from \"{0}\" to \"{1}\")".format(asset.previous_revision.details, asset.details) \
                     if asset.previous_revision and not asset.is_deleted else \
                     "({0})".format(asset.details) if asset.details else ""
+            )
+            change_phrases.append((exp_phrase, phrase,))
+        for liability in self.liabilitydetails_set.all():
+            exp_cost = - self.calc_quirk_ex_cost(liability)
+            exp_phrase = self.get_exp_phrase(exp_cost)
+            change_word = "removed" if liability.is_deleted else \
+                "changed {0} of ".format(liability.relevant_quirk().details_field_name) if liability.previous_revision else "took"
+            phrase = "{0} liability {1} {2}".format(
+                change_word,
+                liability.relevant_quirk().name,
+                "(from \"{0}\" to \"{1}\")".format(liability.previous_revision.details, liability.details) \
+                    if liability.previous_revision and not liability.is_deleted else \
+                    "({0})".format(liability.details) if liability.details else ""
             )
             change_phrases.append((exp_phrase, phrase,))
         return change_phrases
