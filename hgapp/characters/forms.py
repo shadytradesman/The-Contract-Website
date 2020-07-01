@@ -203,3 +203,28 @@ class LiabilityForm(QuirkForm):
 
 class AssetForm(QuirkForm):
     pass
+
+class LimitForm(forms.Form):
+    checked = forms.BooleanField(required=False)
+    id = forms.IntegerField(label=None, widget=forms.HiddenInput(),required=False) # hidden field to track which limit we are editing.
+    limit_rev_id = forms.IntegerField(label=None, widget=forms.HiddenInput(),required=False)
+
+    name = forms.CharField(max_length=40,
+                           required=False,
+                           widget=forms.TextInput(attrs={'class': 'form-control sec-ability-name'}))
+    description = forms.CharField(max_length=900,
+                                  required=False,
+                                  widget=forms.TextInput(attrs={'class': 'form-control sec-ability-desc'}))
+
+    def __init__(self, *args, **kwargs):
+        super(LimitForm, self).__init__(*args, **kwargs)
+        if 'limit' in self.initial:
+            limit = self.initial["limit"]
+            self.fields['id'].initial = limit.id
+            self.fields['checked'].label = limit.name
+            self.fields['name'].initial = limit.name
+            self.fields['description'].initial = limit.description
+        if 'selected' in self.initial:
+            self.fields['checked'].initial = self.initial['selected']
+        if 'limit_rev_id' in self.initial:
+            self.fields['limit_rev_id'].initial = self.initial['limit_rev_id']

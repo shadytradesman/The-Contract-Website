@@ -203,6 +203,17 @@
         {% endfor %}
         </div>
     </div>
+    <div class ="row text-center">
+        <h2>Limits</h2>
+        {% for limit_rev in character.stats_snapshot.limitrevision_set.all %}
+            <div class="col-md-3">
+                <p>
+                    <b>{{limit_rev.relevant_limit.name}}:</b>
+                    {{limit_rev.relevant_limit.description}}
+                </p>
+            </div>
+        {% endfor %}
+    </div>
         <div class="row">
             <h2>Powers</h2>
             <p><b>Power Value: </b>{{character.get_power_cost_total}}</p>
@@ -337,6 +348,6 @@
         </div>
     {% endif %}
     </div>
-    </div>
+</div>
 
 {% endblock %}

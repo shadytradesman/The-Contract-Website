@@ -76,3 +76,8 @@ input[type="number"] {
     *display:inline; /* ie7 fix */
      zoom:1; /* hasLayout ie7 trigger */
 }
+
+.limit-row {
+    padding-left: 15px;
+    padding-right: 15px;
+}

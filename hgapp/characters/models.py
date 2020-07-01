@@ -1,3 +1,5 @@
+import math
+
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
@@ -33,6 +35,10 @@ EXP_COST_QUIRK_MULTIPLIER = 3
 EXP_ADV_COST_ATTR_MULTIPLIER = 4
 EXP_ADV_COST_SKILL_MULTIPLIER = 2
 EXP_COST_SKILL_INITIAL = 2
+
+# STAT CONSTANTS
+BASE_MIND_LEVELS = 5
+BASE_BODY_LEVELS = 5
 
 class Character(models.Model):
     name = models.CharField(max_length=100)
@@ -286,7 +292,12 @@ class Character(models.Model):
 
     def archive_txt(self):
         output = "{}\nPlayed by: {}\nArchived on {}\n{} with {} wins and {} losses\n"
-        output = output.format(self.name, self.player.username, datetime.today(), self.get_status_display(), self.number_of_victories(), self.number_of_losses())
+        output = output.format(self.name,
+                               self.player.username,
+                               datetime.today(),
+                               self.get_status_display(),
+                               self.number_of_victories(),
+                               self.number_of_losses())
         output = output + "Age: {}\nSex: {}\nAppearance: {}\nConcept: {}\nAmbition: {}\n"
         output = output.format(self.age, self.sex, self.appearance, self.concept_summary, self.ambition)
         output = output + "Stats: {}\n"
@@ -311,6 +322,7 @@ class Character(models.Model):
         liability_details = []
         ability_values = []
         attribute_values = []
+        limit_revisions = []
         for diff in stat_diffs:
             for detail in diff.assetdetails_set.all():
                 if detail.previous_revision:
@@ -331,6 +343,11 @@ class Character(models.Model):
                     ability_values.remove(value.previous_revision)
                 if value.value > 0:
                     ability_values.append(value)
+            for rev in diff.limitrevision_set.all():
+                if rev.previous_revision:
+                    limit_revisions.remove(rev.previous_revision)
+                if not rev.is_deleted:
+                    limit_revisions.append(rev)
 
         self.stats_snapshot.clear()
         for deet in asset_details:
@@ -365,7 +382,22 @@ class Character(models.Model):
                 previous_revision=value,
             )
             snapshot_value.save()
+        for rev in limit_revisions:
+            snapshot_rev = LimitRevision(
+                relevant_stats=self.stats_snapshot,
+                relevant_limit=rev.relevant_limit,
+                previous_revision=rev,
+            )
+            snapshot_rev.save()
         self.stats_snapshot.save()
+
+    def num_body_levels(self):
+        brawn_value = self.stats_snapshot.atributevalue_set.get(relevant_attribute__scales_body=True).value
+        return BASE_BODY_LEVELS + math.ceil(brawn_value / 2)
+    
+    def num_mind_levels(self):
+        int_value = self.stats_snapshot.atributevalue_set.get(relevant_attribute__scales_mind=True).value
+        return BASE_MIND_LEVELS + math.ceil(int_value / 2)
 
 class BasicStats(models.Model):
     stats = models.CharField(max_length=10000)
@@ -426,7 +458,8 @@ class Trait(models.Model):
         abstract = True
 
 class Attribute(Trait):
-    pass
+    scales_body = models.BooleanField(default=False)
+    scales_mind = models.BooleanField(default=False)
 
 class Ability(Trait):
     is_primary = models.BooleanField(default=False)
@@ -475,9 +508,15 @@ class Liability(Quirk):
 
 
 class Limit(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=40)
     description = models.CharField(max_length=1000)
     is_default = models.BooleanField(default=False)
+    is_primary = models.BooleanField(default=False)
+    # if not a primary, should have an owner.
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL,
+                              null=True,
+                              blank=True,
+                              on_delete=models.CASCADE)
 
 class ContractStats(models.Model):
     created_time = models.DateTimeField(default=timezone.now)
@@ -501,6 +540,8 @@ class ContractStats(models.Model):
                                    through="LiabilityDetails",
                                    through_fields=('relevant_stats', 'relevant_liability'))
     limits = models.ManyToManyField(Limit,
+                                    through="LimitRevision",
+                                    through_fields=('relevant_stats', 'relevant_limit'),
                                     blank=True)
 
     def exp_cost(self):
@@ -595,6 +636,16 @@ class ContractStats(models.Model):
                     "({0})".format(liability.details) if liability.details else ""
             )
             change_phrases.append((exp_phrase, phrase,))
+        for limit in self.limitrevision_set.all():
+            exp_cost = 0
+            exp_phrase = self.get_exp_phrase(exp_cost)
+            change_word = "removed" if limit.is_deleted else \
+                "edited" if limit.previous_revision else "took"
+            phrase = "{0} Limit {1}".format(
+                change_word,
+                limit.relevant_limit.name
+            )
+            change_phrases.append((exp_phrase, phrase,))
         return change_phrases
 
     def clear(self):
@@ -608,6 +659,8 @@ class ContractStats(models.Model):
             ability.delete()
         for attribute in self.attributevalue_set.all():
             attribute.delete()
+        for limit in self.limitrevision_set.all():
+            limit.delete()
 
 
 class QuirkDetails(models.Model):
@@ -673,6 +726,16 @@ class AbilityValue(TraitValue):
     class Meta:
         unique_together = (("relevant_ability", "relevant_stats"))
 
+class LimitRevision(models.Model):
+    relevant_limit = models.ForeignKey(Limit,
+                                       on_delete=models.CASCADE)
+    relevant_stats = models.ForeignKey(ContractStats,
+                                             on_delete=models.CASCADE)
+    previous_revision = models.ForeignKey('self',
+                                          null=True,
+                                          blank=True,
+                                          on_delete=models.CASCADE)  # Used in revisioning to determine value change.
+    is_deleted = models.BooleanField(default=False)
 
 class Character_Death(models.Model):
     relevant_character = models.ForeignKey(Character,

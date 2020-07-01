@@ -98,3 +98,17 @@ $(document).on('change','[id$=-is_selected]', function(ev) {
             checkbox.closest('[id^=' + quirkWord + '-'+quirkId+']').hide();
         }
 });
+
+// Limit Warning
+$(document).on('change','[id$=-checked]', function(ev){
+    var numLimitsSelected = $('input:checked[id$=-checked]').length; // subtract empty form
+    var warnDiv = $('[class~=limit-warn]');
+    if (numLimitsSelected == 3) {
+        warnDiv.css("display","none");
+    } else {
+        warnDiv.html("<p>All Characters must select exactly <b>3</b> Limits unless they have an Asset or "
+                            + "Liability that states otherwise.</p>"
+                            + "<p>Number currently selected: <b>" + numLimitsSelected + "</b></p>");
+        warnDiv.css("display","block");
+    }
+});

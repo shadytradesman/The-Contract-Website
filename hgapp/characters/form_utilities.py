@@ -1,10 +1,11 @@
 from django.forms import formset_factory
 
 from characters.models import Character, BasicStats, Character_Death, Graveyard_Header, Attribute, Ability, \
-    CharacterTutorial, Asset, Liability, AttributeValue, ContractStats, AbilityValue, LiabilityDetails, AssetDetails
+    CharacterTutorial, Asset, Liability, AttributeValue, ContractStats, AbilityValue, LiabilityDetails, AssetDetails, \
+    Limit, LimitRevision
 from powers.models import Power_Full
 from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, AbilityForm, \
-    AssetForm, LiabilityForm
+    AssetForm, LiabilityForm, LimitForm
 from collections import defaultdict
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
@@ -12,17 +13,6 @@ from django.shortcuts import get_object_or_404
 # logic for Character creation and editing
 # TRANSACTIONS HAPPEN IN VIEW LAYER
 # See tests.py for hints on how revisioning works.
-
-def __get_attribute_formset_for_edit(existing_character, AttributeFormSet, POST=None):
-    return AttributeFormSet(
-        POST,
-        initial=[{'attribute_id': x.relevant_attribute.id,
-                  'value': x.value,
-                  'attribute': x.relevant_attribute,
-                  'previous_value_id': x.previous_revision.id if x.previous_revision else None}
-                 for x in existing_character.stats_snapshot.attributevalue_set.order_by('relevant_attribute__name').all()],
-        prefix="attributes")
-
 def get_edit_context(user, existing_character=None):
     char_form = make_character_form(user)(instance=existing_character)
     AttributeFormSet = formset_factory(AttributeForm, extra=0)
@@ -34,6 +24,7 @@ def get_edit_context(user, existing_character=None):
         liability_formsets = __get_liability_formsets(existing_character)
         ability_formset = __get_ability_formset_for_edit(existing_character, AbilityFormSet)
         attribute_formset = __get_attribute_formset_for_edit(existing_character, AttributeFormSet)
+        limit_formset = __get_limit_formset_for_edit(existing_character)
     else:
         asset_formsets = __get_asset_formsets()
         liability_formsets = __get_liability_formsets()
@@ -44,12 +35,19 @@ def get_edit_context(user, existing_character=None):
         ability_formset = AbilityFormSet(
             initial=[{'ability_id': x.id, 'value': 0, 'ability': x} for x in default_abilities],
             prefix="abilities")
+        primary_limits = Limit.objects.filter(is_primary=True).order_by('-is_default', 'name')
+        LimitFormSet = formset_factory(LimitForm, extra=3)
+        limit_formset = LimitFormSet(
+            initial=[{'limit': x, 'selected': x.is_default} for x in primary_limits],
+            prefix="limits"
+        )
     context = {
         'char_form': char_form,
         'attribute_formset': attribute_formset,
         'ability_formset': ability_formset,
         'asset_formsets': asset_formsets,
         'liability_formsets': liability_formsets,
+        'limit_formset': limit_formset,
         'tutorial': tutorial,
         'character': existing_character,
     }
@@ -93,6 +91,48 @@ def update_character_from_post(user, POST, existing_character):
 
 # __private methods
 
+def __limits_from_formset(limit_formset, stats):
+    if limit_formset.is_valid():
+        for form in limit_formset:
+            if 'checked' in form.cleaned_data and form.cleaned_data['checked']:
+                if not 'limit' in form.initial and 'name' in form.cleaned_data and form.cleaned_data['name']:
+                    limit = Limit(
+                        name = form.cleaned_data['name'],
+                        description = form.cleaned_data['description'] if 'description' in form.cleaned_data else "",
+                        owner = stats.assigned_character.player,
+                    )
+                    limit.save()
+                else:
+                    limit = get_object_or_404(Limit, id=form.cleaned_data['id'])
+            if 'limit_rev_id' in form.cleaned_data and form.cleaned_data['limit_rev_id']:
+                if form.changed_data:
+                    prev_rev = get_object_or_404(LimitRevision, id=form.cleaned_data['limit_rev_id'])
+                    if prev_rev.relevant_limit.owner \
+                            and stats.assigned_character.player == prev_rev.relevant_limit.owner \
+                            and form.cleaned_data['checked']:
+                        limit.name = form.cleaned_data['name']
+                        limit.description = form.cleaned_data['description'] if 'description' in form.cleaned_data else ""
+                        limit.save()
+                    if not form.cleaned_data['checked']:
+                        limit = get_object_or_404(Limit, id=form.cleaned_data['id'])
+                        limit_rev = LimitRevision(
+                            relevant_limit=limit,
+                            relevant_stats=stats,
+                            previous_revision = prev_rev,
+                            is_deleted= True,
+                        )
+                        limit_rev.save()
+            elif 'checked' in form.cleaned_data and form.cleaned_data['checked']:
+                limit_rev = LimitRevision(
+                    relevant_limit=limit,
+                    relevant_stats=stats,
+                    is_deleted=False,
+                )
+                limit_rev.save()
+    else:
+        raise ValueError("Invalid Limit Formset")
+
+#TODO: cleanup / split this method
 def __save_stats_diff_from_post(POST, existing_character=None, new_character=None):
     if new_character:
         # Create the character's stats snapshot and save.
@@ -107,39 +147,21 @@ def __save_stats_diff_from_post(POST, existing_character=None, new_character=Non
     asset_formsets = __get_asset_formsets(existing_character, POST=POST)
     liability_formsets = __get_liability_formsets(existing_character, POST=POST)
     if existing_character:
-        stats = ContractStats(assigned_character=existing_character)
-        stats.save()
+        new_stats_rev = ContractStats(assigned_character=existing_character)
+        new_stats_rev.save()
+        limit_formset = __get_limit_formset_for_edit(existing_character, POST)
         for asset_formset in asset_formsets:
-            __save_edit_quirks_from_formset(formset=asset_formset, stats=stats, is_asset=True)
+            __save_edit_quirks_from_formset(formset=asset_formset, stats=new_stats_rev, is_asset=True)
         for liability_formset in liability_formsets:
-            __save_edit_quirks_from_formset(formset=liability_formset, stats=stats, is_asset=False)
+            __save_edit_quirks_from_formset(formset=liability_formset, stats=new_stats_rev, is_asset=False)
         ability_formset = __get_ability_formset_for_edit(existing_character, AbilityFormSet, POST)
-        __save_edit_abilities_from_formset(formset=ability_formset, stats=stats)
+        __save_edit_abilities_from_formset(formset=ability_formset, stats=new_stats_rev)
         attribute_formset = __get_attribute_formset_for_edit(existing_character, AttributeFormSet, POST)
-        attribute_formset.is_valid
-        for form in attribute_formset:
-            if form.is_valid():
-                attribute = get_object_or_404(Attribute, id=form.cleaned_data['attribute_id'])
-                if "previous_value_id" in form.cleaned_data and form.cleaned_data["previous_value_id"]:
-                    value_id = form.cleaned_data['previous_value_id']
-                    prev_val = get_object_or_404(AttributeValue, id=value_id)
-                    if form.changed_data and form.cleaned_data['value'] != str(prev_val.value):
-                        new_val = AttributeValue(
-                            relevant_stats=stats,
-                            relevant_attribute=attribute,
-                            value=form.cleaned_data['value'],
-                            previous_revision=prev_val,
-                        )
-                        new_val.save()
-                else:
-                    raise ValueError("The site doesn't support adding attribute until you implement this.")
-            else:
-                raise ValueError("invalid attribute form in edit")
-
-
+        __save_edit_attributes_from_formset(attribute_formset, new_stats_rev)
     else: # new character
-        stats = ContractStats(assigned_character=new_character)
-        stats.save()
+        new_stats_rev = ContractStats(assigned_character=new_character)
+        new_stats_rev.save()
+        limit_formset = __get_limit_formset_for_edit(new_character, POST)
         attribute_formset = AttributeFormSet(POST,
                                              initial=[{'attribute_id': x.id, 'value': 1, 'attribute': x} for x in attributes],
                                              prefix="attributes")
@@ -148,12 +170,35 @@ def __save_stats_diff_from_post(POST, existing_character=None, new_character=Non
                                          initial=[{'ability_id': x.id, 'value': 0, 'ability': x} for x in
                                                   default_abilities],
                                          prefix="abilities")
-        attribute_values = __attributes_from_form(attribute_formset, stats)
-        ability_values = __abilities_from_form(ability_formset, stats)
-        liabilities = __liabilities_from_formsets(liability_formsets, stats)
-        assets = __assets_from_formsets(asset_formsets, stats)
-    stats.save()
-    return stats
+        attribute_values = __attributes_from_form(attribute_formset, new_stats_rev)
+        ability_values = __abilities_from_form(ability_formset, new_stats_rev)
+        liabilities = __liabilities_from_formsets(liability_formsets, new_stats_rev)
+        assets = __assets_from_formsets(asset_formsets, new_stats_rev)
+    __limits_from_formset(limit_formset, new_stats_rev)
+    new_stats_rev.save()
+    return new_stats_rev
+
+
+def __save_edit_attributes_from_formset(attribute_formset, new_stats_rev):
+    for form in attribute_formset:
+        if form.is_valid():
+            attribute = get_object_or_404(Attribute, id=form.cleaned_data['attribute_id'])
+            if "previous_value_id" in form.cleaned_data and form.cleaned_data["previous_value_id"]:
+                value_id = form.cleaned_data['previous_value_id']
+                prev_val = get_object_or_404(AttributeValue, id=value_id)
+                if form.changed_data and form.cleaned_data['value'] != str(prev_val.value):
+                    new_val = AttributeValue(
+                        relevant_stats=new_stats_rev,
+                        relevant_attribute=attribute,
+                        value=form.cleaned_data['value'],
+                        previous_revision=prev_val,
+                    )
+                    new_val.save()
+            else:
+                raise ValueError("The site doesn't support adding attribute until you implement this.")
+        else:
+            raise ValueError("invalid attribute form in edit")
+
 
 def __liabilities_from_formsets(liability_formsets, stats):
     liability_details = []
@@ -188,7 +233,7 @@ def __assets_from_formsets(asset_formsets, stats):
                     new_asset_deets.save()
                     asset_details.append(new_asset_deets)
         else:
-            raise ValueError("Invalid liability formset")
+            raise ValueError("Invalid asset formset")
     return asset_details
 
 def __attributes_from_form(attribute_formset, stats):
@@ -234,6 +279,31 @@ def __new_ability_from_form(form, stats):
         )
         ability_value.save()
         return ability_value
+
+def __get_attribute_formset_for_edit(existing_character, AttributeFormSet, POST=None):
+    return AttributeFormSet(
+        POST,
+        initial=[{'attribute_id': x.relevant_attribute.id,
+                  'value': x.value,
+                  'attribute': x.relevant_attribute,
+                  'previous_value_id': x.previous_revision.id if x.previous_revision else None}
+                 for x in existing_character.stats_snapshot.attributevalue_set.order_by('relevant_attribute__name').all()],
+        prefix="attributes")
+
+def __get_limit_formset_for_edit(character, POST=None):
+    selected_limits = character.stats_snapshot.limitrevision_set.order_by('relevant_limit__name')
+    LimitFormSet = formset_factory(LimitForm, extra= 3 - selected_limits.filter(relevant_limit__is_primary=False).all().count())
+    primary_limits = Limit.objects.filter(is_primary=True).order_by('-is_default', 'name')
+    initial_data = [{'limit': x.relevant_limit, 'selected': True, 'limit_rev_id': x.previous_revision.id} for x in selected_limits.all()]
+    selected_limit_ids = [x.relevant_limit.id for x in selected_limits.all()]
+    for limit in primary_limits:
+        if not limit.id in selected_limit_ids:
+            initial_data.append({'limit': limit, 'selected': False})
+    return LimitFormSet(
+        POST,
+        initial=initial_data,
+        prefix="limits"
+    )
 
 def __get_asset_formsets(existing_character = None, POST = None):
     asset_formsets = []

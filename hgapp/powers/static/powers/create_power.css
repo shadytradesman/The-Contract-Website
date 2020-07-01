@@ -1,8 +1,10 @@
 .affix {
     top: 60px;
-    margin-left: -290px;
     z-index: 9999 !important;
     background-color: lightgray;
-    padding: 20px;
+    text-align: center;
+    padding: 10px;
+    width: 200px;
     direction: rtl;
+    border: 1px solid black;
 }
