@@ -41,7 +41,7 @@ def make_enhancement_form(enhancement, enhancement_instance=None):
             requirements = ""
             required_status = {}
             for status in HIGH_ROLLER_STATUS: required_status[status[0]] = status[1]
-            if enhancement.required_status in [HIGH_ROLLER_STATUS[2][0], HIGH_ROLLER_STATUS[3][0]]:
+            if enhancement.required_status in [HIGH_ROLLER_STATUS[3][0], HIGH_ROLLER_STATUS[4][0]]:
                 requirements = "requires: {}".format(required_status[enhancement.required_status])
             return '{} ({}) {}'.format(enhancement.name, enhancement.description, requirements)
 
@@ -69,7 +69,7 @@ def make_drawback_form(drawback):
             requirements = ""
             required_status = {}
             for status in HIGH_ROLLER_STATUS: required_status[status[0]] = status[1]
-            if drawback.required_status in [HIGH_ROLLER_STATUS[2][0], HIGH_ROLLER_STATUS[3][0]]:
+            if drawback.required_status in [HIGH_ROLLER_STATUS[3][0], HIGH_ROLLER_STATUS[4][0]]:
                 requirements = "requires: {}".format(required_status[drawback.required_status])
             return '{} ({}) {}'.format(drawback.name, drawback.description, requirements)
 

@@ -1,0 +1,388 @@
+{% extends "site_base.html" %}
+{% load staticfiles %}
+{% load markdown_deux_tags %}
+{% load games_tags %}
+{% load i18n %}
+
+{% block head_title %}
+    {{character.name}}
+{% endblock %}
+{% block body_class %}
+    home
+{% endblock %}
+{% csrf_token %}
+{% block extra_styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'characters/view_character_style.css' %}" />
+{% endblock %}
+{% block extra_scripts %}
+    <script src="{% static 'characters/view_character.js' %}"></script>
+    <script src="{% static 'overrides/wiki-macro-scripts.js' %}"></script>
+{% endblock %}
+
+{% block body_base %}
+<div class="container">
+    <div class="backdropped">
+        {% include "characters/view_pages/header_section.html" %}
+        {% include "characters/view_pages/essentials_section.html" %}
+        <div class ="row text-center">
+            <h2>Attributes</h2>
+            {% for attribute_value in physical_attributes %}
+                <div class="col-md-2 col-sm-6 col-xs-6">
+                    <h4>
+                        {{attribute_value.relevant_attribute.name}}
+                        <span class="stat-value">
+                            {{attribute_value.value}}
+                        </span>
+                    </h4>
+                </div>
+            {% endfor %}
+            {% for attribute_value in mental_attributes %}
+                <div class="col-md-2 col-sm-6 col-xs-6">
+                    <h4>
+                        <span class="stat-value">
+                            {{attribute_value.value}}</span>
+                        {{attribute_value.relevant_attribute.name}}
+                    </h4>
+                </div>
+            {% endfor %}
+        </div>
+        <div class ="row text-center">
+            <h2>Abilities</h2>
+            <span id="abilities-toggle" class="btn btn-default btn-xs">Show all Primaries</span>
+            <br>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="row">
+                    {% for ability_value in ability_value_by_name %}
+                        {% if ability_value.1.is_physical %}
+                        <div class="ability {% if not ability_value.2%} zero-ability {% endif %}"
+                            {% if not ability_value.2 %} style="display:none;" {% endif %}>
+                            <p>
+                                <div class="col-md-4 col-sm-3 col-xs-4 text-right">
+                                    <p>
+                                        <b>{{ability_value.1.name}}</b>
+                                        <span class="stat-value">
+                                            {{ability_value.2}}
+                                        </span>
+                                    </p>
+                                </div>
+                            </p>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="row">
+                    {% for ability_value in ability_value_by_name %}
+                        {% if not ability_value.1.is_physical %}
+                            <div class="ability {% if not ability_value.2%} zero-ability {% endif %}"
+                                {% if not ability_value.2 %} style="display:none;" {% endif %}>
+                                <p>
+                                    <div class="col-md-4 col-sm-3 col-xs-4 text-left">
+                                        <p>
+                                            <span class="stat-value">
+                                                {{ability_value.2}}</span>
+                                            <b>{{ability_value.1.name}}</b>
+
+                                        </p>
+                                    </div>
+                                </p>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    <div class="row ">
+        <div class="col-md-4">
+            <div class="row text-center">
+                <h3 data-toggle="tooltip" title='{{tutorial.injuries}}'>Injuries</h3>
+                <div class="text-left">
+                        <li class="stat-value">-1 slashed elbow</li>
+                        <li class="stat-value">-4 stomach stab wound</li>
+                        <li class="stat-value">-4 pointer finger right hand cut off</li>
+                        <li class="stat-value">-4 stomach stab wound</li>
+                        <li class="stat-value">-1 slashed elbow</li>
+                </div>
+            </div>
+            <div class="row text-center">
+                <h3 data-toggle="tooltip" title='{{tutorial.battle_scars}}'>Battle Scars</h3>
+                <div class="text-left">
+                    {% for scar in character.battlescar_set.all %}
+                        <li class="stat-value">
+                            scar.description
+                            {% if user_can_edit %}<span class="pull-right">[delete]</span>{%endif%}
+                        </li>
+                    {% endfor%}
+                    {% if user_can_edit %}
+                        <form id="scar-form">
+                            {{ battle_scar_form.about.errors }}
+                            {{ battle_scar_form.non_field_errors }}
+                            <div class="col-md-8">
+                                {{battle_scar_form.description}}
+                            </div>
+                            <div class="col-md-4">
+                                <input type="submit" class="btn btn-default" value="Add Scar" />
+                            </div>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="row">
+                <h3 class="text-center">Assets And Liabilities</h3>
+                {% for asset_details in character.stats_snapshot.assetdetails_set.all %}
+                        <li class="stat-value">
+                            <b>[+{{asset_details.relevant_asset.value}}] {{asset_details.relevant_asset.name}}:</b>
+                            {{asset_details.relevant_asset.system}}
+                            {% if asset_details.details %}
+                                <br>
+                                <b>{{asset_details.relevant_asset.details_field_name}}</b>
+                                {{asset_details.details}}
+                            {% endif %}
+                        </li>
+                {% endfor %}
+                {% for liability_details in character.stats_snapshot.liabilitydetails_set.all %}
+                    <li class="stat-value">
+                        <b>[-{{liability_details.relevant_liability.value}}] {{liability_details.relevant_liability.name}}:</b>
+                        {{liability_details.relevant_liability.system}}
+                        {% if liability_details.details %}
+                            <br>
+                            <b>{{liability_details.relevant_liability.details_field_name}}</b>
+                            {{liability_details.details}}
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </div>
+            <div class="row">
+                <h3 class="text-center">Equipment</h3>
+                    {% if character.basic_stats.movement %}
+                        <div class="col-md-6">
+                            <p><b>Movement:</b> {{character.basic_stats.movement}}</p>
+                        </div>
+                    {% endif %}
+                    {% if character.basic_stats.armor %}
+                        <div class="col-md-6">
+                            <p><b>Armor:</b> {{character.basic_stats.armor}}</p>
+                        </div>
+                    {% endif %}
+                    {% if character.total_encumbrance %}
+                        <div class="col-md-6">
+                            <p><b>Total Encumbrance:</b> {{character.total_encumbrance}}</p>
+                        </div>
+                    {% endif %}
+                    {% if character.max_encumbrance %}
+                        <div class="col-md-6">
+                            <p><b>Maximum Encumbrance:</b> {{character.max_encumbrance}}</p>
+                        </div>
+                    {% endif %}
+                {% if character.equipment %}
+                    <p>{{character.equipment | markdown | linebreaks}}</p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="row text-center">
+                        <div class="col-md-5 text-right" data-toggle="tooltip" title='{{tutorial.body}}'>
+                            <h2 class="css-body-h">
+                                Body <span class="stat-value css-fort-stat">{{character.num_body_levels}}</span>
+                            </h2>
+                        </div>
+                        <div class="col-md-2" data-toggle="tooltip" title='{{tutorial.penalty}}'>
+                            <span style="position:relative;right:6px">penalty</span><br>
+                            <i class="fa fa-square-o fa-3x" ></i>
+                        </div>
+                        <div class="col-md-5 text-left" data-toggle="tooltip" title='{{tutorial.mind}}'>
+                            <h2 class="css-mind-h">
+                                <span class="stat-value css-fort-stat">{{character.num_mind_levels}}</span> Mind
+                            </h2>
+                        </div>
+                    </div>
+                    {% for row in health_display %}
+                        <div class="row">
+                            <div class="col-md-4 text-right">
+                                {{row.0}}
+                            </div>
+                            <div class="col-md-1 text-center health-box">
+                                {% if row.1 == 'empty' %}
+                                    <i class="fa fa-square-o fa-2x"></i>
+                                {% elif row.i == 'full' %}
+                                    FULL
+                                {% else %}
+                                {% endif %}
+                            </div>
+                            <div class="col-md-2 text-center ">
+                                {% if row.2 == 'Incap' %}
+                                    <span data-toggle="tooltip" title='You are Incapacitated. You may take no actions.'>
+                                        X_X
+                                    </span>
+                                {% elif row.2 == 'Dead' %}
+                                    <img src="{% static 'characters/skull.svg' %}" data-toggle="tooltip" title='You are Dead.'/>
+                                {% else %}
+                                    {{ row.2 }}
+                                {% endif %}
+                            </div>
+                            <div class="col-md-1 text-center health-box" >
+                                {% if row.3 == 'empty' %}
+                                    <i class="fa fa-square-o fa-2x"></i>
+                                {% elif row.3 == 'full' %}
+                                    FULL
+                                {% else %}
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4 text-left" >
+                                {{ row.4 }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="col-md-6">
+                    <div class="row text-center">
+                        <h3 data-toggle="tooltip" title='{{tutorial.limits_view}}'>Limits</h3>
+                        {% for limit_rev in character.stats_snapshot.limitrevision_set.all %}
+                            <div class="stat-value" data-toggle="tooltip" title='{{limit_rev.relevant_limit.description}}'>
+                                <b>{{limit_rev.relevant_limit.name}}</b>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="row text-center">
+                        <h3 data-toggle="tooltip" title='{{tutorial.traumas}}'>Traumas</h3>
+                        <div class="text-left">
+                            <li class="stat-value">Fear of strange-smelling places</li>
+                            <li class="stat-value">Compulsion to sniff butts</li>
+                        </div>
+                    </div>
+                    <div class="row text-center">
+                        <div class="col-md-12">
+                    <div class="row text-center">
+                        <h3>
+                            Moon
+                            <i class="fa fa-circle fa-1x"></i>
+                            <i class="fa fa-circle fa-1x"></i>
+                            <i class="fa fa-circle-o fa-1x"></i>
+                            <i class="fa fa-circle-o fa-1x"></i>
+                            <i class="fa fa-times-circle fa-1x" style="color:grey"></i>
+                            <i class="fa fa-times-circle fa-1x" style="color:grey"></i>
+                            <i class="fa fa-times-circle fa-1x" style="color:grey"></i>
+                            <i class="fa fa-times-circle fa-1x" style="color:grey"></i>
+                            <i class="fa fa-times-circle fa-1x" style="color:grey"></i>
+                            <i class="fa fa-times-circle fa-1x" style="color:grey"></i>
+                        </h3>
+                    </div>
+                </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                    <h2 class="text-center">Powers</h2>
+                    {% for power_full in character.power_full_set.all %}
+                        <div class="row">
+                            {% if request.user.is_authenticated and request.user.id == character.player.id and character.unspent_rewards|length > 0 %}
+                                <div class= "col-md-2 container">
+                                    <a href="{% url 'powers:powers_edit_power' power_full.id %}" class="btn btn-success"><i class="fa fa-plus-square fa-4x"></i></a>
+                                </div>
+                                <div class= "col-md-10">
+                            {% else %}
+                                <div class= "col-md-12">
+                            {% endif %}
+                            {% include "powers/power_badge_snippet.html" %}
+                            </div>
+                        </div>
+                    {% empty %}
+                        <h4 class="text-center">{{character.name}} doesn't have any powers yet. What a noob :(</h4>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+
+        <h2>Character Timeline</h2>
+            <p><b>{{ character.number_of_victories }}</b> Victories - <b>{{ character.number_of_losses }}</b> Losses</p>
+            {% for date, event_list in timeline.items %}
+                <h4>{{ date }}</h4>
+                <ul>
+                {% for event in event_list %}
+                    {% if event.0 == "game"%}
+                        {% with event.1 as attendance %}
+                            {% include "games/game_attendance_badge_snippet.html" %}
+                        {% endwith %}
+                    {% else %}
+                        {% for phrase in event.1.get_change_phrases %}
+                            <li>
+                                <b>{{phrase.0}} Exp:</b> {{phrase.1}}
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}
+                </ul>
+            {% empty %}
+                <h4>{{character.name}} Still hasn't been invited on their first game! Awww</h4>
+            {% endfor %}
+            {% if character.basic_stats.advancement_history %}
+                <h3>Advancement History</h3>
+                <p>{{character.basic_stats.advancement_history |linebreaks}}</p>
+            {% endif %}
+
+
+
+        <h2>Gifts and Improvements</h2>
+            {% if character.unspent_rewards|length > 0 %}
+                <h4>Character has {{character.unspent_rewards|length}} unspent rewards</h4>
+                    <ul >
+                        {% for reward in character.unspent_rewards %}
+                            <li>{% render_reward reward %}</li>
+                        {% endfor %}
+                    </ul>
+            {% endif %}
+            {% if character.spent_rewards|length > 0 %}
+                <h4>Gift / Reward History</h4>
+                    <ul >
+                        {% for reward in character.spent_rewards %}
+                            <li>{% render_reward reward %}</li>
+                        {% endfor %}
+                    </ul>
+            {% endif %}
+    {% if character.wish_list %}
+        <div class="container">
+            <h3>Wish List</h3>
+            <div class="container">
+                <p>{{character.wish_list | linebreaks}}</p>
+            </div>
+        </div>
+    {% endif %}
+    {% if character.to_do_list %}
+        <div class="container">
+            <h3>To-Do List</h3>
+            <div class="container">
+                <p>{{character.to_do_list | linebreaks}}</p>
+            </div>
+        </div>
+    {% endif %}
+    {% if character.notes %}
+        <div class="container">
+            <h3>Other Notes</h3>
+            <div class="container">
+                <p>{{character.notes | markdown | linebreaks}}</p>
+            </div>
+        </div>
+    {% endif %}
+    {% if character.void_deaths %}
+        <div class="container text-danger">
+            <h2>Voided Deaths</h2>
+            <h4>You should probably know about these. . .</h4>
+            <ul>
+            {% for death in character.void_deaths %}
+                <div class="container">
+                    <li>{{death.date_of_death}} - {{death.cause_of_death }}</li>
+                </div>
+            {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    </div>
+</div>
+
+{% endblock %}

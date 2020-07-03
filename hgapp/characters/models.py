@@ -12,6 +12,7 @@ from cells.models import Cell
 
 HIGH_ROLLER_STATUS = (
     ('ANY', 'Any'),
+    ('NEWBIE', 'Newbie'),
     ('NOVICE', 'Novice'),
     ('SEASONED', 'Seasoned'),
     ('VETERAN', 'Veteran'),
@@ -22,6 +23,39 @@ QUIRK_CATEGORY = (
     ('BACKGROUND', 'Background'),
     ('MENTAL', 'Mental'),
     ('RESTRICTED', 'Restricted'),
+)
+
+BODY_STATUS = (
+    'Bruised',
+    'Bruised',
+    'Hurt',
+    'Injured',
+    'Wounded',
+    'Mauled',
+    'Maimed'
+)
+
+MIND_STATUS = (
+    'Agitated',
+    'Agitated',
+    'Distracted',
+    'Worried',
+    'Alarmed',
+    'Frantic',
+    'Delerious',
+)
+
+PENALTIES = (
+    0,
+    0,
+    0,
+    -1,
+    -1,
+    -2,
+    -3,
+    -4,
+    "Incap",
+    "Dead"
 )
 
 # EXPERIENCE CONSTANTS
@@ -185,12 +219,14 @@ class Character(models.Model):
 
     def calculate_status(self):
         num_victories = self.number_of_victories()
-        if num_victories < 10:
+        if num_victories == 0 and self.number_of_losses() == 0:
             return HIGH_ROLLER_STATUS[1][0]
-        elif num_victories < 30:
+        elif num_victories < 10:
             return HIGH_ROLLER_STATUS[2][0]
-        else:
+        elif num_victories < 30:
             return HIGH_ROLLER_STATUS[3][0]
+        else:
+            return HIGH_ROLLER_STATUS[4][0]
 
     def save(self, *args, **kwargs):
         self.status = self.calculate_status()
@@ -300,8 +336,6 @@ class Character(models.Model):
                                self.number_of_losses())
         output = output + "Age: {}\nSex: {}\nAppearance: {}\nConcept: {}\nAmbition: {}\n"
         output = output.format(self.age, self.sex, self.appearance, self.concept_summary, self.ambition)
-        output = output + "Stats: {}\n"
-        output = output.format(self.basic_stats.stats)
         output = output + "\n=======\nPowers:\n=======\n"
         for power_full in self.power_full_set.all():
             output = output +"{}\n"
@@ -392,12 +426,49 @@ class Character(models.Model):
         self.stats_snapshot.save()
 
     def num_body_levels(self):
-        brawn_value = self.stats_snapshot.atributevalue_set.get(relevant_attribute__scales_body=True).value
+        brawn_value = self.stats_snapshot.attributevalue_set.get(relevant_attribute__scales_body=True).value
         return BASE_BODY_LEVELS + math.ceil(brawn_value / 2)
-    
+
     def num_mind_levels(self):
-        int_value = self.stats_snapshot.atributevalue_set.get(relevant_attribute__scales_mind=True).value
-        return BASE_MIND_LEVELS + math.ceil(int_value / 2)
+        intelligence_value = self.stats_snapshot.attributevalue_set.get(relevant_attribute__scales_mind=True).value
+        return BASE_MIND_LEVELS + math.ceil(intelligence_value / 2)
+
+    def get_attributes(self, is_physical):
+        return self.stats_snapshot.attributevalue_set\
+            .filter(relevant_attribute__is_physical=is_physical)\
+            .order_by('relevant_attribute__name')\
+            .all()
+
+    def get_abilities(self, is_physical):
+        return self.stats_snapshot.abilityvalue_set\
+            .filter(relevant_ability__is_physical=is_physical)\
+             .order_by('relevant_ability__name')\
+            .all()
+
+    #TODO: boxes are full / empty based on injuries and mind health
+    def get_health_display(self):
+        # Example output for bottom 3 rows. for a mentally incapacitated, physically unharmed character
+        # format is: (injury flavor, body box, penalty, mind box, mental health flavor)
+        # ('maimed', 'empty', '-4', 'full', 'delerious')
+        # ('', 'empty', 'Incapacitated', 'full', '')   # incap
+        # ('', 'empty', 'Dead', 'none', '')   # dead level
+        body_levels = self.num_body_levels()
+        mind_levels = self.num_mind_levels()
+        health_rows = []
+        for x in range(max(body_levels, mind_levels) + 1):
+            health_rows.insert(0, (
+                BODY_STATUS[-(x - 1)] if BODY_STATUS[-(x - 2)] and x-2 >= 0 and x <= body_levels else "",
+                'empty' if x <= body_levels else 'none',
+                PENALTIES[-x-1],
+                'empty' if x <= mind_levels and x > 0 else 'none',
+                MIND_STATUS[-(x - 1)] if MIND_STATUS[-(x - 2)] and x - 2 >= 0 and x <= mind_levels else "",
+            ))
+        return health_rows
+
+class BattleScar(models.Model):
+    character = models.ForeignKey(Character,
+                                   on_delete=models.CASCADE)
+    description = models.CharField(max_length=500)
 
 class BasicStats(models.Model):
     stats = models.CharField(max_length=10000)
@@ -451,6 +522,8 @@ class Trait(models.Model):
     tutorial_text = models.CharField(max_length=250,
                               null=True,
                               blank=True)
+    is_physical = models.BooleanField(default=False) # for rendering character sheet
+
     def __str__(self):
         return self.name
 
@@ -767,3 +840,10 @@ class CharacterTutorial(models.Model):
     secondary_abilities = models.TextField(max_length=3000)
     assets_and_liabilities = models.TextField(max_length=3000)
     limits = models.TextField(max_length=3000)
+    limits_view = models.TextField(max_length=3000)
+    traumas = models.TextField(max_length=3000)
+    injuries = models.TextField(max_length=3000)
+    battle_scars = models.TextField(max_length=3000)
+    penalty = models.TextField(max_length=3000)
+    mind = models.TextField(max_length=3000)
+    body = models.TextField(max_length=3000)

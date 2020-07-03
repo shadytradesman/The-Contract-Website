@@ -12,7 +12,7 @@ from characters.models import Character, BasicStats, Character_Death, Graveyard_
     CharacterTutorial, Asset, Liability
 from powers.models import Power_Full
 from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, AbilityForm, \
-    AssetForm, LiabilityForm
+    AssetForm, LiabilityForm, BattleScarForm
 from characters.form_utilities import get_edit_context, character_from_post, update_character_from_post
 
 
@@ -108,12 +108,25 @@ def view_character(request, character_id):
     timeline = defaultdict(list)
     for event in events_by_date:
         timeline[event[0].strftime("%b %m %Y")].append((event[1], event[2]))
+
+    char_ability_values = character.stats_snapshot.abilityvalue_set.order_by("relevant_ability__name").all()
+    char_value_ids = [x.relevant_ability.id for x in char_ability_values]
+    primary_zero_values = [(x.name, x, 0) for x in Ability.objects.filter(is_primary=True).order_by("name").all()
+                 if x.id not in char_value_ids]
+    all_ability_values =[(x.relevant_ability.name, x.relevant_ability, x.value) for x in char_ability_values]
+    ability_value_by_name = list(merge(primary_zero_values, all_ability_values))
     context = {
         'character': character,
         'user_can_edit': user_can_edit,
+        'health_display': character.get_health_display(),
+        'ability_value_by_name': ability_value_by_name,
+        'physical_attributes': character.get_attributes(is_physical=True),
+        'mental_attributes': character.get_attributes(is_physical=False),
         'timeline': dict(timeline),
+        'tutorial': get_object_or_404(CharacterTutorial),
+        'battle_scar_form': BattleScarForm(),
     }
-    return render(request, 'characters/view_character.html', context)
+    return render(request, 'characters/view_pages/view_character.html', context)
 
 
 def archive_character(request, character_id):

@@ -1,0 +1,22 @@
+{% if character.private %}
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1 alert alert-warning" role="alert">
+            <p>
+                <i class="fa fa-user-secret fa-2x"></i>
+                This character and their powers cannot be viewed by others because they are <b>Private</b>.
+            </p>
+        </div>
+    </div>
+{% endif %}
+{% if character.get_power_cost_total != character.active_spent_rewards|length %}
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1 alert alert-danger" role="alert">
+            <p>
+                Character's power value does not match number of spent gifts! </br>
+                <b>Power Value: </b>{{character.get_power_cost_total}}
+                <br>
+                <b>Spent Rewards: </b>{{character.active_spent_rewards|length}}
+            </p>
+        </div>
+    </div>
+{% endif %}

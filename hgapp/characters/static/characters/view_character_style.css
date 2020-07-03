@@ -1,0 +1,37 @@
+.char-essentials {
+    border-color: black;
+    border-radius: 4px;
+    border-width: 1px;
+    border-style: solid;
+}
+
+.stat-value {
+    border-color: black;
+    border-radius: 4px;
+    border-width: 1px;
+    border-style: solid;
+    padding: 5px;
+}
+
+.health-box {
+    position: relative;
+    right: 12px;
+    bottom: 3px;
+}
+
+.ability {
+}
+
+.css-fort-stat {
+    font-size: 18px;
+}
+
+.css-body-h {
+    position:relative;
+    left: 9px;
+}
+
+.css-mind-h {
+    position:relative;
+    right: 12px;
+}

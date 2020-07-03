@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.validators import MaxValueValidator, MinValueValidator
 from overrides.widgets import CustomStylePagedown
 
-from characters.models import Character, BasicStats, Character_Death
+from characters.models import Character, BasicStats, Character_Death, BattleScar
 
 ATTRIBUTE_VALUES = {
     "Brawn": (
@@ -58,7 +58,7 @@ ATTRIBUTE_VALUES = {
     ),
 }
 
-def make_character_form(user):
+def make_character_form(user, existing_character=None):
     class CharacterForm(ModelForm):
         class Meta:
             model = Character
@@ -105,7 +105,10 @@ def make_character_form(user):
                                             "This defines your character's home world and allows "
                                             "Cell leaders to help you with record-keeping. "
                                             "NOTE: Cell leaders will be able to view and edit your character.",
-                                  required=False)
+                                  required=False,
+                                  )
+    if existing_character:
+        cell.initial = existing_character.cell
     form.base_fields["cell"] = cell
     return form
 
@@ -228,3 +231,8 @@ class LimitForm(forms.Form):
             self.fields['checked'].initial = self.initial['selected']
         if 'limit_rev_id' in self.initial:
             self.fields['limit_rev_id'].initial = self.initial['limit_rev_id']
+
+class BattleScarForm(forms.Form):
+    description = forms.CharField(max_length=900,
+                                  label=None,
+                                  widget=forms.TextInput(attrs={'class': 'form-control'}))

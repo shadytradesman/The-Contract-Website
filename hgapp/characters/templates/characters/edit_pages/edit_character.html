@@ -47,7 +47,6 @@
     {{ char_form.non_field_errors }}
     {{ attribute_formset.non_field_errors }}
     {% csrf_token %}
-    {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
     <div class="thumbnail">
         <h2 class = "text-center" data-toggle="tooltip" title='{{tutorial.core_info}}'>Core Info</h2>
         <div class="row">

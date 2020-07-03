@@ -2,7 +2,7 @@ from django.conf import settings
 from django.db import models
 
 # Create your models here.
-from characters.models import Character
+from characters.models import Character, HIGH_ROLLER_STATUS
 from guardian.shortcuts import assign_perm, remove_perm
 
 ACTIVATION_STYLE = (
@@ -15,13 +15,6 @@ CREATION_REASON = (
     ('IMPROVEMENT', 'Improvement'),
     ('REVISION', 'Revision'),
     ('ADJUSTMENT', 'Adjustment'),
-)
-
-HIGH_ROLLER_STATUS = (
-    ('ANY', 'Any'),
-    ('NOVICE', 'Novice'),
-    ('SEASONED', 'Seasoned'),
-    ('VETERAN', 'Veteran'),
 )
 
 DICE_SYSTEM = (

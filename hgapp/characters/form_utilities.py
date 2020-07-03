@@ -13,8 +13,9 @@ from django.shortcuts import get_object_or_404
 # logic for Character creation and editing
 # TRANSACTIONS HAPPEN IN VIEW LAYER
 # See tests.py for hints on how revisioning works.
+
 def get_edit_context(user, existing_character=None):
-    char_form = make_character_form(user)(instance=existing_character)
+    char_form = make_character_form(user, existing_character)(instance=existing_character)
     AttributeFormSet = formset_factory(AttributeForm, extra=0)
     AbilityFormSet = formset_factory(AbilityForm, extra=1)
     attributes = Attribute.objects.order_by('name')
@@ -72,7 +73,7 @@ def character_from_post(user, POST):
         raise ValueError("Invalid char_form")
 
 def update_character_from_post(user, POST, existing_character):
-    char_form = make_character_form(user)(POST, instance=existing_character)
+    char_form = make_character_form(user, existing_character)(POST, instance=existing_character)
     if char_form.is_valid():
         char_form.save(commit=False)
         existing_character.edit_date = timezone.now()
