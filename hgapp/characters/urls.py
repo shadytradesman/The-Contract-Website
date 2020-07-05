@@ -41,4 +41,8 @@ urlpatterns = [
     url(r'^post/ajax/c/(?P<character_id>[\d]+)/trauma', views.post_trauma, name="post_trauma"),
 
     url(r'^post/ajax/delete-trauma/s/(?P<trauma_rev_id>[\d\w]+)/xp/(?P<used_xp>[TF]*)', views.delete_trauma, name="delete_trauma"),
+
+    url(r'^post/ajax/c/(?P<character_id>[\d]+)/injury', views.post_injury, name="post_injury"),
+
+    url(r'^post/ajax/delete-injury/s/(?P<injury_id>[\d\w]+)', views.delete_injury, name="delete_injury"),
 ]

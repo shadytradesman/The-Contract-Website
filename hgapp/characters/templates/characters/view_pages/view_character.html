@@ -14,6 +14,8 @@
     <link rel="stylesheet" type="text/css" href="{% static 'characters/view_character_style.css' %}" />
 {% endblock %}
 {% block extra_scripts %}
+
+    {{character.num_body_levels|json_script:"numBodyLevels"}}
     <script src="{% static 'characters/view_character.js' %}"></script>
     <script src="{% static 'overrides/wiki-macro-scripts.js' %}"></script>
 {% endblock %}
@@ -23,76 +25,7 @@
     <div class="backdropped">
         {% include "characters/view_pages/header_section.html" %}
         {% include "characters/view_pages/essentials_section.html" %}
-        <div class ="row text-center">
-            <h2>Attributes</h2>
-            {% for attribute_value in physical_attributes %}
-                <div class="col-md-2 col-sm-6 col-xs-6">
-                    <h4>
-                        {{attribute_value.relevant_attribute.name}}
-                        <span class="stat-value">
-                            {{attribute_value.value}}
-                        </span>
-                    </h4>
-                </div>
-            {% endfor %}
-            {% for attribute_value in mental_attributes %}
-                <div class="col-md-2 col-sm-6 col-xs-6">
-                    <h4>
-                        <span class="stat-value">
-                            {{attribute_value.value}}</span>
-                        {{attribute_value.relevant_attribute.name}}
-                    </h4>
-                </div>
-            {% endfor %}
-        </div>
-        <div class ="row text-center">
-            <h2>Abilities</h2>
-            <span id="abilities-toggle" class="btn btn-default btn-xs">Show all Primaries</span>
-            <br>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="row">
-                    {% for ability_value in ability_value_by_name %}
-                        {% if ability_value.1.is_physical %}
-                        <div class="ability {% if not ability_value.2%} zero-ability {% endif %}"
-                            {% if not ability_value.2 %} style="display:none;" {% endif %}>
-                            <p>
-                                <div class="col-md-4 col-sm-3 col-xs-4 text-right">
-                                    <p>
-                                        <b>{{ability_value.1.name}}</b>
-                                        <span class="stat-value">
-                                            {{ability_value.2}}
-                                        </span>
-                                    </p>
-                                </div>
-                            </p>
-                        </div>
-                        {% endif %}
-                    {% endfor %}
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="row">
-                    {% for ability_value in ability_value_by_name %}
-                        {% if not ability_value.1.is_physical %}
-                            <div class="ability {% if not ability_value.2%} zero-ability {% endif %}"
-                                {% if not ability_value.2 %} style="display:none;" {% endif %}>
-                                <p>
-                                    <div class="col-md-4 col-sm-3 col-xs-4 text-left">
-                                        <p>
-                                            <span class="stat-value">
-                                                {{ability_value.2}}</span>
-                                            <b>{{ability_value.1.name}}</b>
-                                        </p>
-                                    </div>
-                                </p>
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                    </div>
-                </div>
-            </div>
-        </div>
+        {% include "characters/view_pages/attributes_and_abilities.html" %}
     <div class="row ">
         <div class="col-md-4">
             {% include "characters/view_pages/left_column.html" %}
@@ -100,59 +33,7 @@
         <div class="col-md-8">
             <div class="row">
                 <div class="col-md-6">
-                    <div class="row text-center">
-                        <div class="col-md-5 text-right" data-toggle="tooltip" title='{{tutorial.body}}'>
-                            <h2 class="css-body-h">
-                                Body <span class="stat-value css-fort-stat">{{character.num_body_levels}}</span>
-                            </h2>
-                        </div>
-                        <div class="col-md-2" data-toggle="tooltip" title='{{tutorial.penalty}}'>
-                            <span style="position:relative;right:6px">penalty</span><br>
-                            <i class="fa fa-square-o fa-3x" ></i>
-                        </div>
-                        <div class="col-md-5 text-left" data-toggle="tooltip" title='{{tutorial.mind}}'>
-                            <h2 class="css-mind-h">
-                                <span class="stat-value css-fort-stat">{{character.num_mind_levels}}</span> Mind
-                            </h2>
-                        </div>
-                    </div>
-                    {% for row in health_display %}
-                        <div class="row">
-                            <div class="col-md-4 text-right">
-                                {{row.0}}
-                            </div>
-                            <div class="col-md-1 text-center health-box">
-                                {% if row.1 == 'empty' %}
-                                    <i class="fa fa-square-o fa-2x"></i>
-                                {% elif row.i == 'full' %}
-                                    FULL
-                                {% else %}
-                                {% endif %}
-                            </div>
-                            <div class="col-md-2 text-center ">
-                                {% if row.2 == 'Incap' %}
-                                    <span data-toggle="tooltip" title='You are Incapacitated. You may take no actions.'>
-                                        X_X
-                                    </span>
-                                {% elif row.2 == 'Dead' %}
-                                    <img src="{% static 'characters/skull.svg' %}" data-toggle="tooltip" title='You are Dead.'/>
-                                {% else %}
-                                    {{ row.2 }}
-                                {% endif %}
-                            </div>
-                            <div class="col-md-1 text-center health-box" >
-                                {% if row.3 == 'empty' %}
-                                    <i class="fa fa-square-o fa-2x"></i>
-                                {% elif row.3 == 'full' %}
-                                    FULL
-                                {% else %}
-                                {% endif %}
-                            </div>
-                            <div class="col-md-4 text-left" >
-                                {{ row.4 }}
-                            </div>
-                        </div>
-                    {% endfor %}
+                    {% include "characters/view_pages/center_column.html" %}
                 </div>
                 <div class="col-md-6">
                     {% include "characters/view_pages/right_column.html" %}
@@ -205,9 +86,6 @@
                 <h3>Advancement History</h3>
                 <p>{{character.basic_stats.advancement_history |linebreaks}}</p>
             {% endif %}
-
-
-
         <h2>Gifts and Improvements</h2>
             {% if character.unspent_rewards|length > 0 %}
                 <h4>Character has {{character.unspent_rewards|length}} unspent rewards</h4>

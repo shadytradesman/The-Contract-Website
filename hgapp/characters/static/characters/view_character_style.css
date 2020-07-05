@@ -19,9 +19,6 @@
     bottom: 3px;
 }
 
-.ability {
-}
-
 .css-fort-stat {
     font-size: 18px;
 }
@@ -38,4 +35,40 @@
 
 .css-del-trauma-form {
     display: inline;
+}
+
+.js-injury-value-input {
+    width: 25px !important;
+    padding: 5px !important;
+    text-align:center;
+    font-size:16px;
+}
+
+/* Hide HTML5 Up and Down arrows. */
+input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+.css-injury-val {
+    padding-bottom: 8px;
+}
+
+.css-penalty-box {
+    width: 40px !important;
+    height: 40px !important;
+    position: relative;
+    right: 4px;
+    font-size: 18px;
+}
+
+.css-dead-img {
+
+    width: 30px !important;
+    height: 30px !important;
+
 }

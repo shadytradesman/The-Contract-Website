@@ -1,0 +1,61 @@
+{% load staticfiles %}
+
+<div class="row text-center">
+    <div class="col-md-5 text-right" data-toggle="tooltip" title='{{tutorial.body}}'>
+        <h2 class="css-body-h">
+            Body <span class="stat-value css-fort-stat">{{character.num_body_levels}}</span>
+        </h2>
+    </div>
+    <div class="col-md-2" data-toggle="tooltip" title='{{tutorial.penalty}}'>
+        <span style="position:relative;right:7px">penalty</span><br>
+        <div id="js-penalty-box" class="stat-value css-penalty-box text-center">
+
+        </div>
+    </div>
+    <div class="col-md-5 text-left" data-toggle="tooltip" title='{{tutorial.mind}}'>
+        <h2 class="css-mind-h">
+            <span class="stat-value css-fort-stat">{{character.num_mind_levels}}</span> Mind
+        </h2>
+    </div>
+</div>
+{% for row in health_display %}
+    <div class="row">
+        <div class="col-md-4 text-right">
+            {{row.0}}
+        </div>
+        <div class="col-md-1 text-center health-box">
+            {% if row.1 == 'none' %}
+            {% else %}
+                <span id ="js-body-{{row.1}}">
+                    <i class="fa fa-square-o fa-2x" ></i>
+                </span>
+            {% endif %}
+        </div>
+        <div class="col-md-2 text-center ">
+            <span class="js-penalty-body-{{row.1}} js-penalty-mind-{{row.3}}">
+            {% if row.2 == 'Incap' %}
+                <span data-toggle="tooltip" title='You are Incapacitated. You may take no actions.'>
+                    X_X
+                </span>
+            {% elif row.2 == 'Dead' %}
+                <img class="css-dead-img" src="{% static 'characters/skull.svg' %}" data-toggle="tooltip" title='You are Dead.'/>
+            {% else %}
+                    {{ row.2 }}
+            {% endif %}
+                                </span>
+
+
+        </div>
+        <div class="col-md-1 text-center health-box" >
+            {% if row.3 == 'none' %}
+            {% else %}
+                <span id ="js-mind-{{row.3}}">
+                    <i class="fa fa-square-o fa-2x"></i>
+                </span>
+            {% endif %}
+        </div>
+        <div class="col-md-4 text-left" >
+            {{ row.4 }}
+        </div>
+    </div>
+{% endfor %}

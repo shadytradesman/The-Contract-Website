@@ -1,0 +1,70 @@
+<div class ="row text-center">
+    <h2>Attributes</h2>
+    {% for attribute_value in physical_attributes %}
+        <div class="col-md-2 col-sm-6 col-xs-6">
+            <h4>
+                {{attribute_value.relevant_attribute.name}}
+                <span class="stat-value">
+                    {{attribute_value.value}}
+                </span>
+            </h4>
+        </div>
+    {% endfor %}
+    {% for attribute_value in mental_attributes %}
+        <div class="col-md-2 col-sm-6 col-xs-6">
+            <h4>
+                <span class="stat-value">
+                    {{attribute_value.value}}</span>
+                {{attribute_value.relevant_attribute.name}}
+            </h4>
+        </div>
+    {% endfor %}
+</div>
+<div class ="row text-center">
+    <h2>Abilities</h2>
+    <span id="abilities-toggle" class="btn btn-default btn-xs">Show all Primaries</span>
+    <br>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="row">
+            {% for ability_value in ability_value_by_name %}
+                {% if ability_value.1.is_physical %}
+                <div class="ability {% if not ability_value.2%} zero-ability {% endif %}"
+                    {% if not ability_value.2 %} style="display:none;" {% endif %}>
+                    <p>
+                        <div class="col-md-4 col-sm-3 col-xs-4 text-right">
+                            <p>
+                                <b>{{ability_value.1.name}}</b>
+                                <span class="stat-value">
+                                    {{ability_value.2}}
+                                </span>
+                            </p>
+                        </div>
+                    </p>
+                </div>
+                {% endif %}
+            {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="row">
+            {% for ability_value in ability_value_by_name %}
+                {% if not ability_value.1.is_physical %}
+                    <div class="ability {% if not ability_value.2%} zero-ability {% endif %}"
+                        {% if not ability_value.2 %} style="display:none;" {% endif %}>
+                        <p>
+                            <div class="col-md-4 col-sm-3 col-xs-4 text-left">
+                                <p>
+                                    <span class="stat-value">
+                                        {{ability_value.2}}</span>
+                                    <b>{{ability_value.1.name}}</b>
+                                </p>
+                            </div>
+                        </p>
+                    </div>
+                {% endif %}
+            {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>

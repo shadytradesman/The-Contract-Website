@@ -10,10 +10,10 @@ from collections import defaultdict
 from heapq import merge
 
 from characters.models import Character, BasicStats, Character_Death, Graveyard_Header, Attribute, Ability, \
-    CharacterTutorial, Asset, Liability, BattleScar, Trauma, TraumaRevision
+    CharacterTutorial, Asset, Liability, BattleScar, Trauma, TraumaRevision, Injury
 from powers.models import Power_Full
 from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, AbilityForm, \
-    AssetForm, LiabilityForm, BattleScarForm, TraumaForm
+    AssetForm, LiabilityForm, BattleScarForm, TraumaForm, InjuryForm
 from characters.form_utilities import get_edit_context, character_from_post, update_character_from_post, \
     grant_trauma_to_character, delete_trauma_rev
 
@@ -128,6 +128,7 @@ def view_character(request, character_id):
         'tutorial': get_object_or_404(CharacterTutorial),
         'battle_scar_form': BattleScarForm(),
         'trauma_form': TraumaForm(prefix="trauma"),
+        'injury_form': InjuryForm(request.POST, prefix="injury"),
     }
     return render(request, 'characters/view_pages/view_character.html', context)
 
@@ -260,4 +261,32 @@ def delete_trauma(request, trauma_rev_id, used_xp):
             return JsonResponse({}, status=200)
         else:
             return JsonResponse({"error": "cannot edit trauma"}, status=403)
+    return JsonResponse({"error": ""}, status=400)
+
+def post_injury(request, character_id):
+    if request.is_ajax and request.method == "POST":
+        character = get_object_or_404(Character, id=character_id)
+        form = InjuryForm(request.POST, prefix="injury")
+        if form.is_valid() and character.player_can_edit(request.user):
+            injury = Injury(description = form.cleaned_data['description'],
+                            character=character,
+                            severity = form.cleaned_data['severity'])
+            with transaction.atomic():
+                injury.save()
+            ser_instance = serializers.serialize('json', [ injury, ])
+            return JsonResponse({"instance": ser_instance, "id": injury.id, "severity": injury.severity}, status=200)
+        else:
+            return JsonResponse({"error": form.errors}, status=400)
+    return JsonResponse({"error": ""}, status=400)
+
+def delete_injury(request, injury_id):
+    if request.is_ajax and request.method == "POST":
+        injury = get_object_or_404(Injury, id=injury_id)
+        form = InjuryForm(request.POST, prefix="injury")
+        if injury.character.player_can_edit(request.user):
+            with transaction.atomic():
+                injury.delete()
+            return JsonResponse({}, status=200)
+        else:
+            return JsonResponse({"error": form.errors}, status=400)
     return JsonResponse({"error": ""}, status=400)

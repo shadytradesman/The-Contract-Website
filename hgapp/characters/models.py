@@ -161,6 +161,8 @@ class Character(models.Model):
         null=True,
         blank=True)
 
+    mental_damage = models.PositiveIntegerField(default=0)
+
     class Meta:
         permissions = (
             ('view_private_character', 'View private character'),
@@ -459,22 +461,21 @@ class Character(models.Model):
              .order_by('relevant_ability__name')\
             .all()
 
-    #TODO: boxes are full / empty based on injuries and mind health
     def get_health_display(self):
-        # Example output for bottom 3 rows. for a mentally incapacitated, physically unharmed character
-        # format is: (injury flavor, body box, penalty, mind box, mental health flavor)
-        # ('maimed', 'empty', '-4', 'full', 'delerious')
-        # ('', 'empty', 'Incapacitated', 'full', '')   # incap
-        # ('', 'empty', 'Dead', 'none', '')   # dead level
+        # Example output for bottom 3 rows.
+        # format is: (injury flavor, body box id or 'none', penalty, mind box id or 'none', mental health flavor)
+        # ('maimed', '4', '-4', '5', 'delerious')
+        # ('', '5', 'Incapacitated', '6', '')   # incap
+        # ('', '6', 'Dead', 'none', '')   # dead level
         body_levels = self.num_body_levels()
         mind_levels = self.num_mind_levels()
         health_rows = []
         for x in range(max(body_levels, mind_levels) + 1):
             health_rows.insert(0, (
                 BODY_STATUS[-(x - 1)] if BODY_STATUS[-(x - 2)] and x-2 >= 0 and x <= body_levels else "",
-                'empty' if x <= body_levels else 'none',
+                body_levels - x if x <= body_levels else 'none',
                 PENALTIES[-x-1],
-                'empty' if x <= mind_levels and x > 0 else 'none',
+                mind_levels - x if x <= mind_levels and x > 0 else 'none',
                 MIND_STATUS[-(x - 1)] if MIND_STATUS[-(x - 2)] and x - 2 >= 0 and x <= mind_levels else "",
             ))
         return health_rows
@@ -483,6 +484,12 @@ class BattleScar(models.Model):
     character = models.ForeignKey(Character,
                                    on_delete=models.CASCADE)
     description = models.CharField(max_length=500)
+
+class Injury(models.Model):
+    character = models.ForeignKey(Character,
+                                   on_delete=models.CASCADE)
+    description = models.CharField(max_length=500)
+    severity = models.PositiveIntegerField(default=1)
 
 class BasicStats(models.Model):
     stats = models.CharField(max_length=10000)
