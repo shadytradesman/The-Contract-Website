@@ -1,15 +1,16 @@
 from random import randint
 
-from django.http import HttpResponseRedirect, HttpResponseForbidden, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponseForbidden, HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.utils import timezone
 from django.db import transaction
+from django.core import serializers
 from collections import defaultdict
 from heapq import merge
 
 from characters.models import Character, BasicStats, Character_Death, Graveyard_Header, Attribute, Ability, \
-    CharacterTutorial, Asset, Liability
+    CharacterTutorial, Asset, Liability, BattleScar
 from powers.models import Power_Full
 from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, AbilityForm, \
     AssetForm, LiabilityForm, BattleScarForm
@@ -201,3 +202,39 @@ def spend_reward(request, character_id):
         'character': character,
     }
     return render(request, 'characters/reward_character.html', context)
+
+def post_scar(request, character_id):
+    if request.is_ajax and request.method == "POST":
+        character = get_object_or_404(Character, id=character_id)
+        # get the form data
+        form = BattleScarForm(request.POST)
+        # save the data and after fetch the object in instance
+        if form.is_valid() and character.player_can_edit(request.user):
+            battle_scar = BattleScar(description = form.cleaned_data['description'],
+                                     character=character)
+            with transaction.atomic():
+                battle_scar.save()
+            ser_instance = serializers.serialize('json', [ battle_scar, ])
+            # send to client side.
+            return JsonResponse({"instance": ser_instance, "id": battle_scar.id}, status=200)
+        else:
+            # some form errors occured.
+            return JsonResponse({"error": form.errors}, status=400)
+
+    # some error occured
+    return JsonResponse({"error": ""}, status=400)
+
+def delete_scar(request, scar_id):
+    if request.is_ajax and request.method == "POST":
+        scar = get_object_or_404(BattleScar, id=scar_id)
+        # get the form data
+        form = BattleScarForm(request.POST)
+        # save the data and after fetch the object in instance
+        if scar.character.player_can_edit(request.user):
+            with transaction.atomic():
+                scar.delete()
+            # send to client side.
+            return JsonResponse({}, status=200)
+        else:
+            return JsonResponse({"error": form.errors}, status=400)
+    return JsonResponse({"error": ""}, status=400)

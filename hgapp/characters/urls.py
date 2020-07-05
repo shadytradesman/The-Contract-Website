@@ -31,4 +31,9 @@ urlpatterns = [
     # ex: .com/characters/edit/c/112/p/21
     url(r'^edit/c/(?P<character_id>[\d]+)/p/(?P<power_full_id>[\d]+)$', views.toggle_power, name='characters_power_toggle'),
 
+    # ex:
+    url(r'^post/ajax/c/(?P<character_id>[\d]+)/scar', views.post_scar, name="post_scar"),
+
+    # ex:
+    url(r'^post/ajax/delete-scar/s/(?P<scar_id>[\d\w]+)', views.delete_scar, name="delete_scar"),
 ]

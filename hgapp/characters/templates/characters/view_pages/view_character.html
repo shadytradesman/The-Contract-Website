@@ -1,8 +1,9 @@
 {% extends "site_base.html" %}
 {% load staticfiles %}
-{% load markdown_deux_tags %}
 {% load games_tags %}
 {% load i18n %}
+{% load markdown_deux_tags %}
+
 
 {% block head_title %}
     {{character.name}}
@@ -10,7 +11,6 @@
 {% block body_class %}
     home
 {% endblock %}
-{% csrf_token %}
 {% block extra_styles %}
     <link rel="stylesheet" type="text/css" href="{% static 'characters/view_character_style.css' %}" />
 {% endblock %}
@@ -97,90 +97,7 @@
         </div>
     <div class="row ">
         <div class="col-md-4">
-            <div class="row text-center">
-                <h3 data-toggle="tooltip" title='{{tutorial.injuries}}'>Injuries</h3>
-                <div class="text-left">
-                        <li class="stat-value">-1 slashed elbow</li>
-                        <li class="stat-value">-4 stomach stab wound</li>
-                        <li class="stat-value">-4 pointer finger right hand cut off</li>
-                        <li class="stat-value">-4 stomach stab wound</li>
-                        <li class="stat-value">-1 slashed elbow</li>
-                </div>
-            </div>
-            <div class="row text-center">
-                <h3 data-toggle="tooltip" title='{{tutorial.battle_scars}}'>Battle Scars</h3>
-                <div class="text-left">
-                    {% for scar in character.battlescar_set.all %}
-                        <li class="stat-value">
-                            scar.description
-                            {% if user_can_edit %}<span class="pull-right">[delete]</span>{%endif%}
-                        </li>
-                    {% endfor%}
-                    {% if user_can_edit %}
-                        <form id="scar-form">
-                            {{ battle_scar_form.about.errors }}
-                            {{ battle_scar_form.non_field_errors }}
-                            <div class="col-md-8">
-                                {{battle_scar_form.description}}
-                            </div>
-                            <div class="col-md-4">
-                                <input type="submit" class="btn btn-default" value="Add Scar" />
-                            </div>
-                        </form>
-                    {% endif %}
-                </div>
-            </div>
-            <div class="row">
-                <h3 class="text-center">Assets And Liabilities</h3>
-                {% for asset_details in character.stats_snapshot.assetdetails_set.all %}
-                        <li class="stat-value">
-                            <b>[+{{asset_details.relevant_asset.value}}] {{asset_details.relevant_asset.name}}:</b>
-                            {{asset_details.relevant_asset.system}}
-                            {% if asset_details.details %}
-                                <br>
-                                <b>{{asset_details.relevant_asset.details_field_name}}</b>
-                                {{asset_details.details}}
-                            {% endif %}
-                        </li>
-                {% endfor %}
-                {% for liability_details in character.stats_snapshot.liabilitydetails_set.all %}
-                    <li class="stat-value">
-                        <b>[-{{liability_details.relevant_liability.value}}] {{liability_details.relevant_liability.name}}:</b>
-                        {{liability_details.relevant_liability.system}}
-                        {% if liability_details.details %}
-                            <br>
-                            <b>{{liability_details.relevant_liability.details_field_name}}</b>
-                            {{liability_details.details}}
-                        {% endif %}
-                    </li>
-                {% endfor %}
-            </div>
-            <div class="row">
-                <h3 class="text-center">Equipment</h3>
-                    {% if character.basic_stats.movement %}
-                        <div class="col-md-6">
-                            <p><b>Movement:</b> {{character.basic_stats.movement}}</p>
-                        </div>
-                    {% endif %}
-                    {% if character.basic_stats.armor %}
-                        <div class="col-md-6">
-                            <p><b>Armor:</b> {{character.basic_stats.armor}}</p>
-                        </div>
-                    {% endif %}
-                    {% if character.total_encumbrance %}
-                        <div class="col-md-6">
-                            <p><b>Total Encumbrance:</b> {{character.total_encumbrance}}</p>
-                        </div>
-                    {% endif %}
-                    {% if character.max_encumbrance %}
-                        <div class="col-md-6">
-                            <p><b>Maximum Encumbrance:</b> {{character.max_encumbrance}}</p>
-                        </div>
-                    {% endif %}
-                {% if character.equipment %}
-                    <p>{{character.equipment | markdown | linebreaks}}</p>
-                {% endif %}
-            </div>
+            {% include "characters/view_pages/left_column.html" %}
         </div>
         <div class="col-md-8">
             <div class="row">
@@ -297,8 +214,6 @@
                 </div>
             </div>
         </div>
-
-
         <h2>Character Timeline</h2>
             <p><b>{{ character.number_of_victories }}</b> Victories - <b>{{ character.number_of_losses }}</b> Losses</p>
             {% for date, event_list in timeline.items %}
