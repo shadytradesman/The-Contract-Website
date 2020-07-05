@@ -423,7 +423,7 @@ class Power(models.Model):
             remove_perm('view_private_power', player, self)
 
     def archive_txt(self):
-        output = "{}\nA {} point {} {} power\nCreated by {}"
+        output = "{}\nA {} point {} {} power\nCreated by {}\n"
         output = output.format(self.name, self.get_point_value(), self.get_activation_style_display(), self.base.name, self.created_by.username)
         output = output + "{}\nDescription: {}\nSystem: {}\n"
         output = output.format(self.flavor_text,self.description, self.system)

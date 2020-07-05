@@ -4,7 +4,6 @@
 {% load i18n %}
 {% load markdown_deux_tags %}
 
-
 {% block head_title %}
     {{character.name}}
 {% endblock %}
@@ -84,7 +83,6 @@
                                             <span class="stat-value">
                                                 {{ability_value.2}}</span>
                                             <b>{{ability_value.1.name}}</b>
-
                                         </p>
                                     </div>
                                 </p>
@@ -157,40 +155,7 @@
                     {% endfor %}
                 </div>
                 <div class="col-md-6">
-                    <div class="row text-center">
-                        <h3 data-toggle="tooltip" title='{{tutorial.limits_view}}'>Limits</h3>
-                        {% for limit_rev in character.stats_snapshot.limitrevision_set.all %}
-                            <div class="stat-value" data-toggle="tooltip" title='{{limit_rev.relevant_limit.description}}'>
-                                <b>{{limit_rev.relevant_limit.name}}</b>
-                            </div>
-                        {% endfor %}
-                    </div>
-                    <div class="row text-center">
-                        <h3 data-toggle="tooltip" title='{{tutorial.traumas}}'>Traumas</h3>
-                        <div class="text-left">
-                            <li class="stat-value">Fear of strange-smelling places</li>
-                            <li class="stat-value">Compulsion to sniff butts</li>
-                        </div>
-                    </div>
-                    <div class="row text-center">
-                        <div class="col-md-12">
-                    <div class="row text-center">
-                        <h3>
-                            Moon
-                            <i class="fa fa-circle fa-1x"></i>
-                            <i class="fa fa-circle fa-1x"></i>
-                            <i class="fa fa-circle-o fa-1x"></i>
-                            <i class="fa fa-circle-o fa-1x"></i>
-                            <i class="fa fa-times-circle fa-1x" style="color:grey"></i>
-                            <i class="fa fa-times-circle fa-1x" style="color:grey"></i>
-                            <i class="fa fa-times-circle fa-1x" style="color:grey"></i>
-                            <i class="fa fa-times-circle fa-1x" style="color:grey"></i>
-                            <i class="fa fa-times-circle fa-1x" style="color:grey"></i>
-                            <i class="fa fa-times-circle fa-1x" style="color:grey"></i>
-                        </h3>
-                    </div>
-                </div>
-                    </div>
+                    {% include "characters/view_pages/right_column.html" %}
                 </div>
             </div>
             <div class="col-md-12">

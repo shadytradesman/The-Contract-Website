@@ -10,11 +10,12 @@ from collections import defaultdict
 from heapq import merge
 
 from characters.models import Character, BasicStats, Character_Death, Graveyard_Header, Attribute, Ability, \
-    CharacterTutorial, Asset, Liability, BattleScar
+    CharacterTutorial, Asset, Liability, BattleScar, Trauma, TraumaRevision
 from powers.models import Power_Full
 from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, AbilityForm, \
-    AssetForm, LiabilityForm, BattleScarForm
-from characters.form_utilities import get_edit_context, character_from_post, update_character_from_post
+    AssetForm, LiabilityForm, BattleScarForm, TraumaForm
+from characters.form_utilities import get_edit_context, character_from_post, update_character_from_post, \
+    grant_trauma_to_character, delete_trauma_rev
 
 
 def create_character(request):
@@ -108,7 +109,7 @@ def view_character(request, character_id):
     events_by_date = list(merge(completed_games, character_edit_history))
     timeline = defaultdict(list)
     for event in events_by_date:
-        timeline[event[0].strftime("%b %m %Y")].append((event[1], event[2]))
+        timeline[event[0].strftime("%d %b %Y")].append((event[1], event[2]))
 
     char_ability_values = character.stats_snapshot.abilityvalue_set.order_by("relevant_ability__name").all()
     char_value_ids = [x.relevant_ability.id for x in char_ability_values]
@@ -126,6 +127,7 @@ def view_character(request, character_id):
         'timeline': dict(timeline),
         'tutorial': get_object_or_404(CharacterTutorial),
         'battle_scar_form': BattleScarForm(),
+        'trauma_form': TraumaForm(prefix="trauma"),
     }
     return render(request, 'characters/view_pages/view_character.html', context)
 
@@ -203,38 +205,59 @@ def spend_reward(request, character_id):
     }
     return render(request, 'characters/reward_character.html', context)
 
+#####
+# View Character AJAX
+####
+
 def post_scar(request, character_id):
     if request.is_ajax and request.method == "POST":
         character = get_object_or_404(Character, id=character_id)
-        # get the form data
         form = BattleScarForm(request.POST)
-        # save the data and after fetch the object in instance
         if form.is_valid() and character.player_can_edit(request.user):
             battle_scar = BattleScar(description = form.cleaned_data['description'],
                                      character=character)
             with transaction.atomic():
                 battle_scar.save()
             ser_instance = serializers.serialize('json', [ battle_scar, ])
-            # send to client side.
             return JsonResponse({"instance": ser_instance, "id": battle_scar.id}, status=200)
         else:
-            # some form errors occured.
             return JsonResponse({"error": form.errors}, status=400)
 
-    # some error occured
     return JsonResponse({"error": ""}, status=400)
 
 def delete_scar(request, scar_id):
     if request.is_ajax and request.method == "POST":
         scar = get_object_or_404(BattleScar, id=scar_id)
-        # get the form data
         form = BattleScarForm(request.POST)
-        # save the data and after fetch the object in instance
         if scar.character.player_can_edit(request.user):
             with transaction.atomic():
                 scar.delete()
-            # send to client side.
             return JsonResponse({}, status=200)
         else:
             return JsonResponse({"error": form.errors}, status=400)
+    return JsonResponse({"error": ""}, status=400)
+
+
+def post_trauma(request, character_id):
+    if request.is_ajax and request.method == "POST":
+        character = get_object_or_404(Character, id=character_id)
+        form = TraumaForm(request.POST, prefix="trauma")
+        if form.is_valid() and character.player_can_edit(request.user):
+            with transaction.atomic():
+                trauma_rev = grant_trauma_to_character(form, character)
+            return JsonResponse({"id": trauma_rev.id, "description": trauma_rev.relevant_trauma.description}, status=200)
+        else:
+            return JsonResponse({"error": form.errors}, status=400)
+    return JsonResponse({"error": ""}, status=400)
+
+def delete_trauma(request, trauma_rev_id, used_xp):
+    if request.is_ajax and request.method == "POST":
+        trauma_rev = get_object_or_404(TraumaRevision, id=trauma_rev_id)
+        character = trauma_rev.relevant_stats.assigned_character
+        if character.player_can_edit(request.user):
+            with transaction.atomic():
+                delete_trauma_rev(character, trauma_rev, True if used_xp == "T" else False)
+            return JsonResponse({}, status=200)
+        else:
+            return JsonResponse({"error": "cannot edit trauma"}, status=403)
     return JsonResponse({"error": ""}, status=400)

@@ -2,7 +2,7 @@ from django.forms import formset_factory
 
 from characters.models import Character, BasicStats, Character_Death, Graveyard_Header, Attribute, Ability, \
     CharacterTutorial, Asset, Liability, AttributeValue, ContractStats, AbilityValue, LiabilityDetails, AssetDetails, \
-    Limit, LimitRevision
+    Limit, LimitRevision, Trauma, TraumaRevision
 from powers.models import Power_Full
 from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, AbilityForm, \
     AssetForm, LiabilityForm, LimitForm
@@ -89,6 +89,34 @@ def update_character_from_post(user, POST, existing_character):
         existing_character.regen_stats_snapshot()
     else:
         raise ValueError("invalid edit char_form")
+
+def grant_trauma_to_character(form, character):
+    trauma = Trauma(description=form.cleaned_data['description'])
+    new_stats_rev = ContractStats(assigned_character=character)
+    new_stats_rev.save()
+    trauma.save()
+    trauma_rev = TraumaRevision(
+        relevant_trauma=trauma,
+        relevant_stats=new_stats_rev
+    )
+    new_stats_rev.save()
+    trauma_rev.save()
+    character.regen_stats_snapshot()
+    return trauma_rev
+
+def delete_trauma_rev(character, trauma_rev, used_xp):
+    new_stats_rev = ContractStats(assigned_character=character)
+    new_stats_rev.save()
+    trauma_rev = TraumaRevision(
+        relevant_trauma=trauma_rev.relevant_trauma,
+        relevant_stats=new_stats_rev,
+        previous_revision=trauma_rev,
+        is_deleted=True,
+        was_bought_off=used_xp,
+    )
+    trauma_rev.save()
+    new_stats_rev.save()
+    character.regen_stats_snapshot()
 
 # __private methods
 

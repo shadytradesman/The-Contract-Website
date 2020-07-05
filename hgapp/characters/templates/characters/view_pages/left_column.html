@@ -35,6 +35,8 @@
                     </span>
                 {%endif%}
             </li>
+        {% empty %}
+            <h4 class="text-center" id="js-no-scars">({{character.name}} has no Battle Scars)</h4>
         {% endfor%}
     </div>
     {% if user_can_edit %}

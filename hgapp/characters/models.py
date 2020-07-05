@@ -69,6 +69,7 @@ EXP_COST_QUIRK_MULTIPLIER = 3
 EXP_ADV_COST_ATTR_MULTIPLIER = 4
 EXP_ADV_COST_SKILL_MULTIPLIER = 2
 EXP_COST_SKILL_INITIAL = 2
+EXP_COST_TRAUMA_THERAPY = 3
 
 # STAT CONSTANTS
 BASE_MIND_LEVELS = 5
@@ -357,6 +358,7 @@ class Character(models.Model):
         ability_values = []
         attribute_values = []
         limit_revisions = []
+        trauma_revisions = []
         for diff in stat_diffs:
             for detail in diff.assetdetails_set.all():
                 if detail.previous_revision:
@@ -382,6 +384,11 @@ class Character(models.Model):
                     limit_revisions.remove(rev.previous_revision)
                 if not rev.is_deleted:
                     limit_revisions.append(rev)
+            for rev in diff.traumarevision_set.all():
+                if rev.previous_revision:
+                    trauma_revisions.remove(rev.previous_revision)
+                if not rev.is_deleted:
+                    trauma_revisions.append(rev)
 
         self.stats_snapshot.clear()
         for deet in asset_details:
@@ -420,6 +427,13 @@ class Character(models.Model):
             snapshot_rev = LimitRevision(
                 relevant_stats=self.stats_snapshot,
                 relevant_limit=rev.relevant_limit,
+                previous_revision=rev,
+            )
+            snapshot_rev.save()
+        for rev in trauma_revisions:
+            snapshot_rev = TraumaRevision(
+                relevant_stats=self.stats_snapshot,
+                relevant_trauma=rev.relevant_trauma,
                 previous_revision=rev,
             )
             snapshot_rev.save()
@@ -579,6 +593,8 @@ class Liability(Quirk):
     def is_liability(self):
         return True
 
+class Trauma(models.Model):
+    description = models.CharField(max_length=500)
 
 class Limit(models.Model):
     name = models.CharField(max_length=40)
@@ -616,8 +632,13 @@ class ContractStats(models.Model):
                                     through="LimitRevision",
                                     through_fields=('relevant_stats', 'relevant_limit'),
                                     blank=True)
+    traumas = models.ManyToManyField(Trauma,
+                                    through="TraumaRevision",
+                                    through_fields=('relevant_stats', 'relevant_trauma'),
+                                    blank=True)
 
     def exp_cost(self):
+        #TODO: EXP must be calculated by looking through whole diff, should maybe be denormalized in snapshot.
         if self.is_snapshot:
             cost = 0
             for attribute in self.attributevalue_set.all():
@@ -652,6 +673,10 @@ class ContractStats(models.Model):
             initial_cost = 0
         return ((new_value - old_value) * (old_value + new_value - 1) / 2) * EXP_ADV_COST_SKILL_MULTIPLIER + initial_cost
 
+    def calc_trauma_xp_cost(self, trauma_revision):
+        if trauma_revision.is_deleted and trauma_revision.was_bought_off:
+            return EXP_COST_TRAUMA_THERAPY
+        return 0
 
     def get_exp_phrase(self, exp_cost):
         change_sign = "+" if exp_cost < 0 else "-"
@@ -719,6 +744,17 @@ class ContractStats(models.Model):
                 limit.relevant_limit.name
             )
             change_phrases.append((exp_phrase, phrase,))
+        for trauma in self.traumarevision_set.all():
+            exp_cost = self.calc_trauma_xp_cost(trauma)
+            exp_phrase = self.get_exp_phrase(exp_cost)
+            change_word = "therapy for" if trauma.is_deleted and trauma.was_bought_off else \
+                "cured" if trauma.is_deleted else "developed"
+            phrase = "{0} Trauma {1}".format(
+                change_word,
+                trauma.relevant_trauma.description
+            )
+            change_phrases.append((exp_phrase, phrase,))
+
         return change_phrases
 
     def clear(self):
@@ -734,6 +770,8 @@ class ContractStats(models.Model):
             attribute.delete()
         for limit in self.limitrevision_set.all():
             limit.delete()
+        for trauma in self.traumarevision_set.all():
+            trauma.delete()
 
 
 class QuirkDetails(models.Model):
@@ -809,6 +847,18 @@ class LimitRevision(models.Model):
                                           blank=True,
                                           on_delete=models.CASCADE)  # Used in revisioning to determine value change.
     is_deleted = models.BooleanField(default=False)
+
+class TraumaRevision(models.Model):
+    relevant_trauma = models.ForeignKey(Trauma,
+                                        on_delete=models.CASCADE)
+    relevant_stats = models.ForeignKey(ContractStats,
+                                             on_delete=models.CASCADE)
+    previous_revision = models.ForeignKey('self',
+                                          null=True,
+                                          blank=True,
+                                          on_delete=models.CASCADE)  # Used in revisioning to determine value change.
+    is_deleted = models.BooleanField(default=False)
+    was_bought_off = models.BooleanField(default=False)
 
 class Character_Death(models.Model):
     relevant_character = models.ForeignKey(Character,
