@@ -82,12 +82,12 @@ input[type="number"] {
 }
 
 .css-remaining-exp-cont {
-    width: 190px;
+    width: 290px;
     margin: auto;
 }
 
 .css-remaining-exp {
-    width: 190px;
+    width: 290px;
     margin: auto;
     border-color: black;
     border-radius: 4px;
@@ -98,11 +98,14 @@ input[type="number"] {
 }
 
 .css-fake-height-div {
-    height: 80px;
+    height: 40px;
 }
-
 
 .affix {
     top: 60px;
     z-index: 9999 !important;
+}
+
+h1 {
+    margin-top: 0px;
 }
