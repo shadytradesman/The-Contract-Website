@@ -14,7 +14,6 @@
     <link rel="stylesheet" type="text/css" href="{% static 'characters/view_character_style.css' %}" />
 {% endblock %}
 {% block extra_scripts %}
-
     {{character.num_body_levels|json_script:"numBodyLevels"}}
     {{character.num_mind_levels|json_script:"numMindLevels"}}
     {{character.mental_damage|json_script:"mindDamage"}}
@@ -65,7 +64,15 @@
             </div>
         </div>
         <h2>Character Timeline</h2>
-            <p><b>{{ character.number_of_victories }}</b> Victories - <b>{{ character.number_of_losses }}</b> Losses</p>
+            <p>
+                <b>{{ character.number_of_victories }}</b> Victories - <b>{{ character.number_of_losses }}</b> Losses
+                <br>
+                {% if unspent_experience < 0 %}
+                    <h4 class="text-danger">{{character.name}} has overspent Experience</h4>
+                {% endif %}
+                <b>Remaining: </b>{{unspent_experience}} Exp.
+                (<b>Earned: </b> {{exp_earned}} - <b>Spent: </b> {{exp_cost}})
+            </p>
             {% for date, event_list in timeline.items %}
                 <h4>{{ date }}</h4>
                 <ul>
@@ -74,9 +81,14 @@
                         {% with event.1 as attendance %}
                             {% include "games/game_attendance_badge_snippet.html" %}
                         {% endwith %}
+                    {% elif event.0 == "exp_reward" %}
+                        <li class="thumbnail">
+                            <b>{{event.1.get_history_blurb.0}}</b>
+                            {{event.1.get_history_blurb.1}}
+                        </li>
                     {% else %}
-                        {% for phrase in event.1.get_change_phrases %}
-                            <li>
+                        {% for phrase in event.1.get_change_phrases %} {# This is expensive. TODO: make ajax? #}
+                            <li class="thumbnail">
                                 <b>{{phrase.0}} Exp:</b> {{phrase.1}}
                             </li>
                         {% endfor %}
@@ -84,7 +96,7 @@
                 {% endfor %}
                 </ul>
             {% empty %}
-                <h4>{{character.name}} Still hasn't been invited on their first game! Awww</h4>
+                <h4>{{character.name}} Has never edited their stats or attended a Game</h4>
             {% endfor %}
             {% if character.basic_stats.advancement_history %}
                 <h3>Advancement History</h3>

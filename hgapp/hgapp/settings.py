@@ -144,7 +144,6 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'hgapp.urls'
-
 CSRF_USE_SESSIONS = True
 
 TEMPLATES = [

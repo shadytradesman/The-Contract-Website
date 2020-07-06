@@ -346,20 +346,21 @@ class Character(models.Model):
         return output
 
     def unspent_experience(self):
+        total_exp = self.exp_earned()
+        exp_cost = self.exp_cost()
+        return int(total_exp - exp_cost)
+
+    def exp_earned(self):
         rewards = self.experiencereward_set.all()
         total_exp = EXP_NEW_CHAR
         for reward in rewards:
             total_exp = total_exp + reward.get_value()
-        exp_cost = self.exp_cost()
-        return total_exp - exp_cost
+        return int(total_exp)
 
     def exp_cost(self):
-        stat_diffs = self.contractstats_set.filter(is_snapshot=False).all()
-        cost = 0
-        for diff in stat_diffs:
-            cost = cost + diff.exp_cost()
-        return cost
+        return self.stats_snapshot.exp_cost
 
+    # WARNING: this is an expensive call
     def regen_stats_snapshot(self):
         stat_diffs = self.contractstats_set.filter(is_snapshot=False).order_by("created_time").all()
         asset_details = []
@@ -368,24 +369,33 @@ class Character(models.Model):
         attribute_values = []
         limit_revisions = []
         trauma_revisions = []
+        cost = 0
         for diff in stat_diffs:
             for detail in diff.assetdetails_set.all():
+                cost = cost + diff.calc_quirk_ex_cost(detail)
                 if detail.previous_revision:
                     asset_details.remove(detail.previous_revision)
                 if not detail.is_deleted:
                     asset_details.append(detail)
             for detail in diff.liabilitydetails_set.all():
+                cost = cost - diff.calc_quirk_ex_cost(detail)
                 if detail.previous_revision:
                     liability_details.remove(detail.previous_revision)
                 if not detail.is_deleted:
                     liability_details.append(detail)
             for value in diff.attributevalue_set.all():
                 if value.previous_revision:
+                    cost = cost + diff.calc_attr_change_ex_cost(value.previous_revision.value, value.value)
                     attribute_values.remove(value.previous_revision)
+                else:
+                    cost = cost + diff.calc_attr_change_ex_cost(1, value.value)
                 attribute_values.append(value)
             for value in diff.abilityvalue_set.all():
                 if value.previous_revision:
+                    cost = cost + diff.calc_ability_change_ex_cost(value.previous_revision.value, value.value)
                     ability_values.remove(value.previous_revision)
+                else:
+                    cost = cost + diff.calc_ability_change_ex_cost(0, value.value)
                 if value.value > 0:
                     ability_values.append(value)
             for rev in diff.limitrevision_set.all():
@@ -394,6 +404,7 @@ class Character(models.Model):
                 if not rev.is_deleted:
                     limit_revisions.append(rev)
             for rev in diff.traumarevision_set.all():
+                cost = cost + diff.calc_trauma_xp_cost(rev)
                 if rev.previous_revision:
                     trauma_revisions.remove(rev.previous_revision)
                 if not rev.is_deleted:
@@ -446,6 +457,7 @@ class Character(models.Model):
                 previous_revision=rev,
             )
             snapshot_rev.save()
+        self.stats_snapshot.exp_cost = cost
         self.stats_snapshot.save()
 
     def num_body_levels(self):
@@ -528,13 +540,23 @@ class ExperienceReward(models.Model):
             return self.game
         raise ValueError("Experience reward has no source")
 
+    def source_blurb(self):
+        if hasattr(self, 'game_attendance'):
+            return "from attending " + self.game_attendance.relevant_game.scenario.title
+        elif hasattr(self, 'game'):
+            return "from GMing " + self.game.scenario.title
+        else:
+            raise ValueError("Experience reward has no source")
+
     def get_value(self):
         if hasattr(self, 'game_attendance'):
             attendance = self.game_attendance
             value = 0
-            if attendance.is_mvp:
-                value = value + EXP_MVP
+            # if attendance.is_mvp():
+            #     value = value + EXP_MVP
             if attendance.is_victory():
+                value = value + EXP_WIN
+            if attendance.is_ringer_victory():
                 value = value + EXP_WIN
             else:
                 value = value + EXP_LOSS
@@ -543,8 +565,12 @@ class ExperienceReward(models.Model):
             return EXP_GM
         raise ValueError("Experience reward has no source")
 
-## ADVANCED STATS
+    def get_history_blurb(self):
+        value = self.get_value()
+        source_text = self.source_blurb()
+        return ("+{0} Exp.".format(str(value)), "{0}".format(source_text))
 
+## ADVANCED STATS
 class Trait(models.Model):
     name = models.CharField(max_length=50)
     tutorial_text = models.CharField(max_length=250,
@@ -625,6 +651,7 @@ class ContractStats(models.Model):
     created_time = models.DateTimeField(default=timezone.now)
     is_snapshot = models.BooleanField(default=False)
     assigned_character = models.ForeignKey(Character, on_delete=models.CASCADE)
+    exp_cost = models.IntegerField(default=-1)
 
     attributes = models.ManyToManyField(Attribute,
                                        blank=True,
@@ -651,23 +678,11 @@ class ContractStats(models.Model):
                                     through_fields=('relevant_stats', 'relevant_trauma'),
                                     blank=True)
 
-    def exp_cost(self):
-        #TODO: EXP must be calculated by looking through whole diff, should maybe be denormalized in snapshot.
-        if self.is_snapshot:
-            raise ValueError("Cannot calculate the exp cost from a snapshot")
-        else:
-            cost = 0
-            for attribute in self.attributevalue_set.all():
-                cost = cost + self.calc_attr_change_ex_cost(1, attribute.value)
-            for ability in self.abilityvalue_set.all():
-                cost = cost + self.calc_ability_change_ex_cost(0, ability.value)
-            for asset in self.assetdetails_set.all():
-                cost = cost + self.calc_quirk_ex_cost(asset)
-            for liability in self.liabilitydetails_set.all():
-                cost = cost - self.calc_quirk_ex_cost(liability)
-            for trauma in self.traumarevision_set.all():
-                cost = cost + self.calc_trauma_xp_cost(trauma)
-            return cost
+    class Meta:
+        indexes = [
+            models.Index(fields=['assigned_character', 'is_snapshot'], name='stats_char_idx'),
+            models.Index(fields=['created_time'], name='stats_date_idx'),
+        ]
 
     def calc_attr_change_ex_cost(self, old_value, new_value):
         return ((new_value - old_value) * (old_value + new_value - 1) / 2) * EXP_ADV_COST_ATTR_MULTIPLIER
@@ -705,6 +720,7 @@ class ContractStats(models.Model):
             str(prev_value),
             str(new_value))
 
+    # This is an expensive call
     def get_change_phrases(self):
         change_phrases = []
         for attribute in self.attributevalue_set.all():
@@ -770,7 +786,6 @@ class ContractStats(models.Model):
                 trauma.relevant_trauma.description
             )
             change_phrases.append((exp_phrase, phrase,))
-
         return change_phrases
 
     def clear(self):
@@ -814,12 +829,23 @@ class QuirkDetails(models.Model):
 class AssetDetails(QuirkDetails):
     relevant_asset = models.ForeignKey(Asset,
                                        on_delete=models.CASCADE)
+    class Meta:
+        indexes = [
+            models.Index(fields=['relevant_stats']),
+        ]
+
     def relevant_quirk(self):
         return self.relevant_asset
 
 class LiabilityDetails(QuirkDetails):
     relevant_liability = models.ForeignKey(Liability,
                                        on_delete=models.CASCADE)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['relevant_stats']),
+        ]
+
     def relevant_quirk(self):
         return self.relevant_liability
 
@@ -846,12 +872,18 @@ class AttributeValue(TraitValue):
                                        on_delete=models.CASCADE)
     class Meta:
         unique_together = (("relevant_attribute", "relevant_stats"))
+        indexes = [
+            models.Index(fields=['relevant_stats']),
+        ]
 
 class AbilityValue(TraitValue):
     relevant_ability = models.ForeignKey(Ability,
                                        on_delete=models.CASCADE)
     class Meta:
         unique_together = (("relevant_ability", "relevant_stats"))
+        indexes = [
+            models.Index(fields=['relevant_stats']),
+        ]
 
 class LimitRevision(models.Model):
     relevant_limit = models.ForeignKey(Limit,
@@ -863,6 +895,10 @@ class LimitRevision(models.Model):
                                           blank=True,
                                           on_delete=models.CASCADE)  # Used in revisioning to determine value change.
     is_deleted = models.BooleanField(default=False)
+    class Meta:
+        indexes = [
+            models.Index(fields=['relevant_stats']),
+        ]
 
 class TraumaRevision(models.Model):
     relevant_trauma = models.ForeignKey(Trauma,
@@ -875,6 +911,10 @@ class TraumaRevision(models.Model):
                                           on_delete=models.CASCADE)  # Used in revisioning to determine value change.
     is_deleted = models.BooleanField(default=False)
     was_bought_off = models.BooleanField(default=False)
+    class Meta:
+        indexes = [
+            models.Index(fields=['relevant_stats']),
+        ]
 
 class Character_Death(models.Model):
     relevant_character = models.ForeignKey(Character,

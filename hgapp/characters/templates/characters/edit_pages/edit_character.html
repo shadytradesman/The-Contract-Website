@@ -44,6 +44,24 @@
         <h1 class = "text-center">New Character</h1>
         <form action="{% url 'characters:characters_create' %}" method="post">
     {% endif %}
+    <div class="row">
+        <div class="css-remaining-exp-cont">
+            <span data-spy="affix" data-offset-top="110">
+                <div class="text-center nav navbar-nav css-remaining-exp">
+                    <b>Experience Remaining</b>
+                    <h4 class="css-remaining-values">
+                        <span id="js-remaining-exp">31</span>
+                        <small>
+                            (<span id="js-starting-exp">31</span> - <span id="js-spent-exp">0</span>)
+                        </small>
+                    </h4>
+                </div>
+            </span>
+            <div class="css-fake-height-div">
+            </div>
+        </div>
+    </div>
+
     {{ char_form.non_field_errors }}
     {{ attribute_formset.non_field_errors }}
     {% csrf_token %}
@@ -88,8 +106,6 @@
     <div class="thumbnail">
         <h2 class = "row text-center" data-toggle="tooltip" title='{{tutorial.attributes}}'>
             Attributes
-            <br>
-            <small>Raw Capability</small>
         </h2>
         <div class="row">
             {{ attribute_formset.management_form }}
@@ -109,8 +125,6 @@
     <div class="thumbnail">
         <h2 class = "row text-center" data-toggle="tooltip" title='{{tutorial.abilities}}'>
             Abilities
-            <br>
-            <small>Trained Skills</small>
         </h2>
         <div class="row" id="abilities-forms">
             {{ ability_formset.management_form }}
@@ -135,8 +149,6 @@
     <div class="thumbnail">
         <h2 class = "row text-center" data-toggle="tooltip" title='{{tutorial.assets_and_liabilities}}'>
             Assets and Liabilities
-            <br>
-            <small>Unique Traits</small>
         </h2>
         {# asset and liability management forms #}
         {% for formset in asset_formsets %}
@@ -152,6 +164,7 @@
             <li><a data-toggle="pill" href="#mental">Mental/Emotional</a></li>
             <li><a data-toggle="pill" href="#restricted">Restricted</a></li>
         </ul>
+        {# TODO: THIS SECTION IS AWFUL AND SLOW. ITERATE AND CHECK LESS #}
         <div class="tab-content">
             <div id="physical" class="tab-pane fade in active">
                 <div class="col-md-6">

@@ -20,3 +20,37 @@
         </div>
     </div>
 {% endif %}
+{% if character.unspent_experience < 0 %}
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1 alert alert-danger" role="alert">
+            <p>
+                {{character.name}} has overspent Experience</br>
+                <b>Remaining: </b>{{character.unspent_experience}} Exp.
+                (<b>Earned: </b> {{character.exp_earned}} - <b>Spent: </b> {{character.exp_cost}})
+            </p>
+        </div>
+    </div>
+{% endif %}
+{% if character.unspent_experience > 2 and user_can_edit %}
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1 alert alert-success" role="alert">
+            <p>
+                {{character.name}} has <b>{{character.unspent_experience}}</b> unspent Experience</br>
+            </p>
+            <a href="{% url 'characters:characters_edit' character.id %}" class="btn btn-default">
+                Spend Now
+            </a>
+        </div>
+    </div>
+{% endif %}
+{% if user_can_edit and character.unspent_rewards|length > 0 %}
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1 alert alert-success" role="alert">
+            <p>
+                <a href="{% url 'characters:characters_spend_reward' character.id %}">
+                    Spend Available Gifts
+                </a>
+            </p>
+        </div>
+    </div>
+{% endif %}

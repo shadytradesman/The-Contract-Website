@@ -100,16 +100,19 @@ def graveyard(request):
 
 def view_character(request, character_id):
     character = get_object_or_404(Character, id=character_id)
-    user_can_edit = request.user.is_authenticated and character.player_can_edit(request.user)
     if not character.player_can_view(request.user):
         return HttpResponseForbidden()
-    completed_games = [(x.relevant_game.end_time, "game", x) for x in character.completed_games()]
+    user_can_edit = request.user.is_authenticated and character.player_can_edit(request.user)
+
+    completed_games = [(x.relevant_game.end_time, "game", x) for x in character.completed_games()] # completed_games() does ordering
     character_edit_history = [(x.created_time, "edit", x) for x in
                               character.contractstats_set.filter(is_snapshot=False).order_by("created_time").all()[1:]]
-    events_by_date = list(merge(completed_games, character_edit_history))
+    exp_rewards = [(x.created_time, "exp_reward", x) for x in character.experiencereward_set.order_by("created_time").all()]
+    events_by_date = list(merge(completed_games, character_edit_history, exp_rewards))
     timeline = defaultdict(list)
     for event in events_by_date:
         timeline[event[0].strftime("%d %b %Y")].append((event[1], event[2]))
+
 
     char_ability_values = character.stats_snapshot.abilityvalue_set.order_by("relevant_ability__name").all()
     char_value_ids = [x.relevant_ability.id for x in char_ability_values]
@@ -117,6 +120,10 @@ def view_character(request, character_id):
                  if x.id not in char_value_ids]
     all_ability_values =[(x.relevant_ability.name, x.relevant_ability, x.value) for x in char_ability_values]
     ability_value_by_name = list(merge(primary_zero_values, all_ability_values))
+    unspent_experience = character.unspent_experience()
+    exp_earned = character.exp_earned()
+    exp_cost = character.exp_cost()
+
     context = {
         'character': character,
         'user_can_edit': user_can_edit,
@@ -129,6 +136,9 @@ def view_character(request, character_id):
         'battle_scar_form': BattleScarForm(),
         'trauma_form': TraumaForm(prefix="trauma"),
         'injury_form': InjuryForm(request.POST, prefix="injury"),
+        'exp_cost': exp_cost,
+        'exp_earned': exp_earned,
+        'unspent_experience': unspent_experience,
     }
     return render(request, 'characters/view_pages/view_character.html', context)
 

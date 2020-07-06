@@ -80,3 +80,29 @@ input[type="number"] {
     padding-left: 15px;
     padding-right: 15px;
 }
+
+.css-remaining-exp-cont {
+    width: 190px;
+    margin: auto;
+}
+
+.css-remaining-exp {
+    width: 190px;
+    margin: auto;
+    border-color: black;
+    border-radius: 4px;
+    border-width: 1px;
+    border-style: solid;
+    padding: 5px;
+    background-color: #E1E1E1;
+}
+
+.css-fake-height-div {
+    height: 80px;
+}
+
+
+.affix {
+    top: 60px;
+    z-index: 9999 !important;
+}

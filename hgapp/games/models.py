@@ -113,7 +113,7 @@ class Game(models.Model):
                              null=True, # for migration reasons. All games should have cells.
                              blank=True, # for migration reasons. All games should have cells.
                              on_delete=models.CASCADE)
-    gm_experience_reward = models.ForeignKey(ExperienceReward,
+    gm_experience_reward = models.OneToOneField(ExperienceReward,
                                           null=True,
                                           blank=True,
                                           on_delete=models.CASCADE)
@@ -176,7 +176,7 @@ class Game(models.Model):
         self.give_rewards()
 
     def give_rewards(self):
-        if not self.is_finished():
+        if not self.is_finished() or self.is_recorded():
             print("Game is not finished: " + str(self.id))
             return
         for game_attendance in self.game_attendance_set.all():
@@ -265,11 +265,10 @@ class Game_Attendance(models.Model):
                                            blank=True,
                                            on_delete=models.CASCADE)
     is_confirmed = models.BooleanField(default=True)
-    experience_reward = models.ForeignKey(ExperienceReward,
+    experience_reward = models.OneToOneField(ExperienceReward,
                                           null=True,
                                           blank=True,
                                           on_delete=models.CASCADE)
-
 
     def is_victory(self):
         return self.outcome == OUTCOME[0][0]
@@ -306,6 +305,7 @@ class Game_Attendance(models.Model):
                                    rewarded_player=self.attending_character.player,
                                    is_improvement=False)
             player_reward.save()
+        if self.attending_character:
             exp_reward = ExperienceReward(
                 rewarded_character=self.attending_character,
                 rewarded_player=self.attending_character.player,

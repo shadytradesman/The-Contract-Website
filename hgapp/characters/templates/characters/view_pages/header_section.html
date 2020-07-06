@@ -3,11 +3,6 @@
 
 <div class="text-center">
     {% if user_can_edit %}
-        {% if character.unspent_rewards|length > 0 %}
-            <a href="{% url 'characters:characters_spend_reward' character.id %}" class="btn btn-success">
-                Spend Available Gifts
-            </a>
-        {% endif %}
         <ul class="nav nav-pills nav-justified">
             <li><a href="{% url 'characters:characters_edit' character.id %}" class="btn btn-default">
                 Edit Character
