@@ -49,12 +49,13 @@
                 <div class="clearfix"></div>
             </span>
         {% empty %}
-            <h4 class="text-center" id="js-no-injuries">({{character.name}} is unharmed)</h4>
+        <h4 class="text-center" id="js-no-injuries"><small>({{character.name}} is unharmed)</small></h4>
         {% endfor%}
     </div>
     {% if user_can_edit %}
         <div class="row form-inline">
             <form id="injury-form"
+                  class="injury-form"
                   data-new-injury-url="{% url 'characters:post_injury' character.id %}"
                   data-delete-injury-url="{% url 'characters:delete_injury' 'injuryIdJs' %}">
                 {{ injury_form.about.errors }}
@@ -86,7 +87,7 @@
                 {%endif%}
             </li>
         {% empty %}
-            <h4 class="text-center" id="js-no-scars">({{character.name}} has no Battle Scars)</h4>
+        <h4 class="text-center" id="js-no-scars"><small>({{character.name}} has no Battle Scars)</small></h4>
         {% endfor%}
     </div>
     {% if user_can_edit %}

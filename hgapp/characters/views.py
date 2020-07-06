@@ -290,3 +290,23 @@ def delete_injury(request, injury_id):
         else:
             return JsonResponse({"error": form.errors}, status=400)
     return JsonResponse({"error": ""}, status=400)
+
+def set_mind_damage(request, character_id):
+    if request.is_ajax and request.method == "POST":
+        character = get_object_or_404(Character, id=character_id)
+        form = InjuryForm(request.POST, prefix="mental-exertion")
+        if form.is_valid() and character.player_can_edit(request.user):
+            requested_damage = form.cleaned_data['severity']
+            num_mind = character.num_mind_levels()
+            if requested_damage > num_mind:
+                character.mental_damage = num_mind
+            elif requested_damage < 0:
+                character.mental_damage = 0
+            else:
+                character.mental_damage = requested_damage
+            with transaction.atomic():
+                character.save()
+            return JsonResponse({}, status=200)
+        else:
+            return JsonResponse({"error": form.errors}, status=400)
+    return JsonResponse({"error": ""}, status=400)

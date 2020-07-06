@@ -350,8 +350,15 @@ class Character(models.Model):
         total_exp = EXP_NEW_CHAR
         for reward in rewards:
             total_exp = total_exp + reward.get_value()
-        exp_cost = self.stats.exp_cost()
+        exp_cost = self.exp_cost()
         return total_exp - exp_cost
+
+    def exp_cost(self):
+        stat_diffs = self.contractstats_set.filter(is_snapshot=False).all()
+        cost = 0
+        for diff in stat_diffs:
+            cost = cost + diff.exp_cost()
+        return cost
 
     def regen_stats_snapshot(self):
         stat_diffs = self.contractstats_set.filter(is_snapshot=False).order_by("created_time").all()
@@ -647,6 +654,8 @@ class ContractStats(models.Model):
     def exp_cost(self):
         #TODO: EXP must be calculated by looking through whole diff, should maybe be denormalized in snapshot.
         if self.is_snapshot:
+            raise ValueError("Cannot calculate the exp cost from a snapshot")
+        else:
             cost = 0
             for attribute in self.attributevalue_set.all():
                 cost = cost + self.calc_attr_change_ex_cost(1, attribute.value)
@@ -656,9 +665,9 @@ class ContractStats(models.Model):
                 cost = cost + self.calc_quirk_ex_cost(asset)
             for liability in self.liabilitydetails_set.all():
                 cost = cost - self.calc_quirk_ex_cost(liability)
+            for trauma in self.traumarevision_set.all():
+                cost = cost + self.calc_trauma_xp_cost(trauma)
             return cost
-        else:
-            pass # just find the diff
 
     def calc_attr_change_ex_cost(self, old_value, new_value):
         return ((new_value - old_value) * (old_value + new_value - 1) / 2) * EXP_ADV_COST_ATTR_MULTIPLIER

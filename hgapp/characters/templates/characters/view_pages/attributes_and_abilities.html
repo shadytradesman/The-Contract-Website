@@ -21,16 +21,16 @@
     {% endfor %}
 </div>
 <div class ="row text-center">
-    <h2>Abilities</h2>
-    <span id="abilities-toggle" class="btn btn-default btn-xs">Show all Primaries</span>
+    <span id="abilities-toggle" class="btn btn-outline">
+        <h2>Abilities</h2>
+    </span>
     <br>
     <div class="row">
         <div class="col-md-6">
             <div class="row">
             {% for ability_value in ability_value_by_name %}
                 {% if ability_value.1.is_physical %}
-                <div class="ability {% if not ability_value.2%} zero-ability {% endif %}"
-                    {% if not ability_value.2 %} style="display:none;" {% endif %}>
+                <div class="ability {% if not ability_value.2%} zero-ability {% endif %}">
                     <p>
                         <div class="col-md-4 col-sm-3 col-xs-4 text-right">
                             <p>
@@ -50,8 +50,7 @@
             <div class="row">
             {% for ability_value in ability_value_by_name %}
                 {% if not ability_value.1.is_physical %}
-                    <div class="ability {% if not ability_value.2%} zero-ability {% endif %}"
-                        {% if not ability_value.2 %} style="display:none;" {% endif %}>
+                    <div class="ability {% if not ability_value.2%} zero-ability {% endif %}">
                         <p>
                             <div class="col-md-4 col-sm-3 col-xs-4 text-left">
                                 <p>

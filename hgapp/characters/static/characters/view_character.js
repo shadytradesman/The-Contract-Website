@@ -1,17 +1,44 @@
-var zeroValVisible = false;
+// Abilities show/hide
+var zeroValVisible = true;
 $(document).on("click", "#abilities-toggle", function() {
     var button = $(this);
     if (zeroValVisible) {
         $("[class~=zero-ability]").css("display","none");
-        button.html("Show all Primaries");
         zeroValVisible = false;
     } else {
         $("[class~=zero-ability]").css("display","block");
-        button.html("Hide Unused Abilities");
         zeroValVisible = true;
     }
 });
 
+// Limits show/hide
+var limitsVisible = true;
+$(document).on("click", "#limits-toggle", function() {
+    var button = $(this);
+    if (limitsVisible) {
+        $("#js-limits-compact").css("display","block");
+        $("#js-limits-full").css("display","none");
+        limitsVisible = false;
+    } else {
+        $("#js-limits-compact").css("display","none");
+        $("#js-limits-full").css("display","block");
+        limitsVisible = true;
+    }
+});
+
+function updateLimitVisibility() {
+    if ($(".js-trauma-entry").length < 2) {
+         $("#js-limits-compact").css("display","none");
+         $("#js-limits-full").css("display","block");
+         limitsVisible = true;
+    } else {
+        $("#js-limits-compact").css("display","block");
+        $("#js-limits-full").css("display","none");
+        limitsVisible = false;
+    }
+}
+
+// expandable trauma deletion reasons
 $(document).on("click", ".js-trauma-del", function() {
     var button = $(this);
     this.classList.toggle("active");
@@ -23,10 +50,14 @@ $(document).on("click", ".js-trauma-del", function() {
     }
 });
 
+//ON DOCUMENT READY
 $(document).ready(function(){
     $('[data-toggle="tooltip"]').tooltip({
         trigger : 'hover'
     });
+    updateHealthDisplay();
+    updateMentalForms();
+    updateLimitVisibility();
 });
 
 // CSRF protection on form
@@ -117,7 +148,7 @@ $("#trauma-form").submit(function (e) {
                 compiledTmpl
             )
             $("#js-no-traumas").remove();
-
+            updateLimitVisibility();
         },
         error: function (response) {
             console.log(response);
@@ -138,6 +169,7 @@ $("#js-trauma-container").on("submit",".js-delete-trauma-form", function (e) {
         data: serializedData,
         success: function (response) {
             traumaForm.parent().parent().parent().remove();
+            updateLimitVisibility();
         },
         error: function (response) {
             console.log(response);
@@ -177,7 +209,7 @@ $(document).on("click", ".val-adjuster", function() {
 });
 
 // add injury
-$("#injury-form").submit(function (e) {
+$(".injury-form").submit(function (e) {
     e.preventDefault();
     var serializedData = $(this).serialize();
     var delUrl = $(this).attr("data-delete-injury-url");
@@ -231,6 +263,8 @@ $("#js-injury-container").on("submit",".js-delete-injury-form", function (e) {
 
 
 const numBodyLevels = JSON.parse(document.getElementById('numBodyLevels').textContent);
+const numMindLevels = JSON.parse(document.getElementById('numMindLevels').textContent);
+var mindDamage = JSON.parse(document.getElementById('mindDamage').textContent);
 
 // health display
 function updateHealthDisplay() {
@@ -248,7 +282,7 @@ function updateHealthDisplay() {
     var i;
     var bodyPenalty = 0;
     for (i = 0; i < numBodyLevels + 1; i++) {
-        content = damageValue > i ? '<i class="fa fa-square fa-2x" ></i>' : '<i class="fa fa-square-o fa-2x" ></i>';
+        var content = damageValue > i ? '<i class="fa fa-square fa-2x" ></i>' : '<i class="fa fa-square-o fa-2x" ></i>';
         $("#js-body-" + i).html(content);
         if (damageValue > i) {
             var penalty = $(".js-penalty-body-" + i);
@@ -256,19 +290,90 @@ function updateHealthDisplay() {
             if (penalty.html()) {
                 var penalty = penalty.html().trim();
                 var penNum = parseInt(penalty);
-                console.log(penNum);
                 if (isNaN(penNum)) {
                     bodyPenalty = penalty;
-                    penaltyDecided = true;
-                    console.log("decided" + penalty);
                 } else {
                     bodyPenalty = penNum;
                 }
             }
         }
     }
-
+    var mindPenalty = 0;
+    for (i = 0; i < numMindLevels + 1; i++) {
+        var content = mindDamage > i ? '<i class="fa fa-square fa-2x" ></i>' : '<i class="fa fa-square-o fa-2x" ></i>';
+        $("#js-mind-" + i).html(content);
+        if (mindDamage > i) {
+            var penalty = $(".js-penalty-mind-" + i);
+            if (penalty.html()) {
+                var penalty = penalty.html().trim();
+                var penNum = parseInt(penalty);
+                if (isNaN(penNum)) {
+                    mindPenalty = penalty;
+                } else {
+                    mindPenalty = penNum;
+                }
+            }
+        }
+    }
     // update penalty
-    $("#js-penalty-box").html(bodyPenalty)
+    var penaltyContent;
+    if (isNaN(mindPenalty)) {
+        penaltyContent = mindPenalty;
+    } else if (isNaN(bodyPenalty)) {
+        penaltyContent = bodyPenalty;
+    } else {
+        penaltyContent = mindPenalty + bodyPenalty;
+    }
+    $("#js-penalty-box").html(penaltyContent);
 
+    if (damageValue > numBodyLevels) {
+        $("#js-dead-box").css("display","block");
+    } else {
+        $("#js-dead-box").css("display","none");
+    }
 }
+
+function updateMentalForms() {
+    $("#exert-mind-val").val(mindDamage + 1);
+    $("#recover-mind-val").val(mindDamage <=0 ? 0 : mindDamage > numMindLevels ? numMindLevels : mindDamage -1);
+}
+
+// Exert mind
+$("#exert-mind-form").submit(function (e) {
+    e.preventDefault();
+    var serializedData = $(this).serialize();
+    $.ajax({
+        type: 'POST',
+        url: $(this).attr("data-url"),
+        data: serializedData,
+        success: function (response) {
+            mindDamage = parseInt($("#exert-mind-val").val());
+            updateMentalForms();
+            updateHealthDisplay();
+        },
+        error: function (response) {
+            console.log(response);
+            alert(response["responseJSON"]["error"]);
+        }
+    })
+})
+
+// Recover mind
+$("#recover-mind-form").submit(function (e) {
+    e.preventDefault();
+    var serializedData = $(this).serialize();
+    $.ajax({
+        type: 'POST',
+        url: $(this).attr("data-url"),
+        data: serializedData,
+        success: function (response) {
+            mindDamage = parseInt($("#recover-mind-val").val());
+            updateMentalForms();
+            updateHealthDisplay();
+        },
+        error: function (response) {
+            console.log(response);
+            alert(response["responseJSON"]["error"]);
+        }
+    })
+})

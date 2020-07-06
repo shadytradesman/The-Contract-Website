@@ -186,6 +186,12 @@ class Game(models.Model):
                                rewarded_player=self.gm,
                                is_improvement=True)
             gm_reward.save()
+        exp_reward = ExperienceReward(
+            rewarded_player=self.gm,
+        )
+        exp_reward.save()
+        self.gm_experience_reward = exp_reward
+        self.save()
 
     def achieves_golden_ratio(self):
         death = False
@@ -300,11 +306,24 @@ class Game_Attendance(models.Model):
                                    rewarded_player=self.attending_character.player,
                                    is_improvement=False)
             player_reward.save()
+            exp_reward = ExperienceReward(
+                rewarded_character=self.attending_character,
+                rewarded_player=self.attending_character.player,
+            )
+            exp_reward.save()
+            self.experience_reward = exp_reward
+            self.save()
         if self.is_ringer_victory():
             ringer_reward = Reward(relevant_game=self.relevant_game,
                                    rewarded_player=self.game_invite.invited_player,
                                    is_improvement=True)
             ringer_reward.save()
+            exp_reward = ExperienceReward(
+                rewarded_player=self.game_invite.invited_player,
+            )
+            exp_reward.save()
+            self.experience_reward = exp_reward
+            self.save()
 
     def save(self, *args, **kwargs):
         if self.outcome and self.attending_character and self.is_confirmed:

@@ -45,4 +45,9 @@ urlpatterns = [
     url(r'^post/ajax/c/(?P<character_id>[\d]+)/injury', views.post_injury, name="post_injury"),
 
     url(r'^post/ajax/delete-injury/s/(?P<injury_id>[\d\w]+)', views.delete_injury, name="delete_injury"),
+
+    # Sets character's mental damage to requested value in "severity" field of injury form. If out of bounds,
+    # sets character's injury to either their number of mental health levels or 0.
+    url(r'^post/ajax/c/(?P<character_id>[\d]+)/mental', views.set_mind_damage, name="set_mind_damage"),
+
 ]
