@@ -25,6 +25,12 @@ QUIRK_CATEGORY = (
     ('RESTRICTED', 'Restricted'),
 )
 
+PRONOUN = (
+    ('HE', 'his'),
+    ('SHE', 'her'),
+    ('THEY', 'their'),
+)
+
 BODY_STATUS = (
     'Bruised',
     'Bruised',
@@ -86,6 +92,9 @@ class Character(models.Model):
     appearance = models.TextField(max_length=3000)
     age = models.CharField(max_length=50)
     sex = models.CharField(max_length=15)
+    pronoun = models.CharField(choices=PRONOUN,
+                              max_length=25,
+                              default=PRONOUN[2][0])
     concept_summary = models.CharField(max_length=150)
     ambition = models.CharField(max_length=150)
     private = models.BooleanField(default=False)

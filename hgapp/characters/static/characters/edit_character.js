@@ -112,3 +112,24 @@ $(document).on('change','[id$=-checked]', function(ev){
         warnDiv.css("display","block");
     }
 });
+
+//////////////////
+// EXPERIENCE MANAGEMENT
+//////////////////
+const expToSpend = JSON.parse(document.getElementById('expToSpend').textContent);
+var spentExp = 0;
+
+function updateExpTotals() {
+    $(".js-remaining-exp").text(expToSpend - spentExp);
+    $("#js-starting-exp").text(expToSpend);
+    $("#js-spent-exp").text(spentExp);
+    if (expToSpend < 0) {
+        $(".js-exp-warn").css("display","block");
+    } else {
+        $(".js-exp-warn").css("display","none");
+    }
+}
+
+$(document).ready(function(){
+    updateExpTotals();
+});

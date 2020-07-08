@@ -109,3 +109,80 @@ input[type="number"] {
 h1 {
     margin-top: 0px;
 }
+
+/* ESSENTIALS SECTION */
+.css-essential-field {
+    float: left;
+}
+
+.css-essential-field input {
+    font-size: 16px;
+}
+.css-essential-field select {
+    font-size: 16px;
+}
+
+#css-name-field {
+    max-width: 270px;
+}
+#css-concept-field {
+    max-width: 270px;
+}
+#css-ambition-field {
+    max-width: 945px;
+}
+#css-age-field {
+    max-width: 90px;
+}
+#css-appearance-field {
+    max-width: 830px;
+    min-width: 300px;
+}
+
+@media (min-width: 500px) {
+   #css-appearance-field {
+        min-width: 400px;
+    }
+    #css-checked-field {
+        max-width: 200px;
+    }
+    #css-cell-field {
+        max-width: 500px;
+    }
+    #css-tagline-field {
+        max-width: 300px;
+    }
+}
+@media (min-width: 700px) {
+   #css-appearance-field {
+        min-width: 500px;
+    }
+}
+@media (min-width: 991px) {
+    #css-appearance-field {
+        min-width: 660px;
+    }
+    #css-concept-field {
+        max-width: 500px;
+    }
+    #css-name-field {
+    min-width: 200px;
+    }
+}
+
+.css-new-row {
+    height: 90px;
+}
+.css-essential-text {
+    padding-left: 5px;
+    padding-right: 5px;
+    float: left;
+    font-size: 16px;
+    position:relative;
+    top: 7px;
+    margin-bottom: 22px;
+}
+
+.css-essential-help {
+    color: #737373;
+}

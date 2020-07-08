@@ -8,6 +8,7 @@
     <link rel="stylesheet" type="text/css" href="{% static 'characters/edit_character_style.css' %}" />
 {% endblock %}
 {% block extra_scripts %}
+    {{unspent_experience|json_script:"expToSpend"}}
     <script src="{% static 'characters/edit_character.js' %}"></script>
     <script src="{% static 'overrides/wiki-macro-scripts.js' %}"></script>
 {% endblock %}
@@ -50,9 +51,9 @@
                 <div class="text-center nav navbar-nav css-remaining-exp">
                     <b>Experience Remaining:</b>
                     <span class="css-remaining-values">
-                        <span id="js-remaining-exp">31</span>
+                        <span class="js-remaining-exp">150</span>
                         <small>
-                            (<span id="js-starting-exp">31</span> - <span id="js-spent-exp">0</span>)
+                            (<span id="js-starting-exp">150</span> - <span id="js-spent-exp">0</span>)
                         </small>
                     </span>
                 </div>
@@ -68,38 +69,72 @@
     <div class="thumbnail">
         <h2 class = "text-center" data-toggle="tooltip" title='{{tutorial.core_info}}'>Core Info</h2>
         <div class="row">
-            <div class="col-sm-4">
-                {{ char_form.name | bootstrap}}
-            </div>
-            <div class="col-sm-8">
-                {{ char_form.tagline | bootstrap}}
+            <div class="col-xs-12">
+                <div id="css-name-field" class="css-essential-field">
+                    {{ char_form.name}}
+                    <figcaption class="help-block">
+                        {{ char_form.name.help_text}}
+                    </figcaption>
+                </div>
+                <div class="clearfix visible-xs-block"></div>
+                <span class="css-essential-text"> is a </span>
+                <div id="css-concept-field" class="css-essential-field"  >
+                    {{ char_form.concept_summary}}
+                    <figcaption class="help-block">
+                        {{ char_form.concept_summary.help_text}}
+                    </figcaption>
+                </div>
+                <div class="clearfix visible-xs-block visible-sm-block visible-md-block"></div>
+                <span class="css-essential-text"> who will risk </span>
+                <div id="css-pronoun-field" class="css-essential-field">
+                    {{char_form.pronoun}}
+                </div>
+                <span class="css-essential-text"> life in the Games </span>
+                <div class="visible-lg-block css-new-row"></div>
+                <span class="css-essential-text"> for a chance to </span>
+                <div id="css-ambition-field" class="css-essential-field">
+                    {{ char_form.ambition}}
+                    <figcaption class="help-block">
+                        {{ char_form.ambition.help_text}}
+                    </figcaption>
+                </div>
+                <span class="css-essential-text visible-lg-block"> .</span>
             </div>
         </div>
-       <div class="row">
-            <div class="col-xs-3">
-                {{ char_form.private | bootstrap}}
-            </div>
-            <div class="col-xs-7">
-                {{ char_form.cell | bootstrap}}
-            </div>
-       </div>
-        <div class ="row">
-            <div class="col-sm-2">
-                {{ char_form.age | bootstrap}}
-            </div>
-            <div class="col-sm-2">
-                {{ char_form.sex | bootstrap }}
-            </div>
-            <div class="col-sm-8">
-                {{ char_form.appearance | bootstrap}}
+        <div class="row">
+            <div class="col-xs-12">
+                <span class="css-essential-text"> They are </span>
+                <div id="css-age-field" class="css-essential-field">
+                    {{ char_form.age}}
+                    <figcaption class="help-block">
+                        {{ char_form.age.help_text}}
+                    </figcaption>
+                </div>
+                <span class="css-essential-text"> years old, and usually appear as</span>
+                <div class="visible-sm-block visible-md-block visible-xs-block css-new-row"></div>
+                <div id="css-appearance-field" class="css-essential-field">
+                    {{ char_form.appearance}}
+                    <figcaption class="help-block">
+                        {{ char_form.appearance.help_text}}
+                    </figcaption>
+                </div>
+                <span class="css-essential-text visible-md-block visible-lg-block"> .</span>
             </div>
         </div>
-        <div class ="row">
-            <div class="col-sm-6">
-                {{ char_form.concept_summary | bootstrap }}
-            </div>
-            <div class="col-sm-6">
-                {{ char_form.ambition | bootstrap }}
+        <hr>
+        <div class="row">
+            <div class="col-xs-12">
+                <div id="css-checked-field" class="css-essential-field">
+                    {{ char_form.private | bootstrap}}
+                </div>
+                <div id="css-cell-field" class="css-essential-field">
+                    {{ char_form.cell | bootstrap}}
+                </div>
+                <span class="css-essential-text visible-md-block visible-lg-block"> </span>
+                <div id="css-tagline-field" class="css-essential-field">
+                    {{ char_form.tagline | bootstrap}}
+                </div>
+
             </div>
         </div>
     </div>
@@ -297,6 +332,21 @@
     <div class="thumbnail">
         <div class="row">
             <div class="col-md-10 col-md-offset-1 alert alert-warning limit-warn text-center" role="alert" style="display:none;">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1 alert alert-danger js-exp-warn text-center" role="alert" style="display:none;">
+                Your Character does not have enough Experience to purchase the desired stats.
+                <br>
+                <b>Remaining Exp: <span class="js-remaining-exp">150</span></b>
+                <br>
+                <a class="btn btn-default btn-sm wiki-entry-collapsible">Why can I still submit?</a>
+                <div class="collapse-content clearfix"  style="display:none;">
+                    In order to support custom house rules, The Contract's website does not strictly enforce the
+                    official format.
+                    <br>
+                    Instead, we merely flag Characters and forms when they deviate from the official rules.
+                </div>
             </div>
         </div>
         <div class="row text-center">

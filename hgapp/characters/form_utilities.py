@@ -2,7 +2,7 @@ from django.forms import formset_factory
 
 from characters.models import Character, BasicStats, Character_Death, Graveyard_Header, Attribute, Ability, \
     CharacterTutorial, Asset, Liability, AttributeValue, ContractStats, AbilityValue, LiabilityDetails, AssetDetails, \
-    Limit, LimitRevision, Trauma, TraumaRevision
+    Limit, LimitRevision, Trauma, TraumaRevision, EXP_NEW_CHAR
 from powers.models import Power_Full
 from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, AbilityForm, \
     AssetForm, LiabilityForm, LimitForm
@@ -51,6 +51,7 @@ def get_edit_context(user, existing_character=None):
         'limit_formset': limit_formset,
         'tutorial': tutorial,
         'character': existing_character,
+        'unspent_experience': existing_character.unspent_experience() if existing_character else EXP_NEW_CHAR,
     }
     return context
 

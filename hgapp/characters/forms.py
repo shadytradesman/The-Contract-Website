@@ -65,14 +65,18 @@ def make_character_form(user, existing_character=None):
             fields = ('name', 'private', 'tagline', 'appearance', 'age', 'sex', 'concept_summary', 'ambition', 'paradigm',
                       'residence', 'languages', 'insanities', 'disabilities', 'current_alias', 'previous_aliases',
                       'resources', 'contacts', 'equipment', 'total_encumbrance', 'max_encumbrance', 'wish_list',
-                      'to_do_list', 'contracts', 'background', 'notes')
+                      'to_do_list', 'contracts', 'background', 'notes', 'pronoun')
             help_texts = {
-                'name': _('The Character\'s Name'),
-                'private': _("If checked, character will not be publicly viewable."),
-                'tagline': _('A subtitle that introduces the character in a flavorful way'),
-                'appearance': _('A brief description of the character\'s outward appearance'),
-                'concept_summary': _('A very brief overview of the primary concept, themes, and archetypes'),
-                'ambition': _('Why does this character risk their lives and participate in the games?'),
+                'name': _('Name'),
+                'private': _("If checked, Character will not be publicly viewable."),
+                'pronoun': _(""),
+                'tagline': _('A subtitle that introduces your Character in a flavorful way'),
+                'appearance': _('A brief description of your Character\'s outward appearance.'),
+                'concept_summary': _('Archetype Summary (ex: "skater punk werewolf", "cannibal chef", or "golden-age comic book hero")'),
+                'ambition': _('Ambition. Why does this character risk their life in the games? Good ambitions can shape '
+                              'the Character\'s interactions (ex: "drive non-humans out of the USA" is better than "become'
+                              ' the ultimate fighter")'),
+                'age': _("Age"),
                 'paradigm': _('How do the character\'s powers work?'),
                 'residence': _('Where the character lives'),
                 'languages': _('List of languages the character speaks'),
@@ -92,19 +96,24 @@ def make_character_form(user, existing_character=None):
                 'notes': _('Misc notes'),
             }
             widgets = {
+                'name': forms.TextInput(attrs={'class': 'form-control'}),
+                'concept_summary':forms.TextInput(attrs={'class': 'form-control '}),
+                'pronoun': forms.Select(attrs={'class': 'form-control '}),
+                'ambition': forms.TextInput(attrs={'class': 'form-control '}),
+                'age': forms.TextInput(attrs={'class': 'form-control '}),
+                'appearance': forms.TextInput(attrs={'class': 'form-control '}),
                 'equipment': CustomStylePagedown(),
                 'notes': CustomStylePagedown(),
-                'appearance': forms.TextInput(),
             }
 
     form = CharacterForm
     queryset = user.cell_set.all()
     cell = forms.ModelChoiceField(queryset=queryset,
                                   empty_label="Free Agent (No Cell)",
-                                  help_text="Select a Cell for your character. "
-                                            "This defines your character's home world and allows "
+                                  help_text="Select a Cell for your Character. "
+                                            "This defines your Character's home world and allows "
                                             "Cell leaders to help you with record-keeping. "
-                                            "NOTE: Cell leaders will be able to view and edit your character.",
+                                            "NOTE: Cell leaders will be able to view and edit your Character.",
                                   required=False,
                                   )
     if existing_character:
