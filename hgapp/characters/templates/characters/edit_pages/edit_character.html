@@ -164,20 +164,19 @@
         <div class="row" id="abilities-forms">
             {{ ability_formset.management_form }}
             {% for form in ability_formset %}
-                {% if form.initial.ability %}
-                    <div class="col-sm-3 form-inline" data-toggle="tooltip" title='{{form.initial.ability.tutorial_text}}'>
+                {% if form.initial.ability_id %}
+                    <div class="col-sm-3 form-inline" data-toggle="tooltip" title='{{form.initial.ability_tutorial_text}}'>
                         <span id="ability-form-{{forloop.counter0}}" class="ability-form">
                             {{ form.value }}
                         </span>
                         {{ form.ability_id }}
                         {{ form.value_id }}
-                        <b>{{form.initial.ability.name}}</b>
+                        <b>{{form.initial.ability_name}}</b>
                     </div>
                 {% else %}
                     {% include "characters/edit_pages/secondary_ability_snippet.html" %}
                 {% endif %}
             {% endfor %}
-
         </div>
         <br>
     </div>
@@ -350,7 +349,7 @@
             </div>
         </div>
         <div class="row text-center">
-        <input class="btn btn-primary btn-lg" type="submit" value="Submit" />
+        <input class="btn btn-primary btn-lg" type="submit" value="Submit" onsubmit="setFormSubmitting"/>
         </div>
     </div>
     </form>

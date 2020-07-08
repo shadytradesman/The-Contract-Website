@@ -91,7 +91,7 @@ class Character(models.Model):
                               default=HIGH_ROLLER_STATUS[1][0])
     appearance = models.TextField(max_length=3000)
     age = models.CharField(max_length=50)
-    sex = models.CharField(max_length=15)
+    sex = models.CharField(max_length=15, default="Unknown")
     pronoun = models.CharField(choices=PRONOUN,
                               max_length=25,
                               default=PRONOUN[2][0])
@@ -330,6 +330,14 @@ class Character(models.Model):
 
     def __str__(self):
         return self.name + " [" + self.player.username + "]"
+
+    def pres_tense_to_be(self):
+        if self.pronoun == PRONOUN[0][0]:
+            return "He is"
+        if self.pronoun == PRONOUN[1][0]:
+            return "She is"
+        else:
+            return "They are"
 
     def kill(self):
         if self.is_dead():

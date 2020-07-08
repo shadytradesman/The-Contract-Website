@@ -1,7 +1,7 @@
 {% load bootstrap %}
 {{form.errors}}
  <div class="col-sm-6 form-inline" data-toggle="tooltip" title='{{tutorial.secondary_abilities}}' >
-    {% if form.initial.ability and form.initial.ability.is_primary %}
+    {% if form.initial.ability and form.initial.ability_is_primary %}
         <span id="primary-ability-form-{{forloop.counter0}}" class="ability-form">
      {% else %}
         <span id="secondary-ability-form-{{forloop.counter0}}__prefix__" class="ability-form">

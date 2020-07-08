@@ -1,3 +1,15 @@
+// Enable navigation prompt
+var isDirty = false;
+var formSubmitting = false;
+window.onbeforeunload = function() {
+    if (formSubmitting || !isDirty) {
+    } else {
+        return true;
+    }
+};
+var setFormSubmitting = function() { formSubmitting = true; };
+
+
 function makeIncDecButtons(element) {
     element.append('<span class="inc val-adjuster btn btn-default btn-xs"><i class="fa fa-plus"></i></span>');
     element.prepend('<span class="dec val-adjuster btn btn-default btn-xs"><i class="fa fa-minus"></i></span>');
@@ -6,6 +18,7 @@ function makeIncDecButtons(element) {
 $(makeIncDecButtons($("span[class~='ability-form']")));
 
 $(document).on("click", ".val-adjuster", function() {
+  isDirty = true;
   var button = $(this);
   var oldValue = button.parent().find("input").val();
   var newValue = 0;
@@ -35,6 +48,7 @@ $(document).ready(function(){
 
 // Secondary ability creation / destruction
 $(document).on('change','[class~=sec-ability-name]', function(ev){
+    isDirty = true;
     var numSkills = $('[class~=ability-value-input]').length - 1; // subtract empty form
     var emptySecondaries = $('[class~=sec-ability-name]')
         .filter(function() {return !this.value && !$(this.parentElement).is(":hidden");});
@@ -61,46 +75,48 @@ $(".btn").mouseup(function(){
 // Quirk creation / destruction
 //NOTE: instead of removing the quirk, perhaps just hide it? Can use is_selected() to figure out if it's selected in forms.
 $(document).on('change','[id$=-is_selected]', function(ev) {
-        var checkbox = $(this);
-        if (checkbox.hasClass("quirk-multiple-False")) {
-            return true;
-        }
-        var checkboxGroup = checkbox.closest(".quirk-group-container");
-        var isLiability = checkboxGroup.children("[id^=liability]").length > 0;
-        var quirkWord = isLiability ? 'liability' : 'asset';
+    isDirty = true;
+    var checkbox = $(this);
+    if (checkbox.hasClass("quirk-multiple-False")) {
+        return true;
+    }
+    var checkboxGroup = checkbox.closest(".quirk-group-container");
+    var isLiability = checkboxGroup.children("[id^=liability]").length > 0;
+    var quirkWord = isLiability ? 'liability' : 'asset';
 
-        var quirkId = checkboxGroup.attr('id').slice(6);
-        var count = $('[class~=btn-'+ (isLiability ? "True" : "False") +'-'+ quirkId + ']').length;
-        var allThisQuirksButtons = $('[class~=btn-'+ (isLiability ? "True" : "False") +'-'+ quirkId + ']');
-        var emptyCheckboxes = allThisQuirksButtons
-                .filter(function() {return !$(this).is(".active") && !$(this.parentElement).is(":hidden");});
-        console.log(allThisQuirksButtons)
-        console.log(emptyCheckboxes)
-        var visibleCount =  allThisQuirksButtons
-                .filter(function() {return !$(this.parentElement).is(":hidden");})
-                .length;
-        if (this.checked && visibleCount < 4) {
-            if (isLiability) {
-                var tmplMarkup = $('#liability-'+quirkId+"-template").html();
-            } else {
-                var tmplMarkup = $('#asset-'+quirkId+"-template").html();
-            }
-            var compiledTmpl = tmplMarkup.replace(/__prefix__/g, count);
-
-            checkboxGroup.append(compiledTmpl);
-            if (compiledTmpl.includes("wiki-entry-collapsible")) {
-                    var collapsibleContainer = checkboxGroup.find('[class~=wiki-entry-collapsible]').get(count);
-                    setupCollapsibles(collapsibleContainer);
-            }
-            $('#id_' + quirkWord + '-' + quirkId + '-' + count + '-id').attr('value', quirkId)
-            $('#id_' + quirkWord + '-' + quirkId + '-TOTAL_FORMS').attr('value', count+1);
-        } else if (!this.checked && (count > 1) && emptyCheckboxes.length>1) {
-            checkbox.closest('[id^=' + quirkWord + '-'+quirkId+']').hide();
+    var quirkId = checkboxGroup.attr('id').slice(6);
+    var count = $('[class~=btn-'+ (isLiability ? "True" : "False") +'-'+ quirkId + ']').length;
+    var allThisQuirksButtons = $('[class~=btn-'+ (isLiability ? "True" : "False") +'-'+ quirkId + ']');
+    var emptyCheckboxes = allThisQuirksButtons
+            .filter(function() {return !$(this).is(".active") && !$(this.parentElement).is(":hidden");});
+    console.log(allThisQuirksButtons)
+    console.log(emptyCheckboxes)
+    var visibleCount =  allThisQuirksButtons
+            .filter(function() {return !$(this.parentElement).is(":hidden");})
+            .length;
+    if (this.checked && visibleCount < 4) {
+        if (isLiability) {
+            var tmplMarkup = $('#liability-'+quirkId+"-template").html();
+        } else {
+            var tmplMarkup = $('#asset-'+quirkId+"-template").html();
         }
+        var compiledTmpl = tmplMarkup.replace(/__prefix__/g, count);
+
+        checkboxGroup.append(compiledTmpl);
+        if (compiledTmpl.includes("wiki-entry-collapsible")) {
+                var collapsibleContainer = checkboxGroup.find('[class~=wiki-entry-collapsible]').get(count);
+                setupCollapsibles(collapsibleContainer);
+        }
+        $('#id_' + quirkWord + '-' + quirkId + '-' + count + '-id').attr('value', quirkId)
+        $('#id_' + quirkWord + '-' + quirkId + '-TOTAL_FORMS').attr('value', count+1);
+    } else if (!this.checked && (count > 1) && emptyCheckboxes.length>1) {
+        checkbox.closest('[id^=' + quirkWord + '-'+quirkId+']').hide();
+    }
 });
 
 // Limit Warning
 $(document).on('change','[id$=-checked]', function(ev){
+    isDirty = true;
     var numLimitsSelected = $('input:checked[id$=-checked]').length; // subtract empty form
     var warnDiv = $('[class~=limit-warn]');
     if (numLimitsSelected == 3) {

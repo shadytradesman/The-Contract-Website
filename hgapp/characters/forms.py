@@ -62,7 +62,7 @@ def make_character_form(user, existing_character=None):
     class CharacterForm(ModelForm):
         class Meta:
             model = Character
-            fields = ('name', 'private', 'tagline', 'appearance', 'age', 'sex', 'concept_summary', 'ambition', 'paradigm',
+            fields = ('name', 'private', 'tagline', 'appearance', 'age', 'concept_summary', 'ambition', 'paradigm',
                       'residence', 'languages', 'insanities', 'disabilities', 'current_alias', 'previous_aliases',
                       'resources', 'contacts', 'equipment', 'total_encumbrance', 'max_encumbrance', 'wish_list',
                       'to_do_list', 'contracts', 'background', 'notes', 'pronoun')
@@ -181,6 +181,10 @@ class AbilityForm(forms.Form):
         super(AbilityForm, self).__init__(*args, **kwargs)
         if 'ability' in self.initial:
             ability = self.initial["ability"]
+            self.initial["ability_name"] = ability.name
+            self.initial["ability_is_primary"] = ability.is_primary
+            self.initial["ability_tutorial_text"] = ability.tutorial_text
+
             self.fields['name'].initial = ability.name
             self.fields['ability_id'].initial = ability.id
             self.fields['description'].widget = forms.HiddenInput()
