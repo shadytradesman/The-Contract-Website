@@ -7,7 +7,7 @@ window.onbeforeunload = function() {
         return true;
     }
 };
-var setFormSubmitting = function() { formSubmitting = true; };
+var setFormSubmitting = function() { formSubmitting = true; isDirty=false; };
 
 
 function makeIncDecButtons(element) {
@@ -38,6 +38,11 @@ $(document).on("click", ".val-adjuster", function() {
     }
   }
   button.parent().find("input").val(newValue); // NOTE: this causes issues if there is more than one input child.
+  updateAbilityExp(button.parent());
+});
+
+$(document).on("input keyup mouseup", ".ability-value-input", function() {
+    updateAbilityExp($(this).parent());
 });
 
 $(document).ready(function(){
@@ -55,6 +60,10 @@ $(document).on('change','[class~=sec-ability-name]', function(ev){
     var numEmptySecondaries = emptySecondaries.length;
     if (numEmptySecondaries > 1) {
         var sec = emptySecondaries[0];
+        $(sec).siblings(".ability-form").children(".ability-value-input").val(0);
+        console.log($(sec).siblings(".ability-form").children(".ability-value-input"));
+        updateAbilityExp($(sec).siblings(".ability-form"));
+        updateExpTotals();
         $(sec.parentElement).hide();
     } else if (numEmptySecondaries == 0) {
         var secondaryId = numSkills + 1;
@@ -133,19 +142,93 @@ $(document).on('change','[id$=-checked]', function(ev){
 // EXPERIENCE MANAGEMENT
 //////////////////
 const expToSpend = JSON.parse(document.getElementById('expToSpend').textContent);
-var spentExp = 0;
+const costs = JSON.parse(document.getElementById('expCosts').textContent)
+var expPrice = 0;
 
 function updateExpTotals() {
-    $(".js-remaining-exp").text(expToSpend - spentExp);
+    updateExpPrice();
+    $(".js-remaining-exp").text(expToSpend + expPrice);
     $("#js-starting-exp").text(expToSpend);
-    $("#js-spent-exp").text(spentExp);
-    if (expToSpend < 0) {
+    $("#js-spent-exp").text(expPrice > 0 ? "+" + expPrice : expPrice == 0? "-" + expPrice : expPrice);
+    if (expToSpend + expPrice < 0) {
         $(".js-exp-warn").css("display","block");
     } else {
         $(".js-exp-warn").css("display","none");
     }
 }
 
+function updateExpPrice() {
+  expPrice = 0;
+  $(".js-experience-cost-value").each(function() {
+        expPrice = expPrice + parseInt($(this).text());
+  });
+}
+
 $(document).ready(function(){
     updateExpTotals();
 });
+
+// update attribute exp values
+$(document).on("change", "[id^=id_attributes]", function() {
+    var value = $(this).children("option:selected").attr("value");
+    var expCostDiv = $(this).siblings(".css-experience-cost");
+    var initial = expCostDiv.attr("data-initial-attr-value");
+    var cost = calculateAttrChangeCost(initial, value);
+    var price = -cost;
+    var priceText = price > 0 ? "+" + price : price;
+    expCostDiv.children(".js-experience-cost-value").text(priceText);
+    if (cost != 0) {
+        expCostDiv.css("display","inline");
+    } else {
+        expCostDiv.css("display","none");
+    }
+    updateExpTotals();
+});
+
+function calculateAttrChangeCost(oldValue, newValue) {
+    oldValue = parseInt(oldValue);
+    newValue = parseInt(newValue);
+    return ((newValue - oldValue) * (oldValue + newValue - 1) / 2) * parseInt(costs["EXP_ADV_COST_ATTR_MULTIPLIER"]);
+}
+
+function calculateAbilityChangeCost(oldValue, newValue) {
+    oldValue = parseInt(oldValue);
+    newValue = parseInt(newValue);
+    var advMultiplier = parseInt(costs["EXP_ADV_COST_SKILL_MULTIPLIER"]);
+    if (oldValue == 0 && newValue != 0) {
+        initial_cost = 2;
+    }
+    else if (oldValue != 0 && newValue == 0) {
+        initial_cost = -2;
+    }
+    else {
+        initial_cost = 0;
+    }
+    return ((newValue - oldValue) * (oldValue + newValue - 1) / 2) * advMultiplier + initial_cost;
+}
+
+function updateAbilityExp(valueSpanElement) {
+    console.log("abilityxp");
+    console.log(valueSpanElement);
+    var value = valueSpanElement.children(".ability-value-input").val();
+    if (!value) {
+        console.log("nan out");
+        return;
+    }
+    console.log(value);
+    var initial = valueSpanElement.attr("data-initial-val");
+    initial = initial ? initial : 0;
+    console.log(initial);
+    var cost = calculateAbilityChangeCost(initial, value);
+    var expCostDiv = valueSpanElement.siblings(".css-experience-cost");
+    console.log(expCostDiv);
+    var price = -cost;
+    var priceText = price > 0 ? "+" + price : price;
+    expCostDiv.children(".js-experience-cost-value").text(priceText);
+    if (cost != 0) {
+        expCostDiv.css("display","inline");
+    } else {
+        expCostDiv.css("display","none");
+    }
+    updateExpTotals();
+}

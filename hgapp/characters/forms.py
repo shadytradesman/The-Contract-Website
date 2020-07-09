@@ -58,6 +58,11 @@ ATTRIBUTE_VALUES = {
     ),
 }
 
+PHYS_MENTAL = (
+    ("0", "Physical"),
+    ("1", "Mental"),
+)
+
 def make_character_form(user, existing_character=None):
     class CharacterForm(ModelForm):
         class Meta:
@@ -145,7 +150,8 @@ class ConfirmAssignmentForm(forms.Form):
 
 #Advanced stat forms
 class AttributeForm(forms.Form):
-    value = forms.ChoiceField(choices=(()))
+    value = forms.ChoiceField(choices=(()),
+                              widget=forms.Select(attrs={'class': 'form-control '}))
     attribute_id = forms.IntegerField(label=None, widget=forms.HiddenInput(),) # hidden field to track which attribute we are editing.
     previous_value_id = forms.IntegerField(label=None, widget=forms.HiddenInput(),required=False)
 
@@ -176,6 +182,11 @@ class AbilityForm(forms.Form):
     description = forms.CharField(max_length=250,
                                   required=False,
                                   widget=forms.TextInput(attrs={'class': 'form-control sec-ability-desc'}))
+    phys_mental = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control sec-ability-phys'}),
+                                    choices=PHYS_MENTAL,
+                                    required=False,
+                                    help_text="For display purposes only. Most Abilities may be used for physical or "
+                                              "mental actions, depending on the situation.")
 
     def __init__(self, *args, **kwargs):
         super(AbilityForm, self).__init__(*args, **kwargs)
@@ -184,6 +195,7 @@ class AbilityForm(forms.Form):
             self.initial["ability_name"] = ability.name
             self.initial["ability_is_primary"] = ability.is_primary
             self.initial["ability_tutorial_text"] = ability.tutorial_text
+            self.initial["phys_mental"] = PHYS_MENTAL[0] if ability.is_physical else PHYS_MENTAL[1]
 
             self.fields['name'].initial = ability.name
             self.fields['ability_id'].initial = ability.id

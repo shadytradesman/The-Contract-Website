@@ -13,14 +13,22 @@ input[type="number"] {
     padding: 5px !important;
     text-align:center;
     font-size:16px;
+    display: inline !important;
 }
 
 .sec-ability-desc {
-    width: 250px !important;
+    width: 100% !important;
+    max-width: 550px !important;
+    display: inline !important;
 }
 
 .sec-ability-name {
-    width: 150px !important;
+    max-width: 150px !important;
+    display: inline !important;
+}
+.sec-ability-phys {
+    width: 90px !important;
+    display: inline !important;
 }
 
 .thumbnail {
@@ -185,4 +193,10 @@ h1 {
 
 .css-essential-help {
     color: #737373;
+}
+
+.css-experience-cost {
+    font-size: 12px;
+    color: #a94442;
+    display: none;
 }

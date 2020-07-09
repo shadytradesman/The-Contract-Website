@@ -1,17 +1,21 @@
 {% load bootstrap %}
 {{form.errors}}
- <div class="col-sm-6 form-inline" data-toggle="tooltip" title='{{tutorial.secondary_abilities}}' >
+ <div class="col-lg-12 col-md-12 form-inline" data-toggle="tooltip" title='{{tutorial.secondary_abilities}}' >
     {% if form.initial.ability and form.initial.ability_is_primary %}
-        <span id="primary-ability-form-{{forloop.counter0}}" class="ability-form">
+        <span id="primary-ability-form-{{forloop.counter0}}" class="ability-form" data-initial-val="{{form.initial.value}}">
      {% else %}
-        <span id="secondary-ability-form-{{forloop.counter0}}__prefix__" class="ability-form">
+        <span id="secondary-ability-form-{{forloop.counter0}}__prefix__" class="ability-form" data-initial-val="{{form.initial.value}}">
      {% endif %}
         {{ form.value }}
+    </span>
+    <span class="css-experience-cost">
+         (
+        <span class="js-experience-cost-value">0</span>
+        Exp )
     </span>
     {{ form.ability_id }}
     {{ form.value_id }}
     {{ form.name}}
-    <span class="pull-right">
-        Detail: {{ form.description}}
-    </span>
+    Detail: {{ form.description}}
+    <span data-toggle="tooltip" title='{{form.phys_mental.help_text}}'>{{ form.phys_mental}}</span>
 </div>

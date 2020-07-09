@@ -2,10 +2,10 @@ from django.forms import formset_factory
 
 from characters.models import Character, BasicStats, Character_Death, Graveyard_Header, Attribute, Ability, \
     CharacterTutorial, Asset, Liability, AttributeValue, ContractStats, AbilityValue, LiabilityDetails, AssetDetails, \
-    Limit, LimitRevision, Trauma, TraumaRevision, EXP_NEW_CHAR
+    Limit, LimitRevision, Trauma, TraumaRevision, EXP_NEW_CHAR, EXP_ADV_COST_ATTR_MULTIPLIER, EXP_ADV_COST_SKILL_MULTIPLIER
 from powers.models import Power_Full
 from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, AbilityForm, \
-    AssetForm, LiabilityForm, LimitForm
+    AssetForm, LiabilityForm, LimitForm, PHYS_MENTAL
 from collections import defaultdict
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
@@ -52,6 +52,8 @@ def get_edit_context(user, existing_character=None):
         'tutorial': tutorial,
         'character': existing_character,
         'unspent_experience': existing_character.unspent_experience() if existing_character else EXP_NEW_CHAR,
+        'exp_costs': {"EXP_ADV_COST_ATTR_MULTIPLIER": EXP_ADV_COST_ATTR_MULTIPLIER,
+                      "EXP_ADV_COST_SKILL_MULTIPLIER": EXP_ADV_COST_SKILL_MULTIPLIER}
     }
     return context
 
@@ -299,6 +301,7 @@ def __new_ability_from_form(form, stats):
         ability = Ability(
             name=form.cleaned_data['name'],
             tutorial_text=form.cleaned_data['description'] if 'description' in form.cleaned_data else "",
+            is_physical = True if form.cleaned_data['phys_mental'] == PHYS_MENTAL[0][0] else False
         )
         ability.save()
     if 'value' in form.cleaned_data and form.cleaned_data['value'] > 0:
