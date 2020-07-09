@@ -5,16 +5,25 @@
             <div>
     {% endif %}
     <label class="btn btn-outline btn-block quirk-btn btn-{{quirk.is_liability}}-{{quirk.id}}
+                 js-quirk-selected
                 {% if form.initial.is_selected %}
                     active
-                {% endif %}" data-toggle="buttons">
+                {% endif %}"
+           data-toggle="buttons"
+            data-initial="{{form.initial.is_selected}}"
+            data-liability="{{quirk.is_liability}}">
         <div class="quirk-btn-inner">
             <h4>
                 {{form.is_selected}}
                 &ensp;
-                <b>{{quirk.value}}</b>
+                <b class="js-quirk-value">{{quirk.value}}</b>
                 -
                 {{quirk.name}}
+                <span class="css-experience-cost">
+                     (
+                    <span class="js-experience-cost-value">0</span>
+                    Exp )
+                </span>
             </h4>
             <p>
                 {{quirk.description}}

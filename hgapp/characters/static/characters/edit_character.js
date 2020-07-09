@@ -86,6 +86,7 @@ $(".btn").mouseup(function(){
 $(document).on('change','[id$=-is_selected]', function(ev) {
     isDirty = true;
     var checkbox = $(this);
+    updateQuirkExp(checkbox.parents(".quirk-btn"));
     if (checkbox.hasClass("quirk-multiple-False")) {
         return true;
     }
@@ -231,4 +232,56 @@ function updateAbilityExp(valueSpanElement) {
         expCostDiv.css("display","none");
     }
     updateExpTotals();
+}
+
+const EXP_COST_QUIRK_MULTIPLIER = parseInt(costs["EXP_COST_QUIRK_MULTIPLIER"]);
+function updateQuirkExp(quirkButtonDiv) {
+    console.log(quirkButtonDiv);
+    var initialActive = quirkButtonDiv.attr("data-initial") == "True";
+    console.log("initialActive: " + initialActive);
+    var active = $(quirkButtonDiv).hasClass("active");
+    console.log("active: " + active);
+    var quirkValue = $(quirkButtonDiv).find(".js-quirk-value").text();
+    console.log("qvalue: " + quirkValue);
+    var quirkIsLiability = $(quirkButtonDiv).attr("data-liability") == "True";
+    console.log("is liability: " + quirkIsLiability);
+    var cost;
+    if (active == initialActive) {
+        cost = 0;
+    } else {
+        expVal = EXP_COST_QUIRK_MULTIPLIER * quirkValue;
+        cost = active == quirkIsLiability ? expVal : -expVal;
+    }
+    console.log("cost: " + cost);
+    var expCostDiv = quirkButtonDiv.find(".css-experience-cost")
+    quirkButtonDiv.find(".js-experience-cost-value").text(cost);
+    console.log(expCostDiv);
+    if (cost != 0) {
+        expCostDiv.css("display","inline");
+    } else {
+        expCostDiv.css("display","none");
+    }
+    updateQuirkCatExpTotals();
+    updateExpTotals();
+}
+
+function updateQuirkCatExpTotals() {
+    function updateQuirkCatExpTotal(category) {
+        var expPrice = 0;
+        $("#" + category).find(".js-experience-cost-value").each(function() {
+            expPrice = expPrice + parseInt($(this).text());
+        });
+        var expCat = $("#" + "js-quirk-cat-" + category + "-exp-val");
+        var priceText = expPrice > 0 ? "+" + expPrice : expPrice;
+        expCat.text(priceText);
+        if (expPrice != 0) {
+            expCat.parent().css("display","inline");
+        } else {
+            expCat.parent().css("display","none");
+        }
+    };
+    updateQuirkCatExpTotal("physical");
+    updateQuirkCatExpTotal("background");
+    updateQuirkCatExpTotal("mental");
+    updateQuirkCatExpTotal("restricted");
 }

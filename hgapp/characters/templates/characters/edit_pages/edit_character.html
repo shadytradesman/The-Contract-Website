@@ -204,11 +204,55 @@
             {{ formset.management_form }}
         {% endfor %}
 
-        <ul class="nav nav-pills text-center center-pills">
-            <li class="active"><a data-toggle="pill" href="#physical">Physical</a></li>
-            <li><a data-toggle="pill" href="#background">Background</a></li>
-            <li><a data-toggle="pill" href="#mental">Mental/Emotional</a></li>
-            <li><a data-toggle="pill" href="#restricted">Restricted</a></li>
+        <ul class="nav nav-pills text-center center-pills css-quirk-cat-buttons">
+            <li class="active">
+                <a data-toggle="pill" href="#physical" class="js-quirk-cat-button">
+                    Physical
+                </a>
+                <div class="css-quirk-cat-caption-cont">
+                    &nbsp;
+                    <span class="css-experience-cost">
+                        ( <span id="js-quirk-cat-physical-exp-val">-0</span> Exp )
+                    </span>
+                    &nbsp;
+                </div>
+            </li>
+            <li>
+                <a data-toggle="pill" href="#background" class="js-quirk-cat-button">
+                    Background
+                </a>
+                <div class="css-quirk-cat-caption-cont">
+                    &nbsp;
+                    <span class="css-experience-cost">
+                        ( <span id="js-quirk-cat-background-exp-val">-0</span> Exp )
+                    </span>
+                    &nbsp;
+                </div>
+            </li>
+            <li>
+                <a data-toggle="pill" href="#mental" class="js-quirk-cat-button">
+                Mental/Emotional
+                </a>
+                <div class="css-quirk-cat-caption-cont">
+                    &nbsp;
+                    <span class="css-experience-cost">
+                        ( <span id="js-quirk-cat-mental-exp-val">-0</span> Exp )
+                    </span>
+                    &nbsp;
+                </div>
+            </li>
+            <li>
+                <a data-toggle="pill" href="#restricted" class="js-quirk-cat-button">
+                Restricted
+                </a>
+                <div class="css-quirk-cat-caption-cont">
+                    &nbsp;
+                    <span class="css-experience-cost">
+                        ( <span id="js-quirk-cat-restricted-exp-val">-0</span> Exp )
+                    </span>
+                    &nbsp;
+                </div>
+            </li>
         </ul>
         {# TODO: THIS SECTION IS AWFUL AND SLOW. ITERATE AND CHECK LESS #}
         <div class="tab-content">

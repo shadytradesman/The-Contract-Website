@@ -200,3 +200,17 @@ h1 {
     color: #a94442;
     display: none;
 }
+
+.css-quirk-cat-buttons > li {
+    display: inline-block !important;
+}
+
+.css-quirk-cat-buttons>li>a {
+    display: inline !important;
+}
+
+.css-quirk-cat-caption-cont {
+    display: block;
+    position:relative;
+    top: 8px;
+}

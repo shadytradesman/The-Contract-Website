@@ -2,7 +2,8 @@ from django.forms import formset_factory
 
 from characters.models import Character, BasicStats, Character_Death, Graveyard_Header, Attribute, Ability, \
     CharacterTutorial, Asset, Liability, AttributeValue, ContractStats, AbilityValue, LiabilityDetails, AssetDetails, \
-    Limit, LimitRevision, Trauma, TraumaRevision, EXP_NEW_CHAR, EXP_ADV_COST_ATTR_MULTIPLIER, EXP_ADV_COST_SKILL_MULTIPLIER
+    Limit, LimitRevision, Trauma, TraumaRevision, EXP_NEW_CHAR, EXP_ADV_COST_ATTR_MULTIPLIER, \
+    EXP_ADV_COST_SKILL_MULTIPLIER, EXP_COST_QUIRK_MULTIPLIER
 from powers.models import Power_Full
 from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, AbilityForm, \
     AssetForm, LiabilityForm, LimitForm, PHYS_MENTAL
@@ -53,7 +54,8 @@ def get_edit_context(user, existing_character=None):
         'character': existing_character,
         'unspent_experience': existing_character.unspent_experience() if existing_character else EXP_NEW_CHAR,
         'exp_costs': {"EXP_ADV_COST_ATTR_MULTIPLIER": EXP_ADV_COST_ATTR_MULTIPLIER,
-                      "EXP_ADV_COST_SKILL_MULTIPLIER": EXP_ADV_COST_SKILL_MULTIPLIER}
+                      "EXP_ADV_COST_SKILL_MULTIPLIER": EXP_ADV_COST_SKILL_MULTIPLIER,
+                      "EXP_COST_QUIRK_MULTIPLIER": EXP_COST_QUIRK_MULTIPLIER,}
     }
     return context
 
