@@ -74,6 +74,7 @@ EXP_NEW_CHAR = 150
 EXP_COST_QUIRK_MULTIPLIER = 3
 EXP_ADV_COST_ATTR_MULTIPLIER = 4
 EXP_ADV_COST_SKILL_MULTIPLIER = 2
+EXP_ADV_COST_SOURCE_MULTIPLIER = 2
 EXP_COST_SKILL_INITIAL = 2
 EXP_COST_TRAUMA_THERAPY = 3
 
@@ -346,6 +347,19 @@ class Character(models.Model):
                                     date_of_death=timezone.now())
         new_death.save()
 
+    def grant_initial_source_if_required(self):
+        if self.stats_snapshot.sources.all().count() == 0:
+            source = Source(name="Source",
+                   owner=self,)
+            source.save()
+            new_stats = ContractStats(assigned_character=self)
+            new_stats.save()
+            source_rev = SourceRevision(relevant_stats = new_stats,
+                                        relevant_source = source,
+                                        max = 1)
+            source_rev.save()
+            self.regen_stats_snapshot()
+
     def archive_txt(self):
         output = "{}\nPlayed by: {}\nArchived on {}\n{} with {} wins and {} losses\n"
         output = output.format(self.name,
@@ -386,6 +400,7 @@ class Character(models.Model):
         attribute_values = []
         limit_revisions = []
         trauma_revisions = []
+        source_revisions = []
         cost = 0
         for diff in stat_diffs:
             for detail in diff.assetdetails_set.all():
@@ -426,6 +441,13 @@ class Character(models.Model):
                     trauma_revisions.remove(rev.previous_revision)
                 if not rev.is_deleted:
                     trauma_revisions.append(rev)
+            for rev in diff.sourcerevision_set.all():
+                if rev.previous_revision:
+                    source_revisions.remove(rev.previous_revision)
+                    cost = cost + diff.calc_source_change_ex_cost(rev.previous_revision.max, rev.max)
+                else:
+                    cost = cost + diff.calc_source_change_ex_cost(1, rev.max)
+                source_revisions.append(rev)
 
         self.stats_snapshot.clear()
         for deet in asset_details:
@@ -472,6 +494,14 @@ class Character(models.Model):
                 relevant_stats=self.stats_snapshot,
                 relevant_trauma=rev.relevant_trauma,
                 previous_revision=rev,
+            )
+            snapshot_rev.save()
+        for rev in source_revisions:
+            snapshot_rev = SourceRevision(
+                relevant_stats=self.stats_snapshot,
+                relevant_source=rev.relevant_source,
+                previous_revision=rev,
+                max=rev.max,
             )
             snapshot_rev.save()
         self.stats_snapshot.exp_cost = cost
@@ -653,6 +683,12 @@ class Liability(Quirk):
 class Trauma(models.Model):
     description = models.CharField(max_length=500)
 
+class Source(models.Model):
+    name = models.CharField(max_length=500)
+    owner = models.ForeignKey(Character,
+                              on_delete=models.CASCADE)
+    current_val = models.PositiveIntegerField(default = 1) # Max val is stored on the revision
+
 class Limit(models.Model):
     name = models.CharField(max_length=40)
     description = models.CharField(max_length=1000)
@@ -694,6 +730,10 @@ class ContractStats(models.Model):
                                     through="TraumaRevision",
                                     through_fields=('relevant_stats', 'relevant_trauma'),
                                     blank=True)
+    sources = models.ManyToManyField(Source,
+                                    through="SourceRevision",
+                                    through_fields=('relevant_stats', 'relevant_source'),
+                                    blank=True)
 
     class Meta:
         indexes = [
@@ -703,6 +743,9 @@ class ContractStats(models.Model):
 
     def calc_attr_change_ex_cost(self, old_value, new_value):
         return ((new_value - old_value) * (old_value + new_value - 1) / 2) * EXP_ADV_COST_ATTR_MULTIPLIER
+
+    def calc_source_change_ex_cost(self, old_value, new_value):
+        return ((new_value - old_value) * (old_value + new_value - 1) / 2) * EXP_ADV_COST_SOURCE_MULTIPLIER
 
     def calc_quirk_ex_cost(self, quirk_details):
         if quirk_details.is_deleted:
@@ -720,6 +763,7 @@ class ContractStats(models.Model):
         else:
             initial_cost = 0
         return ((new_value - old_value) * (old_value + new_value - 1) / 2) * EXP_ADV_COST_SKILL_MULTIPLIER + initial_cost
+
 
     def calc_trauma_xp_cost(self, trauma_revision):
         if trauma_revision.is_deleted and trauma_revision.was_bought_off:
@@ -803,6 +847,15 @@ class ContractStats(models.Model):
                 trauma.relevant_trauma.description
             )
             change_phrases.append((exp_phrase, phrase,))
+        for source in self.sourcerevision_set.all():
+            if source.previous_revision:
+                exp_cost = self.calc_source_change_ex_cost(source.previous_revision.max, source.max)
+                exp_phrase = self.get_exp_phrase(exp_cost)
+                phrase = self.get_trait_value_change_phrase(source.relevant_source.name,
+                                                            exp_cost,
+                                                            source.previous_revision.max,
+                                                            source.max)
+                change_phrases.append((exp_phrase, phrase,))
         return change_phrases
 
     def clear(self):
@@ -820,6 +873,8 @@ class ContractStats(models.Model):
             limit.delete()
         for trauma in self.traumarevision_set.all():
             trauma.delete()
+        for source in self.sourcerevision_set.all():
+            source.delete()
 
 
 class QuirkDetails(models.Model):
@@ -933,6 +988,22 @@ class TraumaRevision(models.Model):
             models.Index(fields=['relevant_stats']),
         ]
 
+class SourceRevision(models.Model):
+    relevant_source = models.ForeignKey(Source,
+                                        on_delete=models.CASCADE)
+    relevant_stats = models.ForeignKey(ContractStats,
+                                             on_delete=models.CASCADE)
+    previous_revision = models.ForeignKey('self',
+                                          null=True,
+                                          blank=True,
+                                          on_delete=models.CASCADE)  # Used in revisioning to determine value change.
+    max = models.PositiveIntegerField()
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['relevant_stats']),
+        ]
+
 class Character_Death(models.Model):
     relevant_character = models.ForeignKey(Character,
                                            on_delete=models.CASCADE)
@@ -970,3 +1041,5 @@ class CharacterTutorial(models.Model):
     penalty = models.TextField(max_length=3000)
     mind = models.TextField(max_length=3000)
     body = models.TextField(max_length=3000)
+    source_edit = models.TextField(max_length=3000)
+    source_view = models.TextField(max_length=3000)

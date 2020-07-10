@@ -258,6 +258,11 @@ class Power_Full(models.Model):
             ('edit_power_full', 'Edit power full'),
         )
 
+    def save(self, *args, **kwargs):
+        super(Power_Full, self).save(*args, **kwargs)
+        if self.character:
+            self.character.grant_initial_source_if_required()
+
     def player_manages_via_cell(self, player):
         if self.character:
             if self.character.cell:

@@ -16,6 +16,14 @@ input[type="number"] {
     display: inline !important;
 }
 
+.source-value-input {
+    width: 30px !important;
+    padding: 5px !important;
+    text-align:center;
+    font-size:16px;
+    display: inline !important;
+}
+
 .sec-ability-desc {
     width: 100% !important;
     max-width: 550px !important;

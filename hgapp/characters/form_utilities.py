@@ -3,10 +3,10 @@ from django.forms import formset_factory
 from characters.models import Character, BasicStats, Character_Death, Graveyard_Header, Attribute, Ability, \
     CharacterTutorial, Asset, Liability, AttributeValue, ContractStats, AbilityValue, LiabilityDetails, AssetDetails, \
     Limit, LimitRevision, Trauma, TraumaRevision, EXP_NEW_CHAR, EXP_ADV_COST_ATTR_MULTIPLIER, \
-    EXP_ADV_COST_SKILL_MULTIPLIER, EXP_COST_QUIRK_MULTIPLIER
+    EXP_ADV_COST_SKILL_MULTIPLIER, EXP_COST_QUIRK_MULTIPLIER, EXP_ADV_COST_SOURCE_MULTIPLIER, Source, SourceRevision
 from powers.models import Power_Full
 from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, AbilityForm, \
-    AssetForm, LiabilityForm, LimitForm, PHYS_MENTAL
+    AssetForm, LiabilityForm, LimitForm, PHYS_MENTAL, SourceForm
 from collections import defaultdict
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
@@ -14,7 +14,6 @@ from django.shortcuts import get_object_or_404
 # logic for Character creation and editing
 # TRANSACTIONS HAPPEN IN VIEW LAYER
 # See tests.py for hints on how revisioning works.
-
 def get_edit_context(user, existing_character=None):
     char_form = make_character_form(user, existing_character)(instance=existing_character)
     AttributeFormSet = formset_factory(AttributeForm, extra=0)
@@ -27,6 +26,7 @@ def get_edit_context(user, existing_character=None):
         ability_formset = __get_ability_formset_for_edit(existing_character, AbilityFormSet)
         attribute_formset = __get_attribute_formset_for_edit(existing_character, AttributeFormSet)
         limit_formset = __get_limit_formset_for_edit(existing_character)
+        source_formset = __get_source_formset_for_edit(existing_character)
     else:
         asset_formsets = __get_asset_formsets()
         liability_formsets = __get_liability_formsets()
@@ -43,6 +43,7 @@ def get_edit_context(user, existing_character=None):
             initial=[{'limit': x, 'selected': x.is_default} for x in primary_limits],
             prefix="limits"
         )
+        source_formset = ()
     context = {
         'char_form': char_form,
         'attribute_formset': attribute_formset,
@@ -52,10 +53,12 @@ def get_edit_context(user, existing_character=None):
         'limit_formset': limit_formset,
         'tutorial': tutorial,
         'character': existing_character,
+        'source_formset': source_formset,
         'unspent_experience': existing_character.unspent_experience() if existing_character else EXP_NEW_CHAR,
         'exp_costs': {"EXP_ADV_COST_ATTR_MULTIPLIER": EXP_ADV_COST_ATTR_MULTIPLIER,
                       "EXP_ADV_COST_SKILL_MULTIPLIER": EXP_ADV_COST_SKILL_MULTIPLIER,
-                      "EXP_COST_QUIRK_MULTIPLIER": EXP_COST_QUIRK_MULTIPLIER,}
+                      "EXP_COST_QUIRK_MULTIPLIER": EXP_COST_QUIRK_MULTIPLIER,
+                      "EXP_ADV_COST_SOURCE_MULTIPLIER": EXP_ADV_COST_SOURCE_MULTIPLIER,}
     }
     return context
 
@@ -67,7 +70,7 @@ def character_from_post(user, POST):
         new_character.edit_date = timezone.now()
         new_character.player = user
         new_character.save()
-        __save_stats_diff_from_post(POST, new_character=new_character)
+        __save_stats_diff_from_post(POST=POST, new_character=new_character, user=user)
         new_character.regen_stats_snapshot()
         cell = char_form.cleaned_data['cell']
         if cell != "free":
@@ -88,9 +91,9 @@ def update_character_from_post(user, POST, existing_character):
             for power_full in existing_character.power_full_set.all():
                 power_full.set_self_and_children_privacy(is_private=char_form.cleaned_data['private'])
         if existing_character.stats_snapshot:
-            __save_stats_diff_from_post(POST=POST, existing_character=existing_character)
+            __save_stats_diff_from_post(POST=POST, existing_character=existing_character, user=user)
         else:
-            __save_stats_diff_from_post(POST=POST, new_character=existing_character)
+            __save_stats_diff_from_post(POST=POST, new_character=existing_character, user=user)
         existing_character.regen_stats_snapshot()
     else:
         raise ValueError("invalid edit char_form")
@@ -166,8 +169,31 @@ def __limits_from_formset(limit_formset, stats):
     else:
         raise ValueError("Invalid Limit Formset")
 
+def __save_edit_sources_from_formset(formset, stats, user):
+    for form in formset:
+        if form.is_valid():
+            source = get_object_or_404(Source, id=form.cleaned_data['source_id'])
+            if not source.owner.player_can_edit(user):
+                raise ValueError("cannot edit")
+            if "rev_id" in form.cleaned_data and form.cleaned_data["rev_id"]:
+                rev_id = form.cleaned_data['rev_id']
+                prev_val = get_object_or_404(SourceRevision, id=rev_id)
+                if form.changed_data:
+                    new_revision = SourceRevision(
+                        relevant_stats=stats,
+                        relevant_source=source,
+                        max=form.cleaned_data['value'],
+                        previous_revision=prev_val,
+                    )
+                    new_revision.save()
+                    if "name" in form.cleaned_data:
+                        source.name=form.cleaned_data['name']
+                        source.save()
+        else:
+            raise ValueError("invalid source form in edit")
+
 #TODO: cleanup / split this method
-def __save_stats_diff_from_post(POST, existing_character=None, new_character=None):
+def __save_stats_diff_from_post(POST, existing_character=None, new_character=None, user=None):
     if new_character:
         # Create the character's stats snapshot and save.
         stats_snapshot = ContractStats(assigned_character=new_character,
@@ -192,6 +218,8 @@ def __save_stats_diff_from_post(POST, existing_character=None, new_character=Non
         __save_edit_abilities_from_formset(formset=ability_formset, stats=new_stats_rev)
         attribute_formset = __get_attribute_formset_for_edit(existing_character, AttributeFormSet, POST)
         __save_edit_attributes_from_formset(attribute_formset, new_stats_rev)
+        source_formset = __get_source_formset_for_edit(existing_character, POST)
+        __save_edit_sources_from_formset(source_formset, new_stats_rev, user=user)
     else: # new character
         new_stats_rev = ContractStats(assigned_character=new_character)
         new_stats_rev.save()
@@ -442,6 +470,20 @@ def __save_edit_quirks_from_formset(formset, stats, is_asset):
                     new_quirk_deets.save()
     else:
         raise ValueError("invalid quirk formset from edit post")
+
+
+def __get_source_formset_for_edit(existing_character, POST = None):
+    SourceFormSet = formset_factory(SourceForm, extra=0)
+    source_revs = existing_character.stats_snapshot.sourcerevision_set.all()
+    initial_sources = [{'source_id': x.relevant_source.id,
+                          'value': x.max,
+                          'source': x.relevant_source,
+                          'rev_id': x.previous_revision.id}
+                         for x in source_revs]
+    return SourceFormSet(POST,
+                         initial=initial_sources,
+                         prefix="source")
+
 
 def __get_ability_formset_for_edit(existing_character, AbilityFormSet, POST = None):
     default_abilities = Ability.objects.filter(is_primary=True).order_by('name')

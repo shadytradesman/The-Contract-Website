@@ -10,39 +10,54 @@ window.onbeforeunload = function() {
 var setFormSubmitting = function() { formSubmitting = true; isDirty=false; };
 
 
-function makeIncDecButtons(element) {
-    element.append('<span class="inc val-adjuster btn btn-default btn-xs"><i class="fa fa-plus"></i></span>');
-    element.prepend('<span class="dec val-adjuster btn btn-default btn-xs"><i class="fa fa-minus"></i></span>');
+function makeIncDecButtons(element, type) {
+    element.append('<span class="inc val-adjuster-'+type+' btn btn-default btn-xs"><i class="fa fa-plus"></i></span>');
+    element.prepend('<span class="dec val-adjuster-'+type+' btn btn-default btn-xs"><i class="fa fa-minus"></i></span>');
 }
 
-$(makeIncDecButtons($("span[class~='ability-form']")));
+$(makeIncDecButtons($("span[class~='ability-form']"), "ability"));
+$(makeIncDecButtons($("span[class~='source-form']"), "source"));
 
-$(document).on("click", ".val-adjuster", function() {
-  isDirty = true;
-  var button = $(this);
-  var oldValue = button.parent().find("input").val();
-  var newValue = 0;
+function handleAdjusterPress(button) {
+    isDirty = true;
+    var oldValue = parseInt(button.parent().find("input").val());
+    var newValue = 0;
+    var maxValue = parseInt(button.parent().attr("data-max-value"));
+    var minValue = parseInt(button.parent().attr("data-min-value"));
 
-  if (button.hasClass("inc")) {
-      if (oldValue < 5) {
-        newValue = parseFloat(oldValue) + 1;
-      }
-      else {
-	     newValue = 5;
-	  }
-	} else {
-    if (oldValue > 0) {
-      newValue = parseFloat(oldValue) - 1;
+    if (button.hasClass("inc")) {
+        if (oldValue < maxValue) {
+            newValue = oldValue + 1;
+        }
+        else {
+            newValue = maxValue;
+        }
     } else {
-      newValue = 0;
+        if (oldValue > minValue) {
+            newValue = oldValue - 1;
+        } else {
+            newValue = minValue;
+        }
     }
-  }
-  button.parent().find("input").val(newValue); // NOTE: this causes issues if there is more than one input child.
-  updateAbilityExp(button.parent());
+    button.parent().find("input").val(newValue); // NOTE: this causes issues if there is more than one input child.
+}
+
+$(document).on("click", ".val-adjuster-ability", function() {
+    handleAdjusterPress($(this));
+    updateAbilityExp($(this).parent());
+});
+
+$(document).on("click", ".val-adjuster-source", function() {
+  handleAdjusterPress($(this));
+  updateSourceExp($(this).parent());
 });
 
 $(document).on("input keyup mouseup", ".ability-value-input", function() {
     updateAbilityExp($(this).parent());
+});
+
+$(document).on("input keyup mouseup", ".source-value-input", function() {
+    updateSourceExp($(this).parent());
 });
 
 $(document).ready(function(){
@@ -192,6 +207,12 @@ function calculateAttrChangeCost(oldValue, newValue) {
     return ((newValue - oldValue) * (oldValue + newValue - 1) / 2) * parseInt(costs["EXP_ADV_COST_ATTR_MULTIPLIER"]);
 }
 
+function calculateSourceChangeCost(oldValue, newValue) {
+    oldValue = parseInt(oldValue);
+    newValue = parseInt(newValue);
+    return ((newValue - oldValue) * (oldValue + newValue - 1) / 2) * parseInt(costs["EXP_ADV_COST_SOURCE_MULTIPLIER"]);
+}
+
 function calculateAbilityChangeCost(oldValue, newValue) {
     oldValue = parseInt(oldValue);
     newValue = parseInt(newValue);
@@ -284,4 +305,30 @@ function updateQuirkCatExpTotals() {
     updateQuirkCatExpTotal("background");
     updateQuirkCatExpTotal("mental");
     updateQuirkCatExpTotal("restricted");
+}
+
+function updateSourceExp(valueSpanElement) {
+    console.log("source xp");
+    console.log(valueSpanElement);
+    var value = valueSpanElement.children(".source-value-input").val();
+    if (!value) {
+        console.log("nan out");
+        return;
+    }
+    console.log(value);
+    var initial = valueSpanElement.attr("data-initial-val");
+    initial = initial ? initial : 0;
+    console.log(initial);
+    var cost = calculateSourceChangeCost(initial, value);
+    var expCostDiv = valueSpanElement.siblings(".css-experience-cost");
+    console.log(expCostDiv);
+    var price = -cost;
+    var priceText = price > 0 ? "+" + price : price;
+    expCostDiv.children(".js-experience-cost-value").text(priceText);
+    if (cost != 0) {
+        expCostDiv.css("display","inline");
+    } else {
+        expCostDiv.css("display","none");
+    }
+    updateExpTotals();
 }

@@ -266,6 +266,25 @@ class TraumaForm(forms.Form):
                                   label=None,
                                   widget=forms.TextInput(attrs={'class': 'form-control'}))
 
+class SourceForm(forms.Form):
+    source_id = forms.IntegerField(label=None,
+                                    widget=forms.HiddenInput(),
+                                    required=False)  # hidden field to track which abilities we are editing.
+    value = forms.IntegerField(initial=1,
+                               validators=[MaxValueValidator(10), MinValueValidator(1)],
+                               widget=forms.NumberInput(attrs={'class': 'source-value-input form-control'}))
+    rev_id = forms.IntegerField(label=None, widget=forms.HiddenInput(), required=False)
+    name = forms.CharField(max_length=50,
+                           widget=forms.TextInput(attrs={'class': 'form-control source-name'}))
+    def __init__(self, *args, **kwargs):
+        super(SourceForm, self).__init__(*args, **kwargs)
+        if 'source' in self.initial:
+            source = self.initial["source"]
+            self.fields['name'].initial = source.name
+            self.fields['source_id'].initial = source.id
+        if 'rev_id' in self.initial and self.initial['rev_id']:
+            self.fields['rev_id'].initial = self.initial['rev_id']
+
 class InjuryForm(forms.Form):
     description = forms.CharField(max_length=900,
                                   label=None,
