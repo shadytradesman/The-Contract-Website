@@ -268,8 +268,7 @@ class TraumaForm(forms.Form):
 
 class SourceForm(forms.Form):
     source_id = forms.IntegerField(label=None,
-                                    widget=forms.HiddenInput(),
-                                    required=False)  # hidden field to track which abilities we are editing.
+                                    widget=forms.HiddenInput())  # hidden field to track which source we are editing.
     value = forms.IntegerField(initial=1,
                                validators=[MaxValueValidator(10), MinValueValidator(1)],
                                widget=forms.NumberInput(attrs={'class': 'source-value-input form-control'}))
@@ -294,3 +293,29 @@ class InjuryForm(forms.Form):
 
 class SourceValForm(forms.Form):
     value = forms.IntegerField(validators=[MaxValueValidator(10), MinValueValidator(0)])
+
+def make_allocate_gm_exp_form(queryset):
+    class AllocateGmExpForm(forms.Form):
+        chosen_character = forms.ModelChoiceField(queryset=queryset,
+                                                  empty_label="Save for now",
+                                                  required=False,
+                                                  label=None,
+                                                  widget=forms.Select(attrs={'class': 'form-control '}))
+        reward_id = forms.IntegerField(label=None, widget=forms.HiddenInput(), required=False)
+
+        def __init__(self, *args, **kwargs):
+            super(AllocateGmExpForm, self).__init__(*args, **kwargs)
+            self.fields['chosen_character'].label_from_instance = self.label_from_instance
+            if 'reward' in self.initial:
+                reward = self.initial["reward"]
+                self.fields['reward_id'].initial = reward.id
+                self.initial['reward_source'] = reward.source_blurb()
+                self.initial['reward_amount'] = reward.get_value()
+            else:
+                raise ValueError("GM Exp form must have a supplied reward")
+
+        @staticmethod
+        def label_from_instance(obj):
+            return obj.name
+
+    return AllocateGmExpForm

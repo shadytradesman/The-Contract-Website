@@ -43,12 +43,12 @@ BODY_STATUS = (
 
 MIND_STATUS = (
     'Agitated',
-    'Agitated',
     'Distracted',
+    'Rattled',
     'Worried',
     'Alarmed',
     'Frantic',
-    'Delerious',
+    'Delirious',
 )
 
 PENALTIES = (

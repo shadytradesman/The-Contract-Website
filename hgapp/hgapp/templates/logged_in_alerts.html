@@ -87,14 +87,15 @@
 {% if avail_exp_rewards %}
     <div class="alert alert-success text-center">
         <h3>Unspent Experience Rewards</h3>
-        <ul class="nav nav-pills nav-stacked">
-            {% for reward in avail_exp_rewards %}
-                <li>
-                    <a href="{% url 'games:games_view_game' '123' %}">
-                        Grant {{reward.get_value}} Exp reward {{reward.source_blurb}}
-                    </a>
-                </li>
-            {% endfor %}
-        </ul>
+        <b>You've earned Experience not yet assigned to any Character!</b>
+        <br>
+        <br>
+        {% for reward in avail_exp_rewards %}
+                {{reward.get_value}} Exp reward {{reward.source_blurb}}<br>
+        {% endfor %}
+        <br>
+        <a href="{% url 'characters:characters_allocate_gm_exp' %}" class="btn btn-primary">
+            Grant Rewards
+        </a>
     </div>
 {% endif %}

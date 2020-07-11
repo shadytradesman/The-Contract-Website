@@ -103,23 +103,27 @@
         {% for source in character.stats_snapshot.sources.all %}
             <div id="js-source-{{source.id}}" class="row text-center js-source">
                 <h3>{{source.name}}</h3>
-                    <form class="js-source-dec-form js-source-form"
-                      data-url="{% url 'characters:set_source_val' source.id %}"
-                      data-source-id="{{source.id}}">
-                        {% csrf_token %}
-                        <input class="js-source-val" type="number" name="source-value" value="1" required="" style="display:none;">
-                        <input type="submit" value="-" class="btn btn-default btn-sm css-source-button">
-                    </form>
+                    {% if user_can_edit %}
+                        <form class="js-source-dec-form js-source-form"
+                          data-url="{% url 'characters:set_source_val' source.id %}"
+                          data-source-id="{{source.id}}">
+                            {% csrf_token %}
+                            <input class="js-source-val" type="number" name="source-value" value="1" required="" style="display:none;">
+                            <input type="submit" value="-" class="btn btn-default btn-sm css-source-button">
+                        </form>
+                    {% endif %}
 
                     <span class="js-source-display">
                     </span>
-                    <form class="js-source-inc-form js-source-form"
-                      data-url="{% url 'characters:set_source_val' source.id %}"
-                      data-source-id="{{source.id}}">
-                        {% csrf_token %}
-                        <input class="js-source-val" type="number" name="source-value" value="1" required="" style="display:none;">
-                        <input type="submit" value="+" class=" btn btn-default btn-sm css-source-button">
-                    </form>
+                    {% if user_can_edit %}
+                        <form class="js-source-inc-form js-source-form"
+                          data-url="{% url 'characters:set_source_val' source.id %}"
+                          data-source-id="{{source.id}}">
+                            {% csrf_token %}
+                            <input class="js-source-val" type="number" name="source-value" value="1" required="" style="display:none;">
+                            <input type="submit" value="+" class=" btn btn-default btn-sm css-source-button">
+                        </form>
+                    {% endif %}
             </div>
         {% endfor %}
     </div>

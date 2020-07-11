@@ -7,13 +7,14 @@ from django.utils import timezone
 from django.db import transaction
 from django.core import serializers
 from collections import defaultdict
+from django.forms import formset_factory
 from heapq import merge
 
 from characters.models import Character, BasicStats, Character_Death, Graveyard_Header, Attribute, Ability, \
-    CharacterTutorial, Asset, Liability, BattleScar, Trauma, TraumaRevision, Injury, Source
+    CharacterTutorial, Asset, Liability, BattleScar, Trauma, TraumaRevision, Injury, Source, ExperienceReward
 from powers.models import Power_Full
 from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, AbilityForm, \
-    AssetForm, LiabilityForm, BattleScarForm, TraumaForm, InjuryForm, SourceValForm
+    AssetForm, LiabilityForm, BattleScarForm, TraumaForm, InjuryForm, SourceValForm, make_allocate_gm_exp_form
 from characters.form_utilities import get_edit_context, character_from_post, update_character_from_post, \
     grant_trauma_to_character, delete_trauma_rev
 
@@ -334,3 +335,39 @@ def set_source_val(request, source_id):
         else:
             return JsonResponse({"error": form.errors}, status=400)
     return JsonResponse({"error": ""}, status=400)
+
+
+def allocate_gm_exp(request):
+    if not request.user.is_authenticated:
+        return HttpResponseForbidden()
+    users_living_character_ids = [char.id for char in request.user.character_set.all() if not char.is_dead()]
+    queryset = Character.objects.filter(id__in=users_living_character_ids)
+    RewardForm = make_allocate_gm_exp_form(queryset)
+    RewardFormset = formset_factory(RewardForm, extra=0)
+    if request.method == 'POST':
+        reward_formset = RewardFormset(
+            request.POST,
+            initial=[{"reward": x} for x in request.user.experiencereward_set.filter(rewarded_character=None).all()])
+        if reward_formset.is_valid():
+            for form in reward_formset:
+                reward = get_object_or_404(ExperienceReward, id=form.cleaned_data["reward_id"])
+                if reward.rewarded_character or reward.rewarded_player != request.user:
+                    return HttpResponseForbidden()
+                if "chosen_character" in form.changed_data:
+                    char = form.cleaned_data["chosen_character"]
+                    if char.player != request.user:
+                        return HttpResponseForbidden()
+                    reward.rewarded_character = char
+                    reward.created_time = timezone.now()
+                    with transaction.atomic():
+                        reward.save()
+            return HttpResponseRedirect(reverse('home'))
+        else:
+            raise ValueError("Invalid reward forms")
+    else:
+        reward_formset = RewardFormset(
+            initial=[{"reward": x} for x in request.user.experiencereward_set.filter(rewarded_character=None).all()])
+        context = {
+            'reward_formset': reward_formset,
+        }
+        return render(request, 'characters/gm_exp_reward.html', context)

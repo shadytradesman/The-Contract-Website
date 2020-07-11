@@ -28,6 +28,9 @@ urlpatterns = [
     # ex: .com/characters/edit/powers/c/112/
     url(r'^edit/powers/c/(?P<character_id>[\d]+)/$', views.choose_powers, name='characters_power_picker'),
 
+    # ex: .com/characters/gm/reward/
+    url(r'^gm/reward/$', views.allocate_gm_exp, name='characters_allocate_gm_exp'),
+
     # ex: .com/characters/edit/c/112/p/21
     url(r'^edit/c/(?P<character_id>[\d]+)/p/(?P<power_full_id>[\d]+)$', views.toggle_power, name='characters_power_toggle'),
 
@@ -50,8 +53,8 @@ urlpatterns = [
     # sets character's injury to either their number of mental health levels or 0.
     url(r'^post/ajax/c/(?P<character_id>[\d]+)/mental', views.set_mind_damage, name="set_mind_damage"),
 
-    # Sets source's current value to requested value in "severity" field of injury form. If out of bounds,
-    # sets character's injury to either their number of mental health levels or 0.
+    # Sets source's current value to requested value. If out of bounds,
+    # sets source value to either its max or 0.
     url(r'^post/ajax/update-source/s/(?P<source_id>[\d]+)/', views.set_source_val, name="set_source_val"),
 
 ]
