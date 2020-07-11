@@ -269,10 +269,10 @@ def get_power_creation_reason(new_power, old_power):
     new_points = new_power.get_point_value()
     old_points = old_power.get_point_value()
 
-    if new_power.get_point_value() > old_power.get_point_value():
+    if new_points > old_points:
         # improvement
         return CREATION_REASON[1][0]
-    if new_power.get_point_value() < old_power.get_point_value()\
+    if new_points < old_points\
             or get_param_difference_text(new_power, old_power)\
             or get_added_enhancements(new_power, old_power)\
             or get_removed_enhancements(new_power, old_power)\

@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from characters.models import Character, HIGH_ROLLER_STATUS, Character_Death
+from characters.models import Character, HIGH_ROLLER_STATUS, Character_Death, ExperienceReward
 from powers.models import Power
 from cells.models import Cell
 from django.utils import timezone
@@ -113,6 +113,10 @@ class Game(models.Model):
                              null=True, # for migration reasons. All games should have cells.
                              blank=True, # for migration reasons. All games should have cells.
                              on_delete=models.CASCADE)
+    gm_experience_reward = models.OneToOneField(ExperienceReward,
+                                          null=True,
+                                          blank=True,
+                                          on_delete=models.CASCADE)
 
     class Meta:
         permissions = (
@@ -172,7 +176,7 @@ class Game(models.Model):
         self.give_rewards()
 
     def give_rewards(self):
-        if not self.is_finished():
+        if not self.is_finished() or self.is_recorded():
             print("Game is not finished: " + str(self.id))
             return
         for game_attendance in self.game_attendance_set.all():
@@ -182,6 +186,12 @@ class Game(models.Model):
                                rewarded_player=self.gm,
                                is_improvement=True)
             gm_reward.save()
+        exp_reward = ExperienceReward(
+            rewarded_player=self.gm,
+        )
+        exp_reward.save()
+        self.gm_experience_reward = exp_reward
+        self.save()
 
     def achieves_golden_ratio(self):
         death = False
@@ -255,7 +265,10 @@ class Game_Attendance(models.Model):
                                            blank=True,
                                            on_delete=models.CASCADE)
     is_confirmed = models.BooleanField(default=True)
-
+    experience_reward = models.OneToOneField(ExperienceReward,
+                                          null=True,
+                                          blank=True,
+                                          on_delete=models.CASCADE)
 
     def is_victory(self):
         return self.outcome == OUTCOME[0][0]
@@ -292,11 +305,25 @@ class Game_Attendance(models.Model):
                                    rewarded_player=self.attending_character.player,
                                    is_improvement=False)
             player_reward.save()
+        if self.attending_character:
+            exp_reward = ExperienceReward(
+                rewarded_character=self.attending_character,
+                rewarded_player=self.attending_character.player,
+            )
+            exp_reward.save()
+            self.experience_reward = exp_reward
+            self.save()
         if self.is_ringer_victory():
             ringer_reward = Reward(relevant_game=self.relevant_game,
                                    rewarded_player=self.game_invite.invited_player,
                                    is_improvement=True)
             ringer_reward.save()
+            exp_reward = ExperienceReward(
+                rewarded_player=self.game_invite.invited_player,
+            )
+            exp_reward.save()
+            self.experience_reward = exp_reward
+            self.save()
 
     def save(self, *args, **kwargs):
         if self.outcome and self.attending_character and self.is_confirmed:
@@ -307,11 +334,9 @@ class Game_Attendance(models.Model):
             if orig.attending_character != self.attending_character:
                 #if attending character has changed
                 orig.attending_character.default_perms_char_and_powers_to_player(self.relevant_game.gm)
-        if self.outcome == OUTCOME[2][0] and self.character_death is None and self.is_confirmed:
-            new_death = Character_Death(relevant_character=self.attending_character,
-                                        date_of_death=timezone.now())
-            new_death.save()
-            self.character_death = new_death
+        if self.outcome == OUTCOME[2][0] and self.character_death is None and self.is_confirmed and self.attending_character:
+            self.attending_character.kill()
+            self.character_death = self.attending_character.real_death()
         super(Game_Attendance, self).save(*args, **kwargs)
         if (self.relevant_game.is_scheduled() or self.relevant_game.is_active()) and self.attending_character:
             self.attending_character.reveal_char_and_powers_to_player(self.relevant_game.gm)

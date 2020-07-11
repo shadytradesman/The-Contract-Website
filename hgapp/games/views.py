@@ -624,7 +624,7 @@ def finalize_create_ex_game_for_cell(request, cell_id, gm_user_id, players):
                     attendance.save()
                     game_invite.attendance=attendance
                     game_invite.save()
-                    attendance.give_reward()
+                game.give_rewards()
                 return HttpResponseRedirect(reverse('cells:cells_view_cell', args=(cell.id,)))
         else:
             print(general_form.errors)

@@ -7,6 +7,7 @@
 
 {% block styles %}
     <link href="{% static "css/site.css" %}" rel="stylesheet" />
+    {% block extra_styles %}{% endblock %}
 {% endblock %}
 
 
@@ -22,6 +23,7 @@
 
 {% block scripts %}
     <script src="{% static "js/site.js" %}"></script>
+    {% block extra_scripts %}{% endblock %}
 {% endblock %}
 
 {% block extra_body_base %}

@@ -1,0 +1,224 @@
+/* Hide HTML5 Up and Down arrows. */
+input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+.ability-value-input {
+    width: 25px !important;
+    padding: 5px !important;
+    text-align:center;
+    font-size:16px;
+    display: inline !important;
+}
+
+.source-value-input {
+    width: 30px !important;
+    padding: 5px !important;
+    text-align:center;
+    font-size:16px;
+    display: inline !important;
+}
+
+.sec-ability-desc {
+    width: 100% !important;
+    max-width: 550px !important;
+    display: inline !important;
+}
+
+.sec-ability-name {
+    max-width: 150px !important;
+    display: inline !important;
+}
+.sec-ability-phys {
+    width: 90px !important;
+    display: inline !important;
+}
+
+.thumbnail {
+    padding: 10px;
+}
+
+.tab-content>.active {
+    display: flex;
+}
+
+.quirk-btn-cont {
+  background-color: #EFEFEF;
+  border-radius: 4px;
+}
+
+.quirk-btn-inner {
+  text-align: left;
+  white-space: normal;
+  font-weight: 200;
+}
+
+.quirk-btn.active {
+  background-color: #CFCFCF;
+  box-shadow: inset 0px 0px 0px 0px rgba(0,0,0,.125);
+}
+
+.quirk-collapse {
+  background-color: #CFCFCF;
+  padding-right: 5px;
+  padding-bottom: 5px;
+  border-radius: 4px;
+  margin-top:-8px;
+  white-space: noWrap;
+}
+
+.quirk-details {
+  position-relative: 0;
+  top: 7px;
+}
+
+.quirk-btn:hover {
+  background-color: #E1E1E1;
+}
+
+.quirk-btn.focus {
+      outline: none !important;
+}
+
+.nav-tabs > li, .nav-pills > li {
+    float:none;
+    display:inline-block;
+    *display:inline; /* ie7 fix */
+     zoom:1; /* hasLayout ie7 trigger */
+}
+
+.limit-row {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.css-remaining-exp-cont {
+    width: 290px;
+    margin: auto;
+}
+
+.css-remaining-exp {
+    width: 290px;
+    margin: auto;
+    border-color: black;
+    border-radius: 4px;
+    border-width: 1px;
+    border-style: solid;
+    padding: 5px;
+    background-color: #E1E1E1;
+}
+
+.css-fake-height-div {
+    height: 40px;
+}
+
+.affix {
+    top: 60px;
+    z-index: 9999 !important;
+}
+
+h1 {
+    margin-top: 0px;
+}
+
+/* ESSENTIALS SECTION */
+.css-essential-field {
+    float: left;
+}
+
+.css-essential-field input {
+    font-size: 16px;
+}
+.css-essential-field select {
+    font-size: 16px;
+}
+
+#css-name-field {
+    max-width: 270px;
+}
+#css-concept-field {
+    max-width: 270px;
+}
+#css-ambition-field {
+    max-width: 945px;
+}
+#css-age-field {
+    max-width: 90px;
+}
+#css-appearance-field {
+    max-width: 830px;
+    min-width: 300px;
+}
+
+@media (min-width: 500px) {
+   #css-appearance-field {
+        min-width: 400px;
+    }
+    #css-checked-field {
+        max-width: 200px;
+    }
+    #css-cell-field {
+        max-width: 500px;
+    }
+    #css-tagline-field {
+        max-width: 300px;
+    }
+}
+@media (min-width: 700px) {
+   #css-appearance-field {
+        min-width: 500px;
+    }
+}
+@media (min-width: 991px) {
+    #css-appearance-field {
+        min-width: 660px;
+    }
+    #css-concept-field {
+        max-width: 500px;
+    }
+    #css-name-field {
+    min-width: 200px;
+    }
+}
+
+.css-new-row {
+    height: 90px;
+}
+.css-essential-text {
+    padding-left: 5px;
+    padding-right: 5px;
+    float: left;
+    font-size: 16px;
+    position:relative;
+    top: 7px;
+    margin-bottom: 22px;
+}
+
+.css-essential-help {
+    color: #737373;
+}
+
+.css-experience-cost {
+    font-size: 12px;
+    color: #a94442;
+    display: none;
+}
+
+.css-quirk-cat-buttons > li {
+    display: inline-block !important;
+}
+
+.css-quirk-cat-buttons>li>a {
+    display: inline !important;
+}
+
+.css-quirk-cat-caption-cont {
+    display: block;
+    position:relative;
+    top: 8px;
+}

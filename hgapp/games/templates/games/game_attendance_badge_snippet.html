@@ -1,6 +1,6 @@
 {% load guardian_tags %}
 {% get_obj_perms request.user for attendance.relevant_game.scenario as "scenario_perms" %}
-<div class="thumbnail">
+<div class="css-timeline-item css-game-badge">
     <h4>
         {% if "view_scenario" in scenario_perms %}
             <a href="{% url 'games:games_view_scenario' attendance.relevant_game.scenario.id %}">

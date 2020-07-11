@@ -2,7 +2,7 @@ from django.conf import settings
 from django.db import models
 
 # Create your models here.
-from characters.models import Character
+from characters.models import Character, HIGH_ROLLER_STATUS
 from guardian.shortcuts import assign_perm, remove_perm
 
 ACTIVATION_STYLE = (
@@ -15,13 +15,6 @@ CREATION_REASON = (
     ('IMPROVEMENT', 'Improvement'),
     ('REVISION', 'Revision'),
     ('ADJUSTMENT', 'Adjustment'),
-)
-
-HIGH_ROLLER_STATUS = (
-    ('ANY', 'Any'),
-    ('NOVICE', 'Novice'),
-    ('SEASONED', 'Seasoned'),
-    ('VETERAN', 'Veteran'),
 )
 
 DICE_SYSTEM = (
@@ -265,6 +258,11 @@ class Power_Full(models.Model):
             ('edit_power_full', 'Edit power full'),
         )
 
+    def save(self, *args, **kwargs):
+        super(Power_Full, self).save(*args, **kwargs)
+        if self.character:
+            self.character.grant_initial_source_if_required()
+
     def player_manages_via_cell(self, player):
         if self.character:
             if self.character.cell:
@@ -430,7 +428,7 @@ class Power(models.Model):
             remove_perm('view_private_power', player, self)
 
     def archive_txt(self):
-        output = "{}\nA {} point {} {} power\nCreated by {}"
+        output = "{}\nA {} point {} {} power\nCreated by {}\n"
         output = output.format(self.name, self.get_point_value(), self.get_activation_style_display(), self.base.name, self.created_by.username)
         output = output + "{}\nDescription: {}\nSystem: {}\n"
         output = output.format(self.flavor_text,self.description, self.system)

@@ -1,0 +1,39 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+
+{% block head_title %}Rewarding Character{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% load staticfiles %}
+{% load bootstrap %}
+
+
+{% block body_base %}
+    <div class="container">
+        <div class="backdropped">
+            <div class="text-center form-inline">
+                <h1>Grant Experience</h1>
+                <p class="help-block">
+                    Declare which Characters should receive the Experience.
+                    Once confirmed, this action cannot be undone.
+                    Only living characters may be rewarded.
+                </p>
+                <form action="{% url 'characters:characters_allocate_gm_exp'%}" method="post">
+                    {% csrf_token %}
+                    {{ reward_formset.management_form }}
+                    <div class="text-left">
+                        {% for form in reward_formset %}
+                            {{form.chosen_character}}
+                            {{form.reward_id}}
+                            {{form.initial.reward_amount}} Exp Reward {{form.initial.reward_source}}
+                            <br><br>
+                        {% endfor %}
+                    </div>
+                    <input type="submit" class="btn btn-md btn-primary" value="Reward">
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

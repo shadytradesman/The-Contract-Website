@@ -1,0 +1,23 @@
+{% if form.initial.limit.is_primary %}
+    <div class="form-inline col-md-4">
+        <label>
+        <h4>
+            {{ form.checked }}
+            <b>{{ form.initial.limit.name }}</b>
+            <br>
+            <small>{{form.initial.limit.description}}</small>
+        </h4>
+            {{form.id}} {{form.limit_rev_id}}
+        </label>
+    </div>
+{% else %}
+    <div class="form-inline col-md-4">
+        <label>
+        <h4>{{ form.checked }} {{ form.name }}
+            <br>
+            {{form.description}}
+        </h4>
+            {{form.id}} {{form.limit_rev_id}}
+        </label>
+    </div>
+{% endif %}
