@@ -291,3 +291,6 @@ class InjuryForm(forms.Form):
                                   widget=forms.TextInput(attrs={'class': 'form-control'}))
     severity = forms.IntegerField(validators=[MaxValueValidator(20), MinValueValidator(0)],
                                widget=forms.NumberInput(attrs={'class': 'js-injury-value-input form-control', 'value': '1'}))
+
+class SourceValForm(forms.Form):
+    value = forms.IntegerField(validators=[MaxValueValidator(10), MinValueValidator(0)])

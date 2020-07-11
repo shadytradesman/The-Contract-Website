@@ -347,6 +347,13 @@ class Character(models.Model):
                                     date_of_death=timezone.now())
         new_death.save()
 
+    def source_values(self):
+        values = {}
+        for rev in self.stats_snapshot.sourcerevision_set.all():
+            source = rev.relevant_source
+            values[source.id] = (source.current_val, rev.max)
+        return values
+
     def grant_initial_source_if_required(self):
         if self.stats_snapshot.sources.all().count() == 0:
             source = Source(name="Source",

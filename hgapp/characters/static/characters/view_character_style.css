@@ -70,3 +70,20 @@ input[type="number"] {
     width: 30px !important;
     height: 30px !important;
 }
+
+.css-source-button {
+    position: relative;
+    bottom: 6px;
+    font-size: 22px;
+    height: 35px;
+    padding-bottom: 27px;
+    padding-top: 0px;
+}
+
+.css-limit-compact {
+    margin: 5px;
+}
+
+.js-source-form {
+    display: inline;
+}

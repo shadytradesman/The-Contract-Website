@@ -10,10 +10,10 @@ from collections import defaultdict
 from heapq import merge
 
 from characters.models import Character, BasicStats, Character_Death, Graveyard_Header, Attribute, Ability, \
-    CharacterTutorial, Asset, Liability, BattleScar, Trauma, TraumaRevision, Injury
+    CharacterTutorial, Asset, Liability, BattleScar, Trauma, TraumaRevision, Injury, Source
 from powers.models import Power_Full
 from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, AbilityForm, \
-    AssetForm, LiabilityForm, BattleScarForm, TraumaForm, InjuryForm
+    AssetForm, LiabilityForm, BattleScarForm, TraumaForm, InjuryForm, SourceValForm
 from characters.form_utilities import get_edit_context, character_from_post, update_character_from_post, \
     grant_trauma_to_character, delete_trauma_rev
 
@@ -316,6 +316,20 @@ def set_mind_damage(request, character_id):
                 character.mental_damage = requested_damage
             with transaction.atomic():
                 character.save()
+            return JsonResponse({}, status=200)
+        else:
+            return JsonResponse({"error": form.errors}, status=400)
+    return JsonResponse({"error": ""}, status=400)
+
+
+def set_source_val(request, source_id):
+    if request.is_ajax and request.method == "POST":
+        source = get_object_or_404(Source, id=source_id)
+        form = SourceValForm(request.POST, prefix="source")
+        if form.is_valid() and source.owner.player_can_edit(request.user):
+            source.current_val = form.cleaned_data['value']
+            with transaction.atomic():
+                source.save()
             return JsonResponse({}, status=200)
         else:
             return JsonResponse({"error": form.errors}, status=400)

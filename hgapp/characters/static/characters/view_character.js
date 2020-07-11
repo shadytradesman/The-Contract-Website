@@ -12,7 +12,7 @@ $(document).on("click", "#abilities-toggle", function() {
 });
 
 // Limits show/hide
-var limitsVisible = true;
+var limitsVisible = false;
 $(document).on("click", "#limits-toggle", function() {
     var button = $(this);
     if (limitsVisible) {
@@ -27,7 +27,7 @@ $(document).on("click", "#limits-toggle", function() {
 });
 
 function updateLimitVisibility() {
-    if ($(".js-trauma-entry").length < 2) {
+    if ($(".js-trauma-entry").length < 2 && $(".js-source").length < 1) {
          $("#js-limits-compact").css("display","none");
          $("#js-limits-full").css("display","block");
          limitsVisible = true;
@@ -376,4 +376,71 @@ $("#recover-mind-form").submit(function (e) {
             alert(response["responseJSON"]["error"]);
         }
     })
+})
+
+var sourceValues = JSON.parse(document.getElementById('sourceValues').textContent);
+const sourceFullIcon = ' <i class="fa fa-circle fa-2x"></i> '
+const sourceEmptyIcon = ' <i class="fa fa-circle-o fa-2x"></i> '
+
+function updateSourceDisplay() {
+    Object.keys(sourceValues).forEach(function(key) {
+        content = "";
+        var i =0;
+        var currentVal = parseInt(sourceValues[key][0]);
+        var maxVal = parseInt(sourceValues[key][1]);
+        if (currentVal > maxVal) {
+            currentVal = maxVal;
+            sourceValues[key][0] = maxVal;
+        }
+        for (i=0; i < currentVal; i++) {
+            content = content + sourceFullIcon;
+        }
+        for (i=sourceValues[key][0]; i < maxVal; i++) {
+            content = content + sourceEmptyIcon;
+        }
+        $("#js-source-" + key).find(".js-source-display").html(content);
+        console.log(key, sourceValues[key]);
+    });
+}
+
+function updateSourceForms() {
+    $(".js-source-dec-form").each(function(){
+        var sourceId = $(this).attr("data-source-id");
+        var currentVal = sourceValues[sourceId][0];
+        var newValue = currentVal == 0 ? currentVal : currentVal - 1;
+        $(this).children(".js-source-val").val(newValue);
+    });
+    $(".js-source-inc-form").each(function(){
+        var sourceId = $(this).attr("data-source-id");
+        var currentVal = parseInt(sourceValues[sourceId][0]);
+        var newValue = parseInt(sourceValues[sourceId][1]) == currentVal ? currentVal : currentVal + 1;
+        $(this).children(".js-source-val").val(newValue);
+    });
+}
+
+$(updateSourceDisplay());
+$(updateSourceForms());
+
+//update source
+$(".js-source-form").submit(function (e) {
+    e.preventDefault();
+    var serializedData = $(this).serialize();
+    var newValue = $(this).children(".js-source-val").val();
+    var sourceId = $(this).attr("data-source-id");
+    if (newValue <= sourceValues[sourceId][1] && newValue >= 0 ) {
+        $.ajax({
+            type: 'POST',
+            url: $(this).attr("data-url"),
+            data: serializedData,
+            success: function (response) {
+                sourceValues[sourceId][0] = newValue;
+                updateSourceForms();
+                updateSourceDisplay();
+            },
+            error: function (response) {
+                console.log(response);
+                alert(response["responseJSON"]["error"]);
+            }
+        })
+    }
 })

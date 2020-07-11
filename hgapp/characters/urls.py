@@ -50,4 +50,8 @@ urlpatterns = [
     # sets character's injury to either their number of mental health levels or 0.
     url(r'^post/ajax/c/(?P<character_id>[\d]+)/mental', views.set_mind_damage, name="set_mind_damage"),
 
+    # Sets source's current value to requested value in "severity" field of injury form. If out of bounds,
+    # sets character's injury to either their number of mental health levels or 0.
+    url(r'^post/ajax/update-source/s/(?P<source_id>[\d]+)/', views.set_source_val, name="set_source_val"),
+
 ]
