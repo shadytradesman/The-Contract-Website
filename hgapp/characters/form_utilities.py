@@ -96,6 +96,7 @@ def update_character_from_post(user, POST, existing_character):
             __save_stats_diff_from_post(POST=POST, existing_character=existing_character, user=user)
         else:
             __save_stats_diff_from_post(POST=POST, new_character=existing_character, user=user)
+            existing_character.grant_initial_source_if_required()
         existing_character.regen_stats_snapshot()
     else:
         raise ValueError("invalid edit char_form")

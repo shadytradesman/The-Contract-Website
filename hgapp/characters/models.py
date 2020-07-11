@@ -1050,3 +1050,4 @@ class CharacterTutorial(models.Model):
     body = models.TextField(max_length=3000)
     source_edit = models.TextField(max_length=3000)
     source_view = models.TextField(max_length=3000)
+    experience_edit = models.TextField(max_length=3000)

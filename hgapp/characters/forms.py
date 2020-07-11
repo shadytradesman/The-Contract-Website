@@ -29,7 +29,7 @@ ATTRIBUTE_VALUES = {
         ('5', '5 - Lightning-fast'),
     ),
     "Intelligence": (
-        ('1', '1 - Dumb'),
+        ('1', '1 - Simple'),
         ('2', '2 - Average'),
         ('3', '3 - Bright'),
         ('4', '4 - Intellectual'),

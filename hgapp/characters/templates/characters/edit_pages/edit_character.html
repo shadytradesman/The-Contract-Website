@@ -39,17 +39,17 @@
     {% if character %}
         <h1 class = "text-center">Editing {{character.name}}</h1>
             <form action="{% url 'characters:characters_edit' character.id %}" method="post" onsubmit="setFormSubmitting()">
-        <h4 class = "text-center">If you'd rather assign powers,
-            <a href="{% url 'characters:characters_power_picker' character.id %}">Click Here!</a>
-        </h4>
     {% else %}
         <h1 class = "text-center">New Character</h1>
         <form action="{% url 'characters:characters_create' %}" method="post" onsubmit="setFormSubmitting()">
     {% endif %}
     <div class="row">
         <div class="css-remaining-exp-cont">
-            <span data-spy="affix" data-offset-top="90">
-                <div class="text-center nav navbar-nav css-remaining-exp">
+            <span data-spy="affix" data-offset-top="60">
+                <div class="text-center nav navbar-nav css-remaining-exp"
+                     data-toggle="tooltip"
+                     data-placement="bottom"
+                     title='{{tutorial.experience_edit}}'>
                     <b>Experience Remaining:</b>
                     <span class="css-remaining-values">
                         <span class="js-remaining-exp">150</span>
@@ -63,6 +63,11 @@
             </div>
         </div>
     </div>
+    {% if character %}
+        <h4 class = "text-center">If you'd rather assign powers,
+            <a href="{% url 'characters:characters_power_picker' character.id %}">Click Here!</a>
+        </h4>
+    {% endif %}
 
     {{ char_form.non_field_errors }}
     {{ attribute_formset.non_field_errors }}

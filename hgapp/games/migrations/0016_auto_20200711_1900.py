@@ -6,7 +6,6 @@ from games.models import GAME_STATUS
 def grant_historical_exp_rewards(apps, schema_editor):
     # We can't import the models directly as it may be a newer
     # version than this migration expects. We use the historical version.
-    Game_Attendance = apps.get_model('games', 'Game_Attendance')
     Game = apps.get_model('games', 'Game')
     ExperienceReward = apps.get_model('characters', 'ExperienceReward')
     for game in Game.objects.all():
@@ -36,7 +35,7 @@ def grant_historical_exp_rewards(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('games', '0016_auto_20200701_1446'),
+        ('games', '0015_auto_20200711_1900'),
     ]
 
     operations = [
