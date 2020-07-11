@@ -1,17 +1,17 @@
 {% load staticfiles %}
 
 <div class="row text-center">
-    <div class="col-md-5 text-right" data-toggle="tooltip" title='{{tutorial.body}}'>
+    <div class="col-xs-5 text-right" data-toggle="tooltip" title='{{tutorial.body}}'>
         <h2 class="css-body-h">
             Body <span class="stat-value css-fort-stat">{{character.num_body_levels}}</span>
         </h2>
     </div>
-    <div class="col-md-2" data-toggle="tooltip" title='{{tutorial.penalty}}'>
+    <div class="col-xs-2" data-toggle="tooltip" title='{{tutorial.penalty}}'>
         <span style="position:relative;right:7px">penalty</span><br>
         <div id="js-penalty-box" class="stat-value css-penalty-box text-center">
         </div>
     </div>
-    <div class="col-md-5 text-left" data-toggle="tooltip" title='{{tutorial.mind}}'>
+    <div class="col-xs-5 text-left" data-toggle="tooltip" title='{{tutorial.mind}}'>
         <h2 class="css-mind-h">
             <span class="stat-value css-fort-stat">{{character.num_mind_levels}}</span> Mind
         </h2>
@@ -19,10 +19,10 @@
 </div>
 {% for row in health_display %}
     <div class="row">
-        <div class="col-md-4 text-right">
+        <div class="col-xs-4 text-right">
             {{row.0}}
         </div>
-        <div class="col-md-1 text-center health-box">
+        <div class="col-xs-1 text-center health-box">
             {% if row.1 == 'none' %}
             {% else %}
                 <span id ="js-body-{{row.1}}">
@@ -30,7 +30,7 @@
                 </span>
             {% endif %}
         </div>
-        <div class="col-md-2 text-center ">
+        <div class="col-xs-2 text-center ">
             <span class="js-penalty-body-{{row.1}} js-penalty-mind-{{row.3}}">
                 {% if row.2 == 'Incap' %}
                     <span data-toggle="tooltip" title='You are Incapacitated. You may take no actions.'>
@@ -43,7 +43,7 @@
                 {% endif %}
             </span>
         </div>
-        <div class="col-md-1 text-center health-box" >
+        <div class="col-xs-1 text-center health-box" >
             {% if row.3 == 'none' %}
             {% else %}
                 <span id ="js-mind-{{row.3}}">
@@ -51,7 +51,7 @@
                 </span>
             {% endif %}
         </div>
-        <div class="col-md-4 text-left" >
+        <div class="col-xs-4 text-left" >
             {{ row.4 }}
         </div>
     </div>

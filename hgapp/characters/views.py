@@ -14,7 +14,7 @@ from characters.models import Character, BasicStats, Character_Death, Graveyard_
     CharacterTutorial, Asset, Liability, BattleScar, Trauma, TraumaRevision, Injury, Source, ExperienceReward
 from powers.models import Power_Full
 from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, AbilityForm, \
-    AssetForm, LiabilityForm, BattleScarForm, TraumaForm, InjuryForm, SourceValForm, make_allocate_gm_exp_form
+    AssetForm, LiabilityForm, BattleScarForm, TraumaForm, InjuryForm, SourceValForm, make_allocate_gm_exp_form, EquipmentForm
 from characters.form_utilities import get_edit_context, character_from_post, update_character_from_post, \
     grant_trauma_to_character, delete_trauma_rev
 
@@ -104,6 +104,10 @@ def view_character(request, character_id):
     if not character.player_can_view(request.user):
         return HttpResponseForbidden()
     user_can_edit = request.user.is_authenticated and character.player_can_edit(request.user)
+    if not character.stats_snapshot:
+        context={"character": character,
+                 "user_can_edit": user_can_edit}
+        return render(request, 'characters/legacy_character.html', context)
 
     completed_games = [(x.relevant_game.end_time, "game", x) for x in character.completed_games()] # completed_games() does ordering
     character_edit_history = [(x.created_time, "edit", x) for x in
@@ -125,6 +129,7 @@ def view_character(request, character_id):
     exp_earned = character.exp_earned()
     exp_cost = character.exp_cost()
 
+    equipment_form = EquipmentForm()
     context = {
         'character': character,
         'user_can_edit': user_can_edit,
@@ -140,6 +145,7 @@ def view_character(request, character_id):
         'exp_cost': exp_cost,
         'exp_earned': exp_earned,
         'unspent_experience': unspent_experience,
+        'equipment_form': equipment_form,
     }
     return render(request, 'characters/view_pages/view_character.html', context)
 
@@ -371,3 +377,17 @@ def allocate_gm_exp(request):
             'reward_formset': reward_formset,
         }
         return render(request, 'characters/gm_exp_reward.html', context)
+
+def post_equipment(request, character_id):
+    if request.is_ajax and request.method == "POST":
+        character = get_object_or_404(Character, id=character_id)
+        form = EquipmentForm(request.POST)
+        if form.is_valid() and character.player_can_edit(request.user):
+            character.equipment=form.cleaned_data['equipment']
+            with transaction.atomic():
+                character.save()
+            return JsonResponse({"equipment": form.cleaned_data['equipment']}, status=200)
+        else:
+            return JsonResponse({"error": form.errors}, status=400)
+
+    return JsonResponse({"error": ""}, status=400)

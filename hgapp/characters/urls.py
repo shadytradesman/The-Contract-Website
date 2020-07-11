@@ -39,6 +39,8 @@ urlpatterns = [
     ######
     url(r'^post/ajax/c/(?P<character_id>[\d]+)/scar', views.post_scar, name="post_scar"),
 
+    url(r'^post/ajax/c/(?P<character_id>[\d]+)/equipment', views.post_equipment, name="post_equipment"),
+
     url(r'^post/ajax/delete-scar/s/(?P<scar_id>[\d\w]+)', views.delete_scar, name="delete_scar"),
 
     url(r'^post/ajax/c/(?P<character_id>[\d]+)/trauma', views.post_trauma, name="post_trauma"),

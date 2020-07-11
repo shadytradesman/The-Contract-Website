@@ -85,7 +85,7 @@ $(document).on('change','[class~=sec-ability-name]', function(ev){
         var tmplMarkup = $('#sec-ability-template').html();
         var compiledTmpl = tmplMarkup.replace(/__prefix__/g, secondaryId);
         var elem = $("#abilities-forms").append(compiledTmpl);
-        makeIncDecButtons($("span[id=secondary-ability-form-" + secondaryId + "]"));
+        makeIncDecButtons($("span[id=secondary-ability-form-" + secondaryId + "]"), "ability");
         $('#id_abilities-TOTAL_FORMS').attr('value', numSkills + 1);
     }
 });
@@ -132,8 +132,8 @@ $(document).on('change','[id$=-is_selected]', function(ev) {
                 var collapsibleContainer = checkboxGroup.find('[class~=wiki-entry-collapsible]').get(count);
                 setupCollapsibles(collapsibleContainer);
         }
-        $('#id_' + quirkWord + '-' + quirkId + '-' + count + '-id').attr('value', quirkId)
-        $('#id_' + quirkWord + '-' + quirkId + '-TOTAL_FORMS').attr('value', count+1);
+        $('#id_' + quirkWord  + quirkId + '-' + count + '-id').attr('value', quirkId)
+        $('#id_' + quirkWord +  quirkId + '-TOTAL_FORMS').attr('value', count+1);
     } else if (!this.checked && (count > 1) && emptyCheckboxes.length>1) {
         checkbox.closest('[id^=' + quirkWord + '-'+quirkId+']').hide();
     }

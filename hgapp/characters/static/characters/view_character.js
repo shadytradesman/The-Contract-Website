@@ -261,7 +261,6 @@ $("#js-injury-container").on("submit",".js-delete-injury-form", function (e) {
     })
 })
 
-
 const numBodyLevels = JSON.parse(document.getElementById('numBodyLevels').textContent);
 const numMindLevels = JSON.parse(document.getElementById('numMindLevels').textContent);
 var mindDamage = JSON.parse(document.getElementById('mindDamage').textContent);
@@ -443,4 +442,35 @@ $(".js-source-form").submit(function (e) {
             }
         })
     }
+})
+
+// Equipment
+var equipmentValue = JSON.parse(document.getElementById('equipment').textContent);
+$($("#js-equipment-form").children("textarea").val(equipmentValue));
+$(document).on("click", "#js-edit-equipment-button", function(){
+    $("#js-equipment-display").css("display","none");
+    $("#js-equipment-form").css("display","block");
+});
+
+$("#equipment-form").submit(function (e) {
+    e.preventDefault();
+    var serializedData = $(this).serialize();
+    $.ajax({
+        type: 'POST',
+        url: $(this).attr("data-post-url"),
+        data: serializedData,
+        success: function (response) {
+            var instance = response["equipment"];
+            var conv = new showdown.Converter();
+            $("#js-equipment-form").children("textarea").val(instance);
+            // This is safe only because the only people to see this output are the ones who submitted it.
+            $("#js-equipment-text").html(conv.makeHtml(instance));
+            $("#js-equipment-display").css("display","block");
+            $("#js-equipment-form").css("display","none");
+        },
+        error: function (response) {
+            console.log(response);
+            alert(response["responseJSON"]["error"]);
+        }
+    })
 })

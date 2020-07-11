@@ -87,3 +87,28 @@ input[type="number"] {
 .js-source-form {
     display: inline;
 }
+
+.css-section-button:hover {
+    border: 1px dotted black;
+}
+.css-section-button {
+    border: 1px solid transparent;
+}
+
+.css-timeline-item {
+    display: block;
+    padding: 4px;
+    margin-bottom: 5px;
+    line-height: 1.42857143;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.css-timeline-exp {
+    border-color: wheat;
+}
+
+.css-game-badge {
+    border-color: lightskyblue;
+}

@@ -34,10 +34,10 @@
     <div class="text-left" id="js-injury-container">
         {% for injury in character.injury_set.all %}
             <span>
-                <div class="stat-value col-md-1 text-center css-injury-val">
+                <div class="stat-value col-xs-1 text-center css-injury-val">
                     <b class="injury-severity">{{injury.severity}}</b>
                 </div>
-                <div class="stat-value col-md-11">
+                <div class="stat-value col-xs-11">
                     {{injury.description}}
                     {% if user_can_edit %}
                         <form class="js-delete-injury-form pull-right" data-del-injury-url="{% url 'characters:delete_injury' injury.id %}">
@@ -53,6 +53,8 @@
         {% endfor%}
     </div>
     {% if user_can_edit %}
+        <div class="col-xs-12">
+
         <div class="row form-inline">
             <form id="injury-form"
                   class="injury-form"
@@ -67,6 +69,7 @@
                 {{injury_form.description}}
                 <input type="submit" class="btn btn-default" value="Ouch!" />
             </form>
+        </div>
         </div>
     {% endif %}
 </div>
@@ -133,27 +136,26 @@
 </div>
 <div class="row">
     <h3 class="text-center">Equipment</h3>
-        {% if character.basic_stats.movement %}
-            <div class="col-md-6">
-                <p><b>Movement:</b> {{character.basic_stats.movement}}</p>
+    {% if user_can_edit %}
+        <form id="equipment-form"
+              data-post-url="{% url 'characters:post_equipment' character.id %}">
+            <div id="js-equipment-form" style="display:none;">
+                {{ equipment_form.about.errors }}
+                {{ equipment_form.non_field_errors }}
+                {% csrf_token %}
+                {{equipment_form.equipment}}
+                <input class="btn btn-sm btn-default" type="submit" value="Save">
+                <small><a href="https://commonmark.org/help/">Markdown</a> enabled</small>
             </div>
-        {% endif %}
-        {% if character.basic_stats.armor %}
-            <div class="col-md-6">
-                <p><b>Armor:</b> {{character.basic_stats.armor}}</p>
-            </div>
-        {% endif %}
-        {% if character.total_encumbrance %}
-            <div class="col-md-6">
-                <p><b>Total Encumbrance:</b> {{character.total_encumbrance}}</p>
-            </div>
-        {% endif %}
-        {% if character.max_encumbrance %}
-            <div class="col-md-6">
-                <p><b>Maximum Encumbrance:</b> {{character.max_encumbrance}}</p>
-            </div>
-        {% endif %}
-    {% if character.equipment %}
-        <p>{{character.equipment | markdown | linebreaks}}</p>
+        </form>
     {% endif %}
+    <div id="js-equipment-display">
+        {% if character.equipment %}
+            <span id="js-equipment-text">{{character.equipment | markdown}}</span>
+        {% endif %}
+        {% if user_can_edit %}
+            <div id="js-edit-equipment-button" class="btn btn-default btn-xs"><i class="fa fa-edit fa-2x"></i></div>
+        {% endif %}
+    </div>
+
 </div>

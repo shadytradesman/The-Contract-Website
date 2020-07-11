@@ -10,6 +10,7 @@
             </h4>
         </div>
     {% endfor %}
+    <div class="clearfix visible-xs-block"></div>
     {% for attribute_value in mental_attributes %}
         <div class="col-md-2 col-sm-6 col-xs-6">
             <h4>
@@ -21,8 +22,8 @@
     {% endfor %}
 </div>
 <div class ="row text-center">
-    <span id="abilities-toggle" class="btn btn-outline">
-        <h2>Abilities</h2>
+    <span id="abilities-toggle" class="btn btn-outline css-section-button">
+        <h2 class="">Abilities</h2>
     </span>
     <br>
     <div class="row">
@@ -32,7 +33,7 @@
                 {% if ability_value.1.is_physical %}
                 <div class="ability {% if not ability_value.2%} zero-ability {% endif %}">
                     <p>
-                        <div class="col-md-4 col-sm-3 col-xs-4 text-right">
+                        <div class="col-md-4 col-sm-3 col-xs-6 text-right">
                             <p>
                                 <b>{{ability_value.1.name}}</b>
                                 <span class="stat-value">
@@ -52,7 +53,7 @@
                 {% if not ability_value.1.is_physical %}
                     <div class="ability {% if not ability_value.2%} zero-ability {% endif %}">
                         <p>
-                            <div class="col-md-4 col-sm-3 col-xs-4 text-left">
+                            <div class="col-md-4 col-sm-3 col-xs-6 text-left">
                                 <p>
                                     <span class="stat-value">
                                         {{ability_value.2}}</span>

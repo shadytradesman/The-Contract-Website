@@ -54,7 +54,9 @@
         {%if character.real_death.obituary %}
             {{character.real_death.obituary | linebreaks}}
         {% elif request.user.id == character.player.id %}
-            Write an obituary
+            <a href="{%url 'characters:characters_obituary' character.id %}" class="btn btn-default">
+                    Edit Obituary
+            </a>
         {% endif %}
     {% endif %}
 

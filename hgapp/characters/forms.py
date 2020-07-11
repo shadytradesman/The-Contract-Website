@@ -319,3 +319,7 @@ def make_allocate_gm_exp_form(queryset):
             return obj.name
 
     return AllocateGmExpForm
+
+class EquipmentForm(forms.Form):
+    equipment = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control'}),
+                                label=None)

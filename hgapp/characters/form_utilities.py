@@ -54,7 +54,9 @@ def get_edit_context(user, existing_character=None):
         'tutorial': tutorial,
         'character': existing_character,
         'source_formset': source_formset,
-        'unspent_experience': existing_character.unspent_experience() if existing_character else EXP_NEW_CHAR,
+        'unspent_experience': existing_character.unspent_experience() \
+            if existing_character and existing_character.stats_snapshot and existing_character.stats_snapshot.exp_cost \
+            else EXP_NEW_CHAR,
         'exp_costs': {"EXP_ADV_COST_ATTR_MULTIPLIER": EXP_ADV_COST_ATTR_MULTIPLIER,
                       "EXP_ADV_COST_SKILL_MULTIPLIER": EXP_ADV_COST_SKILL_MULTIPLIER,
                       "EXP_COST_QUIRK_MULTIPLIER": EXP_COST_QUIRK_MULTIPLIER,
