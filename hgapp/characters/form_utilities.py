@@ -330,14 +330,14 @@ def __new_ability_from_form(form, stats):
     ability = None
     if 'ability_id' in form.cleaned_data and form.cleaned_data['ability_id']:
         ability = get_object_or_404(Ability, id=form.cleaned_data['ability_id'])
-    elif 'name' in form.cleaned_data:
+    elif 'name' in form.cleaned_data and form.cleaned_data["name"]:
         ability = Ability(
             name=form.cleaned_data['name'],
             tutorial_text=form.cleaned_data['description'] if 'description' in form.cleaned_data else "",
             is_physical = True if form.cleaned_data['phys_mental'] == PHYS_MENTAL[0][0] else False
         )
         ability.save()
-    if 'value' in form.cleaned_data and form.cleaned_data['value'] > 0:
+    if 'value' in form.cleaned_data and form.cleaned_data['value'] > 0 and ability:
         ability_value = AbilityValue(
             relevant_ability=ability,
             value=form.cleaned_data['value'],
@@ -512,15 +512,9 @@ def __get_ability_formset_for_edit(existing_character, AbilityFormSet, POST = No
 def __save_edit_abilities_from_formset(formset, stats):
     for form in formset:
         if form.is_valid():
-            if 'ability_id' in form.cleaned_data and form.cleaned_data['ability_id']:
+            if 'ability_id' in form.cleaned_data and form.cleaned_data['ability_id'] \
+                    and "value_id" in form.cleaned_data and form.cleaned_data["value_id"]:
                 ability = get_object_or_404(Ability, id=form.cleaned_data['ability_id'])
-            elif 'name' in form.cleaned_data:
-                ability = Ability(
-                    name=form.cleaned_data['name'],
-                    tutorial_text=form.cleaned_data['description'] if 'description' in form.cleaned_data else "",
-                )
-                ability.save()
-            if "value_id" in form.cleaned_data and form.cleaned_data["value_id"]:
                 value_id = form.cleaned_data['value_id']
                 prev_val = get_object_or_404(AbilityValue, id=value_id)
                 if form.changed_data:
