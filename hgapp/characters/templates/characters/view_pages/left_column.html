@@ -135,7 +135,9 @@
     {% endfor %}
 </div>
 <div class="row">
-    <h3 class="text-center">Equipment</h3>
+    <h3 class="text-center" data-toggle="tooltip" title='{{tutorial.equipment}}'>
+        Equipment
+    </h3>
     {% if user_can_edit %}
         <form id="equipment-form"
               data-post-url="{% url 'characters:post_equipment' character.id %}">

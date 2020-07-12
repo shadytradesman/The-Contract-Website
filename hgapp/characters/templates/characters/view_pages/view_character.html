@@ -44,7 +44,9 @@
                 </div>
             </div>
             <div class="col-md-12">
-                    <h2 class="text-center">Powers</h2>
+                    <h2 class="text-center" data-toggle="tooltip" title='{{tutorial.powers_view}}'>
+                        Powers
+                    </h2>
                     {% for power_full in character.power_full_set.all %}
                         <div class="row">
                             {% if request.user.is_authenticated and request.user.id == character.player.id and character.unspent_rewards|length > 0 %}
@@ -66,7 +68,9 @@
                 </div>
             </div>
         </div>
-        <h2>Character Timeline</h2>
+        <h2 data-toggle="tooltip" title='{{tutorial.character_timeline}}'>
+            Character Timeline
+        </h2>
             <p>
                 <b>{{ character.number_of_victories }}</b> Victories - <b>{{ character.number_of_losses }}</b> Losses
                 <br>

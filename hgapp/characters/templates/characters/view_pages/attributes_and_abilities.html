@@ -1,8 +1,10 @@
 <div class ="row text-center">
-    <h2>Attributes</h2>
+    <h2 data-toggle="tooltip" title='{{tutorial.attributes_view}}'>
+        Attributes
+    </h2>
     {% for attribute_value in physical_attributes %}
         <div class="col-md-2 col-sm-6 col-xs-6">
-            <h4>
+            <h4 data-toggle="tooltip" title='{{attribute_value.relevant_attribute.tutorial_text}}'>
                 {{attribute_value.relevant_attribute.name}}
                 <span class="stat-value">
                     {{attribute_value.value}}
@@ -13,7 +15,7 @@
     <div class="clearfix visible-xs-block"></div>
     {% for attribute_value in mental_attributes %}
         <div class="col-md-2 col-sm-6 col-xs-6">
-            <h4>
+            <h4 data-toggle="tooltip" title='{{attribute_value.relevant_attribute.tutorial_text}}'>
                 <span class="stat-value">
                     {{attribute_value.value}}</span>
                 {{attribute_value.relevant_attribute.name}}
@@ -23,7 +25,9 @@
 </div>
 <div class ="row text-center">
     <span id="abilities-toggle" class="btn btn-outline css-section-button">
-        <h2 class="">Abilities</h2>
+        <h2 data-toggle="tooltip" title='{{tutorial.abilities_view}}'>
+            Abilities
+        </h2>
     </span>
     <br>
     <div class="row">
@@ -33,7 +37,9 @@
                 {% if ability_value.1.is_physical %}
                 <div class="ability {% if not ability_value.2%} zero-ability {% endif %}">
                     <p>
-                        <div class="col-md-4 col-sm-3 col-xs-6 text-right">
+                        <div class="col-md-4 col-sm-3 col-xs-6 text-right"
+                             data-toggle="tooltip"
+                             title='{{ability_value.1.tutorial_text}}'>
                             <p>
                                 <b>{{ability_value.1.name}}</b>
                                 <span class="stat-value">
@@ -53,7 +59,9 @@
                 {% if not ability_value.1.is_physical %}
                     <div class="ability {% if not ability_value.2%} zero-ability {% endif %}">
                         <p>
-                            <div class="col-md-4 col-sm-3 col-xs-6 text-left">
+                            <div class="col-md-4 col-sm-3 col-xs-6 text-left"
+                                 data-toggle="tooltip"
+                                 title='{{ability_value.1.tutorial_text}}'>
                                 <p>
                                     <span class="stat-value">
                                         {{ability_value.2}}</span>
