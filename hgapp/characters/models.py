@@ -64,6 +64,23 @@ PENALTIES = (
     "Dead"
 )
 
+EQUIPMENT_DEFAULT = """
+#### On Person
+
+* Clothes
+* Wallet
+* Keys
+* flask of tears
+* Rugged no-metal belt that can be used as a pair of nunchucks
+
+#### In Bag
+
+* Oxygen canister
+* Census-taker's liver
+* Fava Beans
+* Chianti
+"""
+
 # EXPERIENCE CONSTANTS
 # These can be changed at will as the historical values are all dynamically calculated.
 EXP_MVP = 2
@@ -136,7 +153,8 @@ class Character(models.Model):
                                 blank=True)
     equipment = models.CharField(max_length=15000,
                                 null=True,
-                                blank=True)
+                                blank=True,
+                                default=EQUIPMENT_DEFAULT)
     total_encumbrance = models.CharField(max_length=300,
                                 null=True,
                                 blank=True)
