@@ -239,10 +239,10 @@ class LimitForm(forms.Form):
 
     name = forms.CharField(max_length=40,
                            required=False,
-                           widget=forms.TextInput(attrs={'class': 'form-control sec-ability-name'}))
+                           widget=forms.TextInput(attrs={'class': 'form-control'}))
     description = forms.CharField(max_length=900,
                                   required=False,
-                                  widget=forms.TextInput(attrs={'class': 'form-control sec-ability-desc'}))
+                                  widget=forms.TextInput(attrs={'class': 'form-control'}))
 
     def __init__(self, *args, **kwargs):
         super(LimitForm, self).__init__(*args, **kwargs)

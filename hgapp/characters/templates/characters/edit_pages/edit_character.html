@@ -144,6 +144,44 @@
         </div>
     </div>
     <div class="thumbnail">
+        <div class = "row text-center" data-toggle="tooltip" title='{{tutorial.limits}}'>
+        <h2>
+            Limits
+            <br>
+            <small>"This is where I draw the line"</small>
+        </h2>
+        </div>
+        {{ limit_formset.management_form }}
+        <div class = "row text-center">
+        {% for form in limit_formset %}
+            {% if form.initial.selected %}
+                {% include "characters/edit_pages/limit_snippet.html" %}
+            {% endif %}
+        {% endfor %}
+        </div>
+        <div class = "row text-center">
+            <div class="collapse-container">
+                <a class="btn btn-default btn-sm wiki-entry-collapsible">Show More</a>
+                <div class="collapse-content clearfix"  style="display:none;">
+                    <div class="row limit-row">
+                    {% for form in limit_formset %}
+                        {% if forloop.counter0|divisibleby:3 %}
+                        </div>
+                        <div class="row limit-row">
+                        {% endif %}
+                        {% if not form.initial.selected %}
+                            {% include "characters/edit_pages/limit_snippet.html" %}
+                        {% endif %}
+                    {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="col-md-10 col-md-offset-1 alert alert-warning limit-warn" role="alert" style="display:none;">
+            </div>
+        </div>
+    </div>
+    <div class="thumbnail">
         <h2 class = "row text-center" data-toggle="tooltip" title='{{tutorial.attributes}}'>
             Attributes
         </h2>
@@ -352,44 +390,6 @@
                         {% endfor %}
                     {% endfor %}
                 </div>
-            </div>
-        </div>
-    </div>
-    <div class="thumbnail">
-        <div class = "row text-center" data-toggle="tooltip" title='{{tutorial.limits}}'>
-        <h2>
-            Limits
-            <br>
-            <small>"This is where I draw the line"</small>
-        </h2>
-        </div>
-        {{ limit_formset.management_form }}
-        <div class = "row text-center">
-        {% for form in limit_formset %}
-            {% if form.initial.selected %}
-                {% include "characters/edit_pages/limit_snippet.html" %}
-            {% endif %}
-        {% endfor %}
-        </div>
-        <div class = "row text-center">
-            <div class="collapse-container">
-                <a class="btn btn-default btn-sm wiki-entry-collapsible">Show More</a>
-                <div class="collapse-content clearfix"  style="display:none;">
-                    <div class="row limit-row">
-                    {% for form in limit_formset %}
-                        {% if forloop.counter0|divisibleby:3 %}
-                        </div>
-                        <div class="row limit-row">
-                        {% endif %}
-                        {% if not form.initial.selected %}
-                            {% include "characters/edit_pages/limit_snippet.html" %}
-                        {% endif %}
-                    {% endfor %}
-                    </div>
-                </div>
-            </div>
-            <br>
-            <div class="col-md-10 col-md-offset-1 alert alert-warning limit-warn" role="alert" style="display:none;">
             </div>
         </div>
     </div>
