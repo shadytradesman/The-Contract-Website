@@ -597,7 +597,6 @@ def finalize_create_ex_game_for_cell(request, cell_id, gm_user_id, players):
                 game.save()
                 for form in outcome_formset:
                     player = get_object_or_404(User, id=form.cleaned_data['player_id'])
-
                     attendance = Game_Attendance(
                         relevant_game=game,
                         notes=form.cleaned_data['notes'],

@@ -628,7 +628,7 @@ class ExperienceReward(models.Model):
             #     value = value + EXP_MVP
             if attendance.is_victory():
                 value = value + EXP_WIN
-            if attendance.is_ringer_victory():
+            elif attendance.is_ringer_victory():
                 value = value + EXP_WIN
             else:
                 value = value + EXP_LOSS

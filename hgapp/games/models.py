@@ -176,7 +176,7 @@ class Game(models.Model):
         self.give_rewards()
 
     def give_rewards(self):
-        if not self.is_finished() or self.is_recorded():
+        if not self.is_finished() and not self.is_recorded():
             print("Game is not finished: " + str(self.id))
             return
         for game_attendance in self.game_attendance_set.all():
@@ -196,7 +196,7 @@ class Game(models.Model):
     def achieves_golden_ratio(self):
         death = False
         win = False
-        for attendance in self.game_attendance_set:
+        for attendance in self.game_attendance_set.all():
             if attendance.is_victory():
                 win = True
             if attendance.is_death():
@@ -273,6 +273,9 @@ class Game_Attendance(models.Model):
     def is_victory(self):
         return self.outcome == OUTCOME[0][0]
 
+    def is_death(self):
+        return self.outcome == OUTCOME[2][0]
+
     def is_ringer_victory(self):
         return self.outcome == OUTCOME[4][0]
 
@@ -305,7 +308,7 @@ class Game_Attendance(models.Model):
                                    rewarded_player=self.attending_character.player,
                                    is_improvement=False)
             player_reward.save()
-        if self.attending_character:
+        if self.attending_character and not self.is_death():
             exp_reward = ExperienceReward(
                 rewarded_character=self.attending_character,
                 rewarded_player=self.attending_character.player,
