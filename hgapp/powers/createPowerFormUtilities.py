@@ -406,4 +406,4 @@ def refund_or_assign_rewards(new_power, old_power=None):
             for a in range(delta*-1):
                 if a == len(spent_gifts):
                     break
-                spent_gifts[a].refund()
+                spent_gifts[a].refund_keeping_character_assignment()

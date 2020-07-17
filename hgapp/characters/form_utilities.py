@@ -6,7 +6,7 @@ from characters.models import Character, BasicStats, Character_Death, Graveyard_
     EXP_ADV_COST_SKILL_MULTIPLIER, EXP_COST_QUIRK_MULTIPLIER, EXP_ADV_COST_SOURCE_MULTIPLIER, Source, SourceRevision
 from powers.models import Power_Full
 from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, AbilityForm, \
-    AssetForm, LiabilityForm, LimitForm, PHYS_MENTAL, SourceForm
+    AssetForm, LiabilityForm, LimitForm, PHYS_MENTAL, SourceForm, make_charon_coin_form
 from collections import defaultdict
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
@@ -44,6 +44,7 @@ def get_edit_context(user, existing_character=None):
             prefix="limits"
         )
         source_formset = ()
+    charon_coin_form = __get_charon_coin_form(user, existing_character, POST=None)
     context = {
         'char_form': char_form,
         'attribute_formset': attribute_formset,
@@ -51,6 +52,7 @@ def get_edit_context(user, existing_character=None):
         'asset_formsets': asset_formsets,
         'liability_formsets': liability_formsets,
         'limit_formset': limit_formset,
+        'charon_coin_form': charon_coin_form,
         'tutorial': tutorial,
         'character': existing_character,
         'source_formset': source_formset,
@@ -78,6 +80,10 @@ def character_from_post(user, POST):
         if cell != "free":
             new_character.cell = cell
         new_character.save()
+        charon_coin_form = __get_charon_coin_form(user, None, POST=POST)
+        if charon_coin_form and charon_coin_form.is_valid():
+            if charon_coin_form.cleaned_data["spend_coin"]:
+                new_character.use_charon_coin()
         return new_character
     else:
         raise ValueError("Invalid char_form")
@@ -98,6 +104,12 @@ def update_character_from_post(user, POST, existing_character):
             __save_stats_diff_from_post(POST=POST, new_character=existing_character, user=user)
             existing_character.grant_initial_source_if_required()
         existing_character.regen_stats_snapshot()
+        charon_coin_form = __get_charon_coin_form(user, existing_character, POST=POST)
+        if charon_coin_form and charon_coin_form.is_valid():
+            if charon_coin_form.cleaned_data["spend_coin"]:
+                existing_character.use_charon_coin()
+            else:
+                existing_character.refund_coin()
     else:
         raise ValueError("invalid edit char_form")
 
@@ -130,6 +142,16 @@ def delete_trauma_rev(character, trauma_rev, used_xp):
     character.regen_stats_snapshot()
 
 # __private methods
+
+def __get_charon_coin_form(user, existing_character=None, POST=None):
+    avail_charon_coins = user.rewarded_player.filter(rewarded_character=None, is_charon_coin=True).filter(
+        is_void=False).all()
+    coin_eligible = not existing_character or not existing_character.completed_games()
+    if coin_eligible and (avail_charon_coins or (existing_character and existing_character.assigned_coin())):
+        CharonCoinForm = make_charon_coin_form(existing_character)
+    else:
+        return None
+    return CharonCoinForm(POST)
 
 def __limits_from_formset(limit_formset, stats):
     if limit_formset.is_valid():

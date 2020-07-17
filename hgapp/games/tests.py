@@ -192,6 +192,11 @@ class CellModelTests(TestCase):
         self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
         self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
         self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR)
+        self.assertEquals(
+            self.user1.rewarded_player
+                .filter(rewarded_character=None, is_charon_coin=True)
+                .filter(is_void=False).all().count(),
+            0)
         game = Game(
             title="title",
             creator=self.user2,
@@ -226,10 +231,20 @@ class CellModelTests(TestCase):
         self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
         self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR)
         self.assertEquals(self.char_user1_cell.is_dead(), True)
+        self.assertEquals(
+            self.user1.rewarded_player
+                .filter(rewarded_character=None, is_charon_coin=True)
+                .filter(is_void=False).all().count(),
+            1)
 
     def test_archive_game_gm_rewards_basic(self):
         self.assertEquals(self.user2.experiencereward_set.filter(rewarded_character=None).all().count(), 0)
-        self.assertEquals(self.user2.rewarded_player.filter(rewarded_character=None).filter(is_void=False).all().count(), 0)
+        self.assertEquals(self.user2.rewarded_player.filter(rewarded_character=None, is_charon_coin=False).filter(is_void=False).all().count(), 0)
+        self.assertEquals(
+            self.user1.rewarded_player
+                .filter(rewarded_character=None, is_charon_coin=True)
+                .filter(is_void=False).all().count(),
+            0)
         game = Game(
             title="title",
             creator=self.user2,
@@ -257,12 +272,17 @@ class CellModelTests(TestCase):
         game_invite.save()
         game.give_rewards()
         self.assertEquals(self.user2.experiencereward_set.filter(rewarded_character=None).all().count(), 1)
-        self.assertEquals(self.user2.rewarded_player.filter(rewarded_character=None).filter(is_void=False).all().count(), 0)
+        self.assertEquals(self.user2.rewarded_player.filter(rewarded_character=None, is_charon_coin=False).filter(is_void=False).all().count(), 0)
+        self.assertEquals(
+            self.user1.rewarded_player
+                .filter(rewarded_character=None, is_charon_coin=True)
+                .filter(is_void=False).all().count(),
+            1)
 
     def test_archive_game_gm_rewards_ratio(self):
         self.assertEquals(self.user2.experiencereward_set.filter(rewarded_character=None).all().count(), 0)
         self.assertEquals(
-            self.user2.rewarded_player.filter(rewarded_character=None).filter(is_void=False).all().count(), 0)
+            self.user2.rewarded_player.filter(rewarded_character=None, is_charon_coin=False).filter(is_void=False).all().count(), 0)
 
         game = Game(
             title="title",
@@ -304,7 +324,7 @@ class CellModelTests(TestCase):
         game_invite.save()
         game.give_rewards()
         self.assertEquals(self.user2.experiencereward_set.filter(rewarded_character=None).all().count(), 1)
-        self.assertEquals(self.user2.rewarded_player.filter(rewarded_character=None).filter(is_void=False).all().count(), 1)
+        self.assertEquals(self.user2.rewarded_player.filter(rewarded_character=None, is_charon_coin=False).filter(is_void=False).all().count(), 1)
 
     def test_archive_game_victory_not_in_cell(self):
         self.assertEquals(self.char_user2_nocell.unspent_rewards().count(), 0)

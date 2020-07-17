@@ -285,6 +285,25 @@ class Character(models.Model):
     def completed_games(self):
         return self.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).order_by("relevant_game__end_time").all()
 
+    def assigned_coin(self):
+        coins = self.reward_set.filter(is_void=False, is_charon_coin=True).all()
+        return coins[0] if coins else None
+
+    def use_charon_coin(self):
+        coins = self.player.rewarded_player \
+            .filter(rewarded_character=None, is_charon_coin=True) \
+            .filter(is_void=False).all()
+        if not coins or self.assigned_coin():
+            # fail silently, as players may have multiple active forms and stuff
+            return
+        coins[0].grant_to_character(self)
+
+    def refund_coin(self):
+        current_coin = self.assigned_coin()
+        if current_coin:
+            current_coin.refund_and_unassign_from_character()
+
+
     def is_dead(self):
         return len(self.character_death_set.filter(is_void=False).all()) > 0
 
@@ -1077,3 +1096,4 @@ class CharacterTutorial(models.Model):
     exert_mind = models.TextField(max_length=3000)
     recover_mind = models.TextField(max_length=3000)
     exert_body = models.TextField(max_length=3000)
+    charon_coin = models.TextField(max_length=3000)

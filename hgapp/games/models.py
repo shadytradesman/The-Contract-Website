@@ -316,6 +316,12 @@ class Game_Attendance(models.Model):
             exp_reward.save()
             self.experience_reward = exp_reward
             self.save()
+        if self.attending_character and self.is_death():
+            charon_coin_reward = Reward(relevant_game=self.relevant_game,
+                                   rewarded_player=self.attending_character.player,
+                                   is_improvement=False,
+                                   is_charon_coin=True,)
+            charon_coin_reward.save()
         if self.is_ringer_victory():
             ringer_reward = Reward(relevant_game=self.relevant_game,
                                    rewarded_player=self.game_invite.invited_player,
@@ -337,9 +343,12 @@ class Game_Attendance(models.Model):
             if orig.attending_character != self.attending_character:
                 #if attending character has changed
                 orig.attending_character.default_perms_char_and_powers_to_player(self.relevant_game.gm)
-        if self.outcome == OUTCOME[2][0] and self.character_death is None and self.is_confirmed and self.attending_character:
-            self.attending_character.kill()
-            self.character_death = self.attending_character.real_death()
+        if self.outcome == OUTCOME[2][0] and not self.character_death and self.is_confirmed and self.attending_character:
+            if not self.attending_character.is_dead():
+                self.attending_character.kill()
+            char_real_death = self.attending_character.real_death()
+            if not hasattr(char_real_death, "game_attendance"):
+                self.character_death = self.attending_character.real_death()
         super(Game_Attendance, self).save(*args, **kwargs)
         if (self.relevant_game.is_scheduled() or self.relevant_game.is_active()) and self.attending_character:
             self.attending_character.reveal_char_and_powers_to_player(self.relevant_game.gm)
@@ -511,29 +520,42 @@ class Reward(models.Model):
         related_name='rewarded_player',
         on_delete=models.CASCADE)
     is_improvement = models.BooleanField(default=True)
+    is_charon_coin = models.BooleanField(default=False)
     is_void = models.BooleanField(default=False)
     awarded_on = models.DateTimeField('awarded on')
     assigned_on = models.DateTimeField('assigned on',
                                             null=True,
                                             blank=True)
 
+    def grant_to_character(self, character):
+        if not character:
+            raise ValueError("must provide character when assigning reward!")
+        if self.rewarded_character:
+            # instead may want to refund and then assign new reward?
+            raise ValueError("reward already assigned!")
+        if not self.is_charon_coin:
+            #TODO: use this method to grant improvements as well.
+            raise ValueError("model granting non-charon rewards not implemented yet")
+        self.rewarded_character = character
+        self.save()
+
+
     def save(self, *args, **kwargs):
         if not self.is_void:
-            try:
-                if self.relevant_power.parent_power.character.id != self.rewarded_character.id:
-                    print("Error: INVARIANT BROKEN SAVING REWARD")
-                    return
-            except:
-                pass
-            if self.rewarded_character is None and not self.is_improvement:
-                print("ERROR: cannot award gifts with uncertain character")
-                return
+            if self.relevant_power and self.relevant_power.parent_power.character.id != self.rewarded_character.id:
+                raise ValueError("ERROR: cannot assign gifts to other players' characters")
+            if self.rewarded_character is None and (not self.is_improvement and not self.is_charon_coin):
+                raise ValueError("ERROR: invalid unassigned reward")
+            if self.is_charon_coin:
+                if self.rewarded_character and self.rewarded_character.assigned_coin() and self.rewarded_character.assigned_coin().id != self.id:
+                    raise ValueError("ERROR: cannot assign more than one coin to a character")
+
         if self.pk is None:
             if self.awarded_on is None:
                 self.awarded_on = timezone.now()
         super(Reward, self).save(*args, **kwargs)
 
-    def refund(self):
+    def refund_keeping_character_assignment(self):
         self.is_void = True
         self.save()
         new_reward = Reward(relevant_game = self.relevant_game,
@@ -541,7 +563,21 @@ class Reward(models.Model):
                             rewarded_character = self.rewarded_character,
                             rewarded_player = self.rewarded_player,
                             awarded_on = self.awarded_on,
-                            is_improvement = self.is_improvement)
+                            is_improvement = self.is_improvement,
+                            is_charon_coin = self.is_charon_coin)
+        new_reward.save()
+
+    def refund_and_unassign_from_character(self):
+        character = None if self.is_charon_coin or self.is_improvement else self.rewarded_character
+        self.is_void = True
+        self.save()
+        new_reward = Reward(relevant_game = self.relevant_game,
+                            relevant_power = None,
+                            rewarded_character = character,
+                            rewarded_player = self.rewarded_player,
+                            awarded_on = self.awarded_on,
+                            is_improvement = self.is_improvement,
+                            is_charon_coin = self.is_charon_coin)
         new_reward.save()
 
     def assign_to_power(self, power):
@@ -569,6 +605,8 @@ class Reward(models.Model):
             reason = ""
             if self.relevant_game.gm.id == self.rewarded_player.id:
                 reason = "running "
+            elif self.is_charon_coin:
+                reason = "dying in "
             else:
                 reason = "playing in "
             reason = reason + self.relevant_game.scenario.title

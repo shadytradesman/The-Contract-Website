@@ -8,12 +8,7 @@
         from
         {% if reward.relevant_game %}
             <a href="{% url 'games:games_view_game' reward.relevant_game.id %}">
-                {% if reward.relevant_game.gm.id == reward.rewarded_player.id %}
-                    running
-                {% else %}
-                    playing in
-                {% endif %}
-                {{ reward.relevant_game.scenario.title }}
+                {{ reward.reason_text }}
             </a>
         {% endif %}
         {% if reward.relevant_power %}

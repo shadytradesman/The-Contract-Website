@@ -32,7 +32,8 @@ def home(request):
         active_games_attending =  request.user.game_set.filter(status=GAME_STATUS[1][0])
         active_games_creator = request.user.game_creator.filter(status=GAME_STATUS[1][0])
         active_games = list(chain(active_games_attending, active_games_creator))
-        avail_improvements = request.user.rewarded_player.filter(rewarded_character=None).filter(is_void=False).all()
+        avail_improvements = request.user.rewarded_player.filter(rewarded_character=None, is_charon_coin=False).filter(is_void=False).all()
+        avail_charon_coins = request.user.rewarded_player.filter(rewarded_character=None, is_charon_coin=True).filter(is_void=False).all()
         cells = request.user.cell_set.all()
         cell_invites = request.user.cellinvite_set.filter(membership=None).filter(is_declined=False).all()
         attendance_invites_to_confirm = request.user.game_invite_set.filter(attendance__is_confirmed=False).exclude(is_declined=True).all()
@@ -48,6 +49,7 @@ def home(request):
             'upcoming_games_invited': upcoming_games_invited,
             'active_games': active_games,
             'avail_improvements': avail_improvements,
+            'avail_charon_coins': avail_charon_coins,
             'cells': cells,
             'cell_invites': cell_invites,
             'attendance_invites_to_confirm': attendance_invites_to_confirm,

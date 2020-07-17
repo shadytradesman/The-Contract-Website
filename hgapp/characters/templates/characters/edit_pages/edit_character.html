@@ -142,6 +142,16 @@
                 </div>
             </div>
         </div>
+        {% if charon_coin_form %}
+            <div class="row">
+                <div class="col-xs-10 col-xs-offset-1 alert alert-info text-center" role="alert" >
+                    <label data-toggle="tooltip" data-placement="bottom" title='{{tutorial.charon_coin}}'>
+                        {{ charon_coin_form.spend_coin }} Spend a Charon Coin on this Character
+                    </label>
+                </div>
+            </div>
+        {% endif %}
+
     </div>
     <div class="thumbnail">
         <div class = "row text-center" data-toggle="tooltip" title='{{tutorial.limits}}'>

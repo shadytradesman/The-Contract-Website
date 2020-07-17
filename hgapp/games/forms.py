@@ -282,7 +282,9 @@ class ArchivalOutcomeForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(ArchivalOutcomeForm, self).__init__(*args, **kwargs)
         # user may have declared character dead after the game ended, so allow selecting dead characters
-        queryset = self.initial["invited_player"].character_set.all()
+        queryset = self.initial["invited_player"].character_set\
+            .exclude(character_death__is_void = False, character_death__game_attendance__isnull = False)\
+            .distinct()
         self.fields['attending_character'].queryset = queryset
 
 class RsvpAttendanceForm(forms.Form):
