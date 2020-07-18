@@ -113,7 +113,7 @@
             {% for game in scenario.finished_games %}
                 <div class="thumbnail">
                     <h4>
-                    <a href="{% url 'profiles:profiles_view_profile' game.creator.id %}">{% user_display game.gm %}</a>
+                    <a href="{% url 'profiles:profiles_view_profile' game.gm.id %}">{% user_display game.gm %}</a>
                     {% if game.cell %}
                         ran for
                         <a href="{% url 'cells:cells_view_cell' game.cell.id %}">
