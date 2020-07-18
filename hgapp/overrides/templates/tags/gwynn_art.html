@@ -1,0 +1,7 @@
+{% load staticfiles %}
+{% with 'overrides/art/'|add:filename|add:'.jpg' as image_static %}
+    <div class="gwynn-art">
+        <img class="css-art-{{filename}}" src="{% static image_static %}" data-toggle="tooltip" title='Art by Gwynn Tavaras'/>
+        <figcaption><small>Art by <a href="https://www.artstation.com/tavaresart">Gwynn Tavaras</a></small></figcaption>
+    </div>
+{% endwith %}

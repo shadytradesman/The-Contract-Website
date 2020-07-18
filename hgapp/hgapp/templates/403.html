@@ -1,0 +1,25 @@
+{% extends "site_base.html" %}
+{% load hgapp_tags %}
+{% load staticfiles %}
+
+{% block head_title %}403{% endblock %}
+{% block extra_styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'overrides/403_style.css' %}" />
+{% endblock %}
+
+{% block body_base %}
+<div class="container">
+    <div class="backdropped text-center">
+        <h1>
+            Forbidden
+        </h1>
+        <h3>
+            <small>{{ exception |safe}}</small>
+        </h3>
+        {% gwynn_art  "403" %}
+        <h4>
+            <a href="javascript:history.back()">Get back</a> before you lose a tentacle!
+        </h4>
+    </div>
+</div>
+{% endblock %}

@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from django.forms import formset_factory
-from django.http import HttpResponseForbidden
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.db import transaction
@@ -52,7 +52,7 @@ def create_scenario(request):
 def edit_scenario(request, scenario_id):
     scenario = get_object_or_404(Scenario, id=scenario_id)
     if not request.user.has_perm('edit_scenario', scenario):
-        return HttpResponseForbidden()
+        raise PermissionDenied("You don't have permission to edit this scenario")
     if request.method == 'POST':
         form = CreateScenarioForm(request.POST)
         if form.is_valid():
@@ -92,7 +92,7 @@ def edit_scenario(request, scenario_id):
 def view_scenario(request, scenario_id, game_id=None):
     scenario = get_object_or_404(Scenario, id=scenario_id)
     if not request.user.has_perm("view_scenario", scenario):
-        return HttpResponseForbidden()
+        raise PermissionDenied("You don't have permission to view this scenario")
     if request.method == 'POST':
         form = GameFeedbackForm(request.POST)
         if form.is_valid() and game_id:
@@ -118,7 +118,7 @@ def view_scenario(request, scenario_id, game_id=None):
 
 def view_scenario_gallery(request):
     if not request.user.is_authenticated:
-        return HttpResponseForbidden()
+        raise PermissionDenied("You must be logged into view your discovered and created Scenarios")
     owned_scenarios = request.user.scenario_creator.all()
     discovered_scenarios = request.user.scenario_discovery_set.exclude(reason=DISCOVERY_REASON[1][0]).all()
     context = {
@@ -172,7 +172,7 @@ def edit_game(request, game_id):
     game = get_object_or_404(Game, id=game_id)
     if request.method == 'POST':
         if not request.user.has_perm('edit_game', game):
-            return HttpResponseForbidden()
+            raise PermissionDenied("You don't have permission to edit this Game event")
         form = make_game_form(user=request.user, game_status=game.required_character_status)(request.POST)
         if form.is_valid():
             game.title=form.cleaned_data['title']
@@ -234,15 +234,15 @@ def cancel_game(request, game_id):
     game = get_object_or_404(Game, id=game_id)
     if request.method == 'POST':
         if not request.user.has_perm('edit_game', game):
-            return HttpResponseForbidden()
+            raise PermissionDenied("You don't have permission to edit this Game event")
         if not game.is_scheduled() and not game.is_active():
-            return HttpResponseForbidden()
+            raise PermissionDenied("You cannot cancel a game that has been completed")
         with transaction.atomic():
             game.transition_to_canceled()
         return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
     else:
         if not request.user.has_perm('edit_game', game):
-            return HttpResponseForbidden()
+            raise PermissionDenied("You don't have permission to edit this Game event")
         context = {
             'game': game,
         }
@@ -251,16 +251,16 @@ def cancel_game(request, game_id):
 def invite_players(request, game_id):
     game = get_object_or_404(Game, id=game_id)
     if not request.user.has_perm('edit_game', game) or not game.is_scheduled():
-        return HttpResponseForbidden()
+        raise PermissionDenied("You don't have permission to edit this Game event, or it has already started")
     if request.method == 'POST':
         form = CustomInviteForm(request.POST)
         if form.is_valid():
             player = get_object_or_404(User, username__iexact= form.cleaned_data['username'])
             if get_queryset_size(player.game_invite_set.filter(relevant_game=game)) > 0:
                 #player is already invited. Maybe update invitation instead?
-                return HttpResponseForbidden()
+                raise PermissionDenied("Player already invited")
             if player == game.creator or player == game.gm:
-                return HttpResponseForbidden()
+                raise PermissionDenied("You can't invite players to someone else's game")
             game_invite = Game_Invite(invited_player=player,
                                       relevant_game=game,
                                       invite_text=form.cleaned_data['message'],
@@ -282,13 +282,13 @@ def invite_players(request, game_id):
 
 def accept_invite(request, game_id):
     if not request.user.is_authenticated or request.user.is_anonymous:
-        return HttpResponseForbidden()
+        raise PermissionDenied("You must log in to accept this Game invite")
     game = get_object_or_404(Game, id=game_id)
     if not game.is_scheduled() or game.creator.id == request.user.id or game.gm.id == request.user.id:
-        return HttpResponseForbidden()
+        raise PermissionDenied("This Game has already started, or you're the GM!")
     invite = get_object_or_none(request.user.game_invite_set.filter(relevant_game=game))
     if not invite and not game.open_invitations:
-        return HttpResponseForbidden()
+        raise PermissionDenied("This is awkward. . . You, uh, haven't been invited to this Game event")
     if request.method == 'POST':
         if not invite:
             # player self-invite
@@ -357,9 +357,9 @@ def decline_invite(request, game_id):
 def start_game(request, game_id, char_error=" ", player_error=" "):
     game = get_object_or_404(Game, id=game_id)
     if not request.user.has_perm('edit_game', game):
-        return HttpResponseForbidden()
+        raise PermissionDenied("You don't have permission to edit this Game event")
     if not game.is_scheduled:
-        return HttpResponseForbidden()
+        raise PermissionDenied("This Game has already started")
     ValidateAttendanceFormSet = formset_factory(ValidateAttendanceForm, extra=0)
     game_attendances = game.game_attendance_set.all()
     initial_data = []
@@ -374,7 +374,7 @@ def start_game(request, game_id, char_error=" ", player_error=" "):
         initial_data.append(initial)
     if request.method == 'POST':
         if request.POST['form-TOTAL_FORMS'] == '0':
-            return HttpResponseForbidden()
+            raise PermissionDenied("Must have at least one Player")
 
         formset = ValidateAttendanceFormSet(request.POST,
                                             form_kwargs={'game': game},
@@ -390,7 +390,7 @@ def start_game(request, game_id, char_error=" ", player_error=" "):
                     changed_character_players.append(str(form.cleaned_data["player"].id))
                 elif form.cleaned_data['player'].id != form.initial['player']:
                     #forged form, changed player invariant check
-                    return HttpResponseForbidden()
+                    raise PermissionDenied("Stop messing with the forms.")
             if canceled_players or changed_character_players:
                 url_kwargs = {'game_id': game.id}
                 if changed_character_players:
@@ -408,7 +408,7 @@ def start_game(request, game_id, char_error=" ", player_error=" "):
                     elif form.cleaned_data['character']:
                         attending_characters.append(form.cleaned_data['character'].id)
                 if len(attending_characters) == 0:
-                    return HttpResponseForbidden()
+                    raise PermissionDenied("You can't start a game without any attending Characters!")
                 for character in game.attended_by.all():
                     if character.id not in attending_characters:
                         game.not_attending(character.player)
@@ -442,9 +442,9 @@ def start_game(request, game_id, char_error=" ", player_error=" "):
 def end_game(request, game_id):
     game = get_object_or_404(Game, id=game_id)
     if not request.user.has_perm('edit_game', game):
-        return HttpResponseForbidden()
+        raise PermissionDenied("You don't have permission to edi this Game Event")
     if not game.is_active:
-        return HttpResponseForbidden()
+        raise PermissionDenied("You can't end a Game event that isn't in progress")
     DeclareOutcomeFormset = formset_factory(DeclareOutcomeForm, extra=0)
     game_attendances = game.game_attendance_set.all()
     initial_data = []
@@ -487,7 +487,7 @@ def end_game(request, game_id):
 
 def allocate_improvement_generic(request):
     if not request.user.is_authenticated:
-        return HttpResponseForbidden()
+        raise PermissionDenied("You must be logged in to allocate improvements")
     avail_improvements = request.user.rewarded_player.filter(rewarded_character=None).filter(is_void=False).all()
     if len(avail_improvements) > 0:
         return HttpResponseRedirect(reverse('games:games_allocate_improvement', args=(avail_improvements.first().id,)))
@@ -497,9 +497,9 @@ def allocate_improvement_generic(request):
 def allocate_improvement(request, improvement_id):
     improvement = get_object_or_404(Reward, id=improvement_id)
     if not improvement.is_improvement or improvement.rewarded_character:
-        return HttpResponseForbidden()
+        raise PermissionDenied("Either this Reward isn't an improvement, or it's already been allocated")
     if not request.user.is_authenticated or not improvement.rewarded_player.id == request.user.id:
-        return HttpResponseForbidden()
+        raise PermissionDenied("You must log in, or you can only allocate your own rewards")
     if request.method == 'POST':
         form = make_allocate_improvement_form(request.user)(request.POST)
         if form.is_valid():
@@ -521,10 +521,10 @@ def allocate_improvement(request, improvement_id):
 # Select which players attended and who was GM
 def create_ex_game_for_cell(request, cell_id):
     if not request.user.is_authenticated:
-        return HttpResponseForbidden()
+        raise PermissionDenied("You must log in to create archival Game events")
     cell = get_object_or_404(Cell, id = cell_id)
     if not cell.player_can_manage_games(request.user):
-        return HttpResponseForbidden()
+        raise PermissionDenied("You do not have permission to manage Game Events for this Cell")
     MemberFormSet = formset_factory(CellMemberAttendedForm, extra=0)
     OutsiderFormSet = formset_factory(OutsiderAttendedForm, extra=3)
     WhoWasGm = make_who_was_gm_form(cell)
@@ -567,10 +567,10 @@ def create_ex_game_for_cell(request, cell_id):
 
 def finalize_create_ex_game_for_cell(request, cell_id, gm_user_id, players):
     if not request.user.is_authenticated:
-        return HttpResponseForbidden()
+        raise PermissionDenied("Log in, yo")
     cell = get_object_or_404(Cell, id = cell_id)
     if not cell.player_can_manage_games(request.user):
-        return HttpResponseForbidden()
+        raise PermissionDenied("You do not have permission to manage Game Events for this Cell")
     gm = get_object_or_404(User, id=gm_user_id)
     player_list = [get_object_or_404(User, id=player_id) for player_id in players.split('+') if not player_id == str(gm.id)]
     GenInfoForm = make_archive_game_general_info_form(gm)
@@ -583,7 +583,7 @@ def finalize_create_ex_game_for_cell(request, cell_id, gm_user_id, players):
         if general_form.is_valid() and outcome_formset.is_valid():
             form_gm = get_object_or_404(User, id=general_form.cleaned_data['gm_id'])
             if not cell.get_player_membership(form_gm):
-                return HttpResponseForbidden()
+                raise PermissionDenied("Only players who are members of a Cell can GM games inside it.")
             with transaction.atomic():
                 #TODO: check to see if the game has the exact same time as existing game and fail.
                 game = Game(
@@ -653,10 +653,10 @@ def finalize_create_ex_game_for_cell(request, cell_id, gm_user_id, players):
 
 def confirm_attendance(request, attendance_id, confirmed=None):
     if not request.user.is_authenticated:
-        return HttpResponseForbidden()
+        raise PermissionDenied("You gotta log in")
     attendance = get_object_or_404(Game_Attendance, id=attendance_id)
     if not request.user.id == attendance.game_invite.invited_player.id:
-        return HttpResponseForbidden()
+        raise PermissionDenied("Wait, you're not the person I was talking about 0.o")
     if request.method == 'POST':
         if confirmed is None:
             return render_confirm_attendance_page(request, attendance)

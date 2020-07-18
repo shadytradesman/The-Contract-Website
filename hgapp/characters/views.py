@@ -1,14 +1,16 @@
 from random import randint
 
-from django.http import HttpResponseRedirect, HttpResponseForbidden, HttpResponse, JsonResponse
+from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.utils import timezone
+from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.core import serializers
 from collections import defaultdict
 from django.forms import formset_factory
 from heapq import merge
+from django.http import HttpResponseRedirect
 
 from characters.models import Character, BasicStats, Character_Death, Graveyard_Header, Attribute, Ability, \
     CharacterTutorial, Asset, Liability, BattleScar, Trauma, TraumaRevision, Injury, Source, ExperienceReward
@@ -21,7 +23,8 @@ from characters.form_utilities import get_edit_context, character_from_post, upd
 
 def create_character(request):
     if not request.user.is_authenticated:
-        return HttpResponseForbidden()
+        raise PermissionDenied("You must be logged in to create a Character.<br>"
+                               "Accounts are free, there are no ads, and we will never share your info. Period.")
     if request.method == 'POST':
         with transaction.atomic():
             new_character = character_from_post(request.user, request.POST)
@@ -33,7 +36,7 @@ def create_character(request):
 def edit_character(request, character_id):
     character = get_object_or_404(Character, id=character_id)
     if not character.player_can_edit(request.user):
-        return HttpResponseForbidden()
+        raise PermissionDenied("You do not have permission to edit this Character")
     if request.method == 'POST':
         with transaction.atomic():
             update_character_from_post(request.user, existing_character=character, POST=request.POST)
@@ -47,7 +50,7 @@ def edit_obituary(request, character_id):
     character = get_object_or_404(Character, id=character_id)
     existing_death = character.character_death_set.filter(is_void=False).first()
     if not character.player_can_edit(request.user):
-        return HttpResponseForbidden()
+        raise PermissionDenied("You do not have permission to edit this Character")
     if request.method == 'POST':
         if character.active_game_attendances():
             HttpResponseRedirect(reverse('characters:characters_obituary', args=(character.id,)))
@@ -102,7 +105,7 @@ def graveyard(request):
 def view_character(request, character_id):
     character = get_object_or_404(Character, id=character_id)
     if not character.player_can_view(request.user):
-        return HttpResponseForbidden()
+        raise PermissionDenied("You do not have permission to view this Character")
     user_can_edit = request.user.is_authenticated and character.player_can_edit(request.user)
     if not character.stats_snapshot:
         context={"character": character,
@@ -152,14 +155,14 @@ def view_character(request, character_id):
 def archive_character(request, character_id):
     character = get_object_or_404(Character, id=character_id)
     if not character.player_can_view(request.user):
-        return HttpResponseForbidden()
+        raise PermissionDenied("You do not have permission to view this Character")
     return HttpResponse(character.archive_txt(), content_type='text/plain')
 
 
 def choose_powers(request, character_id):
     character = get_object_or_404(Character, id=character_id)
     if request.user.is_anonymous or not character.player_can_edit(request.user):
-        return HttpResponseForbidden()
+        raise PermissionDenied("You do not have permission to edit this Character")
     assigned_powers = character.power_full_set.all()
     unassigned_powers = request.user.power_full_set.filter(character=None, is_deleted=False).order_by('-pub_date').all()
     context = {
@@ -174,7 +177,7 @@ def toggle_power(request, character_id, power_full_id):
     character = get_object_or_404(Character, id=character_id)
     power_full = get_object_or_404(Power_Full, id=power_full_id)
     if not (character.player_can_edit(request.user) and request.user.has_perm('edit_power_full', power_full)):
-            return HttpResponseForbidden()
+        raise PermissionDenied("You do not have permission to edit this Character or the requested Power")
     if request.method == 'POST':
         assignment_form = ConfirmAssignmentForm(request.POST)
         if assignment_form.is_valid():
@@ -188,7 +191,7 @@ def toggle_power(request, character_id, power_full_id):
                         reward.refund_keeping_character_assignment()
                 elif not power_full.character:
                     if power_full.is_deleted:
-                        return HttpResponseForbidden()
+                        raise PermissionDenied("This Power has been deleted")
                     # Assign the power
                     power_full.character = character
                     power_full.save()
@@ -219,7 +222,7 @@ def toggle_power(request, character_id, power_full_id):
 def spend_reward(request, character_id):
     character = get_object_or_404(Character, id=character_id)
     if not character.player_can_edit(request.user):
-        return HttpResponseForbidden()
+        raise PermissionDenied("You do not have permission to edit this Character")
     context = {
         'character': character,
     }
@@ -347,7 +350,7 @@ def set_source_val(request, source_id):
 
 def allocate_gm_exp(request):
     if not request.user.is_authenticated:
-        return HttpResponseForbidden()
+        raise PermissionDenied("You must be logged in to allocate exp")
     users_living_character_ids = [char.id for char in request.user.character_set.all() if not char.is_dead()]
     queryset = Character.objects.filter(id__in=users_living_character_ids)
     RewardForm = make_allocate_gm_exp_form(queryset)
@@ -360,11 +363,11 @@ def allocate_gm_exp(request):
             for form in reward_formset:
                 reward = get_object_or_404(ExperienceReward, id=form.cleaned_data["reward_id"])
                 if reward.rewarded_character or reward.rewarded_player != request.user:
-                    return HttpResponseForbidden()
+                    raise PermissionDenied("This reward has been allocated, or it isn't yours")
                 if "chosen_character" in form.changed_data:
                     char = form.cleaned_data["chosen_character"]
                     if char.player != request.user:
-                        return HttpResponseForbidden()
+                        raise PermissionDenied("You cannot give your rewards to other people's characters!")
                     reward.rewarded_character = char
                     reward.created_time = timezone.now()
                     with transaction.atomic():

@@ -3,7 +3,6 @@ from django.shortcuts import render
 from django.db import transaction
 from django.db.models import Q
 from cells.forms import CreateCellForm, CustomInviteForm, RsvpForm, PlayerRoleForm, KickForm
-from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
 
 from hgapp.utilities import get_object_or_none
@@ -11,13 +10,14 @@ from .models import Cell, ROLE, CellInvite
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from games.models import GAME_STATUS
+from django.core.exceptions import PermissionDenied
 from postman.api import pm_write
 from django.utils.safestring import SafeText
 from django.forms import formset_factory
 
 def create_cell(request):
     if not request.user.is_authenticated:
-        return HttpResponseForbidden()
+        raise PermissionDenied("You must be logged in to create a cell")
     if request.method == 'POST':
         form = CreateCellForm(request.POST)
         if form.is_valid():
@@ -44,11 +44,11 @@ def create_cell(request):
 
 def edit_cell(request, cell_id):
     if not request.user.is_authenticated:
-        return HttpResponseForbidden()
+        raise PermissionDenied("You must be logged in to edit a cell")
     cell = get_object_or_404(Cell, id=cell_id)
     # check "edit world" permissions
     if not cell.player_can_edit_world(request.user):
-        return HttpResponseForbidden()
+        raise PermissionDenied("You don't have the permissions to edit this cell's world")
     if request.method == 'POST':
         form = CreateCellForm(request.POST)
         if form.is_valid():
@@ -119,11 +119,11 @@ def view_cell(request, cell_id):
 
 def invite_players(request, cell_id):
     if not request.user.is_authenticated:
-        return HttpResponseForbidden()
+        raise PermissionDenied("You must be logged in to invite players to a Cell")
     cell = get_object_or_404(Cell, id=cell_id)
     # check "manage memberships" permissions
     if not cell.player_can_manage_memberships(request.user):
-        return HttpResponseForbidden()
+        raise PermissionDenied("You don't have permissions to manage memberships for this Cell")
     if request.method == 'POST':
         form = CustomInviteForm(request.POST)
         if form.is_valid():
@@ -161,7 +161,7 @@ def invite_players(request, cell_id):
 
 def rsvp_invite(request, cell_id, secret_key = None, accept = None):
     if not request.user.is_authenticated:
-        return HttpResponseForbidden()
+        raise PermissionDenied("You must be logged in to RSVP to a Cell invitation")
     if accept:
         is_accepted = accept == 'y'
     else:
@@ -172,7 +172,7 @@ def rsvp_invite(request, cell_id, secret_key = None, accept = None):
     invite = get_object_or_none(cell.open_invitations().filter(invited_player=request.user))
     if not invite:
         if not secret_key or not cell.invite_link_secret_key == secret_key:
-            return HttpResponseForbidden()
+            raise PermissionDenied("This Cell invite link has expired. Ask for a new one.")
     if request.method == 'POST':
         form = RsvpForm(request.POST)
         if form.is_valid():
@@ -200,21 +200,21 @@ def rsvp_invite(request, cell_id, secret_key = None, accept = None):
 #TODO: use a form like in rsvp_invite to prevent cross site scripting attacks
 def reset_invite_link(request, cell_id):
     if not request.user.is_authenticated:
-        return HttpResponseForbidden()
+        raise PermissionDenied("You must be logged in to reset the invite link")
     cell = get_object_or_404(Cell, id=cell_id)
     # check "manage memberships" permissions
     if not cell.player_can_manage_memberships(request.user):
-        return HttpResponseForbidden()
+        raise PermissionDenied("You don't have permission to manage the memberships of this Cell")
     with transaction.atomic():
         cell.resetShareLink()
     return HttpResponseRedirect(reverse("cells:cells_invite_players", args=(cell.id,)))
 
 def revoke_invite(request, cell_id, invite_id):
     if not request.user.is_authenticated:
-        return HttpResponseForbidden()
+        raise PermissionDenied("You must be logged in to revoke a Cell invitation")
     cell = get_object_or_404(Cell, id=cell_id)
     if not cell.player_can_manage_memberships(request.user):
-        return HttpResponseForbidden()
+        raise PermissionDenied("You don't have permission to manage the memberships of this Cell")
     invite = get_object_or_404(CellInvite, id=invite_id)
     with transaction.atomic():
         invite.reject()
@@ -222,10 +222,10 @@ def revoke_invite(request, cell_id, invite_id):
 
 def leave_cell(request, cell_id):
     if not request.user.is_authenticated:
-        return HttpResponseForbidden()
+        raise PermissionDenied("You must be logged in to leave a Cell")
     cell = get_object_or_404(Cell, id=cell_id)
     if not cell.get_player_membership(request.user):
-        return HttpResponseForbidden()
+        raise PermissionDenied("You can't leave a Cell you're not a member of")
     if request.method == 'POST':
         form = RsvpForm(request.POST)
         if form.is_valid():
@@ -245,10 +245,10 @@ def leave_cell(request, cell_id):
 
 def manage_members(request, cell_id):
     if not request.user.is_authenticated:
-        return HttpResponseForbidden()
+        raise PermissionDenied("You must be logged in to revoke a Cell invitation")
     cell = get_object_or_404(Cell, id=cell_id)
     if not cell.player_can_manage_memberships(request.user):
-        return HttpResponseForbidden()
+        raise PermissionDenied("You don't have permission to manage the memberships of this Cell")
     cell_members = cell.cellmembership_set.all()
     FormSet = formset_factory(PlayerRoleForm, extra=0)
     if request.method == 'POST':
@@ -262,7 +262,7 @@ def manage_members(request, cell_id):
                     if membership.role != form_role:
                         if (membership.role == ROLE[0][0] or form_role == ROLE[0][0])\
                                 and not cell.player_can_admin(request.user):
-                            return HttpResponseForbidden()
+                            raise PermissionDenied("Coup averted: You must be a Cell leader to promote a Cell leader")
                         membership.role = form.cleaned_data['role']
                         membership.save()
             return HttpResponseRedirect(reverse('cells:cells_manage_members', args=(cell.id,)))
@@ -281,11 +281,11 @@ def manage_members(request, cell_id):
 
 def kick_player(request, cell_id, user_id):
     if not request.user.is_authenticated:
-        return HttpResponseForbidden()
+        raise PermissionDenied("You must be logged in to manage your Cell")
     cell = get_object_or_404(Cell, id=cell_id)
     player = get_object_or_404(User, id=int(user_id))
     if not cell.player_can_manage_memberships(request.user):
-        return HttpResponseForbidden()
+        raise PermissionDenied("You don't have permission to manage the memberships of this Cell")
     if request.method == 'POST':
         form = KickForm(request.POST)
         if form.is_valid():

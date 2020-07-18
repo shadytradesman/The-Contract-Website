@@ -1,7 +1,8 @@
-from django.http import HttpResponseRedirect, HttpResponseForbidden
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.utils import timezone
+from django.core.exceptions import PermissionDenied
 from django.views import generic
 from django.views.generic import ListView
 from django.db import transaction
@@ -68,7 +69,7 @@ def create_power(request, base_power_slug, character_id=None):
     if character_id:
         character = get_object_or_404(Character, pk=character_id)
         if not character.player_can_edit(request.user):
-            return HttpResponseForbidden()
+            raise PermissionDenied("You can't give Gifts to a Character you can't edit.")
     if request.method == 'POST':
         with transaction.atomic():
             power = create_new_power_and_parent(base_power, request, character)
@@ -97,14 +98,14 @@ def create_power_from_existing(request, power_id):
     else:
         # Build a power form.
         if not extant_power.player_can_view(request.user):
-            return HttpResponseForbidden()
+            raise PermissionDenied("This Power has been deleted, or you're not allowed to view it")
         context = get_create_power_context_from_power(extant_power)
         return render(request, 'powers/create_power_pages/createpower.html', context)
 
 def edit_power(request, power_id):
     power_full = get_object_or_404(Power_Full, pk=power_id)
     if not power_full.player_can_edit(request.user):
-        return HttpResponseForbidden()
+        raise PermissionDenied("This Power has been deleted, or you're not allowed to view it")
     extant_power = power_full.power_set.order_by('-pub_date').all()[0]
     base_power = get_object_or_404(Base_Power, pk=extant_power.base.slug)
     if request.method == 'POST':
@@ -123,9 +124,9 @@ def edit_power(request, power_id):
 def delete_power(request, power_id):
     power_full = get_object_or_404(Power_Full, pk=power_id)
     if not power_full.player_can_edit(request.user):
-        return HttpResponseForbidden()
+        raise PermissionDenied("This Power has been deleted, or you're not allowed to view it")
     if power_full.owner != request.user:
-        return HttpResponseForbidden()
+        raise PermissionDenied("You must own a Power to delete it")
     if request.method == 'POST':
         char = power_full.character
         if DeletePowerForm(request.POST).is_valid():
@@ -144,7 +145,7 @@ def delete_power(request, power_id):
 def power_view(request, power_id):
     power = get_object_or_404(Power, id=power_id)
     if not power.player_can_view(request.user):
-        return HttpResponseForbidden()
+        raise PermissionDenied("This Power has been deleted, or you're not allowed to view it")
     if power.parent_power:
         power_full = Power_Full.objects.filter(id=power.parent_power.id).all().first()
         power_list = power_full.power_set.order_by('-pub_date').all()
@@ -163,7 +164,7 @@ def power_view(request, power_id):
 def power_full_view(request, power_full_id):
     power_full = get_object_or_404(Power_Full, id=power_full_id)
     if not power_full.player_can_view(request.user):
-        return HttpResponseForbidden()
+        raise PermissionDenied("This Power has been deleted, or you're not allowed to view it")
     most_recent_power = power_full.power_set.order_by('-pub_date').all()[0]
     return power_view(request, power_id=most_recent_power.id)
 
