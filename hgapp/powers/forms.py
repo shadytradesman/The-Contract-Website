@@ -120,3 +120,6 @@ class CreatePowerForm(forms.Form):
         self.fields['activation_style'].help_text='Choose whether the power is always on (passive) or activated manually (active). ' \
                                                   'Default is ' + base_power.default_activation_style + "."
         self.fields['activation_style'].initial=base_power.default_activation_style
+
+class DeletePowerForm(forms.Form):
+    pass

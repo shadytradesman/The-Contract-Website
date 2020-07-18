@@ -1,0 +1,30 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+
+{% block head_title %}Rewarding Character{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% load staticfiles %}
+{% load bootstrap %}
+
+
+{% block body_base %}
+    <div class="container">
+        <div class="backdropped">
+            <div class="text-center form-inline">
+                <h1>Delete {{power.name}}?</h1>
+                <p class="help-block">
+                    Deleting powers is permanent.
+                </p>
+                <form action="{% url 'powers:powers_delete_power' power.id %}" method="post">
+                    {% csrf_token %}
+                    {{ form }}
+                    <a href="{% url 'powers:powers_view_power_full' power.id %}" class="btn btn-md btn-primary">Never Mind</a>
+                    <input type="submit" class="btn btn-md btn-danger" value="Delete">
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

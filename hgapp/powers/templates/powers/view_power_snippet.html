@@ -22,6 +22,9 @@
             {% if can_edit %}
                 <a href="{% url 'powers:powers_edit_power' power.parent_power.id %}" class="btn btn-primary">Edit Power</a>
             {% endif %}
+            {% if request.user == power.parent_power.owner %}
+                <a href="{% url 'powers:powers_delete_power' power.parent_power.id %}" class="btn btn-danger">Delete Power</a>
+            {% endif %}
         {% endif %}
         <a href="{% url 'powers:powers_create_power_from _existing' power.id %}" class="btn btn-default">Copy and Edit New</a>
     </div>

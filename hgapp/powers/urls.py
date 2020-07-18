@@ -38,8 +38,11 @@ urlpatterns = [
     # ex: .com/powers/create/p/110
     url(r'^create/p/(?P<power_id>[\d]+)/$', views.create_power_from_existing, name='powers_create_power_from _existing'),
 
-    # ex: .com/powers/create/p/110
+    # ex: .com/powers/edit/p/110
     url(r'^edit/p/(?P<power_id>[\d]+)/$', views.edit_power, name='powers_edit_power'),
+
+    # ex: .com/powers/delete/p/110
+    url(r'^delete/p/(?P<power_id>[\d]+)/$', views.delete_power, name='powers_delete_power'),
 
     # ex: .com/powers/browse
     url(r'^browse/$', BrowsePowersView.as_view(), name='powers_browse_powers'),

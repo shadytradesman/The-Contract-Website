@@ -14,10 +14,10 @@ class ProfileView(generic.DetailView):
     def get_queryset(self):
         self.profile = get_object_or_404(Profile, pk=self.kwargs['pk'])
         if self.profile.user == self.request.user:
-            self.powers = self.profile.user.power_full_set.order_by('-pub_date').all()
+            self.powers = self.profile.user.power_full_set.filter(is_deleted=False).order_by('-pub_date').all()
             self.characters = self.profile.user.character_set.order_by('-edit_date').all()
         else:
-            self.powers = self.profile.user.power_full_set.filter(private=False).order_by('-pub_date').all()
+            self.powers = self.profile.user.power_full_set.filter(private=False, is_deleted=False).order_by('-pub_date').all()
             self.characters = self.profile.user.character_set.filter(private=False).order_by('-edit_date').all()
         return Profile.objects
 
@@ -30,7 +30,7 @@ class ProfileView(generic.DetailView):
 
 def my_profile_view(request):
     profile = get_object_or_404(Profile, pk=request.user.pk)
-    powers = request.user.power_full_set.order_by('-pub_date').all()
+    powers = request.user.power_full_set.filter(is_deleted=False).order_by('-pub_date').all()
     characters = request.user.character_set.order_by('-edit_date').all()
     context = {
         'profile': profile,

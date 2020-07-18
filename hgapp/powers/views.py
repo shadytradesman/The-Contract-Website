@@ -11,7 +11,7 @@ from .createPowerFormUtilities import get_create_power_context_from_base, \
     get_create_power_context_from_power, get_edit_power_context_from_power, create_new_power_and_parent, \
     create_power_for_new_edit, refund_or_assign_rewards
 from .models import Power, Base_Power_Category, Base_Power, Base_Power_System, DICE_SYSTEM, Power_Full
-
+from .forms import DeletePowerForm
 
 def index(request):
     latest_power_list = Power.objects.filter(private=False).order_by('-id')[:40]
@@ -120,6 +120,26 @@ def edit_power(request, power_id):
         context = get_edit_power_context_from_power(extant_power)
         return render(request, 'powers/create_power_pages/edit_power.html', context)
 
+def delete_power(request, power_id):
+    power_full = get_object_or_404(Power_Full, pk=power_id)
+    if not power_full.player_can_edit(request.user):
+        return HttpResponseForbidden()
+    if power_full.owner != request.user:
+        return HttpResponseForbidden()
+    if request.method == 'POST':
+        char = power_full.character
+        if DeletePowerForm(request.POST).is_valid():
+            with transaction.atomic():
+                power_full.delete()
+        else:
+            raise ValueError("could not delete power")
+        if char:
+            return HttpResponseRedirect(reverse('characters:characters_view', args=(char.id,)))
+        return HttpResponseRedirect(reverse('home'))
+    else:
+        context = {"form": DeletePowerForm(),
+                   "power": power_full}
+        return render(request, 'powers/delete_power.html', context)
 
 def power_view(request, power_id):
     power = get_object_or_404(Power, id=power_id)

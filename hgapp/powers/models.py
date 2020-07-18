@@ -238,6 +238,7 @@ class Power_Full(models.Model):
     base = models.ForeignKey(Base_Power,
                              on_delete=models.PROTECT)
     private = models.BooleanField(default=False)
+    is_deleted = models.BooleanField(default=False)
     linked_powers = models.ManyToManyField("Power_Full",
                                            blank=True, 
                                            through="Power_Link",
@@ -258,12 +259,21 @@ class Power_Full(models.Model):
             ('edit_power_full', 'Edit power full'),
         )
 
+    def delete(self):
+        self.character = None
+        for reward in self.reward_list():
+            reward.refund_keeping_character_assignment()
+        self.is_deleted=True
+        self.save()
+
     def save(self, *args, **kwargs):
         super(Power_Full, self).save(*args, **kwargs)
         if self.character:
             self.character.grant_initial_source_if_required()
 
     def player_manages_via_cell(self, player):
+        if self.is_deleted:
+            return False
         if self.character:
             if self.character.cell:
                 if self.character.cell.player_can_edit_characters(player):
@@ -271,12 +281,16 @@ class Power_Full(models.Model):
         return False
 
     def player_can_edit(self, player):
+        if self.is_deleted:
+            return False
         is_owner = player == self.owner
         return is_owner or \
                self.player_manages_via_cell(player) or \
                (player.has_perm("edit_power_full", self) and self.player_can_view(player))
 
     def player_can_view(self, player):
+        if self.is_deleted:
+            return False
         is_owner = player == self.owner
         return is_owner or \
                not self.private or \

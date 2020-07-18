@@ -161,7 +161,7 @@ def choose_powers(request, character_id):
     if request.user.is_anonymous or not character.player_can_edit(request.user):
         return HttpResponseForbidden()
     assigned_powers = character.power_full_set.all()
-    unassigned_powers = request.user.power_full_set.filter(character=None).order_by('-pub_date').all()
+    unassigned_powers = request.user.power_full_set.filter(character=None, is_deleted=False).order_by('-pub_date').all()
     context = {
         'character': character,
         'assigned_powers': assigned_powers,
@@ -185,8 +185,10 @@ def toggle_power(request, character_id, power_full_id):
                     power_full.save()
                     power_full.set_self_and_children_privacy(is_private=False)
                     for reward in power_full.reward_list():
-                        reward.refund()
+                        reward.refund_keeping_character_assignment()
                 elif not power_full.character:
+                    if power_full.is_deleted:
+                        return HttpResponseForbidden()
                     # Assign the power
                     power_full.character = character
                     power_full.save()
