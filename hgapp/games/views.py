@@ -35,7 +35,8 @@ def create_scenario(request):
                 requires_ringer= form.cleaned_data['requires_ringer'],
                 is_rivalry = form.cleaned_data['is_rivalry']
             )
-            scenario.save()
+            with transaction.atomic():
+                scenario.save()
             return HttpResponseRedirect(reverse('games:games_view_scenario', args=(scenario.id,)))
         else:
             print(form.errors)
@@ -65,7 +66,8 @@ def edit_scenario(request, scenario_id):
             scenario.is_rivalry=form.cleaned_data['is_rivalry']
             scenario.requires_ringer=form.cleaned_data['requires_ringer']
             scenario.pub_date=timezone.now()
-            scenario.save()
+            with transaction.atomic():
+                scenario.save()
             return HttpResponseRedirect(reverse('games:games_view_scenario', args=(scenario.id,)))
         else:
             print(form.errors)
@@ -235,7 +237,8 @@ def cancel_game(request, game_id):
             return HttpResponseForbidden()
         if not game.is_scheduled() and not game.is_active():
             return HttpResponseForbidden()
-        game.transition_to_canceled()
+        with transaction.atomic():
+            game.transition_to_canceled()
         return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
     else:
         if not request.user.has_perm('edit_game', game):
@@ -262,9 +265,9 @@ def invite_players(request, game_id):
                                       relevant_game=game,
                                       invite_text=form.cleaned_data['message'],
                                       as_ringer=form.cleaned_data['invite_as_ringer'])
-            game_invite.save()
-            game_invite.notify_invitee(request, game)
-            #Do invite shit, notify player in the model create method.
+            with transaction.atomic():
+                game_invite.save()
+                game_invite.notify_invitee(request, game)
             return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
         else:
             print(form.errors)
@@ -293,25 +296,27 @@ def accept_invite(request, game_id):
                                  relevant_game=game)
             if game.scenario in request.user.scenario_set.all():
                 invite.as_ringer = True
-            invite.save()
+            with transaction.atomic():
+                invite.save()
         form =  make_accept_invite_form(invite)(request.POST)
         if form.is_valid():
             game_attendance = invite.attendance
-            if game_attendance:
-                game_attendance.attending_character=form.cleaned_data['attending_character']
-                game_attendance.save()
-            else:
-                game_attendance = Game_Attendance(
-                    attending_character=form.cleaned_data['attending_character'],
-                    relevant_game=game,
-                )
-                game_attendance.save()
-                invite.is_declined = False
-                invite.attendance = game_attendance
-                invite.save()
-                if invite.as_ringer:
-                    #Reveal scenario to ringer
-                    game.scenario.played_discovery(request.user)
+            with transaction.atomic():
+                if game_attendance:
+                    game_attendance.attending_character=form.cleaned_data['attending_character']
+                    game_attendance.save()
+                else:
+                    game_attendance = Game_Attendance(
+                        attending_character=form.cleaned_data['attending_character'],
+                        relevant_game=game,
+                    )
+                    game_attendance.save()
+                    invite.is_declined = False
+                    invite.attendance = game_attendance
+                    invite.save()
+                    if invite.as_ringer:
+                        #Reveal scenario to ringer
+                        game.scenario.played_discovery(request.user)
             return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
         else:
             print(form.errors)
@@ -343,7 +348,8 @@ def decline_invite(request, game_id):
             if invite.attendance:
                 invite.attendance.delete()
                 invite.attendance = None
-            invite.save()
+            with transaction.atomic():
+                invite.save()
     return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
 
 #TODO: Pull some of this into helper functions
@@ -365,7 +371,6 @@ def start_game(request, game_id, char_error=" ", player_error=" "):
         }
         if game_attendance.attending_character:
             initial['character'] = game_attendance.attending_character.id
-
         initial_data.append(initial)
     if request.method == 'POST':
         if request.POST['form-TOTAL_FORMS'] == '0':
@@ -374,7 +379,6 @@ def start_game(request, game_id, char_error=" ", player_error=" "):
         formset = ValidateAttendanceFormSet(request.POST,
                                             form_kwargs={'game': game},
                                             initial=initial_data)
-
         if formset.is_valid():
             canceled_players=[]
             changed_character_players=[]
@@ -397,17 +401,18 @@ def start_game(request, game_id, char_error=" ", player_error=" "):
                     url_kwargs['player_error'] = playas
                 return HttpResponseRedirect(reverse('games:games_start_game', kwargs=url_kwargs))
             attending_characters = []
-            for form in formset:
-                if not form.cleaned_data['attending']:
-                    game.not_attending(form.cleaned_data['player'])
-                elif form.cleaned_data['character']:
-                    attending_characters.append(form.cleaned_data['character'].id)
-            if len(attending_characters) == 0:
-                return HttpResponseForbidden()
-            for character in game.attended_by.all():
-                if character.id not in attending_characters:
-                    game.not_attending(character.player)
-            game.transition_to_active(lock_characters=False)
+            with transaction.atomic():
+                for form in formset:
+                    if not form.cleaned_data['attending']:
+                        game.not_attending(form.cleaned_data['player'])
+                    elif form.cleaned_data['character']:
+                        attending_characters.append(form.cleaned_data['character'].id)
+                if len(attending_characters) == 0:
+                    return HttpResponseForbidden()
+                for character in game.attended_by.all():
+                    if character.id not in attending_characters:
+                        game.not_attending(character.player)
+                game.transition_to_active(lock_characters=False)
             return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
         else:
             print(formset.errors)
@@ -455,16 +460,17 @@ def end_game(request, game_id):
                                             initial=initial_data)
         game_feedback_form = GameFeedbackForm(request.POST)
         if declare_outcome_formset.is_valid() and game_feedback_form.is_valid():
-            for form in declare_outcome_formset:
-                attendance = get_object_or_404(Game_Attendance, id=form.cleaned_data['hidden_attendance'].id)
-                attendance.outcome = form.cleaned_data['outcome']
-                if form.cleaned_data['notes']:
-                    attendance.notes = form.cleaned_data['notes']
-                attendance.save()
-            if game_feedback_form.cleaned_data['scenario_notes']:
-                game.scenario_notes = game_feedback_form.cleaned_data['scenario_notes']
-            game.save()
-            game.transition_to_finished()
+            with transaction.atomic():
+                for form in declare_outcome_formset:
+                    attendance = get_object_or_404(Game_Attendance, id=form.cleaned_data['hidden_attendance'].id)
+                    attendance.outcome = form.cleaned_data['outcome']
+                    if form.cleaned_data['notes']:
+                        attendance.notes = form.cleaned_data['notes']
+                    attendance.save()
+                if game_feedback_form.cleaned_data['scenario_notes']:
+                    game.scenario_notes = game_feedback_form.cleaned_data['scenario_notes']
+                game.save()
+                game.transition_to_finished()
             return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
         else:
             print(declare_outcome_formset.errors + game_feedback_form.errors)
@@ -488,8 +494,6 @@ def allocate_improvement_generic(request):
     else:
         return HttpResponseRedirect(reverse('hgapp:home', args=()))
 
-
-
 def allocate_improvement(request, improvement_id):
     improvement = get_object_or_404(Reward, id=improvement_id)
     if not improvement.is_improvement or improvement.rewarded_character:
@@ -500,7 +504,8 @@ def allocate_improvement(request, improvement_id):
         form = make_allocate_improvement_form(request.user)(request.POST)
         if form.is_valid():
             improvement.rewarded_character = form.cleaned_data['chosen_character']
-            improvement.save()
+            with transaction.atomic():
+                improvement.save()
             return HttpResponseRedirect(reverse('characters:characters_spend_reward', args=(form.cleaned_data['chosen_character'].id,)))
         else:
             print(form.errors)

@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views import generic
 from django.views.generic import ListView
-from guardian.shortcuts import assign_perm
+from django.db import transaction
 
 from characters.models import Character
 from .createPowerFormUtilities import get_create_power_context_from_base, \
@@ -70,13 +70,14 @@ def create_power(request, base_power_slug, character_id=None):
         if not character.player_can_edit(request.user):
             return HttpResponseForbidden()
     if request.method == 'POST':
-        power = create_new_power_and_parent(base_power, request, character)
-        if (power):
-            if character:
-                refund_or_assign_rewards(power)
-            return HttpResponseRedirect(reverse('powers:powers_view_power', args=(power.id,)))
-        else:
-            print("ERROR CREATING POWER")
+        with transaction.atomic():
+            power = create_new_power_and_parent(base_power, request, character)
+            if (power):
+                if character:
+                    refund_or_assign_rewards(power)
+                return HttpResponseRedirect(reverse('powers:powers_view_power', args=(power.id,)))
+            else:
+                print("ERROR CREATING POWER")
     else:
         # Build a power form.
         context = get_create_power_context_from_base(base_power, character)
@@ -87,7 +88,8 @@ def create_power_from_existing(request, power_id):
     extant_power = get_object_or_404(Power, pk=power_id)
     base_power = get_object_or_404(Base_Power, pk=extant_power.base.slug)
     if request.method == 'POST':
-        new_power = create_new_power_and_parent(base_power, request)
+        with transaction.atomic():
+            new_power = create_new_power_and_parent(base_power, request)
         if (new_power):
             return HttpResponseRedirect(reverse('powers:powers_view_power', args=(new_power.id,)))
         else:
@@ -106,12 +108,13 @@ def edit_power(request, power_id):
     extant_power = power_full.power_set.order_by('-pub_date').all()[0]
     base_power = get_object_or_404(Base_Power, pk=extant_power.base.slug)
     if request.method == 'POST':
-        new_power = create_power_for_new_edit(base_power, request, power_full)
-        if (new_power):
-            refund_or_assign_rewards(new_power, extant_power)
-            return HttpResponseRedirect(reverse('powers:powers_view_power', args=(new_power.id,)))
-        else:
-            print("ERROR CREATING POWER")
+        with transaction.atomic():
+            new_power = create_power_for_new_edit(base_power, request, power_full)
+            if (new_power):
+                refund_or_assign_rewards(new_power, extant_power)
+                return HttpResponseRedirect(reverse('powers:powers_view_power', args=(new_power.id,)))
+            else:
+                print("ERROR CREATING POWER")
     else:
         # Build a power form.
         context = get_edit_power_context_from_power(extant_power)

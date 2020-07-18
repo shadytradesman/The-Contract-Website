@@ -118,7 +118,6 @@ def view_character(request, character_id):
     for event in events_by_date:
         timeline[event[0].strftime("%d %b %Y")].append((event[1], event[2]))
 
-
     char_ability_values = character.stats_snapshot.abilityvalue_set.order_by("relevant_ability__name").all()
     char_value_ids = [x.relevant_ability.id for x in char_ability_values]
     primary_zero_values = [(x.name, x, 0) for x in Ability.objects.filter(is_primary=True).order_by("name").all()
@@ -179,21 +178,22 @@ def toggle_power(request, character_id, power_full_id):
     if request.method == 'POST':
         assignment_form = ConfirmAssignmentForm(request.POST)
         if assignment_form.is_valid():
-            if power_full.character == character:
-                # Unassign the power
-                power_full.character = None
-                power_full.save()
-                power_full.set_self_and_children_privacy(is_private=False)
-                for reward in power_full.reward_list():
-                    reward.refund()
-            elif not power_full.character:
-                # Assign the power
-                power_full.character = character
-                power_full.save()
-                power_full.set_self_and_children_privacy(is_private=character.private)
-                rewards_to_be_spent = character.reward_cost_for_power(power_full)
-                for reward in rewards_to_be_spent:
-                    reward.assign_to_power(power_full.latest_revision())
+            with transaction.atomic():
+                if power_full.character == character:
+                    # Unassign the power
+                    power_full.character = None
+                    power_full.save()
+                    power_full.set_self_and_children_privacy(is_private=False)
+                    for reward in power_full.reward_list():
+                        reward.refund()
+                elif not power_full.character:
+                    # Assign the power
+                    power_full.character = character
+                    power_full.save()
+                    power_full.set_self_and_children_privacy(is_private=character.private)
+                    rewards_to_be_spent = character.reward_cost_for_power(power_full)
+                    for reward in rewards_to_be_spent:
+                        reward.assign_to_power(power_full.latest_revision())
             return HttpResponseRedirect(reverse('characters:characters_power_picker', args=(character.id,)))
         else:
             print(assignment_form.errors)

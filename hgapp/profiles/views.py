@@ -2,6 +2,8 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.views import generic
+from django.db import transaction
+
 
 from profiles.forms import EditProfileForm
 from profiles.models import Profile
@@ -44,7 +46,8 @@ def profile_edit(request):
         form = EditProfileForm(request.POST)
         if form.is_valid():
             profile.about = form.cleaned_data['about']
-            profile.save()
+            with transaction.atomic():
+                profile.save()
             return HttpResponseRedirect(reverse('profiles:profiles_view_profile', args=(profile.id,)))
         else:
             print(form.errors)
