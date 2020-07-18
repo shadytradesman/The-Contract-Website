@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.contrib.auth.models import AnonymousUser, User
 from characters.models import Character, ContractStats, Asset, Liability, AssetDetails, LiabilityDetails, Attribute, \
     AttributeValue, Ability, AbilityValue
+from games.models import Reward
 from cells.models import Cell
 from django.utils import timezone
 
@@ -116,6 +117,36 @@ class CellModelTests(TestCase):
         )
         self.char_full.regen_stats_snapshot()
 
+    def reward_user(self, user):
+        normal_reward = Reward(
+            rewarded_character=self.char_full,
+            rewarded_player=user,
+            is_improvement=False,
+            is_charon_coin=False,
+            awarded_on=timezone.now(),
+        )
+        normal_reward.save()
+        gm_reward = Reward(
+            rewarded_player=user,
+            is_improvement=True,
+            is_charon_coin=False,
+            awarded_on=timezone.now(),
+        )
+        gm_reward.save()
+        coin_reward = Reward(
+            rewarded_player=user,
+            is_improvement=False,
+            is_charon_coin=True,
+            awarded_on=timezone.now(),
+        )
+        coin_reward.save()
+        coin_reward = Reward(
+            rewarded_player=user,
+            is_improvement=False,
+            is_charon_coin=True,
+            awarded_on=timezone.now(),
+        )
+        coin_reward.save()
 
     def test_basic_privacy(self):
         self.assertTrue(self.char_full.player_can_view(self.user1))
@@ -292,7 +323,20 @@ class CellModelTests(TestCase):
         self.assertEquals(snapshot.abilityvalue_set.all().count(), 0)
         self.assertEquals(snapshot.attributevalue_set.all().count(), 0)
 
-
+    def test_charon_coins(self):
+        self.grant_basic_stats_to_char_full()
+        self.reward_user(self.user1)
+        self.assertFalse(self.char_full.assigned_coin())
+        self.char_full.use_charon_coin()
+        self.assertEquals(self.char_full.reward_set.filter(is_void=False, is_charon_coin=True).all().count(), 1)
+        self.assertTrue(self.char_full.assigned_coin())
+        self.char_full.use_charon_coin()
+        self.assertEquals(self.char_full.reward_set.filter(is_void=False, is_charon_coin=True).all().count(), 1)
+        self.assertTrue(self.char_full.assigned_coin())
+        self.char_full.refund_coin()
+        self.assertEquals(self.char_full.reward_set.filter(is_void=False, is_charon_coin=True).all().count(), 0)
+        self.assertFalse(self.char_full.assigned_coin())
+        self.char_full.refund_coin()
 
 
 

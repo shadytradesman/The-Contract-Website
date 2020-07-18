@@ -44,11 +44,12 @@
                     {% endif %}
                 {% endwith %}
                 {% if invitation.attendance.character_death.cause_of_death %}
-                    {{ invitation.attendance.character_death.cause_of_death }}
+                    Cause of death: {{ invitation.attendance.character_death.cause_of_death }}
                     <br>
                 {% endif %}
                 {% if invitation.attendance.notes %}
                     <p>
+                        <br>
                         {{invitation.attendance.notes}}
                     </p>
                 {% endif %}
