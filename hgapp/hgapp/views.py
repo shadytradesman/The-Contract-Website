@@ -21,7 +21,7 @@ def home(request):
     if request.user.is_anonymous:
         return render(request, 'logged_out_homepage.html')
     else:
-        my_characters = request.user.character_set.order_by('name').all()
+        my_characters = request.user.character_set.filter(is_deleted=False).order_by('name').all()
         my_powers = request.user.power_full_set.filter(is_deleted=False).order_by('name').all()
         my_scenarios = request.user.scenario_creator.order_by("title").all()
         new_players = User.objects.order_by('-date_joined')[:6]

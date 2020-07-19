@@ -116,6 +116,7 @@ class Character(models.Model):
     concept_summary = models.CharField(max_length=150)
     ambition = models.CharField(max_length=150)
     private = models.BooleanField(default=False)
+    is_deleted = models.BooleanField(default=False)
     pub_date = models.DateTimeField('date published')
     edit_date = models.DateTimeField('date last edited')
 
@@ -268,6 +269,10 @@ class Character(models.Model):
             self.set_default_permissions()
             super(Character, self).save(*args, **kwargs)
 
+    def delete(self):
+        self.is_deleted=True
+        self.save()
+
     def player_has_cell_edit_perms(self, player):
         if self.cell:
             return self.cell.player_can_edit_characters(player)
@@ -275,11 +280,15 @@ class Character(models.Model):
             return False
 
     def player_can_edit(self, player):
+        if self.is_deleted:
+            return False
         can_edit = player.has_perm('edit_character', self) or self.player_has_cell_edit_perms(player)
         can_view_private = self.player_can_view(player)
         return can_edit and can_view_private
 
     def player_can_view(self, player):
+        if self.is_deleted:
+            return False
         return not self.private or player.has_perm("view_private_character", self) or self.player_has_cell_edit_perms(player)
 
     def completed_games(self):

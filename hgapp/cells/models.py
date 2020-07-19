@@ -195,7 +195,7 @@ class CellMembership(models.Model):
             self.member_player.groups.remove(group)
 
     def remove_characters_from_cell(self):
-        for character in self.member_player.character_set.filter(cell=self.relevant_cell):
+        for character in self.member_player.character_set.filter(cell=self.relevant_cell, is_deleted=False):
             character.cell = None
             character.save()
 

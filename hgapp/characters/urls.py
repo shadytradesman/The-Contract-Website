@@ -22,6 +22,9 @@ urlpatterns = [
     # ex: .com/characters/edit/c/112
     url(r'^edit/c/(?P<character_id>[\d]+)/$', views.edit_character, name='characters_edit'),
 
+    # ex: .com/characters/delete/c/112
+    url(r'^delete/c/(?P<character_id>[\d]+)/$', views.delete_character, name='characters_delete'),
+
     # ex: .com/characters/obituary/c/112
     url(r'^obituary/c/(?P<character_id>[\d]+)/$', views.edit_obituary, name='characters_obituary'),
 

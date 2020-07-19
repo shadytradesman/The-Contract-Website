@@ -7,6 +7,11 @@
             <li><a href="{% url 'characters:characters_edit' character.id %}" class="btn btn-default">
                 Edit Character
             </a></li>
+            {% if request.user == character.player %}
+                <li><a href="{% url 'characters:characters_delete' character.id %}" class="btn btn-danger">
+                    Delete Character
+                </a></li>
+            {% endif %}
             <li><a href="{% url 'characters:characters_power_picker' character.id %}" class="btn btn-default">
                 Assign Powers
             </a></li>

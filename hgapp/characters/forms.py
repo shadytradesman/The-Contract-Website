@@ -330,3 +330,6 @@ def make_charon_coin_form(character=None):
         spend_coin = forms.BooleanField(required=False,
                                         initial=initial)
     return CharonCoinForm
+
+class DeleteCharacterForm(forms.Form):
+    pass

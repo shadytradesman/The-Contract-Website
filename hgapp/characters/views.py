@@ -16,7 +16,8 @@ from characters.models import Character, BasicStats, Character_Death, Graveyard_
     CharacterTutorial, Asset, Liability, BattleScar, Trauma, TraumaRevision, Injury, Source, ExperienceReward
 from powers.models import Power_Full
 from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, AbilityForm, \
-    AssetForm, LiabilityForm, BattleScarForm, TraumaForm, InjuryForm, SourceValForm, make_allocate_gm_exp_form, EquipmentForm
+    AssetForm, LiabilityForm, BattleScarForm, TraumaForm, InjuryForm, SourceValForm, make_allocate_gm_exp_form, EquipmentForm,\
+    DeleteCharacterForm
 from characters.form_utilities import get_edit_context, character_from_post, update_character_from_post, \
     grant_trauma_to_character, delete_trauma_rev
 
@@ -45,6 +46,23 @@ def edit_character(request, character_id):
         context = get_edit_context(user=request.user, existing_character=character)
         return render(request, 'characters/edit_pages/edit_character.html', context)
 
+def delete_character(request, character_id):
+    character = get_object_or_404(Character, pk=character_id)
+    if not character.player_can_edit(request.user):
+        raise PermissionDenied("This Character has been deleted, or you're not allowed to view them")
+    if character.player != request.user:
+        raise PermissionDenied("Only the creator of a Character can delete them")
+    if request.method == 'POST':
+        if DeleteCharacterForm(request.POST).is_valid():
+            with transaction.atomic():
+                character.delete()
+        else:
+            raise ValueError("could not delete character")
+        return HttpResponseRedirect(reverse('home'))
+    else:
+        context = {"form": DeleteCharacterForm(),
+                   "character": character}
+        return render(request, 'characters/delete_character.html', context)
 
 def edit_obituary(request, character_id):
     character = get_object_or_404(Character, id=character_id)
@@ -351,7 +369,7 @@ def set_source_val(request, source_id):
 def allocate_gm_exp(request):
     if not request.user.is_authenticated:
         raise PermissionDenied("You must be logged in to allocate exp")
-    users_living_character_ids = [char.id for char in request.user.character_set.all() if not char.is_dead()]
+    users_living_character_ids = [char.id for char in request.user.character_set.filter(is_deleted=False).all() if not char.is_dead()]
     queryset = Character.objects.filter(id__in=users_living_character_ids)
     RewardForm = make_allocate_gm_exp_form(queryset)
     RewardFormset = formset_factory(RewardForm, extra=0)

@@ -132,13 +132,13 @@ def make_accept_invite_form(invitation):
     class AcceptInviteForm(forms.Form):
         if invitation.as_ringer:
             attending_character = forms.ModelChoiceField(
-                queryset=invitation.invited_player.character_set,
+                queryset=invitation.invited_player.character_set.filter(is_deleted=False),
                  empty_label="NPC only",
                  help_text="Instead of one of your characters, you will play an NPC",
                  required=False,
                  disabled=True)
         else:
-            users_living_character_ids = [char.id for char in invitation.invited_player.character_set.all() if not char.is_dead()]
+            users_living_character_ids = [char.id for char in invitation.invited_player.character_set.filter(is_deleted=False).all() if not char.is_dead()]
             required_status = invitation.relevant_game.required_character_status
             if required_status == HIGH_ROLLER_STATUS[0][0]:
                 queryset = Character.objects.filter(id__in=users_living_character_ids)
@@ -205,7 +205,7 @@ class GameFeedbackForm(forms.Form):
 
 def make_allocate_improvement_form(user):
     class AllocateImprovementForm(forms.Form):
-        users_living_character_ids = [char.id for char in user.character_set.all() if
+        users_living_character_ids = [char.id for char in user.character_set.filter(is_deleted=False).all() if
                                       not char.is_dead() and char.improvement_ok()]
         queryset = Character.objects.filter(id__in=users_living_character_ids)
         chosen_character = forms.ModelChoiceField(queryset=queryset,
@@ -282,7 +282,7 @@ class ArchivalOutcomeForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(ArchivalOutcomeForm, self).__init__(*args, **kwargs)
         # user may have declared character dead after the game ended, so allow selecting dead characters
-        queryset = self.initial["invited_player"].character_set\
+        queryset = self.initial["invited_player"].character_set.filter(is_deleted=False)\
             .exclude(character_death__is_void = False, character_death__game_attendance__isnull = False)\
             .distinct()
         self.fields['attending_character'].queryset = queryset

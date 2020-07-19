@@ -93,7 +93,7 @@ def view_cell(request, cell_id):
     for role in ROLE:
         for membership in cell.cellmembership_set.filter(role = role[0]):
             characters = ()
-            for character in membership.member_player.character_set.filter(cell = cell):
+            for character in membership.member_player.character_set.filter(cell = cell, is_deleted=False):
                 if not character.is_dead():
                     characters = characters + (character,)
             memberships_and_characters = memberships_and_characters + ((membership, characters,),)
