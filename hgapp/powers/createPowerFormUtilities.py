@@ -61,7 +61,7 @@ def get_modifier_requirements(enhancements, drawbacks):
     return requirements
 
 
-def get_create_power_context_from_power(power):
+def get_create_power_context_from_power(power, new=True):
     primary_form = CreatePowerForm(power.base,
                                    initial={'system': power.system,
                                             'description': power.description,
@@ -87,7 +87,7 @@ def get_create_power_context_from_power(power):
         'requirements_json': json.dumps(requirements),
     }
     if power.parent_power is not None:
-        if power.parent_power.character is not None:
+        if power.parent_power.character is not None and new:
             context["character"] = power.parent_power.character
             unspent_rewards = []
             for reward in power.parent_power.character.unspent_rewards().all():

@@ -99,7 +99,7 @@ def create_power_from_existing(request, power_id):
         # Build a power form.
         if not extant_power.player_can_view(request.user):
             raise PermissionDenied("This Power has been deleted, or you're not allowed to view it")
-        context = get_create_power_context_from_power(extant_power)
+        context = get_create_power_context_from_power(extant_power, False)
         return render(request, 'powers/create_power_pages/createpower.html', context)
 
 def edit_power(request, power_id):
