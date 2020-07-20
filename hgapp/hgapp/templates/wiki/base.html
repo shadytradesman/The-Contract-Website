@@ -6,20 +6,26 @@
     <link href="{% static "wiki/bootstrap/css/wiki-bootstrap.min.css" %}" rel="stylesheet">
     <link href="{% static "overrides/wiki-macro-style.css" %}" rel="stylesheet">
 
+    <!-- This is so the site's styles override the wiki's -->
+    <link href="{% static "css/site.css" %}" rel="stylesheet" />
+
     <link rel="stylesheet" href="/static/wiki/colorbox/example1/colorbox.css" />
 {% endblock %}
 
 {% block body_base %}
     {% block wiki_body %}
     <div class="container" style="margin-top: 10px;">
-        {% load account_tags %}
-        {% include "_messages.html" %}
-        <!-- Reserved for breadcrumbs -->
-        <span class="pull-left" style="margin-right: 10px"><a class="btn btn-info" href="/">My Homepage</a></span>
-        {% block wiki_breadcrumbs %}{% endblock %}
+        <div class="backdropped">
+            {% load account_tags %}
+            {% include "_messages.html" %}
+            <!-- Reserved for breadcrumbs -->
+            <span class="pull-left" style="margin-right: 10px"><a class="btn btn-info" href="/">My Homepage</a></span>
+            <span class="pull-left" style="margin-right: 10px"><a class="btn btn-default" href="/wiki/">Player's Guide Home</a></span>
+            {% block wiki_breadcrumbs %}{% endblock %}
 
-        <!-- Main page contents go here -->
-        {% block wiki_contents %}{% endblock %}
+            <!-- Main page contents go here -->
+            {% block wiki_contents %}{% endblock %}
+        </div>
     </div>
     {% endblock %}
 {% endblock %}
