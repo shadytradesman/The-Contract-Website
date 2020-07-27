@@ -3,10 +3,12 @@ from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.views import generic
 from django.db import transaction
+from django.utils import timezone
 
 
-from profiles.forms import EditProfileForm
+from profiles.forms import EditProfileForm, AcceptTermsForm
 from profiles.models import Profile
+from hgapp.terms import EULA, TERMS, PRIVACY
 
 class ProfileView(generic.DetailView):
     template_name = 'profiles/view_profile.html'
@@ -40,7 +42,6 @@ def my_profile_view(request):
     return render(request, 'profiles/view_profile.html', context)
 
 def profile_edit(request):
-    # TODO: replace this get object call with a more informative error page
     profile = get_object_or_404(Profile, pk=request.user.pk)
     if request.method == 'POST':
         form = EditProfileForm(request.POST)
@@ -53,7 +54,6 @@ def profile_edit(request):
             print(form.errors)
             return None
     else:
-        # Build a power form.
         form = EditProfileForm(
             initial={
                 'about': profile.about,
@@ -64,3 +64,28 @@ def profile_edit(request):
             'form' : form,
         }
         return render(request, 'profiles/edit_profile.html', context)
+
+def accept_terms(request):
+    profile = request.user.profile
+    if (profile.confirmed_agreements):
+        return HttpResponseRedirect(reverse('home'))
+    if request.method == 'POST':
+        form = AcceptTermsForm(request.POST)
+        if form.is_valid():
+            profile.confirmed_agreements = True
+            profile.date_confirmed_agreements = timezone.now()
+            with transaction.atomic():
+                profile.save()
+            return HttpResponseRedirect(reverse('home'))
+        else:
+            print(form.errors)
+            return None
+    else:
+        form = AcceptTermsForm()
+        context = {
+            'form': form,
+            "terms": TERMS,
+            "eula": EULA,
+            "privacy": PRIVACY,
+        }
+        return render(request, 'profiles/accept_terms.html', context)

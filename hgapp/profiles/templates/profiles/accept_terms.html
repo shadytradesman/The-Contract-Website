@@ -1,0 +1,45 @@
+{% extends "site_base.html" %}
+
+{% block head_title %}The Contract Terms and EULA{% endblock %}
+
+{% block body_base %}
+<div class="container">
+    <div class="backdropped">
+        <h1>In order to continue using The Contract</h1>
+        You must read and agree to the following policies.
+        <br>
+        Scroll to the bottom of the page and click "I Agree to the Above Policies" to continue using the site.
+        <h2>
+            User Agreements
+            <br>
+            <small>Terms and Conditions, EULA, and Privacy Policy</small>
+        </h2>
+        <p>
+            By using The Contract's website, you agree to the EULA, Privacy Policy, and the Terms and Conditions below.
+            <br>
+            Scroll to read the entirety of all three agreements.
+        </p>
+
+        <div class="card card-body" style="height: 500px; overflow:auto; border: 1px solid black;padding:5px;background-color:white;">
+          <h3>EULA</h3>
+            {{eula|linebreaks}}
+        </div>
+        <br>
+        <div class="card card-body" style="height: 500px; overflow:auto; border: 1px solid black;padding:5px;background-color:white;">
+            <h3>TERMS AND CONDITIONS</h3>
+          {{terms|linebreaks}}
+        </div>
+        <br>
+        <div class="card card-body" style="height: 500px; overflow:auto; border: 1px solid black;padding:5px;background-color:white;">
+            <h3>PRIVACY POLICY</h3>
+            {{privacy|linebreaks}}
+        </div>
+        <br>
+        <form action="{% url 'profiles:profiles_terms' %}" method="post">
+            {{ form.non_field_errors }}
+            {% csrf_token %}
+            {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+        <input class="btn btn-primary" type="submit" value="I Agree to the Above Policies" />
+    </div>
+</div>
+{% endblock %}

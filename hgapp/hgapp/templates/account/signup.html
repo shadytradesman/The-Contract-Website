@@ -1,0 +1,72 @@
+{% extends "site_base.html" %}
+
+{% load account_tags %}
+{% load i18n %}
+{% load bootstrap %}
+
+{% block head_title %}{% trans "Sign up" %}{% endblock %}
+
+{% block body %}
+    <div class="container">
+    <div class="backdropped">
+    <div class="row">
+        <div class="col-md-4 col-md-offset-4">
+            <form id="signup_form" method="post" action="{% url "account_signup" %}" autocapitalize="off" {% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
+                <legend>{% trans "Sign up for The Contract" %}</legend>
+                {% csrf_token %}
+                {{ form.username|bootstrap }}
+                {{ form.email|bootstrap }}
+                {{ form.password|bootstrap }}
+                {{ form.password_confirm|bootstrap }}
+                {{ form.code}}
+                <label>
+                    {{ form.agree_to_tos }}
+                    I have read and agree to The Contract's
+                    <a data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+                        EULA, Privacy Policy, and Terms and Conditions
+                    </a>
+                </label>
+                <br>
+                {% if redirect_field_value %}
+                    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+                {% endif %}
+                <button type="submit" class="btn btn-primary">{% trans "Sign up" %}</button>
+                <p class="login-signup">
+                    <small>
+                        {% trans "Already have an account?" %}  <strong><a href="{% urlnext 'account_login' %}">{% trans "Log in" %}</a></strong>
+                    </small>
+                </p>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+                <div class="collapse" id="collapseExample">
+                    <h4>EULA, Privacy Policy, and Terms and Conditions</h4>
+                      <div class="card card-body" style="height: 251px; overflow:auto; border: 1px solid black;padding:5px;background-color:white;">
+                          A link to these documents is always available in the footer of the website.
+                          <H3>Privacy Policy</H3>
+                          {{form.privacy|linebreaks}}
+                          <br>
+                          <h3>EULA</h3>
+                          {{form.eula|linebreaks}}
+                          <br>
+                          <h3>Terms and Conditions</h3>
+                          {{form.terms|linebreaks}}
+                          <br>
+                      </div>
+                </div>
+        </div>
+    </div>
+    </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#id_username').focus();
+        });
+    </script>
+{% endblock %}

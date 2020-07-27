@@ -18,6 +18,8 @@ from django.forms import formset_factory
 def create_cell(request):
     if not request.user.is_authenticated:
         raise PermissionDenied("You must be logged in to create a cell")
+    if not request.user.profile.confirmed_agreements:
+        return HttpResponseRedirect(reverse('profiles:profiles_terms'))
     if request.method == 'POST':
         form = CreateCellForm(request.POST)
         if form.is_valid():
@@ -86,6 +88,8 @@ def view_cell(request, cell_id):
     user_membership = None
     if request.user.is_authenticated:
         user_membership = cell.get_player_membership(request.user)
+        if not request.user.profile.confirmed_agreements:
+            return HttpResponseRedirect(reverse('profiles:profiles_terms'))
     can_edit_characters = cell.player_can_edit_characters(request.user)
     can_administer = cell.player_can_admin(request.user)
     can_manage_games = cell.player_can_manage_games(request.user)

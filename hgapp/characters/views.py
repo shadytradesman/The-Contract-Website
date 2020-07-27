@@ -26,6 +26,8 @@ def create_character(request):
     if not request.user.is_authenticated:
         raise PermissionDenied("You must be logged in to create a Character.<br>"
                                "Accounts are free, there are no ads, and we will never share your info. Period.")
+    if not request.user.profile.confirmed_agreements:
+        return HttpResponseRedirect(reverse('profiles:profiles_terms'))
     if request.method == 'POST':
         with transaction.atomic():
             new_character = character_from_post(request.user, request.POST)
@@ -35,6 +37,8 @@ def create_character(request):
         return render(request, 'characters/edit_pages/edit_character.html', context)
 
 def edit_character(request, character_id):
+    if not request.user.profile.confirmed_agreements:
+        return HttpResponseRedirect(reverse('profiles:profiles_terms'))
     character = get_object_or_404(Character, id=character_id)
     if not character.player_can_edit(request.user):
         raise PermissionDenied("You do not have permission to edit this Character")
@@ -124,6 +128,8 @@ def view_character(request, character_id):
     character = get_object_or_404(Character, id=character_id)
     if not character.player_can_view(request.user):
         raise PermissionDenied("You do not have permission to view this Character")
+    if request.user.is_authenticated and not request.user.profile.confirmed_agreements:
+            return HttpResponseRedirect(reverse('profiles:profiles_terms'))
     user_can_edit = request.user.is_authenticated and character.player_can_edit(request.user)
     if not character.stats_snapshot:
         context={"character": character,

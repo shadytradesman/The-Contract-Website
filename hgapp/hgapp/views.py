@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect, HttpResponseForbidden
 from django.shortcuts import render, get_object_or_404
 from django.conf import settings
+import account.views
 
 # Create your views here.
 from django.urls import reverse
@@ -15,12 +16,18 @@ from characters.models import Character
 from powers.models import Power_Full
 
 from games.models import GAME_STATUS
+from hgapp.forms import SignupForm
+from hgapp.terms import EULA, TERMS, PRIVACY
 
+class SignupView(account.views.SignupView):
+   form_class = SignupForm
 
 def home(request):
     if request.user.is_anonymous:
         return render(request, 'logged_out_homepage.html')
     else:
+        if not request.user.profile.confirmed_agreements:
+            return HttpResponseRedirect(reverse('profiles:profiles_terms'))
         my_characters = request.user.character_set.filter(is_deleted=False).order_by('name').all()
         my_powers = request.user.power_full_set.filter(is_deleted=False).order_by('name').all()
         my_scenarios = request.user.scenario_creator.order_by("title").all()
@@ -56,3 +63,11 @@ def home(request):
             'avail_exp_rewards': avail_exp_rewards,
         }
         return render(request, 'logged_in_homepage.html', context)
+
+def terms(request):
+    context= {
+        "terms": TERMS,
+        "eula": EULA,
+        "privacy": PRIVACY,
+    }
+    return render(request, 'terms.html', context)

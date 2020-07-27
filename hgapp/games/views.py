@@ -20,6 +20,8 @@ from hgapp.utilities import get_queryset_size, get_object_or_none
 from cells.models import Cell
 
 def create_scenario(request):
+    if not request.user.profile.confirmed_agreements:
+        return HttpResponseRedirect(reverse('profiles:profiles_terms'))
     if request.method == 'POST':
         form = CreateScenarioForm(request.POST)
         if form.is_valid():
@@ -53,6 +55,8 @@ def edit_scenario(request, scenario_id):
     scenario = get_object_or_404(Scenario, id=scenario_id)
     if not request.user.has_perm('edit_scenario', scenario):
         raise PermissionDenied("You don't have permission to edit this scenario")
+    if not request.user.profile.confirmed_agreements:
+        return HttpResponseRedirect(reverse('profiles:profiles_terms'))
     if request.method == 'POST':
         form = CreateScenarioForm(request.POST)
         if form.is_valid():
