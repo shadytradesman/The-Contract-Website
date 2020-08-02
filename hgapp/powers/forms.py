@@ -1,7 +1,6 @@
 from django import forms
 
-from .models import ACTIVATION_STYLE, HIGH_ROLLER_STATUS, Enhancement, Drawback, CREATION_REASON, Power_Full
-
+from .models import ACTIVATION_STYLE, HIGH_ROLLER_STATUS, Enhancement, Drawback, CREATION_REASON, Power_Full, PowerTag
 
 def set_field_html_name(cls, new_name):
     """
@@ -24,7 +23,12 @@ class EnhancementDrawbackPickerForm(forms.ModelForm):
         forms.ModelForm.__init__(self, *args, **kwargs)
         self.fields['enhancements'].queryset = Enhancement.objects.order_by("-is_general").all()
         self.fields['drawbacks'].queryset = Drawback.objects.order_by("-is_general").all()
-        self.fields['example_powers'].queryset = Power_Full.objects.order_by("-pub_date").all()
+
+class TagPickerForm(forms.ModelForm):
+    # used in the admin app for PremadeCategory
+    def  __init__(self, *args, **kwargs):
+        forms.ModelForm.__init__(self, *args, **kwargs)
+        self.fields['tags'].queryset = PowerTag.objects.order_by("tag").all()
 
 class DrawbackModelForm(forms.ModelForm):
     class Meta:
@@ -96,7 +100,6 @@ def make_parameter_form(power_param):
         level_picker = forms.ChoiceField(choices=param_choices,
                                          initial=power_param.default)
         set_field_html_name(level_picker, parameter.slug)
-
     return ParameterForm
 
 class CreatePowerForm(forms.Form):
@@ -110,7 +113,8 @@ class CreatePowerForm(forms.Form):
     system = forms.CharField(label='System', widget=forms.Textarea,
                              help_text='Describe the power\'s cost, associated roll(s), determination of outcome, conditions, etc')
     activation_style = forms.ChoiceField(choices=ACTIVATION_STYLE, disabled=True)
-
+    tags = forms.ModelMultipleChoiceField(queryset=PowerTag.objects.order_by("tag").all(),
+                                          widget=forms.CheckboxSelectMultiple)
 
     def __init__(self, base_power, *args, **kwargs):
         super(CreatePowerForm, self).__init__(*args, **kwargs)

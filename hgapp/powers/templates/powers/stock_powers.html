@@ -1,0 +1,80 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+
+{% block head_title %}Premade Powers{% endblock %}
+
+{% load staticfiles %}
+{% block extra_styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'powers/stock_powers_style.css' %}" />
+{% endblock %}
+
+{% block body_base %}
+<div class="container">
+    <div class="backdropped">
+        <div class="panel panel-default panel-body">
+            <h1 class = "text-center panel-heading">
+            Stock Powers
+                <br>
+                <small>Pre-made Powers to use for Gifts or inspiration</small>
+            </h1>
+        </div>
+        <h2>
+            Generic Powers
+            <small>Archetypical Powers to Gift as-is or customize</small>
+        </h2>
+        <div class="panel-group row no-gutters" id="accordion-generic" role="tablist" aria-multiselectable="true">
+            {% for category, power_list in generic_powers_by_category.items %}
+            <div class="col-md-6">
+                <div class="panel panel-default">
+                    <a class= "unstyled-link" role="button" data-toggle="collapse" href="#collapse{{category.slug}}" aria-expanded="false" aria-controls="collapse{{category.slug}}">
+                        <div class = "panel-heading text-center" role="tab" id="{{category.slug}}Heading">
+                            <h3 class="fake-link">
+                                {{category.name}}
+                            </h3>
+                            {{category.description}}
+                        </div>
+                    </a>
+                    <div id="collapse{{category.slug}}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="{{category.slug}}Heading">
+                        <div class="panel-body">
+                            {% for power_full in power_list %}
+                                {% include "powers/power_badge_snippet.html" %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <h2>
+            Example Powers
+            <small>Flavorful Powers that demonstrate personalized Gifts for worthy Contractors</small>
+        </h2>
+        <div class="panel-group row no-gutters" id="accordion-example" role="tablist" aria-multiselectable="true">
+            <div class="col-md-6">
+            {% for category, power_list in example_powers_by_category.items %}
+                <div class="panel panel-default">
+                    <a class="unstyled-link" role="button" data-toggle="collapse" href="#collapse{{category.slug}}" aria-expanded="false" aria-controls="collapse{{category.slug}}">
+                        <div class = "panel-heading text-center" role="tab" id="{{category.slug}}Heading">
+                            <h3 class="fake-link">
+                                {{category.name}}
+                            </h3>
+                            <p>
+                                {{category.description}}
+                            </p>
+                        </div>
+                    </a>
+                    <div id="collapse{{category.slug}}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="{{category.slug}}Heading">
+                        <div class="panel-body">
+                            {% for power_full in power_list %}
+                                {% include "powers/power_badge_snippet.html" %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

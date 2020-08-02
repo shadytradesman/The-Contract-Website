@@ -1,0 +1,38 @@
+.panel-heading {
+    padding: 10px 15px;
+}
+
+.panel-default {
+    margin-bottom: 5px !important;
+}
+
+.col-md-6 {
+    padding-right: 5px;
+    padding-left: 5px;
+}
+
+h3 {
+    margin-top: 5px;
+}
+
+.thumbnail {
+    margin-bottom: 10px;
+}
+
+.panel-body {
+    padding-bottom: 5px;
+}
+
+.unstyled-link {
+    color: black;
+    text-decoration: none;
+}
+
+.unstyled-link:focus {
+    color: black;
+    text-decoration: none;
+}
+
+.fake-link {
+    color: #428BCA;
+}

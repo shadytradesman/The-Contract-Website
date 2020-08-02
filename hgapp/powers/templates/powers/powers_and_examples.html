@@ -16,7 +16,7 @@
             <div class="thumbnail">
                 <div class="label">
                          <a class="btn btn-default" href="{% url 'powers:powers_view_base' base_power.slug %}" role="button"><h3>{{base_power.name}}:</h3></a>
-                         {% for example in base_power.example_powers.all %}
+                         {% for example in base_power.example_powers %}
                             <li><a class="btn btn-default" href="{% url 'powers:powers_view_power_full' example.id %}" role="button">{{example.name}}</a></li>
                          {% endfor %}
                 </div>
