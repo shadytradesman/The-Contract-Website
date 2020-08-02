@@ -51,8 +51,8 @@
             <small>Flavorful Powers that demonstrate personalized Gifts for worthy Contractors</small>
         </h2>
         <div class="panel-group row no-gutters" id="accordion-example" role="tablist" aria-multiselectable="true">
-            <div class="col-md-6">
             {% for category, power_list in example_powers_by_category.items %}
+                <div class="col-md-6">
                 <div class="panel panel-default">
                     <a class="unstyled-link" role="button" data-toggle="collapse" href="#collapse{{category.slug}}" aria-expanded="false" aria-controls="collapse{{category.slug}}">
                         <div class = "panel-heading text-center" role="tab" id="{{category.slug}}Heading">
@@ -72,8 +72,8 @@
                         </div>
                     </div>
                 </div>
+                </div>
             {% endfor %}
-            </div>
         </div>
     </div>
 </div>
