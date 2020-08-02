@@ -1,6 +1,6 @@
 from django.conf.urls import url
 
-from .views import BrowsePowersView, BasePowerDetailView
+from .views import BasePowerDetailView
 from . import views
 
 app_name = 'powers'
@@ -44,8 +44,8 @@ urlpatterns = [
     # ex: .com/powers/delete/p/110
     url(r'^delete/p/(?P<power_id>[\d]+)/$', views.delete_power, name='powers_delete_power'),
 
-    # ex: .com/powers/browse
-    url(r'^browse/$', BrowsePowersView.as_view(), name='powers_browse_powers'),
+    # ex: .com/powers/stock
+    url(r'^stock/$', views.stock, name='powers_stock'),
 
     # ex: .com/powers/view/b/blast
     url(r'^view/b/(?P<pk>[\w-]+)/$', BasePowerDetailView.as_view(), name='powers_view_base'),

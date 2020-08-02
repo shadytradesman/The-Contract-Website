@@ -1,3 +1,4 @@
+from collections import defaultdict
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
@@ -11,7 +12,8 @@ from characters.models import Character
 from .createPowerFormUtilities import get_create_power_context_from_base, \
     get_create_power_context_from_power, get_edit_power_context_from_power, create_new_power_and_parent, \
     create_power_for_new_edit, refund_or_assign_rewards
-from .models import Power, Base_Power_Category, Base_Power, Base_Power_System, DICE_SYSTEM, Power_Full
+from .models import Power, Base_Power_Category, Base_Power, Base_Power_System, DICE_SYSTEM, Power_Full, PowerTag, \
+    PremadeCategory
 from .forms import DeletePowerForm
 
 def index(request):
@@ -168,17 +170,21 @@ def power_full_view(request, power_full_id):
     most_recent_power = power_full.power_set.order_by('-pub_date').all()[0]
     return power_view(request, power_id=most_recent_power.id)
 
+def stock(request):
+    generic_categories = PremadeCategory.objects.filter(is_generic=True).all()
+    generic_powers_by_category = {}
+    for cat in generic_categories:
+        generic_powers_by_category[cat] = Power_Full.objects.filter(tags__slug__in=cat.tags.all()).all()
 
-class BrowsePowersView(ListView):
-    model = Power
-    template_name = 'powers/browse_powers.html'
-    queryset = Power.objects.filter(private=False).order_by('-pub_date')
-
-    def get_context_data(self, **kwargs):
-        context = super(BrowsePowersView, self).get_context_data(**kwargs)
-        context['now'] = timezone.now()
-        return context
-
+    example_categories = PremadeCategory.objects.filter(is_generic=False).all()
+    example_powers_by_category = {}
+    for cat in example_categories:
+        example_powers_by_category[cat] = Power_Full.objects.filter(tags__slug__in=cat.tags.all()).all()
+    context = {
+        "generic_powers_by_category": generic_powers_by_category,
+        "example_powers_by_category": example_powers_by_category,
+    }
+    return render(request, 'powers/stock_powers.html', context)
 
 class BasePowerDetailView(generic.DetailView):
     model = Base_Power

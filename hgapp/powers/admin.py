@@ -1,9 +1,9 @@
 from django.contrib import admin
 
-from .forms import EnhancementDrawbackPickerForm
+from .forms import EnhancementDrawbackPickerForm, TagPickerForm
 
 from .models import Enhancement, Parameter, Base_Power, Drawback, Power_Param, Power, Parameter_Value, \
-    Base_Power_Category, Base_Power_System, \
+    Base_Power_Category, Base_Power_System, PowerTag, PremadeCategory,\
     Enhancement_Instance, Drawback_Instance, Power_Full
 
 class PowerParamTabular(admin.TabularInline):
@@ -44,7 +44,18 @@ class BasePowerAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("name",)}
     list_display = ('name', 'category', 'is_public')
     inlines = [PowerParamTabular, SystemInline]
-    filter_horizontal = ["enhancements", "drawbacks", "example_powers"]
+    filter_horizontal = ["enhancements", "drawbacks"]
+
+@admin.register(PowerTag)
+class PowerTagAdmin(admin.ModelAdmin):
+    prepopulated_fields = {"slug": ("tag",)}
+
+@admin.register(PremadeCategory)
+class PremadeCategoryAdmin(admin.ModelAdmin):
+    form = TagPickerForm
+    prepopulated_fields = {"slug": ("name",)}
+    list_display = ('name', 'is_generic')
+    filter_horizontal = ["tags"]
 
 @admin.register(Base_Power_Category)
 class BasePowerCategoryAdmin(admin.ModelAdmin):

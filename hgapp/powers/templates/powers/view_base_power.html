@@ -8,8 +8,7 @@
 
 {% load staticfiles %}
 
-{% block styles %}
-    <link href="{% static "css/site.css" %}" rel="stylesheet" />
+{% block extra_styles %}
     <link rel="stylesheet" type="text/css" href="{% static 'powers/view_base.css' %}" />
 {% endblock %}
 
@@ -116,7 +115,7 @@
             </div>
         <div class="example_powers">
             <h1>Example Powers</h1>
-            {% for power_full in base_power.example_powers.all %}
+            {% for power_full in base_power.example_powers %}
                 {% with power=power_full.power_set.first%}
                     {% include "powers/view_power_snippet.html" %}
                 {% endwith %}

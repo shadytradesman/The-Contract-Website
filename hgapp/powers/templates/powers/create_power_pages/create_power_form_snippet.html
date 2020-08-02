@@ -13,24 +13,23 @@
             {% endif %}
             </h1>
         {% endif %}
-            {{ form.non_field_errors }}
-                {% csrf_token %}
-                {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-                {{ form.power_name.errors }}
-                {{ form.power_name | bootstrap}}
-                <span data-spy="affix" data-offset-top="160">
-                    <h4 class="nav navbar-nav">
-                        Current Gift Cost: <b><span id="current_gift_cost_number">1</span></b>
-                        {% if og_power %}
-                            ({{og_power.get_point_value}} <span id="gift_cost_delta">+0</span>)
-                        {% endif %}
-                    </h4>
-                </span>
-                <br>
-                {% if character %}
-                    <h5>{{character.name}} has <b>{{character.unspent_rewards|length}}</b> Points to spend on this power!</h5>
+        {{ form.non_field_errors }}
+        {% csrf_token %}
+        {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+        {{ form.power_name.errors }}
+        {{ form.power_name | bootstrap}}
+        <span data-spy="affix" data-offset-top="160">
+            <h4 class="nav navbar-nav">
+                Current Gift Cost: <b><span id="current_gift_cost_number">1</span></b>
+                {% if og_power %}
+                    ({{og_power.get_point_value}} <span id="gift_cost_delta">+0</span>)
                 {% endif %}
-
+            </h4>
+        </span>
+        <br>
+        {% if character %}
+            <h5>{{character.name}} has <b>{{character.unspent_rewards|length}}</b> Points to spend on this power!</h5>
+            {% endif %}
     </div>
     <div class="double-columns">
         <div class="container">
@@ -118,6 +117,12 @@
         <h4><div id="gift_cost_summary"></div></h4>
         <ol id="gifts_affected"></ol>
     </div>
+    {% if request.user.is_superuser %}
+        <br>
+        <h3>Power Tags (Admin only)</h3>
+        {{form.tags}}
+        <br>
+    {% endif %}
     <div class="col-md-2 col-md-offset-5">
         <input class="btn btn-lg btn-default" type="submit" value="Done!" />
     </div>

@@ -6,7 +6,9 @@
             {{power_full.name}}
         </a>
         <small>
-            - {{power_full.get_point_value}} point <a href="{% url 'powers:powers_view_base' power_full.base.slug %}">{{power_full.base.name}}</a> power
+            - {{power_full.get_point_value}} Gift
+            <a href="{% url 'powers:powers_view_base' power_full.base.slug %}">{{power_full.base.name}}</a>
+            Power
             {% if power_full.character and power_full.get_point_value > power_full.reward_list|length %}
                 <p class="text-danger">
                     {{power_full.reward_list|length}} Rewards assigned
@@ -19,5 +21,5 @@
             {% endif %}
         </small>
     </h4>
-    <p>{{power_full.latest_revision.description}}</p>
+    <p>{{power_full.latest_revision.description|linebreaks}}</p>
 </div>

@@ -81,25 +81,30 @@
                         </a>
                     </li>
                     <li role="presentation">
-                        <a href="wiki/format-and-website/creating-powers/" class="btn btn-default">
+                        <a href="{% url 'powers:powers_stock' %}" class="btn btn-default">
+                            Browse Pre-made Stock Powers
+                        </a>
+                    </li>
+                    <li role="presentation">
+                        <a href="/wiki/guides-and-tutorials/creating-powers/" class="btn btn-default">
                             Powers Tutorial
                         </a>
                     </li>
                 </ul>
-                    {% if powers %}
-                    <h4>My Unassigned Powers</h4>
-                        <div class="panel-group">
-                            {% for power_full in powers %}
-                                {% if not power_full.character %}
-                                    <a href="{% url 'powers:powers_view_power_full' power_full.id %}">
-                                        <div class="panel css-home-panel">
-                                                {{ power_full.name }}
-                                        </div>
-                                    </a>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                    {% endif %}
+                {% if powers %}
+                <h4>My Unassigned Powers</h4>
+                    <div class="panel-group">
+                        {% for power_full in powers %}
+                            {% if not power_full.character %}
+                                <a href="{% url 'powers:powers_view_power_full' power_full.id %}">
+                                    <div class="panel css-home-panel">
+                                            {{ power_full.name }}
+                                    </div>
+                                </a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
             </div>
             <div class="col-sm-4">
                 <h2>Cells</h2>

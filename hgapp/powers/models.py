@@ -180,8 +180,6 @@ class Base_Power(models.Model):
                                         through_fields=('relevant_base_power', 'relevant_parameter'))
     enhancements = models.ManyToManyField(Enhancement)
     drawbacks = models.ManyToManyField(Drawback)
-    example_powers = models.ManyToManyField("Power_Full",
-                                            blank = True)
     required_status = models.CharField(choices=HIGH_ROLLER_STATUS,
                                        max_length=25,
                                        default=HIGH_ROLLER_STATUS[0])
@@ -190,6 +188,9 @@ class Base_Power(models.Model):
 
     def __str__(self):
         return self.name + " (" + self.summary + ")"
+
+    def example_powers(self):
+        return Power_Full.objects.filter(base=self, tags__in=["example"])
 
 class Base_Power_System(models.Model):
     base_power = models.ForeignKey(Base_Power,
@@ -252,6 +253,8 @@ class Power_Full(models.Model):
                                   blank=True,
                                   null=True,
                                   on_delete=models.CASCADE)
+    tags = models.ManyToManyField("PowerTag",
+                                   blank=True)
 
     class Meta:
         permissions = (
@@ -362,6 +365,23 @@ class Power_Full(models.Model):
         else:
             return self.name + " [NO ASSOCIATED USER]"
 
+class PowerTag(models.Model):
+    tag = models.CharField(max_length=40)
+    slug = models.SlugField("Unique URL-Safe Name",
+                            max_length=40,
+                            primary_key=True)
+    def __str__(self):
+        return self.tag
+
+class PremadeCategory(models.Model):
+    name = models.CharField(max_length=500)
+    slug = models.SlugField("Unique URL-Safe Name",
+                            max_length=50,
+                            primary_key=True)
+    description = models.CharField(max_length=5000)
+    is_generic = models.BooleanField(default=True)
+    tags = models.ManyToManyField("PowerTag",
+                                   blank=True)
 
 class Power(models.Model):
     name = models.CharField(max_length = 100)
