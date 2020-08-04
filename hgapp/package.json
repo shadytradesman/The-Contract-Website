@@ -7,7 +7,7 @@
     "clean": "rm -rf static/dist && mkdir -p static/dist/js && mkdir -p static/dist/css && mkdir -p static/dist/fonts && mkdir -p static/dist/images",
     "watch:babel": "babel static/src/js --out-dir static/dist/js --quiet --watch",
     "build:babel": "babel static/src/js --out-dir static/dist/js --quiet",
-    "build:js": "browserify -t [ babelify --presets [ es2015 stage-1 ] ] -t envify static/src/js/index.js | uglifyjs -c warnings=false -o static/dist/js/site.js",
+    "build:js": "browserify -t [ babelify --presets [ es2015 stage-1 ] ] -t envify static/src/js/index.js static/src/js/custom.js | uglifyjs -c warnings=false -o static/dist/js/site.js",
     "build:css": "lessc --include-path=node_modules/font-awesome/less:node_modules/bootstrap/less:node_modules/eonasdan-bootstrap-datetimepicker/src/less:node_modules static/src/less/site.less static/dist/css/site.css",
     "copy:fonts": "cp node_modules/bootstrap/fonts/* static/dist/fonts/ && cp node_modules/font-awesome/fonts/* static/dist/fonts/",
     "copy:images": "cp -r static/src/images/* static/dist/images/ 2>/dev/null || :",

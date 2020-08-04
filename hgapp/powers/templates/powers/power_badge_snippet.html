@@ -1,6 +1,11 @@
 {% load account_tags %}
 
-<div class="thumbnail">
+<div class="thumbnail power-badge"
+    id="collapse-power-{{power_full.id}}-heading"
+    role="button" data-toggle="collapse"
+    data-target=".collapse-power-{{power_full.id}}"
+    aria-expanded="false"
+    aria-controls="collapse-power-{{power_full.id}}">
     <h4>
         <a href="{% url 'powers:powers_view_power_full' power_full.id %}">
             {{power_full.name}}
@@ -21,8 +26,59 @@
             {% endif %}
         </small>
     </h4>
-    <p>{{power_full.latest_revision.description|linebreaks}}</p>
-    {% if power_full.example_description %}
-        <small style="font-style: italic; color: #808080;">Stock Power Tip: {{power_full.example_description|linebreaks}}</small>
+    <p><i>{{power_full.latest_revision.description|linebreaks}}</i></p>
+    <div class="panel-collapse collapse collapse-power-{{power_full.id}}"
+         role="tabpanel"
+         aria-labelledby="collapse-power-{{power_full.id}}-heading">
+        <p>
+            <b>System: <br></b>
+            {{power_full.latest_revision.system}}
+        </p>
+<!--        data-toggle="tooltip" title='{{tutorial.core_info}}'-->
+        {% if power_full.latest_revision.enhancement_instance_set.all %}
+            <p>
+                <b>Enhancements:</b>
+                {% for instance in power_full.latest_revision.enhancement_instance_set.all %}
+                    <span class="power-badge-modifier"
+                          style="display: inline-block;"
+                          data-toggle="tooltip"
+                          data-html="true"
+                          title='{{instance.relevant_enhancement.description}}
+                          {{instance.relevant_enhancement.eratta|linebreaks}}'>
+                        {{instance.relevant_enhancement.name}}
+                    </span>
+                {% endfor %}
+            </p>
+        {% endif %}
+        {% if power_full.latest_revision.drawback_instance_set.all %}
+            <p>
+                <b>Drawbacks:</b>
+                {% for instance in power_full.latest_revision.drawback_instance_set.all %}
+                    <span style="display: inline-block;"
+                            class="power-badge-modifier"
+                          data-toggle="tooltip"
+                          data-html="true"
+                          title='{{instance.relevant_drawback.description|linebreaks}}
+                          {{instance.relevant_drawback.eratta|linebreaks}}'>
+                        {{instance.relevant_drawback.name}}
+                    </span>
+                {% endfor %}
+            </p>
+        {% endif %}
+        {% if power_full.example_description %}
+            <small style="font-style: italic; color: #808080;">Stock Power Tip: {{power_full.example_description|linebreaks}}</small>
+        {% endif %}
+    </div>
+    {% if power_full.tags.all %}
+        <a href="{% url 'powers:powers_create_power_from _existing' power_full.latest_revision.id %}"
+           class="btn btn-default btn-xs">
+            Customize
+        </a>
     {% endif %}
+    <div class="collapse collapse-power-{{power_full.id}} in"
+          role="tabpanel"
+         aria-labelledby="collapse-power-{{power_full.id}}-heading">
+        <small class="visible-xs-block visible-sm-block text-center"><i>Tap to show system</i></small>
+        <small class="visible-md-block visible-lg-block text-center"><i>Click to show system</i></small>
+    </div>
 </div>

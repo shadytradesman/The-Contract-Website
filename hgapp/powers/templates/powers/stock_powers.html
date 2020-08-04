@@ -9,6 +9,22 @@
     <link rel="stylesheet" type="text/css" href="{% static 'powers/stock_powers_style.css' %}" />
 {% endblock %}
 
+{% block extra_scripts %}
+<script>
+
+/*$(document).on("click", "[id^=collapse-power-]", function() {
+    var collapsible = $(this).children(".panel-collapse");
+    if (collapsible.hasClass("in")) {
+        collapsible.removeClass("in");
+    }
+    else {
+        collapsible.addClass("in");
+    }
+    console.log("Blah");
+});*/
+</script>
+{% endblock %}
+
 {% block body_base %}
 <div class="container">
     <div class="backdropped">

@@ -114,6 +114,7 @@ class CreatePowerForm(forms.Form):
                              help_text='Describe the power\'s cost, associated roll(s), determination of outcome, conditions, etc')
     activation_style = forms.ChoiceField(choices=ACTIVATION_STYLE, disabled=True)
     tags = forms.ModelMultipleChoiceField(queryset=PowerTag.objects.order_by("tag").all(),
+                                          required=False,
                                           widget=forms.CheckboxSelectMultiple)
     example_description = forms.CharField(label='Example Description',
                                           widget=forms.Textarea,

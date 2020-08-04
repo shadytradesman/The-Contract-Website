@@ -112,6 +112,8 @@ source: https://www.codeply.com/go/bp/74926
     height: 100%;
     overflow: auto;
     background-color: #FFFFFF;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
     pading-top: 10px;
 }
 

@@ -60,12 +60,6 @@ $(document).on("input keyup mouseup", ".source-value-input", function() {
     updateSourceExp($(this).parent());
 });
 
-$(document).ready(function(){
-    $('[data-toggle="tooltip"]').tooltip({
-        trigger : 'hover'
-    });
-});
-
 // Secondary ability creation / destruction
 $(document).on('change','[class~=sec-ability-name]', function(ev){
     isDirty = true;
