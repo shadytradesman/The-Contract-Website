@@ -22,4 +22,7 @@
         </small>
     </h4>
     <p>{{power_full.latest_revision.description|linebreaks}}</p>
+    {% if power_full.example_description %}
+        <small style="font-style: italic; color: #808080;">Stock Power Tip: {{power_full.example_description|linebreaks}}</small>
+    {% endif %}
 </div>

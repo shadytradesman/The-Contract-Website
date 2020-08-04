@@ -255,6 +255,9 @@ class Power_Full(models.Model):
                                   on_delete=models.CASCADE)
     tags = models.ManyToManyField("PowerTag",
                                    blank=True)
+    example_description = models.CharField(max_length = 9000,
+                                           blank=True,
+                                           null=True)
 
     class Meta:
         permissions = (

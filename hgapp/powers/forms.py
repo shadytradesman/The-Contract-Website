@@ -115,6 +115,12 @@ class CreatePowerForm(forms.Form):
     activation_style = forms.ChoiceField(choices=ACTIVATION_STYLE, disabled=True)
     tags = forms.ModelMultipleChoiceField(queryset=PowerTag.objects.order_by("tag").all(),
                                           widget=forms.CheckboxSelectMultiple)
+    example_description = forms.CharField(label='Example Description',
+                                          widget=forms.Textarea,
+                                          required=False,
+                                          help_text='Admin only, optional, for the stock powers page. Follow-up advice for this power. '
+                                                    'What sorts of Enhancements and Drawbacks would be good?')
+
 
     def __init__(self, base_power, *args, **kwargs):
         super(CreatePowerForm, self).__init__(*args, **kwargs)

@@ -25,6 +25,10 @@
         </h2>
         <div class="panel-group row no-gutters" id="accordion-generic" role="tablist" aria-multiselectable="true">
             {% for category, power_list in generic_powers_by_category.items %}
+                {% if forloop.counter0|divisibleby:"2" %}
+                    </div>
+                    <div class="row">
+                {% endif %}
             <div class="col-md-6">
                 <div class="panel panel-default">
                     <a class= "unstyled-link" role="button" data-toggle="collapse" href="#collapse{{category.slug}}" aria-expanded="false" aria-controls="collapse{{category.slug}}">

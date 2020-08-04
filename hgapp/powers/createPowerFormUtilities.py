@@ -69,6 +69,8 @@ def get_create_power_context_from_power(power, new=True):
      'power_name': power.name}
     if power.parent_power:
         initial['tags'] = power.parent_power.tags.all()
+        initial['example_description'] = power.parent_power.example_description
+
     primary_form = CreatePowerForm(power.base,
                                    initial=initial)
     enhancement_forms = get_enhancement_formsets_from_power(power)
@@ -213,6 +215,8 @@ def create_power_for_new_edit(base_power, request, power_full):
         old_power = power_full.latest_revision()
         if request.user.is_superuser:
             power_full.tags.set(power_form.cleaned_data["tags"])
+            power_full.example_description = power_form.cleaned_data["example_description"]
+            power_full.save()
         new_power = create_power_from_post_and_base(base_power, request, power_full)
         new_power.creation_reason = get_power_creation_reason(new_power, old_power)
         new_power.creation_reason_expanded_text = get_power_creation_reason_expanded_text(new_power, old_power)
@@ -230,6 +234,7 @@ def create_new_power_and_parent(base_power, request, character=None):
         power_full.save()
         if request.user.is_superuser:
             power_full.tags.set(form.cleaned_data["tags"])
+            power_full.example_description = form.cleaned_data["example_description"]
             power_full.save()
         new_power = create_power_from_post_and_base(base_power, request, power_full)
         new_power.creation_reason = CREATION_REASON[0][0]
