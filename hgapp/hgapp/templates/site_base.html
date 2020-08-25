@@ -30,3 +30,9 @@
     {% analytics %}
     {% block extra_body %}{% endblock %}
 {% endblock %}
+
+{% block site_brand %}
+    <a href="/">
+    <img src="{% static 'overrides/branding/logobone_small.png' %}" width="160" height="45" style="margin-top: 3px;">
+    </a>
+{% endblock %}

@@ -35,7 +35,7 @@ input[type="number"] {
     display: inline !important;
 }
 .sec-ability-phys {
-    width: 90px !important;
+    width: 200px !important;
     display: inline !important;
 }
 
@@ -48,8 +48,12 @@ input[type="number"] {
 }
 
 .quirk-btn-cont {
-  background-color: #EFEFEF;
+  background-color: #191c23;
   border-radius: 4px;
+}
+
+.css-ability-form {
+    padding-bottom: 10px;
 }
 
 .quirk-btn-inner {
@@ -59,12 +63,12 @@ input[type="number"] {
 }
 
 .quirk-btn.active {
-  background-color: #CFCFCF;
+  background-color: #262d37;
   box-shadow: inset 0px 0px 0px 0px rgba(0,0,0,.125);
 }
 
 .quirk-collapse {
-  background-color: #CFCFCF;
+  background-color: #262d37;
   padding-right: 5px;
   padding-bottom: 5px;
   border-radius: 4px;
@@ -78,7 +82,7 @@ input[type="number"] {
 }
 
 .quirk-btn:hover {
-  background-color: #E1E1E1;
+  background-color: #2a323d;
 }
 
 .quirk-btn.focus {
@@ -110,7 +114,7 @@ input[type="number"] {
     border-width: 1px;
     border-style: solid;
     padding: 5px;
-    background-color: #E1E1E1;
+    background-color: #5a5f6c;
 }
 
 .css-fake-height-div {
@@ -122,9 +126,6 @@ input[type="number"] {
     z-index: 9999 !important;
 }
 
-h1 {
-    margin-top: 0px;
-}
 
 /* ESSENTIALS SECTION */
 .css-essential-field {

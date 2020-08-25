@@ -1,18 +1,72 @@
 body {
   padding-top: 50px;
   position: relative;
-  background-color: darkgrey;
 }
 
-.backdropped {
-  background-color: lightgrey;
-  padding: 20px;
-  padding-bottom: 70px;
+/*@body-bg: #272526;*/
+
+@text-color: #F3F2E6;
+@panel-bg: #20252d;
+@red-bg: #271313;
+@border-color: #a6763a;
+@body-bg: darken(@panel-bg, 7%);
+@subtitle-color: #939286;
+@dark-border: darken(@panel-bg, 20%);
+@brand-danger: #BB3B35;
+@btn-bg: #5a5f6c;
+@brand-primary: #648091;
+
+@input-bg: darken(@panel-bg, 3.5%);
+@input-color: @text-color;
+@input-border: @dark-border;
+@input-border-focus: @border-color;
+
+@label-color: @subtitle-color;
+
+@headings-small-color: @subtitle-color;
+@page-header-border-color: @border-color;
+@hr-border: @border-color;
+
+@text-muted: @subtitle-color;
+
+@panel-default-heading-bg: lighten(@panel-bg, 5.5%);
+@panel-default-text: @text-color;
+@panel-heading-padding: 10px 15px;
+@panel-default-border: transparent;
+
+@thumbnail-border: @dark-border;
+
+@navbar-default-border: @border-color;
+@navbar-default-bg: @panel-bg;
+
+@state-danger-bg: darken(@brand-danger, 10%);
+@state-danger-text: lighten(@brand-danger, 25%);
+
+@btn-default-bg: darken(@btn-bg, 15%);
+@btn-default-border: lighten(@btn-default-bg, 15%);
+@btn-default-color: @text-color;
+@btn-primary-color: @text-color;
+
+.help-block {
+    color: @subtitle-color;
+}
+
+.navbar-default {
+    color:  @text-color;
+}
+
+.navbar-default .navbar-nav>li>a, .navbar-default .navbar-text {
+    color:  @text-color;
+}
+
+.thumbnail {
+    background-color: @panel-bg;
 }
 
 section {
   padding: 20px 0px;
 }
+
 .modal form {
   margin-bottom: 0px;
 }
