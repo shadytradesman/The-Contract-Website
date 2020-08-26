@@ -65,15 +65,20 @@ input[type="number"] {
 .quirk-btn.active {
   background-color: #262d37;
   box-shadow: inset 0px 0px 0px 0px rgba(0,0,0,.125);
+  border: 1px solid #a6763a;
 }
 
 .quirk-collapse {
   background-color: #262d37;
   padding-right: 5px;
   padding-bottom: 5px;
-  border-radius: 4px;
+  border-radius: 0px 0px 4px 4px;
   margin-top:-8px;
   white-space: noWrap;
+  border-bottom: 1px solid #a6763a;
+  border-left: 1px solid #a6763a;
+  border-right: 1px solid #a6763a;
+
 }
 
 .quirk-details {

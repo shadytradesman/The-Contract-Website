@@ -30,13 +30,13 @@
         </ul>
     </div>
 {% elif request.user.is_authenticated %}
-    {% if  invitation %}
+    {% if  my_invitation %}
         <div class="container">
-            {% if invitation.attendance %}
-                {% if invitation.attendance.attending_character %}
+            {% if my_invitation.attendance %}
+                {% if my_invitation.attendance.attending_character %}
                     <h4>You are set to attend this game with
-                        <a href="{% url 'characters:characters_view' invitation.attendance.attending_character.id %}">
-                                {{invitation.attendance.attending_character.name}}
+                        <a href="{% url 'characters:characters_view' my_invitation.attendance.attending_character.id %}">
+                                {{my_invitation.attendance.attending_character.name}}
                         </a>
                     </h4>
                     <h5> <a href="{% url 'games:games_accept_invite' game.id %}">Click here to change character</a></h5>
@@ -45,7 +45,7 @@
                     <h4>You are set to attend this game as a ringer (NPC).</h4>
                     <h5> <a href="{% url 'games:games_decline_invite' game.id %}">Click here to cancel your attendance</a></h5>
                 {% endif %}
-            {% elif invitation.is_declined %}
+            {% elif my_invitation.is_declined %}
                 <h4>You have declined your invitation to this game.</h4>
                 <h5><a href="{% url 'games:games_accept_invite' game.id %}">You may still RSVP if you change your mind</a></h5>
             {% else %}

@@ -3,6 +3,7 @@
 {% load games_tags %}
 {% load i18n %}
 {% load markdown_deux_tags %}
+{% load account_tags %}
 
 {% block head_title %}
     {{character.name}}
@@ -26,143 +27,188 @@
 
 {% block body_base %}
 <div class="container">
-    <div class="backdropped">
     {% include "characters/view_pages/header_section.html" %}
-    {% include "characters/view_pages/essentials_section.html" %}
-    {% include "characters/view_pages/attributes_and_abilities.html" %}
-    <div class="row ">
-        <div class="col-md-4">
-            {% include "characters/view_pages/left_column.html" %}
-        </div>
-        <div class="col-md-8">
-            <div class="row">
-                <div class="col-md-6 stat-value">
-                    {% include "characters/view_pages/center_column.html" %}
+
+                <div class="char-view-alerts">
+                    {% include "characters/view_pages/alerts.html" %}
                 </div>
-                <div class="col-md-6">
-                    {% include "characters/view_pages/right_column.html" %}
-                </div>
-            </div>
-            <div class="col-md-12">
-                    <h2 class="text-center" data-toggle="tooltip" title='{{tutorial.powers_view}}'>
-                        Powers
-                    </h2>
-                    {% for power_full in character.power_full_set.all %}
-                        <div class="row">
-                            {% if request.user.is_authenticated and request.user.id == character.player.id and character.unspent_rewards|length > 0 %}
-                                <div class= "col-md-2 container">
-                                    <a href="{% url 'powers:powers_edit_power' power_full.id %}" class="btn btn-success">
-                                        <i class="fa fa-plus-square fa-4x"></i>
-                                    </a>
-                                </div>
-                                <div class= "col-md-10">
-                            {% else %}
-                                <div class= "col-md-12">
-                            {% endif %}
-                            {% include "powers/power_badge_snippet.html" %}
-                            </div>
-                        </div>
-                    {% empty %}
-                        <h4 class="text-center">{{character.name}} doesn't have any powers yet. What a noob :(</h4>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-        <h2 data-toggle="tooltip" title='{{tutorial.character_timeline}}'>
-            Character Timeline
-        </h2>
-            <p>
-                <b>{{ character.number_of_victories }}</b> Victories - <b>{{ character.number_of_losses }}</b> Losses
-                <br>
-                {% if unspent_experience < 0 %}
-                    <h4 class="text-danger">{{character.name}} has overspent Experience</h4>
-                {% endif %}
-                <b>Remaining: </b>{{unspent_experience}} Exp.
-                (<b>Earned: </b> {{exp_earned}} - <b>Spent: </b> {{exp_cost}})
-            </p>
-            {% for date, event_list in timeline.items %}
-                <h4>{{ date }}</h4>
-                <ul>
-                {% for event in event_list %}
-                    {% if event.0 == "game"%}
-                        {% with event.1 as attendance %}
-                            {% include "games/game_attendance_badge_snippet.html" %}
-                        {% endwith %}
-                    {% elif event.0 == "exp_reward" %}
-                        <li class="css-timeline-item css-timeline-exp">
-                            <b>{{event.1.get_history_blurb.0}}</b>
-                            {{event.1.get_history_blurb.1}}
-                        </li>
-                    {% else %}
-                        {% for phrase in event.1.get_change_phrases %} {# This is expensive. TODO: make ajax? #}
-                            <li class="css-timeline-item css-timeline-exp">
-                                <b>{{phrase.0}} Exp:</b> {{phrase.1}}
-                            </li>
-                        {% endfor %}
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="text-center">
+                <h1>
+                    {{ character.name }}
+                    <br>
+                    <small>
+                        {{ character.tagline }}
+                    </small>
+                </h1>
+                <p>
+                    A
+                    {% if character.number_of_victories %}
+                        {{ character.number_of_victories }}-Victory
                     {% endif %}
+                    <b>{{ character.get_status_display }}</b>
+                    played by
+                    <a href="{% url 'profiles:profiles_view_profile' character.player.id %}">{% user_display character.player %}</a>
+                    {% if character.cell %}
+                        in
+                        <a href="{% url 'cells:cells_view_cell' character.cell.id %}">{{ character.cell.name }}</a>
+                    {% else %}
+                        as a Free Agent
+                    {% endif %}
+                </p>
+                {% if character.is_dead %}
+                    <img src="{% static 'characters/skull.svg' %}"/>
+                    <h3>This character is dead. RIP</h3>
+                    {% if character.private %}
+                        <h3 class="text-warning">Hey, this character is dead and private. You should consider making them public so they appear in the graveyard.</h3>
+                    {% endif %}
+                    {%if character.real_death.obituary %}
+                        {{character.real_death.obituary | linebreaks}}
+                    {% elif request.user.id == character.player.id %}
+                        <a href="{%url 'characters:characters_obituary' character.id %}" class="btn btn-default">
+                                Edit Obituary
+                        </a>
+                    {% endif %}
+                {% endif %}
+            </div>
+        {% include "characters/view_pages/essentials_section.html" %}
+        {% include "characters/view_pages/attributes_and_abilities.html" %}
+        <div class="row ">
+            <div class="col-md-4 css-health-section">
+                {% include "characters/view_pages/left_column.html" %}
+            </div>
+            <div class="col-md-8">
+                <div class="row css-health-section">
+
+                    <div class="col-md-6">
+                        {% include "characters/view_pages/center_column.html" %}
+                    </div>
+                    <div class="col-md-6">
+                        {% include "characters/view_pages/right_column.html" %}
+                    </div>
+                </div>
+                <div class="col-md-12">
+                        <h2 class="text-center" data-toggle="tooltip" title='{{tutorial.powers_view}}'>
+                            Powers
+                        </h2>
+                        {% for power_full in character.power_full_set.all %}
+                            <div class="row">
+                                {% if request.user.is_authenticated and request.user.id == character.player.id and character.unspent_rewards|length > 0 %}
+                                    <div class= "col-md-2">
+                                        <a href="{% url 'powers:powers_edit_power' power_full.id %}" class="btn btn-success">
+                                            <i class="fa fa-plus-square fa-4x"></i>
+                                        </a>
+                                    </div>
+                                    <div class= "col-md-10">
+                                {% else %}
+                                    <div class= "col-md-12">
+                                {% endif %}
+                                {% include "powers/power_badge_snippet.html" %}
+                                </div>
+                            </div>
+                        {% empty %}
+                            <h4 class="text-center">{{character.name}} doesn't have any powers yet. What a noob :(</h4>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <h2 data-toggle="tooltip" title='{{tutorial.character_timeline}}'>
+                Character Timeline
+            </h2>
+                <p>
+                    <b>{{ character.number_of_victories }}</b> Victories - <b>{{ character.number_of_losses }}</b> Losses
+                    <br>
+                    {% if unspent_experience < 0 %}
+                        <h4 class="text-danger">{{character.name}} has overspent Experience</h4>
+                    {% endif %}
+                    <b>Remaining: </b>{{unspent_experience}} Exp.
+                    (<b>Earned: </b> {{exp_earned}} - <b>Spent: </b> {{exp_cost}})
+                </p>
+                {% for date, event_list in timeline.items %}
+                    <h4>{{ date }}</h4>
+                    <ul>
+                    {% for event in event_list %}
+                        {% if event.0 == "game"%}
+                            {% with event.1 as attendance %}
+                                {% include "games/game_attendance_badge_snippet.html" %}
+                            {% endwith %}
+                        {% elif event.0 == "exp_reward" %}
+                            <li class="css-timeline-item css-timeline-exp">
+                                <b>{{event.1.get_history_blurb.0}}</b>
+                                {{event.1.get_history_blurb.1}}
+                            </li>
+                        {% else %}
+                            {% for phrase in event.1.get_change_phrases %} {# This is expensive. TODO: make ajax? #}
+                                <li class="css-timeline-item css-timeline-exp">
+                                    <b>{{phrase.0}} Exp:</b> {{phrase.1}}
+                                </li>
+                            {% endfor %}
+                        {% endif %}
+                    {% endfor %}
+                    </ul>
+                {% empty %}
+                    <h4>{{character.name}} Has never edited their stats or attended a Game</h4>
+                {% endfor %}
+                {% if character.basic_stats.advancement_history %}
+                    <h3>Advancement History</h3>
+                    <p>{{character.basic_stats.advancement_history |linebreaks}}</p>
+                {% endif %}
+            <h2>Gifts and Improvements</h2>
+                {% if character.unspent_rewards|length > 0 %}
+                    <h4>Character has {{character.unspent_rewards|length}} unspent rewards</h4>
+                        <ul >
+                            {% for reward in character.unspent_rewards %}
+                                <li>{% render_reward reward %}</li>
+                            {% endfor %}
+                        </ul>
+                {% endif %}
+                {% if character.spent_rewards|length > 0 %}
+                    <h4>Gift / Reward History</h4>
+                        <ul >
+                            {% for reward in character.spent_rewards %}
+                                <li>{% render_reward reward %}</li>
+                            {% endfor %}
+                        </ul>
+                {% endif %}
+        {% if character.wish_list %}
+            <div class="container">
+                <h3>Wish List</h3>
+                <div class="container">
+                    <p>{{character.wish_list | linebreaks}}</p>
+                </div>
+            </div>
+        {% endif %}
+        {% if character.to_do_list %}
+            <div class="container">
+                <h3>To-Do List</h3>
+                <div class="container">
+                    <p>{{character.to_do_list | linebreaks}}</p>
+                </div>
+            </div>
+        {% endif %}
+        {% if character.notes %}
+            <div class="container">
+                <h3>Other Notes</h3>
+                <div class="container">
+                    <p>{{character.notes | markdown | linebreaks}}</p>
+                </div>
+            </div>
+        {% endif %}
+        {% if character.void_deaths %}
+            <div class="container text-danger">
+                <h2>Voided Deaths</h2>
+                <h4>You should probably know about these. . .</h4>
+                <ul>
+                {% for death in character.void_deaths %}
+                    <div class="container">
+                        <li>{{death.date_of_death}} - {{death.cause_of_death }}</li>
+                    </div>
                 {% endfor %}
                 </ul>
-            {% empty %}
-                <h4>{{character.name}} Has never edited their stats or attended a Game</h4>
-            {% endfor %}
-            {% if character.basic_stats.advancement_history %}
-                <h3>Advancement History</h3>
-                <p>{{character.basic_stats.advancement_history |linebreaks}}</p>
-            {% endif %}
-        <h2>Gifts and Improvements</h2>
-            {% if character.unspent_rewards|length > 0 %}
-                <h4>Character has {{character.unspent_rewards|length}} unspent rewards</h4>
-                    <ul >
-                        {% for reward in character.unspent_rewards %}
-                            <li>{% render_reward reward %}</li>
-                        {% endfor %}
-                    </ul>
-            {% endif %}
-            {% if character.spent_rewards|length > 0 %}
-                <h4>Gift / Reward History</h4>
-                    <ul >
-                        {% for reward in character.spent_rewards %}
-                            <li>{% render_reward reward %}</li>
-                        {% endfor %}
-                    </ul>
-            {% endif %}
-    {% if character.wish_list %}
-        <div class="container">
-            <h3>Wish List</h3>
-            <div class="container">
-                <p>{{character.wish_list | linebreaks}}</p>
             </div>
+        {% endif %}
         </div>
-    {% endif %}
-    {% if character.to_do_list %}
-        <div class="container">
-            <h3>To-Do List</h3>
-            <div class="container">
-                <p>{{character.to_do_list | linebreaks}}</p>
-            </div>
-        </div>
-    {% endif %}
-    {% if character.notes %}
-        <div class="container">
-            <h3>Other Notes</h3>
-            <div class="container">
-                <p>{{character.notes | markdown | linebreaks}}</p>
-            </div>
-        </div>
-    {% endif %}
-    {% if character.void_deaths %}
-        <div class="container text-danger">
-            <h2>Voided Deaths</h2>
-            <h4>You should probably know about these. . .</h4>
-            <ul>
-            {% for death in character.void_deaths %}
-                <div class="container">
-                    <li>{{death.date_of_death}} - {{death.cause_of_death }}</li>
-                </div>
-            {% endfor %}
-            </ul>
-        </div>
-    {% endif %}
     </div>
 </div>
 

@@ -13,130 +13,131 @@
 {% endblock %}
 
 {% block body_base %}
-<section class="jumbotron">
-    <div class="container">
-        <div class="text-center">
-            <h1>{% blocktrans %}Welcome {% endblocktrans %}{% user_display request.user %} </h1>
-            {% include "_messages.html" %}
-            <h3><a class="btn btn-lg btn-info" href="{% url 'wiki:root' %}">Read the Player's Guide</a></h3>
-        </div>
-        {% include "logged_in_alerts.html" %}
-        <div class="row">
-            <div class="col-sm-4">
-                <h2>Characters</h2>
-                <ul class="nav nav-pills nav-stacked">
-                    <li role="presentation">
-                        <a href="{% url 'characters:characters_create' %}" class="btn btn-primary">
-                        Create a new Character
-                        {% if avail_charon_coins %}
+<div class="container">
+    <section>
+    <div class="text-center">
+        <h1>{% blocktrans %}Welcome {% endblocktrans %}{% user_display request.user %} </h1>
+        {% include "_messages.html" %}
+        <h3><a class="btn btn-lg btn-primary" href="{% url 'wiki:root' %}">Read the Player's Guide</a></h3>
+    </div>
+    {% include "logged_in_alerts.html" %}
+    <div class="row">
+        <div class="col-sm-4">
+            <h2>Characters</h2>
+            <ul class="nav nav-pills nav-stacked">
+                <li role="presentation">
+                    <a href="{% url 'characters:characters_create' %}" class="btn btn-primary">
+                    Create a new Character
+                    {% if avail_charon_coins %}
+                        <br>
+                        <small class="text-center">
+                            You have <b>{{avail_charon_coins | length}}</b> Coin{{avail_charon_coins|pluralize}} of Charon
                             <br>
-                            <small class="text-center">
-                                You have <b>{{avail_charon_coins | length}}</b> Coin{{avail_charon_coins|pluralize}} of Charon
-                                <br>
-                                You may spend {{avail_charon_coins|pluralize:"it,one"}} to start a new Character with a free Gift
-                            </small>
-                        {% endif %}
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'characters:characters_graveyard' %}" class="btn btn-default">Visit the Graveyard</a>
-                    </li>
-                    {% if avail_improvements %}
-                        <li role="presentation">
-                            <a href="{% url 'games:games_allocate_improvement_generic' %}" class="btn btn-success">Allocate Golden Ratio Rewards</a>
-                        </li>
+                            You may spend {{avail_charon_coins|pluralize:"it,one"}} to start a new Character with a free Gift
+                        </small>
                     {% endif %}
-                </ul>
-                {% if characters %}
-                    <br>
-                    {% for character in characters %}
-                        <a href="{% url 'characters:characters_view' character.id %}">
-                            <div class="row panel text-center">
-                                <h4>
-                                    {{ character.name }}
-                                    <br>
-                                    <small>The {{ character.concept_summary}}</small>
-                                </h4>
-                                {% if character.unspent_rewards|length > 0 %}
-                                    <a class="btn btn-success btn-xs" href="{% url 'characters:characters_spend_reward' character.id %}">
-                                        Spend {{ character.name }}'s Rewards
-                                    </a>
-                                {% endif %}
-                                {% if character.unspent_experience > 2 %}
-                                <a href="{% url 'characters:characters_edit' character.id %}" class="btn btn-success btn-xs">
-                                    Spend {{character.name}}'s {{character.unspent_experience}} Exp
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'characters:characters_graveyard' %}" class="btn btn-default">Visit the Graveyard</a>
+                </li>
+                {% if avail_improvements %}
+                    <li role="presentation">
+                        <a href="{% url 'games:games_allocate_improvement_generic' %}" class="btn btn-success">Allocate Golden Ratio Rewards</a>
+                    </li>
+                {% endif %}
+            </ul>
+            {% if characters %}
+                <hr>
+                {% for character in characters %}
+                    <a href="{% url 'characters:characters_view' character.id %}">
+                        <div class="panel panel-default text-center">
+                            <h4>
+                                {{ character.name }}
+                                <br>
+                                <small>The {{ character.concept_summary}}</small>
+                            </h4>
+                            {% if character.unspent_rewards|length > 0 %}
+                                <a class="btn btn-success btn-xs" href="{% url 'characters:characters_spend_reward' character.id %}">
+                                    Spend {{ character.name }}'s Rewards
                                 </a>
-                                {% endif %}
+                            {% endif %}
+                            {% if character.unspent_experience > 2 %}
+                            <a href="{% url 'characters:characters_edit' character.id %}" class="btn btn-success btn-xs">
+                                Spend {{character.name}}'s {{character.unspent_experience}} Exp
+                            </a>
+                            {% endif %}
+                        </div>
+                    </a>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div class="col-sm-4">
+            <h2>Powers</h2>
+            <ul class="nav nav-pills nav-stacked">
+                <li role="presentation" >
+                    <a href="{% url 'powers:powers_create' %}" class="btn btn-primary">
+                        Create a new Power
+                    </a>
+                </li>
+                <li role="presentation">
+                    <a href="{% url 'powers:powers_stock' %}" class="btn btn-default">
+                        Browse Pre-made Stock Powers
+                    </a>
+                </li>
+                <li role="presentation">
+                    <a href="/wiki/guides-and-tutorials/creating-powers/" class="btn btn-default">
+                        Powers Tutorial
+                    </a>
+                </li>
+            </ul>
+            {% if powers %}
+                <hr>
+                <h4>My Unassigned Powers</h4>
+                <div class="panel-group">
+                    {% for power_full in powers %}
+                        {% if not power_full.character %}
+                            <a href="{% url 'powers:powers_view_power_full' power_full.id %}">
+                                <div class="panel css-home-panel">
+                                        {{ power_full.name }}
+                                </div>
+                            </a>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        <div class="col-sm-4">
+            <h2>Cells</h2>
+            <ul class="nav nav-pills nav-stacked">
+                <li role="presentation">
+                    <a href="{% url 'cells:cells_create' %}" class="btn btn-primary">
+                        Create a new Cell
+                    </a>
+                </li>
+                {% if cells %}
+                    {% for cell in cells %}
+                        <a href="{% url 'cells:cells_view_cell' cell.id %}">
+                            <div class="panel css-home-panel">
+                                <b>{{cell.name}}</b>
                             </div>
                         </a>
                     {% endfor %}
                 {% endif %}
-            </div>
-            <div class="col-sm-4">
-                <h2>Powers</h2>
-                <ul class="nav nav-pills nav-stacked">
-                    <li role="presentation" >
-                        <a href="{% url 'powers:powers_create' %}" class="btn btn-primary">
-                            Create a new Power
-                        </a>
-                    </li>
-                    <li role="presentation">
-                        <a href="{% url 'powers:powers_stock' %}" class="btn btn-default">
-                            Browse Pre-made Stock Powers
-                        </a>
-                    </li>
-                    <li role="presentation">
-                        <a href="/wiki/guides-and-tutorials/creating-powers/" class="btn btn-default">
-                            Powers Tutorial
-                        </a>
-                    </li>
-                </ul>
-                {% if powers %}
-                <h4>My Unassigned Powers</h4>
-                    <div class="panel-group">
-                        {% for power_full in powers %}
-                            {% if not power_full.character %}
-                                <a href="{% url 'powers:powers_view_power_full' power_full.id %}">
-                                    <div class="panel css-home-panel">
-                                            {{ power_full.name }}
-                                    </div>
-                                </a>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            </div>
-            <div class="col-sm-4">
-                <h2>Cells</h2>
-                <ul class="nav nav-pills nav-stacked">
-                    <li role="presentation">
-                        <a href="{% url 'cells:cells_create' %}" class="btn btn-primary">
-                            Create a new Cell
-                        </a>
-                    </li>
-                    {% if cells %}
-                        {% for cell in cells %}
-                            <a href="{% url 'cells:cells_view_cell' cell.id %}">
-                                <div class="panel css-home-panel">
-                                    <b>{{cell.name}}</b>
-                                </div>
-                            </a>
-                        {% endfor %}
-                    {% endif %}
-                </ul>
-                <h2>Games</h2>
-                <ul class="nav nav-pills nav-stacked">
+            </ul>
+            <h2>Games</h2>
+            <ul class="nav nav-pills nav-stacked">
 
-                    <li role="presentation" class="active"> <a href="{% url 'games:games_create_game' %}">Schedule a Game</a></li>
-                    <li role="presentation" class="active"> <a href="{% url 'games:games_create_scenario' %}">Create a New Scenario</a></li>
-                    <li role="presentation" class="active"> <a href="{% url 'games:games_view_scenario_gallery' %}">My Scenario Gallery</a></li>
-                </ul>
-            </div>
+                <li role="presentation" class="active"> <a href="{% url 'games:games_create_game' %}">Schedule a Game</a></li>
+                <li role="presentation" class="active"> <a href="{% url 'games:games_create_scenario' %}">Create a New Scenario</a></li>
+                <li role="presentation" class="active"> <a href="{% url 'games:games_view_scenario_gallery' %}">My Scenario Gallery</a></li>
+            </ul>
         </div>
+    </div>
     </ul>
 </section>
 <section>
-    <div class="container">
+        <hr>
         <h2 class="text-center">{% blocktrans %}Community{% endblocktrans %}</h2>
         <p class="lead text-center">
             {% blocktrans %}
@@ -175,16 +176,14 @@
                 {% endif %}
             </div>
         </div>
-    </div>
 </section>
 <section>
-    <div class="container">
         <p class="lead text-center">
             {% blocktrans %}
             Contact us: thecontractgame@gmail.com
             for more information.
             {% endblocktrans %}
         </p>
-    </div>
 </section>
+</div>
 {% endblock %}

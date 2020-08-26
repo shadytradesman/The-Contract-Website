@@ -1,6 +1,5 @@
 {% extends "site_base.html" %}
 
-
 {% load i18n %}
 {% load bootstrap %}
 
@@ -16,7 +15,12 @@
     <section>
         <div class="container">
             {{ form.about.errors }}
-            <h1>Inviting players to {{game.title}}</h1>
+            {% include "_messages.html" %}
+            <h1>Inviting players to
+                <a href="{% url 'games:games_view_game' game.id %}">
+                    {{game.title}}
+                </a>
+            </h1>
             <form action="{% url 'games:games_invite_players' game.id %}" method="post">
             {{ form.non_field_errors }}
             {% csrf_token %}

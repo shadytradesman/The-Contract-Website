@@ -1,8 +1,26 @@
+h1 {
+    margin-top: 0px;
+}
+
+.css-header-buttons {
+    padding: 10px 0px;
+}
+
+.css-char-alert {
+    padding: 0px;
+}
+
 .char-essentials {
-    border-color: black;
+    border-color: #a6763a;
     border-radius: 4px;
     border-width: 1px;
     border-style: solid;
+    background-color: #353e4b;
+}
+
+.css-health-section {
+
+    background-color: #353e4b;
 }
 
 .stat-value {

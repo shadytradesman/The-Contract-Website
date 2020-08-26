@@ -4,14 +4,17 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.db import transaction
+from django.contrib import messages
 
 # Create your views here.
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.safestring import mark_safe
 from games.forms import CreateScenarioForm, CellMemberAttendedForm, make_game_form, make_allocate_improvement_form, \
     CustomInviteForm, make_accept_invite_form, ValidateAttendanceForm, DeclareOutcomeForm, GameFeedbackForm, \
     OutsiderAttendedForm, make_who_was_gm_form,make_archive_game_general_info_form, ArchivalOutcomeForm, \
     RsvpAttendanceForm
+
 
 from games.models import Scenario, Game, GAME_STATUS, DISCOVERY_REASON, Game_Invite, Game_Attendance, Reward
 
@@ -160,6 +163,14 @@ def create_game(request):
                                                   as_ringer=False)
                         game_invite.save()
                         game_invite.notify_invitee(request, game)
+
+            game_url = reverse('games:games_view_game', args=(game.id,))
+            messages.add_message(request, messages.SUCCESS, mark_safe("Your Game has been created Successfully."
+                                                                      "<br>"
+                                                                      "<a href='"
+                                                                      + game_url +
+                                                                      "'> Click Here</a> "
+                                                                      "if you do not want to invite anyone else at this time."))
             return HttpResponseRedirect(reverse('games:games_invite_players', args=(game.id,)))
         else:
             print(form.errors)

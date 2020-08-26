@@ -14,10 +14,11 @@
     <div class="container text-center">
         <h1>
             Graveyard
+            <br>
+            <small>
+                 {{header|linebreaks}}
+            </small>
         </h1>
-        <h3>
-            {{header|linebreaks}}
-        </h3>
     </div>
     <div class="container">
         <div class="panel-group" id="accordion">
@@ -26,7 +27,12 @@
                 <a data-toggle="collapse" data-parent="#accordion" href="#collapse{{forloop.counter}}">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            {{death.relevant_character.name}} <small>({{death.relevant_character.number_of_victories }} gift {{death.relevant_character.get_status_display}}) - {{death.cause_of_death}}</small>
+                            {{death.relevant_character.name}}
+                            <small>
+                                ({{death.relevant_character.number_of_victories }}
+                                gift {{death.relevant_character.get_status_display}})
+                                - Cause of death:  {{death.cause_of_death}}
+                            </small>
                         </h4>
                     </div>
                 </a>
