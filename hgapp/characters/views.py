@@ -247,8 +247,10 @@ def spend_reward(request, character_id):
     character = get_object_or_404(Character, id=character_id)
     if not character.player_can_edit(request.user):
         raise PermissionDenied("You do not have permission to edit this Character")
+    unassigned_powers = request.user.power_full_set.filter(is_deleted=False, character__isnull=True).all()
     context = {
         'character': character,
+        'unassigned_powers': unassigned_powers,
     }
     return render(request, 'characters/reward_character.html', context)
 

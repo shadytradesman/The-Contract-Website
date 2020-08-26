@@ -46,7 +46,7 @@ body {
 @navbar-default-bg: @panel-bg;
 
 @state-danger-bg: darken(@brand-danger, 10%);
-@state-danger-text: lighten(@brand-danger, 25%);
+@state-danger-text: lighten(@brand-danger, 35%);
 
 @btn-default-bg: darken(@btn-bg, 15%);
 @btn-default-border: lighten(@btn-default-bg, 15%);
@@ -95,14 +95,17 @@ p.login-signup {
 
 .double-columns {
     .make-row();
-
     > div {
         i.fa {
             margin-bottom: 0.2em;
         }
         .make-sm-column(6);
-        margin: 2em 0;
+        margin: 0px 0px;
     }
+}
+
+.double-columns>div {
+    margin-top: 0px;
 }
 
 textarea {
