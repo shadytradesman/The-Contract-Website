@@ -47,9 +47,23 @@
                     </li>
                 {% endif %}
             </ul>
+            {% if avail_exp_rewards %}
+                <br>
+                <div class="alert alert-success text-center css-home-alert">
+                    <b>{{avail_exp_rewards|length}} Unspent Experience Reward{{avail_exp_rewards|pluralize}}</b>
+                    <br>
+                    Choose who will benefit!
+                    <br>
+                    <a href="{% url 'characters:characters_allocate_gm_exp' %}" class="btn btn-primary">
+                        Grant Rewards
+                    </a>
+                </div>
+            {% endif %}
             {% if characters %}
                 <hr>
+                <h4>My Living Characters</h4>
                 {% for character in characters %}
+                    {% if not character.is_dead %}
                     <a href="{% url 'characters:characters_view' character.id %}">
                         <div class="panel panel-default text-center">
                             <h4>
@@ -69,6 +83,7 @@
                             {% endif %}
                         </div>
                     </a>
+                {% endif %}
                 {% endfor %}
             {% endif %}
         </div>
@@ -115,7 +130,22 @@
                         Create a new Cell
                     </a>
                 </li>
-                {% if cells %}
+            </ul>
+            {% if cell_invites %}
+                <br>
+                <div class="alert alert-success text-center css-home-alert">
+                    You've been invited to join
+                    <ul class="nav nav-pills nav-stacked nav-sm">
+                        {% for invite in cell_invites %}
+                            <li><a href="{% url 'cells:cells_view_cell' invite.relevant_cell.id %}">{{ invite.relevant_cell }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            {% if cells %}
+                <hr>
+                <h4>My Cells</h4>
+                <ul class="nav nav-pills nav-stacked">
                     {% for cell in cells %}
                         <a href="{% url 'cells:cells_view_cell' cell.id %}">
                             <div class="panel css-home-panel">
@@ -124,14 +154,80 @@
                         </a>
                     {% endfor %}
                 {% endif %}
+
             </ul>
             <h2>Games</h2>
             <ul class="nav nav-pills nav-stacked">
-
                 <li role="presentation" class="active"> <a href="{% url 'games:games_create_game' %}">Schedule a Game</a></li>
                 <li role="presentation" class="active"> <a href="{% url 'games:games_create_scenario' %}">Create a New Scenario</a></li>
                 <li role="presentation" class="active"> <a href="{% url 'games:games_view_scenario_gallery' %}">My Scenario Gallery</a></li>
             </ul>
+            {% if active_games or attendance_invites_to_confirm or upcoming_games_running or upcoming_games_invited %}
+                <hr>
+            {% endif %}
+            {% if active_games %}
+                <div class="alert alert-warning text-center css-home-alert">
+                    <h4>Ongoing Game!</h4>
+                    <ul class="nav nav-pills nav-stacked">
+                        {% for game in active_games %}
+                            <li>
+                                <a href="{% url 'games:games_view_game' game.id %}"><b>{{game.title}}</b> at {{game.scheduled_start_time}}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            {% if attendance_invites_to_confirm %}
+                <div class="alert alert-warning text-center css-home-alert">
+                    <b>A GM has declared that you attended a Game</b>
+                    <p>
+                        Confirm or deny your attendance
+                    </p>
+                    <ul class="nav nav-pills nav-stacked">
+                        {% for invite in attendance_invites_to_confirm %}
+                            <li>
+                                <a href="{% url 'games:games_confirm_attendance' invite.attendance.id %}">
+                                    <b>{{invite.attendance.relevant_game.title}}</b> at {{invite.attendance.relevant_game.scheduled_start_time}}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            {% if upcoming_games_running %}
+                <div class="alert alert-info text-center css-home-alert">
+                    <b>Upcoming Games You are Running</b>
+                    <ul class="nav nav-pills nav-stacked">
+                        {% for game in upcoming_games_running %}
+                            <li>
+                                <a href="{% url 'games:games_view_game' game.id %}"><b>{{game.title}}</b> at {{game.scheduled_start_time}}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            {% if upcoming_games_invited %}
+                <div class="alert alert-success text-center css-home-alert">
+                    <b>Upcoming Games you can Attend</b>
+                    <ul class="nav nav-pills nav-stacked">
+                        {% for game_invite in upcoming_games_invited %}
+                            <li>
+                                <a href="{% url 'games:games_view_game' game_invite.relevant_game.id %}">
+                                    {% if game_invite.attendance %}
+                                        <b>Attending - </b>
+                                    {% else %}
+                                        <b>Invited - </b>
+                                    {% endif %}
+                                    <b>
+                                        {{game_invite.relevant_game.title}}
+                                    </b> at {{game_invite.relevant_game.scheduled_start_time}}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
         </div>
     </div>
     </ul>

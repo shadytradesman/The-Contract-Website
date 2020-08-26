@@ -3,3 +3,12 @@
     margin-bottom: 5px !important;
     padding-left: 5px;
 }
+
+.css-home-alert {
+    padding: 5px;
+}
+
+.css-home-alert .nav>li>a {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
