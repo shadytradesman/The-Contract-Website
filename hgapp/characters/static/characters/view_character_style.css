@@ -19,7 +19,6 @@ h1 {
 }
 
 .css-health-section {
-
     background-color: #353e4b;
 }
 
@@ -29,6 +28,14 @@ h1 {
     border-width: 1px;
     border-style: solid;
     padding: 5px;
+}
+
+.css-left-panel {
+    background-color: #20252d;
+}
+
+h3 {
+    margin-top: 5px;
 }
 
 .health-box {
