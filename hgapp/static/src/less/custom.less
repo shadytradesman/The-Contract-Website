@@ -14,6 +14,7 @@ body {
 @dark-border: darken(@panel-bg, 20%);
 @brand-danger: #BB3B35;
 @brand-success: #499773;
+@brand-warning: #745b2f;
 @brand-primary: #648091;
 @btn-bg: #5a5f6c;
 
@@ -21,9 +22,6 @@ body {
 @input-color: @text-color;
 @input-border: @dark-border;
 @input-border-focus: @border-color;
-
-@state-success-bg: darken(@brand-success, 5%);
-@state-success-text: @text-color;
 
 @label-color: @subtitle-color;
 
@@ -44,9 +42,16 @@ body {
 
 @navbar-default-border: @border-color;
 @navbar-default-bg: @panel-bg;
+@nav-link-hover-bg: @thumbnail-bg;
 
+
+@state-success-bg: darken(@brand-success, 5%);
+@state-success-text: @text-color;
 @state-danger-bg: darken(@brand-danger, 10%);
-@state-danger-text: lighten(@brand-danger, 35%);
+@alert-danger-text: lighten(@brand-danger, 45%);
+@state-danger-text: @brand-danger;
+@state-warning-bg: @brand-warning;
+@state-warning-text: lighten(@brand-warning, 55%);
 
 @btn-default-bg: darken(@btn-bg, 15%);
 @btn-default-border: lighten(@btn-default-bg, 15%);
@@ -124,4 +129,13 @@ textarea {
 
 .thumbnail {
     padding: 8px;
+}
+
+.css-power-view-buttons >  li > a {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.inline-headers >h1, .inline-headers >h2, .inline-headers >h3, .inline-headers >h4, .inline-headers >h5  {
+    display: inline-block;
 }

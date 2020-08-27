@@ -60,26 +60,32 @@ function updateGiftCost() {
     $('#gift_cost_delta').text(delta_text);
     {% if character %}
         if (delta > {{character.unspent_rewards|length}}) {
-            $('#gift_cost_delta').css("color", "darkred");
+            $('#gift_cost_delta').css("color", "red");
         } else if (delta < 0) {
-            $('#gift_cost_delta').css("color", "darkblue");
+            $('#gift_cost_delta').css("color", "white");
         } else if (delta > 0) {
             $('#gift_cost_delta').css("color", "green");
         } else {
-            $('#gift_cost_delta').css("color", "black");
+            $('#gift_cost_delta').css("color", "white");
         }
         $('#gifts_affected').text("");
-        if (delta > 0 ) {
+        if (delta > 0 && delta > unspent_rewards.length -1) {
+            $('.js-gift-warn').show();
+            $('.js-gift-info').hide();
+        } else if (delta > 0 ) {
+            $('.js-gift-warn').hide();
+            $('.js-gift-info').show();
             $('#gift_cost_summary').text("Finalizing will cost the following gifts:");
             for (index = 0; index < delta; index++) {
                 if (index > unspent_rewards.length -1) {
-                    $('#gifts_affected').append("<li>WARNING: You do not have enough gifts to spend on this power</li>");
                     break;
                 } else {
                      $('#gifts_affected').append("<li>"  + unspent_rewards[index] + "</li>");
                 }
             }
         } else if (delta < 0) {
+            $('.js-gift-warn').hide();
+            $('.js-gift-info').show();
             $('#gift_cost_summary').text("Finalizing will refund the following gifts:");
             for (index = 0; index < delta*-1; index++) {
                 if (index > spent_rewards.length -1) {
@@ -89,6 +95,8 @@ function updateGiftCost() {
                 }
             }
         } else {
+             $('.js-gift-warn').hide();
+             $('.js-gift-info').show();
              $('#gift_cost_summary').text("Finalizing will not affect gifts");
              $('#gifts_affected').text("");
         }
@@ -141,5 +149,18 @@ function getGiftCost() {
     });
     return num_checked_enhancements - {{ base_power.num_free_enhancements }} - num_checked_drawbacks + total_current_param_values + 1;
 }
+
+// example power toggle
+var examplesShown = false;
+$(document).on('click','#js-example-power-button', function() {
+    examplesShown = !examplesShown;
+    if (examplesShown) {
+        $("#js-example-power-button").text("Hide Examples");
+    } else {
+        $("#js-example-power-button").text("Show Examples");
+    }
+});
+
+
 
 </script>

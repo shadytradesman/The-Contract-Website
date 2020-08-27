@@ -25,18 +25,4 @@
         {% include "powers/create_power_pages/create_power_form_snippet.html" %}
     </div>
 </form>
-<div class="container">
-    {% if base_power.example_powers.all %}
-        <button data-toggle="collapse" data-target="#examplepowers">Toggle Example Powers</button>
-        <div id="examplepowers" class="collapse">
-            {% for power_full in base_power.example_powers.all %}
-                {% with power=power_full.power_set.first%}
-                    {% include "powers/view_power_snippet.html" %}
-                {% endwith %}
-            {% empty %}
-            <h2>No Example Powers Yet</h2>
-            {% endfor %}
-        </div>
-    {% endif %}
-</div>
 {% endblock %}

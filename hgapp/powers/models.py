@@ -570,4 +570,4 @@ class Parameter_Value(models.Model):
         output = output.format(self.relevant_power_param.relevant_parameter.name, self.value, self.relevant_power_param.relevant_parameter.get_value_for_level(self.value))
         return output
 
-    level_descrption = property(get_level_description)
+    level_description = property(get_level_description)
