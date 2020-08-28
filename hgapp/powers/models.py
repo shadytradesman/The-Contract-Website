@@ -127,6 +127,25 @@ class Parameter(models.Model):
     def __str__(self):
         return " ".join([self.name]) + " [" +self.slug + "]"
 
+    def get_levels(self):
+        levels = []
+        if hasattr(self, "level_zero") and self.level_zero:
+            levels.append(self.level_zero)
+        if hasattr(self, "level_one") and self.level_one:
+            levels.append(self.level_one)
+        if hasattr(self, "level_two") and self.level_two:
+            levels.append(self.level_two)
+        if hasattr(self, "level_three") and self.level_three:
+            levels.append(self.level_three)
+        if hasattr(self, "level_four") and self.level_four:
+            levels.append(self.level_four)
+        if hasattr(self, "level_five") and self.level_five:
+            levels.append(self.level_five)
+        if hasattr(self, "level_six") and self.level_six:
+            levels.append(self.level_six)
+        return levels
+
+
     def get_value_for_level(self, level):
         if level is 0:
             return self.level_zero

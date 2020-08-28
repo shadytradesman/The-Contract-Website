@@ -15,10 +15,12 @@
 
 {% block body_base %}
 <div class="container">
-    <div class="jumbotron smaller">
-        <h1> {{ base_power.name }}: <small>    {{ base_power.summary }}</small></h1>
-        <div class="base_nav_links">
-            <a class="btn btn-default" href="{% url 'powers:powers_create_power' base_power.slug %}" role="button">Create a {{base_power.name}} Power</a>
+    <div class="text-center">
+        <h1>Viewing Base Power - {{ base_power.name }}
+            <br>
+            <small>{{ base_power.summary }}</small>
+        </h1>
+        <div>
             <p>
                 {% if base_power.required_status == "SEASONED" %}
                     <i class="fa fa-flash fa-1x"></i>
@@ -28,100 +30,105 @@
                     <i class="fa fa-flash fa-1x"></i>
                 {% endif %}
                 {% if base_power.required_status != "ANY" %}
-                    Requires: {{base_power.required_status}}
+                    Requires: {{base_power.get_required_status_display}}
                 {% endif %}
             </p>
         </div>
     </div>
-    <div class="row">
-        <div class="col-sm-6">
-            <div id="base_container">
-                <div id="description" class="base">
-                    <h2>Description</h2>
-                    <div class="base_description">{{ base_power.description|linebreaks }}</div>
-                    {% if base_power.eratta %}
-                    <h4>eratta</h4>
-                    <div class="base_description"><p>{{ base_power.eratta }}</p></div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6">
-            <div id="system" class="base">
-                <h2>HouseGames 1.5 System</h2>
-                <div class="base_system">{{ system_text.system_text|linebreaks }}</div>
-                {% if system_text.eratta %}
-                <h4>eratta</h4>
-                <div class="base_system"><p>{{ system_text.eratta }}</p></div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-6">
-            <div id="base_enhancements" class="base">
-                <h2>Potential Enhancements</h2>
-                <dl>
-                    {% for enhancement in base_power.enhancements.all %}
-                    <div class="base_enhancement">
-                        <dt><b>{{ enhancement.name }}</b> ({{ enhancement.description}})</dt>
-                        <dd><small>{{ enhancement.eratta }}</small> </dd>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <a class="btn btn-default" href="{% url 'powers:powers_create_power' base_power.slug %}" role="button">
+                Create a {{base_power.name}} Power
+            </a>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div>
+                        <div>
+                            <h2>Description</h2>
+                            {{ base_power.description|linebreaks }}
+                            {% if base_power.eratta %}
+                                <h3><small>Eratta</small></h3>
+                                <p>{{ base_power.eratta }}</p>
+                            {% endif %}
+                        </div>
                     </div>
-                    {% endfor %}
-                </dl>
-            </div>
-        </div>
-        <div class="col-sm-6">
-            <div id="base_drawbacks" class="base">
-                <h2>Potential Drawbacks</h2>
-                <dl>
-                    {% for drawback in base_power.drawbacks.all %}
-                    <div class="base_drawback">
-                        <dt><b>{{ drawback.name }}</b> ({{ drawback.description}})</dt>
-                        <dd><small>{{ drawback.eratta }}</small></dd>
+                </div>
+                <div class="col-sm-6">
+                    <div>
+                        <h2>System</h2>
+                        {{ system_text.system_text|linebreaks }}
+                        {% if system_text.eratta %}
+                            <h3><small>Eratta</small></h3>
+                            <p>{{ system_text.eratta }}</p>
+                        {% endif %}
                     </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div>
+                        <h2>Enhancements</h2>
+                        <dl>
+                            {% for enhancement in base_power.enhancements.all %}
+                                <div class="base_enhancement">
+                                    <p>
+                                    <dt><b>{{ enhancement.name }}</b> ({{ enhancement.description}})</dt>
+                                    <dd><small>{{ enhancement.eratta }}</small> </dd>
+                                    </p>
+                                </div>
+                            {% endfor %}
+                        </dl>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div id="base_drawbacks" class="base">
+                        <h2>Drawbacks</h2>
+                        <dl>
+                            {% for drawback in base_power.drawbacks.all %}
+                            <div class="base_drawback">
+                                <dt><b>{{ drawback.name }}</b> ({{ drawback.description}})</dt>
+                                <dd><small>{{ drawback.eratta }}</small></dd>
+                            </div>
+                            {% endfor %}
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                {% for power_param in base_power.power_param_set.all %}
+                <div class="col-sm-6">
+                    <div class="base_parameter base">
+                        <div class="power_param_info">
+                            <h2>Parameter - {{power_param.relevant_parameter.name}}</h2>
+                            <p><b>Default Level:</b> {{ power_param.default }} </p>
+                            <p><b>Seasoned Threshold:</b> {{ power_param.seasoned }} </p>
+                            <p><b>Veteran Threshold:</b> {{ power_param.veteran }}</p>
+                            {% if power_param.relevant_parameter.eratta and power_param.relevant_parameter.eratta|length > 10 %}
+                                <p><b>Eratta:</b> {{ power_param.relevant_parameter.eratta }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="parameter_levels">
+                            <ol start="0">
+                                {% for level in power_param.relevant_parameter.get_levels %}
+                                    <li>{{ level }}</li>
+                                {% endfor %}
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                    </div>
+                <div class="example_powers">
+                    <h1>Example Powers</h1>
+                    {% for power_full in base_power.example_powers %}
+                        {% with power=power_full.power_set.first%}
+                            {% include "powers/power_badge_snippet.html" %}
+                        {% endwith %}
+                    {% empty %}
+                    <h2>No Example Powers Yet</h2>
                     {% endfor %}
-                </dl>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        {% for power_param in base_power.power_param_set.all %}
-        <div class="col-sm-6">
-            <div class="base_parameter base">
-                <div class="power_param_info">
-                    <h2>Parameter: {{power_param.relevant_parameter.name}}</h2>
-                    <h4>Default Level:{{ power_param.default }} </h4>
-                    <h4>Seasoned Threshold: {{ power_param.seasoned }} </h4>
-                    <h4>Veteran Threshold:{{ power_param.veteran }}</h4>
-                    {% if power_param.relevant_parameter.eratta %}
-                    <h4>Eratta: </h4>{{ power_param.relevant_parameter.eratta }}
-                    {% endif %}
-                </div>
-                <div class="parameter_levels">
-                <ol start="0">
-                    <li>{{ power_param.relevant_parameter.level_zero }}</li>
-                    <li>{{ power_param.relevant_parameter.level_one }}</li>
-                    <li>{{ power_param.relevant_parameter.level_two }}</li>
-                    <li>{{ power_param.relevant_parameter.level_three }}</li>
-                    <li>{{ power_param.relevant_parameter.level_four }}</li>
-                    <li>{{ power_param.relevant_parameter.level_five }}</li>
-                    <li>{{ power_param.relevant_parameter.level_six }}</li>
-                </ol>
                 </div>
             </div>
-        </div>
-        {% endfor %}
-            </div>
-        <div class="example_powers">
-            <h1>Example Powers</h1>
-            {% for power_full in base_power.example_powers %}
-                {% with power=power_full.power_set.first%}
-                    {% include "powers/power_badge_snippet.html" %}
-                {% endwith %}
-            {% empty %}
-            <h2>No Example Powers Yet</h2>
-            {% endfor %}
         </div>
     </div>
 </div>
