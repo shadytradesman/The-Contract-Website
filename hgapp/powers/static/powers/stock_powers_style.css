@@ -20,7 +20,7 @@ source: https://www.codeply.com/go/bp/74926
 }
 
 .tabs-below  .nav-tabs {
-  border-top: 1px solid #ddd;
+  border-top: 1px solid  #a6763a;
 }
 
 .tabs-below  .nav-tabs > li {
@@ -36,14 +36,14 @@ source: https://www.codeply.com/go/bp/74926
 
 .tabs-below  .nav-tabs > li > a:hover,
 .tabs-below  .nav-tabs > li > a:focus {
-  border-top-color: #ddd;
+  border-top-color:  #a6763a;
   border-bottom-color: transparent;
 }
 
 .tabs-below  .nav-tabs > .active > a,
 .tabs-below  .nav-tabs > .active > a:hover,
 .tabs-below  .nav-tabs > .active > a:focus {
-  border-color: transparent #ddd #ddd #ddd;
+  border-color: transparent  #a6763a  #a6763a  #a6763a;
 }
 
 .tabs-left  .nav-tabs > li {
@@ -58,27 +58,26 @@ source: https://www.codeply.com/go/bp/74926
 
 .tabs-left  .nav-tabs {
   float: left;
-  margin-right: 19px;
-  border-right: 1px solid #ddd;
+  margin-right: 20px;
+  border-right: 1px solid  #a6763a;
 }
 
 .tabs-left  .nav-tabs > li > a {
   margin-right: -1px;
-  -webkit-border-radius: 4px 0 0 4px;
-     -moz-border-radius: 4px 0 0 4px;
-          border-radius: 4px 0 0 4px;
+  border-radius: 0px;
 }
 
 .tabs-left  .nav-tabs > li > a:hover,
 .tabs-left  .nav-tabs > li > a:focus {
-  border-color: #eeeeee #dddddd #eeeeee #eeeeee;
+  border-color: #a6763a #a6763a #a6763a #a6763a;
 }
 
 .tabs-left  .nav-tabs .active > a,
 .tabs-left  .nav-tabs .active > a:hover,
 .tabs-left  .nav-tabs .active > a:focus {
-  border-color: #ddd transparent #ddd #ddd;
-  *border-right-color: #ffffff;
+  border-color:  #a6763a #111418  #a6763a  #a6763a;
+  position: relative;
+  z-index: 3;
 }
 
 
@@ -87,7 +86,7 @@ source: https://www.codeply.com/go/bp/74926
 
 .col-md-9 {
     padding-right: 5px;
-        padding-bottom: 5px;
+    padding-bottom: 5px;
 }
 
 .panel-heading {
@@ -100,25 +99,31 @@ source: https://www.codeply.com/go/bp/74926
 
 .nav-tabs {
     width: 300px;
-    background-color: #F3F3F3;
+    /*background-color: #F3F3F3;*/
     margin-right: 0px !important;
+    position: relative;
+    left: 1px;
 }
 
 .tab-content, .nav-tabs {
-    margin-left: 15px;
+    margin-left: 14px;
 }
 
 .tab-content {
     height: 100%;
     overflow: auto;
-    background-color: #FFFFFF;
-    border-top: 1px solid #ddd;
-    border-bottom: 1px solid #ddd;
-    pading-top: 10px;
+    background-color: #111418;
+    border-top: 1px solid  #a6763a;
+    border-left: 1px solid  #a6763a;
+}
+
+.nav-tabs>li.active>a {
+    background-color: #111418 !important;
+    color: #F3F2E6 !important;
 }
 
 .main-header {
-    background-color: #FFFFFF;
+    /*background-color: #FFFFFF;*/
     padding-top: 5px;
     padding-bottom: 15px;
     margin-bottom: 10px;
@@ -126,25 +131,26 @@ source: https://www.codeply.com/go/bp/74926
 
 .tab-pane {
     height: 100%;
-    background-color: #ffffff;
+    background-color: #111418;
+
 }
 
 .small-section-header {
-    background-color: #f3f3f3;
+    background-color: #20252d;
     padding: 10px;
     margin-right: -10px;
     margin-left: -10px;
 }
 
 .small-section{
-    background-color: #f3f3f3;
+    background-color: #20252d;
     margin-right: -10px;
     margin-left: -10px;
 }
 
 .tabs-left {
     height: 100%;
-    background-color: #F3F3F3;
+    background-color: #20252d;
     margin-left: 15px;
     margin-right: 15px;
     overflow: hidden;
@@ -153,9 +159,7 @@ source: https://www.codeply.com/go/bp/74926
 .col-md-6 {
     padding-right: 5px;
     padding-left: 5px;
-        padding-bottom: 5px;
-
-
+    padding-bottom: 5px;
 }
 
 h3 {
@@ -174,26 +178,33 @@ h3 {
 
 .panel-body {
     padding-bottom: 5px;
-    padding-left: 10px;
+    padding-left: 15px;
     padding-top: 10px;
+
 }
 
 .thumbnail {
-    background-color: #f3f3f3;
+    /*background-color: #f3f3f3;*/
 }
 
 .unstyled-link {
-    color: black;
+    color: #939286;
     text-decoration: none;
 }
 
 .unstyled-link:focus {
-    color: black;
+    color: #939286;
     text-decoration: none;
 }
 
 .fake-link {
-    color: #428BCA;
+    color: #84A0B1;
+    text-decoration: underline;
+}
+
+.panel-heading {
+    background-color: #5a5f6c;
+    border: solid 1px black;
 }
 
 .panel-group {

@@ -5,9 +5,6 @@ from . import views
 
 app_name = 'powers'
 urlpatterns = [
-    # ex: .com/powers/
-    url(r'^$', views.index, name='powers_index'),
-
     # ex: .com/powers/create/
     url(r'^create/$', views.create, name='powers_create'),
 

@@ -16,13 +16,6 @@ from .models import Power, Base_Power_Category, Base_Power, Base_Power_System, D
     PremadeCategory
 from .forms import DeletePowerForm
 
-def index(request):
-    latest_power_list = Power.objects.filter(private=False).order_by('-id')[:40]
-    context = {
-        'latest_power_list': latest_power_list,
-    }
-    return render(request, 'powers/index.html', context)
-
 def create(request, character_id=None):
     category_list = Base_Power_Category.objects.order_by('name')
     character=None
