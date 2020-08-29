@@ -41,4 +41,4 @@ class PlayerRoleForm(forms.Form):
                             max_length=200,
                             widget=forms.TextInput(attrs={'form': 'manage_form'}))
     role = forms.ChoiceField(choices=ROLE,
-                             widget=forms.Select(attrs={'form': 'manage_form'}))
+                             widget=forms.Select(attrs={'form': 'manage_form', 'class': 'form-control form-inline'}))

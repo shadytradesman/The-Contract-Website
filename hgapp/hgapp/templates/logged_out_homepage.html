@@ -21,8 +21,7 @@
             <br><br>
             Groups of players are encouraged to develop their own setting and character concepts. There are
             no preset classes or paradigms in The Contract, yet characters remain balanced and portable thanks
-            to a robust{% endblocktrans %} <a href="{% url 'powers:powers_index' %}">Powers system.</a>
-
+            to a robust{% endblocktrans %} <a href="">Powers system.</a>
         </p>
         {% if not user.is_authenticated %}
         {% url "account_login" as login_url %}
@@ -55,7 +54,7 @@
             </div>
             <div>
                 <i class="fa fa-superpowers fa-3x"></i><br>
-                <h3><a href="{% url 'powers:powers_index' %}">Powers</a></h3>
+                <h3><a href="">Powers</a></h3>
                 {% blocktrans %}
                 Snowflakes of Carnage. The Powers system allows players to fufill nearly any
                 supernatural character concept while playing alongside characters from around the world.
@@ -66,10 +65,10 @@
 
                 <h3><a href="{% url 'wiki:root' %}">Format</a></h3>
                 {% blocktrans %}
-                Each game begins
-                with a powerful individual (known as a Harbinger)
-                inviting a group of High Rollers on a deadly mission where they risk life and limb
-                for a chance to obtain supernatural abilities and change the world.
+                    Each game begins
+                    with a powerful individual (known as a Harbinger)
+                    inviting a group of High Rollers on a deadly mission where they risk life and limb
+                    for a chance to obtain supernatural abilities and change the world.
                 {% endblocktrans %}
             </div>
         </div>

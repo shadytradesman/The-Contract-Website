@@ -18,9 +18,7 @@
 
 
 {% block body_base %}
-    <br>
     <div class="container">
-        <br>
         <h3 class="text-center">Are you sure you want to leave <a href="{% url 'cells:cells_view_cell' cell_id=cell.id %}">{{cell.name}}</a>?</h3>
         <p class="text-center">All your characters in this cell will be disassociated, saved, and remain active.</p>
         <br>

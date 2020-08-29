@@ -1,4 +1,4 @@
-<script>
+.input-group-addon <script>
   $(document).ready(function(){
     $("#id_scheduled_start_time_pickers:has(input:not([readonly],[disabled]))").datetimepicker(
     {% if form.default_date %}
