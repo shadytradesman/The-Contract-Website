@@ -84,9 +84,10 @@ def view_cell(request, cell_id):
     #TODO: View permissions? Private cells?
     can_manage_memberships = cell.player_can_manage_memberships(request.user)
     can_edit_world = cell.player_can_edit_world(request.user)
-    invite = get_object_or_none(cell.open_invitations().filter(invited_player=request.user))
     user_membership = None
+    invite = None
     if request.user.is_authenticated:
+        invite = get_object_or_none(cell.open_invitations().filter(invited_player=request.user))
         user_membership = cell.get_player_membership(request.user)
         if not request.user.profile.confirmed_agreements:
             return HttpResponseRedirect(reverse('profiles:profiles_terms'))

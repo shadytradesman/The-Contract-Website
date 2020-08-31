@@ -14,14 +14,14 @@
             - {{power_full.get_point_value}} Gift
             <a href="{% url 'powers:powers_view_base' power_full.base.slug %}">{{power_full.base.name}}</a>
             Power
-            {% if power_full.character and power_full.get_point_value > power_full.reward_list|length %}
-                <p class="text-danger">
-                    {{power_full.reward_list|length}} Rewards assigned
-                </p>
-            {% endif %}
+
             {% if power_full.character and not power_full.at_least_one_gift_assigned %}
                 <p class="text-danger">
                     No Gifts assigned!
+                </p>
+            {% elif power_full.character and power_full.get_point_value > power_full.reward_list|length %}
+                <p class="text-danger">
+                    {{power_full.reward_list|length}} Rewards assigned
                 </p>
             {% endif %}
         </small>
@@ -34,7 +34,6 @@
             <b>System: <br></b>
             {{power_full.latest_revision.system}}
         </p>
-<!--        data-toggle="tooltip" title='{{tutorial.core_info}}'-->
         {% if power_full.latest_revision.enhancement_instance_set.all %}
             <p>
                 <b>Enhancements:</b>

@@ -4,14 +4,17 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.db import transaction
+from django.contrib import messages
 
 # Create your views here.
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.safestring import mark_safe
 from games.forms import CreateScenarioForm, CellMemberAttendedForm, make_game_form, make_allocate_improvement_form, \
     CustomInviteForm, make_accept_invite_form, ValidateAttendanceForm, DeclareOutcomeForm, GameFeedbackForm, \
     OutsiderAttendedForm, make_who_was_gm_form,make_archive_game_general_info_form, ArchivalOutcomeForm, \
     RsvpAttendanceForm
+
 
 from games.models import Scenario, Game, GAME_STATUS, DISCOVERY_REASON, Game_Invite, Game_Attendance, Reward
 
@@ -100,16 +103,22 @@ def view_scenario(request, scenario_id, game_id=None):
     if request.method == 'POST':
         form = GameFeedbackForm(request.POST)
         if form.is_valid() and game_id:
-            with transaction.atomic():
-                game = get_object_or_404(Game, id=game_id)
-                if game.gm.id == request.user.id:
-                    game.scenario_notes = form.cleaned_data['scenario_notes']
-                    game.save()
+            game = get_object_or_none(Game, id=game_id);
+            if game and game.gm.id == request.user.id and str(game.scenario.id) == scenario_id:
+                with transaction.atomic():
+                    game = get_object_or_404(Game, id=game_id)
+                    if game.gm.id == request.user.id:
+                        game.scenario_notes = form.cleaned_data['scenario_notes']
+                        game.save()
+            else:
+                raise ValueError("Invalid Game for feedback")
         return HttpResponseRedirect(reverse('games:games_view_scenario', args=(scenario.id,)))
     else:
         game_feedback = None
         games_run = Game.objects.filter(gm_id=request.user.id, scenario_id=scenario.id).all()
+        games_run = [x for x in games_run if not x.is_scheduled() and not x.is_active()]
         games_run_no_feedback = Game.objects.filter(gm_id=request.user.id, scenario_id=scenario.id, scenario_notes=None).all()
+        games_run_no_feedback = [x for x in games_run_no_feedback if not x.is_scheduled() and not x.is_active()]
         if games_run_no_feedback:
             game_feedback = GameFeedbackForm()
         context = {
@@ -153,13 +162,19 @@ def create_game(request):
                 game.save()
                 if form.cleaned_data['invite_all_members']:
                     for member in game.cell.cellmembership_set.exclude(member_player = game.gm):
-                        invite = str(game.creator) + " has invited you to a Game in " + game.cell.name
                         game_invite = Game_Invite(invited_player=member.member_player,
                                                   relevant_game=game,
-                                                  invite_text=invite,
+                                                  invite_text=game.hook,
                                                   as_ringer=False)
                         game_invite.save()
                         game_invite.notify_invitee(request, game)
+            game_url = reverse('games:games_view_game', args=(game.id,))
+            messages.add_message(request, messages.SUCCESS, mark_safe("Your Game has been created Successfully."
+                                                                      "<br>"
+                                                                      "<a href='"
+                                                                      + game_url +
+                                                                      "'> Click Here</a> "
+                                                                      "if you do not want to invite anyone else at this time."))
             return HttpResponseRedirect(reverse('games:games_invite_players', args=(game.id,)))
         else:
             print(form.errors)
@@ -174,10 +189,18 @@ def create_game(request):
 
 def edit_game(request, game_id):
     game = get_object_or_404(Game, id=game_id)
+    initial_data = {'title': game.title,
+     'hook': game.hook,
+     'scenario': game.scenario,
+     'required_character_status': game.required_character_status,
+     'start_time': game.scheduled_start_time,
+     'cell': game.cell,
+     }
+    GameForm = make_game_form(user=request.user, game_status=game.status)
     if request.method == 'POST':
         if not request.user.has_perm('edit_game', game):
             raise PermissionDenied("You don't have permission to edit this Game event")
-        form = make_game_form(user=request.user, game_status=game.required_character_status)(request.POST)
+        form = GameForm(request.POST, initial=initial_data)
         if form.is_valid():
             game.title=form.cleaned_data['title']
             game.hook=form.cleaned_data['hook']
@@ -191,12 +214,11 @@ def edit_game(request, game_id):
                     game.scenario = form.cleaned_data['scenario']
             with transaction.atomic():
                 game.save()
-                if form.cleaned_data['invite_all_members']:
+                if game.is_scheduled() and hasattr(form.changed_data, 'invite_all_members') and form.cleaned_data['invite_all_members']:
                     for member in game.cell.cellmembership_set.exclude(member_player=game.gm):
-                        invite = game.creator.name + " has invited you to a Game in " + game.cell.name
                         game_invite = Game_Invite(invited_player=member.member_player,
                                                   relevant_game=game,
-                                                  invite_text=invite,
+                                                  invite_text=game.hook,
                                                   as_ringer=False)
                         game_invite.save()
             return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
@@ -205,13 +227,7 @@ def edit_game(request, game_id):
             return None
     else:
         # Build a game form.
-        form = make_game_form(user=request.user, game_status=game.status)(initial={'title': game.title,
-                                                                                   'hook': game.hook,
-                                                                                   'scenario': game.scenario,
-                                                                                   'required_character_status': game.required_character_status,
-                                                                                   'start_time': game.scheduled_start_time,
-                                                                                   'cell': game.cell,
-                                                                                   })
+        form = GameForm(initial=initial_data)
         context = {
             'game': game,
             'form' : form,
@@ -226,10 +242,15 @@ def view_game(request, game_id):
         my_invitation = get_object_or_none(request.user.game_invite_set.filter(relevant_game=game_id))
     if request.user.has_perm("view_scenario", game.scenario):
         can_view_scenario = True
+    invite_form = None
+    if request.user.has_perm('edit_game', game) and game.is_scheduled():
+        initial_data = {"message": game.hook}
+        invite_form = CustomInviteForm(initial=initial_data)
     context = {
         'game': game,
         'can_view_scenario': can_view_scenario,
         'my_invitation': my_invitation,
+        'invite_form': invite_form,
     }
     return render(request, 'games/view_game_pages/view_game.html', context)
 
@@ -256,8 +277,9 @@ def invite_players(request, game_id):
     game = get_object_or_404(Game, id=game_id)
     if not request.user.has_perm('edit_game', game) or not game.is_scheduled():
         raise PermissionDenied("You don't have permission to edit this Game event, or it has already started")
+    initial_data = {"message": game.hook}
     if request.method == 'POST':
-        form = CustomInviteForm(request.POST)
+        form = CustomInviteForm(request.POST, initial=initial_data)
         if form.is_valid():
             player = get_object_or_404(User, username__iexact= form.cleaned_data['username'])
             if get_queryset_size(player.game_invite_set.filter(relevant_game=game)) > 0:
@@ -277,12 +299,7 @@ def invite_players(request, game_id):
             print(form.errors)
             return None
     else:
-        form = CustomInviteForm()
-        context = {
-            'form':form,
-            'game':game,
-        }
-        return render(request, 'games/invite_players.html', context)
+        return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
 
 def accept_invite(request, game_id):
     if not request.user.is_authenticated or request.user.is_anonymous:
@@ -292,7 +309,7 @@ def accept_invite(request, game_id):
         raise PermissionDenied("This Game has already started, or you're the GM!")
     invite = get_object_or_none(request.user.game_invite_set.filter(relevant_game=game))
     if not invite and not game.open_invitations:
-        raise PermissionDenied("This is awkward. . . You, uh, haven't been invited to this Game event")
+        raise PermissionDenied("This is awkward. . . You, uh, haven't been invited to this Game")
     if request.method == 'POST':
         if not invite:
             # player self-invite

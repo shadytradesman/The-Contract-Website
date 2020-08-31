@@ -1,80 +1,23 @@
 {% extends "site_base.html" %}
 
 {% load i18n %}
+{% load staticfiles %}
+
 
 {% block head_title %}The Contract{% endblock %}
 
 {% block body_class %}home{% endblock %}
 
 {% block body_base %}
-<section class="jumbotron">
-    <div class="container">
-        {% include "_messages.html" %}
-        <h1>{% blocktrans %}Welcome to The Contract{% endblocktrans %}</h1>
-        <p>
-            {% blocktrans %}
-            "The Contract" is a role-playing game that utilizes a round-robin storytelling format
-            where individual sessions tell a self-contained story, and the position of storyteller is
-            rotated between the various members of the group. Because of this, each game will have a slightly
-            different cast of characters, or "High Rollers", which helps to solve the age-old roleplaying
-            problem of absenteeism.
-            <br><br>
-            Groups of players are encouraged to develop their own setting and character concepts. There are
-            no preset classes or paradigms in The Contract, yet characters remain balanced and portable thanks
-            to a robust{% endblocktrans %} <a href="{% url 'powers:powers_index' %}">Powers system.</a>
-
-        </p>
-        {% if not user.is_authenticated %}
-        {% url "account_login" as login_url %}
-        {% url "account_signup" as signup_url %}
-        <p>{% blocktrans %}You can browse the site as a guest or
-            <a href="{{ signup_url }}" class="btn btn-primary">Sign Up</a>
-            and <a href="{{ login_url }}" class="btn btn-default">Log In</a>
-            to unlock its full potential.{% endblocktrans %}</p>
-        {% endif %}
-    </div>
-</section>
-<section>
-    <div class="container">
-        <h2 class="text-center">{% blocktrans %}What is The Contract?{% endblocktrans %}</h2>
-        <p class="lead">
-            {% blocktrans %}
-            <b>The System</b> allows for flexible and open character design, setting, and dice,
-            allowing you to be anything from a ninja in feudal japan to a cyborg in the year 2200. All the while
-            character portability is maintained so that you can visit other groups of players without balance concerns.
-            {% endblocktrans %}
-        </p>
-        <div class="feature-columns">
-            <div>
-                <i class="fa fa-cubes fa-3x"></i><br>
-                <h3><a href="{% url 'wiki:root' %}">Dice</a></h3>
-                {% blocktrans %}
-                The Contract has a detailed dice system and players guide, but players may
-                choose to use their own dice system as well.
-                {% endblocktrans %}
-            </div>
-            <div>
-                <i class="fa fa-superpowers fa-3x"></i><br>
-                <h3><a href="{% url 'powers:powers_index' %}">Powers</a></h3>
-                {% blocktrans %}
-                Snowflakes of Carnage. The Powers system allows players to fufill nearly any
-                supernatural character concept while playing alongside characters from around the world.
-                {% endblocktrans %}
-            </div>
-            <div>
-                <i class="fa fa-user-secret fa-3x"></i><br>
-
-                <h3><a href="{% url 'wiki:root' %}">Format</a></h3>
-                {% blocktrans %}
-                Each game begins
-                with a powerful individual (known as a Harbinger)
-                inviting a group of High Rollers on a deadly mission where they risk life and limb
-                for a chance to obtain supernatural abilities and change the world.
-                {% endblocktrans %}
-            </div>
-        </div>
-    </div>
-</section>
+<div class="container">
+    <h1 class="text-center">
+        <br>
+        <img src="{% static 'overrides/branding/logobone_small.png' %}" style="margin-top: 3px;">
+        <br>
+        <br>
+        Coming Soon
+    </h1>
+</div>
 <section>
     <div class="container">
         <p class="lead text-center">

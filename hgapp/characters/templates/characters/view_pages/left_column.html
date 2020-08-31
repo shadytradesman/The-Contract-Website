@@ -53,8 +53,8 @@
         {% endfor%}
     </div>
     {% if user_can_edit %}
+        <br>
         <div class="col-xs-12">
-
         <div class="row form-inline">
             <form id="injury-form"
                   class="injury-form"
@@ -73,6 +73,7 @@
         </div>
     {% endif %}
 </div>
+<hr>
 <div class="row text-center">
     <h3 data-toggle="tooltip" title='{{tutorial.battle_scars}}'>Battle Scars</h3>
     <div class="text-left" id="js-scar-container">
@@ -109,10 +110,11 @@
         </form>
     {% endif %}
 </div>
-<div class="row">
+<hr>
+<div>
     <h3 class="text-center">Assets And Liabilities</h3>
     {% for asset_details in character.stats_snapshot.assetdetails_set.all %}
-        <li class="stat-value">
+        <li>
                 <b>[+{{asset_details.relevant_asset.value}}] {{asset_details.relevant_asset.name}}:</b>
                 {{asset_details.relevant_asset.system}}
                 {% if asset_details.details %}
@@ -123,7 +125,7 @@
             </li>
     {% endfor %}
     {% for liability_details in character.stats_snapshot.liabilitydetails_set.all %}
-        <li class="stat-value">
+        <li>
             <b>[-{{liability_details.relevant_liability.value}}] {{liability_details.relevant_liability.name}}:</b>
             {{liability_details.relevant_liability.system}}
             {% if liability_details.details %}
@@ -134,7 +136,8 @@
         </li>
     {% endfor %}
 </div>
-<div class="row">
+<hr>
+<div>
     <h3 class="text-center" data-toggle="tooltip" title='{{tutorial.equipment}}'>
         Equipment
     </h3>
@@ -152,12 +155,9 @@
         </form>
     {% endif %}
     <div id="js-equipment-display">
-        {% if character.equipment %}
-            <span id="js-equipment-text">{{character.equipment | markdown}}</span>
-        {% endif %}
+        <span id="js-equipment-text">{{character.equipment | markdown}}</span>
         {% if user_can_edit %}
             <div id="js-edit-equipment-button" class="btn btn-default btn-xs"><i class="fa fa-edit fa-2x"></i></div>
         {% endif %}
     </div>
-
 </div>

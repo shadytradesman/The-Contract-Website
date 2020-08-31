@@ -11,12 +11,13 @@
 
 {% block body_base %}
 <div class="container">
-    <div class="text-center jumbotron">
+    <div class="text-center">
         <h1>
         {{ cell.name }}
         </h1>
-        Founded by <a href="{% url 'profiles:profiles_view_profile' cell.creator.profile.id %}">{% user_display cell.creator %}</a>
+        Cell Founded by <a href="{% url 'profiles:profiles_view_profile' cell.creator.profile.id %}">{% user_display cell.creator %}</a>
     </div>
+    <br>
     <ul class="nav nav-pills nav-justified navbar-default">
         {% if request.user.is_authenticated and can_manage_memberships %}
             <li>
@@ -60,11 +61,11 @@
     <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
         <div class=" panel panel-default">
             <h3 class = "panel-heading" role="tab" id="settingHeading">
-                <a role="button" data-toggle="collapse" href="#collapseSetting" aria-expanded="false" aria-controls="collapseSetting">
+                <a role="button" data-toggle="collapse" href="#collapseSetting" aria-expanded="true" aria-controls="collapseSetting">
                     Setting - <b>{{ cell.setting_name }}</b>
                 </a>
             </h3>
-            <div id="collapseSetting" class="panel-collapse collapse" role="tabpanel" aria-labelledby="settingHeading">
+            <div id="collapseSetting" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="settingHeading">
             <div class="container">
                 <p>
                     {{cell.setting_description | markdown | linebreaks}}
@@ -147,7 +148,7 @@
                         <a href="{% url 'games:games_view_game' game.id %}">
                             {{ game.title }}
                         </a>
-                        - occurred {{ game.end_time }}
+                        - run by {% user_display game.gm %} on {{ game.end_time }}
                     </li>
                 {% endfor %}
                 </ul>

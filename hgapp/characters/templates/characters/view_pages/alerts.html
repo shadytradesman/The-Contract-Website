@@ -1,20 +1,19 @@
 {% if character.private %}
     <div class="row">
-        <div class="col-md-10 col-md-offset-1 alert alert-warning" role="alert">
+        <div class="col-md-8 col-md-offset-2 alert alert-warning text-center css-char-alert" role="alert">
             <p>
                 <i class="fa fa-user-secret fa-2x"></i>
-                This character and their powers cannot be viewed by others because they are <b>Private</b>.
+                {{character.name}} and their Powers cannot be viewed by others because they are <b>Private</b>.
             </p>
         </div>
     </div>
 {% endif %}
 {% if character.get_power_cost_total != character.active_spent_rewards|length %}
     <div class="row">
-        <div class="col-md-10 col-md-offset-1 alert alert-danger" role="alert">
+        <div class="col-md-8 col-md-offset-2 alert alert-danger text-center css-char-alert" role="alert">
             <p>
-                Character's power value does not match number of spent gifts! </br>
+                {{character.name}}'s Power value does not match their spent Gifts! </br>
                 <b>Power Value: </b>{{character.get_power_cost_total}}
-                <br>
                 <b>Spent Rewards: </b>{{character.active_spent_rewards|length}}
             </p>
         </div>
@@ -22,7 +21,7 @@
 {% endif %}
 {% if character.unspent_experience < 0 %}
     <div class="row">
-        <div class="col-md-10 col-md-offset-1 alert alert-danger" role="alert">
+        <div class="col-md-8 col-md-offset-2 alert alert-danger text-center css-char-alert" role="alert">
             <p>
                 {{character.name}} has overspent Experience</br>
                 <b>Remaining: </b>{{character.unspent_experience}} Exp.
@@ -33,24 +32,19 @@
 {% endif %}
 {% if character.unspent_experience > 2 and user_can_edit %}
     <div class="row">
-        <div class="col-md-10 col-md-offset-1 alert alert-success" role="alert">
-            <p>
-                {{character.name}} has <b>{{character.unspent_experience}}</b> unspent Experience</br>
-            </p>
-            <a href="{% url 'characters:characters_edit' character.id %}" class="btn btn-default">
-                Spend Now
-            </a>
-        </div>
+        <a href="{% url 'characters:characters_edit' character.id %}">
+            <div class="col-md-8 col-md-offset-2 alert alert-success btn btn-success css-char-alert" role="alert">
+                Spend {{character.name}}'s <b>{{character.unspent_experience}}</b> unspent Experience
+            </div>
+        </a>
     </div>
 {% endif %}
 {% if user_can_edit and character.unspent_rewards|length > 0 %}
     <div class="row">
-        <div class="col-md-10 col-md-offset-1 alert alert-success" role="alert">
-            <p>
-                <a href="{% url 'characters:characters_spend_reward' character.id %}">
-                    Spend Available Gifts
-                </a>
-            </p>
-        </div>
+        <a href="{% url 'characters:characters_spend_reward' character.id %}">
+            <div class="col-md-8 col-md-offset-2 alert alert-success btn btn-success css-char-alert" role="alert">
+                Spend Available Gifts
+            </div>
+        </a>
     </div>
 {% endif %}

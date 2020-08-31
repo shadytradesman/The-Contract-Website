@@ -9,78 +9,139 @@
     {{ form.media }}
 {% endblock %}
 
-{% block scripts %}
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-    <script src="{% static 'js/site.js' %}"></script>
+{% block extra_scripts %}
     {% include "games/datepicker.js" %}
+    <script src="{% static 'overrides/wiki-macro-scripts.js' %}"></script>
 {% endblock %}
 
 
-{% block head_title %}Editing Scenario{% endblock %}
+{% block head_title %}
+{% if game %}
+    Editing Game for {{game.scenario.title}}
+{% else %}
+    Scheduling a Game
+{% endif %}
+{% endblock %}
 
 {% block body_class %}home{% endblock %}
 
 {% block body_base %}
 <div class="container">
-    <div class="backdropped">
-        <section>
-            {{ form.about.errors }}
-            {% if game %}
-                <h1>Editing {{game.title}}</h1>
-                <form action="{% url 'games:games_game_edit' game.id %}" method="post">
-            {% else %}
-                <h1>Create a new Game Event</h1>
-                <form action="{% url 'games:games_create_game' %}" method="post">
-                <div class="container">
-                   <p>
-                       Once this form is submitted, Players may RSVP and declare which Character they wish to attend with. <br>
-                       When you are ready, you may then start the Game and confirm which Players and Characters are attending.<br>
-                       When the Game is over, you can transition its status to Finished and declare winners, losers, and leave feedback on the scenario.
-                   </p>
-                </div>
-            {% endif %}
-            {{ form.non_field_errors }}
-            {% csrf_token %}
-            {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-            {{ form.title | bootstrap}}
-            {{ form.hook | bootstrap}}
-
-            {{ form.cell | bootstrap}}
-            {% if not form.cell.field.choices.queryset.all|length %}
+    {{ form.about.errors }}
+    <div class="text-center">
+        {% if game %}
+            <h1>Editing {{game.title}}</h1>
+        {% else %}
+            <h1>Create a new Game Event</h1>
+        {% endif %}
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <form action=
+                    {% if game %}
+                        "{% url 'games:games_game_edit' game.id %}"
+                    {% else %}
+                        "{% url 'games:games_create_game' %}"
+                    {% endif %}
+                    method="post">
+                {% if not game %}
+                    <div class="row text-center">
+                        <a class="btn btn-default btn-sm wiki-entry-collapsible">Toggle Tutorial</a>
+                        <div class="collapse-content clearfix"  style="display:none;">
+                            <br>
+                            <div class="col-md-8 col-md-offset-2 thumbnail text-left">
+                                <p>
+                                   Once this form is submitted, Players may RSVP and declare which Contractor they will
+                                    bring.
+                                   When you are ready to begin, visit the Game's page, click the "Start Game" button,
+                                    and confirm which Players and Contractors are attending. Be sure to do this before you
+                                    start playing. Otherwise, you will want to declared a completed Game.
+                                   <br><br>
+                                   While the Game is Active, Players will not be able bring their Contractor on other
+                                    Games.
+                                   Private Characters will be revealed to you.
+                                   If the Game is Active for more than 24 hours, any Player will be able to cancel the
+                                    Game.
+                                   <br><br>
+                                   When the Game is over, transition its status to Finished and declare the outcome for
+                                    each Contractor.
+                                   Surviving Contractors will receive Experience and, if they won, Gifts. Those less
+                                    fortunate are declared deceased.
+                                   You are awarded Experience for GMing. If at least one Contractor died and at least
+                                    one achieves victory, you are given an Improvement for one of your Characters'
+                                    Powers.
+                                   <br><br>
+                                   The Scenario is revealed to the Players in their Scenario Gallery, and you will be
+                                    able to leave feedback about your experience running it.
+                               </p>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                {{ form.non_field_errors }}
+                {% csrf_token %}
+                {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+                {% if game.is_scheduled %}
+                    {{ form.cell | bootstrap}}
+                {% endif %}
+                {% if game.is_scheduled and not form.cell.field.choices.queryset.all|length %}
+                    <div class="row">
+                        <div class="alert-danger col-xs-7 col-xs-offset-2">
+                            <h4>You are not a member of any <a href="/wiki/format-and-website/cells/">cells</a></h4>
+                            <p>
+                                All Games must take place inside a Cell. Ask your friends for an invite or
+                                <a href="{% url 'cells:cells_create' %}">make your own</a>!
+                            </p>
+                        </div>
+                    </div>
+                    <br>
+                {% endif %}
                 <div class="row">
-                    <div class="alert-danger col-xs-7 col-xs-offset-2">
-                        <h4>You are not a member of any <a href="/wiki/format-and-website/cells/">cells</a></h4>
-                        <p>
-                            All Games must take place inside a Cell. Ask your friends for an invite or
-                            <a href="{% url 'cells:cells_create' %}">make your own</a>!
-                        </p>
+                    <div class="col-md-6">
+                        {% if game.is_scheduled %}
+                            {{ form.scenario | bootstrap }}
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.title | bootstrap}}
                     </div>
                 </div>
-                <br>
-            {% endif %}
-            {{ form.invite_all_members | bootstrap}}
-            {{ form.scenario | bootstrap }}
-            {% if not form.scenario.field.choices.queryset.all|length %}
+                {% if game.is_scheduled and not form.scenario.field.choices.queryset.all|length %}
+                    <div class="row">
+                        <div class="alert-warning col-xs-7 col-xs-offset-2">
+                            <h4>You do not have access to any scenarios</h4>
+                            <p>
+                                You discover Scenarios by playing in games or <a href="{% url 'games:games_create_scenario' %}">writing them yourself</a>!
+                                Scheduling this game will create a placeholder Scenario that you can edit later.
+                            </p>
+                        </div>
+                    </div>
+                    <br>
+                {% endif %}
                 <div class="row">
-                    <div class="alert-warning col-xs-7 col-xs-offset-2">
-                        <h4>You do not have access to any scenarios</h4>
-                        <p>
-                            You discover Scenarios by playing in games or <a href="{% url 'games:games_create_scenario' %}">writing them yourself</a>!
-                            Scheduling this game will create a placeholder Scenario that you can edit later.
-                        </p>
+                    <div class="col-md-6">
+                        {{ form.required_character_status | bootstrap }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.scheduled_start_time | bootstrap }}
                     </div>
                 </div>
-                <br>
-            {% endif %}
-            {{ form.required_character_status | bootstrap }}
-
-            {{ form.open_invitations | bootstrap }}
-            {{ form.scheduled_start_time | bootstrap }}
-        </section>
-            <div class="container">
-                <input class="btn btn-primary" type="submit" value="Done!" />
-            </div>
-        </form>
-</div>
+                {{ form.hook | bootstrap}}
+                {{ form.invite_all_members | bootstrap}}
+                {{ form.open_invitations | bootstrap }}
+                <div class="text-center">
+                    <input class="btn btn-primary" type="submit" value="
+                            {% if game %}
+                                Done
+                            {% else %}
+                                Schedule Game
+                            {% endif %}
+                            "/>
+                    <br>
+                    <small>You will be taken to a page where you may invite specific Players.</small>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 {% endblock %}

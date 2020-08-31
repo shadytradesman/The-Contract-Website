@@ -14,29 +14,30 @@
 {% block body_class %}home{% endblock %}
 
 {% block body_base %}
-    <section>
-        <div class="container">
-            {{ form.about.errors }}
-            <h1>Starting {{game.title}} in {{game.cell.name}}</h1>
-            <h3>Choose which players will be attending.</h3>
-            <h5>Uncheck the box to deny attendance</h5>
+<div class="container">
+    <div class="text-center">
+        <h1>Starting {{game.title}} in {{game.cell.name}}</h1>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <h3>
+                Choose which players will be attending.
+                <br>
+                <small>Uncheck the box to deny attendance</small>
+            </h3>
             {% for player in player_errors %}
-            <div class="container">
-                <p class="text-danger"><b>{% user_display player %} has canceled their attendance!</b></p>
-            </div>
+                <p class="text-danger"><b>{% user_display player %} has canceled their attendance.</b></p>
             {% endfor %}
             {% for player in char_errors %}
-            <div class="container">
-                <p class="text-danger"><b>{% user_display player %} has changed their character!</b></p>
-            </div>
+                <p class="text-danger"><b>{% user_display player %} has changed their Character.</b></p>
             {% endfor %}
             <form action="{% url 'games:games_start_game' game.id %}" method="post" class="form-inline">
-            {{ formset.non_field_errors }}
-            {{ formset.management_form }}
-            {% csrf_token %}
-            {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-            {% for form in formset %}
-                <div class="container">
+                {{ form.about.errors }}
+                {{ formset.non_field_errors }}
+                {{ formset.management_form }}
+                {% csrf_token %}
+                {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+                {% for form in formset %}
                     <p>
                         {{ form.attending | bootstrap }} <b>{{ form.attendance.game_invite.invited_player.username}}</b> Playing
                         <b>
@@ -48,29 +49,24 @@
                         </b>
                         {{ form.player}} {{ form.character }}
                     </p>
-                </div>
-            {% empty %}
-                <div class="container">
+                {% empty %}
                     <h4 class="text-danger">
-                        No players attending! Games must have a minimum of two Player Characters (or one if the attending Character is a Veteran)
+                        No players are attending! Games must have a minimum of two Player Characters (or one if the attending Character is a Veteran)
                     </h4>
-                </div>
-            {% endfor %}
-                <p>
-                    Once the game has started, all Players will be unable to edit their characters for the duration.
-                    If the game hasn't been finished in 24 hours, each Player will be given the ability to cancel the game, wiping the history of it,
-                    and unlocking their Characters.
-                </p>
-            {% if formset.forms %}
-                <div class="container">
-                    <input class="btn btn-primary" type="submit" value="Start!" />
-                </div>
-            {% else %}
-                <div class="container">
-                    <input class="btn btn-primary" type="submit" value="Start!" disabled />
-                </div>
-            {% endif %}
+                {% endfor %}
+                    <p>
+                        Once the game has started, all Players will be unable to edit their Characters for the duration.
+                        If the Game hasn't been finished in 24 hours, each Player will be given the ability to cancel the game, wiping its history
+                        and unlocking their Characters.
+                    </p>
+                {% if formset.forms %}
+                    <input class="btn btn-primary" type="submit" value="Start" />
+                {% else %}
+                    <input class="btn btn-primary" type="submit" value="Start" disabled />
+                {% endif %}
+            </form>
         </div>
-    </section>
-    </form>
+    </div>
+
+</div>
 {% endblock %}

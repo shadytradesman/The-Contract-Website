@@ -12,22 +12,27 @@
 
 {% block body_base %}
     <div class="container">
-        <div class="backdropped">
-            <div class="text-center form-inline">
-                <h1>Delete {{character.name}}?</h1>
-                <p class="help-block">
-                    Deleting Characters is Permanent. You will never be able to view or play this character again.
-                </p>
-                <p>
-                    Any Rewards you have assigned to this Character will be lost. Any Powers associated with this
-                    character will remain available.
-                </p>
-                <form action="{% url 'characters:characters_delete' character.id %}" method="post">
-                    {% csrf_token %}
-                    {{ form }}
-                    <a href="{% url 'characters:characters_view' character.id %}" class="btn btn-md btn-primary">Never Mind</a>
-                    <input type="submit" class="btn btn-md btn-danger" value="Delete {{character.name}}">
-                </form>
+
+        <div class="text-center form-inline">
+            <h1>Delete <a href="{% url 'characters:characters_view' character.id %}">{{ character.name }}</a>?</h1>
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <p>
+                        Deleting Characters is Permanent. You will never be able to view or play this character again.
+                    </p>
+                    <p class="help-block">
+                        Any Rewards you have assigned to this Character will be lost. Any Powers associated with this
+                        character will remain available.
+                    </p>
+                    <form action="{% url 'characters:characters_delete' character.id %}" method="post">
+                        {% csrf_token %}
+                        {{ form }}
+                        <br>
+                        <a href="{% url 'characters:characters_view' character.id %}" class="btn btn-md btn-primary">Never Mind</a>
+                         <span style="width:50px; display: inline-block;"></span>
+                        <input type="submit" class="btn btn-md btn-danger" value="Delete {{character.name}}">
+                    </form>
+                </div>
             </div>
         </div>
     </div>

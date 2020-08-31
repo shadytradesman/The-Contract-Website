@@ -9,49 +9,169 @@
 {% block body_class %}home{% endblock %}
 
 {% block body_base %}
-	<div class="container">
-		{% include "powers/view_power_snippet.html" %}
-	</div>
-    {% if power_full %}
-        <div class="container">
-            {% if power_list.0.id == power.id %}
-                {% if power_full.reward_list %}
-                    <h2>Invested Rewards</h2>
-                    {% for reward in power_full.reward_list %}
-                        {% render_reward reward %}
-                    {% endfor %}
-                {% endif %}
+
+{% load account_tags %}
+{% load power_tags %}
+
+<div class="container">
+    <br>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h2>
+                {{ power.name }}
+                <br>
+                <small><i>{{ power.flavor_text|linebreaks }}</i></small>
+            </h2>
+            <p>
+                A {{power_full.get_point_value}} Gift
+                <a href="{% url 'powers:powers_view_base' power_full.base.slug %}">{{power_full.base.name}}</a>
+                Power
+            {% if power.parent_power.character %}
+                used by <a href="{% url 'characters:characters_view' power.parent_power.character.id %}">{{ power.parent_power.character.name }}</a>,
             {% endif %}
-            <h2>Edit History</h2>
-            {% if power.id != power_list.0.id %}
-                <h3>You are viewing an old version of this power.</h3>
-                <p>To view the most recent version <a href="{% url 'powers:powers_view_power_full' power_full.id %}">Click Here</a></p>
+            {% if power.parent_power.owner %}
+                created by <a href="{% url 'profiles:profiles_view_profile' power.parent_power.owner.id %}">{% user_display power.parent_power.owner %}</a>.
             {% endif %}
-            {% for curr_power in power_list %}
-                <div class="container">
+            </p>
+            {%if power.private %}
+                <h5><i class="fa fa-user-secret fa-2x"></i> Power is private because it is assigned to a private character.</h5>
+            {% endif %}
+            <div class="text-center">
+                <ul class="nav nav-pills nav-justified  css-power-view-buttons">
+                    {% if request.user.is_authenticated %}
+                        {% player_can_edit_power power request.user as can_edit %}
+                        {% if can_edit %}
+                            <li>
+                                <a href="{% url 'powers:powers_edit_power' power.parent_power.id %}" class="btn btn-primary">Edit Power</a>
+                            </li>
+                        {% endif %}
+                        {% if request.user == power.parent_power.owner %}
+                            <li>
+                                <a href="{% url 'powers:powers_delete_power' power.parent_power.id %}" class="btn btn-default">Delete Power</a>
+                            </li>
+                        {% endif %}
+                    {% endif %}
+                    <li>
+                        <a href="{% url 'powers:powers_create_power_from _existing' power.id %}" class="btn btn-default">Copy and Edit New</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>Description</h4>
                     <p>
-                        {% if curr_power.id == power.id %}
-                                <b><i class="fa fa-caret-right fa-1x"></i> -</b>
-                        {% endif %}
-                        {%if curr_power.id == power_list.0.id %}
-                                <a href="{% url 'powers:powers_view_power_full' power_full.id %}">
-                        {% else %}
-                                <a href="{% url 'powers:powers_view_power' curr_power.id %}">
-                        {% endif %}
-                        <b>{{ curr_power.pub_date }}</b> - {{ curr_power.creation_reason }} Cost: {{ curr_power.get_point_value }}. Change: {{curr_power.creation_reason_expanded_text}}</a>
+                        {{ power.description|linebreaks }}
                     </p>
                 </div>
-                {% if curr_power.relevant_power.all %}
-                    <div class="container" style="margin-left: 50px">
-                        Revision purchased with:
-                        <div class="small">
-                            {% for reward in curr_power.relevant_power.all %}
-                                {% render_reward  reward %}
+                <div class="col-md-6">
+                    <h4>
+                        System
+                        <small>{{ power.get_activation_style_display }}</small>
+                    </h4>
+                    <p><i>
+                    {{ power.system|linebreaks }}
+                    </i></p>
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                {% if power.enhancement_instance_set.all %}
+                    <div class="col-sm-6">
+                        <h3 class="text-center">Enhancements</h3>
+                        <ul>
+                            {% for enhancement_inst in power.enhancement_instance_set.all %}
+                                <li
+                                    {% if enhancement_inst.relevant_enhancement.eratta %}
+                                        data-toggle="tooltip"
+                                        data-html="true"
+                                        title='{{enhancement_inst.relevant_enhancement.eratta|linebreaks}}'
+                                    {% endif %}
+                                >
+
+                                    <b>{{ enhancement_inst.relevant_enhancement.name }} </b> ({{ enhancement_inst.relevant_enhancement.description }})
+                                    {% if enhancement_inst.detail %}
+                                        <ul ><li class="list-unstyled">
+                                            <p><b>{{ enhancement_inst.relevant_enhancement.detail_field_label }} - </b> {{ enhancement_inst.detail }}</p>
+                                        </li></ul>
+                                    {% endif %}
+                                </li>
                             {% endfor %}
-                        </div>
+                        </ul>
                     </div>
                 {% endif %}
-            {% endfor %}
+                {% if power.drawback_instance_set.all %}
+                    <div class="col-sm-6">
+                        <h3 class="text-center">Drawbacks</h3>
+                        <ul>
+                            {% for drawback_inst in power.drawback_instance_set.all %}
+                                <li
+                                    {% if drawback_inst.relevant_drawback.eratta %}
+                                        data-toggle="tooltip"
+                                        data-html="true"
+                                        title='{{drawback_inst.relevant_drawback.eratta|linebreaks}}'
+                                    {% endif %}
+                                >
+                                    <b>{{ drawback_inst.relevant_drawback.name }} </b> ({{ drawback_inst.relevant_drawback.description }})
+                                    {% if drawback_inst.detail %}
+                                        <ul ><li class="list-unstyled">
+                                            <b>{{ drawback_inst.relevant_drawback.detail_field_label }} - </b> {{ drawback_inst.detail }}
+                                        </li></ul>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+            {% if power.parameter_value_set.all %}
+                <div class="text-center col-sm-6">
+                    <h3 >Parameters</h3>
+                    {% for param_value in power.parameter_value_set.all %}
+                        <span style="display: inline-block; width: 25px;"></span>
+                        <b>{{ param_value.relevant_power_param.relevant_parameter.name }}: </b>
+                        {{ param_value.value }} ( {{ param_value.level_description}} )
+                        <span style="display: inline-block; width: 25px;"></span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            </div>
+            {% if power_full %}
+                <hr>
+                <h3>Edit History</h3>
+                {% if power.id != power_list.0.id %}
+                    <h4>You are viewing an old version of this power.</h4>
+                    <p>To view the most recent version <a href="{% url 'powers:powers_view_power_full' power_full.id %}">Click Here</a></p>
+                {% endif %}
+                {% for curr_power in power_list %}
+                    <div>
+                        <p>
+                            {% if curr_power.id == power.id %}
+                                    <b><i class="fa fa-caret-right fa-1x"></i> -</b>
+                            {% endif %}
+                            {%if curr_power.id == power_list.0.id %}
+                                    <a href="{% url 'powers:powers_view_power_full' power_full.id %}">
+                            {% else %}
+                                    <a href="{% url 'powers:powers_view_power' curr_power.id %}">
+                            {% endif %}
+                            <b>{{ curr_power.pub_date }}</b>
+                                        - {{ curr_power.get_creation_reason_display }} Cost: {{ curr_power.get_point_value }}. {{curr_power.creation_reason_expanded_text}}</a>
+                        </p>
+                    </div>
+                    {% if curr_power.relevant_power.all %}
+                        <div style="margin-left: 50px">
+                            Revision purchased with:
+                            <div class="small">
+                                {% for reward in curr_power.relevant_power.all %}
+                                    {% render_reward  reward %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
         </div>
-    {% endif %}
+    </div>
+</div>
+
 {% endblock %}

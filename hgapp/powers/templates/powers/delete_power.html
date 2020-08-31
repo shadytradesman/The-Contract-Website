@@ -18,12 +18,17 @@
                 <p class="help-block">
                     Deleting powers is permanent.
                 </p>
-                <form action="{% url 'powers:powers_delete_power' power.id %}" method="post">
-                    {% csrf_token %}
-                    {{ form }}
-                    <a href="{% url 'powers:powers_view_power_full' power.id %}" class="btn btn-md btn-primary">Never Mind</a>
-                    <input type="submit" class="btn btn-md btn-danger" value="Delete">
-                </form>
+                <div class="panel-default panel">
+                    <div class="panel-body">
+                        <form action="{% url 'powers:powers_delete_power' power.id %}" method="post">
+                            {% csrf_token %}
+                            {{ form }}
+                            <a href="{% url 'powers:powers_view_power_full' power.id %}" class="btn btn-md btn-primary">Never Mind</a>
+                            <span style="display:inline-block;width:10px;"></span>
+                            <input type="submit" class="btn btn-md btn-danger" value="Delete">
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

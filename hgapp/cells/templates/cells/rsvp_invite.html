@@ -18,8 +18,9 @@
 
 
 {% block body_base %}
-    <br>
-    <div class="container">
+<br>
+<div class="container">
+    <div class="panel panel-default">
         <br>
         <h3 class="text-center">You have been invited to join  <a href="{% url 'cells:cells_view_cell' cell_id=cell.id %}">{{cell.name}}</a></h3>
         <br>
@@ -51,5 +52,7 @@
                 </form>
             </div>
         </div>
+        <br>
     </div>
+</div>
 {% endblock %}

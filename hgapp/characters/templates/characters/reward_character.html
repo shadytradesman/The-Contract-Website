@@ -16,47 +16,65 @@
     <div class="backdropped">
     {% if character.unspent_rewards|length > 0 %}
         <div class="text-center">
-            <h1>
-                You've done well, <a href="{% url 'characters:characters_view' character.id %}">{{ character.name }}</a>
-            </h1>
-            <h3>
-                Please accept this Gift
-            </h3>
+            {% if character.unspent_gifts|length > 0 %}
+                <h1>
+                    You've done well, <a href="{% url 'characters:characters_view' character.id %}">{{ character.name }}</a>
+                </h1>
+                <h3>
+                    {% if character.unspent_gifts|length == 1 and character.unspent_improvements|length == 0 %}
+                        Please accept this Gift
+                    {% elif character.unspent_gifts|length > 1 %}
+                        Please accept these Gifts
+                    {% endif %}
+                </h3>
+            {% else %}
+                <h1>
+                    Imbue <a href="{% url 'characters:characters_view' character.id %}">{{ character.name }}</a> with a Power Improvement
+                </h1>
+            {% endif %}
         </div>
         {% if character.unspent_gifts|length > 0 %}
-            <h4>{{ character.name }} has {{character.unspent_rewards|length}} unspent rewards</h4>
-            <ul >
+            <ul class="list-unstyled text-center">
                 {% for reward in character.unspent_rewards %}
                     <li>{% render_reward reward %}</li>
                 {% endfor %}
             </ul>
-            <div class="panel">
-                <a href="{% url 'powers:powers_create_for_char' character.id %}"><h2>&nbsp;Get a New Power</h2></a>
-            </div>
         {% endif %}
-        <div class = "panel">
-            <h2>&nbsp;Improve an Existing Power</h2>
-            {% for power_full in character.power_full_set.all %}
-                <div class="row">
-                    {% if request.user.is_authenticated and request.user.id == character.player.id and character.unspent_rewards|length > 0 %}
-                        <div class= "col-sm-1 container">
-                            <a href="{% url 'powers:powers_edit_power' power_full.id %}" class="btn btn-success"><i class="fa fa-plus-square fa-4x"></i></a>
+        <div class="panel panel-default">
+            <div class="panel-body">
+                {% if character.unspent_gifts|length > 0 %}
+                    <a href="{% url 'powers:powers_create_for_char' character.id %}">
+                        <h2>Create a New Power</h2>
+                    </a>
+                {% endif %}
+                {% if character.power_full_set.all|length > 0 %}
+                    <hr>
+                    <h2>Improve an Existing Power</h2>
+                    {% for power_full in character.power_full_set.all %}
+                        <div class="row">
+                            {% if request.user.is_authenticated and request.user.id == character.player.id and character.unspent_rewards|length > 0 %}
+                                <div class= "col-sm-1 container">
+                                    <a href="{% url 'powers:powers_edit_power' power_full.id %}" class="btn btn-success"><i class="fa fa-plus-square fa-4x"></i></a>
+                                </div>
+                                <div class= "col-sm-11">
+                                     {% include "powers/power_badge_snippet.html" %}
+                                </div>
+                            {% else %}
+                                <div class= "col-sm-12">
+                                     {% include "powers/power_badge_snippet.html" %}
+                                </div>
+                            {% endif %}
                         </div>
-                        <div class= "col-sm-11">
-                    {% else %}
-                        <div class= "col-sm-12">
-                    {% endif %}
-                    {% include "powers/power_badge_snippet.html" %}
-                </div>
-                </div>
-
-            {% empty %}
-                <h4>{{character.name}} doesn't have any powers yet. What a noob :(</h4>
-            {% endfor %}
+                    {% endfor %}
+                {% endif %}
+                {% if unassigned_powers %}
+                    <hr>
+                    <a href="{% url 'characters:characters_power_picker' character.id %}">
+                        <h2>Assign Created Powers to {{ character.name }}</h2>
+                    </a>
+                {% endif %}
+            </div>
         </div>
-    <div class="panel">
-        <a href="{% url 'characters:characters_power_picker' character.id %}"><h2>&nbsp;Assign Already Created Powers to {{ character.name }}</h2></a>
-    </div>
     {% else %}
         <h1>
             <a href="{% url 'characters:characters_view' character.id %}">{{ character.name }}</a> does not have any Gifts or Improvements to spend.

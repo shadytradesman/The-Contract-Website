@@ -1,101 +1,15 @@
-{% if cell_invites %}
-    <div class="alert alert-success text-center">
-        <h3>You're invited to join</h3>
-        <ul class="nav nav-pills nav-stacked">
-            {% for invite in cell_invites %}
-                <li><a href="{% url 'cells:cells_view_cell' invite.relevant_cell.id %}"><h4>{{ invite.relevant_cell }}</h4></a></li>
-            {% endfor %}
-        </ul>
-    </div>
-{% elif not cells %}
+{% if not cell_invites and not cells %}
     <div class="alert alert-warning text-center">
         <h3>You aren't in any Cells</h3>
         <ul class="nav nav-pills nav-stacked">
                 <li>Ask your friends to invite you or <a href="{% url 'cells:cells_create' %}"><h4>Start your own!</h4></a></li>
         </ul>
     </div>
-{% elif not characters %}
+{% elif not living_characters or dead_characters %}
     <div class="alert alert-warning text-center">
         <h3>Who will you become?</h3>
         <ul class="nav nav-pills nav-stacked">
                 <li>You haven't made any characters yet! <a href="{% url 'characters:characters_create' %}"><h4>Time to change that</h4></a></li>
         </ul>
-    </div>
-{% endif %}
-{% if active_games %}
-    <div class="alert alert-danger text-center">
-        <h3>Ongoing Game!</h3>
-        <ul class="nav nav-pills nav-stacked">
-            {% for game in active_games %}
-                <li>
-                    <a href="{% url 'games:games_view_game' game.id %}"><b>{{game.title}}</b> at {{game.scheduled_start_time}}</a>
-                </li>
-            {% endfor %}
-        </ul>
-    </div>
-{% endif %}
-{% if attendance_invites_to_confirm %}
-    <div class="alert alert-warning text-center">
-        <h3>A GM has declared that you attended a Game</h3>
-        <h4>
-            Confirm or deny your attendance
-        </h4>
-        <ul class="nav nav-pills nav-stacked">
-            {% for invite in attendance_invites_to_confirm %}
-                <li>
-                    <a href="{% url 'games:games_confirm_attendance' invite.attendance.id %}">
-                        <b>{{invite.attendance.relevant_game.title}}</b> at {{invite.attendance.relevant_game.scheduled_start_time}}
-                    </a>
-                </li>
-            {% endfor %}
-        </ul>
-    </div>
-{% endif %}
-{% if upcoming_games_running %}
-    <div class="alert alert-info text-center">
-        <h3>Upcoming Games I'm Running</h3>
-        <ul class="nav nav-pills nav-stacked">
-            {% for game in upcoming_games_running %}
-                <li>
-                    <a href="{% url 'games:games_view_game' game.id %}"><b>{{game.title}}</b> at {{game.scheduled_start_time}}</a>
-                </li>
-            {% endfor %}
-        </ul>
-    </div>
-{% endif %}
-{% if upcoming_games_invited %}
-    <div class="alert alert-success text-center">
-        <h3>Upcoming Games I can Attend</h3>
-        <ul class="nav nav-pills nav-stacked">
-            {% for game_invite in upcoming_games_invited %}
-                <li>
-                    <a href="{% url 'games:games_view_game' game_invite.relevant_game.id %}">
-                        {% if game_invite.attendance %}
-                            <b>Attending - </b>
-                        {% else %}
-                            <b>Invited - </b>
-                        {% endif %}
-                        <b>
-                            {{game_invite.relevant_game.title}}
-                        </b> at {{game_invite.relevant_game.scheduled_start_time}}
-                    </a>
-                </li>
-            {% endfor %}
-        </ul>
-    </div>
-{% endif %}
-{% if avail_exp_rewards %}
-    <div class="alert alert-success text-center">
-        <h3>Unspent Experience Rewards</h3>
-        <b>You've earned Experience not yet assigned to any Character!</b>
-        <br>
-        <br>
-        {% for reward in avail_exp_rewards %}
-                {{reward.get_value}} Exp reward {{reward.source_blurb}}<br>
-        {% endfor %}
-        <br>
-        <a href="{% url 'characters:characters_allocate_gm_exp' %}" class="btn btn-primary">
-            Grant Rewards
-        </a>
     </div>
 {% endif %}

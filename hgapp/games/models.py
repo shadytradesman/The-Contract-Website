@@ -83,7 +83,7 @@ class Game(models.Model):
                                        max_length=25,
                                        default=HIGH_ROLLER_STATUS[0][0])
     title = models.CharField(max_length=130)
-    hook = models.TextField(max_length=500,
+    hook = models.TextField(max_length=5000,
                             null=True,
                             blank=True)
     created_date = models.DateTimeField('date created',
@@ -365,7 +365,7 @@ class Game_Invite(models.Model):
     relevant_game = models.ForeignKey(Game,
                                       on_delete=models.PROTECT)
     is_declined = models.BooleanField(default=False)
-    invite_text = models.TextField(max_length=1000,
+    invite_text = models.TextField(max_length=5500,
                                    null=True,
                                    blank=True)
     attendance = models.OneToOneField(Game_Attendance,
@@ -379,9 +379,10 @@ class Game_Invite(models.Model):
         unique_together = (("invited_player", "relevant_game"))
 
     def notify_invitee(self, request, game):
-        message_body = SafeText('###{0} has invited you to join {1}\n\n{2}\n\n [Click Here]({3}) to respond.'
+        # This string is considered "safe" only because the markdown renderer will escape malicious HTML and scripts.
+        message_body = SafeText('###{0} has invited you to an upcoming Game in {1}\n\n{2}\n\n [Click Here]({3}) to respond.'
                                 .format(self.relevant_game.creator.get_username(),
-                                        self.relevant_game.title,
+                                        self.relevant_game.cell.name,
                                         self.invite_text,
                                         request.build_absolute_uri(reverse("games:games_view_game", args=[game.id])),
                                         ))

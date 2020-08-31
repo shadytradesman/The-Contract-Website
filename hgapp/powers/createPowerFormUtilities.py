@@ -339,6 +339,8 @@ def get_power_creation_reason_expanded_text(new_power, old_power):
             for drawback in removed_drawbacks:
                 edit_text = edit_text + drawback.relevant_drawback.name + ", "
         edit_text = edit_text + get_param_difference_text(new_power, old_power)
+    if edit_text[-2] == ',':
+        edit_text = edit_text[:-2]
     return edit_text[:1500]
 
 def get_added_enhancements(new_power, old_power):

@@ -13,6 +13,7 @@
 
 {% block extra_head_base %}
     {% block extra_head %}{% endblock %}
+    <link rel="shortcut icon" href="{% static 'overrides/branding/favicon.jpg' %}" />
 {% endblock %}
 
 
@@ -29,4 +30,10 @@
 {% block extra_body_base %}
     {% analytics %}
     {% block extra_body %}{% endblock %}
+{% endblock %}
+
+{% block site_brand %}
+    <a href="/">
+    <img src="{% static 'overrides/branding/logobone_small.png' %}" width="160" height="45" style="margin-top: 3px;">
+    </a>
 {% endblock %}

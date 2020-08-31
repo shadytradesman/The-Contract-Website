@@ -13,45 +13,59 @@
 {% endblock %}
 
 {% block body_base %}
-<section class="jumbotron">
-    <div class="container">
-        <div class="text-center">
-            <h1>{% blocktrans %}Welcome {% endblocktrans %}{% user_display request.user %} </h1>
-            {% include "_messages.html" %}
-            <h3><a class="btn btn-lg btn-info" href="{% url 'wiki:root' %}">Read the Player's Guide</a></h3>
-        </div>
-        {% include "logged_in_alerts.html" %}
-        <div class="row">
-            <div class="col-sm-4">
-                <h2>Characters</h2>
-                <ul class="nav nav-pills nav-stacked">
-                    <li role="presentation">
-                        <a href="{% url 'characters:characters_create' %}" class="btn btn-primary">
-                        Create a new Character
-                        {% if avail_charon_coins %}
+<div class="container">
+    <section>
+    <div class="text-center">
+        <h1>{% blocktrans %}Welcome {% endblocktrans %}{% user_display request.user %} </h1>
+        {% include "_messages.html" %}
+        <h3><a class="btn btn-lg btn-primary" href="{% url 'wiki:root' %}">Read the Player's Guide</a></h3>
+    </div>
+    {% include "logged_in_alerts.html" %}
+    <div class="row">
+        <div class="col-sm-4">
+            <h2>Characters</h2>
+            <ul class="nav nav-pills nav-stacked">
+                <li role="presentation">
+                    <a href="{% url 'characters:characters_create' %}" class="btn btn-primary">
+                    Create a new Character
+                    {% if avail_charon_coins %}
+                        <br>
+                        <small class="text-center">
+                            You have <b>{{avail_charon_coins | length}}</b> Coin{{avail_charon_coins|pluralize}} of Charon
                             <br>
-                            <small class="text-center">
-                                You have <b>{{avail_charon_coins | length}}</b> Coin{{avail_charon_coins|pluralize}} of Charon
-                                <br>
-                                You may spend {{avail_charon_coins|pluralize:"it,one"}} to start a new Character with a free Gift
-                            </small>
-                        {% endif %}
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'characters:characters_graveyard' %}" class="btn btn-default">Visit the Graveyard</a>
-                    </li>
-                    {% if avail_improvements %}
-                        <li role="presentation">
-                            <a href="{% url 'games:games_allocate_improvement_generic' %}" class="btn btn-success">Allocate Golden Ratio Rewards</a>
-                        </li>
+                            You may spend {{avail_charon_coins|pluralize:"it,one"}} to start a new Character with a free Gift
+                        </small>
                     {% endif %}
-                </ul>
-                {% if characters %}
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'characters:characters_graveyard' %}" class="btn btn-default">Visit the Graveyard</a>
+                </li>
+                {% if avail_improvements %}
+                    <li role="presentation">
+                        <a href="{% url 'games:games_allocate_improvement_generic' %}" class="btn btn-success">Allocate Golden Ratio Rewards</a>
+                    </li>
+                {% endif %}
+            </ul>
+            {% if avail_exp_rewards %}
+                <br>
+                <div class="alert alert-success text-center css-home-alert">
+                    <b>{{avail_exp_rewards|length}} Unspent Experience Reward{{avail_exp_rewards|pluralize}}</b>
                     <br>
-                    {% for character in characters %}
+                    Choose who will benefit!
+                    <br>
+                    <a href="{% url 'characters:characters_allocate_gm_exp' %}" class="btn btn-primary">
+                        Grant Rewards
+                    </a>
+                </div>
+            {% endif %}
+            {% if living_characters or dead_characters%}
+                <hr>
+                {% if living_characters %}
+                    <h4>Your Living Characters</h4>
+                    {% for character in living_characters %}
                         <a href="{% url 'characters:characters_view' character.id %}">
-                            <div class="row panel text-center">
+                            <div class="panel panel-default text-center">
                                 <h4>
                                     {{ character.name }}
                                     <br>
@@ -71,72 +85,169 @@
                         </a>
                     {% endfor %}
                 {% endif %}
-            </div>
-            <div class="col-sm-4">
-                <h2>Powers</h2>
-                <ul class="nav nav-pills nav-stacked">
-                    <li role="presentation" >
-                        <a href="{% url 'powers:powers_create' %}" class="btn btn-primary">
-                            Create a new Power
+                {% if dead_characters %}
+                    <h4>Your Deceased Characters</h4>
+                    {% for character in dead_characters %}
+                        <a href="{% url 'characters:characters_view' character.id %}">
+                            <div class="panel panel-default text-center">
+                                <h4>
+                                    {{ character.name }}
+                                    <br>
+                                    <small>The {{ character.concept_summary}}</small>
+                                </h4>
+                            </div>
                         </a>
-                    </li>
-                    <li role="presentation">
-                        <a href="{% url 'powers:powers_stock' %}" class="btn btn-default">
-                            Browse Pre-made Stock Powers
-                        </a>
-                    </li>
-                    <li role="presentation">
-                        <a href="/wiki/guides-and-tutorials/creating-powers/" class="btn btn-default">
-                            Powers Tutorial
-                        </a>
-                    </li>
-                </ul>
-                {% if powers %}
-                <h4>My Unassigned Powers</h4>
-                    <div class="panel-group">
-                        {% for power_full in powers %}
-                            {% if not power_full.character %}
-                                <a href="{% url 'powers:powers_view_power_full' power_full.id %}">
-                                    <div class="panel css-home-panel">
-                                            {{ power_full.name }}
-                                    </div>
-                                </a>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
+                    {% endfor %}
                 {% endif %}
-            </div>
-            <div class="col-sm-4">
-                <h2>Cells</h2>
-                <ul class="nav nav-pills nav-stacked">
-                    <li role="presentation">
-                        <a href="{% url 'cells:cells_create' %}" class="btn btn-primary">
-                            Create a new Cell
-                        </a>
-                    </li>
-                    {% if cells %}
-                        {% for cell in cells %}
-                            <a href="{% url 'cells:cells_view_cell' cell.id %}">
+            {% endif %}
+        </div>
+        <div class="col-sm-4">
+            <h2>Powers</h2>
+            <ul class="nav nav-pills nav-stacked">
+                <li role="presentation" >
+                    <a href="{% url 'powers:powers_create' %}" class="btn btn-primary">
+                        Create a new Power
+                    </a>
+                </li>
+                <li role="presentation">
+                    <a href="{% url 'powers:powers_stock' %}" class="btn btn-default">
+                        Browse Pre-made Stock Powers
+                    </a>
+                </li>
+                <li role="presentation">
+                    <a href="/wiki/guides-and-tutorials/creating-powers/" class="btn btn-default">
+                        Powers Tutorial
+                    </a>
+                </li>
+            </ul>
+            {% if powers %}
+                <hr>
+                <h4>My Unassigned Powers</h4>
+                <div class="panel-group">
+                    {% for power_full in powers %}
+                        {% if not power_full.character %}
+                            <a href="{% url 'powers:powers_view_power_full' power_full.id %}">
                                 <div class="panel css-home-panel">
-                                    <b>{{cell.name}}</b>
+                                        {{ power_full.name }}
                                 </div>
                             </a>
-                        {% endfor %}
-                    {% endif %}
-                </ul>
-                <h2>Games</h2>
-                <ul class="nav nav-pills nav-stacked">
-
-                    <li role="presentation" class="active"> <a href="{% url 'games:games_create_game' %}">Schedule a Game</a></li>
-                    <li role="presentation" class="active"> <a href="{% url 'games:games_create_scenario' %}">Create a New Scenario</a></li>
-                    <li role="presentation" class="active"> <a href="{% url 'games:games_view_scenario_gallery' %}">My Scenario Gallery</a></li>
-                </ul>
-            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
         </div>
+        <div class="col-sm-4">
+            <h2>Cells</h2>
+            <ul class="nav nav-pills nav-stacked">
+                <li role="presentation">
+                    <a href="{% url 'cells:cells_create' %}" class="btn btn-primary">
+                        Create a new Cell
+                    </a>
+                </li>
+            </ul>
+            {% if cell_invites %}
+                <br>
+                <div class="alert alert-success text-center css-home-alert">
+                    You've been invited to join
+                    <ul class="nav nav-pills nav-stacked nav-sm">
+                        {% for invite in cell_invites %}
+                            <li><a href="{% url 'cells:cells_view_cell' invite.relevant_cell.id %}">{{ invite.relevant_cell }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            {% if cells %}
+                <hr>
+                <h4>My Cells</h4>
+                <ul class="nav nav-pills nav-stacked">
+                    {% for cell in cells %}
+                        <a href="{% url 'cells:cells_view_cell' cell.id %}">
+                            <div class="panel css-home-panel">
+                                <b>{{cell.name}}</b>
+                            </div>
+                        </a>
+                    {% endfor %}
+                {% endif %}
+
+            </ul>
+            <h2>Games</h2>
+            <ul class="nav nav-pills nav-stacked">
+                <li role="presentation" class="active"> <a href="{% url 'games:games_create_game' %}">Schedule a Game</a></li>
+                <li role="presentation" class="active"> <a href="{% url 'games:games_create_scenario' %}">Create a New Scenario</a></li>
+                <li role="presentation" class="active"> <a href="{% url 'games:games_view_scenario_gallery' %}">My Scenario Gallery</a></li>
+            </ul>
+            {% if active_games or attendance_invites_to_confirm or upcoming_games_running or upcoming_games_invited %}
+                <hr>
+            {% endif %}
+            {% if active_games %}
+                <div class="alert alert-warning text-center css-home-alert">
+                    <h4>Ongoing Game!</h4>
+                    <ul class="nav nav-pills nav-stacked">
+                        {% for game in active_games %}
+                            <li>
+                                <a href="{% url 'games:games_view_game' game.id %}"><b>{{game.title}}</b> at {{game.scheduled_start_time}}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            {% if attendance_invites_to_confirm %}
+                <div class="alert alert-warning text-center css-home-alert">
+                    <b>A GM has declared that you attended a Game</b>
+                    <p>
+                        Confirm or deny your attendance
+                    </p>
+                    <ul class="nav nav-pills nav-stacked">
+                        {% for invite in attendance_invites_to_confirm %}
+                            <li>
+                                <a href="{% url 'games:games_confirm_attendance' invite.attendance.id %}">
+                                    <b>{{invite.attendance.relevant_game.title}}</b> at {{invite.attendance.relevant_game.scheduled_start_time}}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            {% if upcoming_games_running %}
+                <div class="alert alert-info text-center css-home-alert">
+                    <b>Upcoming Games You are Running</b>
+                    <ul class="nav nav-pills nav-stacked">
+                        {% for game in upcoming_games_running %}
+                            <li>
+                                <a href="{% url 'games:games_view_game' game.id %}"><b>{{game.title}}</b> at {{game.scheduled_start_time}}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            {% if upcoming_games_invited %}
+                <div class="alert alert-success text-center css-home-alert">
+                    <b>Upcoming Games you can Attend</b>
+                    <ul class="nav nav-pills nav-stacked">
+                        {% for game_invite in upcoming_games_invited %}
+                            <li>
+                                <a href="{% url 'games:games_view_game' game_invite.relevant_game.id %}">
+                                    {% if game_invite.attendance %}
+                                        <b>Attending - </b>
+                                    {% else %}
+                                        <b>Invited - </b>
+                                    {% endif %}
+                                    <b>
+                                        {{game_invite.relevant_game.title}}
+                                    </b> at {{game_invite.relevant_game.scheduled_start_time}}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
     </ul>
 </section>
 <section>
-    <div class="container">
+        <hr>
         <h2 class="text-center">{% blocktrans %}Community{% endblocktrans %}</h2>
         <p class="lead text-center">
             {% blocktrans %}
@@ -175,16 +286,14 @@
                 {% endif %}
             </div>
         </div>
-    </div>
 </section>
 <section>
-    <div class="container">
         <p class="lead text-center">
             {% blocktrans %}
             Contact us: thecontractgame@gmail.com
             for more information.
             {% endblocktrans %}
         </p>
-    </div>
 </section>
+</div>
 {% endblock %}
