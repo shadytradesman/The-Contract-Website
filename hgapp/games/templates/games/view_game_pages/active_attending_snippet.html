@@ -1,50 +1,44 @@
 {% load account_tags %}
 
-{% if request.user.is_authenticated and request.user.id == game.creator.id %}
-    <div class="container">
-        <h4>
-            Attending Players
-        </h4>
-        <ul>
-            {% for invitation in game.game_invite_set.all %}
-                <li>
-                    <a href="{% url 'profiles:profiles_view_profile' invitation.invited_player.id %}"><b>{% user_display invitation.invited_player %}</b></a>
-                    {% if invitation.attendance.attending_character %}
-                        Playing <a href="{% url 'characters:characters_view' invitation.attendance.attending_character.id %}">{{invitation.attendance.attending_character.name}}</a>
-                    {% else %}
-                        Playing a ringer
-                    {% endif %}
-                </li>
-            {% empty %}
-                <p>
-                    No players attending this game?!??!?! <br>
-                    Maybe <a href="{% url 'games:games_cancel_game' game.id %}">Cancel Game</a> and try re-making?
-                </p>
-            {% endfor %}
-        </ul>
-    </div>
-{% elif request.user.is_authenticated %}
-    {% if  invitation.attendance %}
-        <div class="container">
+<div class="panel-body">
+    {% if request.user.is_authenticated and request.user.id == game.creator.id %}
+            <h4>
+                Attending Players
+            </h4>
+            <ul>
+                {% for invitation in game.game_invite_set.all %}
+                    <li>
+                        <a href="{% url 'profiles:profiles_view_profile' invitation.invited_player.id %}"><b>{% user_display invitation.invited_player %}</b></a>
+                        {% if invitation.attendance.attending_character %}
+                            Playing <a href="{% url 'characters:characters_view' invitation.attendance.attending_character.id %}">{{invitation.attendance.attending_character.name}}</a>
+                        {% else %}
+                            Playing a ringer
+                        {% endif %}
+                    </li>
+                {% empty %}
+                    <p>
+                        No players attending this game?!??!?! <br>
+                        Maybe <a href="{% url 'games:games_cancel_game' game.id %}">Cancel Game</a> and try re-making?
+                    </p>
+                {% endfor %}
+            </ul>
+    {% elif request.user.is_authenticated %}
+        {% if  my_invitation.attendance %}
             <h4>
                 You are attending this game
-                {% if invitation.attendance.attending_character %}
+                {% if my_invitation.attendance.attending_character %}
                     with
-                    <a href="{% url 'characters:characters_view' invitation.attendance.attending_character.id %}">
-                        {{invitation.attendance.attending_character.name}}
+                    <a href="{% url 'characters:characters_view' my_invitation.attendance.attending_character.id %}">
+                        {{my_invitation.attendance.attending_character.name}}
                     </a>
                 {% else %}
                     as an NPC Ringer
                 {% endif %}
             </h4>
-        </div>
-    {% else %}
-        <div class="container">
+        {% else %}
             <h3>You are not attending this game.</h3>
-        </div>
-    {% endif %}
-{% else %}
-    <div class="container">
+        {% endif %}
+    {% else %}
         <h3>Log in to check attendance</h3>
-    </div>
-{% endif %}
+    {% endif %}
+</div>

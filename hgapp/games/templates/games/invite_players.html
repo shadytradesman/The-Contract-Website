@@ -14,13 +14,14 @@
 {% block body_base %}
     <section>
         <div class="container">
-            {{ form.about.errors }}
-            {% include "_messages.html" %}
+
             <h1>Inviting players to
                 <a href="{% url 'games:games_view_game' game.id %}">
                     {{game.title}}
                 </a>
             </h1>
+            {{ form.about.errors }}
+            {% include "_messages.html" %}
             <form action="{% url 'games:games_invite_players' game.id %}" method="post">
             {{ form.non_field_errors }}
             {% csrf_token %}

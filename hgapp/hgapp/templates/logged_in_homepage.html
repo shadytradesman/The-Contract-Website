@@ -59,32 +59,46 @@
                     </a>
                 </div>
             {% endif %}
-            {% if characters %}
+            {% if living_characters or dead_characters%}
                 <hr>
-                <h4>My Living Characters</h4>
-                {% for character in characters %}
-                    {% if not character.is_dead %}
-                    <a href="{% url 'characters:characters_view' character.id %}">
-                        <div class="panel panel-default text-center">
-                            <h4>
-                                {{ character.name }}
-                                <br>
-                                <small>The {{ character.concept_summary}}</small>
-                            </h4>
-                            {% if character.unspent_rewards|length > 0 %}
-                                <a class="btn btn-success btn-xs" href="{% url 'characters:characters_spend_reward' character.id %}">
-                                    Spend {{ character.name }}'s Rewards
+                {% if living_characters %}
+                    <h4>Your Living Characters</h4>
+                    {% for character in living_characters %}
+                        <a href="{% url 'characters:characters_view' character.id %}">
+                            <div class="panel panel-default text-center">
+                                <h4>
+                                    {{ character.name }}
+                                    <br>
+                                    <small>The {{ character.concept_summary}}</small>
+                                </h4>
+                                {% if character.unspent_rewards|length > 0 %}
+                                    <a class="btn btn-success btn-xs" href="{% url 'characters:characters_spend_reward' character.id %}">
+                                        Spend {{ character.name }}'s Rewards
+                                    </a>
+                                {% endif %}
+                                {% if character.unspent_experience > 2 %}
+                                <a href="{% url 'characters:characters_edit' character.id %}" class="btn btn-success btn-xs">
+                                    Spend {{character.name}}'s {{character.unspent_experience}} Exp
                                 </a>
-                            {% endif %}
-                            {% if character.unspent_experience > 2 %}
-                            <a href="{% url 'characters:characters_edit' character.id %}" class="btn btn-success btn-xs">
-                                Spend {{character.name}}'s {{character.unspent_experience}} Exp
-                            </a>
-                            {% endif %}
-                        </div>
-                    </a>
+                                {% endif %}
+                            </div>
+                        </a>
+                    {% endfor %}
                 {% endif %}
-                {% endfor %}
+                {% if dead_characters %}
+                    <h4>Your Deceased Characters</h4>
+                    {% for character in dead_characters %}
+                        <a href="{% url 'characters:characters_view' character.id %}">
+                            <div class="panel panel-default text-center">
+                                <h4>
+                                    {{ character.name }}
+                                    <br>
+                                    <small>The {{ character.concept_summary}}</small>
+                                </h4>
+                            </div>
+                        </a>
+                    {% endfor %}
+                {% endif %}
             {% endif %}
         </div>
         <div class="col-sm-4">

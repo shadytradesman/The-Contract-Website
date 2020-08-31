@@ -29,6 +29,8 @@ def home(request):
         if not request.user.profile.confirmed_agreements:
             return HttpResponseRedirect(reverse('profiles:profiles_terms'))
         my_characters = request.user.character_set.filter(is_deleted=False).order_by('name').all()
+        living_characters = [x for x in my_characters if x.is_dead() == False]
+        dead_characters = [x for x in my_characters if x.is_dead() == True]
         my_powers = request.user.power_full_set.filter(is_deleted=False).order_by('name').all()
         my_scenarios = request.user.scenario_creator.order_by("title").all()
         new_players = User.objects.order_by('-date_joined')[:6]
@@ -46,7 +48,8 @@ def home(request):
         attendance_invites_to_confirm = request.user.game_invite_set.filter(attendance__is_confirmed=False).exclude(is_declined=True).all()
         avail_exp_rewards = request.user.experiencereward_set.filter(rewarded_character=None).all()
         context = {
-            'characters': my_characters,
+            'living_characters': living_characters,
+            'dead_characters': dead_characters,
             'powers': my_powers,
             'my_scenarios': my_scenarios,
             'new_players': new_players,

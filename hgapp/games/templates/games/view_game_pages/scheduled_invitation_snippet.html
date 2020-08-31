@@ -1,10 +1,11 @@
 {% load account_tags %}
+{% load bootstrap %}
 
-{% if request.user.is_authenticated and request.user.id == game.creator.id %}
-    <div class="container">
-        <h4>
+<div class="panel-body">
+    {% if request.user.is_authenticated and request.user.id == game.creator.id %}
+        <h3>
             Invited Players
-        </h4>
+        </h3>
         <ul>
             {% for invitation in game.game_invite_set.all %}
             <li>
@@ -24,14 +25,28 @@
             {% empty %}
                 <p> No players invited yet! <a href="{% url 'games:games_invite_players' game.id %}">Invite Some!</a></p>
                 {% if game.open_invitations %}
-                    <p>This game also accepts self-invitaitons, so just share this page with anyone you want to invite!</p>
+                    <p>This game also accepts self-invitations, so just share this page with anyone you want to invite.</p>
                 {% endif %}
             {% endfor %}
         </ul>
-    </div>
-{% elif request.user.is_authenticated %}
-    {% if  my_invitation %}
-        <div class="container">
+        {% if invite_form %}
+            <hr>
+            <h3>
+                Invite Additional Players
+            </h3>
+            {{ invite_form.about.errors }}
+            {% include "_messages.html" %}
+            <form action="{% url 'games:games_invite_players' game.id %}" method="post">
+            {{ invite_form.non_field_errors }}
+            {% csrf_token %}
+            {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+            {{ invite_form.username | bootstrap}}
+            {{ invite_form.message | bootstrap}}
+            {{ invite_form.invite_as_ringer | bootstrap }}
+            <input class="btn btn-primary" type="submit" value="Invite" />
+        {% endif %}
+    {% elif request.user.is_authenticated %}
+        {% if  my_invitation %}
             {% if my_invitation.attendance %}
                 {% if my_invitation.attendance.attending_character %}
                     <h4>You are set to attend this game with
@@ -52,22 +67,16 @@
                 <h4>You have been invited to attend this game!</h4>
                 <h5> <a href="{% url 'games:games_accept_invite' game.id %}">Click here to RSVP</a></h5>
             {% endif %}
-        </div>
-    {% elif game.open_invitations %}
-        <div class="container">
+        {% elif game.open_invitations %}
             <h3>This game is open for self-invites!</h3>
             {% if view_scenario %}
                 <h5>Since you already have access to this scenario, you may only attend as a ringer.</h5>
             {% endif %}
                 <h5><a href="{% url 'games:games_accept_invite' game.id %}">Click here to RSVP</a></h5>
-        </div>
-    {% else %}
-        <div class="container">
+        {% else %}
             <h3>You have not been invited to this game.</h3>
-        </div>
-    {% endif %}
-{% else %}
-    <div class="container">
+        {% endif %}
+    {% else %}
         <h3>Log in to check invite status</h3>
-    </div>
-{% endif %}
+    {% endif %}
+</div>

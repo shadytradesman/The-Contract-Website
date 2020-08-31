@@ -73,7 +73,11 @@
                             <a href="{% url 'games:games_view_game' game.id %}">
                                 {{ game.title }}
                             </a>
-                            - occurred {{ game.end_time }}
+                            {% if game.end_time %}
+                                - occurred {{ game.end_time }}
+                            {% else %}
+                                never finished.
+                            {% endif %}
                             {% if game in games_run_no_feedback %}
                                 <br>
                                 <form action="{% url 'games:games_view_scenario_feedback' scenario.id game.id %}" method="post">
