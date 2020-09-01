@@ -148,3 +148,23 @@ textarea {
 .bootstrap-datetimepicker-widget {
     background-color: #191c23;
 }
+
+
+/* Article Navbar dropdowns */
+ul.dropdown-menu ul {
+    padding-inline-start: 30px;
+    list-style-type:none
+}
+
+.dropdown-menu a {
+    &:extend(.dropdown-menu>li>a);
+}
+
+.dropdown-menu ul a:hover {
+    &:extend(.dropdown-menu>li>a:hover);
+}
+
+.dropdown:hover .dropdown-menu {
+    display: block;
+    margin-top: 0; // remove the gap so it doesn't close
+ }

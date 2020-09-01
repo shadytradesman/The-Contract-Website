@@ -3,6 +3,7 @@
 <div id="article-breadcrumbs">
 
 <ul class="breadcrumb pull-left">
+  <li><a href="/wiki/">Player's Guide Home</a></li>
   {% for ancestor in urlpath.cached_ancestors %}
     {% if ancestor.path %}
       <li><a href="{% url 'wiki:get' path=ancestor.path %}">{{ ancestor.article.current_revision.title|truncatechars:25 }}</a></li>

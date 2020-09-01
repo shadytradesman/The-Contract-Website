@@ -1,0 +1,15 @@
+{% load wiki_macro_tags %}
+
+{% if article_children %}
+    <ul class="dropdown-menu">
+        <li>
+          <a href="{% url 'wiki:get' path=article.path article_id=article.id %}">
+            {{ article.current_revision.title }} Index
+          </a>
+        </li>
+        {% for child in article_children %}
+          {% article_list child 20 %}
+          {% empty %}
+        {% endfor %}
+    </ul>
+{% endif %}

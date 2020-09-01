@@ -5,7 +5,7 @@
                 <li>Ask your friends to invite you or <a href="{% url 'cells:cells_create' %}"><h4>Start your own!</h4></a></li>
         </ul>
     </div>
-{% elif not living_characters or dead_characters %}
+{% elif not living_characters and not dead_characters %}
     <div class="alert alert-warning text-center">
         <h3>Who will you become?</h3>
         <ul class="nav nav-pills nav-stacked">

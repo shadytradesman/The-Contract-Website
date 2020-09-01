@@ -1,15 +1,13 @@
 {% load i18n %}
 {% load account_tags %}
 {% load postman_tags %}
+{% load hgapp_tags %}
 
 {% postman_unread as unread_count %}
 <ul class="nav navbar-nav pull-right">
     {% if request.user.is_authenticated %}
         <li>
             <a href="{% url 'profiles:profiles_view_profile' request.user.id %}"><i class="fa fa-user"></i> {% user_display request.user %}</a>
-        </li>
-        <li>
-            <a href="{% url 'profiles:profiles_edit' %}"><i class="fa fa-edit"></i> {% trans "Edit Profile" %}</a>
         </li>
         <li>
             <a href="{% url 'account_settings' %}"><i class="fa fa-cog"></i> {% trans "Settings" %}</a>
@@ -52,7 +50,25 @@
                 </button>
               </span>
             </div><!-- /input-group -->
-          </form>
+    </form>
+    <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+            Tutorials <span class="caret"></span>
+        </a>
+        {% article_toc 'guides-and-tutorials' %}
+    </li>
+    <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+            Dice Rules <span class="caret"></span>
+        </a>
+        {% article_toc 'rules' %}
+    </li>
+    <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+            Format <span class="caret"></span>
+        </a>
+        {% article_toc 'the-contract-format' %}
+    </li>
 </ul>
 
 <form id="accountLogOutForm" style="display: none;" action="{% url 'account_logout' %}" method="POST">
