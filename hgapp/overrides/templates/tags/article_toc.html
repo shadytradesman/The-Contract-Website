@@ -3,12 +3,12 @@
 {% if article_children %}
     <ul class="dropdown-menu">
         <li>
-          <a href="{% url 'wiki:get' path=article.path article_id=article.id %}">
+          <a href="{% url 'wiki:get' path=article_path article_id=article.article.id %}">
             {{ article.current_revision.title }} Index
           </a>
         </li>
         {% for child in article_children %}
-          {% article_list child 20 %}
+          {% article_list child 3 %}
           {% empty %}
         {% endfor %}
     </ul>

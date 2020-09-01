@@ -43,7 +43,15 @@ body {
 
 @navbar-default-border: @border-color;
 @navbar-default-bg: @panel-bg;
-@nav-link-hover-bg: @thumbnail-bg;
+@nav-link-hover-bg: lighten(@thumbnail-bg, 10%);
+@navbar-default-link-hover-color: @brand-primary;
+
+@dropdown-bg: @panel-bg;
+@dropdown-border: @border-color;
+@dropdown-link-color: @text-color;
+@dropdown-link-hover-color: lighten(@brand-primary, 10%);
+@dropdown-link-hover-bg: lighten(@panel-bg, 20%);
+
 
 
 @state-success-bg: darken(@brand-success, 5%);
