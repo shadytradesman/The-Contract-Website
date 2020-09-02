@@ -16,6 +16,7 @@ body {
 @brand-success: #499773;
 @brand-warning: darken(@border-color, 8%);
 @brand-primary: #648091;
+@brand-info: #6171a2;
 @btn-bg: #5a5f6c;
 
 @input-bg: darken(@panel-bg, 3.5%);
@@ -41,6 +42,9 @@ body {
 @thumbnail-border: @dark-border;
 @thumbnail-bg: lighten(@panel-bg, 10%);
 
+
+@breadcrumb-bg: @thumbnail-bg;
+
 @navbar-default-border: @border-color;
 @navbar-default-bg: @panel-bg;
 @nav-link-hover-bg: lighten(@thumbnail-bg, 10%);
@@ -51,8 +55,6 @@ body {
 @dropdown-link-color: @text-color;
 @dropdown-link-hover-color: lighten(@brand-primary, 10%);
 @dropdown-link-hover-bg: lighten(@panel-bg, 20%);
-
-
 
 @state-success-bg: darken(@brand-success, 5%);
 @state-success-text: @text-color;
@@ -67,6 +69,10 @@ body {
 @btn-default-color: @text-color;
 @btn-primary-color: @text-color;
 @btn-success-color: @text-color;
+@btn-info-bg: @btn-primary-bg;
+
+@table-bg: @thumbnail-bg;
+@table-border-color: @border-color;
 
 .help-block {
     color: @subtitle-color;
@@ -93,6 +99,7 @@ footer {
 p.login-signup {
     margin-top: 20px;
 }
+
 
 .feature-columns {
     .make-row();
@@ -176,3 +183,25 @@ ul.dropdown-menu ul {
     display: block;
     margin-top: 0; // remove the gap so it doesn't close
  }
+
+ /* wiki style */
+ .wiki-article h1 {
+    border-bottom: 1px solid @border-color;
+ }
+
+ #article-menu {
+    border-bottom: 1px solid @border-color;
+ }
+
+.table-striped>tbody>tr:nth-of-type(odd) {
+    background-color: darken(@thumbnail-bg, 4%);
+}
+
+.wiki-article figure.thumbnail {
+    background-color: @panel-bg;
+    border: none;
+}
+
+.thumbnail .caption {
+    color: @subtitle-color;
+}

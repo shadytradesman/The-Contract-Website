@@ -32,5 +32,5 @@ def article_toc(article_slug=None):
     return {
         'article_children': toc_tree,
         'article': article,
-        'article_path': "wiki/" + article_slug + "/",
+        'article_path': article_slug + "/",
     }
