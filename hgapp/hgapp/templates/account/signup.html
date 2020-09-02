@@ -7,59 +7,123 @@
 {% block head_title %}{% trans "Sign up" %}{% endblock %}
 
 {% block body %}
-    <div class="container">
-    <div class="backdropped">
-    <div class="row">
-        <div class="col-md-4 col-md-offset-4">
-            <form id="signup_form" method="post" action="{% url "account_signup" %}" autocapitalize="off" {% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
-                <legend>{% trans "Sign up for The Contract" %}</legend>
-                {% csrf_token %}
-                {{ form.username|bootstrap }}
-                {{ form.email|bootstrap }}
-                {{ form.password|bootstrap }}
-                {{ form.password_confirm|bootstrap }}
-                {{ form.code}}
-                <label>
-                    {{ form.agree_to_tos }}
-                    I have read and agree to The Contract's
-                    <a data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
-                        EULA, Privacy Policy, and Terms and Conditions
-                    </a>
-                </label>
-                <br>
-                {% if redirect_field_value %}
-                    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
-                {% endif %}
-                <button type="submit" class="btn btn-primary">{% trans "Sign up" %}</button>
-                <p class="login-signup">
-                    <small>
-                        {% trans "Already have an account?" %}  <strong><a href="{% urlnext 'account_login' %}">{% trans "Log in" %}</a></strong>
-                    </small>
-                </p>
-            </form>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-6 col-md-offset-3">
-                <div class="collapse" id="collapseExample">
-                    <h4>EULA, Privacy Policy, and Terms and Conditions</h4>
-                      <div class="card card-body" style="height: 251px; overflow:auto; border: 1px solid black;padding:5px;background-color:white;">
-                          A link to these documents is always available in the footer of the website.
-                          <H3>Privacy Policy</H3>
-                          {{form.privacy|linebreaks}}
-                          <br>
-                          <h3>EULA</h3>
-                          {{form.eula|linebreaks}}
-                          <br>
-                          <h3>Terms and Conditions</h3>
-                          {{form.terms|linebreaks}}
-                          <br>
-                      </div>
+<div class="container">
+    <h1 class="text-center">{% trans "Sign up for The Contract" %}</h1>
+    <h4 class="text-center">Always 100% free. No payment info. No Ads. We do not sell your data.</h4>
+    <hr>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <form id="signup_form" method="post" action="{% url "account_signup" %}" autocapitalize="off" {% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
+                        {% csrf_token %}
+                        {{ form.username|bootstrap }}
+                        {{ form.email|bootstrap }}
+                        {{ form.password|bootstrap }}
+                        {{ form.password_confirm|bootstrap }}
+                        {{ form.code}}
+                        <label>
+                            {{ form.agree_to_tos }}
+                            I have read and agree to The Contract's
+                            <a data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+                                EULA, Privacy Policy, and Terms and Conditions
+                            </a>
+                        </label>
+                        <br>
+                        {% if redirect_field_value %}
+                            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+                        {% endif %}
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary">{% trans "Sign up" %}</button>
+                            <br>
+                            <small>
+                                {% trans "Already have an account?" %}  <strong><a href="{% urlnext 'account_login' %}">{% trans "Log in" %}</a></strong>
+                            </small>
+                        </div>
+                    </form>
+                    <div class="collapse" id="collapseExample">
+                            <h4>EULA, Privacy Policy, and Terms and Conditions</h4>
+                              <div class="card card-body" style="height: 251px; overflow:auto; border: 1px solid black;padding:5px;background-color:#20252d;">
+                                  A link to these documents is always available in the footer of the website.
+                                  <H3>Privacy Policy</H3>
+                                  {{form.privacy|linebreaks}}
+                                  <br>
+                                  <h3>EULA</h3>
+                                  {{form.eula|linebreaks}}
+                                  <br>
+                                  <h3>Terms and Conditions</h3>
+                                  {{form.terms|linebreaks}}
+                                  <br>
+                              </div>
+                        </div>
                 </div>
+                <div class="col-md-8">
+                    <h3>Sign up to Access. . .</h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li>
+                                    <h4>Characters</h4>
+                                    <ul>
+                                        <li>Save the Contractors you create</li>
+                                        <li>Bring your Contractors on Games</li>
+                                        <li>Automatic Experience tracking and history</li>
+                                        <li>Automatic Gift tracking and history</li>
+                                        <li>Assign Powers to your Contractors</li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <h4>Powers</h4>
+                                    <ul>
+                                        <li>Save the Powers you create</li>
+                                        <li>Edit your Powers</li>
+                                        <li>Automatic edit history for Powers</li>
+                                        <li>Use Gifts to improve your Powers</li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <h4>Cells</h4>
+                                    <ul>
+                                        <li>Player Groups, known as Cells</li>
+                                        <li>Help manage your members' Characters</li>
+                                        <li>Describe the world of your Cell</li>
+                                        <li>Configurable roles and permissions</li>
+                                        <li>See your Cell's Players, Characters, and Game history</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li>
+                                    <h4>Games</h4>
+                                    <ul>
+                                        <li>Schedule upcoming Games</li>
+                                        <li>Declare completed Games</li>
+                                        <li>Participating Contractors receive Gifts and Experience</li>
+                                        <li>GMs receive Experience and Power Improvements</li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <h4>Scenarios</h4>
+                                    <ul>
+                                        <li>Create your own Scenarios</li>
+                                        <li>Run your Scenarios as Games</li>
+                                        <li>Leave feedback on Scenarios you've run</li>
+                                        <li>Playing in a Scenario adds it to your collection</li>
+                                        <li>See which Scenarios Players have played in</li>
+                                        <li>Access stock pre-made Scenarios created by The Contract's administrators</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <h3 class="text-center">. . . And More!</h3>
+                </div>
+            </div>
         </div>
     </div>
-    </div>
-    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}

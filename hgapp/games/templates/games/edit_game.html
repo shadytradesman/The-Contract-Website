@@ -81,24 +81,25 @@
                 {{ form.non_field_errors }}
                 {% csrf_token %}
                 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-                {% if game.is_scheduled %}
+                {% if game.is_scheduled or not game%}
                     {{ form.cell | bootstrap}}
-                {% endif %}
-                {% if game.is_scheduled and not form.cell.field.choices.queryset.all|length %}
-                    <div class="row">
-                        <div class="alert-danger col-xs-7 col-xs-offset-2">
-                            <h4>You are not a member of any <a href="/wiki/format-and-website/cells/">cells</a></h4>
-                            <p>
-                                All Games must take place inside a Cell. Ask your friends for an invite or
-                                <a href="{% url 'cells:cells_create' %}">make your own</a>!
-                            </p>
+                    {% if not form.cell.field.choices.queryset.all|length %}
+                        <div class="row">
+                            <div class="alert-danger col-xs-7 col-xs-offset-2">
+                                <h4>You are not a member of any <a href="/wiki/format-and-website/cells/">cells</a></h4>
+                                <p>
+                                    All Games must take place inside a Cell. Ask your friends for an invite or
+                                    <a href="{% url 'cells:cells_create' %}">make your own</a>!
+                                </p>
+                            </div>
                         </div>
-                    </div>
-                    <br>
+                        <br>
+                    {% endif %}
                 {% endif %}
+
                 <div class="row">
                     <div class="col-md-6">
-                        {% if game.is_scheduled %}
+                        {% if game.is_scheduled or not game %}
                             {{ form.scenario | bootstrap }}
                         {% endif %}
                     </div>
@@ -106,17 +107,19 @@
                         {{ form.title | bootstrap}}
                     </div>
                 </div>
-                {% if game.is_scheduled and not form.scenario.field.choices.queryset.all|length %}
-                    <div class="row">
-                        <div class="alert-warning col-xs-7 col-xs-offset-2">
-                            <h4>You do not have access to any scenarios</h4>
-                            <p>
-                                You discover Scenarios by playing in games or <a href="{% url 'games:games_create_scenario' %}">writing them yourself</a>!
-                                Scheduling this game will create a placeholder Scenario that you can edit later.
-                            </p>
+                {% if game.is_scheduled %}
+                    {% if not form.scenario.field.choices.queryset.all|length %}
+                        <div class="row">
+                            <div class="alert-warning col-xs-7 col-xs-offset-2">
+                                <h4>You do not have access to any scenarios</h4>
+                                <p>
+                                    You discover Scenarios by playing in games or <a href="{% url 'games:games_create_scenario' %}">writing them yourself</a>!
+                                    Scheduling this game will create a placeholder Scenario that you can edit later.
+                                </p>
+                            </div>
                         </div>
-                    </div>
-                    <br>
+                        <br>
+                    {% endif %}
                 {% endif %}
                 <div class="row">
                     <div class="col-md-6">

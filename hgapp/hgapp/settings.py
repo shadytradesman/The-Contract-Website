@@ -300,6 +300,8 @@ else:
     EMAIL_HOST_USER = 'thecontractgame@gmail.com'
     EMAIL_HOST_PASSWORD = os.environ["EMAIL_PASS"]
 
+def do_nothing(deletion):
+    pass
 
 ACCOUNT_OPEN_SIGNUP = True
 ACCOUNT_EMAIL_UNIQUE = True
@@ -308,6 +310,9 @@ ACCOUNT_LOGIN_REDIRECT_URL = "home"
 ACCOUNT_LOGOUT_REDIRECT_URL = "home"
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 2
 ACCOUNT_USE_AUTH_AUTHENTICATE = True
+ACCOUNT_DELETION_EXPUNGE_CALLBACK = do_nothing
+
+
 
 AUTHENTICATION_BACKENDS = [
     "account.auth_backends.UsernameAuthenticationBackend",

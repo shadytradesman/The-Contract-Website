@@ -3,8 +3,6 @@ body {
   position: relative;
 }
 
-/*@body-bg: #272526;*/
-
 @text-color: #F3F2E6;
 @panel-bg: #20252d;
 @red-bg: #271313;
@@ -73,6 +71,15 @@ body {
 
 @table-bg: @thumbnail-bg;
 @table-border-color: @border-color;
+
+@list-group-bg: @thumbnail-bg;
+@list-group-hover-bg: lighten(@thumbnail-bg, 10%);
+@list-group-active-border: @border-color;
+@list-group-active-text-color: @text-color;
+@list-group-link-color: @link-color;
+
+@legend-color: @text-color;
+@legend-border-color: @border-color;
 
 .help-block {
     color: @subtitle-color;
@@ -164,7 +171,6 @@ textarea {
     background-color: #191c23;
 }
 
-
 /* Article Navbar dropdowns */
 ul.dropdown-menu ul {
     padding-inline-start: 30px;
@@ -183,6 +189,8 @@ ul.dropdown-menu ul {
     display: block;
     margin-top: 0; // remove the gap so it doesn't close
  }
+ /* end Article Navbar dropdowns */
+
 
  /* wiki style */
  .wiki-article h1 {
@@ -205,3 +213,5 @@ ul.dropdown-menu ul {
 .thumbnail .caption {
     color: @subtitle-color;
 }
+
+/* End Wiki Style */

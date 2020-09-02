@@ -1,0 +1,32 @@
+{% extends "wiki/base.html" %}
+{% load wiki_tags i18n sekizai_tags %}
+
+
+{% block wiki_pagetitle %}{{ article.current_revision.title }}{% endblock %}
+
+{% block wiki_breadcrumbs %}
+{% include "wiki/includes/breadcrumbs.html" %}
+{% endblock %}
+
+{% block wiki_contents %}
+
+  <div id="article-container">
+      {% include "wiki/includes/article_menu.html" %}
+      {% if urlpath.parent %}
+          <h1 id="article-title" class="text-center">
+              {{ article.current_revision.title }}
+          </h1>
+      {% endif %}
+      <div class="panel panel-default">
+          <div class="panel-body">
+            {% block wiki_contents_tab %}
+            {% endblock %}
+          </div>
+    </div>
+  </div>
+
+{% endblock %}
+
+{% block wiki_footer_prepend %}
+  <p style="margin-bottom: 10px;"><em>{% trans "This article was last modified:" %} {{ article.current_revision.modified }}</em></p>
+{% endblock %}
