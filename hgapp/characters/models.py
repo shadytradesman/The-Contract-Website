@@ -10,6 +10,9 @@ from guardian.shortcuts import assign_perm, remove_perm
 from hgapp.utilities import get_queryset_size
 from cells.models import Cell
 
+import random
+import hashlib
+
 HIGH_ROLLER_STATUS = (
     ('ANY', 'Any'),
     ('NEWBIE', 'Newbie'),
@@ -99,11 +102,19 @@ EXP_COST_TRAUMA_THERAPY = 3
 BASE_MIND_LEVELS = 5
 BASE_BODY_LEVELS = 5
 
+
+
+def random_string():
+    return hashlib.sha224(bytes(random.randint(1, 99999999))).hexdigest()
+
 class Character(models.Model):
     name = models.CharField(max_length=100)
     tagline = models.CharField(max_length=200)
     player = models.ForeignKey(settings.AUTH_USER_MODEL,
-                              on_delete=models.CASCADE)
+                              on_delete=models.CASCADE,
+                              null=True)
+    edit_secret_key = models.CharField(default = random_string,
+                                              max_length=64)
     status = models.CharField(choices=HIGH_ROLLER_STATUS,
                               max_length=25,
                               default=HIGH_ROLLER_STATUS[1][0])
@@ -198,10 +209,16 @@ class Character(models.Model):
             ('edit_character', 'Edit character'),
         )
 
+    def is_editable_with_key(self, key):
+        if hasattr(self, 'player') and self.player:
+            return False
+        return self.edit_secret_key == key
+
     def set_default_permissions(self):
-        assign_perm('view_character', self.player, self)
-        assign_perm('view_private_character', self.player, self)
-        assign_perm('edit_character', self.player, self)
+        if hasattr(self, 'player') and self.player:
+            assign_perm('view_character', self.player, self)
+            assign_perm('view_private_character', self.player, self)
+            assign_perm('edit_character', self.player, self)
         for user in User.objects.filter(is_superuser=True).all():
             assign_perm('view_private_character', user, self)
 
@@ -221,7 +238,8 @@ class Character(models.Model):
             assign_perm('edit_character', player, self)
 
     def lock_edits(self):
-        remove_perm('characters.edit_character', self.player)
+        if hasattr(self, 'player') and self.player:
+            remove_perm('characters.edit_character', self.player)
         for power in self.power_full_set.all():
             power.lock_edits()
 
@@ -280,6 +298,8 @@ class Character(models.Model):
             return False
 
     def player_can_edit(self, player):
+        if not hasattr(self, 'player') or not self.player:
+            return False
         if self.is_deleted:
             return False
         can_edit = player.has_perm('edit_character', self) or self.player_has_cell_edit_perms(player)
@@ -287,6 +307,8 @@ class Character(models.Model):
         return can_edit and can_view_private
 
     def player_can_view(self, player):
+        if not hasattr(self, 'player') or not self.player:
+            return True
         if self.is_deleted:
             return False
         return not self.private or player.has_perm("view_private_character", self) or self.player_has_cell_edit_perms(player)
@@ -299,6 +321,8 @@ class Character(models.Model):
         return coins[0] if coins else None
 
     def use_charon_coin(self):
+        if not hasattr(self, 'player') or not self.player:
+            return
         coins = self.player.rewarded_player \
             .filter(rewarded_character=None, is_charon_coin=True) \
             .filter(is_void=False).all()
@@ -375,7 +399,12 @@ class Character(models.Model):
         return self.number_of_victories() * 2 >  len(self.active_rewards())
 
     def __str__(self):
-        return self.name + " [" + self.player.username + "]"
+        string = self.name + " ["
+        if hasattr(self, 'player') and self.player:
+            string = self.name + self.player.username + "]"
+        else:
+            string = self.name + "Anonymous User]"
+        return string
 
     def pres_tense_to_be(self):
         if self.pronoun == PRONOUN[0][0]:
@@ -415,7 +444,7 @@ class Character(models.Model):
     def archive_txt(self):
         output = "{}\nPlayed by: {}\nArchived on {}\n{} with {} wins and {} losses\n"
         output = output.format(self.name,
-                               self.player.username,
+                               self.player.username if hasattr(self, "player") and self.player else "Anonymous User",
                                datetime.today(),
                                self.get_status_display(),
                                self.number_of_victories(),

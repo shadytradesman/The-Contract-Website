@@ -38,7 +38,7 @@
     {{ char_form.about.errors }}
     {% if character %}
         <h1 class = "text-center">Editing {{character.name}}</h1>
-            <form action="{% url 'characters:characters_edit' character.id %}" method="post" onsubmit="setFormSubmitting()">
+            <form action="{% url 'characters:characters_edit' character.id secret_key %}" method="post" onsubmit="setFormSubmitting()">
     {% else %}
         <h1 class = "text-center">New Character</h1>
         <form action="{% url 'characters:characters_create' %}" method="post" onsubmit="setFormSubmitting()">
@@ -132,12 +132,17 @@
             <hr>
             <div class="row">
                 <div class="col-xs-12">
-                    <div id="css-checked-field" class="css-essential-field">
-                        {{ char_form.private | bootstrap}}
-                    </div>
-                    <div id="css-cell-field" class="css-essential-field">
-                        {{ char_form.cell | bootstrap}}
-                    </div>
+                    {% if user.is_authenticated %}
+                        <div id="css-checked-field" class="css-essential-field">
+                            {{ char_form.private | bootstrap}}
+                        </div>
+                    {% endif %}
+
+                    {% if char_form.cell %}
+                        <div id="css-cell-field" class="css-essential-field">
+                            {{ char_form.cell | bootstrap}}
+                        </div>
+                    {% endif %}
                     <span class="css-essential-text visible-md-block visible-lg-block"> </span>
                     <div id="css-tagline-field" class="css-essential-field">
                         {{ char_form.tagline | bootstrap}}

@@ -65,11 +65,11 @@
                             Was your Trauma cured via Therapy or a Power?
                             <br>
                             <small>(Note: Experience used to cure Traumas cannot be refunded)</small>
-                            <form class="js-delete-trauma-form css-del-trauma-form" data-del-trauma-url="{% url 'characters:delete_trauma' trauma.previous_revision.id 'T' %}">
+                            <form class="js-delete-trauma-form css-del-trauma-form" data-del-trauma-url="{% url 'characters:delete_trauma' trauma.previous_revision.id 'T' secret_key %}">
                                 {% csrf_token %}
                                 <input type="submit" class="btn btn-xs btn-warning" value="Therapy (costs 3 Xp)" />
                             </form>
-                           <form class="js-delete-trauma-form css-del-trauma-form" data-del-trauma-url="{% url 'characters:delete_trauma' trauma.previous_revision.id 'F' %}">
+                           <form class="js-delete-trauma-form css-del-trauma-form" data-del-trauma-url="{% url 'characters:delete_trauma' trauma.previous_revision.id 'F' secret_key %}">
                                 {% csrf_token %}
                                 <input type="submit" class="btn btn-xs btn-primary" value="Power (do not spend Xp)" />
                             </form>
@@ -85,8 +85,8 @@
     </div>
     {% if user_can_edit %}
         <form id="trauma-form"
-              data-new-trauma-url="{% url 'characters:post_trauma' character.id %}"
-              data-delete-trauma-url="{% url 'characters:delete_trauma' 'traumaIdJs' '' %}">
+              data-new-trauma-url="{% url 'characters:post_trauma' character.id secret_key %}"
+              data-delete-trauma-url="{% url 'characters:delete_trauma' 'traumaIdJs' 'useXpJs' secret_key %}">
             {{ trauma_form.about.errors }}
             {{ trauma_form.non_field_errors }}
             {% csrf_token %}
@@ -107,7 +107,7 @@
                 <h3>{{source.name}}</h3>
                     {% if user_can_edit %}
                         <form class="js-source-dec-form js-source-form"
-                          data-url="{% url 'characters:set_source_val' source.id %}"
+                          data-url="{% url 'characters:set_source_val' source.id secret_key %}"
                           data-source-id="{{source.id}}">
                             {% csrf_token %}
                             <input class="js-source-val" type="number" name="source-value" value="1" required="" style="display:none;">
@@ -119,7 +119,7 @@
                     </span>
                     {% if user_can_edit %}
                         <form class="js-source-inc-form js-source-form"
-                          data-url="{% url 'characters:set_source_val' source.id %}"
+                          data-url="{% url 'characters:set_source_val' source.id secret_key %}"
                           data-source-id="{{source.id}}">
                             {% csrf_token %}
                             <input class="js-source-val" type="number" name="source-value" value="1" required="" style="display:none;">

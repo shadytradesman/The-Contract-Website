@@ -32,7 +32,7 @@
 {% endif %}
 {% if character.unspent_experience > 2 and user_can_edit %}
     <div class="row">
-        <a href="{% url 'characters:characters_edit' character.id %}">
+        <a href="{% url 'characters:characters_edit' character.id secret_key %}">
             <div class="col-md-8 col-md-offset-2 alert alert-success btn btn-success css-char-alert" role="alert">
                 Spend {{character.name}}'s <b>{{character.unspent_experience}}</b> unspent Experience
             </div>
@@ -44,6 +44,71 @@
         <a href="{% url 'characters:characters_spend_reward' character.id %}">
             <div class="col-md-8 col-md-offset-2 alert alert-success btn btn-success css-char-alert" role="alert">
                 Spend Available Gifts
+            </div>
+        </a>
+    </div>
+{% endif %}
+{% if secret_key and secret_key_valid and not request.user.is_authenticated %}
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2 alert alert-warning css-char-alert text-center" role="alert">
+            <br>
+            <h3>This Character is <b>Unclaimed</b></h3>
+            <p>
+                <a href="{% url 'account_login' %}" class="btn btn-primary">Log in</a> and visit this page to claim {{character.name}} and unlock the rest of the site's functionality.
+                <br>
+                Until you do, anyone with the Edit URL will be able to edit this Character or claim it as their own.
+            </p>
+            <div class="row">
+                <div class="col-md-6">
+                    <br>
+                    <h4>
+                        <b>Share URL</b>
+                    </h4>
+                    Share this URL with others
+                    <br>
+                    <div class="row">
+                        <div class="col-xs-1 col-xs-offset-1">
+                            <a class="btn btn-default" id="copyShareLink"><i class="fa fa-copy"></i> copy</a>
+                        </div>
+                        <div class="col-xs-8 col-xs-offset-2">
+                            <input id="shareCopyField"
+                           class="form-control"
+                           type="text"
+                           value="https://{{ request.META.HTTP_HOST }}{% url 'characters:characters_view' character.id %}"
+                           id="shareLinkInput">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <br>
+                    <h4><b>Edit URL</b></h4>
+                    Save this URL for yourself.
+                    <br>
+                    <div class="row">
+                        <div class="col-xs-1 col-xs-offset-1">
+                            <a class="btn btn-default" id="copySecretLink"><i class="fa fa-copy"></i> copy</a>
+                        </div>
+                        <div class="col-xs-8 col-xs-offset-2">
+                            <input id="secretCopyField"
+                           class="form-control"
+                           type="text"
+                           value="https://{{ request.META.HTTP_HOST }}{% url 'characters:characters_view' character.id secret_key %}"
+                           id="secretLinkInput">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <p>If you lose the Edit URL before you claim this Character, no one will ever be able to edit them again.</p>
+            <br>
+        </div>
+    </div>
+{% endif %}
+{% if secret_key and secret_key_valid and request.user.is_authenticated %}
+    <div class="row">
+        <a href="{% url 'characters:characters_spend_reward' character.id %}">
+            <div class="col-md-8 col-md-offset-2 alert alert-success btn btn-success css-char-alert" role="alert">
+                <h2>Claim This Character</h2>
             </div>
         </a>
     </div>

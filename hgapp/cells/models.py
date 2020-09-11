@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.db import models
-from django.utils.datetime_safe import datetime
 from guardian.shortcuts import assign_perm, remove_perm
 import random
 import hashlib

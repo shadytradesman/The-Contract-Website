@@ -3,26 +3,28 @@
 <div class="text-center css-header-buttons">
     {% if user_can_edit %}
         <ul class="nav nav-pills nav-justified">
-            <li><a href="{% url 'characters:characters_edit' character.id %}" class="btn btn-default">
+            <li><a href="{% url 'characters:characters_edit' character.id secret_key %}" class="btn btn-default">
                 Edit Character
             </a></li>
             {% if request.user == character.player %}
-                <li><a href="{% url 'characters:characters_delete' character.id %}" class="btn btn-default">
+                <li><a href="{% url 'characters:characters_delete' character.id secret_key %}" class="btn btn-default">
                     Delete Character
                 </a></li>
             {% endif %}
-            <li><a href="{% url 'characters:characters_power_picker' character.id %}" class="btn btn-default">
-                Assign Powers
-            </a></li>
-            <li><a href="{% url 'characters:characters_archive' character.id %}" class="btn btn-default">
-                Download Character as plain text
-            </a></li>
+            {% if character.player %}
+                <li><a href="{% url 'characters:characters_power_picker' character.id %}" class="btn btn-default">
+                    Assign Powers
+                </a></li>
+                <li><a href="{% url 'characters:characters_archive' character.id %}" class="btn btn-default">
+                    Download Character as plain text
+                </a></li>
+            {%endif %}
             {% if character.is_dead %}
-                <li><a href="{%url 'characters:characters_obituary' character.id %}" class="btn btn-default">
+                <li><a href="{%url 'characters:characters_obituary' character.id secret_key %}" class="btn btn-default">
                     Edit Obituary
                 </a></li>
             {% else %}
-                <li><a href="{%url 'characters:characters_obituary' character.id %}" class="btn btn-default">
+                <li><a href="{%url 'characters:characters_obituary' character.id secret_key %}" class="btn btn-default">
                     Declare Character Death
                 </a></li>
             {% endif %}
