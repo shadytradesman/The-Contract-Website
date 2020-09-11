@@ -73,6 +73,15 @@
     </div>
     <div class="row">
         <div class="col-sm-4">
+            {% if not living_characters and not dead_characters %}
+            <br>
+                <div class="alert alert-warning text-center">
+                    <h3>Who will you become?</h3>
+                    <p>You haven't made any Contractors yet.</p>
+                    <br>
+                    <a href="{% url 'characters:characters_create' %}" class="btn btn-primary btn-lg">Time to change that</a>
+                </div>
+            {% endif %}
             {% if avail_exp_rewards %}
                 <br>
                 <div class="alert alert-success text-center css-home-alert">
@@ -222,6 +231,15 @@
                     <a href="{% url 'cells:cells_create' %}" class="btn btn-primary">
                         Create a new Cell
                     </a>
+                    {% if not cell_invites and not cells %}
+                        <br>
+                        <div class="alert alert-warning text-center">
+                            <h3>You aren't in any Cells</h3>
+                            <p>Ask your friends to invite you or</p>
+                            <br>
+                            <a href="{% url 'cells:cells_create' %}" class="btn btn-info btn-lg">Start your own</a>
+                        </div>
+                    {% endif %}
                 </li>
             </ul>
             {% if cell_invites %}

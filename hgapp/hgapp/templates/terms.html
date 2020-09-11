@@ -4,31 +4,33 @@
 
 {% block body_base %}
 <div class="container">
-    <div class="backdropped">
-        <h2>
-            User Agreements
-            <br>
-            <small>Terms and Conditions, EULA, and Privacy Policy</small>
-        </h2>
-        <p>
-            By using The Contract's website, you agree to the EULA, Privacy Policy, and the Terms and Conditions below.
-            <br>
-            Scroll to read the entirety of all three agreements.
-        </p>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <h2>
+                User Agreements
+                <br>
+                <small>Terms and Conditions, EULA, and Privacy Policy</small>
+            </h2>
+            <p>
+                By using The Contract's website, you agree to the EULA, Privacy Policy, and the Terms and Conditions below.
+                <br>
+                Scroll to read the entirety of all three agreements.
+            </p>
 
-        <div class="card card-body" style="height: 500px; overflow:auto; border: 1px solid black;padding:5px;background-color:white;">
-          <h3>EULA</h3>
-            {{eula|linebreaks}}
-        </div>
-        <br>
-        <div class="card card-body" style="height: 500px; overflow:auto; border: 1px solid black;padding:5px;background-color:white;">
-            <h3>TERMS AND CONDITIONS</h3>
-          {{terms|linebreaks}}
-        </div>
-        <br>
-        <div class="card card-body" style="height: 500px; overflow:auto; border: 1px solid black;padding:5px;background-color:white;">
-            <h3>PRIVACY POLICY</h3>
-            {{privacy|linebreaks}}
+            <div class="card card-body" style="height: 500px; overflow:auto; border: 1px solid black;padding:5px;background-color:#353e4b;">
+              <h3>EULA</h3>
+                {{eula|linebreaks}}
+            </div>
+            <br>
+            <div class="card card-body" style="height: 500px; overflow:auto; border: 1px solid black;padding:5px;background-color:#353e4b;">
+                <h3>TERMS AND CONDITIONS</h3>
+              {{terms|linebreaks}}
+            </div>
+            <br>
+            <div class="card card-body" style="height: 500px; overflow:auto; border: 1px solid black;padding:5px;background-color:#353e4b;">
+                <h3>PRIVACY POLICY</h3>
+                {{privacy|linebreaks}}
+            </div>
         </div>
     </div>
 </div>

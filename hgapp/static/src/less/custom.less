@@ -12,7 +12,7 @@ body {
 @dark-border: darken(@panel-bg, 20%);
 @brand-danger: #BB3B35;
 @brand-success: #499773;
-@brand-warning: darken(@border-color, 8%);
+@brand-warning: #cb8e28;
 @brand-primary: #648091;
 @brand-info: #6171a2;
 @btn-bg: #5a5f6c;
@@ -61,6 +61,8 @@ body {
 @state-danger-text: @brand-danger;
 @state-warning-bg: @brand-warning;
 @state-warning-text: lighten(@brand-warning, 55%);
+@state-info-bg: darken(@brand-primary, 15%);
+@state-info-text: lighten(@state-info-bg, 50%);
 
 @btn-default-bg: darken(@btn-bg, 15%);
 @btn-default-border: lighten(@btn-default-bg, 15%);
@@ -214,6 +216,10 @@ ul.dropdown-menu ul {
 
 .thumbnail .caption {
     color: @subtitle-color;
+}
+
+.wiki-article div.toc>ul, .wiki-article div.article-list>ul {
+    background-color: @thumbnail-bg;
 }
 
 /* End Wiki Style */
