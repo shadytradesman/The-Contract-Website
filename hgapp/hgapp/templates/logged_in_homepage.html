@@ -13,40 +13,66 @@
 {% endblock %}
 
 {% block body_base %}
+<br>
 <div class="container">
-    <section>
-    <div class="text-center">
-        <h1>{% blocktrans %}Welcome {% endblocktrans %}{% user_display request.user %} </h1>
-        {% include "_messages.html" %}
-        <h3><a class="btn btn-lg btn-primary" href="{% url 'wiki:root' %}">Read the Player's Guide</a></h3>
+    <div class="upper-section css-backgrounded" style="background-image: url({% static 'overrides/art/doors_bg.jpg' %});">
+        <div class="text-center">
+            <br>
+            <h1>{% blocktrans %}Welcome, {% endblocktrans %}{% user_display request.user %} </h1>
+            {% include "_messages.html" %}
+            <br><br>
+        </div>
+        {% include "logged_in_alerts.html" %}
+        <div class="row css-home-row" style="background-color: rgba(0, 0, 0, 0.3);">
+            <div class="col-sm-4">
+                <h2>Characters</h2>
+                <ul class="nav nav-pills nav-stacked">
+                    <li role="presentation">
+                        <a href="{% url 'characters:characters_create' %}" class="btn btn-primary">
+                        Create a new Character
+                        {% if avail_charon_coins %}
+                            <br>
+                            <small class="text-center">
+                                You have <b>{{avail_charon_coins | length}}</b> Coin{{avail_charon_coins|pluralize}} of Charon
+                                <br>
+                                You may spend {{avail_charon_coins|pluralize:"it,one"}} to start a new Character with a free Gift
+                            </small>
+                        {% endif %}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'characters:characters_graveyard' %}" class="btn btn-default">Visit the Graveyard</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-sm-4">
+                <h2>Powers</h2>
+                <ul class="nav nav-pills nav-stacked">
+                    <li role="presentation" >
+                        <a href="{% url 'powers:powers_create' %}" class="btn btn-primary">
+                            Create a new Power
+                        </a>
+                    </li>
+                    <li role="presentation">
+                        <a href="{% url 'powers:powers_stock' %}" class="btn btn-default">
+                            Browse Pre-made Stock Powers
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-sm-4">
+                <h2>Games</h2>
+                <ul class="nav nav-pills nav-stacked">
+                    <li role="presentation" > <a class="btn btn-primary" href="{% url 'games:games_create_game' %}">Schedule a Game</a></li>
+                    <li role="presentation" > <a class="btn btn-default" href="{% url 'games:games_view_scenario_gallery' %}">Scenarios</a></li>
+                </ul>
+                <br>
+            </div>
+        </div>
+
     </div>
-    {% include "logged_in_alerts.html" %}
     <div class="row">
         <div class="col-sm-4">
-            <h2>Characters</h2>
-            <ul class="nav nav-pills nav-stacked">
-                <li role="presentation">
-                    <a href="{% url 'characters:characters_create' %}" class="btn btn-primary">
-                    Create a new Character
-                    {% if avail_charon_coins %}
-                        <br>
-                        <small class="text-center">
-                            You have <b>{{avail_charon_coins | length}}</b> Coin{{avail_charon_coins|pluralize}} of Charon
-                            <br>
-                            You may spend {{avail_charon_coins|pluralize:"it,one"}} to start a new Character with a free Gift
-                        </small>
-                    {% endif %}
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url 'characters:characters_graveyard' %}" class="btn btn-default">Visit the Graveyard</a>
-                </li>
-                {% if avail_improvements %}
-                    <li role="presentation">
-                        <a href="{% url 'games:games_allocate_improvement_generic' %}" class="btn btn-success">Allocate Golden Ratio Rewards</a>
-                    </li>
-                {% endif %}
-            </ul>
             {% if avail_exp_rewards %}
                 <br>
                 <div class="alert alert-success text-center css-home-alert">
@@ -59,10 +85,14 @@
                     </a>
                 </div>
             {% endif %}
+            {% if avail_improvements %}
+                <div class="alert alert-success text-center css-home-alert">
+                    <a href="{% url 'games:games_allocate_improvement_generic' %}" class="btn btn-primary">Allocate Golden Ratio Rewards</a>
+                </div>
+            {% endif %}
             {% if living_characters or dead_characters%}
-                <hr>
                 {% if living_characters %}
-                    <h4>Your Living Characters</h4>
+                    <h4>My Living Characters</h4>
                     {% for character in living_characters %}
                         <a href="{% url 'characters:characters_view' character.id %}">
                             <div class="panel panel-default text-center">
@@ -102,26 +132,7 @@
             {% endif %}
         </div>
         <div class="col-sm-4">
-            <h2>Powers</h2>
-            <ul class="nav nav-pills nav-stacked">
-                <li role="presentation" >
-                    <a href="{% url 'powers:powers_create' %}" class="btn btn-primary">
-                        Create a new Power
-                    </a>
-                </li>
-                <li role="presentation">
-                    <a href="{% url 'powers:powers_stock' %}" class="btn btn-default">
-                        Browse Pre-made Stock Powers
-                    </a>
-                </li>
-                <li role="presentation">
-                    <a href="/wiki/guides-and-tutorials/creating-powers/" class="btn btn-default">
-                        Powers Tutorial
-                    </a>
-                </li>
-            </ul>
             {% if powers %}
-                <hr>
                 <h4>My Unassigned Powers</h4>
                 <div class="panel-group">
                     {% for power_full in powers %}
@@ -137,47 +148,8 @@
             {% endif %}
         </div>
         <div class="col-sm-4">
-            <h2>Cells</h2>
-            <ul class="nav nav-pills nav-stacked">
-                <li role="presentation">
-                    <a href="{% url 'cells:cells_create' %}" class="btn btn-primary">
-                        Create a new Cell
-                    </a>
-                </li>
-            </ul>
-            {% if cell_invites %}
-                <br>
-                <div class="alert alert-success text-center css-home-alert">
-                    You've been invited to join
-                    <ul class="nav nav-pills nav-stacked nav-sm">
-                        {% for invite in cell_invites %}
-                            <li><a href="{% url 'cells:cells_view_cell' invite.relevant_cell.id %}">{{ invite.relevant_cell }}</a></li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            {% endif %}
-            {% if cells %}
-                <hr>
-                <h4>My Cells</h4>
-                <ul class="nav nav-pills nav-stacked">
-                    {% for cell in cells %}
-                        <a href="{% url 'cells:cells_view_cell' cell.id %}">
-                            <div class="panel css-home-panel">
-                                <b>{{cell.name}}</b>
-                            </div>
-                        </a>
-                    {% endfor %}
-                {% endif %}
-
-            </ul>
-            <h2>Games</h2>
-            <ul class="nav nav-pills nav-stacked">
-                <li role="presentation" class="active"> <a href="{% url 'games:games_create_game' %}">Schedule a Game</a></li>
-                <li role="presentation" class="active"> <a href="{% url 'games:games_create_scenario' %}">Create a New Scenario</a></li>
-                <li role="presentation" class="active"> <a href="{% url 'games:games_view_scenario_gallery' %}">My Scenario Gallery</a></li>
-            </ul>
             {% if active_games or attendance_invites_to_confirm or upcoming_games_running or upcoming_games_invited %}
-                <hr>
+                <br>
             {% endif %}
             {% if active_games %}
                 <div class="alert alert-warning text-center css-home-alert">
@@ -241,11 +213,42 @@
                     </ul>
                 </div>
             {% endif %}
-
+            {% if active_games or attendance_invites_to_confirm or upcoming_games_running or upcoming_games_invited %}
+                <hr>
+            {% endif %}
+            <h2>Cells</h2>
+            <ul class="nav nav-pills nav-stacked">
+                <li role="presentation">
+                    <a href="{% url 'cells:cells_create' %}" class="btn btn-primary">
+                        Create a new Cell
+                    </a>
+                </li>
+            </ul>
+            {% if cell_invites %}
+                <br>
+                <div class="alert alert-success text-center css-home-alert">
+                    You've been invited to join
+                    <ul class="nav nav-pills nav-stacked nav-sm">
+                        {% for invite in cell_invites %}
+                            <li><a href="{% url 'cells:cells_view_cell' invite.relevant_cell.id %}">{{ invite.relevant_cell }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            {% if cells %}
+                <h4>My Cells</h4>
+                <ul class="nav nav-pills nav-stacked">
+                    {% for cell in cells %}
+                        <a href="{% url 'cells:cells_view_cell' cell.id %}">
+                            <div class="panel css-home-panel">
+                                <b>{{cell.name}}</b>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </ul>
+            {% endif %}
         </div>
     </div>
-    </ul>
-</section>
 <section>
         <hr>
         <h2 class="text-center">{% blocktrans %}Community{% endblocktrans %}</h2>
