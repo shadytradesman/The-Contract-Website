@@ -112,18 +112,19 @@ def make_character_form(user, existing_character=None):
             }
 
     form = CharacterForm
-    queryset = user.cell_set.all()
-    cell = forms.ModelChoiceField(queryset=queryset,
-                                  empty_label="Free Agent (No Cell)",
-                                  help_text="Select a Cell for your Character. "
-                                            "This defines your Character's home world and allows "
-                                            "Cell leaders to help you with record-keeping. "
-                                            "NOTE: Cell leaders will be able to view and edit your Character.",
-                                  required=False,
-                                  )
-    if existing_character:
-        cell.initial = existing_character.cell
-    form.base_fields["cell"] = cell
+    if user.is_authenticated:
+        queryset = user.cell_set.all()
+        cell = forms.ModelChoiceField(queryset=queryset,
+                                      empty_label="Free Agent (No Cell)",
+                                      help_text="Select a Cell for your Character. "
+                                                "This defines your Character's home world and allows "
+                                                "Cell leaders to help you with record-keeping. "
+                                                "NOTE: Cell leaders will be able to view and edit your Character.",
+                                      required=False,
+                                      )
+        if existing_character:
+            cell.initial = existing_character.cell
+        form.base_fields["cell"] = cell
     return form
 
 class CharacterDeathForm(ModelForm):

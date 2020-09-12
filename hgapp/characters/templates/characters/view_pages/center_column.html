@@ -57,24 +57,26 @@
     </div>
 {% endfor %}
 {% if user_can_edit %}
-    <div id="js-dead-box" class="text-center" style="display:none;">
-        <br>
-        <div class="alert alert-warning" role="alert">
-            It looks like you're dead.
+    {% if character.player %}
+        <div id="js-dead-box" class="text-center" style="display:none;">
             <br>
-            <a href="{%url 'characters:characters_obituary' character.id %}" class="btn btn-primary">
-                Make it Official
-            </a>
+            <div class="alert alert-warning" role="alert">
+                It looks like you're dead.
+                <br>
+                <a href="{%url 'characters:characters_obituary' character.id %}" class="btn btn-primary">
+                    Make it Official
+                </a>
+            </div>
         </div>
-    </div>
+    {% endif %}
     <div class="row text-center">
         <br>
         <ul class="nav nav-pills nav-justified">
             <li>
                 <form id="exert-body-form"
                   class="injury-form"
-                  data-new-injury-url="{% url 'characters:post_injury' character.id %}"
-                  data-delete-injury-url="{% url 'characters:delete_injury' 'injuryIdJs' %}"
+                  data-new-injury-url="{% url 'characters:post_injury' character.id secret_key %}"
+                  data-delete-injury-url="{% url 'characters:delete_injury' 'injuryIdJs' secret_key %}"
                   data-toggle="tooltip" title='{{tutorial.exert_body}}'>
                 {% csrf_token %}
                 <input type="number" name="injury-severity" value="1" required="" style="display:none;">
@@ -84,7 +86,7 @@
             </li>
             <li>
                 <form id="recover-mind-form"
-                  data-url="{% url 'characters:set_mind_damage' character.id %}"
+                  data-url="{% url 'characters:set_mind_damage' character.id secret_key %}"
                   data-toggle="tooltip" title='{{tutorial.recover_mind}}'>
                     {% csrf_token %}
                     <input id="recover-mind-val" type="number" name="mental-exertion-severity" value="1" required="" style="display:none;">
@@ -94,7 +96,7 @@
             </li>
             <li>
                 <form id="exert-mind-form"
-                  data-url="{% url 'characters:set_mind_damage' character.id %}"
+                  data-url="{% url 'characters:set_mind_damage' character.id secret_key %}"
                   data-toggle="tooltip" title='{{tutorial.exert_mind}}'>
                     {% csrf_token %}
                     <input id="exert-mind-val" type="number" name="mental-exertion-severity" value="1" required="" style="display:none;">

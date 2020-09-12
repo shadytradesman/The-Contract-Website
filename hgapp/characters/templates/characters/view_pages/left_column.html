@@ -40,7 +40,7 @@
                 <div class="stat-value col-xs-11">
                     {{injury.description}}
                     {% if user_can_edit %}
-                        <form class="js-delete-injury-form pull-right" data-del-injury-url="{% url 'characters:delete_injury' injury.id %}">
+                        <form class="js-delete-injury-form pull-right" data-del-injury-url="{% url 'characters:delete_injury' injury.id secret_key %}">
                             {% csrf_token %}
                             <input type="submit" class="btn btn-xs btn-danger" value="X"/>
                         </form>
@@ -58,8 +58,8 @@
         <div class="row form-inline">
             <form id="injury-form"
                   class="injury-form"
-                  data-new-injury-url="{% url 'characters:post_injury' character.id %}"
-                  data-delete-injury-url="{% url 'characters:delete_injury' 'injuryIdJs' %}">
+                  data-new-injury-url="{% url 'characters:post_injury' character.id secret_key %}"
+                  data-delete-injury-url="{% url 'characters:delete_injury' 'injuryIdJs' secret_key %}">
                 {{ injury_form.about.errors }}
                 {{ injury_form.non_field_errors }}
                 {% csrf_token %}
@@ -82,7 +82,7 @@
                 {{scar.description}}
                 {% if user_can_edit %}
                     <span class="pull-right">
-                        <form class="js-delete-scar-form" data-del-scar-url="{% url 'characters:delete_scar' scar.id %}">
+                        <form class="js-delete-scar-form" data-del-scar-url="{% url 'characters:delete_scar' scar.id secret_key %}">
                             {% csrf_token %}
                             <input type="submit" class="btn btn-xs btn-danger" value="X" />
                         </form>
@@ -96,8 +96,8 @@
     </div>
     {% if user_can_edit %}
         <form id="scar-form"
-              data-new-scar-url="{% url 'characters:post_scar' character.id %}"
-              data-delete-scar-url="{% url 'characters:delete_scar' 'scarIdJs' %}">
+              data-new-scar-url="{% url 'characters:post_scar' character.id secret_key %}"
+              data-delete-scar-url="{% url 'characters:delete_scar' 'scarIdJs' secret_key %}">
             {{ battle_scar_form.about.errors }}
             {{ battle_scar_form.non_field_errors }}
             {% csrf_token %}
@@ -143,7 +143,7 @@
     </h3>
     {% if user_can_edit %}
         <form id="equipment-form"
-              data-post-url="{% url 'characters:post_equipment' character.id %}">
+              data-post-url="{% url 'characters:post_equipment' character.id secret_key %}">
             <div id="js-equipment-form" style="display:none;">
                 {{ equipment_form.about.errors }}
                 {{ equipment_form.non_field_errors }}

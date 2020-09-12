@@ -14,7 +14,7 @@ from django.shortcuts import get_object_or_404
 # logic for Character creation and editing
 # TRANSACTIONS HAPPEN IN VIEW LAYER
 # See tests.py for hints on how revisioning works.
-def get_edit_context(user, existing_character=None):
+def get_edit_context(user, existing_character=None, secret_key=None):
     char_form = make_character_form(user, existing_character)(instance=existing_character)
     AttributeFormSet = formset_factory(AttributeForm, extra=0)
     AbilityFormSet = formset_factory(AbilityForm, extra=1)
@@ -44,7 +44,9 @@ def get_edit_context(user, existing_character=None):
             prefix="limits"
         )
         source_formset = ()
-    charon_coin_form = __get_charon_coin_form(user, existing_character, POST=None)
+    charon_coin_form = None
+    if user.is_authenticated:
+        charon_coin_form = __get_charon_coin_form(user, existing_character, POST=None)
     context = {
         'char_form': char_form,
         'attribute_formset': attribute_formset,
@@ -62,7 +64,8 @@ def get_edit_context(user, existing_character=None):
         'exp_costs': {"EXP_ADV_COST_ATTR_MULTIPLIER": EXP_ADV_COST_ATTR_MULTIPLIER,
                       "EXP_ADV_COST_SKILL_MULTIPLIER": EXP_ADV_COST_SKILL_MULTIPLIER,
                       "EXP_COST_QUIRK_MULTIPLIER": EXP_COST_QUIRK_MULTIPLIER,
-                      "EXP_ADV_COST_SOURCE_MULTIPLIER": EXP_ADV_COST_SOURCE_MULTIPLIER,}
+                      "EXP_ADV_COST_SOURCE_MULTIPLIER": EXP_ADV_COST_SOURCE_MULTIPLIER,},
+        'secret_key': secret_key if secret_key else "",
     }
     return context
 
@@ -72,13 +75,15 @@ def character_from_post(user, POST):
         new_character = char_form.save(commit=False)
         new_character.pub_date = timezone.now()
         new_character.edit_date = timezone.now()
-        new_character.player = user
+        if user.is_authenticated:
+            new_character.player = user
         new_character.save()
         __save_stats_diff_from_post(POST=POST, new_character=new_character, user=user)
         new_character.regen_stats_snapshot()
-        cell = char_form.cleaned_data['cell']
-        if cell != "free":
-            new_character.cell = cell
+        if user.is_authenticated:
+            cell = char_form.cleaned_data['cell']
+            if cell != "free":
+                new_character.cell = cell
         new_character.save()
         charon_coin_form = __get_charon_coin_form(user, None, POST=POST)
         if charon_coin_form and charon_coin_form.is_valid():
@@ -93,7 +98,8 @@ def update_character_from_post(user, POST, existing_character):
     if char_form.is_valid():
         char_form.save(commit=False)
         existing_character.edit_date = timezone.now()
-        existing_character.cell = char_form.cleaned_data['cell']
+        if hasattr(char_form.cleaned_data, 'cell') and char_form.cleaned_data['cell']:
+            existing_character.cell = char_form.cleaned_data['cell']
         existing_character.save()
         if existing_character.private != char_form.cleaned_data['private']:
             for power_full in existing_character.power_full_set.all():
@@ -144,6 +150,8 @@ def delete_trauma_rev(character, trauma_rev, used_xp):
 # __private methods
 
 def __get_charon_coin_form(user, existing_character=None, POST=None):
+    if not user.is_authenticated:
+        return None
     avail_charon_coins = user.rewarded_player.filter(rewarded_character=None, is_charon_coin=True).filter(
         is_void=False).all()
     coin_eligible = not existing_character or not existing_character.completed_games()

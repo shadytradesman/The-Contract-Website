@@ -49,7 +49,11 @@
                     {% endif %}
                     <b>{{ character.get_status_display }}</b>
                     played by
-                    <a href="{% url 'profiles:profiles_view_profile' character.player.id %}">{% user_display character.player %}</a>
+                    {% if character.player %}
+                        <a href="{% url 'profiles:profiles_view_profile' character.player.id %}">{% user_display character.player %}</a>
+                    {% else %}
+                        an anonymous user
+                    {% endif %}
                     {% if character.cell %}
                         in
                         <a href="{% url 'cells:cells_view_cell' character.cell.id %}">{{ character.cell.name }}</a>
@@ -66,7 +70,7 @@
                     {%if character.real_death.obituary %}
                         {{character.real_death.obituary | linebreaks}}
                     {% elif request.user.id == character.player.id %}
-                        <a href="{%url 'characters:characters_obituary' character.id %}" class="btn btn-default">
+                        <a href="{%url 'characters:characters_obituary' character.id secret_key %}" class="btn btn-default">
                                 Edit Obituary
                         </a>
                     {% endif %}
@@ -96,7 +100,7 @@
                             <div class="row">
                                 {% if request.user.is_authenticated and request.user.id == character.player.id and character.unspent_rewards|length > 0 %}
                                     <div class= "col-md-2">
-                                        <a href="{% url 'powers:powers_edit_power' power_full.id %}" class="btn btn-success">
+                                        <a href="{% url 'powers:powers_edit_power' power_full.id secret_key %}" class="btn btn-success">
                                             <i class="fa fa-plus-square fa-4x"></i>
                                         </a>
                                     </div>
