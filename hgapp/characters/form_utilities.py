@@ -65,7 +65,7 @@ def get_edit_context(user, existing_character=None, secret_key=None):
                       "EXP_ADV_COST_SKILL_MULTIPLIER": EXP_ADV_COST_SKILL_MULTIPLIER,
                       "EXP_COST_QUIRK_MULTIPLIER": EXP_COST_QUIRK_MULTIPLIER,
                       "EXP_ADV_COST_SOURCE_MULTIPLIER": EXP_ADV_COST_SOURCE_MULTIPLIER,},
-        'secret_key': secret_key,
+        'secret_key': secret_key if secret_key else "",
     }
     return context
 

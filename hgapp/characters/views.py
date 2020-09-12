@@ -22,6 +22,14 @@ from characters.form_utilities import get_edit_context, character_from_post, upd
     grant_trauma_to_character, delete_trauma_rev
 
 
+def __check_edit_perms(request, character, secret_key):
+    if hasattr(character, 'player') and character.player:
+        requester_can_edit = request.user.is_authenticated and character.player_can_edit(request.user)
+    else:
+        requester_can_edit = secret_key and character.is_editable_with_key(secret_key)
+    if not requester_can_edit:
+        raise PermissionDenied("You do not have permission to edit this Character")
+
 def create_character(request):
     if request.user.is_authenticated and not request.user.profile.confirmed_agreements:
         return HttpResponseRedirect(reverse('profiles:profiles_terms'))
@@ -38,11 +46,7 @@ def edit_character(request, character_id, secret_key = None):
     if request.user.is_authenticated and not request.user.profile.confirmed_agreements:
         return HttpResponseRedirect(reverse('profiles:profiles_terms'))
     character = get_object_or_404(Character, id=character_id)
-    requester_can_edit = secret_key and character.is_editable_with_key(secret_key)
-    if request.user.is_authenticated:
-        requester_can_edit = requester_can_edit or character.player_can_edit(request.user)
-    if not requester_can_edit:
-        raise PermissionDenied("You do not have permission to edit this Character")
+    __check_edit_perms(request, character, secret_key)
     if request.method == 'POST':
         with transaction.atomic():
             update_character_from_post(request.user, existing_character=character, POST=request.POST)
@@ -70,14 +74,11 @@ def delete_character(request, character_id):
                    "character": character}
         return render(request, 'characters/delete_character.html', context)
 
-def edit_obituary(request, character_id, secret_key = None):
+def edit_obituary(request, character_id):
     character = get_object_or_404(Character, id=character_id)
     existing_death = character.character_death_set.filter(is_void=False).first()
-    requester_can_edit = secret_key and character.is_editable_with_key(secret_key)
-    if request.user.is_authenticated:
-        requester_can_edit = requester_can_edit or character.player_can_edit(request.user)
-    if not requester_can_edit:
-        raise PermissionDenied("You do not have permission to edit this Character")
+    if not character.player_can_edit(request.user):
+        raise PermissionDenied("You cannot edit this character's obituary")
     if request.method == 'POST':
         if character.active_game_attendances():
             HttpResponseRedirect(reverse('characters:characters_obituary', args=(character.id,)))
@@ -112,7 +113,6 @@ def edit_obituary(request, character_id, secret_key = None):
         context = {
             'character': character,
             'obit_form': obit_form,
-            'secret_key': secret_key,
         }
         return render(request, 'characters/edit_obituary.html', context)
 
@@ -133,6 +133,8 @@ def graveyard(request):
 
 def view_character(request, character_id, secret_key = None):
     character = get_object_or_404(Character, id=character_id)
+    if character.player and secret_key:
+        return HttpResponseRedirect(reverse('characters:characters_view', args=(character_id,)))
     if not character.player_can_view(request.user):
         raise PermissionDenied("You do not have permission to view this Character")
     if request.user.is_authenticated and not request.user.profile.confirmed_agreements:
@@ -140,7 +142,7 @@ def view_character(request, character_id, secret_key = None):
     secret_key_valid = False
     if secret_key:
         secret_key_valid = character.is_editable_with_key(secret_key)
-    if not secret_key:
+    else:
         secret_key = ""
     user_can_edit = (request.user.is_authenticated and character.player_can_edit(request.user)) or secret_key_valid
     if not character.stats_snapshot:
@@ -303,6 +305,18 @@ def allocate_gm_exp(request, secret_key = None):
         }
         return render(request, 'characters/gm_exp_reward.html', context)
 
+def claim_character(request, character_id, secret_key = None):
+    if request.method == "POST":
+        character = get_object_or_404(Character, id=character_id)
+        if hasattr(character, 'player') and character.player:
+            raise PermissionDenied("This character has already been claimed.")
+        __check_edit_perms(request, character, secret_key)
+        character.player = request.user
+        with transaction.atomic():
+            character.save()
+            character.set_default_permissions()
+        return HttpResponseRedirect(reverse('characters:characters_view', args=(character_id,)))
+    return HttpResponseRedirect(reverse('characters:characters_view', args= (character_id, secret_key,)))
 
 
 #####
@@ -312,7 +326,7 @@ def allocate_gm_exp(request, secret_key = None):
 def post_scar(request, character_id, secret_key = None):
     if request.is_ajax and request.method == "POST":
         character = get_object_or_404(Character, id=character_id)
-        check_edit_perms(request, character, secret_key)
+        __check_edit_perms(request, character, secret_key)
         form = BattleScarForm(request.POST)
         if form.is_valid():
             battle_scar = BattleScar(description = form.cleaned_data['description'],
@@ -330,26 +344,17 @@ def delete_scar(request, scar_id, secret_key = None):
     if request.is_ajax and request.method == "POST":
         scar = get_object_or_404(BattleScar, id=scar_id)
         character = scar.character
-        check_edit_perms(request, character, secret_key)
+        __check_edit_perms(request, character, secret_key)
         with transaction.atomic():
             scar.delete()
         return JsonResponse({}, status=200)
     return JsonResponse({"error": ""}, status=400)
 
-
-def check_edit_perms(request, character, secret_key):
-    requester_can_edit = secret_key and character.is_editable_with_key(secret_key)
-    if request.user.is_authenticated:
-        requester_can_edit = requester_can_edit or character.player_can_edit(request.user)
-    if not requester_can_edit:
-        raise PermissionDenied("You do not have permission to edit this Character")
-
-
 def post_trauma(request, character_id, secret_key = None):
     if request.is_ajax and request.method == "POST":
         character = get_object_or_404(Character, id=character_id)
         form = TraumaForm(request.POST, prefix="trauma")
-        check_edit_perms(request, character, secret_key)
+        __check_edit_perms(request, character, secret_key)
         if form.is_valid():
             with transaction.atomic():
                 trauma_rev = grant_trauma_to_character(form, character)
@@ -362,7 +367,7 @@ def delete_trauma(request, trauma_rev_id, used_xp, secret_key = None):
     if request.is_ajax and request.method == "POST":
         trauma_rev = get_object_or_404(TraumaRevision, id=trauma_rev_id)
         character = trauma_rev.relevant_stats.assigned_character
-        check_edit_perms(request, character, secret_key)
+        __check_edit_perms(request, character, secret_key)
         with transaction.atomic():
             delete_trauma_rev(character, trauma_rev, True if used_xp == "T" else False)
         return JsonResponse({}, status=200)
@@ -372,7 +377,7 @@ def post_injury(request, character_id, secret_key = None):
     if request.is_ajax and request.method == "POST":
         character = get_object_or_404(Character, id=character_id)
         form = InjuryForm(request.POST, prefix="injury")
-        check_edit_perms(request, character, secret_key)
+        __check_edit_perms(request, character, secret_key)
         if form.is_valid():
             injury = Injury(description = form.cleaned_data['description'],
                             character=character,
@@ -389,7 +394,7 @@ def delete_injury(request, injury_id, secret_key = None):
     if request.is_ajax and request.method == "POST":
         injury = get_object_or_404(Injury, id=injury_id)
         form = InjuryForm(request.POST, prefix="injury")
-        check_edit_perms(request, injury.character, secret_key)
+        __check_edit_perms(request, injury.character, secret_key)
         with transaction.atomic():
             injury.delete()
         return JsonResponse({}, status=200)
@@ -399,7 +404,7 @@ def set_mind_damage(request, character_id, secret_key = None):
     if request.is_ajax and request.method == "POST":
         character = get_object_or_404(Character, id=character_id)
         form = InjuryForm(request.POST, prefix="mental-exertion")
-        check_edit_perms(request, character, secret_key)
+        __check_edit_perms(request, character, secret_key)
         if form.is_valid():
             requested_damage = form.cleaned_data['severity']
             num_mind = character.num_mind_levels()
@@ -421,7 +426,7 @@ def set_source_val(request, source_id, secret_key = None):
     if request.is_ajax and request.method == "POST":
         source = get_object_or_404(Source, id=source_id)
         form = SourceValForm(request.POST, prefix="source")
-        check_edit_perms(request, source.owner, secret_key)
+        __check_edit_perms(request, source.owner, secret_key)
         if form.is_valid():
             source.current_val = form.cleaned_data['value']
             with transaction.atomic():
@@ -435,7 +440,7 @@ def post_equipment(request, character_id, secret_key = None):
     if request.is_ajax and request.method == "POST":
         character = get_object_or_404(Character, id=character_id)
         form = EquipmentForm(request.POST)
-        check_edit_perms(request, character, secret_key)
+        __check_edit_perms(request, character, secret_key)
         if form.is_valid():
             character.equipment=form.cleaned_data['equipment']
             with transaction.atomic():

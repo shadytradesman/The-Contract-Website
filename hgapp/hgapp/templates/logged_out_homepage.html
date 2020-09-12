@@ -21,9 +21,21 @@
 </div>
 <section>
     <div class="container">
+        <p class="text-center">
+            Curious?
+        </p>
         <p class="lead text-center">
             <a href="/wiki/guides-and-tutorials/whatisthecontract/" class="btn btn-primary btn-sm">
                 What is The Contract?
+            </a>
+            <a href="{% url 'characters:characters_create' %}" class="btn btn-default btn-sm">
+                Create a Character
+            </a>
+            <a href="{% url 'powers:powers_stock' %}" class="btn btn-default btn-sm">
+                Browse Powers
+            </a>
+            <a href="{% url 'powers:powers_create' %}" class="btn btn-default btn-sm">
+                Create a Power
             </a>
         </p>
     </div>

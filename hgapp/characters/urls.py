@@ -31,7 +31,6 @@ urlpatterns = [
 
     # ex: .com/characters/obituary/c/112
     url(r'^obituary/c/(?P<character_id>[\d]+)/$', views.edit_obituary, name='characters_obituary'),
-    url(r'^obituary/c/(?P<character_id>[\d]+)/(?P<secret_key>[\da-z]*)$', views.edit_obituary, name='characters_obituary'),
 
     # ex: .com/characters/edit/powers/c/112/
     url(r'^edit/powers/c/(?P<character_id>[\d]+)/$', views.choose_powers, name='characters_power_picker'),
@@ -41,6 +40,9 @@ urlpatterns = [
 
     # ex: .com/characters/edit/c/112/p/21
     url(r'^edit/c/(?P<character_id>[\d]+)/p/(?P<power_full_id>[\d]+)$', views.toggle_power, name='characters_power_toggle'),
+
+    # ex: .com/characters/claim/c/112/6db20aef104038d363eca31985142c08daa82be57e29e53ad3c8171b9d46083f
+    url(r'^claim/c/(?P<character_id>[\d]+)/(?P<secret_key>[\da-z]*)$', views.claim_character, name='characters_claim'),
 
     #####
     # AJAX endpoints for character view page
@@ -70,13 +72,13 @@ urlpatterns = [
 
     # Sets character's mental damage to requested value in "severity" field of injury form. If out of bounds,
     # sets character's injury to either their number of mental health levels or 0.
-    url(r'^post/ajax/c/(?P<character_id>[\d]+)/mental/(?P<secret_key>[\da-z]+)$', views.set_mind_damage, name="set_mind_damage"),
+    url(r'^post/ajax/c/(?P<character_id>[\d]+)/mental/(?P<secret_key>[\da-z]*)$', views.set_mind_damage, name="set_mind_damage"),
     url(r'^post/ajax/c/(?P<character_id>[\d]+)/mental/$', views.set_mind_damage, name="set_mind_damage"),
 
     # Sets source's current value to requested value. If out of bounds,
     # sets source value to either its max or 0.
     url(r'^post/ajax/update-source/s/(?P<source_id>[\d]+)/$', views.set_source_val, name="set_source_val"),
-    url(r'^post/ajax/update-source/s/(?P<source_id>[\d]+)/(?P<secret_key>[\da-z]+)$', views.set_source_val,
+    url(r'^post/ajax/update-source/s/(?P<source_id>[\d]+)/(?P<secret_key>[\da-z]*)$', views.set_source_val,
         name="set_source_val"),
 
 ]

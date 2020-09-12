@@ -7,7 +7,7 @@
                 Edit Character
             </a></li>
             {% if request.user == character.player %}
-                <li><a href="{% url 'characters:characters_delete' character.id secret_key %}" class="btn btn-default">
+                <li><a href="{% url 'characters:characters_delete' character.id %}" class="btn btn-default">
                     Delete Character
                 </a></li>
             {% endif %}
@@ -18,16 +18,17 @@
                 <li><a href="{% url 'characters:characters_archive' character.id %}" class="btn btn-default">
                     Download Character as plain text
                 </a></li>
+                {% if character.is_dead %}
+                    <li><a href="{%url 'characters:characters_obituary' character.id %}" class="btn btn-default">
+                        Edit Obituary
+                    </a></li>
+                {% else %}
+                    <li><a href="{%url 'characters:characters_obituary' character.id %}" class="btn btn-default">
+                        Declare Character Death
+                    </a></li>
+                {% endif %}
             {%endif %}
-            {% if character.is_dead %}
-                <li><a href="{%url 'characters:characters_obituary' character.id secret_key %}" class="btn btn-default">
-                    Edit Obituary
-                </a></li>
-            {% else %}
-                <li><a href="{%url 'characters:characters_obituary' character.id secret_key %}" class="btn btn-default">
-                    Declare Character Death
-                </a></li>
-            {% endif %}
+
         </ul>
     {% endif %}
 </div>
