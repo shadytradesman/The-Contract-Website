@@ -100,7 +100,7 @@
                             <div class="row">
                                 {% if request.user.is_authenticated and request.user.id == character.player.id and character.unspent_rewards|length > 0 %}
                                     <div class= "col-md-2">
-                                        <a href="{% url 'powers:powers_edit_power' power_full.id secret_key %}" class="btn btn-success">
+                                        <a href="{% url 'powers:powers_edit_power' power_full.id %}" class="btn btn-success">
                                             <i class="fa fa-plus-square fa-4x"></i>
                                         </a>
                                     </div>
