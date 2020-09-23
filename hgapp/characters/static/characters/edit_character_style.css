@@ -128,7 +128,7 @@ input[type="number"] {
 
 .affix {
     top: 60px;
-    z-index: 9999 !important;
+    z-index: 9998 !important;
 }
 
 
@@ -227,4 +227,45 @@ input[type="number"] {
     display: block;
     position:relative;
     top: 8px;
+}
+
+.css-big-modal-body {
+    width:598px;
+    position:relative;
+    left:300px;
+}
+
+.css-big-modal-header {
+    width:598px;
+    position:relative;
+    left:300px;
+}
+
+.css-big-modal-image {
+    height:645px !important;
+    float:right;
+}
+
+.css-big-modal-carousel {
+    height:645px;
+    width:100%;
+    position: absolute;
+    right:620px;
+}
+
+#tutorialModal {
+    z-index: 9999;
+}
+
+.css-big-modal-lg {
+    position: relative;
+    left: 70px;
+}
+
+.css-sm-modal-image {
+    height:30%;
+    width: 90%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }

@@ -326,3 +326,9 @@ function updateSourceExp(valueSpanElement) {
     }
     updateExpTotals();
 }
+
+$(document).ready(function(){
+    if (showTutorial) {
+        $('#tutorialModal').modal({});
+    }
+});

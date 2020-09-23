@@ -27,6 +27,7 @@ def get_edit_context(user, existing_character=None, secret_key=None):
         attribute_formset = __get_attribute_formset_for_edit(existing_character, AttributeFormSet)
         limit_formset = __get_limit_formset_for_edit(existing_character)
         source_formset = __get_source_formset_for_edit(existing_character)
+        show_tutorial = False
     else:
         asset_formsets = __get_asset_formsets()
         liability_formsets = __get_liability_formsets()
@@ -44,6 +45,7 @@ def get_edit_context(user, existing_character=None, secret_key=None):
             prefix="limits"
         )
         source_formset = ()
+        show_tutorial = False if user.is_authenticated and user.character_set.all() else True
     charon_coin_form = None
     if user.is_authenticated:
         charon_coin_form = __get_charon_coin_form(user, existing_character, POST=None)
@@ -66,6 +68,7 @@ def get_edit_context(user, existing_character=None, secret_key=None):
                       "EXP_COST_QUIRK_MULTIPLIER": EXP_COST_QUIRK_MULTIPLIER,
                       "EXP_ADV_COST_SOURCE_MULTIPLIER": EXP_ADV_COST_SOURCE_MULTIPLIER,},
         'secret_key': secret_key if secret_key else "",
+        'show_tutorial': show_tutorial,
     }
     return context
 

@@ -1134,3 +1134,6 @@ class CharacterTutorial(models.Model):
     recover_mind = models.TextField(max_length=3000)
     exert_body = models.TextField(max_length=3000)
     charon_coin = models.TextField(max_length=3000)
+    modal_1 = models.TextField(max_length=3000)
+    modal_2 = models.TextField(max_length=3000)
+    modal_3 = models.TextField(max_length=3000)
