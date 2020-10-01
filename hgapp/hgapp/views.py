@@ -22,6 +22,15 @@ from hgapp.terms import EULA, TERMS, PRIVACY
 class SignupView(account.views.SignupView):
    form_class = SignupForm
 
+
+class PasswordResetTokenView(account.views.PasswordResetTokenView):
+    def get_context_data(self, **kwargs):
+        ctx = super(PasswordResetTokenView, self).get_context_data(**kwargs)
+        ctx["username"] = self.get_user()
+        return ctx
+
+
+
 def home(request):
     if request.user.is_anonymous:
         return render(request, 'logged_out_homepage.html')

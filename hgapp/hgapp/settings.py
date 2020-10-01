@@ -371,3 +371,6 @@ WIKI_MARKDOWN_HTML_ATTRIBUTES = {'a': ['aria-controls', 'aria-expanded', 'href',
                                  'tr': ['class', 'id', 'target', 'rel'], 'ul': ['class', 'id', 'target', 'rel']}
 
 WIKI_METHODS = ('article_list', 'toc', 'wikilinks')
+
+# Theme settings
+THEME_CONTACT_EMAIL = "TheContractGame@gmail.com"
