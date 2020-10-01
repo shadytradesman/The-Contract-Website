@@ -26,7 +26,7 @@ class SignupView(account.views.SignupView):
 class PasswordResetTokenView(account.views.PasswordResetTokenView):
     def get_context_data(self, **kwargs):
         ctx = super(PasswordResetTokenView, self).get_context_data(**kwargs)
-        ctx["username"] = self.get_user()
+        ctx["user"] = self.get_user()
         return ctx
 
 
