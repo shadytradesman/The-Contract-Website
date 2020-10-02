@@ -1,9 +1,9 @@
 
 
 window.onload = function () {
-    document.getElementById("copySecretLink").addEventListener("click", function() {
+    document.getElementById("copySecretLink").addEventListener("click here", function() {
     copyToClipboard(document.getElementById("secretCopyField"));});
-    document.getElementById("copyRsvpLink").addEventListener("click", function() {
+    document.getElementById("copyRsvpLink").addEventListener("click here", function() {
     copyToClipboard(document.getElementById("rsvpCopyField"));});
 };
 
