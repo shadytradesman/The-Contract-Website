@@ -401,6 +401,8 @@ class Game_Invite(models.Model):
         else:
             super(Game_Invite, self).save(*args, **kwargs)
 
+    def invitee_can_view_scenario(self):
+        return self.invited_player.has_perm("view_scenario", self.relevant_game.scenario)
 
 class Scenario(models.Model):
     creator = models.ForeignKey(
@@ -433,6 +435,9 @@ class Scenario(models.Model):
 
     def __str__(self):
         return self.title
+
+    def player_can_view(self, player):
+        return player.has_perm("view_scenario", self)
 
     def choice_txt(self):
         return "{} ({}, {}-{} players)".format(self.title, self.get_suggested_status_display(), self.min_players, self.max_players)

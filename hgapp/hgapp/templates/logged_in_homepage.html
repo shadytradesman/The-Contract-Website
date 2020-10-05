@@ -125,7 +125,7 @@
                     {% endfor %}
                 {% endif %}
                 {% if dead_characters %}
-                    <h4>Your Deceased Characters</h4>
+                    <h4>My Deceased Characters</h4>
                     {% for character in dead_characters %}
                         <a href="{% url 'characters:characters_view' character.id %}">
                             <div class="panel panel-default text-center">

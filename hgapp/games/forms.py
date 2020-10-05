@@ -28,7 +28,7 @@ class CreateScenarioForm(forms.Form):
                            max_length=130,
                            help_text='This Scenario\'s title. This may be seen by people who have not played the Scenario')
     summary = forms.CharField(label='Summay',
-                              max_length=1000,
+                              max_length=400,
                               required=False,
                               help_text="Summarize the Scenario so that people who have already played it can recognize it.")
     description = forms.CharField(label='Write-up',
@@ -130,26 +130,26 @@ def make_game_form(user, game_status):
 
 def make_accept_invite_form(invitation):
     class AcceptInviteForm(forms.Form):
+        users_living_character_ids = [char.id for char in invitation.invited_player.character_set.filter(is_deleted=False).all() if not char.is_dead()]
+        required_status = invitation.relevant_game.required_character_status
+        if required_status == HIGH_ROLLER_STATUS[0][0]:
+            queryset = Character.objects.filter(id__in=users_living_character_ids)
+        elif required_status == HIGH_ROLLER_STATUS[1][0] or required_status == HIGH_ROLLER_STATUS[2][0]:
+            queryset = Character.objects.filter(id__in=users_living_character_ids).filter(status__in=[HIGH_ROLLER_STATUS[1][0], HIGH_ROLLER_STATUS[2][0]])
+        else:
+            queryset = Character.objects.filter(id__in=users_living_character_ids).filter(status=invitation.relevant_game.required_character_status)
         if invitation.as_ringer:
             attending_character = forms.ModelChoiceField(
-                queryset=invitation.invited_player.character_set.filter(is_deleted=False),
-                 empty_label="NPC only",
-                 help_text="Instead of one of your characters, you will play an NPC",
-                 required=False,
-                 disabled=True)
+                queryset=queryset,
+                 empty_label="Play an NPC Ringer",
+                 required=False)
         else:
-            users_living_character_ids = [char.id for char in invitation.invited_player.character_set.filter(is_deleted=False).all() if not char.is_dead()]
-            required_status = invitation.relevant_game.required_character_status
-            if required_status == HIGH_ROLLER_STATUS[0][0]:
-                queryset = Character.objects.filter(id__in=users_living_character_ids)
-            else:
-                queryset = Character.objects.filter(id__in=users_living_character_ids).filter(status=invitation.relevant_game.required_character_status)
             attending_character = CharacterModelChoiceField(queryset=queryset,
-                                                         empty_label=None,
-                                                         help_text="Declare which character you're attending with. Private "
-                                                                   "Characters and their powers will be revealed to the "
-                                                                   "Game creator if selected.",
-                                                         required=True)
+                                                     empty_label=None,
+                                                     help_text="Declare which character you're attending with. Private "
+                                                               "Characters and their powers will be revealed to the "
+                                                               "Game creator if selected.",
+                                                     required=True)
     return AcceptInviteForm
 
 class CharacterModelChoiceField(ModelChoiceField):

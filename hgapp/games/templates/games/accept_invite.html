@@ -20,36 +20,45 @@
     <div class="panel panel-default">
         <div class="panel-body">
             <form action="{% url 'games:games_accept_invite' game.id %}" method="post">
-            {{ form.non_field_errors }}
-            {% csrf_token %}
-            {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-            {% if invite.as_ringer %}
-                <div class="container">
+                {{ form.non_field_errors }}
+                {% csrf_token %}
+                {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+                {% if invite.as_ringer %}
                     <h3>You have been invited to play this game as an NPC ringer.</h3>
-                    <p>If you accept this invite, the Scenario will be revealed to you, and you will be unable to
-                        play it as a Contractor in the future. If you succeed in your mission as a ringer, you
+                    <p>If you accept this invite and play as a Ringer, the Scenario will be revealed to you, and you will be unable to
+                        play it as a Contractor in the future. If you succeed in your mission as a Ringer, you
                         will receive an Improvement for the Contractor of your choice.
                     </p>
-                </div>
-            {% endif %}
-            {% if invite.invite_text %}
-                <h3>Invitation from
-                    <a href="{% url 'profiles:profiles_view_profile' game.creator.id %}">
-                        {% user_display game.creator %}:
-                    </a>
-                </h3>
-                <div class="thumbnail">
-                    {{ invite.invite_text|linebreaks }}
-
-                </div>
-            {% endif %}
-            <h4>Required Character Status: <b>{{invite.relevant_game.get_required_character_status_display}}</b></h4>
-            {% if not form.fields.attending_character.choices %}
-                <h3 class="text-danger">You do not have any valid characters.</h3>
-            {% else %}
-                {{ form.attending_character | bootstrap }}
-            {% endif %}
-            {% if not form.fields.attending_character.choices %}
+                {% endif %}
+                {% if invite.invite_text %}
+                    <h3>Invitation from
+                        <a href="{% url 'profiles:profiles_view_profile' game.creator.id %}">
+                            {% user_display game.creator %}:
+                        </a>
+                    </h3>
+                    <div class="thumbnail">
+                        {{ invite.invite_text|linebreaks }}
+                    </div>
+                {% endif %}
+                <h4>Required Character Status: <b>{{invite.relevant_game.get_required_character_status_display}}</b></h4>
+                {% if not form.fields.attending_character.choices %}
+                    <h3 class="text-danger">You do not have any valid characters.</h3>
+                {% else %}
+                    {{ form.attending_character | bootstrap }}
+                {% endif %}
+                {% if can_view_scenario %}
+                    <div class="alert alert-warning text-center">
+                        <h3>You have already discovered this Scenario</h3>
+                        <p>
+                            You have already discovered the Scenario
+                            <a href="{% url 'games:games_view_scenario' game.scenario.id %}">{{game.scenario.title}}</a>
+                            and have access to the full writeup, including spoilers.
+                            <br>
+                            You should only play in this Game as an NPC Ringer.
+                        </p>
+                    </div>
+                {% endif %}
+                {% if not form.fields.attending_character.choices %}
                     <input class="btn btn-primary" type="submit" value="I'll be there!" disabled />
                 {% else %}
                     <input class="btn btn-primary" type="submit" value="I'll be there!" />

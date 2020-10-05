@@ -21,6 +21,11 @@
                 {% else %}
                     <p>Awaiting response.</p>
                 {% endif %}
+                {% if invitation.invitee_can_view_scenario %}
+                    <p class="text-danger">
+                        This Player has already discovered this Scenario and should only play an NPC Ringer.
+                    </p>
+                {% endif %}
             </li>
             {% empty %}
                 <p> No players invited yet! <a href="{% url 'games:games_invite_players' game.id %}">Invite Some!</a></p>
@@ -46,35 +51,47 @@
             <input class="btn btn-primary" type="submit" value="Invite" />
         {% endif %}
     {% elif request.user.is_authenticated %}
-        {% if  my_invitation %}
+        {% if my_invitation %}
             {% if my_invitation.attendance %}
                 {% if my_invitation.attendance.attending_character %}
-                    <h4>You are set to attend this game with
+                    <h3>You are set to attend this game with
                         <a href="{% url 'characters:characters_view' my_invitation.attendance.attending_character.id %}">
                                 {{my_invitation.attendance.attending_character.name}}
                         </a>
-                    </h4>
+                    </h3>
                     <h5> <a href="{% url 'games:games_accept_invite' game.id %}">Click here to change character</a></h5>
                     <h5> <a href="{% url 'games:games_decline_invite' game.id %}">Click here to cancel your attendance</a></h5>
                 {% else %}
-                    <h4>You are set to attend this game as a ringer (NPC).</h4>
+                    <h3>You are set to attend this game as a ringer (NPC).</h3>
                     <h5> <a href="{% url 'games:games_decline_invite' game.id %}">Click here to cancel your attendance</a></h5>
                 {% endif %}
             {% elif my_invitation.is_declined %}
-                <h4>You have declined your invitation to this game.</h4>
+                <h3>You have declined your invitation to this game.</h3>
                 <h5><a href="{% url 'games:games_accept_invite' game.id %}">You may still RSVP if you change your mind</a></h5>
             {% else %}
-                <h4>You have been invited to attend this game!</h4>
+                <h3>You have been invited to attend this game!</h3>
                 <h5> <a href="{% url 'games:games_accept_invite' game.id %}">Click here to RSVP</a></h5>
             {% endif %}
         {% elif game.open_invitations %}
             <h3>This game is open for self-invites!</h3>
             {% if view_scenario %}
-                <h5>Since you already have access to this scenario, you may only attend as a ringer.</h5>
+                <h5>Since you already have access to this Scenario, you should only attend as a Ringer.</h5>
             {% endif %}
-                <h5><a href="{% url 'games:games_accept_invite' game.id %}">Click here to RSVP</a></h5>
+            <h5><a href="{% url 'games:games_accept_invite' game.id %}">Click here to RSVP</a></h5>
         {% else %}
             <h3>You have not been invited to this game.</h3>
+        {% endif %}
+        {% if can_view_scenario %}
+            <div class="alert alert-warning text-center">
+                <h3>You have already discovered this Scenario</h3>
+                <p>
+                    You have already discovered the Scenario
+                    <a href="{% url 'games:games_view_scenario' game.scenario.id %}">{{game.scenario.title}}</a>
+                    and have access to the full writeup, including spoilers.
+                    <br>
+                    You should only play in this Game as an NPC Ringer.
+                </p>
+            </div>
         {% endif %}
     {% else %}
         <h3>Log in to check invite status</h3>
