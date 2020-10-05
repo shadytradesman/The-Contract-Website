@@ -411,7 +411,7 @@ class Scenario(models.Model):
     summary = models.TextField(max_length=5000,
                                blank=True,
                                null=True)
-    description = models.TextField(max_length=40000)
+    description = models.TextField(max_length=74000)
     suggested_status = models.CharField(choices=HIGH_ROLLER_STATUS,
                                        max_length=25,
                                        default=HIGH_ROLLER_STATUS[0][0])

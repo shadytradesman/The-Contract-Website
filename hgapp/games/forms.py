@@ -33,21 +33,22 @@ class CreateScenarioForm(forms.Form):
                               help_text="Summarize the Scenario so that people who have already played it can recognize it.")
     description = forms.CharField(label='Write-up',
                             widget=TinyMCE(attrs={'cols': 80, 'rows': 30}),
-                            max_length=40000,
+                            max_length=70000,
                             help_text='Describe the Scenario in detail. Win conditions, enemies, background, etc.')
-    max_players = forms.IntegerField(label = "Suggested Maximum number of players", initial=4)
-    min_players = forms.IntegerField(label = "Suggested Minimum number of players", initial=2)
-    suggested_character_status = forms.ChoiceField(choices=HIGH_ROLLER_STATUS,
+    max_players = forms.IntegerField(label = "Max Players", initial=4)
+    min_players = forms.IntegerField(label = "Minimum Players", initial=2)
+    suggested_character_status = forms.ChoiceField(label = "Required Status",
+                                                   choices=HIGH_ROLLER_STATUS,
                                                    help_text='Must be this tall to ride')
-    is_highlander = forms.BooleanField(label = "Is Highlander",
+    is_highlander = forms.BooleanField(label = "Highlander",
                                        required=False,
-                                       help_text = "Only one characer can achieve victory")
-    is_rivalry = forms.BooleanField(label = "Is Rivalry",
+                                       help_text = "Only one Contractor can achieve victory")
+    is_rivalry = forms.BooleanField(label = "Rivalry",
                                     required=False,
-                                    help_text="The characters may have different or opposing goals")
+                                    help_text="The Contractors may have different or opposing goals")
     requires_ringer = forms.BooleanField(label = "Requires Ringer",
                                          required=False,
-                                         help_text="One player must play an NPC character instead of their own")
+                                         help_text="One Player must play an NPC instead of their Contractor")
 
 class CustomInviteForm(forms.Form):
     username = forms.CharField(label='Player\'s Username',

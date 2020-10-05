@@ -12,9 +12,10 @@
 
 {% block body_base %}
 <div class="container">
-    <div class="backdropped">
+    <div class="text-center">
+        <h4>Viewing Scenario</h4>
         <h1>
-		    {{ scenario.title }}
+            {{ scenario.title }}
             {% if scenario.summary %}
                 <br>
                 <small>
@@ -22,125 +23,128 @@
                 </small>
             {% endif %}
         </h1>
-        <h4>Created by <a href="{% url 'profiles:profiles_view_profile' scenario.creator.profile.id %}">{% user_display scenario.creator %}</a></h4>
-        {% if request.user.is_authenticated and request.user.id == scenario.creator.id %}
-            <p>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            {% if request.user.is_authenticated and request.user.id == scenario.creator.id %}
                 <a class="btn btn-primary" href="{% url 'games:games_scenario_edit' scenario.id %}">Edit Scenario</a>
+            {% endif %}
+            <h4>Created by <a href="{% url 'profiles:profiles_view_profile' scenario.creator.profile.id %}">{% user_display scenario.creator %}</a></h4>
+            <p>
+                Suggested for
+                <b>{{scenario.min_players}}</b>
+                to
+                <b>{{scenario.max_players}}</b>
+                Characters at
+                <b>{{scenario.get_suggested_status_display}}</b> level
             </p>
-        {% endif %}
-        <p>
-            Suggested for
-            <b>{{scenario.min_players}}</b>
-            to
-            <b>{{scenario.max_players}}</b>
-            Characters at
-            <b>{{scenario.get_suggested_status_display}}</b> level
-        </p>
-        <ul>
-            {% if scenario.requires_ringer %}
+            <ul>
+                {% if scenario.requires_ringer %}
+                        <li>
+                            <h5>
+                             Requires Ringer
+                            </h5>
+                        </li>
+                {% endif %}
+                {% if scenario.is_rivalry %}
                     <li>
                         <h5>
-                         Requires Ringer
+                             Rivalry
                         </h5>
                     </li>
-            {% endif %}
-            {% if scenario.is_rivalry %}
-                <li>
-                    <h5>
-                         Rivalry
-                    </h5>
-                </li>
-            {% endif %}
-            {% if scenario.is_highlander %}
-                <li>
-                    <h5>
-                         Highlander
-                    </h5>
-                </li>
-            {% endif %}
-        </ul>
-        <h4>
-            Total number of runs: <b>{{ scenario.num_finished_games }}</b>
-        </h4>
-        {% if games_run %}
+                {% endif %}
+                {% if scenario.is_highlander %}
+                    <li>
+                        <h5>
+                             Highlander
+                        </h5>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+
+    <h4>
+        Total number of runs: <b>{{ scenario.num_finished_games }}</b>
+    </h4>
+    {% if games_run %}
+        <div class="thumbnail">
+            <h4>
+                You have run this Scenario {{ games_run|length}} time{{games_run|pluralize}}
+            </h4>
+            <ul>
+                {% for game in games_run %}
+                    <li>
+                        <a href="{% url 'games:games_view_game' game.id %}">
+                            {{ game.title }}
+                        </a>
+                        {% if game.end_time %}
+                            - occurred {{ game.end_time }}
+                        {% else %}
+                            never finished.
+                        {% endif %}
+                        {% if game in games_run_no_feedback %}
+                            <br>
+                            <form action="{% url 'games:games_view_scenario_feedback' scenario.id game.id %}" method="post">
+                                <div class="alert alert-warning">
+                                    <h4>
+                                        Leave Feedback
+                                    </h4>
+                                    {{ game_feedback_form.non_field_errors }}
+                                    {{ game_feedback_form.management_form }}
+                                    {% csrf_token %}
+                                    {% if game_feedback_form %}
+                                    {{ game_feedback_form | bootstrap }}
+                                    {% endif %}
+                                    <br>
+                                    <input class="btn btn-primary" type="submit" value="Submit" />
+                                </div>
+                            </form>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    <h2>
+        Here's what happens. . .
+    </h2>
+    <div class="panel panel-default" style="padding:10px;">
+        <p>
+            {{scenario.description | safe}}
+        </p>
+    </div>
+    <div class="panel panel-default">
+        <h3 class="panel-heading">
+            Games Run
+        </h3>
+        <div class="panel-row">
+        {% for game in scenario.finished_games %}
             <div class="thumbnail">
                 <h4>
-                    You have run this Scenario {{ games_run|length}} time{{games_run|pluralize}}
-                </h4>
-                <ul>
-                    {% for game in games_run %}
-                        <li>
-                            <a href="{% url 'games:games_view_game' game.id %}">
-                                {{ game.title }}
-                            </a>
-                            {% if game.end_time %}
-                                - occurred {{ game.end_time }}
-                            {% else %}
-                                never finished.
-                            {% endif %}
-                            {% if game in games_run_no_feedback %}
-                                <br>
-                                <form action="{% url 'games:games_view_scenario_feedback' scenario.id game.id %}" method="post">
-                                    <div class="alert alert-warning">
-                                        <h4>
-                                            Leave Feedback
-                                        </h4>
-                                        {{ game_feedback_form.non_field_errors }}
-                                        {{ game_feedback_form.management_form }}
-                                        {% csrf_token %}
-                                        {% if game_feedback_form %}
-                                        {{ game_feedback_form | bootstrap }}
-                                        {% endif %}
-                                        <br>
-                                        <input class="btn btn-primary" type="submit" value="Submit" />
-                                    </div>
-                                </form>
-                            {% endif %}
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endif %}
-        <h2>
-            Here's what happens. . .
-        </h2>
-        <div class="panel panel-default" style="padding:10px;">
-            <p>
-                {{scenario.description | safe}}
-            </p>
-        </div>
-        <div class="panel panel-default">
-            <h3 class="panel-heading">
-                Games Run
-            </h3>
-            <div class="panel-row">
-            {% for game in scenario.finished_games %}
-                <div class="thumbnail">
-                    <h4>
-                    <a href="{% url 'profiles:profiles_view_profile' game.gm.id %}">{% user_display game.gm %}</a>
-                    {% if game.cell %}
-                        ran for
-                        <a href="{% url 'cells:cells_view_cell' game.cell.id %}">
-                            {{game.cell}}
-                        </a>
-                    {% endif %}
-                    on
-                    <a href="{% url 'games:games_view_game' game.id %}">
-                         {{game.end_time}}
+                <a href="{% url 'profiles:profiles_view_profile' game.gm.id %}">{% user_display game.gm %}</a>
+                {% if game.cell %}
+                    ran for
+                    <a href="{% url 'cells:cells_view_cell' game.cell.id %}">
+                        {{game.cell}}
                     </a>
-                    </h4>
-                    {% if game.scenario_notes %}
-                        <p>
-                            {{game.scenario_notes|linebreaks}}
-                        </p>
-                    {% endif %}
-                </div>
-            {% empty %}
-                <div class="alert-warning">
-                    <h3>No GMs have run this Scenario</h3>
-                </div>
-            {% endfor %}
+                {% endif %}
+                on
+                <a href="{% url 'games:games_view_game' game.id %}">
+                     {{game.end_time}}
+                </a>
+                </h4>
+                {% if game.scenario_notes %}
+                    <p>
+                        {{game.scenario_notes|linebreaks}}
+                    </p>
+                {% endif %}
             </div>
+        {% empty %}
+            <div class="alert-warning">
+                <h3>No GMs have run this Scenario</h3>
+            </div>
+        {% endfor %}
         </div>
     </div>
 </div>
