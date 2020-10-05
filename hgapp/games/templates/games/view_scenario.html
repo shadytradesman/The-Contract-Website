@@ -106,7 +106,7 @@
         </h2>
         <div class="panel panel-default" style="padding:10px;">
             <p>
-                {{scenario.description | markdown | linebreaks}}
+                {{scenario.description | safe}}
             </p>
         </div>
         <div class="panel panel-default">

@@ -17,6 +17,7 @@ from bootstrap3_datetime.widgets import DateTimePicker
 
 from overrides.widgets import CustomStylePagedown
 
+from tinymce.widgets import TinyMCE
 
 class ScenarioModelChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
@@ -28,11 +29,10 @@ class CreateScenarioForm(forms.Form):
                            help_text='This Scenario\'s title. This may be seen by people who have not played the Scenario')
     summary = forms.CharField(label='Summay',
                               max_length=1000,
-                              widget=forms.Textarea,
                               required=False,
                               help_text="Summarize the Scenario so that people who have already played it can recognize it.")
     description = forms.CharField(label='Write-up',
-                            widget=CustomStylePagedown(),
+                            widget=TinyMCE(attrs={'cols': 80, 'rows': 30}),
                             max_length=40000,
                             help_text='Describe the Scenario in detail. Win conditions, enemies, background, etc.')
     max_players = forms.IntegerField(label = "Suggested Maximum number of players", initial=4)

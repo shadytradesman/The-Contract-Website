@@ -36,6 +36,7 @@ urlpatterns = [
     url(r"^characters/", include ("characters.urls"), name="character"),
     url(r"^games/", include("games.urls"), name="games"),
     url(r"^cells/", include("cells.urls"), name="cells"),
+    url(r"^tinymce/", include("tinymce.urls")),
     path('notifications/', include('django_nyt.urls')),
     path('wiki/', include('wiki.urls')),
 ]
