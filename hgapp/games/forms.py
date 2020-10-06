@@ -26,7 +26,7 @@ class ScenarioModelChoiceField(ModelChoiceField):
 class CreateScenarioForm(forms.Form):
     title = forms.CharField(label='Title',
                            max_length=130,
-                           help_text='This Scenario\'s title. This may be seen by people who have not played the Scenario')
+                           help_text='This Scenario\'s title. This may be seen by people who have not played the Scenario.')
     summary = forms.CharField(label='Summay',
                               max_length=400,
                               required=False,
