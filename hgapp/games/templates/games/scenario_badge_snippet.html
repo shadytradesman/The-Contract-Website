@@ -2,11 +2,17 @@
 <div class="thumbnail">
     <h4>
         <a href="{% url 'games:games_view_scenario' scenario.id %}">
-                {{ scenario.title }}
+            {{ scenario.title }}
         </a>
         <br>
         <small>
-            A Scenario written by
+            A
+            {% if scenario.is_stock %}
+                <span class="text-success">
+                    stock
+                </span>
+            {% endif %}
+            Scenario written by
             <a href="{% url 'profiles:profiles_view_profile' scenario.creator.id %}">
                 <b>{% user_display scenario.creator %}</b>
             </a>

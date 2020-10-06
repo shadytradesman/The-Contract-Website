@@ -61,8 +61,14 @@
                         {{ form.requires_ringer | bootstrap }}
                     </div>
                 </div>
+                {% if request.user.is_superuser %}
+                    <br>
+                    <h3>Scenario Tags (Admin only)</h3>
+                    {{form.tags}}
+                    <br>
+                {% endif %}
                 <input class="btn btn-primary" type="submit" value="Done!" />
-            </div>
+            </br>
         </div>
     </form>
 </div>

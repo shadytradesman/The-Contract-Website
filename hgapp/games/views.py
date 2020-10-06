@@ -42,6 +42,8 @@ def create_scenario(request):
             )
             with transaction.atomic():
                 scenario.save()
+                if request.user.is_superuser:
+                    scenario.tags.set(form.cleaned_data["tags"])
             return HttpResponseRedirect(reverse('games:games_view_scenario', args=(scenario.id,)))
         else:
             print(form.errors)
@@ -75,6 +77,8 @@ def edit_scenario(request, scenario_id):
             scenario.pub_date=timezone.now()
             with transaction.atomic():
                 scenario.save()
+                if request.user.is_superuser:
+                    scenario.tags.set(form.cleaned_data["tags"])
             return HttpResponseRedirect(reverse('games:games_view_scenario', args=(scenario.id,)))
         else:
             print(form.errors)
@@ -89,7 +93,9 @@ def edit_scenario(request, scenario_id):
                                             'suggested_character_status': scenario.suggested_status,
                                             'is_highlander': scenario.is_highlander,
                                             'is_rivalry': scenario.is_rivalry,
-                                            'requires_ringer': scenario.requires_ringer})
+                                            'requires_ringer': scenario.requires_ringer,
+                                            'tags': scenario.tags.all(),
+                                           })
         context = {
             'scenario': scenario,
             'form' : form,
@@ -134,9 +140,13 @@ def view_scenario_gallery(request):
         raise PermissionDenied("You must be logged into view your discovered and created Scenarios")
     owned_scenarios = request.user.scenario_creator.all()
     discovered_scenarios = request.user.scenario_discovery_set.exclude(reason=DISCOVERY_REASON[1][0]).all()
+    num_new_cell_scenarios = len(Scenario.objects.filter(tags__slug="newcell").all())
+    not_cell_leader = len(request.user.cell_set.filter(creator=request.user).all()) == 0
     context = {
         'owned_scenarios': owned_scenarios,
         'scenario_discoveries': discovered_scenarios,
+        'num_new_cell_scenarios': num_new_cell_scenarios,
+        'not_cell_leader': not_cell_leader,
     }
     return render(request, 'games/view_scenario_gallery.html', context)
 

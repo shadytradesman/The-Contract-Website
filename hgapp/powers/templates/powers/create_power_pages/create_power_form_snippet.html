@@ -148,21 +148,21 @@
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-md-10 col-md-offset-1 alert alert-danger js-gift-warn text-center" role="alert" style="display:none;">
-                Your Character does not have enough Gifts to purchase your improvements to this Power.
-                <br>
-                <b>Available:</b> {{character.unspent_rewards|length}}
-            </div>
-        </div>
-        {% if request.user.is_superuser %}
+       <div class="row">
+       <div class="col-md-10 col-md-offset-1 alert alert-danger js-gift-warn text-center" role="alert" style="display:none;">
+           Your Character does not have enough Gifts to purchase your improvements to this Power.
+           <br>
+           <b>Available:</b> {{character.unspent_rewards|length}}
+       </div>
+       </div>
+       {% if request.user.is_superuser %}
             <br>
             <h3>Power Tags (Admin only)</h3>
             {{form.tags}}
             <h3>Example Description</h3>
             {{form.example_description | bootstrap}}
             <br>
-        {% endif %}
+       {% endif %}
         <div class="row text-center">
             <input class="btn btn-lg btn-default" type="submit" value="Done!" />
         </div>

@@ -42,11 +42,12 @@
                         {% include "games/scenario_badge_snippet.html" %}
                     </div>
                 {% empty %}
-                    <p class="text-warning">You haven't written any Scenarios yet. Try <a href="{% url 'games:games_create_scenario' ">creating your own.</a></p>
+                    </div>
+                    <p class="text-warning">You haven't written any Scenarios yet. Try <a href="{% url 'games:games_create_scenario' %}">creating your own.</a></p>
+                    <div>
                 {% endfor %}
             </div>
         </div>
-
         <div class="panel-heading">
             <h2>Discovered Scenarios</h2>
         </div>
@@ -54,10 +55,18 @@
             <div class="alert alert-info text-center">
                 <h5>
                     You can discover new Scenarios by playing them in Games.
-                    <br>
-                    Creating a Cell unlocks two stock Scenarios to get you started!
                 </h5>
             </div>
+            {% if not_cell_leader %}
+                <div class="alert alert-success text-center">
+                    <h4>
+                        <a href="{% url 'cells:cells_create'%}">
+                            Create a Cell
+                        </a>
+                        to unlock <b>{{num_new_cell_scenarios}}</b> stock Scenarios to get you started!
+                    </h4>
+                </div>
+            {% endif %}
             <div class="row">
                 {% for scenario_discovery in scenario_discoveries %}
                     {% if forloop.counter|divisibleby:2 == 0 %}
@@ -70,7 +79,9 @@
                         {% endwith %}
                     </div>
                 {% empty %}
+                    </div>
                     <p class="text-warning">You haven't discovered any Scenarios yet.</p>
+                    <div>
                 {% endfor %}
             </div>
         </div>

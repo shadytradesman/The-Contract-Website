@@ -56,6 +56,7 @@ DISCOVERY_REASON = (
     ('PLAYED', 'Played'),
     ('CREATED', 'Created'),
     ('SHARED', 'Shared'),
+    ('UNLOCKED', 'Unlocked'),
 )
 
 def migrate_add_gms(apps, schema_editor):
@@ -432,6 +433,8 @@ class Scenario(models.Model):
                                          through_fields=('relevant_scenario', 'discovering_player'),
                                          default=None,
                                          blank=True)
+    tags = models.ManyToManyField("ScenarioTag",
+                                   blank=True)
 
     def __str__(self):
         return self.title
@@ -456,6 +459,18 @@ class Scenario(models.Model):
                 reason=DISCOVERY_REASON[0][0]
             )
             discovery.save()
+
+    def unlocked_discovery(self, player):
+        if not player.scenario_set.filter(id=self.id).exists():
+            discovery = Scenario_Discovery (
+                discovering_player=player,
+                relevant_scenario=self,
+                reason=DISCOVERY_REASON[3][0]
+            )
+            discovery.save()
+
+    def is_stock(self):
+        return len(self.tags.all()) > 0
 
     def save(self, *args, **kwargs):
         if self.pk is None:
@@ -617,3 +632,11 @@ class Reward(models.Model):
                 reason = "playing in "
             reason = reason + self.relevant_game.scenario.title
             return reason
+
+class ScenarioTag(models.Model):
+    tag = models.CharField(max_length=40)
+    slug = models.SlugField("Unique URL-Safe Name",
+                            max_length=40,
+                            primary_key=True)
+    def __str__(self):
+        return self.tag

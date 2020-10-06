@@ -23,6 +23,7 @@
                 Completed Game
             {% endif %}
         </h1>
+        {% include "_messages.html" %}
         {% if request.user.is_authenticated and request.user.id == game.creator.id or request.user.id == game.gm.id %}
             <br>
             <ul class="nav nav-pills nav-justified navbar-default">

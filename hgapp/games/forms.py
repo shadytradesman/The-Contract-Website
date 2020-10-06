@@ -7,7 +7,7 @@ from django.utils.datetime_safe import datetime
 
 from games.models import Scenario
 
-from games.models import GAME_STATUS, OUTCOME
+from games.models import GAME_STATUS, OUTCOME, ScenarioTag
 
 from characters.models import Character
 
@@ -49,6 +49,9 @@ class CreateScenarioForm(forms.Form):
     requires_ringer = forms.BooleanField(label = "Requires Ringer",
                                          required=False,
                                          help_text="One Player must play an NPC instead of their Contractor")
+    tags = forms.ModelMultipleChoiceField(queryset=ScenarioTag.objects.order_by("tag").all(),
+                                          required=False,
+                                          widget=forms.CheckboxSelectMultiple)
 
 class CustomInviteForm(forms.Form):
     username = forms.CharField(label='Player\'s Username',

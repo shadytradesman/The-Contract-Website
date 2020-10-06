@@ -40,7 +40,6 @@
                 Invite Additional Players
             </h3>
             {{ invite_form.about.errors }}
-            {% include "_messages.html" %}
             <form action="{% url 'games:games_invite_players' game.id %}" method="post">
             {{ invite_form.non_field_errors }}
             {% csrf_token %}

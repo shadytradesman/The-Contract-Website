@@ -4,12 +4,14 @@ from django.db import transaction
 from django.db.models import Q
 from cells.forms import CreateCellForm, CustomInviteForm, RsvpForm, PlayerRoleForm, KickForm
 from django.http import HttpResponseRedirect
+from django.contrib import messages
+from django.utils.safestring import mark_safe
 
 from hgapp.utilities import get_object_or_none
 from .models import Cell, ROLE, CellInvite
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
-from games.models import GAME_STATUS
+from games.models import GAME_STATUS, Scenario
 from django.core.exceptions import PermissionDenied
 from postman.api import pm_write
 from django.utils.safestring import SafeText
@@ -29,8 +31,21 @@ def create_cell(request):
                 setting_name = form.cleaned_data['setting_name'],
                 setting_description = form.cleaned_data['setting_description'],
             )
+            new_cell_scenarios = Scenario.objects.filter(tags__slug="newcell").all()
             with transaction.atomic():
                 cell.save()
+                for scenario in new_cell_scenarios:
+                    scenario.unlocked_discovery(request.user)
+            if len(request.user.cell_set.filter(creator=request.user).all()) == 1:
+                gallery_url = reverse('games:games_view_scenario_gallery')
+                num_unlocked = len(new_cell_scenarios)
+                messages.add_message(request, messages.SUCCESS, mark_safe("<h4 class=\"text-center\">By creating this Cell "
+                                                                          "you have unlocked <b>" + str(num_unlocked) + "</b> premade stock Scenarios!"
+                                                                          "<br>"
+                                                                          "<a href='"
+                                                                          + gallery_url +
+                                                                          "'> Click Here</a> "
+                                                                          "to visit your Scenario Gallery</h4>"))
             return HttpResponseRedirect(reverse('cells:cells_view_cell', args=(cell.id,)))
         else:
             print(form.errors)
@@ -58,8 +73,12 @@ def edit_cell(request, cell_id):
                 cell.name = form.cleaned_data['name']
             cell.setting_name = form.cleaned_data['setting_name']
             cell.setting_description=form.cleaned_data['setting_description']
+            new_cell_scenarios = Scenario.objects.filter(tags__slug="newcell").all()
             with transaction.atomic():
                 cell.save()
+                if request.user == cell.creator:
+                    for scenario in new_cell_scenarios:
+                        scenario.unlocked_discovery(request.user)
             return HttpResponseRedirect(reverse('cells:cells_view_cell', args=(cell.id,)))
         else:
             print(form.errors)

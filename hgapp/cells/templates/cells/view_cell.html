@@ -17,6 +17,8 @@
         </h1>
         Cell Founded by <a href="{% url 'profiles:profiles_view_profile' cell.creator.profile.id %}">{% user_display cell.creator %}</a>
     </div>
+
+            {% include "_messages.html" %}
     <br>
     <ul class="nav nav-pills nav-justified navbar-default">
         {% if request.user.is_authenticated and can_manage_memberships %}
