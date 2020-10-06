@@ -17,6 +17,7 @@ from bootstrap3_datetime.widgets import DateTimePicker
 
 from overrides.widgets import CustomStylePagedown
 
+from tinymce.widgets import TinyMCE
 
 class ScenarioModelChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
@@ -25,29 +26,29 @@ class ScenarioModelChoiceField(ModelChoiceField):
 class CreateScenarioForm(forms.Form):
     title = forms.CharField(label='Title',
                            max_length=130,
-                           help_text='This Scenario\'s title. This may be seen by people who have not played the Scenario')
+                           help_text='This Scenario\'s title. This may be seen by people who have not played the Scenario.')
     summary = forms.CharField(label='Summay',
-                              max_length=1000,
-                              widget=forms.Textarea,
+                              max_length=400,
                               required=False,
                               help_text="Summarize the Scenario so that people who have already played it can recognize it.")
     description = forms.CharField(label='Write-up',
-                            widget=CustomStylePagedown(),
-                            max_length=40000,
+                            widget=TinyMCE(attrs={'cols': 80, 'rows': 30}),
+                            max_length=70000,
                             help_text='Describe the Scenario in detail. Win conditions, enemies, background, etc.')
-    max_players = forms.IntegerField(label = "Suggested Maximum number of players", initial=4)
-    min_players = forms.IntegerField(label = "Suggested Minimum number of players", initial=2)
-    suggested_character_status = forms.ChoiceField(choices=HIGH_ROLLER_STATUS,
+    max_players = forms.IntegerField(label = "Max Players", initial=4)
+    min_players = forms.IntegerField(label = "Minimum Players", initial=2)
+    suggested_character_status = forms.ChoiceField(label = "Required Status",
+                                                   choices=HIGH_ROLLER_STATUS,
                                                    help_text='Must be this tall to ride')
-    is_highlander = forms.BooleanField(label = "Is Highlander",
+    is_highlander = forms.BooleanField(label = "Highlander",
                                        required=False,
-                                       help_text = "Only one characer can achieve victory")
-    is_rivalry = forms.BooleanField(label = "Is Rivalry",
+                                       help_text = "Only one Contractor can achieve victory")
+    is_rivalry = forms.BooleanField(label = "Rivalry",
                                     required=False,
-                                    help_text="The characters may have different or opposing goals")
+                                    help_text="The Contractors may have different or opposing goals")
     requires_ringer = forms.BooleanField(label = "Requires Ringer",
                                          required=False,
-                                         help_text="One player must play an NPC character instead of their own")
+                                         help_text="One Player must play an NPC instead of their Contractor")
 
 class CustomInviteForm(forms.Form):
     username = forms.CharField(label='Player\'s Username',
@@ -129,26 +130,26 @@ def make_game_form(user, game_status):
 
 def make_accept_invite_form(invitation):
     class AcceptInviteForm(forms.Form):
+        users_living_character_ids = [char.id for char in invitation.invited_player.character_set.filter(is_deleted=False).all() if not char.is_dead()]
+        required_status = invitation.relevant_game.required_character_status
+        if required_status == HIGH_ROLLER_STATUS[0][0]:
+            queryset = Character.objects.filter(id__in=users_living_character_ids)
+        elif required_status == HIGH_ROLLER_STATUS[1][0] or required_status == HIGH_ROLLER_STATUS[2][0]:
+            queryset = Character.objects.filter(id__in=users_living_character_ids).filter(status__in=[HIGH_ROLLER_STATUS[1][0], HIGH_ROLLER_STATUS[2][0]])
+        else:
+            queryset = Character.objects.filter(id__in=users_living_character_ids).filter(status=invitation.relevant_game.required_character_status)
         if invitation.as_ringer:
             attending_character = forms.ModelChoiceField(
-                queryset=invitation.invited_player.character_set.filter(is_deleted=False),
-                 empty_label="NPC only",
-                 help_text="Instead of one of your characters, you will play an NPC",
-                 required=False,
-                 disabled=True)
+                queryset=queryset,
+                 empty_label="Play an NPC Ringer",
+                 required=False)
         else:
-            users_living_character_ids = [char.id for char in invitation.invited_player.character_set.filter(is_deleted=False).all() if not char.is_dead()]
-            required_status = invitation.relevant_game.required_character_status
-            if required_status == HIGH_ROLLER_STATUS[0][0]:
-                queryset = Character.objects.filter(id__in=users_living_character_ids)
-            else:
-                queryset = Character.objects.filter(id__in=users_living_character_ids).filter(status=invitation.relevant_game.required_character_status)
             attending_character = CharacterModelChoiceField(queryset=queryset,
-                                                         empty_label=None,
-                                                         help_text="Declare which character you're attending with. Private "
-                                                                   "Characters and their powers will be revealed to the "
-                                                                   "Game creator if selected.",
-                                                         required=True)
+                                                     empty_label=None,
+                                                     help_text="Declare which character you're attending with. Private "
+                                                               "Characters and their powers will be revealed to the "
+                                                               "Game creator if selected.",
+                                                     required=True)
     return AcceptInviteForm
 
 class CharacterModelChoiceField(ModelChoiceField):

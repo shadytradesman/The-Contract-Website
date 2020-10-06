@@ -117,6 +117,7 @@ INSTALLED_APPS = [
     'pagedown.apps.PagedownConfig',
     'markdown_deux',
     'postman',
+    'tinymce',
 
     #Wiki
     #'django.contrib.sites.apps.SitesConfig',
@@ -374,3 +375,20 @@ WIKI_METHODS = ('article_list', 'toc', 'wikilinks')
 
 # Theme settings
 THEME_CONTACT_EMAIL = "TheContractGame@gmail.com"
+
+# TinyMCE settings
+TINYMCE_JS_URL = "https://cdn.tiny.cloud/1/12xkz9g5ryiyz78mjzhthvq62r42rsi6tzik4yulk1tol6rn/tinymce/5/tinymce.min.js"
+TINYMCE_INCLUDE_JQUERY = False
+TINYMCE_DEFAULT_CONFIG = {
+    "theme": "silver",
+    "height": 500,
+    "menubar": False,
+    "plugins": "advlist,autolink,lists,link,image,charmap,print,preview,anchor,"
+    "searchreplace,visualblocks,code,fullscreen,insertdatetime,media,table,paste,"
+    "code,help,wordcount",
+    "toolbar": "formatselect fontselect fontsizeselect | "
+    "bold italic strikethrough underline removeformat | backcolor forecolor | alignleft aligncenter "
+    "| bullist numlist link unlink | "
+    " | help",
+    'content_css': "/static/css/site.css",
+}

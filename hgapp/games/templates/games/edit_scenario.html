@@ -1,6 +1,5 @@
 {% extends "site_base.html" %}
 
-
 {% load i18n %}
 {% load bootstrap %}
 
@@ -13,50 +12,58 @@
 {% block body_class %}home{% endblock %}
 
 {% block body_base %}
-    <section>
-        <div class="container">
-            {{ form.about.errors }}
-            {% if scenario %}
-                <h1>Editing {{scenario.title}}</h1>
-                <form action="{% url 'games:games_scenario_edit' scenario.id %}" method="post">
-            {% else %}
-                <h1>Create a new scenario</h1>
-                <form action="{% url 'games:games_create_scenario' %}" method="post">
-            {% endif %}
+<div class="container">
+    <div class="text-center">
+        {% if scenario %}
+            <h1>Editing Scenario {{scenario.title}}</h1>
+        {% else %}
+            <h1>Create a new Scenario</h1>
+        {% endif %}
+    </div>
+    {% if scenario %}
+        <form action="{% url 'games:games_scenario_edit' scenario.id %}" method="post">
+    {% else %}
+        <form action="{% url 'games:games_create_scenario' %}" method="post">
+    {% endif %}
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="row text-center">
+                    <div class="alert alert-info col-md-6 col-md-offset-3">
+                        For tips on writing Scenarios, <a href="/wiki/guides-and-tutorials/writing-scenarios" style="text-decoration: underline;">read the Guide!</a>
+                    </div>
+                </div>
+                {{ form.about.errors }}
                 {{ form.non_field_errors }}
                 {% csrf_token %}
                 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-                    <div class="container">
-                        {{ form.title | bootstrap}}
-                    </div>
-                    <div class="container">
-                        {{ form.summary | bootstrap}}
-                    </div>
-                    <div class="container">
+                {{ form.title | bootstrap}}
+                {{ form.summary | bootstrap}}
+                {{ form.description | bootstrap}}
+                <div class="row">
+                    <div class="col-sm-4">
                         {{ form.suggested_character_status | bootstrap }}
                     </div>
-                    <div class="container">
-                        {{ form.description | bootstrap}}
-                    </div>
-                    <div class="container">
+                    <div class="col-sm-4">
                         {{ form.min_players | bootstrap }}
                     </div>
-                    <div class="container">
-                        {{ form.max_players | bootstrap}}
+                    <div class="col-sm-4">
+                        {{ form.max_players | bootstrap }}
                     </div>
-                    <div class="container">
+                </div>
+                <div class="row">
+                    <div class="col-sm-4">
                         {{ form.is_highlander | bootstrap }}
                     </div>
-                    <div class="container">
+                    <div class="col-sm-4">
                         {{ form.is_rivalry | bootstrap }}
                     </div>
-                    <div class="container">
+                    <div class="col-sm-4">
                         {{ form.requires_ringer | bootstrap }}
                     </div>
+                </div>
+                <input class="btn btn-primary" type="submit" value="Done!" />
             </div>
-        </section>
-        <div class="container">
-            <input class="btn btn-primary" type="submit" value="Done!" />
         </div>
     </form>
+</div>
 {% endblock %}

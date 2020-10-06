@@ -55,7 +55,7 @@
                     </li>
                     <li role="presentation">
                         <a href="{% url 'powers:powers_stock' %}" class="btn btn-default">
-                            Browse Pre-made Stock Powers
+                            Browse Premade Stock Powers
                         </a>
                     </li>
                 </ul>
@@ -64,7 +64,7 @@
                 <h2>Games</h2>
                 <ul class="nav nav-pills nav-stacked">
                     <li role="presentation" > <a class="btn btn-primary" href="{% url 'games:games_create_game' %}">Schedule a Game</a></li>
-                    <li role="presentation" > <a class="btn btn-default" href="{% url 'games:games_view_scenario_gallery' %}">Scenarios</a></li>
+                    <li role="presentation" > <a class="btn btn-default" href="{% url 'games:games_view_scenario_gallery' %}">Scenario Gallery</a></li>
                 </ul>
                 <br>
             </div>
@@ -125,7 +125,7 @@
                     {% endfor %}
                 {% endif %}
                 {% if dead_characters %}
-                    <h4>Your Deceased Characters</h4>
+                    <h4>My Deceased Characters</h4>
                     {% for character in dead_characters %}
                         <a href="{% url 'characters:characters_view' character.id %}">
                             <div class="panel panel-default text-center">

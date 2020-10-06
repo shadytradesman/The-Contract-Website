@@ -57,7 +57,6 @@
             <h4><a href="{% url 'cells:cells_rsvp_invite' cell.id %}">Click here to RSVP</a></h4>
         </div>
     {% endif %}
-
     <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
         <div class=" panel panel-default">
             <h3 class = "panel-heading" role="tab" id="settingHeading">
@@ -65,12 +64,12 @@
                     Setting - <b>{{ cell.setting_name }}</b>
                 </a>
             </h3>
-            <div id="collapseSetting" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="settingHeading">
-            <div class="container">
-                <p>
-                    {{cell.setting_description | markdown | linebreaks}}
-                </p>
-            </div>
+            <div class="panel-body">
+                <div id="collapseSetting" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="settingHeading">
+                    <p>
+                        {{cell.setting_description | markdown | linebreaks}}
+                    </p>
+                </div>
             </div>
         </div>
         <div class = "panel panel-default">

@@ -166,6 +166,8 @@ def create_game(request):
                                                   relevant_game=game,
                                                   invite_text=game.hook,
                                                   as_ringer=False)
+                        if member.member_player.has_perm("view_scenario", game.scenario):
+                            game_invite.as_ringer = True
                         game_invite.save()
                         game_invite.notify_invitee(request, game)
             game_url = reverse('games:games_view_game', args=(game.id,))
@@ -286,7 +288,7 @@ def invite_players(request, game_id):
                 #player is already invited. Maybe update invitation instead?
                 raise PermissionDenied("Player already invited")
             if player == game.creator or player == game.gm:
-                raise PermissionDenied("You can't invite players to someone else's game")
+                raise PermissionDenied("You can't invite Players to a Game they created or are running.")
             game_invite = Game_Invite(invited_player=player,
                                       relevant_game=game,
                                       invite_text=form.cleaned_data['message'],
@@ -317,12 +319,11 @@ def accept_invite(request, game_id):
                                  relevant_game=game)
             if game.scenario in request.user.scenario_set.all():
                 invite.as_ringer = True
-            with transaction.atomic():
-                invite.save()
         form =  make_accept_invite_form(invite)(request.POST)
         if form.is_valid():
             game_attendance = invite.attendance
             with transaction.atomic():
+                invite.save()
                 if game_attendance:
                     game_attendance.attending_character=form.cleaned_data['attending_character']
                     game_attendance.save()
@@ -335,7 +336,7 @@ def accept_invite(request, game_id):
                     invite.is_declined = False
                     invite.attendance = game_attendance
                     invite.save()
-                    if invite.as_ringer:
+                    if invite.as_ringer and not form.cleaned_data['attending_character']:
                         #Reveal scenario to ringer
                         game.scenario.played_discovery(request.user)
             return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
@@ -343,6 +344,9 @@ def accept_invite(request, game_id):
             print(form.errors)
             return None
     else:
+        can_view_scenario = False
+        if request.user.has_perm("view_scenario", game.scenario):
+            can_view_scenario = True
         # Build a accept form.
         if not invite:
             # if game is open for self-invites, make a temp invite that we don't save so we can make a form
@@ -355,6 +359,7 @@ def accept_invite(request, game_id):
             'form': form,
             'game': game,
             'invite': invite,
+            'can_view_scenario': can_view_scenario,
         }
         return render(request, 'games/accept_invite.html', context)
 

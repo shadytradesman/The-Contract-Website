@@ -401,9 +401,9 @@ class Character(models.Model):
     def __str__(self):
         string = self.name + " ["
         if hasattr(self, 'player') and self.player:
-            string = self.name + self.player.username + "]"
+            string = string + self.player.username + "]"
         else:
-            string = self.name + "Anonymous User]"
+            string = string + "Anonymous User]"
         return string
 
     def pres_tense_to_be(self):

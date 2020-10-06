@@ -11,35 +11,69 @@
 
 {% block body_base %}
 <div class="container">
-    <h1>My Scenario Gallery</h1>
-    <div class="container">
-        <p>
-            This gallery contains a list of each Scenario you have access to. You can gain access to new Scenarios by:
-            <ul>
-                <li><a href="{% url 'games:games_create_scenario' ">Creating your own</a></li>
-                <li>Accepting a Game invite as an NPC Ringer</li>
-                <li>Finishing playing the Scenario in a Game</li>
-                <li>(coming soon) Having one shared with you</li>
-            </ul>
-        </p>
-    </div>
-    <div class="container">
-        <h2>Scenarios I Wrote</h2>
-        {% for scenario in owned_scenarios %}
-                {% include "games/scenario_badge_snippet.html" %}
-        {% empty %}
-            <p>You haven't written any Scenarios yet! Try <a href="{% url 'games:games_create_scenario' ">creating your own!</a></p>
-        {% endfor %}
-    </div>
-    <div class="container">
-        <h2>Scenarios I've Discovered</h2>
-        {% for scenario_discovery in scenario_discoveries %}
-            {% with scenario=scenario_discovery.relevant_scenario %}
-                {% include "games/scenario_badge_snippet.html" %}
-            {% endwith %}
-        {% empty %}
-            <p>You haven't discovered any Scenarios yet!</p>
-        {% endfor %}
+    <h1 class="text-center">Scenario Gallery</h1>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="lead">
+                This gallery contains all the
+                <a href="/wiki/the-contract-format/games/scenarios/">Scenarios</a>
+                you've written or discovered.
+            </div>
+            <p>
+                You may view the full write-up of any Scenarios that appear below including spoilers, their Game history, and feedback from the GMs who have run them.
+            </p>
+        </div>
+        <div class="panel-heading">
+            <h2>
+                My Scenarios
+            </h2>
+        </div>
+        <div class="panel-body">
+            <a class="btn btn-primary" href="{% url 'games:games_create_scenario' %}">Write a new Scenario</a>
+            <br>
+            <br>
+            <div class="row">
+                {% for scenario in owned_scenarios %}
+                    {% if forloop.counter|divisibleby:2 == 0 %}
+                        </div>
+                        <div class="row">
+                    {% endif %}
+                    <div class="col-md-6">
+                        {% include "games/scenario_badge_snippet.html" %}
+                    </div>
+                {% empty %}
+                    <p class="text-warning">You haven't written any Scenarios yet. Try <a href="{% url 'games:games_create_scenario' ">creating your own.</a></p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="panel-heading">
+            <h2>Discovered Scenarios</h2>
+        </div>
+        <div class="panel-body">
+            <div class="alert alert-info text-center">
+                <h5>
+                    You can discover new Scenarios by playing them in Games.
+                    <br>
+                    Creating a Cell unlocks two stock Scenarios to get you started!
+                </h5>
+            </div>
+            <div class="row">
+                {% for scenario_discovery in scenario_discoveries %}
+                    {% if forloop.counter|divisibleby:2 == 0 %}
+                        </div>
+                        <div class="row">
+                    {% endif %}
+                    <div class="col-md-6">
+                        {% with scenario=scenario_discovery.relevant_scenario %}
+                            {% include "games/scenario_badge_snippet.html" %}
+                        {% endwith %}
+                    </div>
+                {% empty %}
+                    <p class="text-warning">You haven't discovered any Scenarios yet.</p>
+                {% endfor %}
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

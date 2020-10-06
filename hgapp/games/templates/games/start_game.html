@@ -48,7 +48,13 @@
                             {% endif %}
                         </b>
                         {{ form.player}} {{ form.character }}
+                        {% if form.attendance.game_invite.invitee_can_view_scenario %}
+                            <span class="text-danger">
+                                This Player has already discovered this Scenario and should only play an NPC Ringer.
+                            </span>
+                        {% endif %}
                     </p>
+
                 {% empty %}
                     <h4 class="text-danger">
                         No players are attending! Games must have a minimum of two Player Characters (or one if the attending Character is a Veteran)
