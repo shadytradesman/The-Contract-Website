@@ -137,7 +137,7 @@ def view_scenario(request, scenario_id, game_id=None):
 
 def view_scenario_gallery(request):
     if not request.user.is_authenticated:
-        raise PermissionDenied("You must be logged into view your discovered and created Scenarios")
+        raise PermissionDenied("You must be logged in to view your Scenario Gallery")
     owned_scenarios = request.user.scenario_creator.all()
     discovered_scenarios = request.user.scenario_discovery_set.exclude(reason=DISCOVERY_REASON[1][0]).all()
     num_new_cell_scenarios = len(Scenario.objects.filter(tags__slug="newcell").all())

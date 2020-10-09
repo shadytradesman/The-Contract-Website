@@ -1,14 +1,127 @@
 {% extends "site_base.html" %}
+{% load hgapp_tags %}
+
+{% block topbar_base %}{% endblock %}
+{% block footer_base %}{% endblock %}
 
 {% load i18n %}
 {% load staticfiles %}
+
+{% block extra_styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'overrides/splash_style.css' %}" />
+{% endblock %}
+
+{% block extra_scripts %}
+    <script src="{% static 'overrides/splash_scripts.js' %}"></script>
+{% endblock %}
 
 
 {% block head_title %}The Contract{% endblock %}
 
 {% block body_class %}home{% endblock %}
-
+{% block body_extra_attributes %}data-spy="scroll" data-target="#splash-tabs" data-offset="72"{% endblock %}
 {% block body_base %}
+<div class="css-main-container">
+
+<div id="splash-tabs" class="navbar navbar-default navbar-fixed-top">
+    <ul class="nav nav-tabs navbar-nav nav-justified" role="tablist">
+            <li role="presentation">
+                <a href="#home"style="padding:5px;" >
+                    <img id="css-die-image" src="{% static 'overrides/branding/favicon.jpg' %}" style="width: 37px; height: 37px;">
+                </a>
+            </li>
+            <li role="presentation"><a href="#contractors" >Contractors</a></li>
+            <li role="presentation"><a href="#games" >Games</a></li>
+            <li role="presentation"><a href="#dice" >Dice</a></li>
+            <li role="presentation"><a href="#website" >Website</a></li>
+    </ul>
+</div>
+<div id="home" class="css-nav-section">
+    <span class="css-art-front-punk" style='background-image:url("{% static 'overrides/art/front-punk.jpg' %}")'></span>
+    <span class="css-front-bg-logo" style='background-image:url("{% static 'overrides/branding/logobone_small.png' %}")'></span>
+    <div id="css-front-text">
+        <span class="lead">
+            <b>The Contract</b> is a TableTop Role Playing Game about ambitious individuals who agree to go on deadly missions
+            in exchange for fantastic Powers.
+            Set in a world where the advent of camera phones confirmed the existence of
+            the supernatural instead of disproving it, Contractors operate on the front lines between the mundane and
+            extraordinary. Those who survive are forged into some of the most fearsome beings in existence.
+        </span>
+    </div>
+    <div id="css-front-bullets-section">
+        <div class="css-front-text-bullets">
+        <span class="lead">
+            <b>Be Unique.</b> Using The Contract’s robust Power-building system, Players craft novel Powers for their
+            Contractors. A Character with any concept-- from a psychic gambler to an undercover alien-- is easy to
+            create, progress, and balance.
+        </span>
+    </div>
+    <br>
+    <div class="css-front-text-bullets">
+        <span class="lead">
+            <b>Any Challenge.</b> Players control characters who are approached by mysterious entities-- known as Harbingers-- and invited to participate in sadistic challenges called Games. The Games are always deadly but may otherwise take any form, from monster hunts, to heists, to corporate espionage. Contractors must think outside the box to survive and succeed.
+        </span>
+    </div>
+    <br>
+    <div class="css-front-text-bullets">
+        <span class="lead">
+            <b>Fast and Fair.</b> The Contract’s dice system is crunchy enough that Player deaths feel fair but lightweight enough that you don’t waste your time micromanaging stats and equipment. Combat is realistically quick and brutal. Gameplay and Advancement center around controlling chaotic situations and creating the /right/ fight rather than being the best fighter.
+        </span>
+    </div>
+    <br>
+    <div class="css-front-text-bullets">
+        <span class="lead">
+            <b>Play with Anyone.</b> Each play session of The Contract is a self-contained mission, meaning you don’t need to cancel if one of your Players can’t make it. Any group can play and advance their favorite Contractors, even if they’ve never met before. The responsibility of the Game Master (GM) also rotates as desired, preventing “forever GM” burnout.
+        </span>
+    </div>
+    <br>
+    <div class="css-front-text-bullets">
+        <span class="lead">
+            <b>100% Free.</b> The Contract eschews traditional publishing in favor of a 100% free website. There are no source books to track down and buy. All new content, balance fixes, and updates are available immediately to all Players, and the Website is rich with features that make learning and running The Contract even easier.
+        </span>
+    </div>
+    </div>
+
+</div>
+
+
+    <div  id="contractors" class="css-nav-section">
+         <h1>Contractors</h1>
+                <img src="{% static 'overrides/branding/logobone_small.png' %}" style="margin-top: 3px; max-width: 90vw;">
+                <br>
+                <img src="{% static 'overrides/branding/logobone_small.png' %}" style="margin-top: 3px; max-width: 90vw;">
+        <br>
+        <img src="{% static 'overrides/branding/logobone_small.png' %}" style="margin-top: 3px; max-width: 90vw;">
+                <br>
+    </div>
+    <div id="games" class="css-nav-section">
+         <h1>mes</h1>
+                <img src="{% static 'overrides/branding/logobone_small.png' %}" style="margin-top: 3px; max-width: 90vw;">
+                <br>
+                <img src="{% static 'overrides/branding/logobone_small.png' %}" style="margin-top: 3px; max-width: 90vw;">
+        <br>
+        <img src="{% static 'overrides/branding/logobone_small.png' %}" style="margin-top: 3px; max-width: 90vw;">
+                <br>
+    </div>
+    <div id="dice" class="css-nav-section">
+         <h1>set</h1>
+                <img src="{% static 'overrides/branding/logobone_small.png' %}" style="margin-top: 3px; max-width: 90vw;">
+                <br>
+                <img src="{% static 'overrides/branding/logobone_small.png' %}" style="margin-top: 3px; max-width: 90vw;">
+        <br>
+        <img src="{% static 'overrides/branding/logobone_small.png' %}" style="margin-top: 3px; max-width: 90vw;">
+                <br>
+    </div>
+    <div id="website" class="css-nav-section">
+
+    </div>
+
+
+
+
+
+
+
 <div class="container">
     <h1 class="text-center">
         <br>
@@ -40,4 +153,6 @@
         </p>
     </div>
 </section>
+    </div>
+
 {% endblock %}

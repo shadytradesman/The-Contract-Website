@@ -5,17 +5,19 @@ from wiki.models import Article, URLPath
 register = template.Library()
 
 @register.inclusion_tag('tags/gwynn_art.html')
-def gwynn_jpg(filename):
+def gwynn_jpg(filename, hide_caption=None):
     return {
         'filename': filename,
-        'ext': ".jpg"
+        'ext': ".jpg",
+        'hide_caption': hide_caption,
     }
 
 @register.inclusion_tag('tags/gwynn_art.html')
-def gwynn_png(filename):
+def gwynn_png(filename, hide_caption=None):
     return {
         'filename': filename,
-        'ext': ".png"
+        'ext': ".png",
+        'hide_caption': hide_caption,
     }
 
 @register.inclusion_tag('tags/article_toc.html')
