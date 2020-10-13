@@ -208,7 +208,7 @@ html {
     background-repeat: no-repeat;
 }
 
-#contractors {
+#contractors:before {
     scroll-snap-align: none; /* must disable to prevent unwanted snapping when inner tabs switch */
 }
 
