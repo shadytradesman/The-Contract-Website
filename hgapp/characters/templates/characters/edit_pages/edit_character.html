@@ -44,19 +44,7 @@
     <div class="modal fade" id="tutorialModal" tabindex="-1" role="dialog" aria-labelledby="tutorialModalLabel">
       <div class="modal-dialog modal-lg css-big-modal-lg visible-md-block visible-lg-block" role="document">
         <div class="modal-content">
-            <div id="carousel-pics" class="carousel slide css-big-modal-carousel" data-interval="" data-ride="carousel">
-                <div class="carousel-inner" role="listbox">
-                    <div class="item active">
-                        <img src="{% static 'overrides/art/time-lg-modal.jpg' %}" class="css-big-modal-image">
-                    </div>
-                    <div class="item">
-                        <img src="{% static 'overrides/art/fox-lg-modal.jpg' %}" class="css-big-modal-image">
-                    </div>
-                    <div class="item">
-                        <img src="{% static 'overrides/art/ocean-lg-modal.jpg' %}" class="css-big-modal-image">
-                    </div>
-                  </div>
-            </div>
+            <img src="{% static 'overrides/art/fox-lg-modal.jpg' %}" class="css-big-modal-image">
           <div class="modal-header text-center css-big-modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true" class="text-primary">&times;</span></button>
             <h2 class="modal-title">What Makes a Contractor?</h2>
@@ -93,16 +81,15 @@
           </div>
           <div class="modal-body">
               <h4 class="text-center">You are exceptional.</h4>
+              <img class="css-sm-modal-image" src="{% static 'overrides/art/fox-lg-modal.jpg' %}">
               <p>
                   {{tutorial.modal_1|safe}}
               </p>
-              <img class="css-sm-modal-image" src="{% static 'overrides/art/time-lg-modal.jpg' %}">
               <br>
               <h4 class="text-center">You will sign The Contract.</h4>
               <p>
                   {{tutorial.modal_2|safe}}
               </p>
-              <img class="css-sm-modal-image" src="{% static 'overrides/art/fox-lg-modal.jpg' %}">
               <br>
               <h4 class="text-center">Incredible Powers sleep within you.</h4>
               <p>

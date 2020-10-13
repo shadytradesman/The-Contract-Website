@@ -1,0 +1,429 @@
+body {
+  position: relative;
+  bottom: 50px;
+  scroll-snap-type: y proximity;
+
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-snap-type: y proximity;
+}
+
+.css-main-container {
+}
+
+.nav>li>a {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+/* anchor links fix */
+.css-nav-section::before {
+  display: block;
+  content: "";
+  height: 50px;
+}
+
+.css-nav-section {
+  min-height:100vh;
+  width: 100%;
+  scroll-snap-align: start;
+    /*
+  border-bottom: 1px solid blue;
+  border-top: 1px solid white;
+*/
+}
+
+/* NAVBAR */
+.navbar-default {
+    border:none;
+}
+
+.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
+}
+
+.nav-tabs>li>a {
+    border:0px;
+}
+
+@media (max-width: 768px) {
+
+
+  .nav-justified {
+    width: 100%;
+    font-size: 13px;
+    top: 1px;
+    position: relative;
+  }
+
+  .navbar-nav {
+    margin: 0px;
+  }
+
+  .nav-justified > li {
+    display: table-cell;
+    width: 1%;
+  }
+
+
+  .nav-justified > li > a  {
+    border-bottom: 1px solid #a6763a !important;
+    border-radius: 0px 0px 0 0 !important;
+    margin-bottom: 0 !important;
+    height: 50px !important;
+  }
+
+  .nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover  {
+    border-bottom: 1px solid rgba(17, 20, 24, 1.0)!important;
+  }
+
+  #css-die-image {
+    width:33px !important;
+    height:33px !important;
+  }
+}
+
+.css-backdropped-text {
+    background-color: rgba(17, 20, 24, 0.3);
+    padding: 15px;
+}
+
+@media (max-width: 768px) {
+    .css-backdropped-text {
+        background-color: rgba(17, 20, 24, 0.7);
+    }
+}
+
+/* HOME SECTION */
+
+.css-art-front-punk {
+    height: 95vh;
+    position: absolute;
+    width: 100%;
+    float: right;
+    background-position: top right;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+@media(max-width: 768px) {
+    .css-art-front-punk {
+        background-size: cover, 100%;
+        background-position: top center;
+    }
+}
+
+.css-front-bg-logo {
+    width: 100%;
+    height: 155px;
+    top: 150px;
+    display: block;
+    position: absolute;
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+#css-front-text {
+    width: 66%;
+    position: relative;
+    margin-top: 300px;
+    left: 40px;
+    background-color: rgba(17, 20, 24, 0.3);
+}
+
+@media (max-width: 768px) {
+    #css-front-text {
+        width: 100%;
+        left: 0px;
+        padding: 15px;
+        background-color: rgba(17, 20, 24, 0.7);
+
+    }
+}
+
+.css-front-text-bullets>.lead {
+    font-size: 18px;
+}
+
+#css-front-bullets-section {
+    margin-top: 50px;
+    position: relative;
+    margin-left: 60px;
+    width: 60%;
+    padding: 20px;
+    background-color: rgba(17, 20, 24, 0.5);
+}
+
+
+@media (max-width: 768px) {
+    #css-front-bullets-section {
+        margin-top: 50px;
+        position: relative;
+        margin-left: 0px;
+        width: 100%;
+        padding: 15px;
+        background-color: rgba(17, 20, 24, 0.7);
+    }
+}
+
+/* CALL TO ACTION */
+
+.btn-lg {
+    font-size: 30px;
+}
+
+#get-started.affix {
+    z-index: 9998 !important;
+    width: 100vw;
+    right: 0px;
+}
+
+@media (min-width: 768px) {
+    #get-started.affix {
+        -webkit-transition: all .3s ease-in;
+        transition: all .3s ease-in;
+        top: 60px;
+    }
+}
+@media (max-width: 768px) {
+    #get-started.affix {
+        bottom: 10px;
+    }
+}
+
+#get-started {
+    right: 13vw;
+}
+
+.css-affix-wrapper {
+    min-height: 75px;
+}
+
+
+/* CONTRACTORS SECTION */
+
+#css-art-front-time {
+    height: 95vh;
+    position: absolute;
+    width: 100%;
+    background-position: top left;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+#contractors {
+    scroll-snap-align: none; /* must disable to prevent unwanted snapping when inner tabs switch */
+}
+
+@media (max-width: 768px) {
+    #css-art-front-time {
+        background-size: cover, 100%;
+        background-position: top center;
+    }
+}
+
+#css-art-front-time.affix {
+    top: 50px;
+    position: fixed;
+}
+
+.css-affix-spacer {
+    height: 80px;
+}
+
+@media (max-width: 768px) {
+    .css-affix-spacer {
+        height: 30vh;
+    }
+}
+
+@media (max-width: 768px) {
+    .css-head-spacer {
+        height: 40vh;
+    }
+    .css-head-spacer-sm {
+        height: 30vh;
+    }
+}
+
+#css-contractors-text {
+    width: 66%;
+    position: relative;
+    left: 33vw;
+}
+
+@media (max-width: 768px) {
+    #css-contractors-text {
+            width: 100%;
+            left: 0px;
+    }
+}
+
+#css-contractors-text>.lead {
+    font-size: 18px;
+}
+
+.css-contractors-first-para {
+    font-size: 24px;
+}
+
+.css-bases {
+  margin: auto;
+}
+
+.css-disabled {
+    background-color: rgba(53, 62, 75, 0.5);
+    color: rgba(90, 90, 90, 1.0);
+}
+.tab-content {
+    border-bottom: 1px solid #a6763a;
+    border-left: 1px solid #a6763a;
+    border-right: 1px solid #a6763a;
+    background-color: rgba(17, 20, 24, 1.0);
+}
+
+.css-power-container {
+    padding: 10px;
+}
+
+.thumbnail {
+    margin: 5px;
+}
+
+.tab-pane>.lead {
+    margin-bottom: 5px;
+    margin-top: 15px;
+}
+
+/* GAMES SECTION */
+
+#css-art-front-doors {
+    height: 95vh;
+    position: absolute;
+    width: 100%;
+    background-position: center;
+    background-size: cover, 100%;
+    background-repeat: no-repeat;
+}
+
+@media (max-width: 768px) {
+    #css-art-front-doors {
+    background-position: left top;
+    }
+}
+
+#css-art-front-doors.affix {
+    top: 50px;
+    position: fixed;
+}
+
+#css-games-text {
+    width: 66%;
+    position: relative;
+    margin: auto;
+}
+
+@media (max-width: 768px) {
+    #css-games-text {
+        width: 100%;
+    }
+}
+
+/* DICE SECTION */
+
+#css-art-front-bamboo {
+    height: 95vh;
+    position: absolute;
+    width: 100%;
+    background-position: top right;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+@media (max-width: 768px) {
+    #css-art-front-bamboo {
+        width: 100%;
+        left: 0px;
+        background-position: top center;
+        background-size: cover, 100%;
+    }
+}
+
+#css-art-front-bamboo.affix {
+    top: 50px;
+    position: fixed;
+}
+
+#css-dice-text {
+    width: 66%;
+    position: relative;
+}
+
+@media (max-width: 768px) {
+    #css-dice-text {
+        width: 100%;
+    }
+}
+
+/* WEBSITE SECTION */
+
+
+#css-art-front-music {
+    height: 95vh;
+    position: absolute;
+    width: 100%;
+    background-position: top left;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+@media (max-width: 768px) {
+    #css-art-front-music {
+        width: 100%;
+        left: 0px;
+        background-position: top center;
+        background-size: cover, 100%;
+    }
+}
+
+#css-art-front-music.affix {
+    top: 50px;
+    position: fixed;
+}
+
+#css-website-text {
+    width: 66%;
+    position: relative;
+    left: 33vw;
+    padding-bottom: 150px;
+}
+
+@media (max-width: 768px) {
+    #css-website-text {
+        width: 100%;
+        left: 0px;
+    }
+}
+
+/* OTHER STUFF */
+.css-art-credit {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    z-index: 9999;
+    background-color: rgba(17, 20, 24, .8);
+    padding: 3px;
+}
+
+@media (max-width: 768px) {
+    .css-art-credit {
+        position: absolute;
+        top: 110px;
+        left: 10px;
+        bottom: inherit;
+        right: inherit;
+        z-index: 2;
+    }
+}

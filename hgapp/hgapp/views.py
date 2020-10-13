@@ -13,7 +13,7 @@ from django.utils import timezone
 from guardian.shortcuts import assign_perm
 
 from characters.models import Character
-from powers.models import Power_Full
+from powers.models import Power_Full, Enhancement, Drawback, Parameter, Base_Power
 
 from games.models import GAME_STATUS
 from hgapp.forms import SignupForm
@@ -33,7 +33,23 @@ class PasswordResetTokenView(account.views.PasswordResetTokenView):
 
 def home(request):
     if request.user.is_anonymous:
-        return render(request, 'logged_out_homepage.html')
+        power_1 = Power_Full.objects.filter(tags__in=["splash1"]).all()[0]
+        power_2 = Power_Full.objects.filter(tags__in=["splash2"]).all()[0]
+        power_3 = Power_Full.objects.filter(tags__in=["splash3"]).all()[0]
+        num_enhancements = Enhancement.objects.all().count()
+        num_drawbacks =  Drawback.objects.all().count()
+        num_params = Parameter.objects.all().count()
+        num_bases = Base_Power.objects.filter(is_public=True).all().count()
+        num_stock = Power_Full.objects.filter(tags__slug="example").all().count()
+        context = {
+            'power_1': power_1,
+            'power_2': power_2,
+            'power_3': power_3,
+            'num_bases': num_bases,
+            'num_modifiers': num_enhancements + num_drawbacks + num_params,
+            'num_stock': num_stock,
+        }
+        return render(request, 'logged_out_homepage.html', context)
     else:
         if not request.user.profile.confirmed_agreements:
             return HttpResponseRedirect(reverse('profiles:profiles_terms'))
@@ -83,3 +99,7 @@ def terms(request):
         "privacy": PRIVACY,
     }
     return render(request, 'terms.html', context)
+
+
+def getting_started(request):
+    return render(request, 'getting_started.html')
