@@ -24,6 +24,13 @@ html {
   height: 50px;
   scroll-snap-align: start;
 }
+@media (max-width: 768px) {
+    .css-nav-section::before {
+      scroll-snap-align: none; /* ios sucks */
+    }
+}
+
+
 
 .css-nav-section {
   min-height:100vh;

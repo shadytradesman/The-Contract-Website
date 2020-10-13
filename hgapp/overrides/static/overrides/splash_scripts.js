@@ -47,13 +47,8 @@ function setAffix() {
     var topBamboo;
     var bottomBamboo;
     const diceEnd =  document.body.scrollHeight - $dice.position().top - $dice.outerHeight(true);
-//    if ($dice.outerHeight(true) < $window.height()) {
-//        topBamboo = 999999;
-//        bottomBamboo = document.body.scrollHeight;
-//    } else {
-        topBamboo = $dice.position().top -50;
-        bottomBamboo = diceEnd +50,
-//    }
+    topBamboo = $dice.position().top -50;
+    bottomBamboo = diceEnd +50,
     $('#css-art-front-bamboo').affix({
       offset: {
         top: topBamboo,
