@@ -33,15 +33,13 @@ function setAffix() {
     })
 
     const $games = $("#games");
-    if ($games.outerHeight(true) > $window.height()) {
-        const gamesEnd =  document.body.scrollHeight - $games.position().top - $games.outerHeight(true);
-        $('#css-art-front-doors').affix({
-          offset: {
-            top: $games.position().top -50,
-            bottom:  gamesEnd +50,
-          }
-        })
-    }
+    const gamesEnd =  document.body.scrollHeight - $games.position().top - $games.outerHeight(true);
+    $('#css-art-front-doors').affix({
+      offset: {
+        top: $games.position().top -50,
+        bottom:  gamesEnd +50,
+      }
+    })
 
     const $dice = $("#dice");
     var topBamboo;
