@@ -1,0 +1,76 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+{% load staticfiles %}
+{% load account_tags %}
+
+{% block head_title %}The Contract RPG{% endblock %}
+
+{% block body_base %}
+<div class="container">
+    <h1 class="text-center">
+        So you want to play The Contract. . .
+    </h1>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <p>
+                <span class="lead">Great!</span> This Guide will make it as easy as possible. You won't even have to make
+                an account until the very end.
+                <br>
+                <br>
+                Please note that this guide is a work in progress.
+            </p>
+            <h2>
+                Step 1: Read the Rules
+            </h2>
+            <h2>
+                Step 2: Try Making a Character
+            </h2>
+            <p>
+                If you're going to ask your Players to make Contractors, you should try making one yourself. That's just good leadership.
+                <br>
+                <br>
+                <a href="{% url 'characters:characters_create'%}">Click here</a> to try out the Character Builder.
+            </p>
+            <h2>
+                Step 3: Unlock a Stock Scenario
+            </h2>
+            <p>
+                To Unlock the Stock scenarios, you'll have to
+                <a href="{% url 'account_signup' %}" class="btn btn-primary btn-xs">make an account.</a>
+                <br>
+                <br>
+                Wait a second, we're already at that part? I guess reading the rules was probably most of the work anyway.
+                <br><br>
+                Alright, look. I know you don't want to <a href="{% url 'account_signup' %}" class="btn btn-primary btn-sm">make an account</a>.
+                It's a hassle, and I haven't gotten around to implementing social media log-in yet. But the site's got all
+                these neat features around Scenario visiblity and tracking the Scenarios you've discovered, and
+                you have to  <a href="{% url 'account_signup' %}" class="btn btn-primary">make an account</a> to access that stuff.
+                <br><br>
+                Plus, what if I just put the Scenarios right out in the open for anyone to read? Do you really trust your
+                Players not to sneak a peak and spoil themselves? Even accidentally? This way your Players are protected.
+                They'd have to <a href="{% url 'account_signup' %}" class="btn btn-lg btn-primary">make an account</a> to get access,
+                and if they're half as hesitant as you are, they'll never see 'em.
+                <br><br>
+                Okay, okay, you probably want more info. Well how about this: everyone who's playested the Stock scenarios
+                says they're really fun. That's not a lie either; their enjoyment was genuine. That means you are either going
+                to enjoy the Stock Scenarios or you're going to have the opportunity to be the first person to tell me they suck.
+                That's pretty neat either way.
+
+                <br><br>
+                That said, you'll need to <a href="{% url 'account_signup' %}" class="btn btn-lg btn-warning">Make an Account</a>
+                to see them!
+            </p>
+            <h2>
+                Step 4: Read the Stock Scenarios
+            </h2>
+            <p>
+                Now that you've made an account, navigate to your
+                <a href="{% url 'games:games_view_scenario_gallery' %}">Scenario Gallery</a> and--
+                <br><br>
+                Hey, wait a minute. You haven't logged in yet! You think you can fool me? I made the whole damn site! Jeeze. . .
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

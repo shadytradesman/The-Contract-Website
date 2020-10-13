@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^messages/', include('postman.urls', namespace="postman"), name="postman"),
     url(r"^$", views.home, name="home"),
+    url(r"^getting-started/$", views.getting_started, name="getting_started"),
     url(r"^terms/$", views.terms, name="terms"),
     url(r'^powers/', include('powers.urls'), name="powers"),
     url(r"^account/signup/$", views.SignupView.as_view(), name="account_signup"),
