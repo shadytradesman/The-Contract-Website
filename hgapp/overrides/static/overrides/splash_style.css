@@ -2,7 +2,6 @@ body {
   position: relative;
   bottom: 50px;
   scroll-snap-type: y proximity;
-
 }
 
 html {
@@ -23,16 +22,12 @@ html {
   display: block;
   content: "";
   height: 50px;
+  scroll-snap-align: start;
 }
 
 .css-nav-section {
   min-height:100vh;
   width: 100%;
-  scroll-snap-align: start;
-    /*
-  border-bottom: 1px solid blue;
-  border-top: 1px solid white;
-*/
 }
 
 /* NAVBAR */
@@ -85,13 +80,13 @@ html {
 }
 
 .css-backdropped-text {
-    background-color: rgba(17, 20, 24, 0.3);
+    background-color: rgba(17, 20, 24, 0.5);
     padding: 15px;
 }
 
 @media (max-width: 768px) {
     .css-backdropped-text {
-        background-color: rgba(17, 20, 24, 0.7);
+        background-color: rgba(17, 20, 24, 0.8);
     }
 }
 
