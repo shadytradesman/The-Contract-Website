@@ -33,22 +33,34 @@ function setAffix() {
     })
 
     const $games = $("#games");
-    const gamesEnd =  document.body.scrollHeight - $games.position().top - $games.outerHeight(true);
-    $('#css-art-front-doors').affix({
+    if ($games.outerHeight(true) > $window.height()) {
+        const gamesEnd =  document.body.scrollHeight - $games.position().top - $games.outerHeight(true);
+        $('#css-art-front-doors').affix({
+          offset: {
+            top: $games.position().top -50,
+            bottom:  gamesEnd +50,
+          }
+        })
+    }
+
+    const $dice = $("#dice");
+    var topBamboo;
+    var bottomBamboo;
+    const diceEnd =  document.body.scrollHeight - $dice.position().top - $dice.outerHeight(true);
+//    if ($dice.outerHeight(true) < $window.height()) {
+//        topBamboo = 999999;
+//        bottomBamboo = document.body.scrollHeight;
+//    } else {
+        topBamboo = $dice.position().top -50;
+        bottomBamboo = diceEnd +50,
+//    }
+    $('#css-art-front-bamboo').affix({
       offset: {
-        top: $games.position().top -50,
-        bottom:  gamesEnd +50,
+        top: topBamboo,
+        bottom: bottomBamboo,
       }
     })
 
-    const $dice = $("#dice");
-    const diceEnd =  document.body.scrollHeight - $dice.position().top - $dice.outerHeight(true);
-    $('#css-art-front-bamboo').affix({
-      offset: {
-        top: $dice.position().top -50,
-        bottom:  diceEnd +50,
-      }
-    })
 
     const $website = $("#website");
     const websiteEnd =  document.body.scrollHeight - $website.position().top - $website.outerHeight(true);
@@ -58,7 +70,12 @@ function setAffix() {
       }
     })
 
-    const startedHeight = textHeight -  $('#get-started-wrapper').outerHeight(true) -130;
+    var startedHeight;
+    if (screen.width > 768) {
+        startedHeight = textHeight -  $('#get-started-wrapper').outerHeight(true) -130;
+    } else {
+        startedHeight = $('#get-started-wrapper').position().top +  $('#get-started-wrapper').outerHeight(true) ;
+    }
     $('#get-started').affix({
       offset: {
         top: startedHeight,
@@ -77,7 +94,6 @@ $( window ).resize(function() {
 });
 
 function updateAffix() {
-    $(window).scroll();
     setTimeout(() => {  $(window).scroll(); }, 700);
     setTimeout(() => {$('#css-art-front-time').affix('checkPosition'); }, 700);
     setTimeout(() => {$('#css-art-front-doors').affix('checkPosition'); }, 700);

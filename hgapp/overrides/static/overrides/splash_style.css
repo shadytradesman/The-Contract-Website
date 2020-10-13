@@ -1,10 +1,13 @@
 body {
   position: relative;
   bottom: 50px;
+  scroll-snap-type: y proximity;
+
 }
 
 html {
     scroll-behavior: smooth;
+    scroll-snap-type: y proximity;
 }
 
 .css-main-container {
@@ -20,12 +23,12 @@ html {
   display: block;
   content: "";
   height: 50px;
-
 }
 
 .css-nav-section {
   min-height:100vh;
   width: 100%;
+  scroll-snap-align: start;
     /*
   border-bottom: 1px solid blue;
   border-top: 1px solid white;
@@ -39,13 +42,19 @@ html {
 
 .nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
 }
+
 .nav-tabs>li>a {
     border:0px;
 }
 
 @media (max-width: 768px) {
+
+
   .nav-justified {
     width: 100%;
+    font-size: 13px;
+    top: 1px;
+    position: relative;
   }
 
   .navbar-nav {
@@ -57,6 +66,7 @@ html {
     width: 1%;
   }
 
+
   .nav-justified > li > a  {
     border-bottom: 1px solid #a6763a !important;
     border-radius: 0px 0px 0 0 !important;
@@ -65,13 +75,24 @@ html {
   }
 
   .nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover  {
-    border-bottom: 0px !important;
+    border-bottom: 1px solid rgba(17, 20, 24, 1.0)!important;
   }
 
   #css-die-image {
     width:33px !important;
     height:33px !important;
   }
+}
+
+.css-backdropped-text {
+    background-color: rgba(17, 20, 24, 0.3);
+    padding: 15px;
+}
+
+@media (max-width: 768px) {
+    .css-backdropped-text {
+        background-color: rgba(17, 20, 24, 0.7);
+    }
 }
 
 /* HOME SECTION */
@@ -85,12 +106,11 @@ html {
     background-size: contain;
     background-repeat: no-repeat;
 }
-@media (max-width: 768px) {
+
+@media(max-width: 768px) {
     .css-art-front-punk {
-        position: absolute;
-        background-position: top right;
-        background-size: contain;
-        background-repeat: no-repeat;
+        background-size: cover, 100%;
+        background-position: top center;
     }
 }
 
@@ -113,6 +133,16 @@ html {
     background-color: rgba(17, 20, 24, 0.3);
 }
 
+@media (max-width: 768px) {
+    #css-front-text {
+        width: 100%;
+        left: 0px;
+        padding: 15px;
+        background-color: rgba(17, 20, 24, 0.7);
+
+    }
+}
+
 .css-front-text-bullets>.lead {
     font-size: 18px;
 }
@@ -127,6 +157,17 @@ html {
 }
 
 
+@media (max-width: 768px) {
+    #css-front-bullets-section {
+        margin-top: 50px;
+        position: relative;
+        margin-left: 0px;
+        width: 100%;
+        padding: 15px;
+        background-color: rgba(17, 20, 24, 0.7);
+    }
+}
+
 /* CALL TO ACTION */
 
 .btn-lg {
@@ -134,12 +175,22 @@ html {
 }
 
 #get-started.affix {
-    top: 60px;
     z-index: 9998 !important;
     width: 100vw;
     right: 0px;
-    -webkit-transition: all .3s ease-in;
-    transition: all .3s ease-in;
+}
+
+@media (min-width: 768px) {
+    #get-started.affix {
+        -webkit-transition: all .3s ease-in;
+        transition: all .3s ease-in;
+        top: 60px;
+    }
+}
+@media (max-width: 768px) {
+    #get-started.affix {
+        bottom: 10px;
+    }
 }
 
 #get-started {
@@ -148,7 +199,7 @@ html {
 
 .css-affix-wrapper {
     min-height: 75px;
- }
+}
 
 
 /* CONTRACTORS SECTION */
@@ -162,6 +213,17 @@ html {
     background-repeat: no-repeat;
 }
 
+#contractors {
+    scroll-snap-align: none; /* must disable to prevent unwanted snapping when inner tabs switch */
+}
+
+@media (max-width: 768px) {
+    #css-art-front-time {
+        background-size: cover, 100%;
+        background-position: top center;
+    }
+}
+
 #css-art-front-time.affix {
     top: 50px;
     position: fixed;
@@ -171,12 +233,32 @@ html {
     height: 80px;
 }
 
+@media (max-width: 768px) {
+    .css-affix-spacer {
+        height: 30vh;
+    }
+}
+
+@media (max-width: 768px) {
+    .css-head-spacer {
+        height: 40vh;
+    }
+    .css-head-spacer-sm {
+        height: 30vh;
+    }
+}
+
 #css-contractors-text {
     width: 66%;
     position: relative;
     left: 33vw;
-    background-color: rgba(17, 20, 24, 0.5);
-    padding: 15px;
+}
+
+@media (max-width: 768px) {
+    #css-contractors-text {
+            width: 100%;
+            left: 0px;
+    }
 }
 
 #css-contractors-text>.lead {
@@ -226,6 +308,11 @@ html {
     background-repeat: no-repeat;
 }
 
+@media (max-width: 768px) {
+    #css-art-front-doors {
+    background-position: left top;
+    }
+}
 
 #css-art-front-doors.affix {
     top: 50px;
@@ -236,8 +323,12 @@ html {
     width: 66%;
     position: relative;
     margin: auto;
-    background-color: rgba(17, 20, 24, 0.5);
-    padding: 15px;
+}
+
+@media (max-width: 768px) {
+    #css-games-text {
+        width: 100%;
+    }
 }
 
 /* DICE SECTION */
@@ -251,6 +342,15 @@ html {
     background-repeat: no-repeat;
 }
 
+@media (max-width: 768px) {
+    #css-art-front-bamboo {
+        width: 100%;
+        left: 0px;
+        background-position: top center;
+        background-size: cover, 100%;
+    }
+}
+
 #css-art-front-bamboo.affix {
     top: 50px;
     position: fixed;
@@ -259,8 +359,12 @@ html {
 #css-dice-text {
     width: 66%;
     position: relative;
-    background-color: rgba(17, 20, 24, 0.5);
-    padding: 15px;
+}
+
+@media (max-width: 768px) {
+    #css-dice-text {
+        width: 100%;
+    }
 }
 
 /* WEBSITE SECTION */
@@ -275,6 +379,15 @@ html {
     background-repeat: no-repeat;
 }
 
+@media (max-width: 768px) {
+    #css-art-front-music {
+        width: 100%;
+        left: 0px;
+        background-position: top center;
+        background-size: cover, 100%;
+    }
+}
+
 #css-art-front-music.affix {
     top: 50px;
     position: fixed;
@@ -284,6 +397,33 @@ html {
     width: 66%;
     position: relative;
     left: 33vw;
-    background-color: rgba(17, 20, 24, 0.5);
-    padding: 15px;
+    padding-bottom: 150px;
+}
+
+@media (max-width: 768px) {
+    #css-website-text {
+        width: 100%;
+        left: 0px;
+    }
+}
+
+/* OTHER STUFF */
+.css-art-credit {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    z-index: 9999;
+    background-color: rgba(17, 20, 24, .8);
+    padding: 3px;
+}
+
+@media (max-width: 768px) {
+    .css-art-credit {
+        position: absolute;
+        top: 110px;
+        left: 10px;
+        bottom: inherit;
+        right: inherit;
+        z-index: 2;
+    }
 }

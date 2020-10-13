@@ -242,14 +242,16 @@ input[type="number"] {
 }
 
 .css-big-modal-image {
-    height:645px !important;
+    height: 100%;
     float:right;
+    position: absolute;
+    right: 600px;
 }
 
 .css-big-modal-carousel {
-    height:645px;
     width:100%;
     position: absolute;
+    height: 100%;
     right:620px;
 }
 
@@ -263,8 +265,7 @@ input[type="number"] {
 }
 
 .css-sm-modal-image {
-    height:30%;
-    width: 90%;
+    height: 60vh;
     display: block;
     margin-left: auto;
     margin-right: auto;
