@@ -17,7 +17,7 @@ from powers.models import Power_Full, Enhancement, Drawback, Parameter, Base_Pow
 
 from games.models import GAME_STATUS
 from hgapp.forms import SignupForm
-from hgapp.terms import EULA, TERMS, PRIVACY
+
 
 class SignupView(account.views.SignupView):
    form_class = SignupForm
@@ -28,8 +28,6 @@ class PasswordResetTokenView(account.views.PasswordResetTokenView):
         ctx = super(PasswordResetTokenView, self).get_context_data(**kwargs)
         ctx["user"] = self.get_user()
         return ctx
-
-
 
 def home(request):
     if request.user.is_anonymous:
@@ -91,15 +89,3 @@ def home(request):
             'avail_exp_rewards': avail_exp_rewards,
         }
         return render(request, 'logged_in_homepage.html', context)
-
-def terms(request):
-    context= {
-        "terms": TERMS,
-        "eula": EULA,
-        "privacy": PRIVACY,
-    }
-    return render(request, 'terms.html', context)
-
-
-def getting_started(request):
-    return render(request, 'getting_started.html')

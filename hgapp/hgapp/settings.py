@@ -97,6 +97,7 @@ INSTALLED_APPS = [
     'games.apps.GamesConfig',
     'overrides.apps.OverridesConfig',
     'cells.apps.CellsConfig',
+    'info.apps.InfoConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

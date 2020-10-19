@@ -8,7 +8,7 @@ from django.utils import timezone
 
 from profiles.forms import EditProfileForm, AcceptTermsForm
 from profiles.models import Profile
-from hgapp.terms import EULA, TERMS, PRIVACY
+from info.terms import EULA, TERMS, PRIVACY
 
 class ProfileView(generic.DetailView):
     template_name = 'profiles/view_profile.html'

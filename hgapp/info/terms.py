@@ -482,15 +482,9 @@ You agree not to, and you will not permit others to:
 
 a) license, sell, rent, lease, assign, distribute, transmit, host, outsource, disclose or otherwise commercially exploit The Contract website or make The Contract website available to any third party.
 
-The Restrictions section is for applying certain restrictions on the app usage, e.g. user can't sell app, user can't distribute the app. For the full disclosure section, create your own EULA.
-
 Modifications to Application
 
 I reserve the right to modify, suspend or discontinue, temporarily or permanently, The Contract website or any service to which it connects, with or without notice and without liability to you.
-
-The Modifications to Application section is for apps that will be updated or regularly maintained. For the full disclosure section, create your own EULA.
-
-
 
 Term and Termination
 
