@@ -1,0 +1,24 @@
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #a6763a;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {
+  display: none;
+}
+
+text {
+    fill:#f3f2e6;
+}
+
+.css-spacer {
+    width: 10px;
+    display: inline-block;
+}
+
+.css-svg {
+    position:relative;
+    top: 10px;
+}

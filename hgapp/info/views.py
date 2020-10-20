@@ -11,3 +11,6 @@ def terms(request):
         "privacy": PRIVACY,
     }
     return render(request, 'info/terms.html', context)
+
+def probability(request):
+    return render(request, 'info/probability.html')

@@ -461,7 +461,6 @@ Spencer Stecko
 thecontractgame@gmail.com 
 """
 
-
 EULA="""End-User License Agreement ("Agreement")
 
 Last updated: Jul 27 2020

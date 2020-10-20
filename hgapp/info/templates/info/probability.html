@@ -1,0 +1,194 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+{% load staticfiles %}
+{% load account_tags %}
+
+{% block head_title %}Dice Pool Probability Calculator{% endblock %}
+
+{% block extra_styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'info/probability_style.css' %}" />
+{% endblock %}
+
+{% block extra_scripts %}
+    <script type="text/javascript">
+        const dataUrl = "{% static 'info/dice_probabilities.json' %}";
+    </script>
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+    <script src="{% static 'info/probability_scripts.js' %}"></script>
+{% endblock %}
+
+{% block body_base %}
+<h1 class="text-center">
+    Dice Pools Probability Calculator
+</h1>
+<div class="container">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <p>
+                When a Character attempts an action that is risky or has an unclear outcome, the GM will call for a roll.
+                They name an Attribute, an Ability, and a Difficulty, and the Player rolls a number of ten-sided dice
+                (d10s) equal to the sum of their Character's ratings in the named Attribute and Ability. Each die that lands on
+                a number equal to or greater than the Difficulty is considered a Success. The Player adds up how many Successes
+                they scored. A die showing '1' is called a "botch" and subtracts a Success. A die showing a '10' is called
+                a "double" and is worth two Successes instead of one. The total number of Successes is called the Outcome
+                and determines the result.
+            </p>
+            <h4>
+                Outcome
+            </h4>
+            <ul class="no-style">
+                <li><b>< 0 Successes:</b> A botch. Something goes horribly wrong.</li>
+                <li><b>0 Successes:</b> The attempt fails.</li>
+                <li><b>1-2 Successes:</b> The attempt is partially successful or is successful but has a complication.</li>
+                <li><b>3-4 Successes:</b> A complete success.</li>
+                <li><b>5+ Successes:</b> An exceptional success. The action is performed with grace and/or has an additional, positive effect.</li>
+            </ul>
+
+            <div class="thumbnail">
+                <label class="radio-inline">
+                    <input type="radio" name="exactOutcome" value="1" checked > Chance of exactly X successes
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" name="exactOutcome" value="0"> Chance of at least X successes
+                </label>
+                <div id="visContainer">
+                </div>
+                <div class="text-center" style="position:relative; bottom: 13px;">
+                    Number of Successes
+                </div>
+                <div class="form-inline js-roll">
+                    <svg width="25" height="25" class="css-svg">
+                      <rect width="25" height="25" style="fill:#d5d5d5;" />
+                    </svg>
+                    <select class="form-control form-inline num-dice">
+                      <option>1</option>
+                      <option>2</option>
+                      <option>3</option>
+                      <option>4</option>
+                      <option selected="true">5</option>
+                      <option>6</option>
+                      <option>7</option>
+                      <option>8</option>
+                      <option>9</option>
+                      <option>10</option>
+                      <option>11</option>
+                      <option>12</option>
+                    </select>
+                    Dice at Difficulty
+                    <select class="form-control form-inline difficulty">
+                      <option>4</option>
+                      <option>5</option>
+                      <option selected="true">6</option>
+                      <option>7</option>
+                      <option>8</option>
+                      <option>9</option>
+                    </select>
+                    <span class="css-spacer"></span>
+                    <span class="checkboxes">
+                        <label class="checkbox-inline ">
+                            <input type="checkbox" checked class="botches"> include botches
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" class="doubles" checked> include doubles
+                        </label>
+                    </span>
+                </div>
+                <div class="form-inline js-roll">
+                    <svg width="25" height="25" class="css-svg">
+                      <rect width="25" height="25" style="fill:#92c5de;" />
+                    </svg>
+                    <select class="form-control form-inline num-dice">
+                      <option>1</option>
+                      <option>2</option>
+                      <option>3</option>
+                      <option>4</option>
+                      <option selected="true">5</option>
+                      <option>6</option>
+                      <option>7</option>
+                      <option>8</option>
+                      <option>9</option>
+                      <option>10</option>
+                      <option>11</option>
+                      <option>12</option>
+                    </select>
+                    Dice at Difficulty
+                    <select class="form-control form-inline difficulty">
+                      <option>4</option>
+                      <option>5</option>
+                      <option selected="true">6</option>
+                      <option>7</option>
+                      <option>8</option>
+                      <option>9</option>
+                    </select>
+                    <span class="css-spacer"></span>
+                    <span class="checkboxes">
+                        <label class="checkbox-inline ">
+                            <input type="checkbox" checked class="botches"> include botches
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" class="doubles" checked> include doubles
+                        </label>
+                    </span>
+                </div>
+                <small>
+                    Botches: 1s subtract a success.
+                    <br>
+                    Doubles: 10s are worth 2 successes.
+                </small>
+            </div>
+            <h3 class="text-center">
+                What do I do with this information?
+            </h3>
+            <p>
+                GMs should <b>not</b> reference the above visualization at game-time when calling for a roll. If a roll
+                must be made, default to the standard Difficulty of 6 (or the
+                <a href="/wiki/Rules/Combat/weapons/">weapon's Difficulty</a> for an attack). If the context of the
+                action seems like it would significantly affect the odds, add or subtract one or two Difficulty as
+                desired.
+            </p>
+            <p>
+                When you call for a roll, you are not judging the difficulty of the task at hand so much as <b>you are
+                entering an agreement with the Player about how much discretion you will have over the outcome.</b>
+                Notice that botches, partial successes, and exceptional successes all allow the GM to determine the
+                specifics of the outcome. A partial success (the most common Outcome) can be anything from a near-failure
+                to a success with a complication. The Contract's emphasis on outside-the-box problem solving
+                necessitates putting such trust and power in the hands of the GM. A more rigid resolution system would
+                feel restrictive and arbitrary when things inevitably go off the rails. GMs should use the leeway
+                afforded to guide the action of the Game. Tastes vary from GM to GM and Cell to Cell, but Players should
+                never feel cheated. A complete success is a complete success.
+            </p>
+            <p>
+                This system gives the GM some control over the "tone" of the game during the standard play,
+                however, <b>during Combat-- when Contractors' lives are on the line-- the GM's discretion is greatly
+                reduced.</b> Partial and exceptional successes have specific outcomes determined by the
+                <a href="/wiki/Rules/Combat/">Combat rules.</a> This makes The Contract's quick, deadly Combat more
+                tactical and fair.
+            </p>
+            <br>
+            <h4>
+                Why max out at 12 dice?
+            </h4>
+            <p>
+                The Contract's <a href="/wiki/guides-and-tutorials/game-design-philosophy/">Design Philosophy</a>
+                de-emphasises advancement through dice bonuses and Difficulty modifiers. Dice bonuses from multiple
+                sources do not stack. This means that dice pools remain relatively small. Beyond 12 dice, consider
+                success a near-certainty even on high Difficulty rolls.
+            </p>
+            <br>
+            <h4>
+                Show me the math!
+            </h4>
+            <p>
+                Dice pool probabilities that account for botches (and doubles) seem fairly difficult to calculate, but
+                it is essentially a standard
+                <a href="https://en.wikipedia.org/wiki/Multinomial_distribution">multinomial distribution</a> problem.
+                See <a href="https://github.com/shadytradesman/dice-probabilities"> this Github repo</a> for the exact
+                code used to generate the probabilities. There may be some very slight abnormalities resulting from
+                rounding and computers' difficulty encoding fractional values.
+            </p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

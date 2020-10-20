@@ -10,4 +10,7 @@ urlpatterns = [
     # ex: .com/info/terms/
     url(r"^terms/$", views.terms, name="terms"),
 
+    # ex: .com/info/probability/
+    url(r"^probability/$", views.probability, name="probability"),
+
 ]
