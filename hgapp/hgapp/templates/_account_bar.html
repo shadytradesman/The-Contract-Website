@@ -30,9 +30,16 @@
     {% endif %}
 </ul>
 <ul class="nav navbar-nav pull-left">
-    {% if request.user.is_authenticated %}
+    {% if request.user.is_authenticated and not request.user.game_set.all %}
         <li>
             <a class="btn-primary" href="{% url 'info:getting_started' %}">Start Playing</a>
+        </li>
+    {% elif request.user.is_authenticated %}
+        <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                Tutorials <span class="caret"></span>
+            </a>
+            {% article_toc 'guides-and-tutorials' %}
         </li>
     {% else %}
         <li>
