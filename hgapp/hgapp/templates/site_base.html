@@ -33,7 +33,8 @@
 {% endblock %}
 
 {% block site_brand %}
-    <a href="/">
-    <img src="{% static 'overrides/branding/logobone_small.png' %}" width="160" height="45" style="margin-top: 5px; margin-left: 5px; margin-right: 10px;">
+    <a href="/" >
+    <img class="visible-sm-block" src="{% static 'overrides/branding/favicon.jpg' %}" style="width: 37px; height: 37px; top: 5px; position:relative;">
+    <img class="hidden-sm" src="{% static 'overrides/branding/logobone_small.png' %}" width="160" height="45" style="margin-top: 5px; margin-left: 5px; margin-right: 10px;">
     </a>
 {% endblock %}
