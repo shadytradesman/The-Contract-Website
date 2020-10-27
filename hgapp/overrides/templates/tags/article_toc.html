@@ -1,15 +1,29 @@
-{% load wiki_macro_tags %}
+{% load hgapp_tags %}
 
 {% if article_children %}
-    <ul class="dropdown-menu">
-        <li>
-          <a href="{% url 'wiki:get' path=article_path article_id=article.article.id %}">
-            {{ article.current_revision.title }} Index
-          </a>
-        </li>
+<div {% if not is_dropdown %} class="article-sidebar"{% endif %}>
+    {% if not is_dropdown %}
+    <div class="css-article-head text-center">
+        {% if article_path != "/" %}
+        <a href="{% url 'wiki:get' path=article_path article_id=article_parent.article.id %}">
+            <h3>{{ article_parent.current_revision.title }} Index</h3>
+        </a>
+        <hr>
+        {% endif %}
+    </div>
+    {% endif %}
+    <ul {% if is_dropdown %} class="dropdown-menu" {% else%} class="article-toc" {%endif%}>
+        {% if is_dropdown %}
+            <li>
+              <a href="{% url 'wiki:get' path=article_path article_id=article_parent.article.id %}">
+                {{ article_parent.current_revision.title }}
+              </a>
+            </li>
+        {% endif %}
         {% for child in article_children %}
-          {% article_list child 3 %}
+          {% article_list child 4 %}
           {% empty %}
         {% endfor %}
     </ul>
+</div>
 {% endif %}

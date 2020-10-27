@@ -17,3 +17,8 @@ $(function() {
         setupCollapsibles(elements[i]);
     }
 });
+
+$(function() {
+    var index= $("#js-article-index");
+    $("#js-lower-index").html(index.html());
+});

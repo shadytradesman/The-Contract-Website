@@ -10,13 +10,13 @@
             <a href="{% url 'profiles:profiles_view_profile' request.user.id %}"><i class="fa fa-user"></i> {% user_display request.user %}</a>
         </li>
         <li>
-            <a href="{% url 'account_settings' %}"><i class="fa fa-cog"></i> {% trans "Settings" %}</a>
+            <a href="{% url 'account_settings' %}"><i class="fa fa-cog"></i> </a>
         </li>
         <li>
             {% if unread_count %}
-                <a href="{% url 'postman:inbox' %}"><i class="fa fa-envelope"></i> ({{ unread_count }}) Mail</a>
+                <a href="{% url 'postman:inbox' %}"><i class="fa fa-envelope"></i> ({{ unread_count }})</a>
             {% else %}
-                <a href="{% url 'postman:inbox' %}"><i class="fa fa-envelope-o"></i> Mail</a>
+                <a href="{% url 'postman:inbox' %}"><i class="fa fa-envelope-o"></i></a>
             {% endif %}
         </li>
         <li>
@@ -30,40 +30,16 @@
     {% endif %}
 </ul>
 <ul class="nav navbar-nav pull-left">
-
     <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-            Tutorials <span class="caret"></span>
-        </a>
-        {% article_toc 'guides-and-tutorials' %}
-    </li>
-    <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-            Dice Rules <span class="caret"></span>
+            Game Rules <span class="caret"></span>
         </a>
         {% article_toc 'rules' %}
     </li>
-    <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-            Format <span class="caret"></span>
-        </a>
-        {% article_toc 'the-contract-format' %}
-    </li>
-    <form class="navbar-form navbar-left" id="wiki-search-form" method="GET" action="{% spaceless %}
-              {% if article or urlpath %}
-                {% url 'wiki:search' article_id=article.id path=urlpath.path %}
-              {% else %}
-                {% url 'wiki:search' %}
-              {% endif %}
-            {% endspaceless %}"
-          >
+    <form class="navbar-form navbar-left" id="wiki-search-form" method="GET" action="{% url 'wiki:search' %}" style="max-width: 98%;">
             <div class="input-group">
               <input type="search" class="form-control search-query" style="width: 150px;" name="q" placeholder="{% spaceless %}
-                {% if article or urlpath %}
-                   {% trans "Search Sub-pages" %}
-                {% else %}
-                  {% trans "Search the Guide" %}
-                {% endif %}
+                {% trans "Search Guide" %}
               {% endspaceless %}" />
               <span class="input-group-btn">
                 <button class="btn btn-default" type="submit">
