@@ -17,12 +17,8 @@
     <div class="container-fluid" style="margin-top: 10px;">
             {% load account_tags %}
             {% include "_messages.html" %}
-
                     <!-- Main page contents go here -->
-                {% block wiki_contents %}{% endblock %}
-                </div>
-            </div>
-
+            {% block wiki_contents %}{% endblock %}
     </div>
     {% endblock %}
 {% endblock %}

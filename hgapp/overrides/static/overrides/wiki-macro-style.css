@@ -23,7 +23,11 @@
 
 .css-article-content {
     background-color: #353e4b !important;
-    max-width: 1200px;
+    margin: auto;
+}
+
+#article-container {
+    max-width: 1800px;
     margin: auto;
 }
 
