@@ -49,6 +49,9 @@ body {
 @navbar-default-bg: @panel-bg;
 @nav-link-hover-bg: lighten(@thumbnail-bg, 10%);
 @navbar-default-link-hover-color: @brand-primary;
+@navbar-default-link-hover-bg: @nav-link-hover-bg;
+@navbar-default-toggle-hover-bg: @nav-link-hover-bg;
+
 @nav-tabs-border-color: @border-color;
 @nav-tabs-active-link-hover-border-color: @border-color;
 @nav-tabs-justified-link-border-color: @border-color;
@@ -193,6 +196,17 @@ ul.dropdown-menu ul {
     &:extend(.dropdown-menu>li>a:hover);
 }
 
+@media (max-width:480px) {
+    .dropdown:hover {
+        display: block;
+        margin-top: 0; // remove the gap so it doesn't close
+     }
+     .navbar-nav .open .dropdown-menu {
+             display: block;
+     }
+}
+
+
 @media (min-width:480px) {
     .dropdown:hover .dropdown-menu {
         display: block;
@@ -216,6 +230,43 @@ ul.dropdown-menu ul {
 
  /* end Article Navbar dropdowns */
 
+/* Navbar unhidden */
+.css-nav-unhidden>li, .css-nav-unhidden>li>a {
+    display: inline-block;
+    float: left;
+}
+
+.css-nav-unhidden {
+    margin: 0px;
+}
+
+.css-nav-unhidden > li > .css-nav-butt {
+    padding: 15px;
+}
+
+.navbar-toggle {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+/* end navbar unhidden */
+
+/* navbar collapse */
+@media (max-width:480px) {
+    .navbar-collapse.in>ul {
+        width: 100%;
+        display: block;
+        float: none !important;
+        margin: auto;
+    }
+    .navbar-collapse.collapsing>ul {
+        width: 100%;
+        display: block;
+        float: none !important;
+        margin: auto;
+    }
+}
+
+/* end navbar collapse */
 
  /* wiki style */
  .wiki-article h1 {

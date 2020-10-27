@@ -1,27 +1,14 @@
-$.fn.followTo = function (pos) {
-    var $this = this,
-        $window = $(window);
-
-    $window.scroll(function (e) {
-        if ($window.scrollTop() + $window.height() > pos - 51) {
-            $this.css({
-                position: 'absolute',
-                top: pos - $window.height() + 50
-            });
-        } else {
-            $this.css({
-                position: 'fixed',
-                top: 50
-            });
-        }
-    });
-};
-
 function setAffix() {
-    const $frontBullets = $('#css-front-bullets-section');
-    const textHeight = $frontBullets.position().top + $frontBullets.outerHeight(true);
     const $window = $(window);
-    $('.css-art-front-punk').followTo(textHeight);
+    const $home = $('#home');
+    const homeEnd =  document.body.scrollHeight - $home.position().top - $home.outerHeight(true);
+
+    $('.css-art-front-punk').affix({
+      offset: {
+        top: -50,
+        bottom:  homeEnd + 50,
+      }
+    })
 
     const $contractors = $('#contractors');
     const contractorsEnd =  document.body.scrollHeight - $contractors.position().top - $contractors.outerHeight(true);
@@ -60,18 +47,6 @@ function setAffix() {
     $('#css-art-front-music').affix({
       offset: {
         top: $website.position().top -50,
-      }
-    })
-
-    var startedHeight;
-    if (screen.width > 768) {
-        startedHeight = textHeight -  $('#get-started-wrapper').outerHeight(true) -130;
-    } else {
-        startedHeight = $('#get-started-wrapper').position().top +  $('#get-started-wrapper').outerHeight(true) ;
-    }
-    $('#get-started').affix({
-      offset: {
-        top: startedHeight,
       }
     })
 }

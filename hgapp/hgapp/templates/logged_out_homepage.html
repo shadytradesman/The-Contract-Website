@@ -1,7 +1,6 @@
 {% extends "site_base.html" %}
 {% load hgapp_tags %}
 
-{% block topbar_base %}{% endblock %}
 {% block footer_base %}{% endblock %}
 
 {% load i18n %}
@@ -19,23 +18,8 @@
 {% block head_title %}The Contract{% endblock %}
 
 {% block body_class %}home{% endblock %}
-{% block body_extra_attributes %}data-spy="scroll" data-target="#splash-tabs" data-offset="72"{% endblock %}
 {% block body_base %}
 <div class="css-main-container">
-    <div id="splash-tabs" class="navbar navbar-default navbar-fixed-top">
-        <ul class="nav nav-tabs navbar-nav nav-justified" role="tablist">
-                <li role="presentation">
-                    <a href="#home"style="padding:5px;" >
-                        <img id="css-die-image" src="{% static 'overrides/branding/favicon.jpg' %}" style="width: 37px; height: 37px;">
-                    </a>
-                </li>
-                <li role="presentation"><a href="#contractors" >Contractors</a></li>
-                <li role="presentation"><a href="#games" >Games</a></li>
-                <li role="presentation"><a href="#dice" >Dice</a></li>
-                <li role="presentation"><a href="#website" >Website</a></li>
-                <li role="presentation" class="btn-primary"><a href="{% url 'account_login' %}">Log in</a></li>
-        </ul>
-    </div>
     <span class="css-art-credit"><small>Art by <a href="https://www.artstation.com/tavaresart">Gwynn Tavares</a></small></span>
 
     <div id="home" class="css-nav-section">

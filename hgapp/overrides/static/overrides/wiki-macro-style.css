@@ -23,6 +23,8 @@
 
 .css-article-content {
     background-color: #353e4b !important;
+    max-width: 1200px;
+    margin: auto;
 }
 
 .article-toc li {

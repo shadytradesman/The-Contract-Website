@@ -3,6 +3,8 @@
 {% load staticfiles %}
 {% load pinax_webanalytics_tags %}
 {% load i18n %}
+{% load hgapp_tags %}
+
 
 
 {% block styles %}
@@ -32,9 +34,24 @@
     {% block extra_body %}{% endblock %}
 {% endblock %}
 
-{% block site_brand %}
-    <a href="/" >
-    <img class="visible-sm-block" src="{% static 'overrides/branding/favicon.jpg' %}" style="width: 37px; height: 37px; top: 5px; position:relative;">
-    <img class="hidden-sm" src="{% static 'overrides/branding/logobone_small.png' %}" width="160" height="45" style="margin-top: 5px; margin-left: 5px; margin-right: 10px;">
-    </a>
+{% block unhidden_navbar %}
+    <li>
+        <a href="/" class="btn btn-outline" style="padding-top: 5px; padding-bottom: 5px; padding-left: 10px; padding-right: 10px; margin-left: 5px;">
+            <img src="{% static 'overrides/branding/homed10.png' %}" width="38" height="38" style="margin-top: 0px; margin-left: 5px; margin-right: 5px;">
+            <span style="position: relative; top: 0px;"> Home </span>
+        </a>
+    </li>
+        {% if request.user.is_authenticated and not request.user.game_set.all %}
+            <li>
+                <a class="css-nav-butt btn-primary" href="{% url 'info:getting_started' %}">Start Playing</a>
+            </li>
+        {% elif request.user.is_authenticated %}
+            <li>
+                <a class="css-nav-butt btn-default" href="/wiki/guides-and-tutorials/">Tutorials</a>
+            </li
+        {% else %}
+            <li>
+                <a class="css-nav-butt btn-warning" href="{% url 'info:getting_started' %}">Start Playing</a>
+            </li>
+        {% endif %}
 {% endblock %}

@@ -1,13 +1,8 @@
 body {
   position: relative;
   bottom: 50px;
-  scroll-snap-type: y proximity;
 }
 
-html {
-    scroll-behavior: smooth;
-    scroll-snap-type: y proximity;
-}
 
 .css-main-container {
 }
@@ -22,68 +17,12 @@ html {
   display: block;
   content: "";
   height: 50px;
-  scroll-snap-align: start;
 }
-@media (max-width: 768px) {
-    .css-nav-section::before {
-      scroll-snap-align: none; /* ios sucks */
-    }
-}
-
 
 
 .css-nav-section {
   min-height:100vh;
   width: 100%;
-}
-
-/* NAVBAR */
-.navbar-default {
-    border:none;
-}
-
-.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
-}
-
-.nav-tabs>li>a {
-    border:0px;
-}
-
-@media (max-width: 768px) {
-
-
-  .nav-justified {
-    width: 100%;
-    font-size: 13px;
-    top: 1px;
-    position: relative;
-  }
-
-  .navbar-nav {
-    margin: 0px;
-  }
-
-  .nav-justified > li {
-    display: table-cell;
-    width: 1%;
-  }
-
-
-  .nav-justified > li > a  {
-    border-bottom: 1px solid #a6763a !important;
-    border-radius: 0px 0px 0 0 !important;
-    margin-bottom: 0 !important;
-    height: 50px !important;
-  }
-
-  .nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover  {
-    border-bottom: 1px solid rgba(17, 20, 24, 1.0)!important;
-  }
-
-  #css-die-image {
-    width:33px !important;
-    height:33px !important;
-  }
 }
 
 .css-backdropped-text {
@@ -107,6 +46,11 @@ html {
     background-position: top right;
     background-size: contain;
     background-repeat: no-repeat;
+}
+
+.css-art-front-punk.affix {
+    top: 50px;
+    position: fixed;
 }
 
 @media(max-width: 768px) {
@@ -213,10 +157,6 @@ html {
     background-position: top left;
     background-size: contain;
     background-repeat: no-repeat;
-}
-
-#contractors:before {
-    scroll-snap-align: none; /* must disable to prevent unwanted snapping when inner tabs switch */
 }
 
 @media (max-width: 768px) {

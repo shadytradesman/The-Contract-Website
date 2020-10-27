@@ -37,18 +37,14 @@
                                 <button class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                                     <span class="fa fa-bars"></span>
                                 </button>
-                                {% block site_brand %}<a class="navbar-brand" href="{% url "home" %}">{{ SITE_NAME }}</a>{% endblock %}
+                                <ul class="nav navbar-nav pull-left css-nav-unhidden">
+                                    {% block unhidden_navbar %}<a class="navbar-brand" href="{% url "home" %}">{{ SITE_NAME }}</a>{% endblock %}
+                                </ul>
                             </div>
                             <div class="collapse navbar-collapse navbar-responsive-collapse">
                                 {% block nav %}
-                                    {% comment %}
-                                        <ul class="nav navbar-nav">
-                                            <li><a href="#tab_one">One</a></li>
-                                            <li><a href="#tab_two">Two</a></li>
-                                        </ul>
-                                    {% endcomment %}
+                                    {% include "_account_bar.html" %}
                                 {% endblock %}
-                                {% block account_bar %}{% include "_account_bar.html" %}{% endblock %}
                             </div>
                         {% endblock %}
                         </div>
