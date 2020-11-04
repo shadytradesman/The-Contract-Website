@@ -439,8 +439,15 @@ class Scenario(models.Model):
     def __str__(self):
         return self.title
 
+    def is_public(self):
+        public = self.tags.filter(slug="public").exists()
+        return public
+
     def player_can_view(self, player):
-        return player.has_perm("view_scenario", self)
+        return self.is_public() or player.has_perm("view_scenario", self)
+
+    def player_discovered(self, player):
+        return Scenario_Discovery.objects.filter(relevant_scenario=self, discovering_player=player).exists()
 
     def choice_txt(self):
         return "{} ({}, {}-{} players)".format(self.title, self.get_suggested_status_display(), self.min_players, self.max_players)

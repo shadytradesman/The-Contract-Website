@@ -10,6 +10,16 @@
 {% block extra_styles %}
     <link rel="stylesheet" type="text/css" href="{% static 'games/view_scenario.css' %}" />
 {% endblock %}
+{% block extra_scripts %}
+    <script>
+        {% if scenario.is_public %}
+            scenarioPublic=true;
+        {% else %}
+            scenarioPublic=false;
+        {% endif %}
+    </script>
+    <script src="{% static 'games/view_scenario_scripts.js' %}"></script>
+{% endblock %}
 
 {% load account_tags %}
 {% load markdown_deux_tags %}
@@ -17,200 +27,245 @@
 
 {% block body_base %}
 <div class="container">
-    <div class="text-center">
-        <h1>
-            {{ scenario.title }}
-        </h1>
-        <h4>
-            A Scenario created by
-            <a href="{% url 'profiles:profiles_view_profile' scenario.creator.profile.id %}">{% user_display scenario.creator %}</a>
-
-        </h4>
-        <ul class="nav nav-pills nav-justified navbar-default">
-            {% if request.user.is_authenticated and request.user.id == scenario.creator.id %}
-                <li>
-                    <a class="btn-primary" href="{% url 'games:games_scenario_edit' scenario.id %}">Edit Scenario</a>
-                </li>
-            {% endif %}
-            <li>
-                <a href="{% url 'games:games_view_scenario_gallery' %}">My Scenario Gallery</a>
-            </li>
-            <li>
-                <a href="{% url 'games:games_create_scenario' %}">Create New Scenario</a>
-            </li>
-            <li>
-                <a href="{% url 'games:games_create_game' %}">Enter Game</a>
-            </li>
-        </ul>
-        <br>
-    </div>
-    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-        <div class="panel panel-default">
-            <div class="panel-heading text-center">
-                <a role="button" data-toggle="collapse" href="#collapseSummary" aria-expanded="true" aria-controls="collapseSummary">
-                    <div class="panel-heading text-center" role="tab" id="summaryHeading">
-                        <h3>Summary</h3>
-                    </div>
-                </a>
+    {% if show_spoiler_warning %}
+        <div class="modal fade" id="spoilerModal" tabindex="-1" role="dialog" aria-labelledby="tutorialModalLabel" data-keyboard="false">
+          <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+              <div class="modal-header text-center css-big-modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true" class="text-primary">&times;</span></button>
+                <h2 class="modal-title">Spoiler Warning!</h2>
+              </div>
+              <div class="modal-body css-big-modal-body text-center">
+                  <p>
+                      The page contains the complete writeup for the Scenario: "{{scenario.title}}".
+                  </p>
+                  <p class="lead">
+                      If you view this Scenario, you will only be able to run it as GM, never play a Contractor in it.
+                  </p>
+              </div>
+              <div class="modal-footer">
+                  <div class="text-center">
+                   <form class="js-accept-spoilers" data-spoiler-url="{% url 'games:games_spoil_scenario' scenario.id %}">
+                   <a class="btn btn-primary" href="javascript:history.back()">Go Back</a>
+                            {% csrf_token %}
+                            <input type="submit" class="btn btn-default" value="Spoil Away" />
+                    </form>
+                  </div>
+              </div>
             </div>
-            <div class="panel-body">
-                <div id="collapseSummary" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="summaryHeading">
-                    <div class="lead">
-                        {% if scenario.summary %}
-                            {{ scenario.summary }}
-                        {% else %}
-                            This Scenario has no summary.
-                        {% endif %}
+          </div>
+        </div>
+    <div class="text-center" id="spoil-confirm-buttons">
+        <br>
+        <h3>This writeup contains spoilers for the Scenario "{{scenario.title}}"</h3>
+        <form class="js-accept-spoilers" data-spoiler-url="{% url 'games:games_spoil_scenario' scenario.id %}">
+        <a class="btn btn-primary" href="javascript:history.back()">Go Back</a>
+                {% csrf_token %}
+                <input type="submit" class="btn btn-default" value="Spoil Away!"/>
+        </form>
+    </div>
+
+    {% endif %}
+    <span id="scenario-content"
+          {% if show_spoiler_warning %}
+            style="display:none;"
+          {% endif %}
+    >
+        <div class="text-center">
+            <h1>
+                {{ scenario.title }}
+            </h1>
+            <h4>
+                A Scenario created by
+                <a href="{% url 'profiles:profiles_view_profile' scenario.creator.profile.id %}">{% user_display scenario.creator %}</a>
+
+            </h4>
+            <ul class="nav nav-pills nav-justified navbar-default">
+                {% if request.user.is_authenticated and request.user.id == scenario.creator.id %}
+                    <li>
+                        <a class="btn-primary" href="{% url 'games:games_scenario_edit' scenario.id %}">Edit Scenario</a>
+                    </li>
+                {% endif %}
+                <li>
+                    <a href="{% url 'games:games_view_scenario_gallery' %}">My Scenario Gallery</a>
+                </li>
+                <li>
+                    <a href="{% url 'games:games_create_scenario' %}">Create New Scenario</a>
+                </li>
+                <li>
+                    <a href="{% url 'games:games_create_game' %}">Enter Game</a>
+                </li>
+            </ul>
+            <br>
+        </div>
+        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+            <div class="panel panel-default">
+                <div class="panel-heading text-center">
+                    <a role="button" data-toggle="collapse" href="#collapseSummary" aria-expanded="true" aria-controls="collapseSummary">
+                        <div class="panel-heading text-center" role="tab" id="summaryHeading">
+                            <h3>Summary</h3>
+                        </div>
+                    </a>
+                </div>
+                <div class="panel-body">
+                    <div id="collapseSummary" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="summaryHeading">
+                        <div class="lead">
+                            {% if scenario.summary %}
+                                {{ scenario.summary }}
+                            {% else %}
+                                This Scenario has no summary.
+                            {% endif %}
+                        </div>
+                        <p>
+                            Suggested for
+                            <b>{{scenario.min_players}}</b>
+                            to
+                            <b>{{scenario.max_players}}</b>
+                            Contractors at
+                            <b>{{scenario.get_suggested_status_display}}</b> level.
+                        </p>
+                        <ul>
+                            {% if scenario.requires_ringer %}
+                                <li>
+                                    <p>
+                                     Requires Ringer
+                                    </p>
+                                </li>
+                            {% endif %}
+                            {% if scenario.is_rivalry %}
+                                <li>
+                                    <p>
+                                         Rivalry
+                                    </p>
+                                </li>
+                            {% endif %}
+                            {% if scenario.is_highlander %}
+                                <li>
+                                    <p>
+                                         Highlander
+                                    </p>
+                                </li>
+                            {% endif %}
+                        </ul>
                     </div>
-                    <p>
-                        Suggested for
-                        <b>{{scenario.min_players}}</b>
-                        to
-                        <b>{{scenario.max_players}}</b>
-                        Contractors at
-                        <b>{{scenario.get_suggested_status_display}}</b> level.
-                    </p>
-                    <ul>
-                        {% if scenario.requires_ringer %}
-                            <li>
-                                <p>
-                                 Requires Ringer
-                                </p>
-                            </li>
-                        {% endif %}
-                        {% if scenario.is_rivalry %}
-                            <li>
-                                <p>
-                                     Rivalry
-                                </p>
-                            </li>
-                        {% endif %}
-                        {% if scenario.is_highlander %}
-                            <li>
-                                <p>
-                                     Highlander
-                                </p>
-                            </li>
-                        {% endif %}
-                    </ul>
                 </div>
             </div>
-        </div>
-        <br>
-        <div class="panel panel-default">
-            <div class="panel-heading text-center">
-                <a role="button" data-toggle="collapse" href="#collapseActivity" aria-expanded="true" aria-controls="collapseActivity">
-                    <div class="panel-heading text-center" role="tab" id="activityHeading">
-                        <h3>This Scenario has been played <b>{{ scenario.num_finished_games }}</b> time{{scenario.num_finished_games|pluralize}}</h3>
-                    </div>
-                    Click for details
-                </a>
-            </div>
-            <div class="panel-body">
-                <div id="collapseActivity" class="panel-collapse collapse" role="tabpanel" aria-labelledby="activityHeading">
-                    <h4 class="text-center">
-                    </h4>
-                    {% if games_run %}
-                        <div>
-                            <h4>
-                                You have run this Scenario {{ games_run|length}} time{{games_run|pluralize}}.
-                            </h4>
-                            <ul>
-                                {% for game in games_run %}
-                                    <li>
-                                        <a href="{% url 'games:games_view_game' game.id %}">
-                                            {% if game.end_time %}
-                                                Finished {{ game.end_time }}
-                                            {% elif game.actual_start_time %}
-                                                Started {{game.actual_start_time}} but never finished
-                                            {% else %}
-                                                Never finished
+            <br>
+            <div class="panel panel-default">
+                <div class="panel-heading text-center">
+                    <a role="button" data-toggle="collapse" href="#collapseActivity" aria-expanded="true" aria-controls="collapseActivity">
+                        <div class="panel-heading text-center" role="tab" id="activityHeading">
+                            <h3>This Scenario has been played <b>{{ scenario.num_finished_games }}</b> time{{scenario.num_finished_games|pluralize}}</h3>
+                        </div>
+                        Click for details
+                    </a>
+                </div>
+                <div class="panel-body">
+                    <div id="collapseActivity" class="panel-collapse collapse" role="tabpanel" aria-labelledby="activityHeading">
+                        <h4 class="text-center">
+                        </h4>
+                        {% if games_run %}
+                            <div>
+                                <h4>
+                                    You have run this Scenario {{ games_run|length}} time{{games_run|pluralize}}.
+                                </h4>
+                                <ul>
+                                    {% for game in games_run %}
+                                        <li>
+                                            <a href="{% url 'games:games_view_game' game.id %}">
+                                                {% if game.end_time %}
+                                                    Finished {{ game.end_time }}
+                                                {% elif game.actual_start_time %}
+                                                    Started {{game.actual_start_time}} but never finished
+                                                {% else %}
+                                                    Never finished
+                                                {% endif %}
+                                            </a>
+                                            {% if game.cell %}
+                                                in <a href="{% url 'cells:cells_view_cell' game.cell.id %}">{{ game.cell.name }}</a>
                                             {% endif %}
-                                        </a>
-                                        {% if game.cell %}
-                                            in <a href="{% url 'cells:cells_view_cell' game.cell.id %}">{{ game.cell.name }}</a>
-                                        {% endif %}
-                                        {% if game in games_run_no_feedback %}
-                                            <br>
-                                            <form action="{% url 'games:games_view_scenario_feedback' scenario.id game.id %}" method="post">
-                                                <div class="alert alert-info">
-                                                    <h4>
-                                                        Leave Feedback
-                                                    </h4>
-                                                    {{ game_feedback_form.non_field_errors }}
-                                                    {{ game_feedback_form.management_form }}
-                                                    {% csrf_token %}
-                                                    {% if game_feedback_form %}
-                                                    {{ game_feedback_form | bootstrap }}
-                                                    {% endif %}
-                                                    <br>
-                                                    <input class="btn btn-primary" type="submit" value="Submit" />
+                                            {% if game in games_run_no_feedback %}
+                                                <br>
+                                                <form action="{% url 'games:games_view_scenario_feedback' scenario.id game.id %}" method="post">
+                                                    <div class="alert alert-info">
+                                                        <h4>
+                                                            Leave Feedback
+                                                        </h4>
+                                                        {{ game_feedback_form.non_field_errors }}
+                                                        {{ game_feedback_form.management_form }}
+                                                        {% csrf_token %}
+                                                        {% if game_feedback_form %}
+                                                        {{ game_feedback_form | bootstrap }}
+                                                        {% endif %}
+                                                        <br>
+                                                        <input class="btn btn-primary" type="submit" value="Submit" />
+                                                    </div>
+                                                </form>
+                                            {% elif game.scenario_notes %}
+                                                <h5>
+                                                    Your Feedback
+                                                </h5>
+                                                <div class="thumbnail">
+                                                    {{game.scenario_notes|linebreaks}}
                                                 </div>
-                                            </form>
-                                        {% elif game.scenario_notes %}
-                                            <h5>
-                                                Your Feedback
-                                            </h5>
+                                            {% endif %}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                        <h4>Games run by other Players:</h4>
+                        <ul>
+                            {% for game in scenario.finished_games %}
+                                {% if not game in games_run %}
+                                    <li>
+                                        <h5>
+                                        <a href="{% url 'profiles:profiles_view_profile' game.gm.id %}">{% user_display game.gm %}</a>
+                                        {% if game.cell %}
+                                            ran for
+                                            <a href="{% url 'cells:cells_view_cell' game.cell.id %}">
+                                                {{game.cell}}
+                                            </a>
+                                        {% endif %}
+                                        on
+                                        <a href="{% url 'games:games_view_game' game.id %}">
+                                             {{game.end_time}}
+                                        </a>
+                                        </h5>
+                                        {% if game.scenario_notes %}
                                             <div class="thumbnail">
                                                 {{game.scenario_notes|linebreaks}}
                                             </div>
                                         {% endif %}
                                     </li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    {% endif %}
-                    <h4>Games run by other Players:</h4>
-                    <ul>
-                        {% for game in scenario.finished_games %}
-                            {% if not game in games_run %}
-                                <li>
-                                    <h5>
-                                    <a href="{% url 'profiles:profiles_view_profile' game.gm.id %}">{% user_display game.gm %}</a>
-                                    {% if game.cell %}
-                                        ran for
-                                        <a href="{% url 'cells:cells_view_cell' game.cell.id %}">
-                                            {{game.cell}}
-                                        </a>
-                                    {% endif %}
-                                    on
-                                    <a href="{% url 'games:games_view_game' game.id %}">
-                                         {{game.end_time}}
-                                    </a>
-                                    </h5>
-                                    {% if game.scenario_notes %}
-                                        <div class="thumbnail">
-                                            {{game.scenario_notes|linebreaks}}
-                                        </div>
-                                    {% endif %}
-                                </li>
-                            {% endif %}
-                        {% empty %}
-                            <div class="alert-warning">
-                                <h3>No GMs have run this Scenario</h3>
-                            </div>
-                        {% endfor %}
-                    </ul>
+                                {% endif %}
+                            {% empty %}
+                                <div class="alert-warning">
+                                    <h3>No GMs have run this Scenario</h3>
+                                </div>
+                            {% endfor %}
+                        </ul>
 
-                </div>
-            </div>
-        </div>
-        <br>
-        <div class="panel panel-default">
-            <div class="panel-heading text-center">
-                <a role="button" data-toggle="collapse" href="#collapseWriteup" aria-expanded="true" aria-controls="collapseWriteup">
-                    <div class="panel-heading text-center" role="tab" id="writeupHeading">
-                        <h3>{{scenario.title}}</h3>
                     </div>
-                </a>
+                </div>
             </div>
-            <div class="panel-body">
-                <div id="collapseWriteup" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="writeupHeading">
-                    {{scenario.description|safe}}
+            <br>
+            <div class="panel panel-default">
+                <div class="panel-heading text-center">
+                    <a role="button" data-toggle="collapse" href="#collapseWriteup" aria-expanded="true" aria-controls="collapseWriteup">
+                        <div class="panel-heading text-center" role="tab" id="writeupHeading">
+                            <h3>{{scenario.title}}</h3>
+                        </div>
+                    </a>
+                </div>
+                <div class="panel-body">
+                    <div id="collapseWriteup" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="writeupHeading">
+                        {{scenario.description|safe}}
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </span>
 </div>
 
 {% endblock %}

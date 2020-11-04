@@ -77,4 +77,10 @@ urlpatterns = [
     url(r'^allocate_improvement/$', views.allocate_improvement_generic,
         name='games_allocate_improvement_generic'),
 
+    ##################
+    # AJAX endpoints
+    ##################
+    url(r'^post/ajax/spoil-scenario/s/(?P<scenario_id>[\d]+)/$', views.spoil_scenario,
+        name="games_spoil_scenario"),
+    #
 ]

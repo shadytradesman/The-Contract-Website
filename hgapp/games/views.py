@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.forms import formset_factory
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.db import transaction
 from django.contrib import messages
@@ -23,6 +23,8 @@ from hgapp.utilities import get_queryset_size, get_object_or_none
 from cells.models import Cell
 
 def create_scenario(request):
+    if not request.user.is_authenticated:
+        raise PermissionDenied("You must be logged in to create a Scenario")
     if not request.user.profile.confirmed_agreements:
         return HttpResponseRedirect(reverse('profiles:profiles_terms'))
     if request.method == 'POST':
@@ -104,12 +106,14 @@ def edit_scenario(request, scenario_id):
 
 def view_scenario(request, scenario_id, game_id=None):
     scenario = get_object_or_404(Scenario, id=scenario_id)
-    if not request.user.has_perm("view_scenario", scenario):
+    if not scenario.player_can_view(request.user):
         raise PermissionDenied("You don't have permission to view this scenario")
+    show_spoiler_warning = scenario.is_public() and \
+                           not (request.user.is_authenticated and scenario.player_discovered(request.user))
     if request.method == 'POST':
         form = GameFeedbackForm(request.POST)
         if form.is_valid() and game_id:
-            game = get_object_or_none(Game, id=game_id);
+            game = get_object_or_none(Game, id=game_id)
             if game and game.gm.id == request.user.id and str(game.scenario.id) == scenario_id:
                 with transaction.atomic():
                     game = get_object_or_404(Game, id=game_id)
@@ -128,6 +132,7 @@ def view_scenario(request, scenario_id, game_id=None):
         if games_run_no_feedback:
             game_feedback = GameFeedbackForm()
         context = {
+            'show_spoiler_warning': show_spoiler_warning,
             'scenario': scenario,
             'games_run': games_run,
             'games_run_no_feedback': games_run_no_feedback,
@@ -151,6 +156,8 @@ def view_scenario_gallery(request):
     return render(request, 'games/view_scenario_gallery.html', context)
 
 def create_game(request):
+    if not request.user.is_authenticated:
+        raise PermissionDenied("You must be logged in to create a Game")
     if request.method == 'POST':
         form = make_game_form(user=request.user, game_status=GAME_STATUS[0][0])(request.POST)
         if form.is_valid():
@@ -718,3 +725,15 @@ def render_confirm_attendance_page(request, attendance):
         'attendance': attendance,
     }
     return render(request, 'games/confirm_attendance.html', context)
+
+def spoil_scenario(request, scenario_id):
+    if not request.user.is_authenticated:
+        return JsonResponse({}, status=200)
+    else:
+        if request.is_ajax and request.method == "POST":
+            scenario = get_object_or_404(Scenario, id=scenario_id)
+            with transaction.atomic():
+                if not scenario.player_discovered(request.user):
+                    scenario.unlocked_discovery(request.user)
+            return JsonResponse({}, status=200)
+        return JsonResponse({"error": ""}, status=400)
