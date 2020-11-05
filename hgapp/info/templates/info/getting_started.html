@@ -14,134 +14,129 @@
     <div class="panel panel-default">
         <div class="panel-body">
             <p>
-                <span class="lead">Great!</span> This Guide will make it as easy as possible.
-                {% if not user.is_authenticated %}
-                    <a href="{% url 'account_signup' %}">Making an account</a> will improve the experience, but it is not
-                    necessary until the very end.
-                {% else %}
+                <div class="text-center">
+                    <span class="lead">Great!</span> This Guide will provide all the information you need to get started.
+                </div>
+            </p>
+            <h2>Explore The Contract</h2>
+            <p>
+                <a href="/wiki/rules/">The Rules</a> offer a detailed Guide on how to play and GM The Contract, but you
+                may wish to glance around before diving into the nitty-gritty.
+                <ul>
+                    {% if not user.is_authenticated %}
+                        <li>Visit <a href="/">The Homepage</a> for a high-level overview of The Contract.</li>
+                    {% endif %}
+                    <li>
+                        Try <a href="{% url 'characters:characters_create'%}">Creating your own Contractor</a>.
+                    </li>
+                    <li>
+                        Check out the premade <a href="{% url 'powers:powers_stock'%}">Stock Powers</a>, or
+                        <a href="{% url 'powers:powers_create'%}">try building your own</a>.
+                    </li>
+                    <li>
+                        Visit our <a href="https://discord.gg/xUZZegYNNy">Discord</a> and
+                        <a href="https://www.reddit.com/r/TheContract/">Subreddit</a> to chat with The Contract's
+                        Developers and other Players.
+                    </li>
+                    {% if not user.is_authenticated %}
+                        <li>
+                            Consider <a href="{% url 'account_signup' %}">Making an account</a> to explore the full website.
+                        </li>
+                    {% endif %}
+                </ul>
+                <br>
+                {% if user.is_authenticated %}
                     I see you've already logged in. That's great! <a href="/">Your home page</a> acts as centralized
-                    location for exploring the site, and you can return there at any time by clicking the logo in the upper
+                    location for exploring the site. You can go Home at any time by clicking the logo in the upper
                     left.
+                    <br>
                 {% endif %}
-                <br>
-                <br>
-                <div class="text-center"><b >Please note that this guide is a work in progress. Some might even call it a placeholder.</b></div>
-                <br>
-                <br>
-                If you want to get in contact with us or find other players, visit our <a href="https://www.reddit.com/r/TheContract/">Subreddit</a>.
+                Once you've satisfied your curiosity, it's time to start Playing!
             </p>
-            <h2>
-                Step 1: Read the Rules
-            </h2>
-            <p>
-                Did you know that people have a harder time absorbing html text content than linear document content?
-                Well I did not when I wrote the first version of the player's guide, so until I rewrite it in a linear way,
-                you can <i>explore</i> the rules <a href="/wiki/rules/">here</a>.
-                <br>
-                <br>
-                Start with <a href="/wiki/Rules/RollingDice/">the basic dice rolling rules</a>, move on to
-                <a href="/wiki/Rules/characterelements/">the Character elements</a>, and finish with <a href="/wiki/Rules/Combat/">Combat</a>.
-            </p>
-            <h2>
-                Step 2: Try Making a Character
-            </h2>
-            <p>
-                If you're going to ask your Players to make Contractors, you should try making one yourself. That's just good leadership.
-                <br>
-                <br>
-                <a href="{% url 'characters:characters_create'%}">Click here</a> to try out the Character Builder.
-            </p>
-            <h2>
-                Step 3: Unlock the Stock Scenarios
-            </h2>
-            <p>
-                {% if not user.is_authenticated %}
-                    You're ready to GM! You can start running The Contract now, or use a Stock Scenario to get started.
-                    To Unlock the Stock scenarios, you'll have to
-                    <a href="{% url 'account_signup' %}" class="btn btn-primary btn-xs">make an account.</a>
-                    <br>
-                    <br>
-                    Wait a second, we're already at that part? I guess reading the rules was probably most of the work anyway.
-                    <br><br>
-                    Alright, look. I know you don't want to <a href="{% url 'account_signup' %}" class="btn btn-primary btn-sm">make an account</a>.
-                    It's a hassle, and I haven't gotten around to implementing social media log-in yet. But the site's got all
-                    these neat features around Scenario visiblity and tracking the Scenarios you've discovered, and
-                    you have to  <a href="{% url 'account_signup' %}" class="btn btn-primary">make an account</a> to access that stuff.
-                    <br><br>
-                    Plus, what if I just put the Scenarios right out in the open for anyone to read? Do you really trust your
-                    Players not to sneak a peak and spoil themselves? Even accidentally? This way your Players are protected.
-                    They'd have to <a href="{% url 'account_signup' %}" class="btn btn-lg btn-primary">make an account</a> to get access,
-                    and if they're half as hesitant as you are, they'll never see 'em.
-                    <br><br>
-                    Okay, okay, you probably want more info. Well how about this: everyone who's playtested the Stock scenarios
-                    says they're really fun. That's not a lie either; their enjoyment was genuine. That means you are either going
-                    to enjoy the Stock Scenarios or you're going to have the opportunity to be the first person to tell me they suck.
-                    That's pretty neat either way.
 
-                    <br><br>
-                    That said, you'll need to <a href="{% url 'account_signup' %}" class="btn btn-lg btn-warning">Make an Account</a>
-                    to see them!
-                {% else %}
-                    In order to unlock the Stock Scenarios, you must <a href="{% url 'cells:cells_create' %}">Create a Cell</a>.
-                    <br>
-                    <br>
-                    Cells are the Player Groups of The Contract, and they make it easy to take advantage of all the recordkeeping
-                    features of the site. Creating one takes almost no time at all, so just go ahead and do it if you're
-                    planning on GMing the first session for your group!
-                    <br>
-                    <br>
-                    <a href="{% url 'cells:cells_create' %}" class="btn btn-primary">Create a Cell</a>
-                    <br>
-                    <br>
-                    Once you create a Cell, you can invite other Players, manage your members' Character Sheets, keep
-                    track of world events, record Games that have already occurred, and many other nifty features. Check
-                    it out when you have the time.
-                {% endif %}
-            </p>
-            <h2>
-                Step 4: Read the Stock Scenarios
-            </h2>
+            <h2>Step 1: Read the <a href="/wiki/rules/">Rules</a></h2>
             <p>
-                {% if not user.is_authenticated %}
-                    Now that you've made an account, navigate to your
-                    <a href="{% url 'games:games_view_scenario_gallery' %}">Scenario Gallery</a> and--
-                    <br><br>
-                    Hey, wait a minute. You haven't logged in yet! You think you can fool me? I made the whole damn site! Jeeze. . .
-                {% else %}
-                    Once you've created a Cell, you can view the Stock Scenarios in your
-                    <a href="{% url 'games:games_view_scenario_gallery' %}">Scenario Gallery</a>.
-                    Yeah, they also need a little polish, but they're certainly playable, so go for it!
-                {% endif %}
+                As the person introducing The Contract to your group, you will act as a rules resource.
+                Read <a href="/wiki/rules/">The Players Guide</a> sequentially for a complete picture of how The Contract
+                works.
             </p>
-            {% if user.is_authenticated %}
-                <h2>
-                    Step 5: Gather your players
-                </h2>
+            <p>
+                By the time you've read through the section on
+                <a href="/wiki/Rules/4-running-contract/">Running The Contract</a>, you will be more than prepared to
+                teach your group the rules and act as Game Master for your first sesion of The Contract.
+            </p>
+            <p>
+                The Rules can easily be referenced from anywhere on the site via the search box or dropdown menu in the upper toolbar.
+            </p>
+
+            <h2>Step 2: Prepare to GM</h2>
+            <p>
+                <b class="lead">Gather your Players</b>, and pitch them on the idea of playing The Contract. Link them
+                to the website, and let them explore the game for themselves. Each Player should
+                <a href="{% url 'characters:characters_create'%}">Create a Contractor</a> before you start the first Game.
+                This can be done either together in a session-zero or asynchronously, and it's a good time to start
+                <a href="/wiki/Rules/4-running-contract/b-contractor-introductions/">Contractor introductions</a>.
+            </p>
+            <p>
+                <b class="lead">Read a Stock Scenario.</b> One Stock Scenario is available for free without an account
+                <a href="/games/view/s/41/">here</a>. To access the other Stock Scenario, you must
+                {% if not user.is_authenticated %}
+                    <a href="{% url 'account_signup' %}">Sign up</a>, and
+                {% endif %}
+                <a href="{% url 'cells:cells_create' %}">Start a Cell</a>. The Scenario will then appear in your
+                <a href="{% url 'games:games_view_scenario_gallery' %}">Scenario Gallery</a>.
+            </p>
+            <p>
+                <b class="lead">Optional: Organize a Cell.</b> Cells are a website feature that allows you to easily
+                track your setting, your Players, their Contractors, and the Games they've played.
+                <a href="{% url 'cells:cells_create' %}">Click here</a> to start a cell. Once you do, you can invite your
+                Players (if they've made accounts), and they can declare your new Cell as their Contractors' home Cell.
+                As Cell Leader, you can record Games that have already occurred, help your Players manage their Character
+                Sheets, and edit your Cell's Setting.
+            </p>
+            <h2>Step 3: Run a Game</h2>
+            <p>
+                If you've read <a href="/wiki/rules/">The Guide</a> and the Stock Scenario, you should be more than
+                prepared to run your first Game. Get your Players togther and have at it. : )
+            </p>
+            <h2>Step 4: Record your Game</h2>
                 <p>
-                    At this point, you want to gather your other players, have them make Characters (and hopefully accounts)
-                    and get them to join your Cell. They don't <i>have to</i> make accounts or join your Cell, but it makes things easier.
+                    Recording played Games unlocks the full potential of The Contract's website. Declaring the outcome
+                    gets you far more than just an easily accessible record of who played which Contractors in which Scenarios.
                 </p>
-                <h2>
-                    Step 6: Play and Record your Game
-                </h2>
-                <p>
-                    Okay. You've got the Stock Scenarios. You know how to GM. Now you can play a Game. There's no need to
-                    do anything on the site before you start playing, although you can go through the trouble of using our
-                    soon-to-be-drastically-changed <a href="{% url 'games:games_create_game' %}">Game Scheduler</a>.
-                    <br>
-                    <br>
-                    The most convenient way to record Games is to simply play them, and then visit your Cell and hit the
-                    "Declare a Completed Game" button near the top. That allows you to just <i>say</i> what happened instead of
-                    having the other Players accept invites and such.
-                    <br>
-                    <br>
-                    Once you enter the completed Game, your Players will recieve their Gifts (if they won), and you will
-                    receive rewards for GMing. Neat!
-                </p>
-                <br>
-                <h4>Don't be a Stranger! <a href="https://www.reddit.com/r/TheContract/">Visit our Subreddit</a>.
-</h4>
-            {% endif %}
+            <ul>
+                <li>Players are notified that their Contractors have Gifts and Experience to spend</li>
+                <li>Players are guided and helped to spend their unspent Rewards</li>
+                <li>
+                    The Game's Scenario appears in each Player's
+                    <a href="{% url 'games:games_view_scenario_gallery' %}">Scenario Gallery</a>,
+                    allowing them to run it in the future
+                </li>
+                <li>The source of all Experience / Gifts expended is recorded on their Character Sheets</li>
+                <li>The GM receives their Rewards and is given an UI for allocating them to their Contractors</li>
+                <li>
+                    Contractors who died are declared dead and appear in
+                    <a href="{% url 'characters:characters_graveyard'%}">the Graveyard</a>
+                </li>
+                <li>Contractors whose stats or Powers exceed their Rewards are flagged so GMs can vet them for shenanigans</li>
+            </ul>
+
+            To record a Game after the fact, visit your Cell and click "Declare a completed Game".
+            <h2>Send us Feedback!</h2>
+            <p>
+                The Contract is still in an early Alpha stage. We are interested in all feedback and impressions no matter
+                how unpolished or incomplete.
+            </p>
+            <p>
+                How to leave feedback:
+                <ul>
+                    <li>
+                        Post on our <a href="https://discord.gg/xUZZegYNNy">Discord</a> or
+                        <a href="https://www.reddit.com/r/TheContract/">Subreddit</a>
+                    </li>
+                    <li>Email us at thecontractgame@gmail.com</li>
+                </ul>
+            </p>
         </div>
     </div>
 </div>
