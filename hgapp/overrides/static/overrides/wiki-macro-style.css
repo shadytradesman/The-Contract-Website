@@ -46,7 +46,7 @@
     border-radius: 2px;
 }
 
-.current-article>a {
+#current-article>a {
     background-color: #252e3b;
     border-right: 1px solid #a6763a;
     border-radius: 2px;
@@ -55,6 +55,6 @@
     font-size: 17px;
 }
 
-.current-article {
+#current-article {
     color: #a6763a;
 }

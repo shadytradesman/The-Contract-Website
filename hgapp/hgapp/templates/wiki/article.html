@@ -24,15 +24,25 @@
         <div class="col-sm-8 col-md-9 ">
             <div>
                 <h1 id="article-title" class="text-center">
-              {{ article.current_revision.title }}
-        </h1>
-              <div class="panel panel-default css-article-content">
+                    {{ article.current_revision.title }}
+                </h1>
+                <div class="panel panel-default css-article-content">
                   <div class="panel-body css-article-content">
                     {% block wiki_contents_tab %}
                     {% endblock %}
                   </div>
+                </div>
+                <div class="text-center">
+                    <a href="#" class="js-prev-article btn btn-default" style="display:none;">
+                        <span class="glyphicon glyphicon-backward"></span>
+                        Previous Article
+                    </a>
+                    <a href="#" class="js-next-article btn btn-default" style="display:none;">
+                        Next Article
+                        <span class="glyphicon glyphicon-forward"></span>
+                    </a>
+                </div>
             </div>
-              </div>
         </div>
         <div id="js-lower-index" class="panel panel-default visible-xs-block">
         </div>
