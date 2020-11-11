@@ -146,7 +146,7 @@
     {{ attribute_formset.non_field_errors }}
     {% csrf_token %}
     <div class="panel panel-default">
-        <h2 class = "text-center" data-toggle="tooltip" title='{{tutorial.core_info}}'>
+        <h2 class = "text-center" data-toggle="tooltip" title='{{tutorial.core_info|safe}}'>
             Essentials
             <br>
         <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#tutorialModal">
@@ -160,7 +160,7 @@
                     <div id="css-name-field" class="css-essential-field">
                         {{ char_form.name}}
                         <figcaption class="help-block">
-                            {{ char_form.name.help_text}}
+                            {{ char_form.name.help_text|safe}}
                         </figcaption>
                     </div>
                     <div class="clearfix visible-xs-block"></div>
@@ -168,7 +168,7 @@
                     <div id="css-concept-field" class="css-essential-field"  >
                         {{ char_form.concept_summary}}
                         <figcaption class="help-block">
-                            {{ char_form.concept_summary.help_text}}
+                            {{ char_form.concept_summary.help_text|safe}}
                         </figcaption>
                     </div>
                     <div class="clearfix visible-xs-block visible-sm-block visible-md-block"></div>
@@ -182,7 +182,7 @@
                     <div id="css-ambition-field" class="css-essential-field">
                         {{ char_form.ambition}}
                         <figcaption class="help-block">
-                            {{ char_form.ambition.help_text}}
+                            {{ char_form.ambition.help_text|safe}}
                         </figcaption>
                     </div>
                     <span class="css-essential-text visible-lg-block"> .</span>
@@ -194,7 +194,7 @@
                     <div id="css-age-field" class="css-essential-field">
                         {{ char_form.age}}
                         <figcaption class="help-block">
-                            {{ char_form.age.help_text}}
+                            {{ char_form.age.help_text|safe}}
                         </figcaption>
                     </div>
                     <span class="css-essential-text"> years old, and usually appear as</span>
@@ -202,7 +202,7 @@
                     <div id="css-appearance-field" class="css-essential-field">
                         {{ char_form.appearance}}
                         <figcaption class="help-block">
-                            {{ char_form.appearance.help_text}}
+                            {{ char_form.appearance.help_text|safe}}
                         </figcaption>
                     </div>
                     <span class="css-essential-text visible-md-block visible-lg-block"> .</span>
@@ -280,7 +280,7 @@
         </div>
     </div>
     <div class="panel panel-default">
-        <h2 class = "row text-center" data-toggle="tooltip" title='{{tutorial.attributes}}'>
+        <h2 class = "row text-center" data-toggle="tooltip" title='{{tutorial.attributes|safe}}'>
             Attributes
         </h2>
         <div class="visible-sm-block visible-xs-block text-center"><small>Tap on each Attribute for more information.</small></div>
@@ -292,8 +292,8 @@
                     {% if forloop.counter0 == 3 %}
                     </div><div class="row">
                     {% endif %}
-                    <div class="col-sm-4" data-toggle="tooltip" title='{{form.initial.attribute.tutorial_text}}'>
-                        <b>{{form.value.label}}</b>
+                    <div class="col-sm-4" data-toggle="tooltip" title='{{form.initial.attribute.tutorial_text|safe}}'>
+                        <b>{{form.value.label|safe}}</b>
                         <span class="css-experience-cost" data-initial-attr-value="{{form.initial.value}}">
                              (
                             <span class="js-experience-cost-value">0</span>
@@ -310,7 +310,7 @@
         </div>
     </div>
     <div class="panel panel-default">
-        <h2 class = "row text-center" data-toggle="tooltip" title='{{tutorial.abilities}}'>
+        <h2 class = "row text-center" data-toggle="tooltip" title='{{tutorial.abilities|safe}}'>
             Abilities
         </h2>
         <div class="visible-sm-block visible-xs-block text-center"><small>Tap on each Ability for more information.</small></div>
@@ -345,7 +345,7 @@
         </div>
     </div>
     <div class="panel panel-default">
-        <h2 class = "row text-center" data-toggle="tooltip" title='{{tutorial.assets_and_liabilities}}'>
+        <h2 class = "row text-center" data-toggle="tooltip" title='{{tutorial.assets_and_liabilities|safe}}'>
             Assets and Liabilities
         </h2>
         <div class="panel-body">
@@ -513,7 +513,7 @@
     {% if source_formset and source_formset|length > 0 %}
         {{ source_formset.management_form }}
         <div class="panel panel-default">
-            <h2 class = "row text-center" data-toggle="tooltip" title='{{tutorial.source_edit}}'>
+            <h2 class = "row text-center" data-toggle="tooltip" title='{{tutorial.source_edit|safe}}'>
                 Sources
             </h2>
             <div class="panel-body">

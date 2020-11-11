@@ -16,9 +16,9 @@
             <h4>
                 {{form.is_selected}}
                 &ensp;
-                <b class="js-quirk-value">{{quirk.value}}</b>
+                <b class="js-quirk-value">{{quirk.value|safe}}</b>
                 -
-                {{quirk.name}}
+                {{quirk.name|safe}}
                 <span class="css-experience-cost">
                      (
                     <span class="js-experience-cost-value">0</span>
@@ -26,8 +26,8 @@
                 </span>
             </h4>
             <p>
-                {{quirk.description}}
-                {{quirk.system}}
+                {{quirk.description|safe}}
+                {{quirk.system|safe}}
                 {{form.id}}
                 {{form.details_id}}
                 {% if quirk.eratta %}
@@ -47,7 +47,7 @@
                 style="display:block;"
              {% endif %}>
             <label class="col-sm-3 text-center quirk-details">
-                <b>{{quirk.details_field_name}}</b>
+                <b>{{quirk.details_field_name|safe}}</b>
             </label>
             <div class="col-sm-9">
                 {{form.details}}

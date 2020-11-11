@@ -3,9 +3,9 @@
         <label>
         <h4>
             {{ form.checked }}
-            <b>{{ form.initial.limit.name }}</b>
+            <b>{{ form.initial.limit.name|safe}}</b>
             <br>
-            <small>{{form.initial.limit.description}}</small>
+            <small>{{form.initial.limit.description|safe}}</small>
         </h4>
             {{form.id}} {{form.limit_rev_id}}
         </label>
