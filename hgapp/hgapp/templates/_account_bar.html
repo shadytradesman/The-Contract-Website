@@ -2,6 +2,7 @@
 {% load account_tags %}
 {% load postman_tags %}
 {% load hgapp_tags %}
+{% load cache %}
 
 {% postman_unread as unread_count %}
 <ul class="nav navbar-nav pull-right">
@@ -30,12 +31,14 @@
     {% endif %}
 </ul>
 <ul class="nav navbar-nav pull-left">
+    {% cache 500 nav-rules-toc %}
     <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
             Game Rules <span class="caret"></span>
         </a>
         {% article_toc 'rules' %}
     </li>
+    {% endcache %}
     <form class="navbar-form navbar-left" id="wiki-search-form" method="GET" action="{% url 'wiki:search' %}" style="max-width: 98%;">
             <div class="input-group">
               <input type="search" class="form-control search-query" style="width: 150px;" name="q" placeholder="{% spaceless %}

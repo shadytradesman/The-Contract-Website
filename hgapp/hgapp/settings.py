@@ -32,6 +32,8 @@ else:
         'hgapp-dev.us-west-2.elasticbeanstalk.com',
         'thecontractgame.com',
         'www.thecontractgame.com',
+        'thecontractrpg.com',
+        'www.thecontractrpg.com',
     ]
     SESSION_COOKIE_DOMAIN = ".thecontractgame.com"
 
@@ -251,7 +253,6 @@ else:
         }
     }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
 AUTH_PASSWORD_VALIDATORS = [
@@ -269,6 +270,20 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Caching
+if DEBUG:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        }
+    }
+else:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+            'LOCATION': '127.0.0.1:11211',
+        }
+    }
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/

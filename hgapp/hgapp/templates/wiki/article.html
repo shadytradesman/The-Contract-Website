@@ -1,5 +1,5 @@
 {% extends "wiki/base.html" %}
-{% load wiki_tags i18n hgapp_tags sekizai_tags %}
+{% load wiki_tags i18n hgapp_tags sekizai_tags cache %}
 
 
 
@@ -12,6 +12,7 @@
 {% block wiki_contents %}
     <div id="article-container" class="row">
         {% include "wiki/includes/article_menu.html" %}
+        {% cache 500 article-siebar urlpath.path %}
         <div id="js-article-index" class="col-sm-4 col-md-3 panel panel-default hidden-xs">
                 {% with urlpath.cached_ancestors as ancestors %}
                     {% if ancestors.1 %}
@@ -21,6 +22,7 @@
                     {% endif %}
                 {% endwith %}
         </div>
+        {% endcache %}
         <div class="col-sm-8 col-md-9 ">
             <div>
                 <h1 id="article-title" class="text-center">
