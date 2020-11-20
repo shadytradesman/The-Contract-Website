@@ -1,12 +1,12 @@
 TERMS= """
 
 The Contract Terms and Conditions
-Last updated July 27, 2020
+Last updated November 20, 2020
 
 
 AGREEMENT TO TERMS
 
-These Terms and Conditions constitute a legally binding agreement made between you, whether personally or on behalf of an entity (“you”) and Spencer Stecko (“we,” “us” or “our”), concerning your access to and use of the The Contract www.thecontractgame.com website as well as any other media form, media channel, mobile website or mobile application related, linked, or otherwise connected thereto (collectively, the “Site”). 
+These Terms and Conditions constitute a legally binding agreement made between you, whether personally or on behalf of an entity (“you”) and Spencer Stecko (“we,” “us” or “our”), concerning your access to and use of the The Contract www.thecontractrpg.com website as well as any other media form, media channel, mobile website or mobile application related, linked, or otherwise connected thereto (collectively, the “Site”). 
 
 You agree that by accessing the Site, you have read, understood, and agree to be bound by all of these Terms and Conditions. If you do not agree with all of these Terms and Conditions, then you are expressly prohibited from using the Site and you must discontinue use immediately.
 
@@ -123,7 +123,7 @@ We are not liable for any statements or representations in your Contributions pr
 
 We do not assert any ownership over your Contributions, with exceptions outlined in the following paragraph (A). You retain full ownership of all of your Contributions and any intellectual property rights or other proprietary rights associated with your Contributions, with exceptions outlined in the following paragraph (A). 
 
-(A) Exceptions to ownership claims. Any contributions to The Contract’s content via the admin-only database editing sub-site ( any page proceeding with www.thecontractgame.com/admin ) or to the Player’s Guide, grants an exclusive, non-revocable license to us and ownership over any characters, worlds, systems, or intellectual property elements described therein. These rights are  unrestricted, unlimited, irrevocable, perpetual, exclusive, non-transferable, royalty-free, fully-paid, worldwide rights, and allow us to host, use, copy, reproduce, disclose, sell, resell, publish, broadcast, retitle, archive, store, cache, publicly perform, publicly display, reformat, translate, transmit, excerpt (in whole or in part), and distribute such Contributions (including, without limitation, your image and voice) for any purpose, commercial, advertising, or otherwise, and to prepare derivative works of, or incorporate into other works, such Contributions, and grant and authorize sublicenses of the foregoing. The use and distribution may occur in any media formats and through any media channels. 
+(A) Exceptions to ownership claims. Any contributions to The Contract’s content via the admin-only database editing sub-site ( any page proceeding with www.thecontractrpg.com/admin ) or to the Player’s Guide, grants an exclusive, non-revocable license to us and ownership over any characters, worlds, systems, or intellectual property elements described therein. These rights are  unrestricted, unlimited, irrevocable, perpetual, exclusive, non-transferable, royalty-free, fully-paid, worldwide rights, and allow us to host, use, copy, reproduce, disclose, sell, resell, publish, broadcast, retitle, archive, store, cache, publicly perform, publicly display, reformat, translate, transmit, excerpt (in whole or in part), and distribute such Contributions (including, without limitation, your image and voice) for any purpose, commercial, advertising, or otherwise, and to prepare derivative works of, or incorporate into other works, such Contributions, and grant and authorize sublicenses of the foregoing. The use and distribution may occur in any media formats and through any media channels. 
 
 You are solely responsible for your Contributions to the Site and you expressly agree to exonerate us from any and all responsibility and to refrain from any legal action against us regarding your Contributions.  
 
@@ -518,7 +518,7 @@ We do not share or sell your personal information, if provided, and we only requ
 
 INTRODUCTION
 
-The Contract (“we” or “us” or “our”) respects the privacy of our users (“user” or “you”). This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website www.thecontractgame.com, including any other media form, media channel, mobile website, or mobile application related or connected thereto (collectively, the “Site”). Please read this privacy policy carefully.  If you do not agree with the terms of this privacy policy, please do not access the site. 
+The Contract (“we” or “us” or “our”) respects the privacy of our users (“user” or “you”). This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website www.thecontractrpg.com, including any other media form, media channel, mobile website, or mobile application related or connected thereto (collectively, the “Site”). Please read this privacy policy carefully.  If you do not agree with the terms of this privacy policy, please do not access the site. 
 
 We reserve the right to make changes to this Privacy Policy at any time and for any reason.  We will alert you about any changes by updating the “Last Updated” date of this Privacy Policy.  Any changes or modifications will be effective immediately upon posting the updated Privacy Policy on the Site, and you waive the right to receive specific notice of each such change or modification. 
 
