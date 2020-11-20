@@ -1,6 +1,9 @@
 {% extends "wiki/base.html" %}
 {% load wiki_tags i18n hgapp_tags sekizai_tags cache %}
 
+{% block head_title %}
+    {{ article.current_revision.title }}
+{% endblock %}
 
 
 {% block wiki_pagetitle %}{{ article.current_revision.title }}{% endblock %}
