@@ -111,9 +111,11 @@ class CreatePowerForm(forms.Form):
                              help_text='A snippet of text that introduces the power in a flavorful way')
     description = forms.CharField(label='Description',
                                   widget=forms.Textarea,
-                                  help_text='Describe what the power looks like when it is used, how it works, and its impact on the owner, target, and environment')
+                                  help_text='Describe what the power looks like when it is used, how it works, '
+                                            'and its impact on the owner, target, and environment. All Powers'
+                                            'are obviously supernatural unless stated otherwise.')
     system = forms.CharField(label='System', widget=forms.Textarea,
-                             help_text='Describe the power\'s cost, associated roll(s), determination of outcome, conditions, etc')
+                             help_text='Describe the power\'s cost, associated roll(s), conditions, and determination of outcome.')
     activation_style = forms.ChoiceField(choices=ACTIVATION_STYLE, disabled=True)
     tags = forms.ModelMultipleChoiceField(queryset=PowerTag.objects.order_by("tag").all(),
                                           required=False,
