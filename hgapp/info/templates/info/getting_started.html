@@ -3,25 +3,46 @@
 {% load i18n %}
 {% load staticfiles %}
 {% load account_tags %}
+{% load hgapp_tags %}
 
 {% block head_title %}Getting Started{% endblock %}
+
+{% block extra_styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'info/getting_started_style.css' %}" />
+{% endblock %}
 
 {% block body_base %}
 <div class="container">
     <h1 class="text-center">
-        So you want to play The Contract. . .
+        So you want to sign The Contract. . .
     </h1>
     <div class="panel panel-default">
         <div class="panel-body">
+            {% gwynn_jpg  "horns" 'true' %}
+            <br>
+            <br>
             <p>
                 <div class="text-center">
-                    <span class="lead">Great!</span> This Guide will provide all the information you need to get started.
+                    <i>
+                        Come closer, calf.<br><br>
+                        Ahhh, yes. I do see the spark inside you. The question is, do you have the hunger?
+                        You've sundered society's limits, but do you dare to challenge your own? Will you
+                        wager the meager pittance of your life for a chance to become something. . . <b>more?</b>
+                        <br>
+                        <br>
+                        Speak now, or slink back to your filth.
+                    </i>
                 </div>
             </p>
+            <div class="hidden-xs">
+                <br>
+                <br>
+                <br>
+            </div>
             <h2>Explore The Contract</h2>
             <p>
-                <a href="/wiki/rules/">The Rules</a> offer a detailed Guide on how to play and GM The Contract, but you
-                may wish to glance around before diving into the nitty-gritty.
+                This page explains how to start playing The Contract, but before diving straight into
+                <a href="/wiki/rules/">The Player's Guide</a>, you may want to glance around.
                 <ul>
                     {% if not user.is_authenticated %}
                         <li>Visit <a href="/">The Homepage</a> for a high-level overview of The Contract.</li>
@@ -34,7 +55,7 @@
                         <a href="{% url 'powers:powers_create'%}">try building your own</a>.
                     </li>
                     <li>
-                        Visit our <a href="https://discord.gg/xUZZegYNNy">Discord</a> and
+                        Visit our <a href="https://discord.gg/xUZZegYNNy">Discord Server</a> and
                         <a href="https://www.reddit.com/r/TheContract/">Subreddit</a> to chat with The Contract's
                         Developers and other Players.
                     </li>
@@ -53,8 +74,8 @@
                 {% endif %}
                 Once you've satisfied your curiosity, it's time to start Playing!
             </p>
-
-            <h2>Step 1: Read the <a href="/wiki/rules/">Rules</a></h2>
+            <h1 class="text-center">Running The Contract</h1>
+            <h3>Step 1 - Read <a href="/wiki/rules/">The Rules</a></h3>
             <p>
                 As the person introducing The Contract to your group, you will act as a rules resource.
                 Read <a href="/wiki/rules/">The Players Guide</a> sequentially for a complete picture of how The Contract
@@ -63,13 +84,14 @@
             <p>
                 By the time you've read through the section on
                 <a href="/wiki/Rules/4-running-contract/">Running The Contract</a>, you will be more than prepared to
-                teach your group the rules and act as Game Master for your first sesion of The Contract.
+                act as Game Master for your first session of The Contract.
             </p>
             <p>
-                The Rules can easily be referenced from anywhere on the site via the search box or dropdown menu in the upper toolbar.
+                The Rules can be easily referenced from anywhere on the site via the search box or dropdown menu in the
+                upper toolbar.
             </p>
 
-            <h2>Step 2: Prepare to GM</h2>
+            <h3>Step 2 - Prepare to GM</h3>
             <p>
                 <b class="lead">Gather your Players</b>, and pitch them on the idea of playing The Contract. Link them
                 to the website, and let them explore the game for themselves. Each Player should
@@ -94,15 +116,15 @@
                 As Cell Leader, you can record Games that have already occurred, help your Players manage their Character
                 Sheets, and edit your Cell's Setting.
             </p>
-            <h2>Step 3: Run a Game</h2>
+            <h3>Step 3 -  Run a Game</h3>
             <p>
-                If you've read <a href="/wiki/rules/">The Guide</a> and the Stock Scenario, you should be more than
-                prepared to run your first Game. Get your Players togther and have at it. : )
+                If you've read <a href="/wiki/rules/">The Guide</a> and <a href="/games/view/s/41/">the Stock Scenario</a>,
+                you are more than ready to run your first Game. Get your Players togther and have at it.
             </p>
-            <h2>Step 4: Record your Game</h2>
+            <h3>Step 4 - Record your Game</h3>
                 <p>
                     Recording played Games unlocks the full potential of The Contract's website. Declaring the outcome
-                    gets you far more than just an easily accessible record of who played which Contractors in which Scenarios.
+                    gets you far more than an easily accessible record of who played which Contractors in which Scenarios.
                 </p>
             <ul>
                 <li>Players are notified that their Contractors have Gifts and Experience to spend</li>
