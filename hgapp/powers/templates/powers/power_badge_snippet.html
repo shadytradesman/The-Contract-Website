@@ -32,7 +32,7 @@
          aria-labelledby="collapse-power-{{power_full.id}}-heading">
         <p>
             <b>System: <br></b>
-            {{power_full.latest_revision.system}}
+            {{power_full.latest_revision.render_system}}
         </p>
         {% if power_full.latest_revision.enhancement_instance_set.all %}
             <p>
