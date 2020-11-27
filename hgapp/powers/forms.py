@@ -115,7 +115,10 @@ class CreatePowerForm(forms.Form):
                                             'and its impact on the owner, target, and environment. All Powers'
                                             'are obviously supernatural unless stated otherwise.')
     system = forms.CharField(label='System', widget=forms.Textarea,
-                             help_text='Describe the power\'s cost, associated roll(s), conditions, and determination of outcome.')
+                             help_text='Describe this Power\'s cost, associated roll(s), conditions, and determination of outcome. '
+                                       'You can reference the value of a Parameter by typing its name in lowercase, '
+                                       'surrounded by double brackets, with spaces replaced by hyphens. For example, to display the value '
+                                       'of a Power\'s "Cast Time" Parameter, write "[[cast-time]]".')
     activation_style = forms.ChoiceField(choices=ACTIVATION_STYLE, disabled=True)
     tags = forms.ModelMultipleChoiceField(queryset=PowerTag.objects.order_by("tag").all(),
                                           required=False,
