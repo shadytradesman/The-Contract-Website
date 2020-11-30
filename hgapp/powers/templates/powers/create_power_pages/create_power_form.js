@@ -104,34 +104,40 @@ function updateGiftCost() {
 }
 
 function checkModifierRequirements() {
+    $(".js_modifier_requirements").html("");
     $( "[id$=-is_selected]" ).each(function() {
         var modifier = $( this );
-            for (index = 0; index < modifier_requirements[modifier.attr('name')].length; ++index) {
-                var required_modifier_name = modifier_requirements[modifier.attr('name')][index];
-                var required_modifier = $( '[name=' + required_modifier_name +']').first();
-                if (! required_modifier[0].checked ){
-                    modifier.prop("checked", false);
-                    modifier.parent()
-                        .children('span')
-                        .attr("class", "text-muted");
-                    modifier.parent()
-                        .children('span')
-                        .children('div')
-                        .children('input')
-                        .attr("disabled", true);
-                    modifier.attr("disabled", true);
-                    break;
-                }
+        for (index = 0; index < modifier_requirements[modifier.attr('name')].length; ++index) {
+            var required_modifier_name = modifier_requirements[modifier.attr('name')][index];
+            var required_modifier = $('[name=' + required_modifier_name +']').first();
+            var required_modifier_readable = required_modifier.attr("data-name");
+            if (!required_modifier[0].checked){
+                modifier.prop("checked", false);
+                modifier.parent().parent()
+                    .addClass("text-muted");
+                modifier.parent().parent()
+                    .find('input')
+                    .attr("disabled", true);
+                modifier.attr("disabled", true);
+                var current_requirements = modifier.parent().parent()
+                    .find(".js_modifier_requirements")
+                    .html();
+                current_requirements = current_requirements.length > 0 ? current_requirements + ", " + required_modifier_readable : "Requires: " + required_modifier_readable;
+                modifier.parent().parent()
+                    .find(".js_modifier_requirements")
+                    .html(current_requirements);
+            } else {
                 modifier.removeAttr("disabled");
-                modifier.parent()
-                        .children('span')
-                        .children('div')
-                        .children('input')
+                modifier.parent().parent()
+                        .find('input')
                         .removeAttr("disabled");
-                modifier.parent()
-                        .children('span')
-                        .removeAttr("class");
+                modifier.parent().parent()
+                        .removeClass("text-muted");
+                modifier.parent().parent()
+                    .find(".js_modifier_requirements")
+                    .html("");
             }
+        }
     });
 }
 

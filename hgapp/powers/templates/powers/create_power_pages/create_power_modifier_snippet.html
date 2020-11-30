@@ -2,7 +2,7 @@
 {{mod.errors}}
 <div class="checkbox thumbnail">
     {% for field in mod.visible_fields|slice:":1"%}
-        <label class="thumbnail" style="border:none">
+        <label class="thumbnail" style="border:none" data-mod-name="{{field.readable_name}}">
             &ensp;
             {{ field}}
             {% if mod.eratta %}
@@ -17,5 +17,6 @@
             {{mod.detail_text.label_tag}}
             {{mod.detail_text}}
          </div>
+        <i><small class="text-danger"><div class="js_modifier_requirements"></div></small></i>
     {% endfor %}
 </div>
