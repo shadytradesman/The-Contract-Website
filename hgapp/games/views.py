@@ -22,6 +22,16 @@ from hgapp.utilities import get_queryset_size, get_object_or_none
 
 from cells.models import Cell
 
+def enter_game(request):
+    if not request.user.is_authenticated:
+        raise PermissionDenied("You must be logged in to enter a Game")
+    cells = request.user.cell_set.all()
+    context = {
+        'cells' : cells,
+    }
+    return render(request, 'games/enter_game.html', context)
+
+
 def create_scenario(request):
     if not request.user.is_authenticated:
         raise PermissionDenied("You must be logged in to create a Scenario")

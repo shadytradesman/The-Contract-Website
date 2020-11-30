@@ -123,7 +123,9 @@
             </p>
             <h3>Step 4 - Record your Game</h3>
                 <p>
-                    Recording played Games unlocks the full potential of The Contract's website. Declaring the outcome
+                    <a href="{% url 'games:games_enter_game' %}">
+                        Recording the Games you play
+                    </a> unlocks the full potential of The Contract's website. Declaring the outcome
                     gets you far more than an easily accessible record of who played which Contractors in which Scenarios.
                 </p>
             <ul>
@@ -143,7 +145,8 @@
                 <li>Contractors whose stats or Powers exceed their Rewards are flagged so GMs can vet them for shenanigans</li>
             </ul>
 
-            To record a Game after the fact, visit your Cell and click "Declare a completed Game".
+            Visit the <a href="{% url 'games:games_enter_game' %}">Enter Game</a> page to record a completed Game
+            or schedule one in the future.
             <h2>Send us Feedback!</h2>
             <p>
                 The Contract is still in an early Alpha stage. We are interested in all feedback and impressions no matter

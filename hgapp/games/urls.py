@@ -5,6 +5,9 @@ from . import views
 
 app_name = 'games'
 urlpatterns = [
+    # ex: .com/games/enter/
+    url(r'^enter/$', views.enter_game, name='games_enter_game'),
+
     # ex: .com/games/create/scenario/
     url(r'^create/scenario/$', views.create_scenario, name='games_create_scenario'),
 

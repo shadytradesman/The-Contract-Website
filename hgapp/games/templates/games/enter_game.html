@@ -1,0 +1,57 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+{% load staticfiles %}
+
+{% block head_title %}Enter a Game{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% block extra_scripts %}
+{% endblock %}
+
+{% load account_tags %}
+{% load markdown_deux_tags %}
+{% load bootstrap %}
+
+{% block body_base %}
+<div class="container">
+    <div class="text-center">
+        <h1>My Game. . .</h1>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-xs-6 text-center">
+                    <h2>
+                        hasn't happened yet
+                    </h2>
+                    <br>
+                    <a class="btn btn-primary btn-lg text-center" href="{% url 'games:games_create_game' %}">
+                        Schedule a Game
+                    </a>
+                </div>
+                <div class="col-xs-6 text-center">
+                    <h2>
+                        occurred in the past
+                    </h2>
+                    {% if cells %}
+                        <div>
+                            Record a completed Game
+                        </div>
+                    {% endif %}
+                    {% for cell in cells %}
+                        <br>
+                        <a class="btn btn-primary" href="{% url 'games:games_create_ex_game_for_cell' cell.id %}">
+                             In {{ cell.name }}
+                        </a>
+                        <br>
+                    {% empty %}
+                        <i class="text-danger">You may declare archival Games only if you are a Judge or Leader of a Cell.</i>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
