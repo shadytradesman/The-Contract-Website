@@ -530,8 +530,10 @@ function copyToClipboard(elem) {
 }
 
 window.onload = function () {
-    document.getElementById("copySecretLink").addEventListener("click", function() {
-    copyToClipboard(document.getElementById("secretCopyField"));});
-    document.getElementById("copyShareLink").addEventListener("click", function() {
-    copyToClipboard(document.getElementById("shareCopyField"));});
+    if (document.getElementById("copySecretLink")) {
+        document.getElementById("copySecretLink").addEventListener("click", function() {
+        copyToClipboard(document.getElementById("secretCopyField"));});
+        document.getElementById("copyShareLink").addEventListener("click", function() {
+        copyToClipboard(document.getElementById("shareCopyField"));});
+    }
 };

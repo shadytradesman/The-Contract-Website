@@ -1,5 +1,4 @@
 
-{% include "powers/create_power_pages/create_power_modifier_snippet.html" %}
 
 <script>
 
@@ -161,6 +160,9 @@ $(document).on('click','#js-example-power-button', function() {
     }
 });
 
-
-
+$(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip({
+        trigger : 'hover'
+    });
+});
 </script>

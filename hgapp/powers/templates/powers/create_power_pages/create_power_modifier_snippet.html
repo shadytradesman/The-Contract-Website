@@ -6,7 +6,10 @@
             &ensp;
             {{ field}}
             {% if mod.eratta %}
-            <span title="{{mod.eratta}}"><i class="fa fa-question-circle fa-1x"></i></span>
+            <span data-toggle="tooltip"
+                     data-placement="top"
+                     title="{{mod.eratta}}"
+            ><i class="fa fa-question-circle fa-1x"></i></span>
             {% endif %}
             {{field.label}}
         </label>
