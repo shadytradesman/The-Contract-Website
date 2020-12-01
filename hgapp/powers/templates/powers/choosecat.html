@@ -1,23 +1,42 @@
 {% extends "site_base.html" %}
 
 {% load i18n %}
+{% load staticfiles %}
 
 {% block head_title %}Choose a Category{% endblock %}
 
 {% block body_class %}home{% endblock %}
 
+{% block extra_scripts %}
+    <script src="{% static 'powers/tutorial_modal_script.js' %}"></script>
+    <script>
+        {% if show_tutorial %}
+            showTutorial=true;
+        {% else %}
+            showTutorial=false;
+        {% endif %}
+    </script>
+{% endblock %}
+
+{% block extra_styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'powers/tutorial_modal_style.css' %}" />
+{% endblock %}
+
 {% block body_base %}
 
 <div class="container">
+    {% include "powers/power_tutorial_modal.html" %}
     <div class="page-header">
         <h1> Create a new Power
             {% if character %}
                 for {{character.name}}
             {% endif %}
-            <small>Choose a category</small>
+            <small>Choose a Base Power Category</small>
         </h1>
         <p>
-            Confused? Check out the <a href="/wiki/Rules/5-powers/">Powers Tutorial</a>
+            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#tutorialModal">
+                Help!
+            </button>
         </p>
     </div>
     {% include "powers/choose_category_snippet.html" %}

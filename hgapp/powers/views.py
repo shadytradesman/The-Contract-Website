@@ -13,7 +13,7 @@ from .createPowerFormUtilities import get_create_power_context_from_base, \
     get_create_power_context_from_power, get_edit_power_context_from_power, create_new_power_and_parent, \
     create_power_for_new_edit, refund_or_assign_rewards
 from .models import Power, Base_Power_Category, Base_Power, Base_Power_System, DICE_SYSTEM, Power_Full, PowerTag, \
-    PremadeCategory
+    PremadeCategory, PowerTutorial
 from .forms import DeletePowerForm
 
 def create(request, character_id=None):
@@ -21,9 +21,15 @@ def create(request, character_id=None):
     character=None
     if character_id:
         character = get_object_or_404(Character, pk=character_id)
+    show_tutorial = (not request.user.is_authenticated) or (not request.user.power_full_set.exists())
+    tutorial = get_object_or_404(PowerTutorial)
     context = {
         'category_list': category_list,
         'character': character,
+        'show_tutorial': show_tutorial,
+        'modal_header': tutorial.modal_base_header,
+        'modal_text': tutorial.modal_base,
+        'modal_art': 'overrides/art/lady_lake_sm.jpg',
     }
     return render(request, 'powers/choosecat.html', context)
 
@@ -40,10 +46,14 @@ def create_category(request, category_slug, character_id=None):
     character = None
     if character_id:
         character = get_object_or_404(Character, pk=character_id)
+    tutorial = get_object_or_404(PowerTutorial)
     context = {
         'powers_list': powers_list,
         'category': category,
         'character': character,
+        'modal_header': tutorial.modal_base_header,
+        'modal_text': tutorial.modal_base,
+        'modal_art': 'overrides/art/lady_lake_sm.jpg',
     }
     return render(request, 'powers/choosebasecat.html', context)
 
@@ -52,9 +62,13 @@ def create_all(request, character_id=None):
     character = None
     if character_id:
         character = get_object_or_404(Character, pk=character_id)
+    tutorial = get_object_or_404(PowerTutorial)
     context = {
         'powers_list': powers_list,
         'character': character,
+        'modal_header': tutorial.modal_base_header,
+        'modal_text': tutorial.modal_base,
+        'modal_art': 'overrides/art/lady_lake_sm.jpg',
     }
     return render(request, 'powers/choosebaseall.html', context)
 

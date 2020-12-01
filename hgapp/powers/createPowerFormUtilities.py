@@ -1,11 +1,12 @@
 from django.forms import formset_factory
 from django.utils import timezone
+from django.shortcuts import get_object_or_404
 import json
 
 from .forms import CreatePowerForm, make_enhancement_form, make_drawback_form, make_parameter_form
 from .models import Enhancement_Instance, Drawback_Instance, Power, DICE_SYSTEM, Enhancement, Drawback, \
     Power_Param, \
-    Parameter_Value, Base_Power_System, Power_Full, CREATION_REASON
+    Parameter_Value, Base_Power_System, Power_Full, CREATION_REASON, PowerTutorial
 
 #TODO: use proper field sanitation instead of this cheat method
 bad_chars = set("\0\'\"\b\n\r\t\Z\\\%\_;*|,/=?")
@@ -42,6 +43,14 @@ def get_create_power_context_from_base(base_power, character=None):
         context["unspent_rewards_json"] = json.dumps(unspent_rewards)
         spent_rewards = []
         context["spent_rewards_json"] = json.dumps(spent_rewards)
+    context = add_tutorial_to_context(context)
+    return context
+
+def add_tutorial_to_context(context):
+    tutorial = get_object_or_404(PowerTutorial)
+    context['modal_header'] = tutorial.modal_edit_header
+    context['modal_text'] = tutorial.modal_edit
+    context['modal_art'] = 'overrides/art/ocean-walking-copy.jpg'
     return context
 
 def get_modifier_requirements(enhancements, drawbacks):
@@ -102,6 +111,7 @@ def get_create_power_context_from_power(power, new=True):
             for reward in power.parent_power.reward_list():
                 spent_rewards.append("{} from {}".format(reward.type_text(), reward.reason_text()))
             context["spent_rewards_json"] = json.dumps(spent_rewards)
+    context = add_tutorial_to_context(context)
     return context
 
 def get_edit_power_context_from_power(og_power):

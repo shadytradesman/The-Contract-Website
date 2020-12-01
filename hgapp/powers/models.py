@@ -605,3 +605,9 @@ class Parameter_Value(models.Model):
         return output
 
     level_description = property(get_level_description)
+
+class PowerTutorial(models.Model):
+    modal_base = models.TextField(max_length=3000)
+    modal_base_header = models.TextField(max_length=3000)
+    modal_edit_header = models.TextField(max_length=3000)
+    modal_edit = models.TextField(max_length=3000)

@@ -117,7 +117,7 @@ class CreatePowerForm(forms.Form):
     description = forms.CharField(label='Description',
                                   widget=forms.Textarea,
                                   help_text='Describe what the power looks like when it is used, how it works, '
-                                            'and its impact on the owner, target, and environment. All Powers'
+                                            'and its impact on the owner, target, and environment. All Powers '
                                             'are obviously supernatural unless stated otherwise.')
     system = forms.CharField(label='System', widget=forms.Textarea,
                              help_text='Describe this Power\'s cost, associated roll(s), conditions, and determination of outcome. '

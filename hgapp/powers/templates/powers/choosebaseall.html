@@ -1,24 +1,37 @@
 {% extends "site_base.html" %}
 
 {% load i18n %}
-
+{% load staticfiles %}
 {% block head_title %}Choose Base Power{% endblock %}
 
 {% block body_class %}home{% endblock %}
 
+{% block extra_styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'powers/tutorial_modal_style.css' %}" />
+{% endblock %}
+
 {% block body_base %}
 <div class="container">
-    <div class="page-header">
+    {% include "powers/power_tutorial_modal.html" %}
+    <div class="page-header"  style="padding-bottom: 50px;">
         <h1>
             Create a new Power
             {% if character %}
                 for {{character.name}}
             {% endif %}
-            <small>Select the {{ category.name }} Base Power you wish to build off</small>
+            <small>Select the {{ category.name }} Base Power you wish to build from</small>
         </h1>
-        <p>
-            Confused? Check out the <a href="/wiki/Rules/5-powers/">Powers Tutorial</a>
-        </p>
+        <div class="pull-left">
+            <a href="{% url 'powers:powers_create' %}" >
+                <span class="glyphicon glyphicon-backward"></span>
+                Back to Select Category
+            </a>
+        </div>
+        <div class="pull-right">
+            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#tutorialModal">
+                Help!
+            </button>
+        </div>
     </div>
     {% include "powers/choose_base_snippet.html" %}
 </div>
