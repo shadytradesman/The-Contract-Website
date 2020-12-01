@@ -20,14 +20,15 @@ def set_field_html_name(cls, new_name):
 class EnhancementDrawbackPickerForm(forms.ModelForm):
     # used in the admin app for base_power
     def  __init__(self, *args, **kwargs):
-        super().__init__(self, *args, **kwargs)
+        super(EnhancementDrawbackPickerForm, self).__init__(*args, **kwargs)
         self.fields['enhancements'].queryset = Enhancement.objects.order_by("-is_general").all()
         self.fields['drawbacks'].queryset = Drawback.objects.order_by("-is_general").all()
+
 
 class TagPickerForm(forms.ModelForm):
     # used in the admin app for PremadeCategory
     def  __init__(self, *args, **kwargs):
-        super().__init__(self, *args, **kwargs)
+        super(TagPickerForm, self).__init__(*args, **kwargs)
         self.fields['tags'].queryset = PowerTag.objects.order_by("tag").all()
 
 class DrawbackModelForm(forms.ModelForm):

@@ -40,7 +40,6 @@ class ParameterAdmin(admin.ModelAdmin):
 
 @admin.register(Base_Power)
 class BasePowerAdmin(admin.ModelAdmin):
-    form = EnhancementDrawbackPickerForm
     prepopulated_fields = {"slug": ("name",)}
     list_display = ('name', 'category', 'is_public')
     inlines = [PowerParamTabular, SystemInline]
