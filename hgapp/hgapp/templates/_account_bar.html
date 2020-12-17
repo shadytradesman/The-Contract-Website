@@ -39,18 +39,43 @@
         {% article_toc 'rules' %}
     </li>
     {% endcache %}
-    <form class="navbar-form navbar-left" id="wiki-search-form" method="GET" action="{% url 'wiki:search' %}" style="max-width: 98%;">
-            <div class="input-group">
-              <input type="search" class="form-control search-query" style="width: 150px;" name="q" placeholder="{% spaceless %}
-                {% trans "Search Guide" %}
-              {% endspaceless %}" />
-              <span class="input-group-btn">
-                <button class="btn btn-default" type="submit">
-                  <span class="fa fa-search"></span>
-                </button>
-              </span>
-            </div><!-- /input-group -->
-    </form>
+    {% if request.user.is_authenticated %}
+        <form class="navbar-form navbar-left" id="wiki-search-form" method="GET" action="{% url 'wiki:search' %}" style="max-width: 98%;">
+                <div class="input-group">
+                  <input type="search" class="form-control search-query" style="width: 150px;" name="q" placeholder="{% spaceless %}
+                    {% trans "Search Guide" %}
+                  {% endspaceless %}" />
+                  <span class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                      <span class="fa fa-search"></span>
+                    </button>
+                  </span>
+                </div><!-- /input-group -->
+        </form>
+    {% else %}
+        <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                Quick Access <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                    <a href="{% url 'characters:characters_create'%}">Create a Contractor</a>
+                </li>
+                <li>
+                    <a href="{% url 'powers:powers_stock'%}">View Stock Powers</a>
+                </li>
+                <li>
+                    <a href="{% url 'powers:powers_create'%}">Create a Power</a>
+                </li>
+                <li>
+                    <a href="https://discord.gg/xUZZegYNNy">Visit Discord Server</a>
+                </li>
+                <li>
+                    <a href="https://www.reddit.com/r/TheContract/">Visit Subreddit</a>
+                </li>
+            </ul>
+        </li>
+    {% endif %}
 </ul>
 
 <form id="accountLogOutForm" style="display: none;" action="{% url 'account_logout' %}" method="POST">
