@@ -10,6 +10,7 @@
 {% block extra_scripts %}
     <script src="{% static 'powers/tutorial_modal_script.js' %}"></script>
     <script>
+        cookieName="base";
         {% if show_tutorial %}
             showTutorial=true;
         {% else %}

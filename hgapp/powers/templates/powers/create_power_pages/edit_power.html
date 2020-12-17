@@ -13,6 +13,7 @@
     {% include "powers/create_power_pages/create_power_form.js" %}
     <script src="{% static 'powers/tutorial_modal_script.js' %}"></script>
     <script>
+        cookieName="edit";
         {% if not request.user.is_authenticated or not request.user.power_full_set.exists %}
             showTutorial=true;
         {% else %}
