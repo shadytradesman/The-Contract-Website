@@ -5,6 +5,7 @@
 
 {% load i18n %}
 {% load staticfiles %}
+{% load cache %}
 
 {% block extra_styles %}
     <link rel="stylesheet" type="text/css" href="{% static 'overrides/splash_style.css' %}" />
@@ -19,6 +20,7 @@
 
 {% block body_class %}home{% endblock %}
 {% block body_base %}
+{% cache 500 loggedouthome %}
 <div class="css-main-container">
     <span class="css-art-credit"><small>Art by <a href="https://www.artstation.com/tavaresart">Gwynn Tavares</a></small></span>
 
@@ -72,7 +74,7 @@
                     <b>Play with Anyone.</b> Each Game may feature a different set of Contractors. You don’t need to
                     cancel if one of your Players can’t make it, and each Player who shows can
                     play and advance their favorite Contractor. The responsibility of
-                    the Game Master (GM) also rotates as desired, preventing “forever GM” burnout.
+                    the Game Master (GM) also rotates as desiried, preventing “forever GM” burnout.
                 </span>
             </div>
             <br>
@@ -449,4 +451,5 @@
         </div>
     </div>
 </div>
+{% endcache %}
 {% endblock %}
