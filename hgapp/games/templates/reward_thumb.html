@@ -10,6 +10,8 @@
             <a href="{% url 'games:games_view_game' reward.relevant_game.id %}">
                 {{ reward.reason_text }}
             </a>
+        {% else %}
+                {{ reward.reason_text }}
         {% endif %}
         {% if reward.relevant_power %}
             spent on

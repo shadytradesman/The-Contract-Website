@@ -68,7 +68,7 @@ function updateGiftCost() {
             $('#gift_cost_delta').css("color", "white");
         }
         $('#gifts_affected').text("");
-        if (delta > 0 && delta > unspent_rewards.length -1) {
+        if (delta > 0 && delta > unspent_rewards.length) {
             $('.js-gift-warn').show();
             $('.js-gift-info').hide();
         } else if (delta > 0 ) {

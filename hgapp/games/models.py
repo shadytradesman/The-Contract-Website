@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from characters.models import Character, HIGH_ROLLER_STATUS, Character_Death, ExperienceReward
+from characters.models import Character, HIGH_ROLLER_STATUS, Character_Death, ExperienceReward, AssetDetails
 from powers.models import Power
 from cells.models import Cell
 from django.utils import timezone
@@ -538,6 +538,11 @@ class Reward(models.Model):
         blank=True,
         related_name='relevant_power',
         on_delete=models.CASCADE)
+    source_asset = models.ForeignKey(
+        AssetDetails,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE)
     rewarded_character = models.ForeignKey(
         Character,
         null=True,
@@ -550,6 +555,7 @@ class Reward(models.Model):
     is_improvement = models.BooleanField(default=True)
     is_charon_coin = models.BooleanField(default=False)
     is_void = models.BooleanField(default=False)
+
     awarded_on = models.DateTimeField('awarded on')
     assigned_on = models.DateTimeField('assigned on',
                                             null=True,
@@ -639,6 +645,9 @@ class Reward(models.Model):
                 reason = "playing in "
             reason = reason + self.relevant_game.scenario.title
             return reason
+        if self.source_asset is not None:
+            return "the Asset " + self.source_asset.relevant_asset.name
+
 
 class ScenarioTag(models.Model):
     tag = models.CharField(max_length=40)

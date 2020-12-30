@@ -9,6 +9,7 @@ from guardian.shortcuts import assign_perm, remove_perm
 
 from hgapp.utilities import get_queryset_size
 from cells.models import Cell
+from characters.signals import GrantAssetGift, VoidAssetGifts
 
 import random
 import hashlib
@@ -734,6 +735,7 @@ class Quirk(models.Model):
                               blank = True,
                               null = True)
     multiplicity_allowed = models.BooleanField(default=False)
+    grants_gift = models.BooleanField(default=False)
 
     def is_physical(self):
         return self.category == QUIRK_CATEGORY[0][0]
@@ -982,6 +984,19 @@ class QuirkDetails(models.Model):
 class AssetDetails(QuirkDetails):
     relevant_asset = models.ForeignKey(Asset,
                                        on_delete=models.CASCADE)
+    def save(self, *args, **kwargs):
+        super(QuirkDetails, self).save(*args, **kwargs)
+        if self.previous_revision and self.is_deleted and self.relevant_asset.grants_gift:
+            if not self.previous_revision.relevant_stats.is_snapshot:
+                VoidAssetGifts.send_robust(sender=self.__class__,
+                                      assetDetail=self,
+                                      character=self.relevant_stats.assigned_character)
+        if not self.previous_revision and not self.is_deleted and self.relevant_asset.grants_gift:
+            if not self.relevant_stats.is_snapshot:
+                GrantAssetGift.send_robust(sender=self.__class__,
+                                      assetDetail=self,
+                                      character=self.relevant_stats.assigned_character)
+
     class Meta:
         indexes = [
             models.Index(fields=['relevant_stats']),
