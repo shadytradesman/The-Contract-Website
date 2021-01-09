@@ -4,7 +4,6 @@
 {% load i18n %}
 {% load bootstrap %}
 {% load staticfiles %}
-{% load cache %}
 
 {% block extra_styles %}
     <link rel="stylesheet" type="text/css" href="{% static 'characters/edit_character_style.css' %}" />
@@ -147,13 +146,7 @@
     {{ char_form.non_field_errors }}
     {{ attribute_formset.non_field_errors }}
     {% csrf_token %}
-    {% if character %}
-        {% include "characters/edit_pages/edit_character_content.html" %}
-    {% else %}
-        {% cache 5000 new-character charon_coin_form %}
-            {% include "characters/edit_pages/edit_character_content.html" %}
-        {% endcache %}
-    {% endif %}
+    {% include "characters/edit_pages/edit_character_content.html" %}
     </form>
 </div>
 {% endblock %}
