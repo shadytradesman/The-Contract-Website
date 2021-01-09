@@ -123,7 +123,7 @@ $(document).on('change','[id$=-is_selected]', function(ev) {
 
         checkboxGroup.append(compiledTmpl);
         if (compiledTmpl.includes("wiki-entry-collapsible")) {
-                var collapsibleContainer = checkboxGroup.find('[class~=wiki-entry-collapsible]').get(count);
+                var collapsibleContainer = checkboxGroup.find('[class~=wiki-entry-collapsible]').last()[0];
                 setupCollapsibles(collapsibleContainer);
         }
         $('#id_' + quirkWord  + quirkId + '-' + count + '-id').attr('value', quirkId)
