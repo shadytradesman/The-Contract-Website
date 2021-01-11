@@ -31,6 +31,7 @@ urlpatterns = [
 
     # ex: .com/characters/obituary/c/112
     url(r'^obituary/c/(?P<character_id>[\d]+)/$', views.edit_obituary, name='characters_obituary'),
+    url(r'^obituary/c/(?P<character_id>[\d]+)/(?P<secret_key>[\da-z]*)$', views.edit_obituary, name='characters_obituary'),
 
     # ex: .com/characters/edit/powers/c/112/
     url(r'^edit/powers/c/(?P<character_id>[\d]+)/$', views.choose_powers, name='characters_power_picker'),

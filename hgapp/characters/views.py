@@ -74,9 +74,10 @@ def delete_character(request, character_id):
                    "character": character}
         return render(request, 'characters/delete_character.html', context)
 
-def edit_obituary(request, character_id):
+def edit_obituary(request, character_id, secret_key = None):
     character = get_object_or_404(Character, id=character_id)
     existing_death = character.character_death_set.filter(is_void=False).first()
+    __check_edit_perms(request, character, secret_key)
     if not character.player_can_edit(request.user):
         raise PermissionDenied("You cannot edit this character's obituary")
     if request.method == 'POST':
