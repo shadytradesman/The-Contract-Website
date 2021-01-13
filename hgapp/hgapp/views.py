@@ -22,6 +22,9 @@ from hgapp.forms import SignupForm
 class SignupView(account.views.SignupView):
    form_class = SignupForm
 
+   def create_account(self, form):
+       return Account.create(request=self.request, user=self.created_user, create_email=False, timezone=form.cleaned_data["timezone"])
+
 
 class PasswordResetTokenView(account.views.PasswordResetTokenView):
     def get_context_data(self, **kwargs):
