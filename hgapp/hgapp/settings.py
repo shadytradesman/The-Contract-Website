@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 import os
+import pytz
 
 try:
     os.environ['SECRET_KEY']
@@ -331,7 +332,7 @@ ACCOUNT_LOGOUT_REDIRECT_URL = "home"
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 2
 ACCOUNT_USE_AUTH_AUTHENTICATE = True
 ACCOUNT_DELETION_EXPUNGE_CALLBACK = do_nothing
-
+ACCOUNT_TIMEZONES = list(zip(pytz.common_timezones, pytz.common_timezones))
 
 
 AUTHENTICATION_BACKENDS = [

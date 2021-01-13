@@ -30,85 +30,89 @@
     </span>
 </script>
 <div class="row text-center">
-    <h3 data-toggle="tooltip" title='{{tutorial.injuries}}'>Injuries</h3>
-    <div class="text-left" id="js-injury-container">
-        {% for injury in character.injury_set.all %}
-            <span>
-                <div class="stat-value col-xs-1 text-center css-injury-val">
-                    <b class="injury-severity">{{injury.severity}}</b>
-                </div>
-                <div class="stat-value col-xs-11">
-                    {{injury.description}}
-                    {% if user_can_edit %}
-                        <form class="js-delete-injury-form pull-right" data-del-injury-url="{% url 'characters:delete_injury' injury.id secret_key %}">
-                            {% csrf_token %}
-                            <input type="submit" class="btn btn-xs btn-danger" value="X"/>
-                        </form>
-                    {%endif%}
-                </div>
-                <div class="clearfix"></div>
-            </span>
-        {% empty %}
-        <h4 class="text-center" id="js-no-injuries"><small>({{character.name}} is unharmed)</small></h4>
-        {% endfor%}
-    </div>
-    {% if user_can_edit %}
-        <br>
-        <div class="col-xs-12">
-        <div class="row form-inline">
-            <form id="injury-form"
-                  class="injury-form"
-                  data-new-injury-url="{% url 'characters:post_injury' character.id secret_key %}"
-                  data-delete-injury-url="{% url 'characters:delete_injury' 'injuryIdJs' secret_key %}">
-                {{ injury_form.about.errors }}
-                {{ injury_form.non_field_errors }}
-                {% csrf_token %}
-                <span class="js-injury-form">
-                    {{ injury_form.severity }}
+    <div class="col-xs-12">
+        <h3 data-toggle="tooltip" title='{{tutorial.injuries}}'>Injuries</h3>
+        <div class="text-left" id="js-injury-container">
+            {% for injury in character.injury_set.all %}
+                <span>
+                    <div class="stat-value col-xs-1 text-center css-injury-val">
+                        <b class="injury-severity">{{injury.severity}}</b>
+                    </div>
+                    <div class="stat-value col-xs-11">
+                        {{injury.description}}
+                        {% if user_can_edit %}
+                            <form class="js-delete-injury-form pull-right" data-del-injury-url="{% url 'characters:delete_injury' injury.id secret_key %}">
+                                {% csrf_token %}
+                                <input type="submit" class="btn btn-xs btn-danger" value="X"/>
+                            </form>
+                        {%endif%}
+                    </div>
+                    <div class="clearfix"></div>
                 </span>
-                {{injury_form.description}}
-                <input type="submit" class="btn btn-default" value="Ouch!" />
-            </form>
+            {% empty %}
+            <h4 class="text-center" id="js-no-injuries"><small>({{character.name}} is unharmed)</small></h4>
+            {% endfor%}
         </div>
-        </div>
-    {% endif %}
+        {% if user_can_edit %}
+            <br>
+            <div class="col-xs-12">
+            <div class="row form-inline">
+                <form id="injury-form"
+                      class="injury-form"
+                      data-new-injury-url="{% url 'characters:post_injury' character.id secret_key %}"
+                      data-delete-injury-url="{% url 'characters:delete_injury' 'injuryIdJs' secret_key %}">
+                    {{ injury_form.about.errors }}
+                    {{ injury_form.non_field_errors }}
+                    {% csrf_token %}
+                    <span class="js-injury-form">
+                        {{ injury_form.severity }}
+                    </span>
+                    {{injury_form.description}}
+                    <input type="submit" class="btn btn-default" value="Ouch!" />
+                </form>
+            </div>
+            </div>
+        {% endif %}
+    </div>
 </div>
 <hr>
 <div class="row text-center">
-    <h3 data-toggle="tooltip" title='{{tutorial.battle_scars}}'>Battle Scars</h3>
-    <div class="text-left" id="js-scar-container">
-        {% for scar in character.battlescar_set.all %}
-            <li class="stat-value">
-                {{scar.description}}
-                {% if user_can_edit %}
-                    <span class="pull-right">
-                        <form class="js-delete-scar-form" data-del-scar-url="{% url 'characters:delete_scar' scar.id secret_key %}">
-                            {% csrf_token %}
-                            <input type="submit" class="btn btn-xs btn-danger" value="X" />
-                        </form>
-                    </span>
-                    <div class="clearfix"></div>
-                {%endif%}
-            </li>
-        {% empty %}
-        <h4 class="text-center" id="js-no-scars"><small>({{character.name}} has no Battle Scars)</small></h4>
-        {% endfor%}
+    <div class="col-xs-12">
+        <h3 data-toggle="tooltip" title='{{tutorial.battle_scars}}'>Battle Scars</h3>
+        <div class="text-left" id="js-scar-container">
+            {% for scar in character.battlescar_set.all %}
+                <li class="stat-value">
+                    {{scar.description}}
+                    {% if user_can_edit %}
+                        <span class="pull-right">
+                            <form class="js-delete-scar-form" data-del-scar-url="{% url 'characters:delete_scar' scar.id secret_key %}">
+                                {% csrf_token %}
+                                <input type="submit" class="btn btn-xs btn-danger" value="X" />
+                            </form>
+                        </span>
+                        <div class="clearfix"></div>
+                    {%endif%}
+                </li>
+            {% empty %}
+            <h4 class="text-center" id="js-no-scars"><small>({{character.name}} has no Battle Scars)</small></h4>
+            {% endfor%}
+        </div>
+        {% if user_can_edit %}
+            <form id="scar-form"
+                  data-new-scar-url="{% url 'characters:post_scar' character.id secret_key %}"
+                  data-delete-scar-url="{% url 'characters:delete_scar' 'scarIdJs' secret_key %}">
+                {{ battle_scar_form.about.errors }}
+                {{ battle_scar_form.non_field_errors }}
+                {% csrf_token %}
+                <div class="col-md-8">
+                    {{battle_scar_form.description}}
+                </div>
+                <div class="col-md-4">
+                    <input type="submit" class="btn btn-default" value="Add Scar" />
+                </div>
+            </form>
+        {% endif %}
     </div>
-    {% if user_can_edit %}
-        <form id="scar-form"
-              data-new-scar-url="{% url 'characters:post_scar' character.id secret_key %}"
-              data-delete-scar-url="{% url 'characters:delete_scar' 'scarIdJs' secret_key %}">
-            {{ battle_scar_form.about.errors }}
-            {{ battle_scar_form.non_field_errors }}
-            {% csrf_token %}
-            <div class="col-md-8">
-                {{battle_scar_form.description}}
-            </div>
-            <div class="col-md-4">
-                <input type="submit" class="btn btn-default" value="Add Scar" />
-            </div>
-        </form>
-    {% endif %}
 </div>
 <hr>
 <div>

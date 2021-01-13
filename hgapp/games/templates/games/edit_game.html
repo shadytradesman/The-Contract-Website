@@ -122,11 +122,14 @@
                     {% endif %}
                 {% endif %}
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         {{ form.required_character_status | bootstrap }}
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         {{ form.scheduled_start_time | bootstrap }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.timezone | bootstrap }}
                     </div>
                 </div>
                 {{ form.hook | bootstrap}}

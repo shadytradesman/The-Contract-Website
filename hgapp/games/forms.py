@@ -4,6 +4,8 @@ from characters.models import HIGH_ROLLER_STATUS
 from django.forms import ModelChoiceField
 from django.shortcuts import get_object_or_404
 from django.utils.datetime_safe import datetime
+from account.conf import settings
+from django.utils import timezone
 
 from games.models import Scenario
 
@@ -76,6 +78,14 @@ def make_game_form(user, game_status):
                                widget=forms.Textarea,
                                max_length=5000,
                                help_text='Entice Players to RSVP or provide information.')
+
+
+        timezone = forms.ChoiceField(
+            label= ("My Timezone"),
+            choices=settings.ACCOUNT_TIMEZONES,
+            required=False,
+            initial=user.account.timezone
+        )
         queryset = user.cell_set.all()
         if game_status == str(GAME_STATUS[0][0]):
             scenario = ScenarioModelChoiceField(queryset=user.scenario_set.all(),
@@ -263,6 +273,12 @@ def make_archive_game_general_info_form(gm):
                                             widget=DateTimePicker(options=False),
                                             input_formats=[date_format],
                                             help_text='When did this Game occur?')
+        timezone = forms.ChoiceField(
+            label= ("My Timezone"),
+            choices=settings.ACCOUNT_TIMEZONES,
+            required=False,
+            initial=timezone.get_current_timezone()
+        )
     return ArchiveGeneralInfoForm
 
 class ArchivalOutcomeForm(forms.Form):

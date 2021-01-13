@@ -28,80 +28,85 @@
     </div>
 </script>
 <div class="row text-center">
-    <span id="limits-toggle" class="btn btn-outline css-section-button">
-        <h3 data-toggle="tooltip" title='{{tutorial.limits_view}}'>Limits</h3>
-    </span>
-    <span id="js-limits-compact" >
-        {% for limit_rev in character.stats_snapshot.limitrevision_set.all %}
-            <div class="stat-value css-limit-compact" data-toggle="tooltip" title='{{limit_rev.relevant_limit.description}}' style="display:inline;">
-                <b>{{limit_rev.relevant_limit.name}}</b>
-            </div>
-        {% endfor %}
-    </span>
-    <span id="js-limits-full" class="text-left" style="display:none;">
-        {% for limit_rev in character.stats_snapshot.limitrevision_set.all %}
-            <div class="stat-value">
-                    <b>{{limit_rev.relevant_limit.name}} - </b>
-                    {{limit_rev.relevant_limit.description}}
-            </div>
-        {% endfor %}
-    </span>
-</div>
-<hr>
-<div class="row text-center">
-    <h3 data-toggle="tooltip" title='{{tutorial.traumas}}'>Traumas</h3>
-    <div class="text-left" id="js-trauma-container">
-        {% for trauma in character.stats_snapshot.traumarevision_set.all %}
-        <div class="stat-value js-trauma-entry">
-            <li>
-                {{trauma.relevant_trauma.description}}
-                {% if user_can_edit %}
-                    <span class="btn btn-danger btn-xs js-trauma-del pull-right">
-                        X
-                        <br>
-                    </span>
-                    <div class="text-center alert alert-warning" style="display:none;">
-                        <p>
-                            Was your Trauma cured via Therapy or a Power?
-                            <br>
-                            <small>(Note: Experience used to cure Traumas cannot be refunded)</small>
-                            <form class="js-delete-trauma-form css-del-trauma-form" data-del-trauma-url="{% url 'characters:delete_trauma' trauma.previous_revision.id 'T' secret_key %}">
-                                {% csrf_token %}
-                                <input type="submit" class="btn btn-xs btn-warning" value="Therapy (costs 3 Xp)" />
-                            </form>
-                           <form class="js-delete-trauma-form css-del-trauma-form" data-del-trauma-url="{% url 'characters:delete_trauma' trauma.previous_revision.id 'F' secret_key %}">
-                                {% csrf_token %}
-                                <input type="submit" class="btn btn-xs btn-primary" value="Power (do not spend Xp)" />
-                            </form>
-                        </p>
-                    </div>
-                    <div class="clearfix"></div>
-                {%endif%}
-            </li>
-        </div>
-        {% empty %}
-        <h4 class="text-center" id="js-no-traumas"><small>({{character.name}} has no Traumas)</small></h4>
-        {% endfor%}
+    <div class="col-xs-12">
+        <span id="limits-toggle" class="btn btn-outline css-section-button">
+            <h3 data-toggle="tooltip" title='{{tutorial.limits_view}}'>Limits</h3>
+        </span>
+        <span id="js-limits-compact" >
+            {% for limit_rev in character.stats_snapshot.limitrevision_set.all %}
+                <div class="stat-value css-limit-compact" data-toggle="tooltip" title='{{limit_rev.relevant_limit.description}}' style="display:inline;">
+                    <b>{{limit_rev.relevant_limit.name}}</b>
+                </div>
+            {% endfor %}
+        </span>
+        <span id="js-limits-full" class="text-left" style="display:none;">
+            {% for limit_rev in character.stats_snapshot.limitrevision_set.all %}
+                <div class="stat-value">
+                        <b>{{limit_rev.relevant_limit.name}} - </b>
+                        {{limit_rev.relevant_limit.description}}
+                </div>
+            {% endfor %}
+        </span>
     </div>
-    {% if user_can_edit %}
-        <form id="trauma-form"
-              data-new-trauma-url="{% url 'characters:post_trauma' character.id secret_key %}"
-              data-delete-trauma-url="{% url 'characters:delete_trauma' 'traumaIdJs' 'useXpJs' secret_key %}">
-            {{ trauma_form.about.errors }}
-            {{ trauma_form.non_field_errors }}
-            {% csrf_token %}
-            <div class="col-md-8">
-                {{trauma_form.description}}
-            </div>
-            <div class="col-md-4">
-                <input type="submit" class="btn btn-default" value="Add Trauma" />
-            </div>
-        </form>
-    {% endif %}
 </div>
 <hr>
 <div class="row text-center">
-    <div class="col-md-12">
+    <div class="col-xs-12">
+
+        <h3 data-toggle="tooltip" title='{{tutorial.traumas}}'>Traumas</h3>
+        <div class="text-left" id="js-trauma-container">
+            {% for trauma in character.stats_snapshot.traumarevision_set.all %}
+            <div class="stat-value js-trauma-entry">
+                <li>
+                    {{trauma.relevant_trauma.description}}
+                    {% if user_can_edit %}
+                        <span class="btn btn-danger btn-xs js-trauma-del pull-right">
+                            X
+                            <br>
+                        </span>
+                        <div class="text-center alert alert-warning" style="display:none;">
+                            <p>
+                                Was your Trauma cured via Therapy or a Power?
+                                <br>
+                                <small>(Note: Experience used to cure Traumas cannot be refunded)</small>
+                                <form class="js-delete-trauma-form css-del-trauma-form" data-del-trauma-url="{% url 'characters:delete_trauma' trauma.previous_revision.id 'T' secret_key %}">
+                                    {% csrf_token %}
+                                    <input type="submit" class="btn btn-xs btn-warning" value="Therapy (costs 3 Xp)" />
+                                </form>
+                               <form class="js-delete-trauma-form css-del-trauma-form" data-del-trauma-url="{% url 'characters:delete_trauma' trauma.previous_revision.id 'F' secret_key %}">
+                                    {% csrf_token %}
+                                    <input type="submit" class="btn btn-xs btn-primary" value="Power (do not spend Xp)" />
+                                </form>
+                            </p>
+                        </div>
+                        <div class="clearfix"></div>
+                    {%endif%}
+                </li>
+            </div>
+            {% empty %}
+            <h4 class="text-center" id="js-no-traumas"><small>({{character.name}} has no Traumas)</small></h4>
+            {% endfor%}
+        </div>
+        {% if user_can_edit %}
+            <form id="trauma-form"
+                  data-new-trauma-url="{% url 'characters:post_trauma' character.id secret_key %}"
+                  data-delete-trauma-url="{% url 'characters:delete_trauma' 'traumaIdJs' 'useXpJs' secret_key %}">
+                {{ trauma_form.about.errors }}
+                {{ trauma_form.non_field_errors }}
+                {% csrf_token %}
+                <div class="col-md-8">
+                    {{trauma_form.description}}
+                </div>
+                <div class="col-md-4">
+                    <input type="submit" class="btn btn-default" value="Add Trauma" />
+                </div>
+            </form>
+        {% endif %}
+    </div>
+</div>
+<hr>
+<div class="row text-center">
+    <div class="col-xs-12">
         {% for source in character.stats_snapshot.sources.all %}
             <div id="js-source-{{source.id}}" class="row text-center js-source">
                 <h3>{{source.name}}</h3>

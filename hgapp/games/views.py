@@ -5,6 +5,9 @@ from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.db import transaction
 from django.contrib import messages
+from datetime import datetime
+import pytz
+
 
 # Create your views here.
 from django.urls import reverse
@@ -21,6 +24,17 @@ from games.models import Scenario, Game, GAME_STATUS, DISCOVERY_REASON, Game_Inv
 from hgapp.utilities import get_queryset_size, get_object_or_none
 
 from cells.models import Cell
+
+def convert_to_localtime(utctime):
+  utc = utctime.replace(tzinfo=pytz.UTC)
+  localtz = utc.astimezone(timezone.get_current_timezone())
+  return localtz
+
+def change_time_to_current_timezone(input_datetime):
+    # Get the MODERN version of our timezone
+    # https://stackoverflow.com/questions/35462876/python-pytz-timezone-function-returns-a-timezone-that-is-off-by-9-minutes
+    time = datetime.now(timezone.get_current_timezone())
+    return input_datetime.replace(tzinfo=time.tzinfo)
 
 def enter_game(request):
     if not request.user.is_authenticated:
@@ -171,6 +185,12 @@ def create_game(request):
     if request.method == 'POST':
         form = make_game_form(user=request.user, game_status=GAME_STATUS[0][0])(request.POST)
         if form.is_valid():
+            start_time = form.cleaned_data['scheduled_start_time']
+            if "timezone" in form.cleaned_data:
+                account = request.user.account
+                account.timezone = form.cleaned_data["timezone"]
+                account.save()
+                start_time = change_time_to_current_timezone(start_time)
             game = Game(
                 title = form.cleaned_data['title'],
                 creator = request.user,
@@ -178,7 +198,7 @@ def create_game(request):
                 required_character_status = form.cleaned_data['required_character_status'],
                 hook = form.cleaned_data['hook'],
                 created_date = timezone.now(),
-                scheduled_start_time = form.cleaned_data['scheduled_start_time'],
+                scheduled_start_time = start_time,
                 open_invitations = form.cleaned_data['open_invitations'],
                 status = GAME_STATUS[0][0],
                 cell = form.cleaned_data['cell']
@@ -222,7 +242,7 @@ def edit_game(request, game_id):
      'hook': game.hook,
      'scenario': game.scenario,
      'required_character_status': game.required_character_status,
-     'start_time': game.scheduled_start_time,
+     'start_time': convert_to_localtime(game.scheduled_start_time),
      'cell': game.cell,
      }
     GameForm = make_game_form(user=request.user, game_status=game.status)
@@ -233,9 +253,15 @@ def edit_game(request, game_id):
         if form.is_valid():
             game.title=form.cleaned_data['title']
             game.hook=form.cleaned_data['hook']
+            start_time = form.cleaned_data['scheduled_start_time']
+            if "timezone" in form.cleaned_data:
+                account = request.user.account
+                account.timezone = form.cleaned_data["timezone"]
+                account.save()
+                start_time = change_time_to_current_timezone(start_time)
             if game.is_scheduled():
                 game.open_invitations = form.cleaned_data['open_invitations']
-                game.scheduled_start_time = form.cleaned_data['scheduled_start_time']
+                game.scheduled_start_time = start_time
                 game.required_character_status = form.cleaned_data['required_character_status']
                 game.scenario=form.cleaned_data['scenario']
                 game.cell = form.cleaned_data['cell']
@@ -638,15 +664,21 @@ def finalize_create_ex_game_for_cell(request, cell_id, gm_user_id, players):
             if not cell.get_player_membership(form_gm):
                 raise PermissionDenied("Only players who are members of a Cell can GM games inside it.")
             with transaction.atomic():
+                occurred_time = general_form.cleaned_data['occurred_time']
+                if "timezone" in general_form.cleaned_data:
+                    account = request.user.account
+                    account.timezone = general_form.cleaned_data["timezone"]
+                    account.save()
+                    occurred_time = change_time_to_current_timezone(occurred_time)
                 #TODO: check to see if the game has the exact same time as existing game and fail.
                 game = Game(
                     title = general_form.cleaned_data['title'],
                     creator = request.user,
                     gm = form_gm,
                     created_date = timezone.now(),
-                    scheduled_start_time = general_form.cleaned_data['occurred_time'],
-                    actual_start_time = general_form.cleaned_data['occurred_time'],
-                    end_time = general_form.cleaned_data['occurred_time'],
+                    scheduled_start_time = occurred_time,
+                    actual_start_time = occurred_time,
+                    end_time = occurred_time,
                     status = GAME_STATUS[6][0],
                     cell = cell,
                 )
