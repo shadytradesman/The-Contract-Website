@@ -75,10 +75,9 @@
             <h1>
                 {{ scenario.title }}
             </h1>
-            <h4>
+            <h4 class="text-center">
                 A Scenario created by
                 <a href="{% url 'profiles:profiles_view_profile' scenario.creator.profile.id %}">{% user_display scenario.creator %}</a>
-
             </h4>
             <ul class="nav nav-pills nav-justified navbar-default">
                 {% if request.user.is_authenticated and request.user.id == scenario.creator.id %}
@@ -101,66 +100,59 @@
         <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
             <div class="panel panel-default">
                 <div class="panel-heading text-center">
-                    <a role="button" data-toggle="collapse" href="#collapseSummary" aria-expanded="true" aria-controls="collapseSummary">
-                        <div class="panel-heading text-center" role="tab" id="summaryHeading">
-                            <h3>Summary</h3>
-                        </div>
-                    </a>
-                </div>
-                <div class="panel-body">
-                    <div id="collapseSummary" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="summaryHeading">
-                        <div class="lead">
+                    <div class="panel-heading text-center" role="tab" id="summaryHeading">
+                        <h4>
                             {% if scenario.summary %}
                                 {{ scenario.summary }}
                             {% else %}
-                                This Scenario has no summary.
+                                This Scenario has no summary yet.
                             {% endif %}
-                        </div>
-                        <p>
-                            Suggested for
-                            <b>{{scenario.min_players}}</b>
-                            to
-                            <b>{{scenario.max_players}}</b>
-                            Contractors at
-                            <b>{{scenario.get_suggested_status_display}}</b> level.
-                        </p>
-                        <ul>
-                            {% if scenario.requires_ringer %}
-                                <li>
-                                    <p>
-                                     Requires Ringer
-                                    </p>
-                                </li>
-                            {% endif %}
-                            {% if scenario.is_rivalry %}
-                                <li>
-                                    <p>
-                                         Rivalry
-                                    </p>
-                                </li>
-                            {% endif %}
-                            {% if scenario.is_highlander %}
-                                <li>
-                                    <p>
-                                         Highlander
-                                    </p>
-                                </li>
-                            {% endif %}
-                        </ul>
+                        </h4>
                     </div>
                 </div>
-            </div>
-            <br>
-            <div class="panel panel-default">
-                <div class="panel-heading text-center">
-                    <a role="button" data-toggle="collapse" href="#collapseActivity" aria-expanded="true" aria-controls="collapseActivity">
-                        <div class="panel-heading text-center" role="tab" id="activityHeading">
-                            <h3>This Scenario has been played <b>{{ scenario.num_finished_games }}</b> time{{scenario.num_finished_games|pluralize}}</h3>
-                        </div>
-                        Click for details
-                    </a>
-                </div>
                 <div class="panel-body">
+                    <p>
+                        Suggested for
+                        <b>{{scenario.min_players}}</b>
+                        to
+                        <b>{{scenario.max_players}}</b>
+                        Contractors at
+                        <b>{{scenario.get_suggested_status_display}}</b> level.
+                    </p>
+                    <ul>
+                        {% if scenario.requires_ringer %}
+                            <li>
+                                <p>
+                                 Requires Ringer
+                                </p>
+                            </li>
+                        {% endif %}
+                        {% if scenario.is_rivalry %}
+                            <li>
+                                <p>
+                                     Rivalry
+                                </p>
+                            </li>
+                        {% endif %}
+                        {% if scenario.is_highlander %}
+                            <li>
+                                <p>
+                                     Highlander
+                                </p>
+                            </li>
+                        {% endif %}
+                    </ul>
+                    <a role="button" data-toggle="collapse" href="#collapseActivity" aria-expanded="true" aria-controls="collapseActivity">
+                        <div class="panel-heading" role="tab" id="activityHeading">
+                            <h4>
+                                This Scenario has been played <b>{{ scenario.num_finished_games }}</b> time{{scenario.num_finished_games|pluralize}}
+                                <br>
+                                <small>
+                                    Click for details
+                                </small>
+                            </h4>
+                        </div>
+                    </a>
                     <div id="collapseActivity" class="panel-collapse collapse" role="tabpanel" aria-labelledby="activityHeading">
                         <h4 class="text-center">
                         </h4>
@@ -245,23 +237,22 @@
                                 </div>
                             {% endfor %}
                         </ul>
-
                     </div>
                 </div>
             </div>
-            <br>
-            <div class="panel panel-default">
-                <div class="panel-heading text-center">
-                    <a role="button" data-toggle="collapse" href="#collapseWriteup" aria-expanded="true" aria-controls="collapseWriteup">
-                        <div class="panel-heading text-center" role="tab" id="writeupHeading">
-                            <h3>{{scenario.title}}</h3>
-                        </div>
-                    </a>
-                </div>
-                <div class="panel-body">
-                    <div id="collapseWriteup" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="writeupHeading">
-                        {{scenario.description|safe}}
+        </div>
+        <br>
+        <div class="panel panel-default">
+            <div class="panel-heading text-center">
+                <a role="button" data-toggle="collapse" href="#collapseWriteup" aria-expanded="true" aria-controls="collapseWriteup">
+                    <div class="panel-heading text-center" role="tab" id="writeupHeading">
+                        <h3>Writeup for {{scenario.title}}</h3>
                     </div>
+                </a>
+            </div>
+            <div class="panel-body">
+                <div id="collapseWriteup" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="writeupHeading">
+                    {{scenario.description|safe}}
                 </div>
             </div>
         </div>

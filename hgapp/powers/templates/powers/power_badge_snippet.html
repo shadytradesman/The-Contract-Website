@@ -8,7 +8,7 @@
     aria-controls="collapse-power-{{power_full.id}}">
     <h4>
         <a href="{% url 'powers:powers_view_power_full' power_full.id %}">
-            {{power_full.name}}
+            {{power_full.latest_revision.name}}
         </a>
         <small>
             - {{power_full.get_point_value}} Gift

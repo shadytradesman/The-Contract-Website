@@ -25,17 +25,17 @@
         {% include "logged_in_alerts.html" %}
         <div class="row css-home-row" style="background-color: rgba(0, 0, 0, 0.3);">
             <div class="col-sm-4">
-                <h2>Characters</h2>
+                <h2>Contractors</h2>
                 <ul class="nav nav-pills nav-stacked">
                     <li role="presentation">
                         <a href="{% url 'characters:characters_create' %}" class="btn btn-primary">
-                        Create a new Character
+                        Create a new Contractor
                         {% if avail_charon_coins %}
                             <br>
                             <small class="text-center">
                                 You have <b>{{avail_charon_coins | length}}</b> Coin{{avail_charon_coins|pluralize}} of Charon
                                 <br>
-                                You may spend {{avail_charon_coins|pluralize:"it,one"}} to start a new Character with a free Gift
+                                You may spend {{avail_charon_coins|pluralize:"it,one"}} to start a new Contractor with a free Gift
                             </small>
                         {% endif %}
                         </a>
