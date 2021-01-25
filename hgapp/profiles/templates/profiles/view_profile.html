@@ -5,103 +5,222 @@
 {% load bootstrap %}
 {% load postman_tags %}
 {% load markdown_deux_tags %}
+{% load static %}
+{% load cells_tags %}
 
 {% block head_title %}Viewing Profile{% endblock %}
 
 {% block body_class %}home{% endblock %}
 
+{% block extra_styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'profiles/profiles_style.css' %}" />
+{% endblock %}
+
 {% block body_base %}
-    <section>
-        <div class="container">
-            <h1>{{profile.user.username}}'s Profile</h1>
-            {% if profile.user == request.user %}
-                <a href="{% url 'profiles:profiles_edit' %}"><i class="fa fa-edit"></i> {% trans "Edit Profile" %}</a>
-            {% else %}
-                <small><i class="fa fa-envelope-o fa-1x"></i> <a href="{% url 'postman:write' profile.user.username %}">send a private message</a></small>
-            {% endif %}
-            <p>{{profile.about | markdown}}</p>
-        </div>
-    </section>
-        {% if profile.user == request.user %}
-            <section>
-                <div class="container">
-                   <small><p><i class="fa fa-user-secret fa-3x"></i> signifies that the element is private, and cannot be viewed publicly.</p></small>
+<div class="container">
+    <div class="text-center">
+        <h1 class="text-center">{{profile.user.username}}</h1>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="text-center">
+                        <h3>
+                            Profile
+                        </h3>
+                        <small>
+                            Member Since {{profile.user.date_joined}}
+                            |
+                            {% if profile.user == request.user %}
+                                <a href="{% url 'profiles:profiles_edit' %}">
+                                    <i class="fa fa-edit"></i> {% trans "Edit Profile" %}
+                                </a>
+                            {% else %}
+                                <a href="{% url 'postman:write' profile.user.username %}">
+                                    <i class="fa fa-envelope-o fa-1x"></i> Send {{profile.user.username}} a Message
+                                </a>
+                            {% endif %}
+                        </small>
+                    </div>
+                    {% if profile.about %}
+                        <p>{{profile.about | markdown}}</p>
+                    {% endif %}
+                    <div class="text-center">
+                        <h3>
+                            Cells
+                        </h3>
+                    </div>
+                    {% if cells %}
+                        <ul class="nav nav-pills nav-stacked">
+                            {% for cell in cells %}
+                                <li>
+                                    <a href="{% url 'cells:cells_view_cell' cell.id %}">
+                                        <b>{{cell.name}}</b>
+                                        <br>
+                                        <small>
+                                            {% player_rank cell profile.user %}
+                                            - {{ cell.number_of_members }} Member{{cell.number_of_members|pluralize}}
+                                            - Participation: {% num_games_player_participated cell profile.user %} Games
+                                        </small>
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>
+                            {{profile.user.username}} is not a member of any Cells.
+                        </p>
+                    {% endif %}
                 </div>
-            </section>
-        {% endif %}
-    <section>
-        <div class="container">
-            {% if profile.user == request.user %}
-                <h3>My Characters</h3>
-                <div class = "container">
-                    <a href="{%url 'characters:characters_create' %}" class="btn btn-primary">Create a New Character</a> <br><br>
+                <div class="col-md-6">
+                    <div class="thumbnail">
+                        <h3 class="text-center">
+                            Untested Newbie
+                        </h3>
+                        <p>
+                            User has played X Games as Y Contractors, accruing a total of X Victories, Y Losses, and Z deaths.
+                        </p>
+                        <p>
+                            They have survived X Games where another Contractor died.
+                            <br>
+                            <a href="#contractors-sec">View Contractors</a>
+                        </p>
+                        <br>
+                        <h3 class="text-center">
+                            Sadistic God
+                        </h3>
+                        <p>
+                            User has run X Games in Y Cells for Z Contractors and N Players.
+                            They awarded X Victories and Y Losses at the cost of Z Contractors' lives.
+                        </p>
+                        <p>
+                            They have achieved the Golden Ratio X times.
+                            <br>
+                            <a href="#games-sec">
+                                View Games and Scenarios
+                            </a>
+                        </p>
+                    </div>
                 </div>
-            {% else %}
-                <h3>{{profile.user.username}}'s Characters</h3>
-            {% endif %}
-            <hr class="styled">
-            {% if characters %}
-                <div class="row">
-                    {% for character in characters %}
-                        {% if not character.is_dead %}
-                            {% include "characters/character_badge_snippet.html" %}
-                        {% endif %}
-                    {% endfor %}
+            </div>
+            <div id="contractors-sec"></div>
+            <hr>
+            <div class="row" >
+                <div class="text-center">
+                    <h2>Contractors</h2>
                 </div>
-                <h3><small>Dead Characters</small></h3>
-                <div class="row">
-                    {% for character in characters %}
-                        {% if character.is_dead %}
-                            {% include "characters/character_badge_snippet.html" %}
-                        {% endif %}
-                    {% endfor %}
+                <div class="col-md-6">
+                    <div class="thumbnail">
+                        <h4>
+                            Contractor Name <small>The Demon Baker</small>
+                        </h4>
+                        A 5-Victory Novice from <a>Nevada County Game Players</a>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="thumbnail">
+                        <h4>
+                            Contractor Name <small>The Demon Baker</small>
+                        </h4>
+                        A 5-Victory Novice from <a>Nevada County Game Players</a>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="thumbnail">
+                        <h4>
+                            Contractor Name <small>The Demon Baker</small>
+                        </h4>
+                        A 5-Victory Novice from <a>Nevada County Game Players</a>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="thumbnail">
+                        <h4>
+                            Contractor Name <small>The Demon Baker</small>
+                        </h4>
+                        A 5-Victory Novice from <a>Nevada County Game Players</a>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="thumbnail">
+                        <h4>
+                            Contractor Name <small>The Demon Baker</small>
+                        </h4>
+                        A 5-Victory Novice from <a>Nevada County Game Players</a>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="text-center">
+                    <h2>
+                        <small>Deceased Contractors</small>
+                    </h2>
                 </div>
 
-            {% else %}
-                {% if profile.user == request.user %}
-                    <p>You haven't created any characters yet! <a href="{%url 'characters:characters_create' %}">Click Here</a> to create one.</p>
-                {% else %}
-                    <p>{{profile.user.username}} has no public characters.</p>
-                {% endif %}
-            {% endif %}
-        </div>
-    </section>
-    <section>
-        <div class="container">
-            {% if profile.user == request.user %}
-                    <h3>My recently edited Powers</h3>
-            {% else %}
-                    <h3>{{profile.user.username}}'s Powers</h3>
-            {% endif %}
-            <hr class="styled">
-            {% if powers %}
-                <div class = "container">
-                    <a href="{%url 'powers:powers_create' %}" class="btn btn-primary">Create a New Power</a> <br><br>
+                <div class="col-md-6">
+                    <div class="thumbnail">
+                        <h4>
+                            Contractor Name <small>The Demon Baker</small>
+                        </h4>
+                        A 5-Victory Novice from <a>Nevada County Game Players</a>
+                    </div>
                 </div>
-                <div class="row">
-                    {% for power in powers %}
-                        <div class="thumbnail">
-                            <a href="{% url 'powers:powers_view_power_full' power.id %}">
-                                {%if power.private %}
-                                    <i class="fa fa-user-secret fa-1x"></i>
-                                {% endif %}
-                                {{ power.name }} created {{ power.pub_date }}
-                            </a>
-                            <p>
-                                {% if power.character %}
-                                Assigned to <a href="{% url 'characters:characters_view' power.character.id %}">{{ power.character.name }}</a>
-                                {% endif %}
-                            </p>
+            </div>
+
+            <div id="games-sec"></div>
+            <hr>
+
+            <div class="row">
+                <div class="text-center">
+                    <h2>
+                        Scenarios
+                        <br>
+                        <small>
+                            Scenarios by User1 in your Gallery
+                        </small>
+                    </h2>
+                </div>
+            </div>
+            <p>
+                You have discovered Y of the X Scenarios {{profile.user.username}} has written.
+            </p>
+            <div class="row">
+                {% for scenario in discovered_scenarios %}
+                    {% if forloop.counter|divisibleby:2 == 0 %}
                         </div>
-                    {% endfor %}
+                        <div class="row">
+                    {% endif %}
+                    <div class="col-md-6">
+                        {% include "games/scenario_badge_snippet.html" %}
+                    </div>
+                {% empty %}
+                    </div>
+                    <div>
+                {% endfor %}
+            </div>
+
+            <div class="row">
+                <div class="text-center">
+                    <h2>
+                        Game History
+                    </h2>
                 </div>
-                {% else %}
-                {% if profile.user == request.user %}
-                    <p> You haven't created any powers yet! <a href="{%url 'powers:powers_create' %}" >Click Here</a> to create one.</p>
-                {% else %}
-                    <p>{{profile.user.username}} has no public powers.</p>
-                {% endif %}
-            {% endif %}
+            </div>
+            <ul>
+                {% for game in game_history %}
+                    <li>
+                        {% include "games/game_history_badge_snippet.html" %}
+                    </li>
+                {% empty %}
+                    </ul>
+                    <p>
+                        {{profile.user.username}} has never attended or run a Game.
+                    </p>
+                    <ul>
+                {% endfor %}
+            </ul>
         </div>
-    </section>
+    </div>
+</div>
 {% endblock %}

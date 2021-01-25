@@ -9,8 +9,8 @@ from django.utils import timezone
 
 from games.models import Scenario
 
-from games.models import GAME_STATUS, OUTCOME, ScenarioTag
-
+from games.models import OUTCOME, ScenarioTag
+from games.games_constants import GAME_STATUS
 from characters.models import Character
 
 from games.models import Game_Attendance

@@ -1,11 +1,13 @@
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.db import models
+from django.db.models import Q
 from guardian.shortcuts import assign_perm, remove_perm
 import random
 import hashlib
 
 from hgapp.utilities import get_queryset_size, get_object_or_none
+from games.games_constants import GAME_STATUS
 
 from .permissionUtilities import default_manage_memberships, default_manage_roles, default_post_events, \
     default_manage_characters, default_manage_games, default_edit_world
@@ -134,6 +136,18 @@ class Cell(models.Model):
             )
             invite.save()
             return invite
+
+    def number_of_members(self):
+        return self.cellmembership_set.count()
+
+    def completed_games(self):
+        return self.game_set \
+            .exclude(Q(status=GAME_STATUS[0][0]) | Q(status=GAME_STATUS[1][0]) | Q(status=GAME_STATUS[4][0])) \
+            .order_by("end_time").all()
+
+    def num_games_player_participated(self, player):
+        completed_games = self.completed_games()
+        return len([game for game in completed_games if game.player_participated(player)])
 
     def save(self, *args, **kwargs):
         if self.pk is None:
