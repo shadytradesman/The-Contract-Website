@@ -173,6 +173,18 @@ class Game(models.Model):
                 death = True
         return win and death
 
+    def at_least_one_death(self):
+        for attendance in self.game_attendance_set.all():
+            if attendance.is_death():
+                return True
+
+    def number_deaths(self):
+        num_deaths = 0
+        for attendance in self.game_attendance_set.all():
+            if attendance.is_death():
+                num_deaths = num_deaths + 1
+        return num_deaths
+
     def not_attending(self, player):
         invite = get_object_or_none(self.game_invite_set.filter(invited_player=player))
         if invite:
@@ -193,6 +205,11 @@ class Game(models.Model):
     def player_participated(self, player):
         return self.gm == player or self.game_invite_set.filter(is_declined=False, invited_player=player)
 
+    def update_participant_titles(self):
+        self.gm.profile.recompute_titles()
+        for invite in self.invitations.all():
+            invite.profile.recompute_titles()
+
     def save(self, *args, **kwargs):
         if not hasattr(self, 'gm'):
             self.gm = self.creator
@@ -212,6 +229,8 @@ class Game(models.Model):
             assign_perm('edit_game', self.creator, self)
         else:
             super(Game, self).save(*args, **kwargs)
+        if self.is_recorded() or self.is_archived():
+            self.update_participant_titles()
 
     def __str__(self):
         return "[" + self.status + "] " + self.scenario.title + " run by: " + self.gm.username
@@ -244,6 +263,9 @@ class Game_Attendance(models.Model):
 
     def is_victory(self):
         return self.outcome == OUTCOME[0][0]
+
+    def is_loss(self):
+        return self.outcome == OUTCOME[1][0]
 
     def is_death(self):
         return self.outcome == OUTCOME[2][0]

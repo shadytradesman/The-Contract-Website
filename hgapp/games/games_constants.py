@@ -1,3 +1,5 @@
+from django.db.models import Q
+
 GAME_STATUS = (
     # Invites go out, players may accept invites w/ characters and change whether they are coming and with which character
     # The scenario is chosen
@@ -29,3 +31,13 @@ GAME_STATUS = (
     # Finalized games that were entered after-the-fact.
     ('RECORDED', 'Archived'),
 )
+
+def get_completed_game_excludes_query():
+    return Q(status=GAME_STATUS[0][0]) \
+            | Q(status=GAME_STATUS[1][0]) \
+            | Q(status=GAME_STATUS[4][0])
+
+def get_completed_game_invite_excludes_query():
+    return Q(relevant_game__status=GAME_STATUS[0][0]) \
+             | Q(relevant_game__status=GAME_STATUS[1][0]) \
+             | Q(relevant_game__status=GAME_STATUS[4][0])

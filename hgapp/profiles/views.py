@@ -8,6 +8,7 @@ from django.utils import timezone
 
 from profiles.forms import EditProfileForm, AcceptTermsForm
 from profiles.models import Profile
+from characters.models import Character
 from info.terms import EULA, TERMS, PRIVACY
 
 class ProfileView(generic.DetailView):
@@ -20,14 +21,46 @@ class ProfileView(generic.DetailView):
             self.characters = self.profile.user.character_set.filter(is_deleted=False).order_by('-edit_date').all()
         else:
             self.characters = self.profile.user.character_set.filter(private=False, is_deleted=False).order_by('-edit_date').all()
+        self.completed_game_invites = self.profile.completed_game_invites()
         return Profile.objects
 
     def get_context_data(self, **kwargs):
         context = super(ProfileView, self).get_context_data(**kwargs)
+        self.profile.recompute_titles() #TODO: Delete this any time after Feb 2021 for a big perf boost.
+
+        context = self.populate_contractor_stats_context(context)
+
         context['profile'] = self.profile
         context['cells'] = self.cells
         context['characters'] = self.characters
         return context
+
+    def populate_contractor_stats_context(self, context):
+        context['num_games_played'] = self.completed_game_invites.count()
+        played_character_ids = set()
+        num_deaths = 0
+        num_victories = 0
+        num_losses = 0
+        for invite in self.completed_game_invites:
+            if invite.attendance:
+                if invite.attendance.attending_character:
+                    played_character_ids.add(invite.attendance.attending_character.id)
+                if invite.attendance.is_victory():
+                    num_victories = num_victories + 1
+                elif invite.attendance.is_loss():
+                    num_losses = num_losses + 1
+                elif invite.attendance.is_death():
+                    num_deaths = num_deaths + 1
+        num_contractors_played = len(played_character_ids)
+        context['num_contractors_played'] = num_contractors_played
+        context['num_contractor_deaths'] = num_deaths
+        context['num_contractor_victories'] = num_victories
+        context['num_contractor_losses'] = num_losses
+        invites_with_a_death = self.profile.get_invites_with_death(self.completed_game_invites)
+        invites_where_player_died = self.profile.get_invites_where_player_died(invites_with_a_death)
+        context['num_deadly_games_survived'] = len(invites_with_a_death) - len(invites_where_player_died)
+        return context
+
 
 def profile_edit(request):
     profile = get_object_or_404(Profile, pk=request.user.pk)

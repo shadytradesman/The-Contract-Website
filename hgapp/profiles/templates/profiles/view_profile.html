@@ -61,7 +61,7 @@
                                         <small>
                                             {% player_rank cell profile.user %}
                                             - {{ cell.number_of_members }} Member{{cell.number_of_members|pluralize}}
-                                            - Participation: {% num_games_player_participated cell profile.user %} Games
+                                            - Game Participation: {% num_games_player_participated cell profile.user %}
                                         </small>
                                     </a>
                                 </li>
@@ -76,23 +76,35 @@
                 <div class="col-md-6">
                     <div class="thumbnail">
                         <h3 class="text-center">
-                            Untested Newbie
+                            {{profile.get_player_prefix_display}} {{profile.get_player_suffix_display}}
                         </h3>
                         <p>
-                            User has played X Games as Y Contractors, accruing a total of X Victories, Y Losses, and Z deaths.
+                            {{profile.user.username}} has played {{num_games_played}} Game{{num_games_played|pluralize}} as
+                            {{num_contractors_played}} Contractor{{num_contractors_played|pluralize}},
+                            accruing a total of {{num_contractor_victories}} Win{{num_contractor_victories|pluralize}},
+                            {{num_contractor_losses}} Failure{{num_contractor_losses|pluralize}},
+                            and {{num_contractor_deaths}} Contractor Death{{num_contractor_deaths|pluralize}}.
                         </p>
                         <p>
-                            They have survived X Games where another Contractor died.
+                            They have survived {{num_deadly_games_survived}} Game{{num_deadly_games_survived|pluralize}} where another Contractor died.
                             <br>
                             <a href="#contractors-sec">View Contractors</a>
                         </p>
                         <br>
                         <h3 class="text-center">
-                            Sadistic God
+                            {% if profile.gm_prefix %}
+                                {{profile.get_gm_prefix_display}}
+                            {% endif %}
+                            {{profile.get_gm_suffix_display}}
                         </h3>
                         <p>
-                            User has run X Games in Y Cells for Z Contractors and N Players.
-                            They awarded X Victories and Y Losses at the cost of Z Contractors' lives.
+                            {{profile.user.username}} has run X Games
+                            in Y Cells
+                            for Z Contractors and
+                            N Players.
+                            They awarded X Victories
+                            and Y Losses,
+                            at the cost of Z Contractors.
                         </p>
                         <p>
                             They have achieved the Golden Ratio X times.
