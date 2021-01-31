@@ -185,6 +185,20 @@ class Game(models.Model):
                 num_deaths = num_deaths + 1
         return num_deaths
 
+    def number_victories(self):
+        number_victories = 0
+        for attendance in self.game_attendance_set.all():
+            if attendance.is_victory():
+                number_victories = number_victories + 1
+        return number_victories
+
+    def number_losses(self):
+        num_losses = 0
+        for attendance in self.game_attendance_set.all():
+            if attendance.is_loss():
+                num_losses = num_losses + 1
+        return num_losses
+
     def not_attending(self, player):
         invite = get_object_or_none(self.game_invite_set.filter(invited_player=player))
         if invite:
@@ -192,6 +206,9 @@ class Game(models.Model):
             if attendance:
                 attendance.delete()
             invite.delete()
+
+    def get_gm_reward(self):
+        return self.reward_set.filter(is_void=False, rewarded_player=self.gm).first()
 
     def get_status_blurb(self):
         if self.is_scheduled():
@@ -274,7 +291,10 @@ class Game_Attendance(models.Model):
         return self.outcome == OUTCOME[4][0]
 
     def associated_active_reward(self):
-        return self.attending_character.reward_set.filter(relevant_game=self.relevant_game.id).filter(is_void=False).first()
+        if self.attending_character:
+            return self.attending_character.reward_set.filter(relevant_game=self.relevant_game.id).filter(is_void=False).first()
+        else:
+            return None
 
     def confirm_and_reward(self):
         self.is_confirmed=True

@@ -1,0 +1,39 @@
+{% load guardian_tags %}
+{% get_obj_perms request.user for game.scenario as "scenario_perms" %}
+<div class="css-timeline-item css-gm-badge">
+    <h4>
+        GMed
+        {% if "view_scenario" in scenario_perms %}
+            <a href="{% url 'games:games_view_scenario' game.scenario.id %}">
+                {{ game.scenario.title }}
+            </a>
+        {% else %}
+            {{ game.scenario.title }}
+        {% endif %}
+        <small>
+            -
+            <a href="{% url 'games:games_view_game' game.id %}">
+                (<i>View Game</i>)
+            </a>
+        </small>
+    </h4>
+    {% if game.achieves_golden_ratio %}
+        Achieved the Golden Ratio
+    {% endif %}
+    {% if game.get_gm_reward %}
+        {% with game.get_gm_reward as reward %}
+            <h5>
+                {% if reward.relevant_power %}
+                    <b>Improvement</b> spent on
+                    <a href="{% url 'powers:powers_view_power' reward.relevant_power.id %}">
+                        {{ reward.relevant_power.creation_reason_action_text }}
+                        power: {{ reward.relevant_power.name }}
+                    </a>
+                {% else %}
+                    <b>Improvement</b> has not yet been granted.
+                {% endif %}
+            </h5>
+        {% endwith %}
+
+    {% endif %}
+</div>

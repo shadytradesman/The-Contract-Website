@@ -8,8 +8,8 @@ from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.core import serializers
 from collections import defaultdict
-from django.forms import formset_factory
 from heapq import merge
+from django.forms import formset_factory
 from django.http import HttpResponseRedirect
 
 from characters.models import Character, BasicStats, Character_Death, Graveyard_Header, Attribute, Ability, \

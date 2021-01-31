@@ -24,7 +24,7 @@ PLAYER_SUFFIX = (
 )
 
 GM_PREFIX = (
-    ('PILLOWY', 'Pillow'),
+    ('PILLOW', 'Pillow'),
     ('BENEVOLENT', 'Benevolent'),
     ('JUST', 'Just'),
     ('SADISTIC', 'Sadistic'),
@@ -33,7 +33,7 @@ GM_PREFIX = (
 
 GM_SUFFIX = (
     ('SPECTATOR', 'Spectator'),
-    ('MANAGER', 'Manager'),
+    ('REFEREE', 'Referee'),
     ('BOSS', 'Boss'),
     ('RULER', 'Ruler'),
     ('GOD', 'God'),
@@ -85,8 +85,9 @@ class Profile(models.Model):
     def get_invites_where_player_died(self, invites_with_death):
         return [invite for invite in invites_with_death if invite.attendance and invite.attendance.is_death()]
 
+
     def recompute_gm_title(self):
-        gm_games = Game.objects.filter(gm=self.user).exclude(get_completed_game_excludes_query()).all()
+        gm_games = self.get_games_where_player_gmed()
         num_gm_games = gm_games.count()
         self.gm_suffix = self._gm_suffix_from_num_gm_games(num_gm_games)[0]
 
@@ -102,18 +103,13 @@ class Profile(models.Model):
         return self.user.game_invite_set \
             .exclude(get_completed_game_invite_excludes_query()) \
             .exclude(is_declined=True) \
+            .order_by("relevant_game__end_time") \
             .all()
 
-    PLAYER_PREFIX = (
-        ('UNTESTED', 'Untested'),
-        ('SHELTERED', 'Sheltered'),
-        ('UNLUCKY', 'Unlucky'),
-        ('RESOURCEFUL', 'Resourceful'),
-        ('DEVIOUS', 'Devious'),
-        ('TORTURED', 'Tortured'),
-        ('CALCULATING', 'Calculating'),
-        ('INGENIOUS', 'Ingenious'),
-    )
+    def get_games_where_player_gmed(self):
+        return Game.objects.filter(gm=self.user).exclude(get_completed_game_excludes_query()) \
+                .order_by("end_time") \
+                .all()
 
     def _player_prefix_from_counts(self, num_completed, num_deadly_games, num_deaths_on_games):
         if num_completed < 3:
@@ -164,7 +160,7 @@ class Profile(models.Model):
         if kill_ratio < 0.07:
             # pillowy
             return GM_PREFIX[0][0]
-        elif kill_ratio < 0.2:
+        elif kill_ratio < 0.15:
             # benevolent
             return GM_PREFIX[1][0]
         elif kill_ratio < 0.5:
