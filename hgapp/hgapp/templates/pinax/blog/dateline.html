@@ -5,7 +5,7 @@
     by
     <span class="author">
         <a href="{% url 'profiles:profiles_view_profile' post.author.id %}">{% user_display post.author %}</a>
-    </span> 
+    </span>
     in
     {% if scoper_lookup %}
         {% url "pinax_blog:blog_section" scoper_lookup post.section.slug as section_url %}

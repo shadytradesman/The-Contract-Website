@@ -73,7 +73,7 @@ def make_game_form(user, game_status):
         title = forms.CharField(label='Game Name',
                                max_length=100,
                                help_text='The Game\'s Name.',
-                               required=False,)
+                               required=True,)
         hook = forms.CharField(label='Invitation Text',
                                widget=forms.Textarea,
                                max_length=5000,
