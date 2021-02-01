@@ -477,6 +477,43 @@ $("#equipment-form").submit(function (e) {
     })
 })
 
+// Bio
+var bioValue = JSON.parse(document.getElementById('bio').textContent);
+$($("#js-bio-form").children("textarea").val(bioValue));
+$(document).on("click", "#js-edit-bio-button", function(){
+    document.getElementById("collapse-biography-heading").setAttribute("data-toggle", "");
+    $("#js-bio-text").css("display","none");
+    $("#js-edit-bio-button").css("display","none");
+    $("#js-bio-form").css("display","block");
+    $("#js-bio-expand-button").css("display","none");
+});
+
+$("#bio-form").submit(function (e) {
+    e.preventDefault();
+    var serializedData = $(this).serialize();
+    $.ajax({
+        type: 'POST',
+        url: $(this).attr("data-post-url"),
+        data: serializedData,
+        success: function (response) {
+            var instance = response["bio"];
+            var conv = new showdown.Converter();
+            $("#js-bio-form").children("textarea").val(instance);
+            // This is safe only because the only people to see this output are the ones who submitted it.
+            $("#js-bio-text").html(conv.makeHtml(instance));
+            $("#js-bio-text").css("display","block");
+            $("#js-edit-bio-button").css("display","inline-block");
+            $("#js-bio-form").css("display","none");
+            $("#js-bio-expand-button").css("display","inline-block");
+            document.getElementById("collapse-biography-heading").setAttribute("data-toggle", "collapse");
+        },
+        error: function (response) {
+            console.log(response);
+            alert(response["responseJSON"]["error"]);
+        }
+    })
+})
+
 
 
 function copyToClipboard(elem) {

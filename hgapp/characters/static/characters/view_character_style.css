@@ -143,3 +143,7 @@ input[type="number"] {
 .css-game-badge {
     border-color: lightskyblue;
 }
+
+.css-bio-text {
+    padding: 10px;
+}
