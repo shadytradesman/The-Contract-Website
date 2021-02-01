@@ -122,6 +122,8 @@ INSTALLED_APPS = [
     'markdown_deux',
     'postman',
     'tinymce',
+    "pinax.blog",
+    "pinax.images",
 
     #Wiki
     #'django.contrib.sites.apps.SitesConfig',

@@ -13,8 +13,21 @@
 {% endblock %}
 
 {% block body_base %}
-<br>
 <div class="container">
+    <div>
+        {% with latest_blog_post as post %}
+            <h4 class="css-blog-header">
+                <a href="{%url 'pinax_blog:blog' %}">
+                    Site News
+                </a>
+                <small>
+                    {{ post.published|date:"jS F Y" }}
+                </small>
+                : <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+            </h4>
+        {% endwith %}
+
+    </div>
     <div class="upper-section css-backgrounded" style="background-image: url({% static 'overrides/art/doors_bg.jpg' %});">
         <div class="text-center">
             <br>
@@ -101,7 +114,7 @@
             {% endif %}
             {% if living_characters or dead_characters%}
                 {% if living_characters %}
-                    <h4>My Living Characters</h4>
+                    <h4>My Living Contractors</h4>
                     {% for character in living_characters %}
                         <a href="{% url 'characters:characters_view' character.id %}">
                             <div class="panel panel-default text-center">
@@ -125,7 +138,7 @@
                     {% endfor %}
                 {% endif %}
                 {% if dead_characters %}
-                    <h4>My Deceased Characters</h4>
+                    <h4>My Deceased Contractors</h4>
                     {% for character in dead_characters %}
                         <a href="{% url 'characters:characters_view' character.id %}">
                             <div class="panel panel-default text-center">
@@ -140,132 +153,139 @@
                 {% endif %}
             {% endif %}
         </div>
-        <div class="col-sm-4">
-            {% if powers %}
-                <h4>My Unassigned Powers</h4>
-                <div class="panel-group">
-                    {% for power_full in powers %}
-                        {% if not power_full.character %}
-                            <a href="{% url 'powers:powers_view_power_full' power_full.id %}">
-                                <div class="panel css-home-panel">
-                                        {{ power_full.name }}
-                                </div>
-                            </a>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-            {% endif %}
-        </div>
-        <div class="col-sm-4">
-            {% if active_games or attendance_invites_to_confirm or upcoming_games_running or upcoming_games_invited %}
-                <br>
-            {% endif %}
-            {% if active_games %}
-                <div class="alert alert-warning text-center css-home-alert">
-                    <h4>Ongoing Game!</h4>
-                    <ul class="nav nav-pills nav-stacked">
-                        {% for game in active_games %}
-                            <li>
-                                <a href="{% url 'games:games_view_game' game.id %}"><b>{{game.title}}</b> at {{game.scheduled_start_time}}</a>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            {% endif %}
-            {% if attendance_invites_to_confirm %}
-                <div class="alert alert-warning text-center css-home-alert">
-                    <b>A GM has declared that you attended a Game</b>
-                    <p>
-                        Confirm or deny your attendance
-                    </p>
-                    <ul class="nav nav-pills nav-stacked">
-                        {% for invite in attendance_invites_to_confirm %}
-                            <li>
-                                <a href="{% url 'games:games_confirm_attendance' invite.attendance.id %}">
-                                    <b>{{invite.attendance.relevant_game.title}}</b> at {{invite.attendance.relevant_game.scheduled_start_time}}
-                                </a>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            {% endif %}
-            {% if upcoming_games_running %}
-                <div class="alert alert-info text-center css-home-alert">
-                    <b>Upcoming Games You are Running</b>
-                    <ul class="nav nav-pills nav-stacked">
-                        {% for game in upcoming_games_running %}
-                            <li>
-                                <a href="{% url 'games:games_view_game' game.id %}"><b>{{game.title}}</b> at {{game.scheduled_start_time}}</a>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            {% endif %}
-            {% if upcoming_games_invited %}
-                <div class="alert alert-success text-center css-home-alert">
-                    <b>Upcoming Games you can Attend</b>
-                    <ul class="nav nav-pills nav-stacked">
-                        {% for game_invite in upcoming_games_invited %}
-                            <li>
-                                <a href="{% url 'games:games_view_game' game_invite.relevant_game.id %}">
-                                    {% if game_invite.attendance %}
-                                        <b>Attending - </b>
-                                    {% else %}
-                                        <b>Invited - </b>
-                                    {% endif %}
-                                    <b>
-                                        {{game_invite.relevant_game.title}}
-                                    </b> at {{game_invite.relevant_game.scheduled_start_time}}
-                                </a>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            {% endif %}
-            {% if active_games or attendance_invites_to_confirm or upcoming_games_running or upcoming_games_invited %}
-                <hr>
-            {% endif %}
-            <h2>Cells</h2>
-            <ul class="nav nav-pills nav-stacked">
-                <li role="presentation">
-                    <a href="{% url 'cells:cells_create' %}" class="btn btn-primary">
-                        Create a new Cell
-                    </a>
-                    {% if not cell_invites and not cells %}
-                        <br>
-                        <div class="alert alert-warning text-center">
-                            <h3>You aren't in any Cells</h3>
-                            <p>Ask your friends to invite you or</p>
-                            <br>
-                            <a href="{% url 'cells:cells_create' %}" class="btn btn-info btn-lg">Start your own</a>
+        <div class="col-sm-8">
+            <div class="row">
+                <div class="col-sm-6">
+                    {% if powers %}
+                        <h4>My Unassigned Powers</h4>
+                        <div class="panel-group">
+                            {% for power_full in powers %}
+                                {% if not power_full.character %}
+                                    <a href="{% url 'powers:powers_view_power_full' power_full.id %}">
+                                        <div class="panel css-home-panel">
+                                                {{ power_full.name }}
+                                        </div>
+                                    </a>
+                                {% endif %}
+                            {% endfor %}
                         </div>
                     {% endif %}
-                </li>
-            </ul>
-            {% if cell_invites %}
-                <br>
-                <div class="alert alert-success text-center css-home-alert">
-                    You've been invited to join
-                    <ul class="nav nav-pills nav-stacked nav-sm">
-                        {% for invite in cell_invites %}
-                            <li><a href="{% url 'cells:cells_view_cell' invite.relevant_cell.id %}">{{ invite.relevant_cell }}</a></li>
-                        {% endfor %}
-                    </ul>
                 </div>
-            {% endif %}
-            {% if cells %}
-                <h4>My Cells</h4>
-                <ul class="nav nav-pills nav-stacked">
-                    {% for cell in cells %}
-                        <a href="{% url 'cells:cells_view_cell' cell.id %}">
-                            <div class="panel css-home-panel">
-                                <b>{{cell.name}}</b>
-                            </div>
-                        </a>
-                    {% endfor %}
-                </ul>
-            {% endif %}
+                <div class="col-sm-6">
+                    {% if active_games or attendance_invites_to_confirm or upcoming_games_running or upcoming_games_invited %}
+                        <br>
+                    {% endif %}
+                    {% if active_games %}
+                        <div class="alert alert-warning text-center css-home-alert">
+                            <h4>Ongoing Game!</h4>
+                            <ul class="nav nav-pills nav-stacked">
+                                {% for game in active_games %}
+                                    <li>
+                                        <a href="{% url 'games:games_view_game' game.id %}"><b>{{game.title}}</b> at {{game.scheduled_start_time}}</a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                    {% if attendance_invites_to_confirm %}
+                        <div class="alert alert-warning text-center css-home-alert">
+                            <b>A GM has declared that you attended a Game</b>
+                            <p>
+                                Confirm or deny your attendance
+                            </p>
+                            <ul class="nav nav-pills nav-stacked">
+                                {% for invite in attendance_invites_to_confirm %}
+                                    <li>
+                                        <a href="{% url 'games:games_confirm_attendance' invite.attendance.id %}">
+                                            <b>{{invite.attendance.relevant_game.title}}</b> at {{invite.attendance.relevant_game.scheduled_start_time}}
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                    {% if upcoming_games_running %}
+                        <div class="alert alert-info text-center css-home-alert">
+                            <b>Upcoming Games You are Running</b>
+                            <ul class="nav nav-pills nav-stacked">
+                                {% for game in upcoming_games_running %}
+                                    <li>
+                                        <a href="{% url 'games:games_view_game' game.id %}"><b>{{game.title}}</b> at {{game.scheduled_start_time}}</a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                    {% if upcoming_games_invited %}
+                        <div class="alert alert-success text-center css-home-alert">
+                            <b>Upcoming Games you can Attend</b>
+                            <ul class="nav nav-pills nav-stacked">
+                                {% for game_invite in upcoming_games_invited %}
+                                    <li>
+                                        <a href="{% url 'games:games_view_game' game_invite.relevant_game.id %}">
+                                            {% if game_invite.attendance %}
+                                                <b>Attending - </b>
+                                            {% else %}
+                                                <b>Invited - </b>
+                                            {% endif %}
+                                            <b>
+                                                {{game_invite.relevant_game.title}}
+                                            </b> at {{game_invite.relevant_game.scheduled_start_time}}
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                    {% if active_games or attendance_invites_to_confirm or upcoming_games_running or upcoming_games_invited %}
+                        <hr>
+                    {% endif %}
+                    <h2>Cells</h2>
+                    <ul class="nav nav-pills nav-stacked">
+                        <li role="presentation">
+                            <a href="{% url 'cells:cells_create' %}" class="btn btn-primary">
+                                Create a new Cell
+                            </a>
+                            {% if not cell_invites and not cells %}
+                                <br>
+                                <div class="alert alert-warning text-center">
+                                    <h3>You aren't in any Cells</h3>
+                                    <p>Ask your friends to invite you or</p>
+                                    <br>
+                                    <a href="{% url 'cells:cells_create' %}" class="btn btn-info btn-lg">Start your own</a>
+                                </div>
+                            {% endif %}
+                        </li>
+                    </ul>
+                    {% if cell_invites %}
+                        <br>
+                        <div class="alert alert-success text-center css-home-alert">
+                            You've been invited to join
+                            <ul class="nav nav-pills nav-stacked nav-sm">
+                                {% for invite in cell_invites %}
+                                    <li><a href="{% url 'cells:cells_view_cell' invite.relevant_cell.id %}">{{ invite.relevant_cell }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                    {% if cells %}
+                        <h4>My Cells</h4>
+                        <ul class="nav nav-pills nav-stacked">
+                            {% for cell in cells %}
+                                <a href="{% url 'cells:cells_view_cell' cell.id %}">
+                                    <div class="panel css-home-panel">
+                                        <b>{{cell.name}}</b>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="row">
+            </div>
         </div>
+
     </div>
 <section>
         <hr>
