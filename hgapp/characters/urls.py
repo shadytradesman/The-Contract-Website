@@ -54,6 +54,10 @@ urlpatterns = [
     url(r'^post/ajax/c/(?P<character_id>[\d]+)/equipment/(?P<secret_key>[\da-z]*)$', views.post_equipment, name="post_equipment"),
     url(r'^post/ajax/c/(?P<character_id>[\d]+)/equipment/$', views.post_equipment, name="post_equipment"),
 
+    url(r'^post/ajax/c/(?P<character_id>[\d]+)/bio/(?P<secret_key>[\da-z]*)$', views.post_bio,
+        name="post_bio"),
+    url(r'^post/ajax/c/(?P<character_id>[\d]+)/bio/$', views.post_bio, name="post_bio"),
+
     url(r'^post/ajax/delete-scar/s/(?P<scar_id>[\d\w]+)/(?P<secret_key>[\da-z]*)$', views.delete_scar, name="delete_scar"),
     url(r'^post/ajax/delete-scar/s/(?P<scar_id>[\d\w]+)/$', views.delete_scar, name="delete_scar"),
 

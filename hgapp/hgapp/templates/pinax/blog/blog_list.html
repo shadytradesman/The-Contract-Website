@@ -1,0 +1,30 @@
+{% extends "pinax/blog/blog_base.html" %}
+
+{% block head_title_base %}News | The Contract RPG{% endblock %}
+
+{% block content %}
+    <h2 class="text-center" style="margin-top: 0px;">Articles</h2>
+    {% if post_list %}
+        <div class="post-list">
+            {% for post in post_list %}
+                <div class="post">
+                    <h3>
+                        <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+                        <br>
+                        <div style="margin-top: 5px;">
+                            <small>
+                                {% include "pinax/blog/dateline.html" %}
+                            </small>
+                        </div>
+                    </h3>
+                    <div class="teaser">{{ post.teaser_html|safe }}</div>
+                    <p class="more"><a href="{{ post.get_absolute_url }}" class="post-link">read more...</a></p>
+                </div>
+                <hr>
+            {% endfor %}
+        </div>
+        {% include "pagination/builtin_pagination_reverse.html" %}
+    {% else %}
+        <p class="alert alert-info lead">No blog posts have been published.</p>
+    {% endif %}
+{% endblock %}

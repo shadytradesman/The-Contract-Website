@@ -5,103 +5,318 @@
 {% load bootstrap %}
 {% load postman_tags %}
 {% load markdown_deux_tags %}
+{% load static %}
+{% load cells_tags %}
+{% load cache %}
 
 {% block head_title %}Viewing Profile{% endblock %}
 
 {% block body_class %}home{% endblock %}
 
-{% block body_base %}
-    <section>
-        <div class="container">
-            <h1>{{profile.user.username}}'s Profile</h1>
-            {% if profile.user == request.user %}
-                <a href="{% url 'profiles:profiles_edit' %}"><i class="fa fa-edit"></i> {% trans "Edit Profile" %}</a>
-            {% else %}
-                <small><i class="fa fa-envelope-o fa-1x"></i> <a href="{% url 'postman:write' profile.user.username %}">send a private message</a></small>
-            {% endif %}
-            <p>{{profile.about | markdown}}</p>
-        </div>
-    </section>
-        {% if profile.user == request.user %}
-            <section>
-                <div class="container">
-                   <small><p><i class="fa fa-user-secret fa-3x"></i> signifies that the element is private, and cannot be viewed publicly.</p></small>
-                </div>
-            </section>
-        {% endif %}
-    <section>
-        <div class="container">
-            {% if profile.user == request.user %}
-                <h3>My Characters</h3>
-                <div class = "container">
-                    <a href="{%url 'characters:characters_create' %}" class="btn btn-primary">Create a New Character</a> <br><br>
-                </div>
-            {% else %}
-                <h3>{{profile.user.username}}'s Characters</h3>
-            {% endif %}
-            <hr class="styled">
-            {% if characters %}
-                <div class="row">
-                    {% for character in characters %}
-                        {% if not character.is_dead %}
-                            {% include "characters/character_badge_snippet.html" %}
-                        {% endif %}
-                    {% endfor %}
-                </div>
-                <h3><small>Dead Characters</small></h3>
-                <div class="row">
-                    {% for character in characters %}
-                        {% if character.is_dead %}
-                            {% include "characters/character_badge_snippet.html" %}
-                        {% endif %}
-                    {% endfor %}
-                </div>
+{% block extra_styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'profiles/profiles_style.css' %}" />
+{% endblock %}
 
-            {% else %}
-                {% if profile.user == request.user %}
-                    <p>You haven't created any characters yet! <a href="{%url 'characters:characters_create' %}">Click Here</a> to create one.</p>
-                {% else %}
-                    <p>{{profile.user.username}} has no public characters.</p>
-                {% endif %}
-            {% endif %}
-        </div>
-    </section>
-    <section>
-        <div class="container">
-            {% if profile.user == request.user %}
-                    <h3>My recently edited Powers</h3>
-            {% else %}
-                    <h3>{{profile.user.username}}'s Powers</h3>
-            {% endif %}
-            <hr class="styled">
-            {% if powers %}
-                <div class = "container">
-                    <a href="{%url 'powers:powers_create' %}" class="btn btn-primary">Create a New Power</a> <br><br>
+{% block body_base %}
+<div class="container">
+    <div class="text-center">
+        <h1 class="text-center">{{profile.user.username}}</h1>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="text-center">
+                        <h3>
+                            Profile
+                        </h3>
+                        <small>
+                            Member Since {{profile.user.date_joined|date}}
+                            |
+                            {% if profile.user == request.user %}
+                                <a href="{% url 'profiles:profiles_edit' %}">
+                                    <i class="fa fa-edit"></i> {% trans "Edit Profile" %}
+                                </a>
+                            {% else %}
+                                <a href="{% url 'postman:write' profile.user.username %}">
+                                    <i class="fa fa-envelope-o fa-1x"></i> Send {{profile.user.username}} a Message
+                                </a>
+                            {% endif %}
+                        </small>
+                    </div>
+                    {% if profile.about %}
+                        <p>{{profile.about | markdown}}</p>
+                    {% endif %}
+                    <div class="text-center">
+                        <h3>
+                            Cells
+                        </h3>
+                    </div>
+                    {% if cells %}
+                        <ul class="nav nav-pills nav-stacked">
+                            {% for cell in cells %}
+                                <li>
+                                    <a href="{% url 'cells:cells_view_cell' cell.id %}">
+                                        <b>{{cell.name}}</b>
+                                        <br>
+                                        <small>
+                                            {% player_rank cell profile.user %}
+                                            - {{ cell.number_of_members }} Member{{cell.number_of_members|pluralize}}
+                                            - Game Participation: {% num_games_player_participated cell profile.user %}
+                                        </small>
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <h4 class="text-center"><small>{{profile.user.username}} is not a member of any Cells</small></h4>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    <div class="thumbnail">
+                        <h3 class="text-center">
+                            {{profile.get_player_prefix_display}} {{profile.get_player_suffix_display}}
+                        </h3>
+                        <p>
+                            <b>{{profile.user.username}}</b> has played
+                            <b>{{num_contractors_played}}</b> Contractor{{num_contractors_played|pluralize}}
+                            in a total of <b>{{num_games_played}}</b> Game{{num_games_played|pluralize}},
+                            earning <b>{{num_contractor_victories}}</b> Win{{num_contractor_victories|pluralize}},
+                            <b>{{num_contractor_losses}}</b> Failure{{num_contractor_losses|pluralize}},
+                            and <b>{{num_contractor_deaths}}</b> Contractor Death{{num_contractor_deaths|pluralize}}.
+                        </p>
+                        <p>
+                            They have survived <b>{{num_deadly_games_survived}}</b> Game{{num_deadly_games_survived|pluralize}} where another Contractor died.
+                            <br>
+                            <a href="#contractors-sec">View Contractors</a>
+                        </p>
+                        <br>
+                        <h3 class="text-center">
+                            {% if profile.gm_prefix %}
+                                {{profile.get_gm_prefix_display}}
+                            {% endif %}
+                            {{profile.get_gm_suffix_display}}
+                        </h3>
+                        <p>
+                            <b>{{profile.user.username}}</b> has run <b>{{num_gm_games}}</b> Game{{num_gm_games|pluralize}}
+                            in <b>{{num_cells_gmed}}</b> Cell{{num_cells_gmed|pluralize}}
+                            for <b>{{num_contractors_gmed}}</b> Contractor{{num_contractors_gmed|pluralize}} and
+                            <b>{{num_players_gmed}}</b> Player{{num_players_gmed|pluralize}}.
+
+                            Contractors in their Games received <b>{{num_gm_victories}}</b> Gift{{num_gm_victories|pluralize}},
+                            failed but survived <b>{{num_gm_losses}}</b> time{{num_gm_losses|pluralize}},
+                            and met with <b>{{num_gm_kills}}</b> unfortunate end{{num_gm_kills|pluralize}}.
+                        </p>
+                        <p>
+                            They have achieved the Golden Ratio <b>{{num_golden_ratio_games}}</b> time{{num_golden_ratio_games|pluralize}}.
+                            <br>
+                            <a href="#games-sec">
+                                View Games and Scenarios
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% cache 9000 view_profile_main profile.user.id request.user %}
+            <div id="contractors-sec"></div>
+            <hr>
+            <div class="row" >
+                <div class="text-center">
+                    <h2>Contractors</h2>
+                </div>
+                {% for character in living_characters %}
+                    {% if forloop.counter == 5 %}
+                        </div>
+                        <div class=""
+                            id="collapse-contractors-heading"
+                            role="button" data-toggle="collapse"
+                            data-target=".collapse-contractors"
+                            aria-expanded="false"
+                            aria-controls="collapse-contractors">
+
+                            <div class="collapse collapse-contractors in"
+                                  role="tabpanel"
+                                 aria-labelledby="collapse-contractors-heading">
+                                <a>
+                                    <span class="visible-xs-block visible-sm-block text-center"><i>Tap to see more</i></span>
+                                    <span class="visible-md-block visible-lg-block text-center"><i>Click to see more</i></span>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="panel-collapse collapse collapse-contractors"
+                             role="tabpanel"
+                             aria-labelledby="collapse-contractors-heading">
+                        <div class="row">
+                    {% endif %}
+                    {% if forloop.counter|divisibleby:2 == 0 %}
+                        </div>
+                        <div class="row">
+                    {% endif %}
+                    <div class="col-md-6">
+                        <div class="thumbnail">
+                            <h4>
+                                <a href="{% url 'characters:characters_view' character.id %}">{{ character.name }}</a> <small>The {{character.concept_summary}}</small>
+                            </h4>
+                            A
+                            {% if character.number_of_victories %}
+                                {{ character.number_of_victories }}-Victory
+                            {% endif %}
+                            <b>{{ character.get_status_display }}</b>
+                            {% if character.cell %}
+                                from
+                                <a href="{% url 'cells:cells_view_cell' character.cell.id %}">{{ character.cell.name }}</a>
+                            {% else %}
+                                without a home Cell
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% if forloop.last and forloop.counter > 5 %}
+                        </div>
+                    {% endif %}
+                {% empty %}
+                    <h4 class="text-center"><small>{{profile.user.username}} has no Contractors</small></h4>
+                {% endfor %}
+            </div>
+            <div class="row">
+                {% if deceased_characters %}
+                    <div class="text-center">
+                        <h2>
+                            <small>Deceased Contractors</small>
+                        </h2>
+                    </div>
+                 {% endif %}
+                {% for character in deceased_characters %}
+                    {% if forloop.counter|divisibleby:2 == 0 %}
+                        </div>
+                        <div class="row">
+                    {% endif %}
+                    <div class="col-md-6">
+                        <div class="thumbnail">
+                            <h4>
+                                <a href="{% url 'characters:characters_view' character.id %}">{{ character.name }}</a>
+                                <small>The {{character.concept_summary}}</small>
+                            </h4>
+                            A
+                            {% if character.number_of_victories %}
+                                {{ character.number_of_victories }}-Victory
+                            {% endif %}
+                            <b>{{ character.get_status_display }}</b>
+                            {% if character.cell %}
+                                from
+                                <a href="{% url 'cells:cells_view_cell' character.cell.id %}">{{ character.cell.name }}</a>
+                            {% else %}
+                                without a home Cell
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div id="games-sec"></div>
+            <hr>
+
+            {% if scenarios  %}
+
+                <div class="row">
+                    <div class="text-center">
+                        <h2>
+                            Scenarios
+                            <br>
+                            <small>
+                            {% if request.user != profile.user %}
+                                Scenarios by {{profile.user.username}} in your Gallery
+                            {% else %}
+                            {% endif %}
+                            </small>
+                        </h2>
+                    </div>
                 </div>
                 <div class="row">
-                    {% for power in powers %}
-                        <div class="thumbnail">
-                            <a href="{% url 'powers:powers_view_power_full' power.id %}">
-                                {%if power.private %}
-                                    <i class="fa fa-user-secret fa-1x"></i>
-                                {% endif %}
-                                {{ power.name }} created {{ power.pub_date }}
-                            </a>
-                            <p>
-                                {% if power.character %}
-                                Assigned to <a href="{% url 'characters:characters_view' power.character.id %}">{{ power.character.name }}</a>
-                                {% endif %}
-                            </p>
-                        </div>
+                    {% for scenario_discovery in scenarios %}
+                        {% with scenario_discovery.relevant_scenario as scenario %}
+                            {% if forloop.counter == 5 %}
+                                </div>
+                                <div class=""
+                                    id="collapse-scenarios-heading"
+                                    role="button" data-toggle="collapse"
+                                    data-target=".collapse-scenarios"
+                                    aria-expanded="false"
+                                    aria-controls="collapse-scenarios">
+
+                                    <div class="collapse collapse-scenarios in"
+                                          role="tabpanel"
+                                         aria-labelledby="collapse-scenarios-heading">
+                                        <a>
+                                            <span class="visible-xs-block visible-sm-block text-center"><i>Tap to see more</i></span>
+                                            <span class="visible-md-block visible-lg-block text-center"><i>Click to see more</i></span>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="panel-collapse collapse collapse-scenarios"
+                                     role="tabpanel"
+                                     aria-labelledby="collapse-scenarios-heading">
+                                <div class="row">
+                            {% endif %}
+                            {% if forloop.counter|divisibleby:2 == 0 %}
+                                </div>
+                                <div class="row">
+                            {% endif %}
+                            <div class="col-md-6">
+                                {% include "games/scenario_badge_snippet.html" %}
+                            </div>
+                        {% endwith %}
+                        {% if forloop.last and forloop.counter > 5 %}
+                            </div>
+                        {% endif %}
                     {% endfor %}
                 </div>
-                {% else %}
-                {% if profile.user == request.user %}
-                    <p> You haven't created any powers yet! <a href="{%url 'powers:powers_create' %}" >Click Here</a> to create one.</p>
-                {% else %}
-                    <p>{{profile.user.username}} has no public powers.</p>
-                {% endif %}
+                <div class="row">
+                    {% for scenario in discovered_scenarios %}
+                        {% if forloop.counter|divisibleby:2 == 0 %}
+                            </div>
+                            <div class="row">
+                        {% endif %}
+                        <div class="col-md-6">
+                            {% include "games/scenario_badge_snippet.html" %}
+                        </div>
+                    {% empty %}
+                        </div>
+                        <div>
+                    {% endfor %}
+                </div>
             {% endif %}
+            {% endcache %}
+            {% cache 9000 view_profile_timeline profile.user.id %}
+            <div class="row">
+                <div class="text-center">
+                    <h2>
+                        Games Played
+                    </h2>
+                </div>
+            </div>
+            {% for date, event_list in game_timeline.items %}
+                <h4>{{ date }}</h4>
+                <ul>
+                {% for event in event_list %}
+                    {% if event.0 == "play" and event.1.attendance %}
+                        {% with event.1.attendance as attendance %}
+                            {% include "games/game_attendance_badge_snippet.html" %}
+                        {% endwith %}
+                    {% elif event.0 == "gm" %}
+                        {% with event.1 as game %}
+                            {% include "games/game_gm_badge_snippet.html" %}
+                        {% endwith %}
+                    {% else %}
+                        Unexpected element. Please file a bug.
+                    {% endif %}
+                {% endfor %}
+                </ul>
+            {% empty %}
+            <h4 class="text-center"><small>{{profile.user.username}} has never GMed or attended a Game</small></h4>
+            {% endfor %}
         </div>
-    </section>
+        {% endcache %}
+    </div>
+</div>
+
 {% endblock %}

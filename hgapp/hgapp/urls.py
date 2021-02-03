@@ -39,6 +39,8 @@ urlpatterns = [
     url(r"^tinymce/", include("tinymce.urls")),
     path('notifications/', include('django_nyt.urls')),
     path('wiki/', include('wiki.urls')),
+    url(r"^news/", include("pinax.blog.urls", namespace="pinax_blog")),
+    url(r"^ajax/images/", include("pinax.images.urls", namespace="pinax_images")),
 ]
 
 import os

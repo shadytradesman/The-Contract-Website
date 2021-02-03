@@ -1,0 +1,68 @@
+{% extends "site_base.html" %}
+
+{% load pinax_blog_tags %}
+
+{% block body_class %}blog{% endblock %}
+
+{% block body_base %}
+<div class="container">
+    <h1 class="text-center">
+        <a href="{%url 'pinax_blog:blog' %}">News and Updates</a>
+    </h1>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-3 sidebar">
+                    {% block sidebar %}
+                        <p class="lead">
+                            What's new in The Contract?
+                        </p>
+                        <hr>
+                        Categories
+                        <ul class="">
+                            <li class="{% if current_section == "all" %}active{% endif %}">
+                                <a href="{%url 'pinax_blog:blog' %}">All</a>
+                            </li>
+                            {% blog_sections as sections %}
+                            {% for section in sections %}
+                                {% if scoper_lookup %}
+                                    {% url "pinax_blog:blog_section" scoper_lookup section.slug as section_url %}
+                                {% else %}
+                                    {% url "pinax_blog:blog_section" section.slug as section_url %}
+                                {% endif %}
+                                <li class="{% if current_section == section %}active{% endif %}">
+                                    <a href="{{ section_url }}">{{ section.name }}</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        <p>
+                            {% if scoper_lookup %}
+                                {% url "pinax_blog:blog_feed" scoper_lookup "all" "atom" as feed_url %}
+                            {% else %}
+                                {% url "pinax_blog:blog_feed" "all" "atom" as feed_url %}
+                            {% endif %}
+                            <a href="{{ feed_url }}"><i class="fa fa-rss"></i> Atom Feed</a>
+                        </p>
+                        <div class="search">
+                            <form class="form-inline" action="{{ search_url }}">
+                                <div class="input-group">
+                                  <input type="search" class="form-control search-query" style="width: 150px;" name="q" placeholder="Search News" />
+                                  <span class="input-group-btn">
+                                    <button class="btn btn-default" type="submit">
+                                      <span class="fa fa-search"></span>
+                                    </button>
+                                  </span>
+                                </div><!-- /input-group -->
+                            </form>
+                        </div>
+                    {% endblock %}
+                </div>
+                <div class="col-md-9 blog-content">
+                    {% block content %}{% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

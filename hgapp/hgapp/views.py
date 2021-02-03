@@ -17,6 +17,7 @@ from powers.models import Power_Full, Enhancement, Drawback, Parameter, Base_Pow
 
 from games.models import GAME_STATUS
 from hgapp.forms import SignupForm
+from pinax.blog.models import Post
 
 
 class SignupView(account.views.SignupView):
@@ -52,16 +53,18 @@ def home(request):
         }
         return render(request, 'logged_out_homepage.html', context)
     else:
-        if not request.user.profile.confirmed_agreements:
-            return HttpResponseRedirect(reverse('profiles:profiles_terms'))
+        if hasattr(request.user, 'profile'):
+            if not request.user.profile.confirmed_agreements:
+                return HttpResponseRedirect(reverse('profiles:profiles_terms'))
         my_characters = request.user.character_set.filter(is_deleted=False).order_by('name').all()
         living_characters = [x for x in my_characters if x.is_dead() == False]
         dead_characters = [x for x in my_characters if x.is_dead() == True]
         my_powers = request.user.power_full_set.filter(is_deleted=False).order_by('name').all()
         my_scenarios = request.user.scenario_creator.order_by("title").all()
         new_players = User.objects.order_by('-date_joined')[:6]
-        new_powers = Power_Full.objects.filter(private=False).order_by('-id')[:6]
-        new_characters = Character.objects.filter(private=False).order_by('-id')[:6]
+        new_powers = Power_Full.objects.filter(private=False, is_deleted=False).order_by('-id')[:6]
+        new_characters = Character.objects.filter(private=False, is_deleted=False).order_by('-id')[:6]
+        latest_blog_post = Post.objects.current().select_related("section", "blog").first()
         upcoming_games_running = request.user.game_creator.filter(status=GAME_STATUS[0][0]).all()
         upcoming_games_invited = request.user.game_invite_set.filter(relevant_game__status=GAME_STATUS[0][0]).all()
         active_games_attending =  request.user.game_set.filter(status=GAME_STATUS[1][0])
@@ -90,5 +93,6 @@ def home(request):
             'cell_invites': cell_invites,
             'attendance_invites_to_confirm': attendance_invites_to_confirm,
             'avail_exp_rewards': avail_exp_rewards,
+            'latest_blog_post': latest_blog_post,
         }
         return render(request, 'logged_in_homepage.html', context)

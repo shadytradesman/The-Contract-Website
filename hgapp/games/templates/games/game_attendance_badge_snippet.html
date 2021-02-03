@@ -2,6 +2,17 @@
 {% get_obj_perms request.user for attendance.relevant_game.scenario as "scenario_perms" %}
 <div class="css-timeline-item css-game-badge">
     <h4>
+        {% if profile_view %}
+            Played
+            {% if attendance.attending_character %}
+                <a href="{% url 'characters:characters_view' attendance.attending_character.id %}">
+                    {{attendance.attending_character.name}}
+                </a>
+            {% else %}
+                an NPC Ringer
+            {% endif %}
+            in
+        {% endif %}
         {% if "view_scenario" in scenario_perms %}
             <a href="{% url 'games:games_view_scenario' attendance.relevant_game.scenario.id %}">
                 {{ attendance.relevant_game.scenario.title }}
@@ -12,7 +23,8 @@
         <small>
             -
             <a href="{% url 'games:games_view_game' attendance.relevant_game.id %}">
-                <b>{{attendance.get_outcome_display}}</b> on {{attendance.relevant_game.end_time |date}}
+                <b>{{attendance.get_outcome_display}}</b>
+                (<i>View Game</i>)
             </a>
         </small>
     </h4>
@@ -26,7 +38,7 @@
                     power: {{ attendance.associated_active_reward.relevant_power.name }}
                 </a>
             {% else %}
-                <b>Gift</b> has not yet been spent!
+                <b>Gift</b> has not yet been spent
             {% endif %}
         </h5>
     {% endif %}

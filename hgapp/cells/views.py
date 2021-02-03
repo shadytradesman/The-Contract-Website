@@ -1,7 +1,6 @@
 from django.contrib.auth.models import User
 from django.shortcuts import render
 from django.db import transaction
-from django.db.models import Q
 from cells.forms import CreateCellForm, CustomInviteForm, RsvpForm, PlayerRoleForm, KickForm
 from django.http import HttpResponseRedirect
 from django.contrib import messages
@@ -11,7 +10,8 @@ from hgapp.utilities import get_object_or_none
 from .models import Cell, ROLE, CellInvite
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
-from games.models import GAME_STATUS, Scenario
+from games.models import Scenario
+from games.games_constants import GAME_STATUS
 from django.core.exceptions import PermissionDenied
 from postman.api import pm_write
 from django.utils.safestring import SafeText
@@ -122,9 +122,7 @@ def view_cell(request, cell_id):
                     characters = characters + (character,)
             memberships_and_characters = memberships_and_characters + ((membership, characters,),)
     upcoming_games = cell.game_set.filter(status = GAME_STATUS[0][0])
-    completed_games = cell.game_set\
-        .exclude(Q(status = GAME_STATUS[0][0]) | Q(status = GAME_STATUS[1][0]) | Q(status = GAME_STATUS[4][0]))\
-        .order_by("end_time").all()
+    completed_games = cell.completed_games()
 
     context = {
         'cell': cell,

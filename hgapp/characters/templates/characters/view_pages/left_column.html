@@ -161,7 +161,11 @@
     <div id="js-equipment-display">
         <span id="js-equipment-text">{{character.equipment | markdown}}</span>
         {% if user_can_edit %}
-            <div id="js-edit-equipment-button" class="btn btn-default btn-xs"><i class="fa fa-edit fa-2x"></i></div>
+            <div id="js-edit-equipment-button" class="btn btn-default btn-xs">
+                <i class="fa fa-edit fa-2x"></i> Edit
+            </div>
+            <br>
+            <br>
         {% endif %}
     </div>
 </div>

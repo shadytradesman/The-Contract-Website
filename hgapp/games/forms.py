@@ -9,8 +9,8 @@ from django.utils import timezone
 
 from games.models import Scenario
 
-from games.models import GAME_STATUS, OUTCOME, ScenarioTag
-
+from games.models import OUTCOME, ScenarioTag
+from games.games_constants import GAME_STATUS
 from characters.models import Character
 
 from games.models import Game_Attendance
@@ -73,7 +73,7 @@ def make_game_form(user, game_status):
         title = forms.CharField(label='Game Name',
                                max_length=100,
                                help_text='The Game\'s Name.',
-                               required=False,)
+                               required=True,)
         hook = forms.CharField(label='Invitation Text',
                                widget=forms.Textarea,
                                max_length=5000,

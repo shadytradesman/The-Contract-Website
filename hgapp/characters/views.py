@@ -8,8 +8,8 @@ from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.core import serializers
 from collections import defaultdict
-from django.forms import formset_factory
 from heapq import merge
+from django.forms import formset_factory
 from django.http import HttpResponseRedirect
 
 from characters.models import Character, BasicStats, Character_Death, Graveyard_Header, Attribute, Ability, \
@@ -17,7 +17,7 @@ from characters.models import Character, BasicStats, Character_Death, Graveyard_
 from powers.models import Power_Full
 from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, AbilityForm, \
     AssetForm, LiabilityForm, BattleScarForm, TraumaForm, InjuryForm, SourceValForm, make_allocate_gm_exp_form, EquipmentForm,\
-    DeleteCharacterForm
+    DeleteCharacterForm, BioForm
 from characters.form_utilities import get_edit_context, character_from_post, update_character_from_post, \
     grant_trauma_to_character, delete_trauma_rev
 
@@ -171,6 +171,7 @@ def view_character(request, character_id, secret_key = None):
     exp_cost = character.exp_cost()
 
     equipment_form = EquipmentForm()
+    bio_form = BioForm()
     context = {
         'character': character,
         'user_can_edit': user_can_edit,
@@ -187,6 +188,7 @@ def view_character(request, character_id, secret_key = None):
         'exp_earned': exp_earned,
         'unspent_experience': unspent_experience,
         'equipment_form': equipment_form,
+        'bio_form': bio_form,
         'secret_key': secret_key,
         'secret_key_valid': secret_key_valid,
     }
@@ -447,6 +449,21 @@ def post_equipment(request, character_id, secret_key = None):
             with transaction.atomic():
                 character.save()
             return JsonResponse({"equipment": form.cleaned_data['equipment']}, status=200)
+        else:
+            return JsonResponse({"error": form.errors}, status=400)
+
+    return JsonResponse({"error": ""}, status=400)
+
+def post_bio(request, character_id, secret_key = None):
+    if request.is_ajax and request.method == "POST":
+        character = get_object_or_404(Character, id=character_id)
+        form = BioForm(request.POST)
+        __check_edit_perms(request, character, secret_key)
+        if form.is_valid():
+            character.background = form.cleaned_data['bio']
+            with transaction.atomic():
+                character.save()
+            return JsonResponse({"bio": form.cleaned_data['bio']}, status=200)
         else:
             return JsonResponse({"error": form.errors}, status=400)
 

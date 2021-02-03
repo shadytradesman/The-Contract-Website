@@ -338,7 +338,7 @@ class Character(models.Model):
             current_coin.refund_and_unassign_from_character()
 
     def is_dead(self):
-        return len(self.character_death_set.filter(is_void=False).all()) > 0
+        return self.character_death_set.filter(is_void=False).all().count() > 0
 
     def real_death(self):
         non_void_deaths = self.character_death_set.filter(is_void=False).all()

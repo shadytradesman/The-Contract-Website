@@ -1,0 +1,26 @@
+h3 {
+    margin-top: 10px;
+}
+
+h2 {
+    margin-top: 10px;
+}
+
+
+.css-timeline-item {
+    display: block;
+    padding: 4px;
+    margin-bottom: 5px;
+    line-height: 1.42857143;
+    background-color: #353e4b;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.css-gm-badge {
+    border-color: wheat;
+}
+
+.css-game-badge {
+    border-color: lightskyblue;
+}

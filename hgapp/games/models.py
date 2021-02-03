@@ -8,40 +8,9 @@ from guardian.shortcuts import assign_perm
 from postman.api import pm_write
 from django.urls import reverse
 from django.utils.safestring import SafeText
+from games.games_constants import GAME_STATUS
 
 from hgapp.utilities import get_object_or_none
-
-GAME_STATUS = (
-    # Invites go out, players may accept invites w/ characters and change whether they are coming and with which character
-    # The scenario is chosen
-    # GM specifies level, message, etc.
-    ('SCHEDULED', 'Scheduled'),
-
-    # The game is "activated". invites are invalidated. Players can no longer change which character is attending
-    # Characters are closed for editing for the duration of the game
-    # GMs have 24 hours from this point to declare the game finished, or individual players may void their attendance.
-    ('ACTIVE', 'Active'),
-
-    # Game is finished, GM declares all outcomes, characters are unlocked or declared dead. Game is officially over
-    # Void proceedings may occur. Players may open game for void vote.
-    # Characters are locked while a void vote is in progress.
-    # Void votes may only last 24 hours
-    # GM may declare void.
-    ('FINISHED', 'Finished'),
-
-    # After a set time peroid, or after any character is attending another game that is in the "ACTIVE" state, the void window
-    # is closed. The game transitions into "ARCHIVED."
-    ('ARCHIVED', 'Archived'),
-
-    # Any game that is scheduled, can be canceled, which is an end state. All invites are voided. Attendances are erased.
-    ('CANCELED', 'Canceled'),
-
-    # All games that reach the "Active" state can be voided through verious means. Attendance remains on record, but is void.
-    ('VOID', 'Void'),
-
-    # Finalized games that were entered after-the-fact.
-    ('RECORDED', 'Archived'),
-)
 
 OUTCOME = (
     ('WIN', 'Victory'),
@@ -204,6 +173,32 @@ class Game(models.Model):
                 death = True
         return win and death
 
+    def at_least_one_death(self):
+        for attendance in self.game_attendance_set.all():
+            if attendance.is_death():
+                return True
+
+    def number_deaths(self):
+        num_deaths = 0
+        for attendance in self.game_attendance_set.all():
+            if attendance.is_death():
+                num_deaths = num_deaths + 1
+        return num_deaths
+
+    def number_victories(self):
+        number_victories = 0
+        for attendance in self.game_attendance_set.all():
+            if attendance.is_victory():
+                number_victories = number_victories + 1
+        return number_victories
+
+    def number_losses(self):
+        num_losses = 0
+        for attendance in self.game_attendance_set.all():
+            if attendance.is_loss():
+                num_losses = num_losses + 1
+        return num_losses
+
     def not_attending(self, player):
         invite = get_object_or_none(self.game_invite_set.filter(invited_player=player))
         if invite:
@@ -211,6 +206,9 @@ class Game(models.Model):
             if attendance:
                 attendance.delete()
             invite.delete()
+
+    def get_gm_reward(self):
+        return self.reward_set.filter(is_void=False, rewarded_player=self.gm).first()
 
     def get_status_blurb(self):
         if self.is_scheduled():
@@ -221,6 +219,13 @@ class Game(models.Model):
             return "This game was Canceled and never took place."
         return "This game is " + self.get_status_display() + " and ended " + self.end_time.strftime('on %d, %b %Y at %I:%M %Z')
 
+    def player_participated(self, player):
+        return self.gm == player or self.game_invite_set.filter(is_declined=False, invited_player=player)
+
+    def update_participant_titles(self):
+        self.gm.profile.recompute_titles()
+        for invite in self.invitations.all():
+            invite.profile.recompute_titles()
 
     def save(self, *args, **kwargs):
         if not hasattr(self, 'gm'):
@@ -241,6 +246,8 @@ class Game(models.Model):
             assign_perm('edit_game', self.creator, self)
         else:
             super(Game, self).save(*args, **kwargs)
+        if self.is_recorded() or self.is_archived():
+            self.update_participant_titles()
 
     def __str__(self):
         return "[" + self.status + "] " + self.scenario.title + " run by: " + self.gm.username
@@ -274,6 +281,9 @@ class Game_Attendance(models.Model):
     def is_victory(self):
         return self.outcome == OUTCOME[0][0]
 
+    def is_loss(self):
+        return self.outcome == OUTCOME[1][0]
+
     def is_death(self):
         return self.outcome == OUTCOME[2][0]
 
@@ -281,7 +291,10 @@ class Game_Attendance(models.Model):
         return self.outcome == OUTCOME[4][0]
 
     def associated_active_reward(self):
-        return self.attending_character.reward_set.filter(relevant_game=self.relevant_game.id).filter(is_void=False).first()
+        if self.attending_character:
+            return self.attending_character.reward_set.filter(relevant_game=self.relevant_game.id).filter(is_void=False).first()
+        else:
+            return None
 
     def confirm_and_reward(self):
         self.is_confirmed=True
