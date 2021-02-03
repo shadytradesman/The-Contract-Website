@@ -17,7 +17,7 @@ from powers.models import Power_Full, Enhancement, Drawback, Parameter, Base_Pow
 
 from games.models import GAME_STATUS
 from hgapp.forms import SignupForm
-from pinax.blog.models import Post
+from blog.models import Post
 
 
 class SignupView(account.views.SignupView):

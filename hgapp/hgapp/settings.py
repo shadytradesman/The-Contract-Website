@@ -122,7 +122,7 @@ INSTALLED_APPS = [
     'markdown_deux',
     'postman',
     'tinymce',
-    "pinax.blog",
+    "blog",
     "pinax.images",
 
     #Wiki
