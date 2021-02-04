@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.contrib.auth.models import AnonymousUser, User
+from django.db.utils import IntegrityError
 from characters.models import Character, ContractStats, Asset, Liability, AssetDetails, LiabilityDetails, Attribute, \
     AttributeValue, Ability, AbilityValue, ExperienceReward, EXP_NEW_CHAR, EXP_LOSS, EXP_WIN
 from games.models import Game, Game_Attendance, Reward, Game_Invite, GAME_STATUS, OUTCOME
@@ -374,4 +375,29 @@ class CellModelTests(TestCase):
         self.assertEquals(self.char_user2_nocell.stats_snapshot.sources.count(), 0)
         self.assertEquals(self.char_user2_nocell.exp_earned(), EXP_NEW_CHAR)
         self.assertEquals(self.user2.game_invite_set.filter(attendance__is_confirmed=False).exclude(is_declined=True).all().count(), 1)
-        
+
+    def test_cannot_double_invite(self):
+        game = Game(
+            title="title",
+            creator=self.user1,
+            gm=self.user1,
+            created_date=timezone.now(),
+            scheduled_start_time=timezone.now(),
+            actual_start_time=timezone.now(),
+            end_time=timezone.now(),
+            status=GAME_STATUS[6][0],
+            cell=self.cell,
+        )
+        game.save()
+        game_invite = Game_Invite(invited_player=self.user2,
+                                  relevant_game=game,
+                                  as_ringer=False,
+                                  )
+        game_invite.save()
+        game_invite2 = Game_Invite(invited_player=self.user2,
+                                  relevant_game=game,
+                                  as_ringer=False,
+                                  )
+        with self.assertRaises(IntegrityError):
+            game_invite2.save()
+

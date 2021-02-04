@@ -99,7 +99,7 @@ def make_game_form(user, game_status):
                                                   required=False,
                                                   initial=True,
                                                   help_text="If checked, Players will be able to invite themselves to the Game. "
-                                                            "You will still be able to declare which Characters may actually attend as you start the Game.",)
+                                                            "You will still be able to declare which Contractors may actually attend as you start the Game.",)
             cell = forms.ModelChoiceField(queryset=queryset,
                                           empty_label="Select a Cell",
                                           help_text="Select a Cell for this Game. This defines the setting of the Game. "
@@ -107,11 +107,12 @@ def make_game_form(user, game_status):
                                                     "run in their cells.",
                                           required=True)
 
-            invite_all_members = forms.BooleanField(initial=True,
+            invite_all_members = forms.BooleanField(initial=False,
                                                     required=False,
                                                     label='Invite all Cell Members',
-                                                    help_text="Automatically invite all members of the chosen Cell to "
-                                                              "this Game.",)
+                                                    help_text="Automatically send an invite to all members of the chosen"
+                                                              " Cell. This will send a notification to all Cell "
+                                                              "members.",)
             required_character_status = forms.ChoiceField(choices=HIGH_ROLLER_STATUS,
                                                           help_text='Players will only be able to RSVP with Contractors of the selected Status.')
         else:

@@ -244,6 +244,7 @@ def edit_game(request, game_id):
      'required_character_status': game.required_character_status,
      'start_time': convert_to_localtime(game.scheduled_start_time),
      'cell': game.cell,
+     'open_invitations': game.open_invitations,
      }
     GameForm = make_game_form(user=request.user, game_status=game.status)
     if request.method == 'POST':
@@ -276,6 +277,7 @@ def edit_game(request, game_id):
                                                   invite_text=game.hook,
                                                   as_ringer=False)
                         game_invite.save()
+                        game_invite.notify_invitee(request, game)
             return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
         else:
             print(form.errors)
