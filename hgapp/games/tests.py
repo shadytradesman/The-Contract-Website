@@ -4,6 +4,7 @@ from characters.models import Character, ContractStats, Asset, Liability, AssetD
     AttributeValue, Ability, AbilityValue, ExperienceReward, EXP_NEW_CHAR, EXP_LOSS, EXP_WIN
 from games.models import Game, Game_Attendance, Reward, Game_Invite, GAME_STATUS, OUTCOME
 from cells.models import Cell
+from profiles.signals import make_profile_for_new_user
 from django.utils import timezone
 
 def make_test_char(player, cell=None):
@@ -26,10 +27,13 @@ class CellModelTests(TestCase):
     def setUp(self):
         self.user1 = User.objects.create_user(
             username='jacob', email='jacob@…', password='top_secret')
+        make_profile_for_new_user(None, self.user1)
         self.user2 = User.objects.create_user(
             username='jacob2', email='jacob@2…', password='top_secret')
+        make_profile_for_new_user(None, self.user2)
         self.cell_owner = User.objects.create_user(
             username='jacob23', email='jacob@23…', password='top_secret')
+        make_profile_for_new_user(None, self.cell_owner)
         self.cell = Cell.objects.create(
                             name = "cell name",
                             creator = self.cell_owner,
