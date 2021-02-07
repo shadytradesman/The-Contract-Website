@@ -477,7 +477,7 @@ class Character(models.Model):
 
     # WARNING: this is an expensive call
     def regen_stats_snapshot(self):
-        stat_diffs = self.contractstats_set.filter(is_snapshot=False).order_by("created_time").all()
+        stat_diffs = self.contractstats_set.filter(is_snapshot=False).order_by("id", "created_time").all()
         asset_details = []
         liability_details = []
         ability_values = []
