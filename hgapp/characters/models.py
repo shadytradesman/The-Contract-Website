@@ -308,6 +308,8 @@ class Character(models.Model):
         return can_edit and can_view_private
 
     def player_can_view(self, player):
+        if player.is_superuser:
+            return True
         if not hasattr(self, 'player') or not self.player:
             return True
         if self.is_deleted:

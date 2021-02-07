@@ -23,6 +23,8 @@ from characters.form_utilities import get_edit_context, character_from_post, upd
 
 
 def __check_edit_perms(request, character, secret_key):
+    if request.user.is_superuser:
+        return True
     if hasattr(character, 'player') and character.player:
         requester_can_edit = request.user.is_authenticated and character.player_can_edit(request.user)
     else:
