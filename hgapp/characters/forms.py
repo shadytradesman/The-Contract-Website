@@ -336,5 +336,15 @@ def make_charon_coin_form(character=None):
                                         initial=initial)
     return CharonCoinForm
 
+class VoidExperienceForm(forms.Form):
+    void_exp = forms.BooleanField(required=False,
+                                    label="Ignore Experience",
+                                    help_text="If this box is checked, any experience costs or credits from changes "
+                                              " you've made in this revision will not be counted when calculating"
+                                              " your Contractor's remaining Experience.")
+    explanation = forms.CharField(max_length=500,
+                                  label=None,
+                                  widget=forms.TextInput(attrs={'class': 'form-control'}))
+
 class DeleteCharacterForm(forms.Form):
     pass

@@ -786,6 +786,11 @@ class Limit(models.Model):
 class ContractStats(models.Model):
     created_time = models.DateTimeField(default=timezone.now)
     is_snapshot = models.BooleanField(default=False)
+    count_exp_costs = models.BooleanField(default=True)
+    description = models.CharField(null=True, blank=True, max_length=1000)
+
+
+
     assigned_character = models.ForeignKey(Character, on_delete=models.CASCADE)
     exp_cost = models.IntegerField(default=-1)
 
@@ -825,12 +830,18 @@ class ContractStats(models.Model):
         ]
 
     def calc_attr_change_ex_cost(self, old_value, new_value):
+        if not self.count_exp_costs:
+            return 0
         return ((new_value - old_value) * (old_value + new_value - 1) / 2) * EXP_ADV_COST_ATTR_MULTIPLIER
 
     def calc_source_change_ex_cost(self, old_value, new_value):
+        if not self.count_exp_costs:
+            return 0
         return ((new_value - old_value) * (old_value + new_value - 1) / 2) * EXP_ADV_COST_SOURCE_MULTIPLIER
 
     def calc_quirk_ex_cost(self, quirk_details):
+        if not self.count_exp_costs:
+            return 0
         if quirk_details.is_deleted:
             return - EXP_COST_QUIRK_MULTIPLIER * quirk_details.relevant_quirk().value
         if quirk_details.previous_revision:
@@ -839,6 +850,8 @@ class ContractStats(models.Model):
             return EXP_COST_QUIRK_MULTIPLIER * quirk_details.relevant_quirk().value
 
     def calc_ability_change_ex_cost(self, old_value, new_value):
+        if not self.count_exp_costs:
+            return 0
         if old_value == 0 and new_value != 0:
             initial_cost = 2
         elif old_value != 0 and new_value == 0:
@@ -849,6 +862,8 @@ class ContractStats(models.Model):
 
 
     def calc_trauma_xp_cost(self, trauma_revision):
+        if not self.count_exp_costs:
+            return 0
         if trauma_revision.is_deleted and trauma_revision.was_bought_off:
             return EXP_COST_TRAUMA_THERAPY
         return 0
@@ -939,6 +954,8 @@ class ContractStats(models.Model):
                                                             source.previous_revision.max,
                                                             source.max)
                 change_phrases.append((exp_phrase, phrase,))
+        if self.description:
+            change_phrases = [phrase.append(" - Cost Waived: " + self.description)]
         return change_phrases
 
     def clear(self):
