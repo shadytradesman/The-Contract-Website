@@ -299,6 +299,8 @@ class Character(models.Model):
             return False
 
     def player_can_edit(self, player):
+        if player.is_superuser:
+            return True
         if not hasattr(self, 'player') or not self.player:
             return False
         if self.is_deleted:

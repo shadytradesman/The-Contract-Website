@@ -185,6 +185,12 @@ WSGI_APPLICATION = 'hgapp.wsgi.application'
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,
+    'formatters': {
+            'verbose': {
+                'format': '{levelname} {asctime} {name} {message}',
+                'style': '{',
+            },
+    },
     'filters': {
         'require_debug_false': {
             '()': 'django.utils.log.RequireDebugFalse',
@@ -208,11 +214,12 @@ LOGGING = {
             'class': 'django.utils.log.AdminEmailHandler'
         },
         'applogfile': {
-            'level':'DEBUG',
+            'level':'INFO',
             'class':'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(os.path.dirname(os.path.abspath(__file__)), 'APPNAME.log'),
+            'filename': os.path.join(os.path.dirname(os.path.abspath(__file__)), 'contract-app.log'),
             'maxBytes': 1024*1024*15, # 15MB
             'backupCount': 1,
+            'formatter': 'verbose'
         },
     },
     'loggers': {
@@ -222,18 +229,25 @@ LOGGING = {
         'django.request': {
             'handlers': ['mail_admins', 'applogfile'],
             'level': 'ERROR',
-            'propagate': False,
+            'propagate': True,
         },
         'django.security': {
-            'handlers': ['mail_admins'],
+            'handlers': ['mail_admins', 'applogfile'],
             'level': 'ERROR',
-            'propagate': False,
+            'propagate': True,
         },
         'py.warnings': {
             'handlers': ['console', 'applogfile'],
+            'propagate': True,
+        },
+        'app': {
+            'handlers': ['console', 'applogfile'],
+            'propagate': True,
         },
     }
 }
+
+ADMINS = [('Spencer', 'spencerstecko@gmail.com'),]
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases

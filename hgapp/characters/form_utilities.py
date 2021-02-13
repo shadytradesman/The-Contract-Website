@@ -1,15 +1,20 @@
 from django.forms import formset_factory
 
+import logging
+
 from characters.models import Character, BasicStats, Character_Death, Graveyard_Header, Attribute, Ability, \
     CharacterTutorial, Asset, Liability, AttributeValue, ContractStats, AbilityValue, LiabilityDetails, AssetDetails, \
     Limit, LimitRevision, Trauma, TraumaRevision, EXP_NEW_CHAR, EXP_ADV_COST_ATTR_MULTIPLIER, \
     EXP_ADV_COST_SKILL_MULTIPLIER, EXP_COST_QUIRK_MULTIPLIER, EXP_ADV_COST_SOURCE_MULTIPLIER, Source, SourceRevision
-from powers.models import Power_Full
 from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, AbilityForm, \
     AssetForm, LiabilityForm, LimitForm, PHYS_MENTAL, SourceForm, make_charon_coin_form
 from collections import defaultdict
 from django.utils import timezone
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
+
+
+logger = logging.getLogger("app." + __name__)
 
 # logic for Character creation and editing
 # TRANSACTIONS HAPPEN IN VIEW LAYER
@@ -94,6 +99,7 @@ def character_from_post(user, POST):
                 new_character.use_charon_coin()
         return new_character
     else:
+        logger.error('Bad Character form: %s', str(char_form.errors))
         raise ValueError("Invalid char_form")
 
 def update_character_from_post(user, POST, existing_character):
@@ -120,6 +126,7 @@ def update_character_from_post(user, POST, existing_character):
             else:
                 existing_character.refund_coin()
     else:
+        logger.error('Bad Character form: %s', str(char_form.errors))
         raise ValueError("invalid edit char_form")
 
 def grant_trauma_to_character(form, character):
@@ -203,6 +210,7 @@ def __limits_from_formset(limit_formset, stats):
                 )
                 limit_rev.save()
     else:
+        logger.error('Bad Limit formset: %s', str(limit_formset.errors))
         raise ValueError("Invalid Limit Formset")
 
 def __save_edit_sources_from_formset(formset, stats, user):
@@ -210,7 +218,7 @@ def __save_edit_sources_from_formset(formset, stats, user):
         if form.is_valid():
             source = get_object_or_404(Source, id=form.cleaned_data['source_id'])
             if not source.owner.player_can_edit(user):
-                raise ValueError("cannot edit")
+                raise PermissionDenied("You cannot edit this Contractor")
             if "rev_id" in form.cleaned_data and form.cleaned_data["rev_id"]:
                 rev_id = form.cleaned_data['rev_id']
                 prev_val = get_object_or_404(SourceRevision, id=rev_id)
@@ -226,6 +234,7 @@ def __save_edit_sources_from_formset(formset, stats, user):
                         source.name=form.cleaned_data['name']
                         source.save()
         else:
+            logger.error('Bad edit source form: %s', str(form.errors))
             raise ValueError("invalid source form in edit")
 
 #TODO: cleanup / split this method
@@ -293,8 +302,9 @@ def __save_edit_attributes_from_formset(attribute_formset, new_stats_rev):
                     )
                     new_val.save()
             else:
-                raise ValueError("The site doesn't support adding attribute until you implement this.")
+                raise ValueError("The site doesn't support adding attributes until you implement this.")
         else:
+            logger.error('Bad Attribute edit form: %s', str(form.errors))
             raise ValueError("invalid attribute form in edit")
 
 
@@ -313,6 +323,7 @@ def __liabilities_from_formsets(liability_formsets, stats):
                     deets.save()
                     liability_details.append(deets)
         else:
+            logger.error('Bad Liability formset. Error %s. Initial ID: %s', str(liability_formset.errors), liability_formset.initial[0]["id"])
             raise ValueError("Invalid liability formset")
     return liability_details
 
@@ -331,7 +342,8 @@ def __assets_from_formsets(asset_formsets, stats):
                     new_asset_deets.save()
                     asset_details.append(new_asset_deets)
         else:
-            raise ValueError("Invalid asset formset")
+            logger.error('Bad Asset formset. Error: %s. Initial ID: %s', str(asset_formset.errors), asset_formset.initial[0]["id"])
+            raise ValueError("Invalid Asset formset")
     return asset_details
 
 def __attributes_from_form(attribute_formset, stats):
@@ -347,6 +359,7 @@ def __attributes_from_form(attribute_formset, stats):
             attribute_values.append(attr_value)
         return attribute_values
     else:
+        logger.error('Bad Attribute formset: %s', str(attribute_formset.errors))
         raise ValueError("Invalid Attribute Formset")
 
 def __abilities_from_form(ability_formset, stats):
@@ -354,9 +367,9 @@ def __abilities_from_form(ability_formset, stats):
         ability_values = []
         for form in ability_formset:
             __new_ability_from_form(form, stats)
-
         return ability_values
     else:
+        logger.error('Bad Ability formset: %s', str(ability_formset.errors))
         raise ValueError("Invalid Ability Formset")
 
 def __new_ability_from_form(form, stats):
@@ -505,6 +518,7 @@ def __save_edit_quirks_from_formset(formset, stats, is_asset):
                         new_quirk_deets.relevant_liability = quirk
                     new_quirk_deets.save()
     else:
+        logger.error('Bad Quirk edit formset: %s', str(formset.errors))
         raise ValueError("invalid quirk formset from edit post")
 
 
@@ -569,4 +583,5 @@ def __save_edit_abilities_from_formset(formset, stats):
                 # No pre-existing value_id means this is a new ability.
                 __new_ability_from_form(form, stats)
         else:
+            logger.error('Bad ability edit form: %s', str(form.errors))
             raise ValueError("invalid ability form in edit")
