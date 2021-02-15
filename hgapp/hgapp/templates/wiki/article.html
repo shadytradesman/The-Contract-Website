@@ -15,7 +15,7 @@
 {% block wiki_contents %}
     <div id="article-container" class="row">
         {% include "wiki/includes/article_menu.html" %}
-        {% cache 500 article-siebar urlpath.path %}
+        {% cache 60000 article-sidebar urlpath.path %}
         <div id="js-article-index" class="col-sm-4 col-md-3 panel panel-default hidden-xs">
                 {% with urlpath.cached_ancestors as ancestors %}
                     {% if ancestors.1 %}

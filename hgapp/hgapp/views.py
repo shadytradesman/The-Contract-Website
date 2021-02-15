@@ -96,3 +96,8 @@ def home(request):
             'latest_blog_post': latest_blog_post,
         }
         return render(request, 'logged_in_homepage.html', context)
+
+def csrf_failure(request, reason=""):
+    context = {
+    }
+    return render(request, 'csrf.html', context)

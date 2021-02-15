@@ -11,6 +11,8 @@ from collections import defaultdict
 from heapq import merge
 from django.forms import formset_factory
 from django.http import HttpResponseRedirect
+from django.middleware.csrf import rotate_token
+
 
 from characters.models import Character, BasicStats, Character_Death, Graveyard_Header, Attribute, Ability, \
     CharacterTutorial, Asset, Liability, BattleScar, Trauma, TraumaRevision, Injury, Source, ExperienceReward
@@ -55,6 +57,7 @@ def edit_character(request, character_id, secret_key = None):
         url_args = (character.id,) if request.user.is_authenticated else (character.id, character.edit_secret_key,)
         return HttpResponseRedirect(reverse('characters:characters_view', args=url_args))
     else:
+        rotate_token(request)  # Prevent interleaved edit form submissions.
         context = get_edit_context(user=request.user, existing_character=character, secret_key=secret_key)
         return render(request, 'characters/edit_pages/edit_character.html', context)
 

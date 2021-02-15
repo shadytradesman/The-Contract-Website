@@ -152,6 +152,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'hgapp.urls'
 CSRF_USE_SESSIONS = True
+CSRF_FAILURE_VIEW = 'hgapp.views.csrf_failure'
 
 TEMPLATES = [
     {

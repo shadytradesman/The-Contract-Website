@@ -938,10 +938,13 @@ class ContractStats(models.Model):
             if source.previous_revision:
                 exp_cost = self.calc_source_change_ex_cost(source.previous_revision.max, source.max)
                 exp_phrase = self.get_exp_phrase(exp_cost)
-                phrase = self.get_trait_value_change_phrase(source.relevant_source.name,
-                                                            exp_cost,
-                                                            source.previous_revision.max,
-                                                            source.max)
+                if source.max == source.previous_revision.max:
+                    phrase = "Source renamed to " + source.relevant_source.name
+                else:
+                    phrase = self.get_trait_value_change_phrase(source.relevant_source.name,
+                                                                exp_cost,
+                                                                source.previous_revision.max,
+                                                                source.max)
                 change_phrases.append((exp_phrase, phrase,))
         return change_phrases
 
@@ -962,6 +965,7 @@ class ContractStats(models.Model):
             trauma.delete()
         for source in self.sourcerevision_set.all():
             source.delete()
+        self.save()
 
 
 class QuirkDetails(models.Model):
