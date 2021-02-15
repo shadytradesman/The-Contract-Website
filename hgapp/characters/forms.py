@@ -70,7 +70,7 @@ def make_character_form(user, existing_character=None):
             fields = ('name', 'private', 'tagline', 'appearance', 'age', 'concept_summary', 'ambition', 'paradigm',
                       'residence', 'languages', 'insanities', 'disabilities', 'current_alias', 'previous_aliases',
                       'resources', 'contacts', 'equipment', 'total_encumbrance', 'max_encumbrance', 'wish_list',
-                      'to_do_list', 'contracts', 'background', 'notes', 'pronoun')
+                      'to_do_list', 'contracts', 'pronoun')
             help_texts = {
                 'name': _('Name'),
                 'private': _("If checked, Character will not be publicly viewable."),
@@ -91,14 +91,11 @@ def make_character_form(user, existing_character=None):
                 'previous_aliases': _('The character\'s previous aliases'),
                 'resources': _('How much money does this character have access to each game?'),
                 'contacts': _('List of other characters that this character has the contact information for'),
-                'equipment': _('List of equipment the character has with them'),
                 'total_encumbrance': _('The weight of the character\'s equipment'),
                 'max_encumbrance': _('The maximum amount that the character can carry'),
                 'wish_list': _('List of wants and dreams'),
                 'to_do_list': _('List of things to do'),
                 'contracts': _('Legal and supernatural contracts this character is entered into'),
-                'background': _('History and backstory'),
-                'notes': _('Misc notes'),
             }
             widgets = {
                 'name': forms.TextInput(attrs={'class': 'form-control'}),
