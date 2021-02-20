@@ -7,14 +7,18 @@ from django.urls import reverse
 
 from .models import Enhancement, Parameter, Base_Power, Drawback, Power_Param, Power, Parameter_Value, \
     Base_Power_Category, Base_Power_System, PowerTag, PremadeCategory,\
-    Enhancement_Instance, Drawback_Instance, Power_Full, PowerTutorial, SystemField
+    Enhancement_Instance, Drawback_Instance, Power_Full, PowerTutorial, SystemFieldText, SystemFieldRoll
 
 class PowerParamTabular(admin.TabularInline):
     model = Power_Param
     extra = 0
 
-class SystemFieldTabular(admin.TabularInline):
-    model = SystemField
+class SystemFieldTextTabular(admin.TabularInline):
+    model = SystemFieldText
+    extra = 0
+
+class SystemFieldRollTabular(admin.TabularInline):
+    model = SystemFieldRoll
     extra = 0
 
 class SystemInline(admin.StackedInline):
@@ -65,7 +69,7 @@ class BasePowerAdmin(admin.ModelAdmin):
 
 @admin.register(Base_Power_System)
 class BasePowerAdmin(admin.ModelAdmin):
-    inlines = [SystemFieldTabular]
+    inlines = [SystemFieldTextTabular, SystemFieldRollTabular]
 
 @admin.register(PowerTag)
 class PowerTagAdmin(admin.ModelAdmin):
@@ -96,4 +100,5 @@ admin.site.register(Parameter_Value)
 admin.site.register(Enhancement_Instance)
 admin.site.register(Drawback_Instance)
 admin.site.register(PowerTutorial)
-admin.site.register(SystemField)
+admin.site.register(SystemFieldText)
+admin.site.register(SystemFieldRoll)

@@ -2,7 +2,7 @@ from django.conf import settings
 from django.db import models
 
 # Create your models here.
-from characters.models import Character, HIGH_ROLLER_STATUS, Attribute, Ability
+from characters.models import Character, HIGH_ROLLER_STATUS, Attribute, Roll
 from guardian.shortcuts import assign_perm, remove_perm
 from django.utils.html import mark_safe, escape, linebreaks
 
@@ -538,40 +538,64 @@ class Power_Link(models.Model):
                                     related_name='child_power',
                                     on_delete=models.CASCADE)
 
+
 class SystemField(models.Model):
     base_power_system = models.ForeignKey(Base_Power_System,
                                    on_delete=models.CASCADE)
     name = models.CharField(max_length = 250)
-    is_roll = models.BooleanField(default=False)
-    allow_mind = models.BooleanField(default=False)
-    allow_body = models.BooleanField(default=False)
-    required_attribute = models.ForeignKey(Attribute,
-                                            on_delete=models.CASCADE,
-                                            null=True,
-                                           blank=True)
+    description = models.CharField(max_length = 800, blank=True, null=True)
+    eratta = models.CharField(max_length = 1000, blank=True, null=True)
+
     def __str__(self):
         base_name = self.base_power_system.base_power.name
         return "{} [{}]".format(self.name, base_name)
 
     class Meta:
         unique_together = (("base_power_system", "name"))
+        abstract = True
+
+
+class SystemFieldRoll(SystemField):
+    allow_mind = models.BooleanField(default=False)
+    allow_body = models.BooleanField(default=False)
+    required_attribute = models.ForeignKey(Attribute,
+                                           on_delete=models.CASCADE,
+                                           null=True,
+                                           blank=True)
+    difficulty = models.PositiveIntegerField(null=True, blank=True)
+    difficulty_formula = models.CharField(max_length=500, null=True, blank=True)
+
+
+class SystemFieldText(SystemField):
+    pass
+
 
 class SystemFieldInstance(models.Model):
-    relevant_field = models.ForeignKey(SystemField,
+    relevant_power = models.ForeignKey(Power, on_delete=models.CASCADE)
+
+    class Meta:
+        abstract = True
+
+
+class SystemFieldTextInstance(SystemFieldInstance):
+    relevant_field = models.ForeignKey(SystemFieldText,
                                              on_delete=models.CASCADE)
-    relevant_power = models.ForeignKey(Power,
-                                       on_delete=models.CASCADE)
-    value = models.CharField(max_length = 500,
+    value = models.CharField(max_length = 1000,
                               null=True,
                               blank=True)
-    chosen_attribute = models.ForeignKey(Attribute,
-                                            on_delete=models.CASCADE,
-                                            null=True)
-    chosen_ability = models.ForeignKey(Ability,
-                                         on_delete=models.CASCADE,
-                                         null=True)
+
     class Meta:
         unique_together = (("relevant_field", "relevant_power"))
+
+
+class SystemFieldRollInstance(SystemFieldInstance):
+    relevant_field = models.ForeignKey(SystemFieldRoll,
+                                       on_delete=models.CASCADE)
+    roll = models.ForeignKey(Roll, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = (("relevant_field", "relevant_power"))
+
 
 class Enhancement_Instance(models.Model):
     relevant_enhancement = models.ForeignKey(Enhancement,

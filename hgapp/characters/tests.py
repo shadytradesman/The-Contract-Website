@@ -1,12 +1,15 @@
 from django.test import TestCase
 from django.contrib.auth.models import AnonymousUser, User
 from characters.models import Character, ContractStats, Asset, Liability, AssetDetails, LiabilityDetails, Attribute, \
-    AttributeValue, Ability, AbilityValue
+    AttributeValue, Ability, AbilityValue, Roll
 from games.models import Reward
 from cells.models import Cell
 from django.utils import timezone
+from django.db.utils import IntegrityError
+from django.db import transaction
 
-class CellModelTests(TestCase):
+
+class CharacterModelTests(TestCase):
     def setUp(self):
         self.user1 = User.objects.create_user(
             username='jacob', email='jacob@…', password='top_secret')
@@ -351,3 +354,77 @@ class CellModelTests(TestCase):
         # Play in game experience reward
         # void game experience repo
         # void game gm experience repo
+
+class RollModelTests(TestCase):
+    def setUp(self):
+        self.attribute_1 = Attribute.objects.create(
+            name="str",
+            tutorial_text="tut"
+        )
+        self.attribute_2 = Attribute.objects.create(
+            name="dex",
+            tutorial_text="tut"
+        )
+        self.ability_1 = Ability.objects.create(
+            name="athletics",
+            tutorial_text="tut"
+        )
+        self.ability_2 = Ability.objects.create(
+            name="meditation",
+            tutorial_text="tut"
+        )
+
+    def make_roll(self, attribute=None, ability=None, is_mind=False, is_body=False, difficulty=6):
+        Roll.objects.create(
+            attribute=attribute,
+            ability=ability,
+            is_mind=is_mind,
+            is_body=is_body,
+            difficulty=difficulty)
+
+    def test_save_valid_rolls(self):
+        self.make_roll(self.attribute_1, self.ability_1)
+        self.make_roll(self.attribute_2, self.ability_1)
+        self.make_roll(self.attribute_2, self.ability_2)
+        self.make_roll(self.attribute_1, self.ability_1, difficulty=5)
+        self.make_roll(is_mind=True)
+        self.make_roll(is_body=True)
+        self.assertEquals(Roll.objects.count(), 6)
+
+    def test_no_duplicate_rolls(self):
+        self.make_roll(self.attribute_1, self.ability_1)
+        self.assertEquals(Roll.objects.count(), 1)
+        with transaction.atomic():
+            with self.assertRaises(IntegrityError):
+                self.make_roll(self.attribute_1, self.ability_1)
+        self.make_roll(self.attribute_1, self.ability_1, difficulty=5)
+        with transaction.atomic():
+            with self.assertRaises(IntegrityError):
+                self.make_roll(self.attribute_1, self.ability_1, difficulty=5)
+        self.assertEquals(Roll.objects.count(), 2)
+
+    def test_only_one_mind_roll(self):
+        self.make_roll(self.attribute_1, self.ability_1)
+        self.make_roll(is_mind=True)
+        with transaction.atomic():
+            with self.assertRaises(IntegrityError):
+                self.make_roll(is_mind=True)
+        with transaction.atomic():
+            with self.assertRaises(IntegrityError):
+                self.make_roll(self.attribute_1, self.ability_1, is_mind=True)
+        with transaction.atomic():
+            with self.assertRaises(IntegrityError):
+                self.make_roll(self.attribute_1, self.ability_2, is_mind=True)
+
+    def test_only_one_body_roll(self):
+        self.make_roll(self.attribute_1, self.ability_1)
+        self.make_roll(is_body=True)
+        with transaction.atomic():
+            with self.assertRaises(IntegrityError):
+                self.make_roll(is_body=True)
+        with transaction.atomic():
+            with self.assertRaises(IntegrityError):
+                self.make_roll(self.attribute_1, self.ability_1, is_body=True)
+        with transaction.atomic():
+            with self.assertRaises(IntegrityError):
+                self.make_roll(self.attribute_1, self.ability_2, is_body=True)

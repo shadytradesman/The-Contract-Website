@@ -3,7 +3,8 @@ from django.utils import timezone
 from django.shortcuts import get_object_or_404
 import json
 
-from .forms import CreatePowerForm, make_enhancement_form, make_drawback_form, make_parameter_form
+from .forms import CreatePowerForm, make_enhancement_form, make_drawback_form, make_parameter_form, \
+    SystemFieldForm
 from .models import Enhancement_Instance, Drawback_Instance, Power, DICE_SYSTEM, Enhancement, Drawback, \
     Power_Param, \
     Parameter_Value, Base_Power_System, Power_Full, CREATION_REASON, PowerTutorial
@@ -24,6 +25,12 @@ def get_create_power_context_from_base(base_power, character=None):
     parameter_forms = []
     for parameter in Power_Param.objects.filter(relevant_base_power=base_power).all():
         parameter_forms.append(formset_factory(make_parameter_form(parameter))())
+    SystemFieldsFormset = formset_factory(SystemFieldForm, extra=0)
+    text_system_fields = system.systemfieldtext_set.order_by("id").all()
+    roll_system_fields = system.systemfieldroll_set.order_by("id").all()
+    system_fields_formset = SystemFieldsFormset(
+        initial=[{'system_field_id': x.id, 'system_field': x} for x in roll_system_fields],
+        prefix="system_fields")
     system = Base_Power_System.objects.filter(dice_system=DICE_SYSTEM[1][0]).get(base_power=base_power.slug)
     requirements = _get_modifier_requirements(Enhancement.objects.filter(pk__in=base_power.enhancements.all()),
                                              Drawback.objects.filter(pk__in=base_power.drawbacks.all()))
@@ -36,6 +43,7 @@ def get_create_power_context_from_base(base_power, character=None):
         'drawbacks': drawback_forms,
         'requirements_json': json.dumps(requirements),
         'character': character,
+        'system_fields_formset': system_fields_formset,
     }
     if character:
         unspent_rewards = []

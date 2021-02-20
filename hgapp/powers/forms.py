@@ -1,6 +1,12 @@
 from django import forms
 
 from .models import ACTIVATION_STYLE, HIGH_ROLLER_STATUS, Enhancement, Drawback, CREATION_REASON, Power_Full, PowerTag
+from characters.models import Attribute, Ability
+
+BODY_ = ("BODY", "Body")
+
+MIND_ = ("MIND", "Mind")
+
 
 def set_field_html_name(cls, new_name):
     """
@@ -146,3 +152,33 @@ class CreatePowerForm(forms.Form):
 
 class DeletePowerForm(forms.Form):
     pass
+
+
+class SystemFieldForm(forms.Form):
+    system_field_id = forms.IntegerField(label=None, widget=forms.HiddenInput(),) # hidden field to track which system field we are editing.
+
+    def __init__(self, *args, **kwargs):
+        super(SystemFieldForm, self).__init__(*args, **kwargs)
+        if "system_field" in self.initial:
+            sys_field = self.initial["system_field"]
+            attribute_choices = []
+            if sys_field.is_roll:
+                if hasattr(sys_field, "required_attribute") and sys_field.required_attribute:
+                    required_attr = sys_field.required_attribute
+                    attribute_choices.append((required_attr.id, required_attr.name))
+                else:
+                    attribute_choices.extend([(x.id, x.name) for x in Attribute.objects.order_by('name')])
+                if sys_field.allow_mind:
+                    attribute_choices.append(MIND_)
+                if sys_field.allow_body:
+                    attribute_choices.append(BODY_)
+                self.fields['attribute_roll'] = forms.ChoiceField(label="{} roll Attribute".format(sys_field.name),
+                                                                  choices=attribute_choices,
+                                                                  widget=forms.Select(attrs={'class': 'form-control'}))
+                primary_abilities = Ability.objects.filter(is_primary=True).order_by('name')
+                ability_choices = [(x.id, x.name) for x in primary_abilities]
+                self.fields['ability_roll'] = forms.ChoiceField(label="{} roll Ability".format(sys_field.name),
+                                                                choices=ability_choices,
+                                                                widget=forms.Select(attrs={'class': 'form-control'}))
+            else:
+                self.fields['description'] = forms.CharField(label=sys_field.name, max_length=500)

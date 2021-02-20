@@ -3,6 +3,7 @@ import math
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models import Q
 from django.utils.datetime_safe import datetime
 from django.utils import timezone
 from guardian.shortcuts import assign_perm, remove_perm
@@ -723,6 +724,29 @@ class Attribute(Trait):
 
 class Ability(Trait):
     is_primary = models.BooleanField(default=False)
+
+class Roll(models.Model):
+    attribute = models.ForeignKey(Attribute,
+                                  on_delete=models.CASCADE,
+                                  null=True)
+    ability = models.ForeignKey(Ability,
+                                on_delete=models.CASCADE,
+                                null=True)
+    is_mind = models.BooleanField(default=False)
+    is_body = models.BooleanField(default=False)
+    difficulty = models.PositiveIntegerField(default=6)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['attribute', 'ability', 'difficulty', 'is_mind', 'is_body',], name='unique_roll'),
+            models.UniqueConstraint(fields=['is_mind'], condition=Q(is_mind=True), name='one_mind_roll'),
+            models.UniqueConstraint(fields=['is_body'], condition=Q(is_body=True), name='one_body_roll'),
+        ]
+        indexes = [
+            models.Index(fields=['is_mind', ]),
+            models.Index(fields=['is_body', ]),
+            models.Index(fields=['attribute', 'ability', 'difficulty', ]),
+        ]
 
 class Quirk(models.Model):
     name = models.CharField(max_length=150)
