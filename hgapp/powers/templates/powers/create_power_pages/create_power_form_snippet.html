@@ -30,71 +30,103 @@
 <br>
 <div class="panel panel-default">
     <div class="panel-body">
-        <div class="pull-right" style="margin-left: 10px;">
-            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#tutorialModal">
-                Help
-            </button>
-        </div>
-        {% if base_power.example_powers.all %}
-            <a class="btn btn-default btn-sm pull-right" id="js-example-power-button" data-toggle="collapse" data-target="#examplepowers">Show Examples</a>
-            <br><br>
-            <div id="examplepowers" class="collapse">
-                {% for power_full in base_power.example_powers.all %}
-                    {% with power=power_full.power_set.first%}
-                        {% include "powers/power_badge_snippet.html" %}
-                    {% endwith %}
-                {% endfor %}
+        <div class="row">
+            <div class="col-xs-12">
+                {{ form.non_field_errors }}
+                {% csrf_token %}
+                {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+                <span class="pull-right" style="margin-left: 10px;">
+                    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#tutorialModal">
+                        Help
+                    </button>
+                </span>
+                {% if base_power.example_powers.all %}
+                    <a class="btn btn-default btn-sm pull-right" id="js-example-power-button" data-toggle="collapse" data-target="#examplepowers">Show Examples</a>
+                    <br><br>
+                    <div id="examplepowers" class="collapse">
+                        {% for power_full in base_power.example_powers.all %}
+                            {% with power=power_full.power_set.first %}
+                                {% include "powers/power_badge_snippet.html" %}
+                            {% endwith %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
             </div>
-        {% endif %}
-        {% if character %}
-            <h5 class="text-center">{{character.name}} has <b>{{character.unspent_rewards|length}}</b> Points to spend on this Power.</h5>
-        {% endif %}
-        {{ form.non_field_errors }}
-            {% csrf_token %}
-            {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-            {{ form.power_name.errors }}
-            {{ form.power_name | bootstrap}}
-        <div class="double-columns">
-            <div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                {{ form.power_name.errors }}
+                {{ form.power_name | bootstrap}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
                 <div class="text-center">
                     <h3>
-                        Base Power -
                         <a href="{% url 'powers:powers_view_base' base_power.slug %}">{{ base_power.name }}</a>
-                        <br>
                         <small>
                             {{ base_power.summary }}
+
                         </small>
                     </h3>
                     {% if base_power.required_status != "ANY" %}
-                        <p>
-                            <b>Required Status:</b> {{base_power.get_required_status_display}}
-                        </p>
+                        <b>Required Status: {{base_power.get_required_status_display}}</b>
                     {% endif %}
                 </div>
-                <p>{{ base_power.description|linebreaks }}</p>
-                <p>{{ power_system.system_text|linebreaks }}</p>
+                <span>
+                    <p>{{ base_power.description|linebreaks }}</p>
+                    <div class="js-system-static">
+                        <p>{{ power_system.system_text|linebreaks }}</p>
+                    </div>
+                    <div id="js-system-form" style="display: none;">
+                        {{ form.system.errors }}
+                        {{ form.system | bootstrap}}
+                    </div>
+                    <a id="js-system-edit-button" class="btn btn-default">
+                        <i class="fa fa-edit fa-1x"></i> Edit System
+                    </a>
+                </span>
             </div>
-            <div class="container">
-                <br>
-                {{ form.description.errors }}
-                {{ form.description | bootstrap}}
+            <div class="col-sm-6">
+                {% for parameter_formset in parameters %}
+                    {% for param in parameter_formset %}
+                        <div class="css-field-form">
+                            <b>Parameter: {{ param.label }}</b>
+                            <br>
+                            {{ param.level_picker  }}
+                            {{ param.errors }}
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+                {% for field in roll_fields %}
+                    <div class="field-form">
+                        <b>{{field.initial.system_field.name}}</b>
+                        <br>
+                        <div class="css-roll-field-primary">
+                            {{field.attribute_roll}}
+                        </div>
+                        <div class="css-roll-field-plus">
+                            +
+                        </div>
+                        <div class="css-roll-field-primary">
+                            {{field.ability_roll}}
+                        </div>
+                    </div>
+                {% endfor %}
+                {{ text_fields.management_form }}
+                {{ text_fields.non_field_errors }}
+                {% for field in text_fields %}
+                    <div class="css-field-form">
+                        {{field.system_field_id}}
+                        {{field.non_field_errors}}
+                        <b>{{field.initial.system_field.name}}</b>
+                        {{field.field_text}}
+                        {{field.field_text.errors}}
+                    </div>
+                {% endfor %}
             </div>
         </div>
-        {% if parameters %}
-            <h3>Parameters</h3>
-            <ul class="list-unstyled">
-            {% for parameter_formset in parameters %}
-                {% for param in parameter_formset %}
-                    <br>
-                    <li>
-                        <b>{{ param.label }}</b>
-                        {{ param.level_picker  }}
-                        {{ param.errors }}
-                    </li>
-                {% endfor %}
-            {% endfor %}
-            </ul>
-        {% endif %}
         <div class="double-columns">
             <div class="enhancements">
                 <h3 class="text-center">Enhancements</h3>
@@ -137,13 +169,14 @@
                 {% endfor %}
             </div>
         </div>
-        {{ form.system.errors }}
-        {{ form.system | bootstrap}}
-
+        <div class="row">
+            <div class="col-xs-12">
+                {{ form.description.errors }}
+                {{ form.description | bootstrap}}
+            </div>
+        </div>
         <br>
-        <h3 >Put a ribbon on it</h3>
         {{ form.flavor | bootstrap}}
-
        <div class="row">
             <div class="col-md-10 col-md-offset-1 alert alert-warning js-gift-info text-center" role="alert" style="display:none;">
                 <div  id="reward_changes">

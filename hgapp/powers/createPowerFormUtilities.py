@@ -4,13 +4,16 @@ from django.shortcuts import get_object_or_404
 import json
 
 from .forms import CreatePowerForm, make_enhancement_form, make_drawback_form, make_parameter_form, \
-    SystemFieldForm
+    SystemFieldRollForm, SystemFieldTextForm, MIND_, BODY_
 from .models import Enhancement_Instance, Drawback_Instance, Power, DICE_SYSTEM, Enhancement, Drawback, \
-    Power_Param, \
+    Power_Param, SystemFieldText, SystemFieldRoll, SystemFieldTextInstance, SystemFieldRollInstance, \
     Parameter_Value, Base_Power_System, Power_Full, CREATION_REASON, PowerTutorial
+
+from characters.models import Roll, Attribute, Ability
 
 #TODO: use proper field sanitation instead of this cheat method
 bad_chars = set("\0\'\"\b\n\r\t\Z\\\%\_;*|,/=?")
+
 
 
 def get_create_power_context_from_base(base_power, character=None):
@@ -25,12 +28,8 @@ def get_create_power_context_from_base(base_power, character=None):
     parameter_forms = []
     for parameter in Power_Param.objects.filter(relevant_base_power=base_power).all():
         parameter_forms.append(formset_factory(make_parameter_form(parameter))())
-    SystemFieldsFormset = formset_factory(SystemFieldForm, extra=0)
-    text_system_fields = system.systemfieldtext_set.order_by("id").all()
-    roll_system_fields = system.systemfieldroll_set.order_by("id").all()
-    system_fields_formset = SystemFieldsFormset(
-        initial=[{'system_field_id': x.id, 'system_field': x} for x in roll_system_fields],
-        prefix="system_fields")
+    roll_fields_formset = _get_system_roll_field_formset(system)
+    text_fields_formset = _get_system_text_field_formset(system)
     system = Base_Power_System.objects.filter(dice_system=DICE_SYSTEM[1][0]).get(base_power=base_power.slug)
     requirements = _get_modifier_requirements(Enhancement.objects.filter(pk__in=base_power.enhancements.all()),
                                              Drawback.objects.filter(pk__in=base_power.drawbacks.all()))
@@ -43,7 +42,8 @@ def get_create_power_context_from_base(base_power, character=None):
         'drawbacks': drawback_forms,
         'requirements_json': json.dumps(requirements),
         'character': character,
-        'system_fields_formset': system_fields_formset,
+        'roll_fields': roll_fields_formset,
+        'text_fields': text_fields_formset,
     }
     if character:
         unspent_rewards = []
@@ -66,6 +66,18 @@ def get_create_power_context_from_power(power, new=True):
         initial['tags'] = power.parent_power.tags.all()
         initial['example_description'] = power.parent_power.example_description
 
+    system = Base_Power_System.objects.filter(dice_system=DICE_SYSTEM[1][0]).get(base_power=power.base.slug)
+    RollFieldsFormset = formset_factory(SystemFieldRollForm, extra=0)
+    roll_system_fields = power.systemfieldroll_set.order_by("id").all()
+    roll_fields_formset = RollFieldsFormset(
+        initial=[{'system_field_id': x.id, 'system_field': x} for x in roll_system_fields],
+        prefix="system_fields")
+    TextFieldsFormset = formset_factory(SystemFieldTextForm, extra=0)
+    text_system_fields = system.systemfieldtext_set.order_by("id").all()
+    text_fields_formset = TextFieldsFormset(
+        initial=[{'system_field_id': x.id, 'system_field': x} for x in text_system_fields],
+        prefix="system_fields")
+
     primary_form = CreatePowerForm(power.base,
                                    initial=initial)
     enhancement_forms = _get_enhancement_formsets_from_power(power)
@@ -74,7 +86,6 @@ def get_create_power_context_from_power(power, new=True):
     for parameter_value in Parameter_Value.objects.filter(relevant_power=power).all():
         init= [{'level_picker': parameter_value.value}]
         parameter_forms.append(formset_factory(make_parameter_form(parameter_value.relevant_power_param), extra = 0)(initial = init))
-    system = Base_Power_System.objects.filter(dice_system=DICE_SYSTEM[1][0]).get(base_power=power.base.slug)
     requirements = _get_modifier_requirements(Enhancement.objects.filter(pk__in=power.base.enhancements.all()),
                                              Drawback.objects.filter(pk__in=power.base.drawbacks.all()))
     context = {
@@ -85,7 +96,10 @@ def get_create_power_context_from_power(power, new=True):
         'enhancements': enhancement_forms,
         'drawbacks': drawback_forms,
         'requirements_json': json.dumps(requirements),
+        'roll_fields': roll_fields_formset,
+        'text_fields': text_fields_formset,
     }
+
     if power.parent_power is not None:
         if power.parent_power.character is not None and new:
             context["character"] = power.parent_power.character
@@ -99,6 +113,17 @@ def get_create_power_context_from_power(power, new=True):
             context["spent_rewards_json"] = json.dumps(spent_rewards)
     context = _add_tutorial_to_context(context)
     return context
+
+def _get_text_field_formsets_for_edit(power, system):
+    TextFieldsFormset = formset_factory(SystemFieldTextForm, extra=0)
+    text_system_fields = system.systemfieldtext_set.order_by("id").all()
+    instances = power.systemfieldrollinstance_set.all()
+    value_by_field_id = {{"id":n.relevant_field.id, "value":n.value} for n in instances}
+    initial = []
+    return TextFieldsFormset(
+        initial=[{'system_field_id': x.id, 'system_field': x} for x in text_system_fields],
+        prefix="system_fields")
+
 
 
 def get_edit_power_context_from_power(og_power):
@@ -299,6 +324,7 @@ def _get_power_from_form(power_form, base):
 def _create_power_from_post_and_base(base_power, request, power_full):
     form = CreatePowerForm(base_power, request.POST)
     if form.is_valid():
+        system = Base_Power_System.objects.filter(dice_system=DICE_SYSTEM[1][0]).get(base_power=base_power.slug)
         power = _get_power_from_form(power_form=form, base=base_power)
         if request.user.id:
             power.created_by = request.user
@@ -321,11 +347,63 @@ def _create_power_from_post_and_base(base_power, request, power_full):
                                         relevant_power_param=power_param,
                                         value=request.POST[power_param.relevant_parameter.slug])
             param_val.save()
+        text_field_formset = _get_system_text_field_formset(system, request.POST)
+        if text_field_formset.is_valid():
+            for form in text_field_formset:
+                system_field = get_object_or_404(SystemFieldText, id=form.cleaned_data["system_field_id"])
+                field_instance = SystemFieldTextInstance(relevant_power=power,
+                                                         relevant_field=system_field,
+                                                         value=form.cleaned_data["field_text"])
+                field_instance.save()
+        else:
+            raise ValueError("Invalid text field formset")
+        roll_field_formset = _get_system_roll_field_formset(system, request.POST)
+        if roll_field_formset.is_valid():
+            for form in roll_field_formset:
+                system_field = get_object_or_404(SystemFieldRoll, id=form.cleaned_data["system_field_id"])
+                roll = Roll()
+                attr = form.cleaned_data["attribute_roll"]
+                if system_field.difficulty:
+                    roll.difficulty = system_field.difficulty
+                if attr == BODY_[0] or attr == MIND_[0]:
+                    if attr == BODY_:
+                        roll = Roll.get_body_roll(roll.difficulty)
+                    else:
+                        roll = Roll.get_mind_roll(roll.difficulty)
+                else:
+                    attribute = get_object_or_404(Attribute, id=attr)
+                    roll.attribute = attribute
+                    ability = get_object_or_404(Ability, id=form.cleaned_data["ability_roll"])
+                    roll.ability = ability
+                roll.save()
+                field_instance = SystemFieldRollInstance(relevant_power=power,
+                                                          relevant_field=system_field,
+                                                          roll=roll)
+                field_instance.save()
+        else:
+            raise ValueError("Invalid roll field formset")
         return power
     else:
-        print(form.errors)
-        return None
+        raise ValueError("Invalid Power Form")
 
+def _get_system_text_field_formset(system, POST = None):
+    TextFieldsFormset = formset_factory(SystemFieldTextForm, extra=0)
+    text_system_fields = system.systemfieldtext_set.order_by("id").all()
+    text_fields_formset = TextFieldsFormset(
+        POST,
+        initial=[{'system_field_id': x.id, 'system_field': x} for x in text_system_fields],
+        prefix="system_fields")
+    return text_fields_formset
+
+
+def _get_system_roll_field_formset(system, POST=None):
+    RollFieldsFormset = formset_factory(SystemFieldRollForm, extra=0)
+    roll_system_fields = system.systemfieldroll_set.order_by("id").all()
+    roll_fields_formset = RollFieldsFormset(
+        POST,
+        initial=[{'system_field_id': x.id, 'system_field': x} for x in roll_system_fields],
+        prefix="system_fields")
+    return roll_fields_formset
 
 def _get_power_creation_reason(new_power, old_power):
     if old_power is None:

@@ -25,5 +25,25 @@
 }
 
 .css-detail-field {
-    width: 60% !important;
+    max-width: 60% !important;
+}
+
+.css-field-form {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.css-roll-field-primary {
+    max-width: 45%;
+    display: inline-block;
+}
+
+.css-roll-field-plus {
+    width: 5%;
+    display: inline-block;
+    text-align: center;
+}
+
+h3 {
+    margin-top: 0px;
 }

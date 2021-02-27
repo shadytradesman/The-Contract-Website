@@ -1,5 +1,3 @@
-
-
 <script>
 
 {% if requirements_json %}
@@ -170,5 +168,11 @@ $(document).ready(function(){
     $('[data-toggle="tooltip"]').tooltip({
         trigger : 'hover'
     });
+});
+
+$(document).on('click','#js-system-edit-button', function() {
+    $("#js-system-form").show();
+    $("#js-system-edit-button").hide();
+    $(".js-system-static").hide();
 });
 </script>

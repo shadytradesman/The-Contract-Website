@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.utils.html import escape
 
 # Create your models here.
 from characters.models import Character, HIGH_ROLLER_STATUS, Attribute, Roll
@@ -489,6 +490,10 @@ class Power(models.Model):
         value_by_name = {param_val.relevant_power_param.relevant_parameter.name :
                              param_val.relevant_power_param.relevant_parameter.get_value_for_level(level=param_val.value)
                          for param_val in self.parameter_value_set.all()}
+        for field_instance in self.systemfieldtextinstance_set.all():
+            value_by_name[field_instance.relevant_field.name] = field_instance.render_value()
+        for field_instance in self.systemfieldrollinstance_set.all():
+            value_by_name[field_instance.relevant_field.name] = field_instance.render_value()
         rendered_system = default_system
         for name, value in value_by_name.items():
             replaceable_name = str.format("[[{}]]",
@@ -558,6 +563,7 @@ class SystemField(models.Model):
 class SystemFieldRoll(SystemField):
     allow_mind = models.BooleanField(default=False)
     allow_body = models.BooleanField(default=False)
+    allow_std_roll = models.BooleanField(default=True)
     required_attribute = models.ForeignKey(Attribute,
                                            on_delete=models.CASCADE,
                                            null=True,
@@ -587,6 +593,9 @@ class SystemFieldTextInstance(SystemFieldInstance):
     class Meta:
         unique_together = (("relevant_field", "relevant_power"))
 
+    def render_value(self):
+        return escape(self.value)
+
 
 class SystemFieldRollInstance(SystemFieldInstance):
     relevant_field = models.ForeignKey(SystemFieldRoll,
@@ -596,6 +605,13 @@ class SystemFieldRollInstance(SystemFieldInstance):
     class Meta:
         unique_together = (("relevant_field", "relevant_power"))
 
+    def render_value(self):
+        first_word = "Mind" if self.roll.is_mind else "Body" if self.roll.is_body else self.roll.attribute.name
+        if self.roll.ability:
+            roll_text = "{} + {}".format(first_word, self.roll.ability.name)
+        else:
+            roll_text = first_word
+        return "{}, Difficulty {}".format(roll_text, self.roll.difficulty)
 
 class Enhancement_Instance(models.Model):
     relevant_enhancement = models.ForeignKey(Enhancement,

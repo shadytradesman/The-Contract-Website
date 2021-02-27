@@ -8,7 +8,7 @@ from django.utils.datetime_safe import datetime
 from django.utils import timezone
 from guardian.shortcuts import assign_perm, remove_perm
 
-from hgapp.utilities import get_queryset_size
+from hgapp.utilities import get_queryset_size, get_object_or_none
 from cells.models import Cell
 from characters.signals import GrantAssetGift, VoidAssetGifts
 
@@ -739,14 +739,36 @@ class Roll(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=['attribute', 'ability', 'difficulty', 'is_mind', 'is_body',], name='unique_roll'),
-            models.UniqueConstraint(fields=['is_mind'], condition=Q(is_mind=True), name='one_mind_roll'),
-            models.UniqueConstraint(fields=['is_body'], condition=Q(is_body=True), name='one_body_roll'),
+            models.UniqueConstraint(fields=['is_mind', 'difficulty'], condition=Q(is_mind=True), name='one_mind_roll'),
+            models.UniqueConstraint(fields=['is_body', 'difficulty'], condition=Q(is_body=True), name='one_body_roll'),
         ]
         indexes = [
-            models.Index(fields=['is_mind', ]),
-            models.Index(fields=['is_body', ]),
+            models.Index(fields=['is_mind', 'difficulty']),
+            models.Index(fields=['is_body', 'difficulty']),
             models.Index(fields=['attribute', 'ability', 'difficulty', ]),
         ]
+
+    # To obtain the singleton Mind and Body rolls, use these static helper methods. Never attempt to directly create a
+    # mind or body roll.
+    @staticmethod
+    def get_mind_roll(difficulty=6):
+        mind_roll = get_object_or_none(Roll, is_mind=True, difficulty=difficulty)
+        if mind_roll:
+            return mind_roll
+        else:
+            mind_roll = Roll(is_mind=True, difficulty=difficulty)
+            mind_roll.save()
+            return mind_roll
+
+    @staticmethod
+    def get_body_roll(difficulty=6):
+        body_roll = get_object_or_none(Roll, is_body=True, difficulty=difficulty)
+        if body_roll:
+            return body_roll
+        else:
+            mind_roll = Roll(is_body=True, difficulty=difficulty)
+            mind_roll.save()
+            return mind_roll
 
 class Quirk(models.Model):
     name = models.CharField(max_length=150)

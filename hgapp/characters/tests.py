@@ -403,7 +403,7 @@ class RollModelTests(TestCase):
                 self.make_roll(self.attribute_1, self.ability_1, difficulty=5)
         self.assertEquals(Roll.objects.count(), 2)
 
-    def test_only_one_mind_roll(self):
+    def test_only_one_mind_roll_per_difficulty(self):
         self.make_roll(self.attribute_1, self.ability_1)
         self.make_roll(is_mind=True)
         with transaction.atomic():
@@ -415,8 +415,11 @@ class RollModelTests(TestCase):
         with transaction.atomic():
             with self.assertRaises(IntegrityError):
                 self.make_roll(self.attribute_1, self.ability_2, is_mind=True)
+        self.make_roll(is_mind=True, difficulty=8)
+        self.assertEquals(Roll.objects.count(), 3)
 
-    def test_only_one_body_roll(self):
+
+    def test_only_one_body_roll_per_difficulty(self):
         self.make_roll(self.attribute_1, self.ability_1)
         self.make_roll(is_body=True)
         with transaction.atomic():
@@ -428,3 +431,27 @@ class RollModelTests(TestCase):
         with transaction.atomic():
             with self.assertRaises(IntegrityError):
                 self.make_roll(self.attribute_1, self.ability_2, is_body=True)
+        self.make_roll(is_body=True, difficulty=8)
+        self.assertEquals(Roll.objects.count(), 3)
+
+    def test_get_mind_roll(self):
+        roll = Roll.get_mind_roll()
+        roll2 = Roll.get_mind_roll(7)
+        self.assertEquals(roll.is_mind, True)
+        self.assertEquals(roll2.is_mind, True)
+        roll3 = Roll.get_mind_roll()
+        self.assertEquals(roll3, roll)
+        roll4 = Roll.get_mind_roll(7)
+        self.assertEquals(roll2, roll4)
+        self.assertEquals(Roll.objects.count(), 2)
+
+    def test_get_body_roll(self):
+        roll = Roll.get_body_roll()
+        roll2 = Roll.get_body_roll(7)
+        self.assertEquals(roll.is_body, True)
+        self.assertEquals(roll2.is_body, True)
+        roll3 = Roll.get_body_roll()
+        self.assertEquals(roll3, roll)
+        roll4 = Roll.get_body_roll(7)
+        self.assertEquals(roll2, roll4)
+        self.assertEquals(Roll.objects.count(), 2)

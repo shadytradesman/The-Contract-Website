@@ -117,17 +117,16 @@ def make_parameter_form(power_param):
 
 class CreatePowerForm(forms.Form):
     power_name = forms.CharField(label='Power Name', max_length=100)
-    flavor = forms.CharField(label='Flavor Text',
-                             widget=forms.Textarea,
-                             help_text='A snippet of text that introduces the power in a flavorful way')
+    flavor = forms.CharField(label='Put a ribbon on it',
+                             help_text='A snippet of text that introduces the Power in a flavorful way')
     description = forms.CharField(label='Description',
                                   widget=forms.Textarea,
-                                  help_text='Describe what the power looks like when it is used, how it works, '
+                                  help_text='Describe what the Power looks like when it is used, how it works, '
                                             'and its impact on the owner, target, and environment. All Powers '
                                             'are obviously supernatural unless stated otherwise.')
     system = forms.CharField(label='System', widget=forms.Textarea,
                              help_text='Describe this Power\'s cost, associated roll(s), conditions, and determination of outcome. '
-                                       'You can reference the value of a Parameter by typing its name in lowercase, '
+                                       'You can reference the value of a Parameter or field by typing its name in lowercase, '
                                        'surrounded by double brackets, with spaces replaced by hyphens. For example, to display the value '
                                        'of a Power\'s "Cast Time" Parameter, write "[[cast-time]]".')
     activation_style = forms.ChoiceField(choices=ACTIVATION_STYLE, disabled=True)
@@ -146,39 +145,51 @@ class CreatePowerForm(forms.Form):
         #
         # base_power context sensitive field mutations go here.
         #
-        self.fields['activation_style'].help_text='Choose whether the power is always on (passive) or activated manually (active). ' \
+        self.fields['activation_style'].help_text='Choose whether the Power is always on (passive) or activated manually (active). ' \
                                                   'Default is ' + base_power.default_activation_style + "."
         self.fields['activation_style'].initial=base_power.default_activation_style
 
 class DeletePowerForm(forms.Form):
     pass
 
+class SystemFieldTextForm(forms.Form):
+    description = forms.CharField(label="animals", max_length=500)
 
-class SystemFieldForm(forms.Form):
+class SystemFieldRollForm(forms.Form):
     system_field_id = forms.IntegerField(label=None, widget=forms.HiddenInput(),) # hidden field to track which system field we are editing.
 
     def __init__(self, *args, **kwargs):
-        super(SystemFieldForm, self).__init__(*args, **kwargs)
+        super(SystemFieldRollForm, self).__init__(*args, **kwargs)
         if "system_field" in self.initial:
             sys_field = self.initial["system_field"]
             attribute_choices = []
-            if sys_field.is_roll:
+            if sys_field.allow_std_roll:
                 if hasattr(sys_field, "required_attribute") and sys_field.required_attribute:
                     required_attr = sys_field.required_attribute
                     attribute_choices.append((required_attr.id, required_attr.name))
                 else:
                     attribute_choices.extend([(x.id, x.name) for x in Attribute.objects.order_by('name')])
-                if sys_field.allow_mind:
-                    attribute_choices.append(MIND_)
-                if sys_field.allow_body:
-                    attribute_choices.append(BODY_)
-                self.fields['attribute_roll'] = forms.ChoiceField(label="{} roll Attribute".format(sys_field.name),
-                                                                  choices=attribute_choices,
-                                                                  widget=forms.Select(attrs={'class': 'form-control'}))
                 primary_abilities = Ability.objects.filter(is_primary=True).order_by('name')
                 ability_choices = [(x.id, x.name) for x in primary_abilities]
                 self.fields['ability_roll'] = forms.ChoiceField(label="{} roll Ability".format(sys_field.name),
                                                                 choices=ability_choices,
+                                                                required=True,
                                                                 widget=forms.Select(attrs={'class': 'form-control'}))
-            else:
-                self.fields['description'] = forms.CharField(label=sys_field.name, max_length=500)
+            if sys_field.allow_mind:
+                attribute_choices.append(MIND_)
+            if sys_field.allow_body:
+                attribute_choices.append(BODY_)
+            self.fields['attribute_roll'] = forms.ChoiceField(label="{} roll Attribute".format(sys_field.name),
+                                                              choices=attribute_choices,
+                                                              required=False,
+                                                              widget=forms.Select(attrs={'class': 'form-control'}))
+
+class SystemFieldTextForm(forms.Form):
+    system_field_id = forms.IntegerField(label=None, widget=forms.HiddenInput(),) # hidden field to track which system field we are editing.
+    field_text = forms.CharField(required=False,
+                                 widget=forms.TextInput(attrs={'class': 'form-control'}))
+    def __init__(self, *args, **kwargs):
+        super(SystemFieldTextForm, self).__init__(*args, **kwargs)
+        if "system_field" in self.initial:
+            sys_field = self.initial["system_field"]
+            self.fields["field_text"].label = sys_field.name
