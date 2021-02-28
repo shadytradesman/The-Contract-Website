@@ -67,7 +67,6 @@
                         <a href="{% url 'powers:powers_view_base' base_power.slug %}">{{ base_power.name }}</a>
                         <small>
                             {{ base_power.summary }}
-
                         </small>
                     </h3>
                     {% if base_power.required_status != "ANY" %}
@@ -89,28 +88,53 @@
                 </span>
             </div>
             <div class="col-sm-6">
+                <h4 >Parameters</h4>
                 {% for parameter_formset in parameters %}
                     {% for param in parameter_formset %}
                         <div class="css-field-form">
-                            <b>Parameter: {{ param.label }}</b>
+                            <b>{{ param.label }}</b>
                             <br>
                             {{ param.level_picker  }}
                             {{ param.errors }}
                         </div>
                     {% endfor %}
                 {% endfor %}
+                {% if roll_fields|length > 0 or text_fields|length > 0 %}
+                <hr>
+                {% endif %}
+                {{ roll_fields.management_form }}
+                {{ roll_fields.non_field_errors }}
                 {% for field in roll_fields %}
                     <div class="field-form">
+                        {{field.errors}}
+                        {{field.system_field_id}}
                         <b>{{field.initial.system_field.name}}</b>
+                        {% if field.initial.system_field.eratta %}
+                            <span data-toggle="tooltip"
+                                     data-placement="top"
+                                     title="{{field.initial.system_field.eratta}}"
+                                  class="field-eratta"
+                            ><i class="fa fa-question-circle fa-1x"></i></span>
+                        {% endif %}
                         <br>
                         <div class="css-roll-field-primary">
                             {{field.attribute_roll}}
                         </div>
-                        <div class="css-roll-field-plus">
-                            +
-                        </div>
-                        <div class="css-roll-field-primary">
-                            {{field.ability_roll}}
+                        {% if field.ability_roll %}
+                            <div class="css-roll-field-plus">
+                                +
+                            </div>
+                            <div class="css-roll-field-primary">
+                                {{field.ability_roll}}
+                            </div>
+                        {% endif %}
+                        <div class="css-roll-field-difficulty">
+                            Difficulty
+                            {% if field.initial.system_field.difficulty %}
+                                {{ field.initial.system_field.difficulty }}
+                            {% else %}
+                                {{field.initial.system_field.difficulty_formula}}
+                            {% endif %}
                         </div>
                     </div>
                 {% endfor %}
@@ -121,6 +145,13 @@
                         {{field.system_field_id}}
                         {{field.non_field_errors}}
                         <b>{{field.initial.system_field.name}}</b>
+                        {% if field.initial.system_field.eratta %}
+                            <span data-toggle="tooltip"
+                                     data-placement="top"
+                                     title="{{field.initial.system_field.eratta}}"
+                                    class="field-eratta"
+                            ><i class="fa fa-question-circle fa-1x"></i></span>
+                        {% endif %}
                         {{field.field_text}}
                         {{field.field_text.errors}}
                     </div>

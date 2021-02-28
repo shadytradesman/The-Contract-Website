@@ -745,11 +745,10 @@ class Roll(models.Model):
         indexes = [
             models.Index(fields=['is_mind', 'difficulty']),
             models.Index(fields=['is_body', 'difficulty']),
-            models.Index(fields=['attribute', 'ability', 'difficulty', ]),
+            models.Index(fields=['attribute', 'ability', 'difficulty',]),
         ]
 
-    # To obtain the singleton Mind and Body rolls, use these static helper methods. Never attempt to directly create a
-    # mind or body roll.
+    # To obtain the singleton rolls, use this static getter methods instead of directly creating the roll objects.
     @staticmethod
     def get_mind_roll(difficulty=6):
         mind_roll = get_object_or_none(Roll, is_mind=True, difficulty=difficulty)
@@ -769,6 +768,25 @@ class Roll(models.Model):
             mind_roll = Roll(is_body=True, difficulty=difficulty)
             mind_roll.save()
             return mind_roll
+
+    @staticmethod
+    def get_roll(attribute=None, ability=None, difficulty=6):
+        roll = get_object_or_none(Roll,
+                                  attribute=attribute,
+                                  ability=ability,
+                                  is_mind=False,
+                                  is_body=False,
+                                  difficulty=difficulty)
+        if roll:
+            return roll
+        else:
+            roll = Roll(attribute=attribute,
+                              ability=ability,
+                              is_mind=False,
+                              is_body=False,
+                              difficulty=difficulty)
+            roll.save()
+            return roll
 
 class Quirk(models.Model):
     name = models.CharField(max_length=150)

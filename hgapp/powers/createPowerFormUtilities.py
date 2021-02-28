@@ -67,16 +67,8 @@ def get_create_power_context_from_power(power, new=True):
         initial['example_description'] = power.parent_power.example_description
 
     system = Base_Power_System.objects.filter(dice_system=DICE_SYSTEM[1][0]).get(base_power=power.base.slug)
-    RollFieldsFormset = formset_factory(SystemFieldRollForm, extra=0)
-    roll_system_fields = power.systemfieldroll_set.order_by("id").all()
-    roll_fields_formset = RollFieldsFormset(
-        initial=[{'system_field_id': x.id, 'system_field': x} for x in roll_system_fields],
-        prefix="system_fields")
-    TextFieldsFormset = formset_factory(SystemFieldTextForm, extra=0)
-    text_system_fields = system.systemfieldtext_set.order_by("id").all()
-    text_fields_formset = TextFieldsFormset(
-        initial=[{'system_field_id': x.id, 'system_field': x} for x in text_system_fields],
-        prefix="system_fields")
+    text_fields_formset = _get_text_field_formsets_for_edit(power, system)
+    roll_fields_formset = _get_roll_field_formsets_for_edit(power, system)
 
     primary_form = CreatePowerForm(power.base,
                                    initial=initial)
@@ -117,14 +109,35 @@ def get_create_power_context_from_power(power, new=True):
 def _get_text_field_formsets_for_edit(power, system):
     TextFieldsFormset = formset_factory(SystemFieldTextForm, extra=0)
     text_system_fields = system.systemfieldtext_set.order_by("id").all()
-    instances = power.systemfieldrollinstance_set.all()
-    value_by_field_id = {{"id":n.relevant_field.id, "value":n.value} for n in instances}
-    initial = []
+    instances = power.systemfieldtextinstance_set.all()
+    value_by_field_id = {n.relevant_field.id:n.value  for n in instances}
     return TextFieldsFormset(
-        initial=[{'system_field_id': x.id, 'system_field': x} for x in text_system_fields],
-        prefix="system_fields")
+        initial=[{'system_field_id': x.id, 'system_field': x, 'field_text': value_by_field_id[x.id]} for x in text_system_fields],
+        prefix="system_text_fields")
 
+def _get_roll_field_formsets_for_edit(power, system):
+    RollFieldsFormset = formset_factory(SystemFieldRollForm, extra=0)
+    roll_system_fields = system.systemfieldroll_set.order_by("id").all()
+    instances = power.systemfieldrollinstance_set.all()
+    value_by_field_id = {n.relevant_field.id:n.roll for n in instances}
+    return RollFieldsFormset(
+        initial=[{'system_field_id': x.id,
+                  'system_field': x,
+                  'ability_roll': value_by_field_id[x.id].ability.id if value_by_field_id[x.id].ability else None,
+                  'attribute_roll': _get_roll_initial_attribute(value_by_field_id[x.id]),
+                  }
+                 for x in roll_system_fields],
+        prefix="system_roll_fields")
 
+def _get_roll_initial_attribute(roll):
+    if roll.attribute:
+        return roll.attribute.id
+    elif roll.is_mind:
+        return MIND_
+    elif roll.is_body:
+        return BODY_
+    else:
+        raise ValueError("Unknown roll attribute")
 
 def get_edit_power_context_from_power(og_power):
     context = get_create_power_context_from_power(og_power)
@@ -321,6 +334,24 @@ def _get_power_from_form(power_form, base):
                   pub_date=timezone.now())
 
 
+def _get_roll_from_form_and_system(form, system_field):
+    attr = form.cleaned_data["attribute_roll"]
+    difficulty = 6
+    if system_field.difficulty:
+        difficulty = system_field.difficulty
+    if attr == BODY_[0] or attr == MIND_[0]:
+        if attr == BODY_:
+            return Roll.get_body_roll(difficulty=difficulty)
+        else:
+            return Roll.get_mind_roll(difficulty=difficulty)
+    else:
+        attribute = get_object_or_404(Attribute, id=attr)
+        ability = get_object_or_404(Ability, id=form.cleaned_data["ability_roll"])
+        return Roll.get_roll(attribute = attribute,
+                             ability = ability,
+                             difficulty = difficulty)
+
+
 def _create_power_from_post_and_base(base_power, request, power_full):
     form = CreatePowerForm(base_power, request.POST)
     if form.is_valid():
@@ -361,21 +392,7 @@ def _create_power_from_post_and_base(base_power, request, power_full):
         if roll_field_formset.is_valid():
             for form in roll_field_formset:
                 system_field = get_object_or_404(SystemFieldRoll, id=form.cleaned_data["system_field_id"])
-                roll = Roll()
-                attr = form.cleaned_data["attribute_roll"]
-                if system_field.difficulty:
-                    roll.difficulty = system_field.difficulty
-                if attr == BODY_[0] or attr == MIND_[0]:
-                    if attr == BODY_:
-                        roll = Roll.get_body_roll(roll.difficulty)
-                    else:
-                        roll = Roll.get_mind_roll(roll.difficulty)
-                else:
-                    attribute = get_object_or_404(Attribute, id=attr)
-                    roll.attribute = attribute
-                    ability = get_object_or_404(Ability, id=form.cleaned_data["ability_roll"])
-                    roll.ability = ability
-                roll.save()
+                roll = _get_roll_from_form_and_system(form, system_field)
                 field_instance = SystemFieldRollInstance(relevant_power=power,
                                                           relevant_field=system_field,
                                                           roll=roll)
@@ -392,7 +409,7 @@ def _get_system_text_field_formset(system, POST = None):
     text_fields_formset = TextFieldsFormset(
         POST,
         initial=[{'system_field_id': x.id, 'system_field': x} for x in text_system_fields],
-        prefix="system_fields")
+        prefix="system_text_fields")
     return text_fields_formset
 
 
@@ -402,7 +419,7 @@ def _get_system_roll_field_formset(system, POST=None):
     roll_fields_formset = RollFieldsFormset(
         POST,
         initial=[{'system_field_id': x.id, 'system_field': x} for x in roll_system_fields],
-        prefix="system_fields")
+        prefix="system_roll_fields")
     return roll_fields_formset
 
 def _get_power_creation_reason(new_power, old_power):

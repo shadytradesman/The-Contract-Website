@@ -44,6 +44,15 @@
     text-align: center;
 }
 
+.css-roll-field-difficulty {
+    padding-left: 5px;
+    display: inline-block;
+}
+
+.field-eratta {
+    padding-left: 5px;
+}
+
 h3 {
     margin-top: 0px;
 }

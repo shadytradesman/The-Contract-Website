@@ -157,6 +157,13 @@ class SystemFieldTextForm(forms.Form):
 
 class SystemFieldRollForm(forms.Form):
     system_field_id = forms.IntegerField(label=None, widget=forms.HiddenInput(),) # hidden field to track which system field we are editing.
+    # ability_roll = forms.ChoiceField(choices=(),
+    #                                  required=True,
+    #                                  widget=forms.Select(attrs={'class': 'form-control'}))
+    # attribute_roll = forms.ChoiceField(
+    #                                                           choices=(),
+    #                                                           required=False,
+    #                                                           widget=forms.Select(attrs={'class': 'form-control'}))
 
     def __init__(self, *args, **kwargs):
         super(SystemFieldRollForm, self).__init__(*args, **kwargs)
@@ -171,18 +178,29 @@ class SystemFieldRollForm(forms.Form):
                     attribute_choices.extend([(x.id, x.name) for x in Attribute.objects.order_by('name')])
                 primary_abilities = Ability.objects.filter(is_primary=True).order_by('name')
                 ability_choices = [(x.id, x.name) for x in primary_abilities]
+                ability_initial = ability_choices[0]
+                # if 'ability_roll' in self.initial:
+                #     abil = self.initial["ability_roll"]
+                #     ability_initial = (abil.id, abil.name)
                 self.fields['ability_roll'] = forms.ChoiceField(label="{} roll Ability".format(sys_field.name),
                                                                 choices=ability_choices,
                                                                 required=True,
+                                                                # initial= ability_initial,
                                                                 widget=forms.Select(attrs={'class': 'form-control'}))
             if sys_field.allow_mind:
                 attribute_choices.append(MIND_)
             if sys_field.allow_body:
                 attribute_choices.append(BODY_)
+            attribute_initial = attribute_choices[0]
+            # if 'attribute_roll' in self.initial:
+            #     attr = self.initial["attribute_roll"]
+            #     attribute_initial = (attr.id, attr.name)
             self.fields['attribute_roll'] = forms.ChoiceField(label="{} roll Attribute".format(sys_field.name),
                                                               choices=attribute_choices,
                                                               required=False,
+                                                              # initial=attribute_initial,
                                                               widget=forms.Select(attrs={'class': 'form-control'}))
+
 
 class SystemFieldTextForm(forms.Form):
     system_field_id = forms.IntegerField(label=None, widget=forms.HiddenInput(),) # hidden field to track which system field we are editing.
