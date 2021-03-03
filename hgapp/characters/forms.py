@@ -130,7 +130,7 @@ class CharacterDeathForm(ModelForm):
         fields = ('obituary', 'cause_of_death')
         help_texts = {
             'obituary': _('Honor the dearly departed'),
-            'cause_of_death': _('Short summary of the cause of death')
+            'cause_of_death': _('They were killed by. . .')
         }
         widgets = {
             'obituary': forms.Textarea,

@@ -146,6 +146,12 @@
                                     {{ character.name }}
                                     <br>
                                     <small>The {{ character.concept_summary}}</small>
+                                    {% if character.needs_obit %}
+                                        <br>
+                                        <a href="{%url 'characters:characters_obituary' character.id %}" class="btn btn-info btn-xs">
+                                            Write {{ character.name }}'s Epitaph
+                                        </a>
+                                    {% endif %}
                                 </h4>
                             </div>
                         </a>

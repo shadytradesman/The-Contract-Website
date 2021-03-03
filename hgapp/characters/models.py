@@ -352,6 +352,13 @@ class Character(models.Model):
         else:
             return None
 
+    def needs_obit(self):
+        death = self.real_death()
+        if death:
+            return not death.obituary or len(death.obituary) == 0 or not death.cause_of_death or len(death.cause_of_death) == 0
+        else:
+            return False
+
     def void_deaths(self):
         return self.character_death_set.filter(is_void=True).all()
 
