@@ -11,6 +11,13 @@
 {% if unspent_rewards_json %}
     var unspent_rewards = {{ unspent_rewards_json | safe}};
 {% endif %}
+
+var systemDefaultText = JSON.parse(document.getElementById('defaultSystem').textContent);
+$(document).on('click', "#reset-system-text-button", function(ev){
+    console.log(systemDefaultText);
+    $("#id_system").val(systemDefaultText);
+})
+
 // Enhancement checkbox creation / deletion for multiplicity
 var checkbox_incrementer=0;
 $(document).on('change','[id$=-is_selected]', function(ev){
@@ -175,4 +182,60 @@ $(document).on('click','#js-system-edit-button', function() {
     $("#js-system-edit-button").hide();
     $(".js-system-static").hide();
 });
+
+$(document).ready(function(){
+
+    var wasMindBodyLast = [];
+
+    function setMindBody(id, isMindBody) {
+        var select = $("select[id$=" + id + "-ability_roll]");
+        var opt1 = select.children("option").get(1).value;
+        if (wasMindBodyLast[id] != isMindBody) {
+            console.log("Setting children of " + id + " to " + isMindBody);
+            if (isMindBody) {
+                select.val('');
+            } else {
+                select.val(opt1);
+            }
+        }
+        if (select.val() == '' && !isMindBody) {
+            select.val(opt1);
+        }
+        select.children("option").prop('disabled', isMindBody);
+        select.children("option[value='']").prop('disabled', !isMindBody);
+        wasMindBodyLast[id] = isMindBody;
+    }
+
+    function updateSelectableRoll(attr_roll) {
+        var idNum = get_id(attr_roll);
+        if (attr_roll.value == "BODY" || attr_roll.value == "MIND") {
+            setMindBody(idNum, true);
+        }else{
+            setMindBody(idNum, false);
+        }
+    }
+
+    function get_id(attr_roll) {
+        var regex = ".*([\\d]).*";
+        var idString = $(attr_roll).attr('id');
+        return idString.toString().match(regex)[1];
+    }
+
+    $("select[id$=-attribute_roll]").change(function () {
+        updateSelectableRoll(this);
+    });
+
+    $("select[id$=-attribute_roll]").each(function() {
+        var id = get_id(this);
+        if (this.value == "BODY" || this.value == "MIND") {
+            wasMindBodyLast[id] = true;
+        } else {
+            wasMindBodyLast[id] = false;
+        }
+        updateSelectableRoll(this);
+
+    });
+
+  });
+
 </script>

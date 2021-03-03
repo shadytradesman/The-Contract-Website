@@ -1,5 +1,8 @@
 {% load bootstrap %}
 
+{% block extra_scripts %}
+    {{ power_system.system_text|json_script:"defaultSystem"}}
+{% endblock %}
 {% include "powers/create_power_pages/create_power_enhancement_script_snippet.html" %}
 {% include "powers/create_power_pages/create_power_drawback_script_snippet.html" %}
 <div class="text-center">
@@ -64,7 +67,8 @@
             <div class="col-sm-6">
                 <div class="text-center">
                     <h3>
-                        <a href="{% url 'powers:powers_view_base' base_power.slug %}">{{ base_power.name }}</a>
+                        Effect: <a href="{% url 'powers:powers_view_base' base_power.slug %}">{{ base_power.name }}</a>
+                        <br>
                         <small>
                             {{ base_power.summary }}
                         </small>
@@ -76,11 +80,25 @@
                 <span>
                     <p>{{ base_power.description|linebreaks }}</p>
                     <div class="js-system-static">
-                        <p>{{ power_system.system_text|linebreaks }}</p>
+                        {% if og_power %}
+                            <p>{{ og_power.system|linebreaks }}</p>
+                        {% else %}
+                            <p>{{ power_system.system_text|linebreaks }}</p>
+                        {% endif %}
                     </div>
                     <div id="js-system-form" style="display: none;">
                         {{ form.system.errors }}
                         {{ form.system | bootstrap}}
+                        <button type="button" class="btn btn-default btn-xs" data-toggle="collapse" data-target="#reset-system-text">Show Default</button>
+                        <div id="reset-system-text" class="collapse">
+                            <br>
+                            <div class="thumbnail">
+                                <p id="js-system-text">{{ power_system.system_text|linebreaks }}</p>
+                                <div class="text-center">
+                                    <button id="reset-system-text-button" type="button" class="btn btn-primary btn-sm" data-toggle="collapse" data-target="#reset-system-text">Reset Edit Field to Default</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <a id="js-system-edit-button" class="btn btn-default">
                         <i class="fa fa-edit fa-1x"></i> Edit System
@@ -88,74 +106,79 @@
                 </span>
             </div>
             <div class="col-sm-6">
-                <h4 >Parameters</h4>
-                {% for parameter_formset in parameters %}
-                    {% for param in parameter_formset %}
-                        <div class="css-field-form">
-                            <b>{{ param.label }}</b>
-                            <br>
-                            {{ param.level_picker  }}
-                            {{ param.errors }}
-                        </div>
+                {% if parameter_formset|length == 0 and roll_fields|length == 0 and text_fields|length == 0%}
+                    {{ form.description.errors }}
+                    {{ form.description | bootstrap}}
+                {% else %}
+                    {% if parameter_formset|length %}
+                        <h4 >Parameters</h4>
+                    {% endif %}
+                    {% for parameter_formset in parameters %}
+                        {% for param in parameter_formset %}
+                            <div class="css-field-form">
+                                <b>{{ param.label }}</b>
+                                <br>
+                                {{ param.level_picker  }}
+                                {{ param.errors }}
+                            </div>
+                        {% endfor %}
                     {% endfor %}
-                {% endfor %}
-                {% if roll_fields|length > 0 or text_fields|length > 0 %}
-                <hr>
-                {% endif %}
-                {{ roll_fields.management_form }}
-                {{ roll_fields.non_field_errors }}
-                {% for field in roll_fields %}
-                    <div class="field-form">
-                        {{field.errors}}
-                        {{field.system_field_id}}
-                        <b>{{field.initial.system_field.name}}</b>
-                        {% if field.initial.system_field.eratta %}
-                            <span data-toggle="tooltip"
-                                     data-placement="top"
-                                     title="{{field.initial.system_field.eratta}}"
-                                  class="field-eratta"
-                            ><i class="fa fa-question-circle fa-1x"></i></span>
-                        {% endif %}
-                        <br>
-                        <div class="css-roll-field-primary">
-                            {{field.attribute_roll}}
-                        </div>
-                        {% if field.ability_roll %}
-                            <div class="css-roll-field-plus">
-                                +
-                            </div>
+                    {% if roll_fields|length > 0 or text_fields|length > 0 %}
+                    <hr>
+                    {% endif %}
+                    {{ roll_fields.management_form }}
+                    {{ roll_fields.non_field_errors }}
+                    {% for field in roll_fields %}
+                        <div class="field-form">
+                            {{field.errors}}
+                            {{field.system_field_id}}
+                            <b>{{field.initial.system_field.name}}</b>
+                            {% if field.initial.system_field.eratta %}
+                                <span data-toggle="tooltip"
+                                         data-placement="top"
+                                         title="{{field.initial.system_field.eratta}}"
+                                      class="field-eratta"
+                                ><i class="fa fa-question-circle fa-1x"></i></span>
+                            {% endif %}
+                            <br>
                             <div class="css-roll-field-primary">
-                                {{field.ability_roll}}
+                                {{field.attribute_roll}}
                             </div>
-                        {% endif %}
-                        <div class="css-roll-field-difficulty">
-                            Difficulty
+                            {% if field.ability_roll %}
+                                <div class="css-roll-field-plus">
+                                    +
+                                </div>
+                                <div class="css-roll-field-primary">
+                                    {{field.ability_roll}}
+                                </div>
+                            {% endif %}
                             {% if field.initial.system_field.difficulty %}
-                                {{ field.initial.system_field.difficulty }}
-                            {% else %}
-                                {{field.initial.system_field.difficulty_formula}}
+                                <div class="css-roll-field-difficulty">
+                                    Difficulty
+                                        {{ field.initial.system_field.difficulty }}
+                                </div>
                             {% endif %}
                         </div>
-                    </div>
-                {% endfor %}
-                {{ text_fields.management_form }}
-                {{ text_fields.non_field_errors }}
-                {% for field in text_fields %}
-                    <div class="css-field-form">
-                        {{field.system_field_id}}
-                        {{field.non_field_errors}}
-                        <b>{{field.initial.system_field.name}}</b>
-                        {% if field.initial.system_field.eratta %}
-                            <span data-toggle="tooltip"
-                                     data-placement="top"
-                                     title="{{field.initial.system_field.eratta}}"
-                                    class="field-eratta"
-                            ><i class="fa fa-question-circle fa-1x"></i></span>
-                        {% endif %}
-                        {{field.field_text}}
-                        {{field.field_text.errors}}
-                    </div>
-                {% endfor %}
+                    {% endfor %}
+                    {{ text_fields.management_form }}
+                    {{ text_fields.non_field_errors }}
+                    {% for field in text_fields %}
+                        <div class="css-field-form">
+                            {{field.system_field_id}}
+                            {{field.non_field_errors}}
+                            <b>{{field.initial.system_field.name}}</b>
+                            {% if field.initial.system_field.eratta %}
+                                <span data-toggle="tooltip"
+                                         data-placement="top"
+                                         title="{{field.initial.system_field.eratta}}"
+                                        class="field-eratta"
+                                ><i class="fa fa-question-circle fa-1x"></i></span>
+                            {% endif %}
+                            {{field.field_text}}
+                            {{field.field_text.errors}}
+                        </div>
+                    {% endfor %}
+                {% endif %}
             </div>
         </div>
         <div class="double-columns">
@@ -200,13 +223,16 @@
                 {% endfor %}
             </div>
         </div>
-        <div class="row">
-            <div class="col-xs-12">
-                {{ form.description.errors }}
-                {{ form.description | bootstrap}}
+        {% if parameter_formset|length == 0 and roll_fields|length == 0 and text_fields|length == 0%}
+        {% else %}
+            <div class="row">
+                <div class="col-xs-12">
+                    {{ form.description.errors }}
+                    {{ form.description | bootstrap}}
+                </div>
             </div>
-        </div>
-        <br>
+            <br>
+        {% endif %}
         {{ form.flavor | bootstrap}}
        <div class="row">
             <div class="col-md-10 col-md-offset-1 alert alert-warning js-gift-info text-center" role="alert" style="display:none;">

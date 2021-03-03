@@ -548,7 +548,6 @@ class SystemField(models.Model):
     base_power_system = models.ForeignKey(Base_Power_System,
                                    on_delete=models.CASCADE)
     name = models.CharField(max_length = 250)
-    description = models.CharField(max_length = 800, blank=True, null=True)
     eratta = models.CharField(max_length = 1000, blank=True, null=True)
 
     def __str__(self):
@@ -569,7 +568,6 @@ class SystemFieldRoll(SystemField):
                                            null=True,
                                            blank=True)
     difficulty = models.PositiveIntegerField(null=True, blank=True)
-    difficulty_formula = models.CharField(max_length=500, null=True, blank=True)
 
 
 class SystemFieldText(SystemField):

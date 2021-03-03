@@ -123,11 +123,19 @@ def _get_roll_field_formsets_for_edit(power, system):
     return RollFieldsFormset(
         initial=[{'system_field_id': x.id,
                   'system_field': x,
-                  'ability_roll': value_by_field_id[x.id].ability.id if value_by_field_id[x.id].ability else None,
+                  'ability_roll': _get_roll_initial_ability(value_by_field_id[x.id]),
                   'attribute_roll': _get_roll_initial_attribute(value_by_field_id[x.id]),
                   }
                  for x in roll_system_fields],
         prefix="system_roll_fields")
+
+
+def _get_roll_initial_ability(roll):
+    if roll.ability:
+        return roll.ability.id
+    else:
+        return None
+
 
 def _get_roll_initial_attribute(roll):
     if roll.attribute:
@@ -138,6 +146,7 @@ def _get_roll_initial_attribute(roll):
         return BODY_
     else:
         raise ValueError("Unknown roll attribute")
+
 
 def get_edit_power_context_from_power(og_power):
     context = get_create_power_context_from_power(og_power)
@@ -340,7 +349,7 @@ def _get_roll_from_form_and_system(form, system_field):
     if system_field.difficulty:
         difficulty = system_field.difficulty
     if attr == BODY_[0] or attr == MIND_[0]:
-        if attr == BODY_:
+        if attr == BODY_[0]:
             return Roll.get_body_roll(difficulty=difficulty)
         else:
             return Roll.get_mind_roll(difficulty=difficulty)
