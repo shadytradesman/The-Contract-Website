@@ -223,10 +223,11 @@ def make_allocate_improvement_form(user):
                                       not char.is_dead() and char.improvement_ok()]
         queryset = Character.objects.filter(id__in=users_living_character_ids)
         chosen_character = forms.ModelChoiceField(queryset=queryset,
+                                                  label="Chosen Contractor",
                                                      empty_label=None,
-                                                     help_text="Declare which Character should recieve the Improvement. "
+                                                     help_text="Declare which Contractor should recieve the Improvement. "
                                                                "Once confirmed, this action cannot be undone. "
-                                                               "NOTE: only living characters that have less than twice as many rewards as victories appear in this list.",
+                                                               "Only living Contractors that have fewer than one Improvement for every two Victories appear in this list.",
                                                      required=True)
     return AllocateImprovementForm
 

@@ -409,7 +409,7 @@ class Character(models.Model):
         return rewards_to_be_spent
 
     def improvement_ok(self):
-        return self.number_of_victories() * 2 >  len(self.active_rewards())
+        return self.number_of_victories() * 2 > len(self.active_rewards())
 
     def __str__(self):
         string = self.name + " ["
