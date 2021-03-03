@@ -70,6 +70,7 @@ def make_enhancement_form(enhancement, enhancement_instance=None):
         if enhancement.detail_field_label is not "" and enhancement.detail_field_label is not None:
             detail_text = forms.CharField(required=False,
                                           label=enhancement.detail_field_label,
+                                          max_length=1200,
                                           widget=forms.TextInput(attrs={'class': 'form-control css-detail-field'}))
             set_field_html_name(detail_text, enhancement.form_detail_name())
             if enhancement_instance:
@@ -98,6 +99,7 @@ def make_drawback_form(drawback):
         if drawback.detail_field_label is not "" and drawback.detail_field_label is not None:
             detail_text = forms.CharField(required=False,
                                           label=drawback.detail_field_label,
+                                          max_length=1200,
                                           widget=forms.TextInput(attrs={'class': 'form-control css-detail-field'}))
             set_field_html_name(detail_text, drawback.form_detail_name())
 

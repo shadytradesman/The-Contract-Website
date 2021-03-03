@@ -616,7 +616,7 @@ class Enhancement_Instance(models.Model):
                                              on_delete=models.PROTECT)
     relevant_power = models.ForeignKey(Power,
                                        on_delete=models.CASCADE)
-    detail = models.CharField(max_length = 150,
+    detail = models.CharField(max_length = 1500,
                               null=True,
                               blank=True)
 
@@ -641,7 +641,7 @@ class Drawback_Instance(models.Model):
     relevant_drawback = models.ForeignKey(Drawback, on_delete=models.CASCADE)
     relevant_power = models.ForeignKey(Power,
                                        on_delete=models.CASCADE)
-    detail = models.CharField(max_length=150,
+    detail = models.CharField(max_length=1500,
                               null=True,
                               blank=True)
 

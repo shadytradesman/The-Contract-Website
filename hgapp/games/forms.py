@@ -29,7 +29,7 @@ class CreateScenarioForm(forms.Form):
     title = forms.CharField(label='Title',
                            max_length=130,
                            help_text='This Scenario\'s title. This may be seen by people who have not played the Scenario.')
-    summary = forms.CharField(label='Summay',
+    summary = forms.CharField(label='Summary',
                               max_length=400,
                               required=False,
                               help_text="Summarize the Scenario so that people who have already played it can recognize it.")
