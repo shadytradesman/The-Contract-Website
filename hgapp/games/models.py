@@ -314,7 +314,7 @@ class Game_Attendance(models.Model):
         if not self.is_confirmed:
             return None
         if self.outcome is None:
-            raise ValueError("Error, game attendane has no outcome when game is being transitioned to finished.",
+            raise ValueError("Error, game attendance has no outcome when game is being transitioned to finished.",
                              str(self.id))
         if self.is_victory():
             player_reward = Reward(relevant_game=self.relevant_game,

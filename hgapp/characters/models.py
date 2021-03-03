@@ -362,11 +362,6 @@ class Character(models.Model):
     def void_deaths(self):
         return self.character_death_set.filter(is_void=True).all()
 
-    def delete_upcoming_attendances(self):
-        scheduled_game_attendances = self.scheduled_game_attendances()
-        for game_attendance in scheduled_game_attendances:
-            game_attendance.delete()
-
     def active_game_attendances(self):
         return [game for game in self.game_attendance_set.all() if game.relevant_game.is_active()]
 
@@ -1188,10 +1183,6 @@ class Character_Death(models.Model):
     cause_of_death= models.CharField(max_length=200,
                                      null=True,
                                      blank=True)
-    def save(self, *args, **kwargs):
-        if self.pk is None:
-            self.relevant_character.delete_upcoming_attendances()
-        super(Character_Death, self).save(*args, **kwargs)
 
 class Graveyard_Header(models.Model):
     header = models.TextField()
