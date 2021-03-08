@@ -109,7 +109,7 @@ class Game(models.Model):
         return self.status == GAME_STATUS[4][0]
 
     def is_void(self):
-        return self.status == GAME_STATUS[4][0]
+        return self.status == GAME_STATUS[5][0]
 
     def is_recorded(self):
         return self.status == GAME_STATUS[6][0]
