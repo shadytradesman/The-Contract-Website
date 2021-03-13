@@ -1118,8 +1118,6 @@ class Character_Death(models.Model):
                                      null=True,
                                      blank=True)
     def save(self, *args, **kwargs):
-        if self.pk is None:
-            self.relevant_character.delete_upcoming_attendances()
         super(Character_Death, self).save(*args, **kwargs)
 
 class Graveyard_Header(models.Model):
