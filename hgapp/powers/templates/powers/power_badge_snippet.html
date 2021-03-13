@@ -44,7 +44,7 @@
                           data-html="true"
                           title='{{instance.relevant_enhancement.description}}
                           {{instance.relevant_enhancement.eratta|linebreaks}}'>
-                        {{instance.relevant_enhancement.name}}
+                        {{instance.relevant_enhancement.display}}
                     </span>
                 {% endfor %}
             </p>
@@ -59,7 +59,7 @@
                           data-html="true"
                           title='{{instance.relevant_drawback.description|linebreaks}}
                           {{instance.relevant_drawback.eratta|linebreaks}}'>
-                        {{instance.relevant_drawback.name}}
+                        {{instance.relevant_drawback.display}}
                     </span>
                 {% endfor %}
             </p>
