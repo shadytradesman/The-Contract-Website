@@ -272,7 +272,7 @@ def make_archive_game_general_info_form(gm):
                                 max_length=100,
                                 help_text='The Game\'s name.')
         occurred_time = forms.DateTimeField(label='Date Played',
-                                            widget=DateTimePicker(options=False),
+                                            widget=DateTimePicker(options=False, format=date_format),
                                             input_formats=[date_format],
                                             help_text='When did this Game occur?')
         timezone = forms.ChoiceField(
@@ -281,6 +281,7 @@ def make_archive_game_general_info_form(gm):
             required=False,
             initial=timezone.get_current_timezone()
         )
+
     return ArchiveGeneralInfoForm
 
 class ArchivalOutcomeForm(forms.Form):

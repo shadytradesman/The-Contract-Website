@@ -32,7 +32,10 @@ urlpatterns = [
     # ex: .com/games/edit-completed/g/112/p/9520+323+412/
     url(r'^edit-completed/g/(?P<game_id>[\d]+)/p/(?P<players>[\d\+]*)/$',
         views.edit_completed,
-        name='games_finalize_add_attendance'),
+        name='games_edit_completed'),
+    url(r'^edit-completed/g/(?P<game_id>[\d]+)/$',
+        views.edit_completed,
+        name='games_edit_completed'),
 
     # ex: .com/games/create/game/ex/cell/1
     url(r'^create/game/ex/cell/(?P<cell_id>[\d]+)/$',

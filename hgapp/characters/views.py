@@ -159,7 +159,7 @@ def view_character(request, character_id, secret_key = None):
     completed_games = [(x.relevant_game.end_time, "game", x) for x in character.completed_games()] # completed_games() does ordering
     character_edit_history = [(x.created_time, "edit", x) for x in
                               character.contractstats_set.filter(is_snapshot=False).order_by("created_time").all()[1:]]
-    exp_rewards = [(x.created_time, "exp_reward", x) for x in character.experiencereward_set.order_by("created_time").all()]
+    exp_rewards = [(x.created_time, "exp_reward", x) for x in character.experiencereward_set.filter(is_void=False).order_by("created_time").all()]
     events_by_date = list(merge(completed_games, character_edit_history, exp_rewards))
     timeline = defaultdict(list)
     for event in events_by_date:
@@ -288,7 +288,7 @@ def allocate_gm_exp(request, secret_key = None):
     if request.method == 'POST':
         reward_formset = RewardFormset(
             request.POST,
-            initial=[{"reward": x} for x in request.user.experiencereward_set.filter(rewarded_character=None).all()])
+            initial=[{"reward": x} for x in request.user.profile.get_avail_exp_rewards()])
         if reward_formset.is_valid():
             for form in reward_formset:
                 reward = get_object_or_404(ExperienceReward, id=form.cleaned_data["reward_id"])
@@ -307,7 +307,7 @@ def allocate_gm_exp(request, secret_key = None):
             raise ValueError("Invalid reward forms")
     else:
         reward_formset = RewardFormset(
-            initial=[{"reward": x} for x in request.user.experiencereward_set.filter(rewarded_character=None).all()])
+            initial=[{"reward": x} for x in request.user.profile.get_avail_exp_rewards()])
         context = {
             'reward_formset': reward_formset,
         }

@@ -12,13 +12,20 @@ from games.games_constants import GAME_STATUS
 
 from hgapp.utilities import get_object_or_none
 
+WIN = 'WIN'
+LOSS = 'LOSS'
+DEATH = 'DEATH'
+DECLINED = 'DECLINED'
+RINGER_VICTORY = 'RINGER_VICTORY'
+RINGER_FAILURE = 'RINGER_FAILURE'
+
 OUTCOME = (
-    ('WIN', 'Victory'),
-    ('LOSS', 'Loss'),
-    ('DEATH', 'Died'),
-    ('DECLINED', 'Declined Harbinger Invite'),
-    ('RINGER_VICTORY', 'Ringer Victory'),
-    ('RINGER_FAILURE', 'Ringer Failure'),
+    (WIN, 'Victory'),
+    (LOSS, 'Loss'),
+    (DEATH, 'Died'),
+    (DECLINED, 'Declined Harbinger Invite'),
+    (RINGER_VICTORY, 'Ringer Victory'),
+    (RINGER_FAILURE, 'Ringer Failure'),
 )
 
 DISCOVERY_REASON = (
@@ -276,21 +283,27 @@ class Game_Attendance(models.Model):
     experience_reward = models.OneToOneField(ExperienceReward,
                                           null=True,
                                           blank=True,
-                                          on_delete=models.CASCADE)
+                                          on_delete=models.SET_NULL)
 
     def is_victory(self):
-        return self.outcome == OUTCOME[0][0]
+        return self.outcome == WIN
 
     def is_loss(self):
-        return self.outcome == OUTCOME[1][0]
+        return self.outcome == LOSS
 
     def is_death(self):
-        return self.outcome == OUTCOME[2][0]
+        return self.outcome == DEATH
 
     def is_ringer_victory(self):
-        return self.outcome == OUTCOME[4][0]
+        return self.outcome == RINGER_VICTORY
 
-    def associated_active_reward(self):
+    def is_ringer_failure(self):
+        return self.outcome == RINGER_FAILURE
+
+    def is_declined_invite(self):
+        return self.outcome == DECLINED
+
+    def associated_character_reward(self):
         if self.attending_character:
             return self.attending_character.reward_set.filter(relevant_game=self.relevant_game.id).filter(is_void=False).first()
         else:
@@ -310,8 +323,49 @@ class Game_Attendance(models.Model):
         else:
             return self.game_invite.invited_player
 
+    # Changes the outcome of the GameAttendance. Handles Gifts, Experience Rewards, attending Character, Character death
+    # status, and confirmation status. This method does NOT update the Game's golden ratio rewards.
+    def change_outcome(self, new_outcome, is_confirmed, attending_character=None):
+        current_outcome = self.outcome
+        if current_outcome == new_outcome and attending_character == self.attending_character and self.is_confirmed == is_confirmed:
+            return
+        current_reward = self.get_reward()
+        # Void rewards
+        if current_reward:
+            current_reward.mark_void()
+        # Void experience rewards
+        if hasattr(self, "experience_reward") and self.experience_reward:
+            self.experience_reward.mark_void()
+            self.experience_reward = None
+        # Void deaths
+        if hasattr(self, "character_death") and self.character_death:
+            self.character_death.mark_void()
+            self.character_death = None
+        # If it's a ringer outcome, unassign character
+        if new_outcome == RINGER_VICTORY or new_outcome == RINGER_FAILURE:
+            if attending_character:
+                raise ValueError("Cannot change to a different character when declaring a ringer outcome")
+            self.attending_character = None
+        # If it's a character outcome, check to see if this attendance has a character
+        elif (new_outcome == DEATH or new_outcome == WIN or new_outcome == LOSS or new_outcome == DECLINED) \
+            and not (hasattr(self, "attending_character") and self.attending_character):
+            if not attending_character:
+                raise ValueError("Must pass character when changing ringer outcome to contractor outcome")
+        # If we're changing attending character, do so
+        if attending_character:
+            self.attending_character = attending_character
+            # Update invited player if necessary
+            if hasattr(self, "game_invite") and self.game_invite:
+                if self.attending_character.player != self.game_invite.invited_player:
+                    self.game_invite.invited_player = self.attending_character.player
+                    self.game_invite.save()
+        self.outcome = new_outcome
+        self.is_confirmed = is_confirmed
+        self.save()
+        self.give_reward()
+
     def give_reward(self):
-        if not self.is_confirmed:
+        if not self.is_confirmed or self.get_reward():
             return None
         if self.outcome is None:
             raise ValueError("Error, game attendance has no outcome when game is being transitioned to finished.",
@@ -322,7 +376,7 @@ class Game_Attendance(models.Model):
                                    rewarded_player=self.attending_character.player,
                                    is_improvement=False)
             player_reward.save()
-        if self.attending_character and not self.is_death():
+        if self.attending_character and not self.is_death() and not self.is_declined_invite():
             exp_reward = ExperienceReward(
                 rewarded_character=self.attending_character,
                 rewarded_player=self.attending_character.player,
@@ -348,13 +402,22 @@ class Game_Attendance(models.Model):
             self.experience_reward = exp_reward
             self.save()
 
+    # Save attendance, creating scenario discoveries as needed, killing characters if needed, and setting GM perms on the
+    # character
     def save(self, *args, **kwargs):
+        game = self.relevant_game
+        if hasattr(self, "attending_character") and self.attending_character and hasattr(self, "game_invite") and self.game_invite:
+            if self.attending_character.player != self.game_invite.invited_player:
+                raise ValueError("Attendance's invited player and attending_character's player differ!")
+        if self.outcome and not (hasattr(self, "attending_character") and self.attending_character):
+            if not (self.is_ringer_victory() or self.is_ringer_failure()):
+                raise ValueError("Cannot save a non-ringer completed attendance without a character")
         if self.outcome and self.attending_character and self.is_confirmed:
             # if game is finished, reveal scenario to those who brought characters.
-            self.relevant_game.scenario.played_discovery(self.attending_character.player)
+            game.scenario.played_discovery(self.attending_character.player)
         if self.pk is not None:
             orig = Game_Attendance.objects.get(pk=self.pk)
-            if orig.attending_character != self.attending_character:
+            if orig.attending_character and orig.attending_character != self.attending_character:
                 #if attending character has changed
                 orig.attending_character.default_perms_char_and_powers_to_player(self.relevant_game.gm)
         if self.outcome == OUTCOME[2][0] and not self.character_death and self.is_confirmed and self.attending_character:
@@ -626,6 +689,10 @@ class Reward(models.Model):
                             is_improvement = self.is_improvement,
                             is_charon_coin = self.is_charon_coin)
         new_reward.save()
+
+    def mark_void(self):
+        self.is_void = True
+        self.save()
 
     def assign_to_power(self, power):
         self.relevant_power = power

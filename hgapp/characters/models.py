@@ -471,7 +471,7 @@ class Character(models.Model):
         return int(total_exp - exp_cost)
 
     def exp_earned(self):
-        rewards = self.experiencereward_set.all()
+        rewards = self.experiencereward_set.filter(is_void=False).all()
         total_exp = EXP_NEW_CHAR
         for reward in rewards:
             total_exp = total_exp + reward.get_value()
@@ -667,6 +667,12 @@ class ExperienceReward(models.Model):
                                            on_delete=models.CASCADE)
     rewarded_player = models.ForeignKey(settings.AUTH_USER_MODEL,
                                         on_delete=models.CASCADE)
+    is_void = models.BooleanField(default=False)
+
+
+    def mark_void(self):
+        self.is_void = True
+        self.save()
 
     # returns one of several potential classes. Intended to be used with visitor pattern
     def get_source(self):
@@ -1183,6 +1189,11 @@ class Character_Death(models.Model):
     cause_of_death= models.CharField(max_length=200,
                                      null=True,
                                      blank=True)
+
+    def mark_void(self):
+        self.is_void = True
+        self.save()
+
 
 class Graveyard_Header(models.Model):
     header = models.TextField()

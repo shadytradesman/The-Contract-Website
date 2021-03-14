@@ -15,7 +15,7 @@ from games.forms import CreateScenarioForm, CellMemberAttendedForm, make_game_fo
     RsvpAttendanceForm
 
 from .game_form_utilities import get_context_for_create_finished_game, change_time_to_current_timezone, convert_to_localtime, \
-    create_archival_game
+    create_archival_game, get_context_for_completed_edit, handle_edit_completed_game
 from .games_constants import GAME_STATUS
 
 
@@ -560,7 +560,7 @@ def end_game(request, game_id):
 def allocate_improvement_generic(request):
     if not request.user.is_authenticated:
         raise PermissionDenied("You must be logged in to allocate improvements")
-    avail_improvements = request.user.rewarded_player.filter(rewarded_character=None).filter(is_void=False).all()
+    avail_improvements = request.user.profile.get_avail_improvements()
     if len(avail_improvements) > 0:
         return HttpResponseRedirect(reverse('games:games_allocate_improvement', args=(avail_improvements.first().id,)))
     else:
@@ -673,7 +673,13 @@ def add_attendance(request, game_id):
 def edit_completed(request, game_id, players = None):
     game = get_object_or_404(Game, id=game_id)
     check_perms_for_edit_completed(request, game)
-    player_list = [get_object_or_404(User, id=player_id) for player_id in players.split('+')] if players else []
+    new_player_list = [get_object_or_404(User, id=player_id) for player_id in players.split('+')] if players else []
+    if request.method == 'POST':
+        handle_edit_completed_game(request, game, players, new_player_list)
+        return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
+    else:
+        context = get_context_for_completed_edit(game, new_player_list, players)
+        return render(request, 'games/edit_archive_game.html', context)
 
 
 def check_perms_for_edit_completed(request, game):

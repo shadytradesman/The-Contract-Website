@@ -23,13 +23,25 @@
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h1>
-                    Declaring a completed Game in <a href="{% url 'cells:cells_view_cell' cell.id %}">{{cell.name}}</a>
+                    {% if game %}
+                        Editing the Game where {{game.gm}} ran {{game.scenario.title}} in {{game.cell.name}}
+                    {% else %}
+                        Declaring a completed Game in <a href="{% url 'cells:cells_view_cell' cell.id %}">{{cell.name}}</a>
+                    {% endif %}
                 </h1>
                 <h3><small>
                     If you would like schedule an upcoming game, <a href="{% url 'games:games_create_game' %}">Click Here</a>
                 </small></h3>
             </div>
-            <form action="{% url 'games:games_edit_ex_game_add_players' cell_id=cell.id gm_user_id=gm_user_id players=players%}" method="post">
+            <form action=
+                    {% if game and players %}
+                        "{% url 'games:games_edit_completed' game_id=game.id players=players%}"
+                    {% elif game %}
+                        "{% url 'games:games_edit_completed' game_id=game.id %}"
+                    {% else %}
+                        "{% url 'games:games_edit_ex_game_add_players' cell_id=cell.id gm_user_id=gm_user_id players=players%}"
+                    {% endif %}
+                  method="post">
                 {% csrf_token %}
                 {{ general_form.about.errors }}
                 {{ general_form.management_form }}
@@ -65,10 +77,19 @@
                     </ul>
                 </div>
                 <div class = "panel-footer">
-                    <div class="alert alert-warning" role="alert">
-                        Warning: Once you confirm this game, you will be unable to edit or delete it.
-                    </div>
-                    <input class="btn btn-primary" type="submit" value="Submit Completed Game"/>
+                    {% if not game %}
+                        <div class="alert alert-warning" role="alert">
+                            Warning: Once you confirm this game, you will be unable to edit the GM or Cell,
+                            and you will be unable to delete it.
+                        </div>
+                    {% endif %}
+                    <input class="btn btn-primary" type="submit"
+                           {% if game %}
+                             value="Submit Edits"
+                           {% else %}
+                              value="Submit Completed Game"
+                           {% endif %}
+                    />
                 </div>
             </form>
         </div>

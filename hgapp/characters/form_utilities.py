@@ -162,8 +162,7 @@ def delete_trauma_rev(character, trauma_rev, used_xp):
 def __get_charon_coin_form(user, existing_character=None, POST=None):
     if not user.is_authenticated:
         return None
-    avail_charon_coins = user.rewarded_player.filter(rewarded_character=None, is_charon_coin=True).filter(
-        is_void=False).all()
+    avail_charon_coins = user.profile.get_avail_charon_coins()
     coin_eligible = not existing_character or not existing_character.completed_games()
     if coin_eligible and (avail_charon_coins or (existing_character and existing_character.assigned_coin())):
         CharonCoinForm = make_charon_coin_form(existing_character)
