@@ -110,21 +110,25 @@ def _get_text_field_formsets_for_edit(power, system):
     TextFieldsFormset = formset_factory(SystemFieldTextForm, extra=0)
     text_system_fields = system.systemfieldtext_set.order_by("id").all()
     instances = power.systemfieldtextinstance_set.all()
-    value_by_field_id = {n.relevant_field.id:n.value  for n in instances}
+    value_by_field_id = {n.relevant_field.id: n.value for n in instances}
     return TextFieldsFormset(
-        initial=[{'system_field_id': x.id, 'system_field': x, 'field_text': value_by_field_id[x.id]} for x in text_system_fields],
+        initial=[{'system_field_id': x.id,
+                  'system_field': x,
+                  'field_text': value_by_field_id[x.id] if x.id in value_by_field_id else ""
+                  } for x in text_system_fields],
         prefix="system_text_fields")
 
 def _get_roll_field_formsets_for_edit(power, system):
     RollFieldsFormset = formset_factory(SystemFieldRollForm, extra=0)
     roll_system_fields = system.systemfieldroll_set.order_by("id").all()
     instances = power.systemfieldrollinstance_set.all()
-    value_by_field_id = {n.relevant_field.id:n.roll for n in instances}
+
+    value_by_field_id = {n.relevant_field.id: n.roll for n in instances}
     return RollFieldsFormset(
         initial=[{'system_field_id': x.id,
                   'system_field': x,
-                  'ability_roll': _get_roll_initial_ability(value_by_field_id[x.id]),
-                  'attribute_roll': _get_roll_initial_attribute(value_by_field_id[x.id]),
+                  'ability_roll': _get_roll_initial_ability(value_by_field_id[x.id]) if x.id in value_by_field_id else None,
+                  'attribute_roll': _get_roll_initial_attribute(value_by_field_id[x.id]) if x.id in value_by_field_id else None,
                   }
                  for x in roll_system_fields],
         prefix="system_roll_fields")
