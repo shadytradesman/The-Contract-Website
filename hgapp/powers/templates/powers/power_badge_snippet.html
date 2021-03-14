@@ -39,14 +39,14 @@
                 <ul>
                 {% for instance in power_full.latest_revision.enhancement_instance_set.all %}
                     <li>
-                    {% if instance.relevant_enhancement.eratta%}
+                        <b>{{instance.relevant_enhancement.name}}:</b> {{instance.relevant_enhancement.description}}
+                        {% if instance.relevant_enhancement.eratta%}
                         <span data-toggle="tooltip" 
                             title="{{instance.relevant_enhancement.eratta}}"
                             data-placement="top">
                             <i class="fa fa-question-circle fa-1x"></i>
                         </span>
-                    {% endif %}
-                        <b>{{instance.relevant_enhancement.name}}:</b> {{instance.relevant_enhancement.description}}
+                        {% endif %}
                         {% if instance.detail%}
                             <ul><li>
                                 {{instance.relevant_enhancement.detail_field_label}}: {{instance.detail}}
@@ -63,14 +63,14 @@
                 <ul>
                 {% for instance in power_full.latest_revision.drawback_instance_set.all %}
                     <li>
-                    {% if instance.relevant_drawback.eratta%}
+                        <b>{{instance.relevant_drawback.name}}:</b> {{instance.relevant_drawback.description}}
+                        {% if instance.relevant_drawback.eratta%}
                         <span data-toggle="tooltip" 
                             title="{{instance.relevant_drawback.eratta}}"
                             data-placement="top">
                             <i class="fa fa-question-circle fa-1x"></i>
                         </span>
                     {% endif %}
-                        <b>{{instance.relevant_drawback.name}}:</b> {{instance.relevant_drawback.description}}
                         {% if instance.detail%}
                             <ul><li>
                                 {{instance.relevant_drawback.detail_field_label}}: {{instance.detail}}
