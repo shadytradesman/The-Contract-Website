@@ -213,6 +213,9 @@ class Base_Power(models.Model):
     def example_powers(self):
         return Power_Full.objects.filter(base=self, tags__in=["example"])
 
+    def get_system(self):
+        return Base_Power_System.objects.filter(dice_system=DICE_SYSTEM[1][0]).get(base_power=self)
+
 class Base_Power_System(models.Model):
     base_power = models.ForeignKey(Base_Power,
                                    on_delete=models.PROTECT)
@@ -428,7 +431,9 @@ class Power(models.Model):
                               on_delete=models.CASCADE,
                                    blank=True,
                                    null=True)
-    system = models.TextField(max_length = 2000)
+    system = models.TextField(max_length = 9000,
+                              blank=True,
+                              null=True)
     selected_enhancements = models.ManyToManyField(Enhancement,
                                                    blank=True,
                                                    through="Enhancement_Instance",
@@ -446,6 +451,12 @@ class Power(models.Model):
         permissions = (
             ('view_private_power', 'View private power'),
         )
+
+    def get_system(self):
+        if hasattr(self, "system") and self.system:
+            return self.system
+        else:
+            return self.base.get_system().system_text
 
     def player_manages_via_cell(self, player):
         if self.parent_power:
@@ -486,7 +497,7 @@ class Power(models.Model):
             remove_perm('view_private_power', player, self)
 
     def render_system(self):
-        default_system = linebreaks(escape(self.system))
+        default_system = linebreaks(escape(self.get_system()))
         value_by_name = {param_val.relevant_power_param.relevant_parameter.name :
                              param_val.relevant_power_param.relevant_parameter.get_value_for_level(level=param_val.value)
                          for param_val in self.parameter_value_set.all()}
@@ -507,7 +518,7 @@ class Power(models.Model):
         output = "{}\nA {} point {} {} power\nCreated by {}\n"
         output = output.format(self.name, self.get_point_value(), self.get_activation_style_display(), self.base.name, self.created_by.username)
         output = output + "{}\nDescription: {}\nSystem: {}\n"
-        output = output.format(self.flavor_text,self.description, self.system)
+        output = output.format(self.flavor_text,self.description, self.get_system())
         output = output + "Parameters:\n-------------\n"
         for parameter_value in self.parameter_value_set.all():
             output = output + "{}"
@@ -534,6 +545,13 @@ class Power(models.Model):
 
     def __str__(self):
         return self.name + " (" + self.description + ")"
+
+    def save(self, *args, **kwargs):
+        if hasattr(self, "system") and self.system:
+            if self.system == self.base.get_system().system_text:
+                self.system = None
+        super(Power, self).save(*args, **kwargs)
+
 
 class Power_Link(models.Model):
     parent_power = models.ForeignKey(Power_Full,

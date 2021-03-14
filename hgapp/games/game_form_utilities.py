@@ -130,7 +130,6 @@ def _update_or_add_attendance(request, form, game):
             attendance.change_outcome(new_outcome=form.cleaned_data['outcome'],
                                       is_confirmed=is_confirmed,
                                       attending_character=attending_character)
-            
     else:
         # New Attendance
         attendance = Game_Attendance(

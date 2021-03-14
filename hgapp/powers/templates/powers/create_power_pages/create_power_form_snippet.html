@@ -83,7 +83,7 @@
                     <p>{{ base_power.description|linebreaks }}</p>
                     <div class="js-system-static">
                         {% if og_power %}
-                            <p>{{ og_power.system|linebreaks }}</p>
+                            <p>{{ og_power.get_system|linebreaks }}</p>
                         {% else %}
                             <p>{{ power_system.system_text|linebreaks }}</p>
                         {% endif %}

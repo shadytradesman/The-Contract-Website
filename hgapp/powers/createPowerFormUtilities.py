@@ -17,7 +17,7 @@ bad_chars = set("\0\'\"\b\n\r\t\Z\\\%\_;*|,/=?")
 
 
 def get_create_power_context_from_base(base_power, character=None):
-    system = Base_Power_System.objects.filter(dice_system=DICE_SYSTEM[1][0]).get(base_power=base_power)
+    system = base_power.get_system()
     primary_form = CreatePowerForm(base_power, initial={'system': system.system_text})
     enhancement_forms = []
     for enhancement in Enhancement.objects.filter(pk__in=base_power.enhancements.all()):
@@ -57,7 +57,7 @@ def get_create_power_context_from_base(base_power, character=None):
 
 
 def get_create_power_context_from_power(power, new=True):
-    initial = {'system': power.system,
+    initial = {'system': power.get_system(),
      'description': power.description,
      'flavor': power.flavor_text,
      'activation_style': power.activation_style,
