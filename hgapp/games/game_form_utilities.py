@@ -43,6 +43,7 @@ def get_context_for_create_finished_game(player_list, players, gm, cell, GenInfo
 def _get_outcome_formset_for_edit(game, new_player_list, POST=None):
     ArchivalOutcomeFormset = formset_factory(ArchivalOutcomeForm, extra=0)
     initial_existing = [{'player_id': attendance.get_player().id,
+                         'attendance_id': attendance.id,
                          'invited_player': attendance.get_player(),
                          'attending_character': attendance.attending_character,
                          'outcome': attendance.outcome,
@@ -68,12 +69,13 @@ def get_context_for_completed_edit(game, new_player_list, new_player_ids):
         'game': game,
     }
 
-def handle_edit_completed_game(request, game, players, new_player_list):
+def handle_edit_completed_game(request, game, new_player_list):
     general_form = _get_general_completed_form_for_edit(game, request.POST)
     outcome_formset = _get_outcome_formset_for_edit(game, new_player_list, request.POST)
     if general_form.is_valid():
         if outcome_formset.is_valid():
             with transaction.atomic():
+                original_game_ratio = game.achieves_golden_ratio()
                 if "timezone" in general_form.changed_data or "occurred_time" in general_form.changed_data:
                     occurred_time = general_form.cleaned_data['occurred_time']
                     if "timezone" in general_form.cleaned_data:
@@ -84,31 +86,64 @@ def handle_edit_completed_game(request, game, players, new_player_list):
                     game.end_time = occurred_time
                 if "scenario" in general_form.changed_data:
                     game.scenario = general_form.cleaned_data['scenario']
-                    # Updating scenario discoveries happens on attendence save.
+                    # Updating scenario discoveries happens on attendance save.
                 game.title = general_form.cleaned_data['title']
                 game.save()
                 for form in outcome_formset:
-                    pass
-                    # PUT ATTENDANCE ID IN FORM SO WE KNOW IF ITS A CHANGE OR NOT.
-
-                    # if 'attending_character' in form.cleaned_data \
-                    #         and not form.cleaned_data['attending_character'] is None:
-                    #     if hasattr(form.cleaned_data['attending_character'], 'cell'):
-                    #         attendance.attending_character = form.cleaned_data['attending_character']
-                    #         if not form.cleaned_data['attending_character'].cell == cell:
-                    #             attendance.is_confirmed = False
-                    #     else:
-                    #         attendance.is_confirmed = False
-                    # else:
-                    #     game_invite.as_ringer = True
-                    #     attendance.is_confirmed = False
-                    # if game.creator.id == player.id:
-                    #     attendance.is_confirmed = True
+                    _update_or_add_attendance(request, form, game)
+                game.refresh_from_db()
+                game.recalculate_golden_ratio(original_game_ratio)
         else:
             raise ValueError("Invalid outcome formset in completed edit")
     else:
         raise ValueError("Invalid general info formset in completed edit")
 
+def _update_or_add_attendance(request, form, game):
+    player = get_object_or_404(User, id=form.cleaned_data['player_id'])
+    is_confirmed = False
+    if 'attending_character' in form.cleaned_data \
+            and form.cleaned_data['attending_character']:
+        if hasattr(form.cleaned_data['attending_character'], 'cell'):
+            if not form.cleaned_data['attending_character'].cell == game.cell:
+                is_confirmed = False
+        else:
+            is_confirmed = False
+    else:
+        is_confirmed = False
+    if request.user.id == player.id:
+        is_confirmed = True
+    notes = None
+    if "notes" in form.changed_data:
+        notes = form.cleaned_data['notes']
+    attending_character = None
+    if 'attending_character' in form.cleaned_data \
+            and not form.cleaned_data['attending_character'] is None:
+        attending_character = form.cleaned_data['attending_character']
+    if form.cleaned_data['attendance_id']:
+        # Edit existing Attendance
+        attendance = get_object_or_404(Game_Attendance, id=form.cleaned_data['attendance_id'])
+        if notes:
+            attendance.notes = notes
+            attendance.save()
+        attendance.change_outcome(new_outcome=form.cleaned_data['outcome'],
+                                  is_confirmed=is_confirmed,
+                                  attending_character=attending_character)
+    else:
+        # New Attendance
+        attendance = Game_Attendance(
+            relevant_game=game,
+            notes=notes,
+            outcome=form.cleaned_data['outcome'],
+            is_confirmed=is_confirmed,
+        )
+        game_invite = Game_Invite(invited_player=player,
+                                  relevant_game=game,
+                                  as_ringer=False,)
+        game_invite.save()
+        attendance.save()
+        game_invite.attendance = attendance
+        game_invite.save()
+        attendance.give_reward()
 
 def _get_general_completed_form_for_edit(game, POST=None):
     GenInfoForm = make_archive_game_general_info_form(game.gm)

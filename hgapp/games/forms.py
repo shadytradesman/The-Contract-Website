@@ -289,6 +289,10 @@ class ArchivalOutcomeForm(forms.Form):
                             max_length=200,
                             widget=forms.HiddenInput(),
                             required=True,)
+    attendance_id = forms.CharField(label=None,
+                            max_length=200,
+                            widget=forms.HiddenInput(),
+                            required=False,)
 
     attending_character = CharacterModelChoiceField(queryset=Character.objects.all(),
                                                     empty_label="Played a Ringer",
@@ -304,9 +308,13 @@ class ArchivalOutcomeForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(ArchivalOutcomeForm, self).__init__(*args, **kwargs)
         # user may have declared character dead after the game ended, so allow selecting dead characters
-        queryset = self.initial["invited_player"].character_set.filter(is_deleted=False)\
-            .exclude(character_death__is_void = False, character_death__game_attendance__isnull = False)\
-            .distinct()
+        if "attendance_id" in self.initial and self.initial["attendance_id"]:
+            queryset = self.initial["invited_player"].character_set.filter(is_deleted=False) \
+                .distinct()
+        else:
+            queryset = self.initial["invited_player"].character_set.filter(is_deleted=False)\
+                .exclude(character_death__is_void = False, character_death__game_attendance__isnull = False)\
+                .distinct()
         self.fields['attending_character'].queryset = queryset
 
 class RsvpAttendanceForm(forms.Form):

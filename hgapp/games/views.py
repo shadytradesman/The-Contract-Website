@@ -294,11 +294,13 @@ def view_game(request, game_id):
     if request.user.has_perm('edit_game', game) and game.is_scheduled():
         initial_data = {"message": game.hook}
         invite_form = CustomInviteForm(initial=initial_data)
+    can_edit = request.user.is_authenticated and request.user.has_perm('edit_game', game)
     context = {
         'game': game,
         'can_view_scenario': can_view_scenario,
         'my_invitation': my_invitation,
         'invite_form': invite_form,
+        'can_edit': can_edit,
     }
     return render(request, 'games/view_game_pages/view_game.html', context)
 
@@ -675,7 +677,7 @@ def edit_completed(request, game_id, players = None):
     check_perms_for_edit_completed(request, game)
     new_player_list = [get_object_or_404(User, id=player_id) for player_id in players.split('+')] if players else []
     if request.method == 'POST':
-        handle_edit_completed_game(request, game, players, new_player_list)
+        handle_edit_completed_game(request, game, new_player_list)
         return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
     else:
         context = get_context_for_completed_edit(game, new_player_list, players)
@@ -685,10 +687,13 @@ def edit_completed(request, game_id, players = None):
 def check_perms_for_edit_completed(request, game):
     if not request.user.is_authenticated:
         raise PermissionDenied("You must log in.")
-    if not request.user.has_perm('edit_game', game):
-        raise PermissionDenied("You don't have permission to edit this Game")
     if not (game.is_finished() or game.is_archived() or game.is_recorded()):
         raise PermissionDenied("You can't add an attendance to a Game that isn't finished.")
+    if game.cell.player_can_manage_games(request.user):
+        return
+    if not request.user.has_perm('edit_game', game):
+        raise PermissionDenied("You don't have permission to edit this Game")
+
 
 
 def confirm_attendance(request, attendance_id, confirmed=None):

@@ -30,6 +30,9 @@
                 {% if game.is_scheduled %}
                     <li><a href="{% url 'games:games_game_edit' game.id %}">Edit Game</a></li>
                 {% endif %}
+                {% if game.is_finished or game.is_recorded %}
+                    <li class="active"><a href="{% url 'games:games_edit_completed' game.id %}">Edit Attendances and Outcomes</a></li>
+                {% endif %}
                 {% if game.is_active or game.is_scheduled %}
                     <li><a href="{% url 'games:games_cancel_game' game.id %}">Cancel Game</a></li>
                 {% endif %}
@@ -39,6 +42,7 @@
                 {% if game.is_active %}
                     <li class="active"><a href="{% url 'games:games_end_game' game.id %}">Finish Game</a></li>
                 {% endif %}
+
             </ul>
             <br>
         {% endif %}
@@ -100,7 +104,7 @@
                         {% elif game.is_canceled%}
                             but was canceled and never occurred
                         {% else %}
-                            on {{ game.scheduled_start_time|date:'M d, Y' }} at {{ game.scheduled_start_time|date:'g:iA' }}
+                            on {{ game.end_time|date:'M d, Y' }} at {{ game.end_time|date:'g:iA' }}
                         {% endif %}
                     </h4>
                 <div class="panel-heading">

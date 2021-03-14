@@ -108,447 +108,447 @@ class GameModelTests(TestCase):
         char.regen_stats_snapshot()
 
 
-    # def test_archive_game_victory(self):
-    #     self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 0)
-    #     self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 0)
-    #     self.assertEquals(self.char_user1_cell.completed_games().count(), 0)
-    #     self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
-    #     self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
-    #     self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
-    #     self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR)
-    #     game = Game(
-    #         title="title",
-    #         creator=self.user2,
-    #         gm=self.user2,
-    #         created_date=timezone.now(),
-    #         scheduled_start_time=timezone.now(),
-    #         actual_start_time=timezone.now(),
-    #         end_time=timezone.now(),
-    #         status=GAME_STATUS[6][0],
-    #         cell=self.cell,
-    #     )
-    #     game.save()
-    #     attendance = Game_Attendance(
-    #         relevant_game=game,
-    #         notes="notes",
-    #         outcome=WIN,
-    #         attending_character=self.char_user1_cell,
-    #     )
-    #     game_invite = Game_Invite(invited_player=self.user1,
-    #                               relevant_game=game,
-    #                               as_ringer=False,
-    #                               )
-    #     attendance.save()
-    #     game_invite.attendance = attendance
-    #     game_invite.save()
-    #     game.give_rewards()
-    #     self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 1)
-    #     self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 1)
-    #     self.assertEquals(self.char_user1_cell.completed_games().count(), 1)
-    #     self.assertEquals(self.char_user1_cell.number_of_victories(), 1)
-    #     self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
-    #     self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
-    #     self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR + EXP_WIN)
-    #
-    # def test_archive_game_loss(self):
-    #     self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 0)
-    #     self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 0)
-    #     self.assertEquals(self.char_user1_cell.completed_games().count(), 0)
-    #     self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
-    #     self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
-    #     self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
-    #     self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR)
-    #     game = Game(
-    #         title="title",
-    #         creator=self.user2,
-    #         gm=self.user2,
-    #         created_date=timezone.now(),
-    #         scheduled_start_time=timezone.now(),
-    #         actual_start_time=timezone.now(),
-    #         end_time=timezone.now(),
-    #         status=GAME_STATUS[6][0],
-    #         cell=self.cell,
-    #     )
-    #     game.save()
-    #     attendance = Game_Attendance(
-    #         relevant_game=game,
-    #         notes="notes",
-    #         outcome=LOSS,
-    #         attending_character=self.char_user1_cell,
-    #     )
-    #     game_invite = Game_Invite(invited_player=self.user1,
-    #                               relevant_game=game,
-    #                               as_ringer=False,
-    #                               )
-    #     attendance.save()
-    #     game_invite.attendance = attendance
-    #     game_invite.save()
-    #     game.give_rewards()
-    #     self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 0)
-    #     self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 0)
-    #     self.assertEquals(self.char_user1_cell.completed_games().count(), 1)
-    #     self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
-    #     self.assertEquals(self.char_user1_cell.number_of_losses(), 1)
-    #     self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
-    #     self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR + EXP_LOSS)
-    #
-    # def test_archive_game_death(self):
-    #     self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 0)
-    #     self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 0)
-    #     self.assertEquals(self.char_user1_cell.completed_games().count(), 0)
-    #     self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
-    #     self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
-    #     self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
-    #     self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR)
-    #     self.assertEquals(
-    #         self.user1.rewarded_player
-    #             .filter(rewarded_character=None, is_charon_coin=True)
-    #             .filter(is_void=False).all().count(),
-    #         0)
-    #     game = Game(
-    #         title="title",
-    #         creator=self.user2,
-    #         gm=self.user2,
-    #         created_date=timezone.now(),
-    #         scheduled_start_time=timezone.now(),
-    #         actual_start_time=timezone.now(),
-    #         end_time=timezone.now(),
-    #         status=GAME_STATUS[6][0],
-    #         cell=self.cell,
-    #     )
-    #     game.save()
-    #     attendance = Game_Attendance(
-    #         relevant_game=game,
-    #         notes="notes",
-    #         outcome=OUTCOME[2][0], # death
-    #         attending_character=self.char_user1_cell,
-    #     )
-    #     game_invite = Game_Invite(invited_player=self.user1,
-    #                               relevant_game=game,
-    #                               as_ringer=False,
-    #                               )
-    #     attendance.save()
-    #     game_invite.attendance = attendance
-    #     game_invite.save()
-    #     game.give_rewards()
-    #     self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 0)
-    #     self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 0)
-    #     self.assertEquals(self.char_user1_cell.completed_games().count(), 1)
-    #     self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
-    #     self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
-    #     self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
-    #     self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR)
-    #     self.assertEquals(self.char_user1_cell.is_dead(), True)
-    #     self.assertEquals(
-    #         self.user1.rewarded_player
-    #             .filter(rewarded_character=None, is_charon_coin=True)
-    #             .filter(is_void=False).all().count(),
-    #         1)
-    #
-    # def test_archive_game_gm_rewards_basic(self):
-    #     self.assertEquals(self.user2.experiencereward_set.filter(rewarded_character=None).all().count(), 0)
-    #     self.assertEquals(self.user2.rewarded_player.filter(rewarded_character=None, is_charon_coin=False).filter(is_void=False).all().count(), 0)
-    #     self.assertEquals(
-    #         self.user1.rewarded_player
-    #             .filter(rewarded_character=None, is_charon_coin=True)
-    #             .filter(is_void=False).all().count(),
-    #         0)
-    #     game = Game(
-    #         title="title",
-    #         creator=self.user2,
-    #         gm=self.user2,
-    #         created_date=timezone.now(),
-    #         scheduled_start_time=timezone.now(),
-    #         actual_start_time=timezone.now(),
-    #         end_time=timezone.now(),
-    #         status=GAME_STATUS[6][0],
-    #         cell=self.cell,
-    #     )
-    #     game.save()
-    #     attendance = Game_Attendance(
-    #         relevant_game=game,
-    #         notes="notes",
-    #         outcome=DEATH,
-    #         attending_character=self.char_user1_cell,
-    #     )
-    #     game_invite = Game_Invite(invited_player=self.user1,
-    #                               relevant_game=game,
-    #                               as_ringer=False,
-    #                               )
-    #     attendance.save()
-    #     game_invite.attendance = attendance
-    #     game_invite.save()
-    #     game.give_rewards()
-    #     self.assertEquals(self.user2.experiencereward_set.filter(rewarded_character=None).all().count(), 1)
-    #     self.assertEquals(self.user2.rewarded_player.filter(rewarded_character=None, is_charon_coin=False).filter(is_void=False).all().count(), 0)
-    #     self.assertEquals(
-    #         self.user1.rewarded_player
-    #             .filter(rewarded_character=None, is_charon_coin=True)
-    #             .filter(is_void=False).all().count(),
-    #         1)
-    #
-    # def test_archive_game_gm_rewards_ratio(self):
-    #     self.assertEquals(self.user2.experiencereward_set.filter(rewarded_character=None).all().count(), 0)
-    #     self.assertEquals(
-    #         self.user2.rewarded_player.filter(rewarded_character=None, is_charon_coin=False).filter(is_void=False).all().count(), 0)
-    #
-    #     game = Game(
-    #         title="title",
-    #         creator=self.user2,
-    #         gm=self.user2,
-    #         created_date=timezone.now(),
-    #         scheduled_start_time=timezone.now(),
-    #         actual_start_time=timezone.now(),
-    #         end_time=timezone.now(),
-    #         status=GAME_STATUS[6][0],
-    #         cell=self.cell,
-    #     )
-    #     game.save()
-    #     attendance = Game_Attendance(
-    #         relevant_game=game,
-    #         notes="notes",
-    #         outcome=WIN,
-    #         attending_character=self.char_user1_cell,
-    #     )
-    #     game_invite = Game_Invite(invited_player=self.user1,
-    #                               relevant_game=game,
-    #                               as_ringer=False,
-    #                               )
-    #     attendance.save()
-    #     game_invite.attendance = attendance
-    #     game_invite.save()
-    #     attendance = Game_Attendance(
-    #         relevant_game=game,
-    #         notes="notes",
-    #         outcome=DEATH,
-    #         attending_character=self.char_user2_cell,
-    #     )
-    #     game_invite = Game_Invite(invited_player=self.user2,
-    #                               relevant_game=game,
-    #                               as_ringer=False,
-    #                               )
-    #     attendance.save()
-    #     game_invite.attendance = attendance
-    #     game_invite.save()
-    #     game.give_rewards()
-    #     self.assertEquals(self.user2.experiencereward_set.filter(rewarded_character=None).all().count(), 1)
-    #     self.assertEquals(self.user2.rewarded_player.filter(rewarded_character=None, is_charon_coin=False).filter(is_void=False).all().count(), 1)
-    #
-    # def test_archive_game_victory_not_in_cell(self):
-    #     self.assertEquals(self.char_user2_nocell.unspent_rewards().count(), 0)
-    #     self.assertEquals(self.char_user2_nocell.unspent_gifts().count(), 0)
-    #     self.assertEquals(self.char_user2_nocell.completed_games().count(), 0)
-    #     self.assertEquals(self.char_user2_nocell.number_of_victories(), 0)
-    #     self.assertEquals(self.char_user2_nocell.number_of_losses(), 0)
-    #     self.assertEquals(self.char_user2_nocell.stats_snapshot.sources.count(), 0)
-    #     self.assertEquals(self.char_user2_nocell.exp_earned(), EXP_NEW_CHAR)
-    #     self.assertEquals(self.user2.game_invite_set.filter(attendance__is_confirmed=False).exclude(is_declined=True).all().count(), 0)
-    #     game = Game(
-    #         title="title",
-    #         creator=self.user1,
-    #         gm=self.user1,
-    #         created_date=timezone.now(),
-    #         scheduled_start_time=timezone.now(),
-    #         actual_start_time=timezone.now(),
-    #         end_time=timezone.now(),
-    #         status=GAME_STATUS[6][0],
-    #         cell=self.cell,
-    #     )
-    #     game.save()
-    #     attendance = Game_Attendance(
-    #         relevant_game=game,
-    #         notes="notes",
-    #         outcome=OUTCOME[0][0], # victory
-    #         attending_character=self.char_user2_nocell,
-    #         is_confirmed = False,
-    #     )
-    #     game_invite = Game_Invite(invited_player=self.user2,
-    #                               relevant_game=game,
-    #                               as_ringer=False,
-    #                               )
-    #     attendance.save()
-    #     game_invite.attendance = attendance
-    #     game_invite.save()
-    #     game.give_rewards()
-    #     self.assertEquals(self.char_user2_nocell.unspent_rewards().count(), 0)
-    #     self.assertEquals(self.char_user2_nocell.unspent_gifts().count(), 0)
-    #     self.assertEquals(self.char_user2_nocell.completed_games().count(), 0)
-    #     self.assertEquals(self.char_user2_nocell.number_of_victories(), 0)
-    #     self.assertEquals(self.char_user2_nocell.number_of_losses(), 0)
-    #     self.assertEquals(self.char_user2_nocell.stats_snapshot.sources.count(), 0)
-    #     self.assertEquals(self.char_user2_nocell.exp_earned(), EXP_NEW_CHAR)
-    #     self.assertEquals(self.user2.game_invite_set.filter(attendance__is_confirmed=False).exclude(is_declined=True).all().count(), 1)
-    #
-    # def test_cannot_double_invite(self):
-    #     game = Game(
-    #         title="title",
-    #         creator=self.user1,
-    #         gm=self.user1,
-    #         created_date=timezone.now(),
-    #         scheduled_start_time=timezone.now(),
-    #         actual_start_time=timezone.now(),
-    #         end_time=timezone.now(),
-    #         status=GAME_STATUS[6][0],
-    #         cell=self.cell,
-    #     )
-    #     game.save()
-    #     game_invite = Game_Invite(invited_player=self.user2,
-    #                               relevant_game=game,
-    #                               as_ringer=False,
-    #                               )
-    #     game_invite.save()
-    #     game_invite2 = Game_Invite(invited_player=self.user2,
-    #                               relevant_game=game,
-    #                               as_ringer=False,
-    #                               )
-    #     with self.assertRaises(IntegrityError):
-    #         game_invite2.save()
-    #
-    # def test_archive_game_change_outcome(self):
-    #     with transaction.atomic():
-    #         game = Game(
-    #             title="title",
-    #             creator=self.user2,
-    #             gm=self.user2,
-    #             created_date=timezone.now(),
-    #             scheduled_start_time=timezone.now(),
-    #             actual_start_time=timezone.now(),
-    #             end_time=timezone.now(),
-    #             status=GAME_STATUS[6][0],
-    #             cell=self.cell,
-    #         )
-    #         game.save()
-    #         attendance = Game_Attendance(
-    #             relevant_game=game,
-    #             notes="notes",
-    #             outcome=WIN,
-    #             attending_character=self.char_user1_cell,
-    #         )
-    #         game_invite = Game_Invite(invited_player=self.user1,
-    #                                   relevant_game=game,
-    #                                   as_ringer=False,
-    #                                   )
-    #         attendance.save()
-    #         game_invite.attendance = attendance
-    #         game_invite.save()
-    #         game.give_rewards()
-    #         self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 1)
-    #         self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 1)
-    #         self.assertEquals(self.char_user1_cell.completed_games().count(), 1)
-    #         self.assertEquals(self.char_user1_cell.number_of_victories(), 1)
-    #         self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
-    #         self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
-    #         self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR + EXP_WIN)
-    #         self.assertEquals(self.user1.profile.get_avail_improvements().count(), 0)
-    #         self.assertEquals(self.user1.profile.get_avail_charon_coins().count(), 0)
-    #         self.assertEquals(self.user1.profile.get_avail_exp_rewards().count(), 0)
-    #
-    #         attendance.refresh_from_db()
-    #         attendance.change_outcome(new_outcome = LOSS, is_confirmed = True)
-    #         self.char_user1_cell.refresh_from_db()
-    #
-    #         self.assertEquals(self.char_user1_cell.is_dead(), False)
-    #         self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 0)
-    #         self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 0)
-    #         self.assertEquals(self.char_user1_cell.completed_games().count(), 1)
-    #         self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
-    #         self.assertEquals(self.char_user1_cell.number_of_losses(), 1)
-    #         self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
-    #         self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR + EXP_LOSS)
-    #         self.assertEquals(self.user1.profile.get_avail_improvements().count(), 0)
-    #         self.assertEquals(self.user1.profile.get_avail_charon_coins().count(), 0)
-    #         self.assertEquals(self.user1.profile.get_avail_exp_rewards().count(), 0)
-    #
-    #         attendance.refresh_from_db()
-    #         attendance.change_outcome(new_outcome = WIN, is_confirmed = True)
-    #
-    #         self.assertEquals(self.char_user1_cell.is_dead(), False)
-    #         self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 1)
-    #         self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 1)
-    #         self.assertEquals(self.char_user1_cell.completed_games().count(), 1)
-    #         self.assertEquals(self.char_user1_cell.number_of_victories(), 1)
-    #         self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
-    #         self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
-    #         self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR + EXP_WIN)
-    #         self.assertEquals(self.user1.profile.get_avail_improvements().count(), 0)
-    #         self.assertEquals(self.user1.profile.get_avail_charon_coins().count(), 0)
-    #         self.assertEquals(self.user1.profile.get_avail_exp_rewards().count(), 0)
-    #
-    #         attendance.refresh_from_db()
-    #         attendance.change_outcome(new_outcome = DEATH, is_confirmed = True)
-    #
-    #         self.assertEquals(self.char_user1_cell.is_dead(), True)
-    #         self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 0)
-    #         self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 0)
-    #         self.assertEquals(self.char_user1_cell.completed_games().count(), 1)
-    #         self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
-    #         self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
-    #         self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
-    #         self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR)
-    #         self.assertEquals(self.user1.profile.get_avail_improvements().count(), 0)
-    #         self.assertEquals(self.user1.profile.get_avail_charon_coins().count(), 1)
-    #         self.assertEquals(self.user1.profile.get_avail_exp_rewards().count(), 0)
-    #
-    #         attendance.refresh_from_db()
-    #         attendance.change_outcome(new_outcome=DECLINED, is_confirmed=True)
-    #
-    #         self.assertEquals(self.char_user1_cell.is_dead(), False)
-    #         self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 0)
-    #         self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 0)
-    #         self.assertEquals(self.char_user1_cell.completed_games().count(), 1) #Maybe this should be different?
-    #         self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
-    #         self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
-    #         self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
-    #         self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR)
-    #         self.assertEquals(self.user1.profile.get_avail_improvements().count(), 0)
-    #         self.assertEquals(self.user1.profile.get_avail_charon_coins().count(), 0)
-    #         self.assertEquals(self.user1.profile.get_avail_exp_rewards().count(), 0)
-    #
-    #         attendance.refresh_from_db()
-    #         attendance.change_outcome(new_outcome=RINGER_VICTORY, is_confirmed=True)
-    #
-    #         self.assertEquals(self.char_user1_cell.is_dead(), False)
-    #         self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 0)
-    #         self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 0)
-    #         self.assertEquals(self.char_user1_cell.completed_games().count(), 0)
-    #         self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
-    #         self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
-    #         self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
-    #         self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR)
-    #         self.assertEquals(self.user1.profile.get_avail_improvements().count(), 1)
-    #         self.assertEquals(self.user1.profile.get_avail_charon_coins().count(), 0)
-    #         self.assertEquals(self.user1.profile.get_avail_exp_rewards().count(), 1)
-    #
-    #         attendance.refresh_from_db()
-    #         attendance.change_outcome(new_outcome=RINGER_FAILURE, is_confirmed=True)
-    #
-    #         self.assertEquals(self.char_user1_cell.is_dead(), False)
-    #         self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 0)
-    #         self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 0)
-    #         self.assertEquals(self.char_user1_cell.completed_games().count(), 0)
-    #         self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
-    #         self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
-    #         self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
-    #         self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR)
-    #         self.assertEquals(self.user1.profile.get_avail_improvements().count(), 0)
-    #         self.assertEquals(self.user1.profile.get_avail_charon_coins().count(), 0)
-    #         self.assertEquals(self.user1.profile.get_avail_exp_rewards().count(), 0)
-    #
-    #         attendance.refresh_from_db()
-    #         attendance.change_outcome(new_outcome=WIN, is_confirmed=True, attending_character=self.char_user1_cell)
-    #
-    #         self.assertEquals(self.char_user1_cell.is_dead(), False)
-    #         self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 1)
-    #         self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 1)
-    #         self.assertEquals(self.char_user1_cell.completed_games().count(), 1)
-    #         self.assertEquals(self.char_user1_cell.number_of_victories(), 1)
-    #         self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
-    #         self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
-    #         self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR + EXP_WIN)
-    #         self.assertEquals(self.user1.profile.get_avail_improvements().count(), 0)
-    #         self.assertEquals(self.user1.profile.get_avail_charon_coins().count(), 0)
-    #         self.assertEquals(self.user1.profile.get_avail_exp_rewards().count(), 0)
-    #
+    def test_archive_game_victory(self):
+        self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 0)
+        self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 0)
+        self.assertEquals(self.char_user1_cell.completed_games().count(), 0)
+        self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
+        self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
+        self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
+        self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR)
+        game = Game(
+            title="title",
+            creator=self.user2,
+            gm=self.user2,
+            created_date=timezone.now(),
+            scheduled_start_time=timezone.now(),
+            actual_start_time=timezone.now(),
+            end_time=timezone.now(),
+            status=GAME_STATUS[6][0],
+            cell=self.cell,
+        )
+        game.save()
+        attendance = Game_Attendance(
+            relevant_game=game,
+            notes="notes",
+            outcome=WIN,
+            attending_character=self.char_user1_cell,
+        )
+        game_invite = Game_Invite(invited_player=self.user1,
+                                  relevant_game=game,
+                                  as_ringer=False,
+                                  )
+        attendance.save()
+        game_invite.attendance = attendance
+        game_invite.save()
+        game.give_rewards()
+        self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 1)
+        self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 1)
+        self.assertEquals(self.char_user1_cell.completed_games().count(), 1)
+        self.assertEquals(self.char_user1_cell.number_of_victories(), 1)
+        self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
+        self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
+        self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR + EXP_WIN)
+
+    def test_archive_game_loss(self):
+        self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 0)
+        self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 0)
+        self.assertEquals(self.char_user1_cell.completed_games().count(), 0)
+        self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
+        self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
+        self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
+        self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR)
+        game = Game(
+            title="title",
+            creator=self.user2,
+            gm=self.user2,
+            created_date=timezone.now(),
+            scheduled_start_time=timezone.now(),
+            actual_start_time=timezone.now(),
+            end_time=timezone.now(),
+            status=GAME_STATUS[6][0],
+            cell=self.cell,
+        )
+        game.save()
+        attendance = Game_Attendance(
+            relevant_game=game,
+            notes="notes",
+            outcome=LOSS,
+            attending_character=self.char_user1_cell,
+        )
+        game_invite = Game_Invite(invited_player=self.user1,
+                                  relevant_game=game,
+                                  as_ringer=False,
+                                  )
+        attendance.save()
+        game_invite.attendance = attendance
+        game_invite.save()
+        game.give_rewards()
+        self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 0)
+        self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 0)
+        self.assertEquals(self.char_user1_cell.completed_games().count(), 1)
+        self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
+        self.assertEquals(self.char_user1_cell.number_of_losses(), 1)
+        self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
+        self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR + EXP_LOSS)
+
+    def test_archive_game_death(self):
+        self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 0)
+        self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 0)
+        self.assertEquals(self.char_user1_cell.completed_games().count(), 0)
+        self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
+        self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
+        self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
+        self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR)
+        self.assertEquals(
+            self.user1.rewarded_player
+                .filter(rewarded_character=None, is_charon_coin=True)
+                .filter(is_void=False).all().count(),
+            0)
+        game = Game(
+            title="title",
+            creator=self.user2,
+            gm=self.user2,
+            created_date=timezone.now(),
+            scheduled_start_time=timezone.now(),
+            actual_start_time=timezone.now(),
+            end_time=timezone.now(),
+            status=GAME_STATUS[6][0],
+            cell=self.cell,
+        )
+        game.save()
+        attendance = Game_Attendance(
+            relevant_game=game,
+            notes="notes",
+            outcome=OUTCOME[2][0], # death
+            attending_character=self.char_user1_cell,
+        )
+        game_invite = Game_Invite(invited_player=self.user1,
+                                  relevant_game=game,
+                                  as_ringer=False,
+                                  )
+        attendance.save()
+        game_invite.attendance = attendance
+        game_invite.save()
+        game.give_rewards()
+        self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 0)
+        self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 0)
+        self.assertEquals(self.char_user1_cell.completed_games().count(), 1)
+        self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
+        self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
+        self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
+        self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR)
+        self.assertEquals(self.char_user1_cell.is_dead(), True)
+        self.assertEquals(
+            self.user1.rewarded_player
+                .filter(rewarded_character=None, is_charon_coin=True)
+                .filter(is_void=False).all().count(),
+            1)
+
+    def test_archive_game_gm_rewards_basic(self):
+        self.assertEquals(self.user2.experiencereward_set.filter(rewarded_character=None).all().count(), 0)
+        self.assertEquals(self.user2.rewarded_player.filter(rewarded_character=None, is_charon_coin=False).filter(is_void=False).all().count(), 0)
+        self.assertEquals(
+            self.user1.rewarded_player
+                .filter(rewarded_character=None, is_charon_coin=True)
+                .filter(is_void=False).all().count(),
+            0)
+        game = Game(
+            title="title",
+            creator=self.user2,
+            gm=self.user2,
+            created_date=timezone.now(),
+            scheduled_start_time=timezone.now(),
+            actual_start_time=timezone.now(),
+            end_time=timezone.now(),
+            status=GAME_STATUS[6][0],
+            cell=self.cell,
+        )
+        game.save()
+        attendance = Game_Attendance(
+            relevant_game=game,
+            notes="notes",
+            outcome=DEATH,
+            attending_character=self.char_user1_cell,
+        )
+        game_invite = Game_Invite(invited_player=self.user1,
+                                  relevant_game=game,
+                                  as_ringer=False,
+                                  )
+        attendance.save()
+        game_invite.attendance = attendance
+        game_invite.save()
+        game.give_rewards()
+        self.assertEquals(self.user2.experiencereward_set.filter(rewarded_character=None).all().count(), 1)
+        self.assertEquals(self.user2.rewarded_player.filter(rewarded_character=None, is_charon_coin=False).filter(is_void=False).all().count(), 0)
+        self.assertEquals(
+            self.user1.rewarded_player
+                .filter(rewarded_character=None, is_charon_coin=True)
+                .filter(is_void=False).all().count(),
+            1)
+
+    def test_archive_game_gm_rewards_ratio(self):
+        self.assertEquals(self.user2.experiencereward_set.filter(rewarded_character=None).all().count(), 0)
+        self.assertEquals(
+            self.user2.rewarded_player.filter(rewarded_character=None, is_charon_coin=False).filter(is_void=False).all().count(), 0)
+
+        game = Game(
+            title="title",
+            creator=self.user2,
+            gm=self.user2,
+            created_date=timezone.now(),
+            scheduled_start_time=timezone.now(),
+            actual_start_time=timezone.now(),
+            end_time=timezone.now(),
+            status=GAME_STATUS[6][0],
+            cell=self.cell,
+        )
+        game.save()
+        attendance = Game_Attendance(
+            relevant_game=game,
+            notes="notes",
+            outcome=WIN,
+            attending_character=self.char_user1_cell,
+        )
+        game_invite = Game_Invite(invited_player=self.user1,
+                                  relevant_game=game,
+                                  as_ringer=False,
+                                  )
+        attendance.save()
+        game_invite.attendance = attendance
+        game_invite.save()
+        attendance = Game_Attendance(
+            relevant_game=game,
+            notes="notes",
+            outcome=DEATH,
+            attending_character=self.char_user2_cell,
+        )
+        game_invite = Game_Invite(invited_player=self.user2,
+                                  relevant_game=game,
+                                  as_ringer=False,
+                                  )
+        attendance.save()
+        game_invite.attendance = attendance
+        game_invite.save()
+        game.give_rewards()
+        self.assertEquals(self.user2.experiencereward_set.filter(rewarded_character=None).all().count(), 1)
+        self.assertEquals(self.user2.rewarded_player.filter(rewarded_character=None, is_charon_coin=False).filter(is_void=False).all().count(), 1)
+
+    def test_archive_game_victory_not_in_cell(self):
+        self.assertEquals(self.char_user2_nocell.unspent_rewards().count(), 0)
+        self.assertEquals(self.char_user2_nocell.unspent_gifts().count(), 0)
+        self.assertEquals(self.char_user2_nocell.completed_games().count(), 0)
+        self.assertEquals(self.char_user2_nocell.number_of_victories(), 0)
+        self.assertEquals(self.char_user2_nocell.number_of_losses(), 0)
+        self.assertEquals(self.char_user2_nocell.stats_snapshot.sources.count(), 0)
+        self.assertEquals(self.char_user2_nocell.exp_earned(), EXP_NEW_CHAR)
+        self.assertEquals(self.user2.game_invite_set.filter(attendance__is_confirmed=False).exclude(is_declined=True).all().count(), 0)
+        game = Game(
+            title="title",
+            creator=self.user1,
+            gm=self.user1,
+            created_date=timezone.now(),
+            scheduled_start_time=timezone.now(),
+            actual_start_time=timezone.now(),
+            end_time=timezone.now(),
+            status=GAME_STATUS[6][0],
+            cell=self.cell,
+        )
+        game.save()
+        attendance = Game_Attendance(
+            relevant_game=game,
+            notes="notes",
+            outcome=OUTCOME[0][0], # victory
+            attending_character=self.char_user2_nocell,
+            is_confirmed = False,
+        )
+        game_invite = Game_Invite(invited_player=self.user2,
+                                  relevant_game=game,
+                                  as_ringer=False,
+                                  )
+        attendance.save()
+        game_invite.attendance = attendance
+        game_invite.save()
+        game.give_rewards()
+        self.assertEquals(self.char_user2_nocell.unspent_rewards().count(), 0)
+        self.assertEquals(self.char_user2_nocell.unspent_gifts().count(), 0)
+        self.assertEquals(self.char_user2_nocell.completed_games().count(), 0)
+        self.assertEquals(self.char_user2_nocell.number_of_victories(), 0)
+        self.assertEquals(self.char_user2_nocell.number_of_losses(), 0)
+        self.assertEquals(self.char_user2_nocell.stats_snapshot.sources.count(), 0)
+        self.assertEquals(self.char_user2_nocell.exp_earned(), EXP_NEW_CHAR)
+        self.assertEquals(self.user2.game_invite_set.filter(attendance__is_confirmed=False).exclude(is_declined=True).all().count(), 1)
+
+    def test_cannot_double_invite(self):
+        game = Game(
+            title="title",
+            creator=self.user1,
+            gm=self.user1,
+            created_date=timezone.now(),
+            scheduled_start_time=timezone.now(),
+            actual_start_time=timezone.now(),
+            end_time=timezone.now(),
+            status=GAME_STATUS[6][0],
+            cell=self.cell,
+        )
+        game.save()
+        game_invite = Game_Invite(invited_player=self.user2,
+                                  relevant_game=game,
+                                  as_ringer=False,
+                                  )
+        game_invite.save()
+        game_invite2 = Game_Invite(invited_player=self.user2,
+                                  relevant_game=game,
+                                  as_ringer=False,
+                                  )
+        with self.assertRaises(IntegrityError):
+            game_invite2.save()
+
+    def test_archive_game_change_outcome(self):
+        with transaction.atomic():
+            game = Game(
+                title="title",
+                creator=self.user2,
+                gm=self.user2,
+                created_date=timezone.now(),
+                scheduled_start_time=timezone.now(),
+                actual_start_time=timezone.now(),
+                end_time=timezone.now(),
+                status=GAME_STATUS[6][0],
+                cell=self.cell,
+            )
+            game.save()
+            attendance = Game_Attendance(
+                relevant_game=game,
+                notes="notes",
+                outcome=WIN,
+                attending_character=self.char_user1_cell,
+            )
+            game_invite = Game_Invite(invited_player=self.user1,
+                                      relevant_game=game,
+                                      as_ringer=False,
+                                      )
+            attendance.save()
+            game_invite.attendance = attendance
+            game_invite.save()
+            game.give_rewards()
+            self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 1)
+            self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 1)
+            self.assertEquals(self.char_user1_cell.completed_games().count(), 1)
+            self.assertEquals(self.char_user1_cell.number_of_victories(), 1)
+            self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
+            self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
+            self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR + EXP_WIN)
+            self.assertEquals(self.user1.profile.get_avail_improvements().count(), 0)
+            self.assertEquals(self.user1.profile.get_avail_charon_coins().count(), 0)
+            self.assertEquals(self.user1.profile.get_avail_exp_rewards().count(), 0)
+
+            attendance.refresh_from_db()
+            attendance.change_outcome(new_outcome = LOSS, is_confirmed = True)
+            self.char_user1_cell.refresh_from_db()
+
+            self.assertEquals(self.char_user1_cell.is_dead(), False)
+            self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 0)
+            self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 0)
+            self.assertEquals(self.char_user1_cell.completed_games().count(), 1)
+            self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
+            self.assertEquals(self.char_user1_cell.number_of_losses(), 1)
+            self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
+            self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR + EXP_LOSS)
+            self.assertEquals(self.user1.profile.get_avail_improvements().count(), 0)
+            self.assertEquals(self.user1.profile.get_avail_charon_coins().count(), 0)
+            self.assertEquals(self.user1.profile.get_avail_exp_rewards().count(), 0)
+
+            attendance.refresh_from_db()
+            attendance.change_outcome(new_outcome = WIN, is_confirmed = True)
+
+            self.assertEquals(self.char_user1_cell.is_dead(), False)
+            self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 1)
+            self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 1)
+            self.assertEquals(self.char_user1_cell.completed_games().count(), 1)
+            self.assertEquals(self.char_user1_cell.number_of_victories(), 1)
+            self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
+            self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
+            self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR + EXP_WIN)
+            self.assertEquals(self.user1.profile.get_avail_improvements().count(), 0)
+            self.assertEquals(self.user1.profile.get_avail_charon_coins().count(), 0)
+            self.assertEquals(self.user1.profile.get_avail_exp_rewards().count(), 0)
+
+            attendance.refresh_from_db()
+            attendance.change_outcome(new_outcome = DEATH, is_confirmed = True)
+
+            self.assertEquals(self.char_user1_cell.is_dead(), True)
+            self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 0)
+            self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 0)
+            self.assertEquals(self.char_user1_cell.completed_games().count(), 1)
+            self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
+            self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
+            self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
+            self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR)
+            self.assertEquals(self.user1.profile.get_avail_improvements().count(), 0)
+            self.assertEquals(self.user1.profile.get_avail_charon_coins().count(), 1)
+            self.assertEquals(self.user1.profile.get_avail_exp_rewards().count(), 0)
+
+            attendance.refresh_from_db()
+            attendance.change_outcome(new_outcome=DECLINED, is_confirmed=True)
+
+            self.assertEquals(self.char_user1_cell.is_dead(), False)
+            self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 0)
+            self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 0)
+            self.assertEquals(self.char_user1_cell.completed_games().count(), 1) #Maybe this should be different?
+            self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
+            self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
+            self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
+            self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR)
+            self.assertEquals(self.user1.profile.get_avail_improvements().count(), 0)
+            self.assertEquals(self.user1.profile.get_avail_charon_coins().count(), 0)
+            self.assertEquals(self.user1.profile.get_avail_exp_rewards().count(), 0)
+
+            attendance.refresh_from_db()
+            attendance.change_outcome(new_outcome=RINGER_VICTORY, is_confirmed=True)
+
+            self.assertEquals(self.char_user1_cell.is_dead(), False)
+            self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 0)
+            self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 0)
+            self.assertEquals(self.char_user1_cell.completed_games().count(), 0)
+            self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
+            self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
+            self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
+            self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR)
+            self.assertEquals(self.user1.profile.get_avail_improvements().count(), 1)
+            self.assertEquals(self.user1.profile.get_avail_charon_coins().count(), 0)
+            self.assertEquals(self.user1.profile.get_avail_exp_rewards().count(), 1)
+
+            attendance.refresh_from_db()
+            attendance.change_outcome(new_outcome=RINGER_FAILURE, is_confirmed=True)
+
+            self.assertEquals(self.char_user1_cell.is_dead(), False)
+            self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 0)
+            self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 0)
+            self.assertEquals(self.char_user1_cell.completed_games().count(), 0)
+            self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
+            self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
+            self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
+            self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR)
+            self.assertEquals(self.user1.profile.get_avail_improvements().count(), 0)
+            self.assertEquals(self.user1.profile.get_avail_charon_coins().count(), 0)
+            self.assertEquals(self.user1.profile.get_avail_exp_rewards().count(), 0)
+
+            attendance.refresh_from_db()
+            attendance.change_outcome(new_outcome=WIN, is_confirmed=True, attending_character=self.char_user1_cell)
+
+            self.assertEquals(self.char_user1_cell.is_dead(), False)
+            self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 1)
+            self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 1)
+            self.assertEquals(self.char_user1_cell.completed_games().count(), 1)
+            self.assertEquals(self.char_user1_cell.number_of_victories(), 1)
+            self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
+            self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
+            self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR + EXP_WIN)
+            self.assertEquals(self.user1.profile.get_avail_improvements().count(), 0)
+            self.assertEquals(self.user1.profile.get_avail_charon_coins().count(), 0)
+            self.assertEquals(self.user1.profile.get_avail_exp_rewards().count(), 0)
+
 
     def test_archive_game_change_attending(self):
         with transaction.atomic():
@@ -794,7 +794,7 @@ class GameModelTests(TestCase):
             self.assertEquals(self.char_user2_cell.number_of_victories(), 1)
             self.assertEquals(self.char_user2_cell.number_of_losses(), 0)
             self.assertEquals(self.char_user2_cell.stats_snapshot.sources.count(), 0)
-            self.assertEquals(self.char_user2_cell.exp_earned(), EXP_NEW_CHAR)
+            self.assertEquals(self.char_user2_cell.exp_earned(), EXP_NEW_CHAR + EXP_WIN)
 
             self.assertEquals(self.user1.profile.get_avail_improvements().count(), 0)
             self.assertEquals(self.user1.profile.get_avail_charon_coins().count(), 0)
@@ -841,4 +841,4 @@ class GameModelTests(TestCase):
             self.assertEquals(self.user2.profile.get_avail_improvements().count(), 1)
             self.assertEquals(self.user2.profile.get_avail_charon_coins().count(), 0)
             self.assertEquals(self.user2.profile.get_avail_exp_rewards().count(), 2) # User 2 gmed the game
-            
+

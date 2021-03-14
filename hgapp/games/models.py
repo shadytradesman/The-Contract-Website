@@ -163,12 +163,29 @@ class Game(models.Model):
                                rewarded_player=self.gm,
                                is_improvement=True)
             gm_reward.save()
+        self._grant_gm_exp_reward()
+
+    def _grant_gm_exp_reward(self):
         exp_reward = ExperienceReward(
             rewarded_player=self.gm,
         )
         exp_reward.save()
         self.gm_experience_reward = exp_reward
         self.save()
+
+    # Determines if the game's golden ratio status has changed and handles GM rewards accordingly.
+    def recalculate_golden_ratio(self, original_value):
+        current_value = self.achieves_golden_ratio()
+        if current_value != original_value:
+            if current_value == True:
+                gm_reward = Reward(relevant_game=self,
+                                   rewarded_player=self.gm,
+                                   is_improvement=True)
+                gm_reward.save()
+                self._grant_gm_exp_reward()
+            else:
+                self.get_gm_reward().mark_void()
+
 
     def achieves_golden_ratio(self):
         death = False
