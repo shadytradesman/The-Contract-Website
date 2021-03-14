@@ -29,9 +29,21 @@
                         Declaring a completed Game in <a href="{% url 'cells:cells_view_cell' cell.id %}">{{cell.name}}</a>
                     {% endif %}
                 </h1>
-                <h3><small>
-                    If you would like schedule an upcoming game, <a href="{% url 'games:games_create_game' %}">Click Here</a>
-                </small></h3>
+                <h3>
+                    <small>
+                        {% if game %}
+                            {% if players %}
+                                To finish adding attendances, select their outcomes below and submit.
+                            {% else %}
+                                If you would like to add attendances,
+                                <a href="{% url 'games:games_add_attendance' game.id %}">Click Here.</a> (Leaves page)
+                            {% endif %}
+                        {% else %}
+                            If you would like schedule an upcoming game,
+                            <a href="{% url 'games:games_create_game' %}">Click Here.</a>
+                        {% endif %}
+                    </small>
+                </h3>
             </div>
             <form action=
                     {% if game and players %}

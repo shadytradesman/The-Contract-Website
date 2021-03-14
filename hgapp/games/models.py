@@ -182,10 +182,11 @@ class Game(models.Model):
                                    rewarded_player=self.gm,
                                    is_improvement=True)
                 gm_reward.save()
+                if hasattr(self, "gm_experience_reward") and self.gm_experience_reward:
+                    self.gm_experience_reward.mark_void()
                 self._grant_gm_exp_reward()
             else:
                 self.get_gm_reward().mark_void()
-
 
     def achieves_golden_ratio(self):
         death = False
@@ -222,6 +223,9 @@ class Game(models.Model):
             if attendance.is_loss():
                 num_losses = num_losses + 1
         return num_losses
+
+    def get_attended_players(self):
+        return self.invitations.filter(game_invite__is_declined=False).all()
 
     def not_attending(self, player):
         invite = get_object_or_none(self.game_invite_set.filter(invited_player=player))

@@ -842,3 +842,90 @@ class GameModelTests(TestCase):
             self.assertEquals(self.user2.profile.get_avail_charon_coins().count(), 0)
             self.assertEquals(self.user2.profile.get_avail_exp_rewards().count(), 2) # User 2 gmed the game
 
+    def test_archive_game_recalculate_golden_ratio(self):
+        with transaction.atomic():
+            game = Game(
+                title="title",
+                creator=self.user2,
+                gm=self.cell_owner,
+                created_date=timezone.now(),
+                scheduled_start_time=timezone.now(),
+                actual_start_time=timezone.now(),
+                end_time=timezone.now(),
+                status=GAME_STATUS[6][0],
+                cell=self.cell,
+            )
+            game.save()
+            attendance = Game_Attendance(
+                relevant_game=game,
+                notes="notes",
+                outcome=WIN,
+                attending_character=self.char_user1_cell,
+            )
+            game_invite = Game_Invite(invited_player=self.user1,
+                                      relevant_game=game,
+                                      as_ringer=False,
+                                      )
+            attendance.save()
+            game_invite.attendance = attendance
+            game_invite.save()
+            game.give_rewards()
+            self.assertFalse(game.achieves_golden_ratio())
+            self.assertEquals(self.user1.profile.get_avail_improvements().count(), 0)
+            self.assertEquals(self.user1.profile.get_avail_charon_coins().count(), 0)
+            self.assertEquals(self.user1.profile.get_avail_exp_rewards().count(), 0)
+            self.assertEquals(self.user2.profile.get_avail_improvements().count(), 0)
+            self.assertEquals(self.user2.profile.get_avail_charon_coins().count(), 0)
+            self.assertEquals(self.user2.profile.get_avail_exp_rewards().count(), 0)
+            self.assertEquals(self.cell_owner.profile.get_avail_improvements().count(), 0)
+            self.assertEquals(self.cell_owner.profile.get_avail_charon_coins().count(), 0)
+            self.assertEquals(self.cell_owner.profile.get_avail_exp_rewards().count(), 1) # cell_owner gmed the game
+
+            attendance2 = Game_Attendance(
+                relevant_game=game,
+                notes="notes",
+                outcome=DEATH,
+                attending_character=self.char_user2_cell,
+            )
+            game_invite = Game_Invite(invited_player=self.user2,
+                                      relevant_game=game,
+                                      as_ringer=False,
+                                      )
+            attendance2.save()
+            game_invite.attendance = attendance2
+            game_invite.save()
+            attendance2.give_reward()
+            game.refresh_from_db()
+            game.recalculate_golden_ratio(False)
+
+            self.assertTrue(game.achieves_golden_ratio())
+            self.assertEquals(self.user1.profile.get_avail_improvements().count(), 0)
+            self.assertEquals(self.user1.profile.get_avail_charon_coins().count(), 0)
+            self.assertEquals(self.user1.profile.get_avail_exp_rewards().count(), 0)
+
+            self.assertEquals(self.user2.profile.get_avail_improvements().count(), 0)
+            self.assertEquals(self.user2.profile.get_avail_charon_coins().count(), 1) # from dying
+            self.assertEquals(self.user2.profile.get_avail_exp_rewards().count(), 0)
+
+            self.assertEquals(self.cell_owner.profile.get_avail_improvements().count(), 1) # from ratio
+            self.assertEquals(self.cell_owner.profile.get_avail_charon_coins().count(), 0)
+            self.assertEquals(self.cell_owner.profile.get_avail_exp_rewards().count(), 1)  # cell_owner gmed the game
+
+            attendance2.refresh_from_db()
+            attendance2.change_outcome(new_outcome=WIN, is_confirmed=True)
+            game.refresh_from_db()
+            game.recalculate_golden_ratio(True)
+
+            self.assertFalse(game.achieves_golden_ratio())
+            self.assertEquals(self.user1.profile.get_avail_improvements().count(), 0)
+            self.assertEquals(self.user1.profile.get_avail_charon_coins().count(), 0)
+            self.assertEquals(self.user1.profile.get_avail_exp_rewards().count(), 0)
+
+            self.assertEquals(self.user2.profile.get_avail_improvements().count(), 0)
+            self.assertEquals(self.user2.profile.get_avail_charon_coins().count(), 0)
+            self.assertEquals(self.user2.profile.get_avail_exp_rewards().count(), 0)
+
+            self.assertEquals(self.cell_owner.profile.get_avail_improvements().count(), 0) # no more ratio reward
+            self.assertEquals(self.cell_owner.profile.get_avail_charon_coins().count(), 0)
+            self.assertEquals(self.cell_owner.profile.get_avail_exp_rewards().count(), 1)  # cell_owner gmed the game
+

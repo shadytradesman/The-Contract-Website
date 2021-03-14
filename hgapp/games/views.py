@@ -15,7 +15,8 @@ from games.forms import CreateScenarioForm, CellMemberAttendedForm, make_game_fo
     RsvpAttendanceForm
 
 from .game_form_utilities import get_context_for_create_finished_game, change_time_to_current_timezone, convert_to_localtime, \
-    create_archival_game, get_context_for_completed_edit, handle_edit_completed_game
+    create_archival_game, get_context_for_completed_edit, handle_edit_completed_game, get_context_for_choose_attending, \
+    get_gm_form, get_outsider_formset, get_member_formset, get_players_for_new_attendances
 from .games_constants import GAME_STATUS
 
 
@@ -599,44 +600,20 @@ def create_ex_game_for_cell(request, cell_id):
     cell = get_object_or_404(Cell, id = cell_id)
     if not cell.player_can_manage_games(request.user):
         raise PermissionDenied("You do not have permission to manage Game Events for this Cell")
-    MemberFormSet = formset_factory(CellMemberAttendedForm, extra=0)
-    OutsiderFormSet = formset_factory(OutsiderAttendedForm, extra=3)
-    WhoWasGm = make_who_was_gm_form(cell)
-    cell_members = cell.cellmembership_set.all()
     if request.method == 'POST':
-        gm_form = WhoWasGm(request.POST, prefix="gm")
-        member_formset = MemberFormSet(request.POST, prefix="member",initial=[{'player_id': x.member_player.id,
-                                                 'username': x.member_player}
-                                                for x in cell_members])
-        outsider_formset = OutsiderFormSet(request.POST, prefix="outsider")
+        gm_form = get_gm_form(cell, request.POST)
+        outsider_formset = get_outsider_formset(request.POST)
+        member_formset = get_member_formset(cell, POST=request.POST)
         if gm_form.is_valid() and member_formset.is_valid() and outsider_formset.is_valid():
-            gm =  get_object_or_404(User, username=gm_form.cleaned_data['gm'])
-            players = []
-            for form in member_formset:
-                if form.cleaned_data['attended']:
-                    players.append(form.cleaned_data['player_id'])
-            for form in outsider_formset:
-                if 'username' in form.cleaned_data:
-                    user = get_object_or_404(User, username=form.cleaned_data['username'])
-                    players.append(str(user.id))
+            gm = get_object_or_404(User, username=gm_form.cleaned_data['gm'])
+            players = get_players_for_new_attendances(member_formset, outsider_formset)
             return HttpResponseRedirect(
                 reverse('games:games_edit_ex_game_add_players', args=(cell.id, gm.id, '+'.join(players),)))
         else:
             #TODO: better error handling.
             raise ValueError("Player filled out the form wrong")
     else:
-        gm_form = WhoWasGm(prefix="gm")
-        member_formset = MemberFormSet(prefix="member",
-                                       initial=[{'player_id': x.member_player.id,
-                                                 'username': x.member_player}
-                                                for x in cell_members])
-        outsider_form_set = OutsiderFormSet(prefix="outsider")
-        context = {
-            'gm_form': gm_form,
-            'member_formset': member_formset,
-            'outsider_formset': outsider_form_set,
-            'cell': cell,
-        }
+        context = get_context_for_choose_attending(cell)
         return render(request, 'games/create_ex_game_choose_attendance.html', context)
 
 def finalize_create_ex_game_for_cell(request, cell_id, gm_user_id, players):
@@ -669,12 +646,26 @@ def finalize_create_ex_game_for_cell(request, cell_id, gm_user_id, players):
 # Choose additional players to add to a completed game.
 def add_attendance(request, game_id):
     game = get_object_or_404(Game, id=game_id)
-    check_perms_for_edit_completed(request, game)
+    _check_perms_for_edit_completed(request, game)
+    cell = game.cell
+    if request.method == 'POST':
+        outsider_formset = get_outsider_formset(request.POST)
+        member_formset = get_member_formset(cell, POST=request.POST)
+        if member_formset.is_valid() and outsider_formset.is_valid():
+            players = get_players_for_new_attendances(member_formset, outsider_formset)
+            return HttpResponseRedirect(
+                reverse('games:games_edit_completed', args=(game_id, '+'.join(players),)))
+        else:
+            raise ValueError("Player filled out the form wrong")
+    else:
+        context = get_context_for_choose_attending(cell, game)
+        return render(request, 'games/create_ex_game_choose_attendance.html', context)
+
 
 
 def edit_completed(request, game_id, players = None):
     game = get_object_or_404(Game, id=game_id)
-    check_perms_for_edit_completed(request, game)
+    _check_perms_for_edit_completed(request, game)
     new_player_list = [get_object_or_404(User, id=player_id) for player_id in players.split('+')] if players else []
     if request.method == 'POST':
         handle_edit_completed_game(request, game, new_player_list)
@@ -684,7 +675,7 @@ def edit_completed(request, game_id, players = None):
         return render(request, 'games/edit_archive_game.html', context)
 
 
-def check_perms_for_edit_completed(request, game):
+def _check_perms_for_edit_completed(request, game):
     if not request.user.is_authenticated:
         raise PermissionDenied("You must log in.")
     if not (game.is_finished() or game.is_archived() or game.is_recorded()):
@@ -693,8 +684,6 @@ def check_perms_for_edit_completed(request, game):
         return
     if not request.user.has_perm('edit_game', game):
         raise PermissionDenied("You don't have permission to edit this Game")
-
-
 
 def confirm_attendance(request, attendance_id, confirmed=None):
     if not request.user.is_authenticated:

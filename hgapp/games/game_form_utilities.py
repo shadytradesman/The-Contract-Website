@@ -8,7 +8,8 @@ from django.shortcuts import get_object_or_404
 from django.db import transaction
 from django.contrib.auth.models import User
 
-from .forms import make_archive_game_general_info_form, ArchivalOutcomeForm
+from .forms import make_archive_game_general_info_form, ArchivalOutcomeForm, CellMemberAttendedForm, OutsiderAttendedForm, \
+    make_who_was_gm_form
 from .models import Game, Game_Invite, Game_Attendance
 from .games_constants import GAME_STATUS
 
@@ -124,10 +125,12 @@ def _update_or_add_attendance(request, form, game):
         attendance = get_object_or_404(Game_Attendance, id=form.cleaned_data['attendance_id'])
         if notes:
             attendance.notes = notes
-            attendance.save()
-        attendance.change_outcome(new_outcome=form.cleaned_data['outcome'],
-                                  is_confirmed=is_confirmed,
-                                  attending_character=attending_character)
+        attendance.save() # always resave the attendance because that's how we do scenario discoveries.
+        if 'attending_character' in form.changed_data or 'outcome' in form.changed_data:
+            attendance.change_outcome(new_outcome=form.cleaned_data['outcome'],
+                                      is_confirmed=is_confirmed,
+                                      attending_character=attending_character)
+            
     else:
         # New Attendance
         attendance = Game_Attendance(
@@ -135,6 +138,7 @@ def _update_or_add_attendance(request, form, game):
             notes=notes,
             outcome=form.cleaned_data['outcome'],
             is_confirmed=is_confirmed,
+            attending_character = attending_character,
         )
         game_invite = Game_Invite(invited_player=player,
                                   relevant_game=game,
@@ -211,3 +215,51 @@ def create_archival_game(request, general_form, cell, outcome_formset):
             game_invite.attendance = attendance
             game_invite.save()
         game.give_rewards()
+
+
+def get_context_for_choose_attending(cell, game=None):
+    gm_form = get_gm_form(cell)
+    outsider_form_set = get_outsider_formset()
+    member_formset = get_member_formset(cell, game)
+    return {
+        'gm_form': gm_form,
+        'member_formset': member_formset,
+        'outsider_formset': outsider_form_set,
+        'cell': cell,
+        'game': game,
+    }
+
+
+def get_gm_form(cell, POST=None):
+    WhoWasGm = make_who_was_gm_form(cell)
+    return WhoWasGm(POST, prefix="gm")
+
+
+def get_member_formset(cell, game=None, POST=None):
+    cell_members = cell.cellmembership_set.all()
+    MemberFormSet = formset_factory(CellMemberAttendedForm, extra=0)
+    attended_players = set()
+    if game:
+        attended_players = {player.id for player in game.get_attended_players()}
+    return MemberFormSet(POST,
+                         prefix="member",
+                         initial=[{'player_id': x.member_player.id,
+                                   'username': x.member_player}
+                                  for x in cell_members if x.member_player.id not in attended_players])
+
+
+def get_outsider_formset(POST=None):
+    OutsiderFormSet = formset_factory(OutsiderAttendedForm, extra=3)
+    return OutsiderFormSet(POST, prefix="outsider")
+
+
+def get_players_for_new_attendances(member_formset, outsider_formset):
+    players = []
+    for form in member_formset:
+        if form.cleaned_data['attended']:
+            players.append(form.cleaned_data['player_id'])
+    for form in outsider_formset:
+        if 'username' in form.cleaned_data:
+            user = get_object_or_404(User, username=form.cleaned_data['username'])
+            players.append(str(user.id))
+    return players

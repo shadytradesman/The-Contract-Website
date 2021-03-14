@@ -31,7 +31,12 @@
                     <li><a href="{% url 'games:games_game_edit' game.id %}">Edit Game</a></li>
                 {% endif %}
                 {% if game.is_finished or game.is_recorded %}
-                    <li class="active"><a href="{% url 'games:games_edit_completed' game.id %}">Edit Attendances and Outcomes</a></li>
+                    <li class="active">
+                        <a href="{% url 'games:games_edit_completed' game.id %}">Edit Attendances and Outcomes</a>
+                    </li>
+                    <li class="">
+                        <a href="{% url 'games:games_add_attendance' game.id %}">Add Attendances</a>
+                    </li>
                 {% endif %}
                 {% if game.is_active or game.is_scheduled %}
                     <li><a href="{% url 'games:games_cancel_game' game.id %}">Cancel Game</a></li>
