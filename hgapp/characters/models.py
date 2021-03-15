@@ -101,7 +101,6 @@ EXP_COST_SKILL_INITIAL = 2
 EXP_COST_TRAUMA_THERAPY = 3
 
 # STAT CONSTANTS
-BASE_MIND_LEVELS = 5
 BASE_BODY_LEVELS = 5
 
 
@@ -601,8 +600,11 @@ class Character(models.Model):
         return BASE_BODY_LEVELS + math.ceil(brawn_value / 2)
 
     def num_mind_levels(self):
-        intelligence_value = self.stats_snapshot.attributevalue_set.get(relevant_attribute__scales_mind=True).value
-        return BASE_MIND_LEVELS + math.ceil(intelligence_value / 2)
+        mind_scaling_attrs = self.stats_snapshot.attributevalue_set.filter(relevant_attribute__scales_mind=True).all()
+        mind_val = 0
+        for attr in mind_scaling_attrs:
+            mind_val = mind_val + attr.value
+        return mind_val
 
     def get_attributes(self, is_physical):
         return self.stats_snapshot.attributevalue_set\
