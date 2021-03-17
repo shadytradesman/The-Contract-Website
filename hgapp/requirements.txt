@@ -77,3 +77,4 @@ webencodings==0.5.1
 websocket-client==0.37.0
 wiki==0.5
 zipp==3.1.0
+setuptools>=36
