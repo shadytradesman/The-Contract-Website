@@ -47,6 +47,7 @@ BODY_STATUS = (
 )
 
 MIND_STATUS = (
+    'Miffed',
     'Agitated',
     'Distracted',
     'Rattled',
