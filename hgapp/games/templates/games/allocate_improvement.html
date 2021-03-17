@@ -14,24 +14,24 @@
 {% block body_class %}home{% endblock %}
 
 {% block body_base %}
-        <div class="container">
-            {{ form.about.errors }}
-            <h1>Select a Character to Improve</h1>
-            <h3>Assigning Improvement from {{improvement.reason_text}} {{improvement.relevant_game.scenario.name}}</h3>
+<div class="container">
+    {{ form.about.errors }}
+    <h2 class="text-center">Assigning Improvement from {{improvement.reason_text}} {{improvement.relevant_game.scenario.name}}</h2>
+     <div class="panel panel-default">
+        <div class="panel-body">
             <form action="{% url 'games:games_allocate_improvement' improvement.id %}" method="post" class="form-inline">
-            {{ form.non_field_errors }}
-            {{ form.management_form }}
-            {% csrf_token %}
-            {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-            <div class="container">
-                {{ form.chosen_character }}
-                <P>
-                    {{form.chosen_character.help_text }}
-                </P>
-            </div>
-            <div class="container">
-                <input class="btn btn-primary" type="submit" value="Confirm" />
-            </div>
+                {{ form.non_field_errors }}
+                {{ form.management_form }}
+                {% csrf_token %}
+                {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+                <div class="">
+                    {{ form.chosen_character|bootstrap }}
+                </div>
+                <div class="">
+                    <input class="btn btn-primary" type="submit" value="Confirm" />
+                </div>
+            </form>
         </div>
-    </form>
+     </div>
+</div>
 {% endblock %}

@@ -29,7 +29,7 @@ class CreateScenarioForm(forms.Form):
     title = forms.CharField(label='Title',
                            max_length=130,
                            help_text='This Scenario\'s title. This may be seen by people who have not played the Scenario.')
-    summary = forms.CharField(label='Summay',
+    summary = forms.CharField(label='Summary',
                               max_length=400,
                               required=False,
                               help_text="Summarize the Scenario so that people who have already played it can recognize it.")
@@ -223,10 +223,11 @@ def make_allocate_improvement_form(user):
                                       not char.is_dead() and char.improvement_ok()]
         queryset = Character.objects.filter(id__in=users_living_character_ids)
         chosen_character = forms.ModelChoiceField(queryset=queryset,
+                                                  label="Chosen Contractor",
                                                      empty_label=None,
-                                                     help_text="Declare which Character should recieve the Improvement. "
+                                                     help_text="Declare which Contractor should recieve the Improvement. "
                                                                "Once confirmed, this action cannot be undone. "
-                                                               "NOTE: only living characters that have less than twice as many rewards as victories appear in this list.",
+                                                               "Only living Contractors that have fewer than one Improvement for every two Victories appear in this list.",
                                                      required=True)
     return AllocateImprovementForm
 
@@ -271,7 +272,7 @@ def make_archive_game_general_info_form(gm):
                                 max_length=100,
                                 help_text='The Game\'s name.')
         occurred_time = forms.DateTimeField(label='Date Played',
-                                            widget=DateTimePicker(options=False),
+                                            widget=DateTimePicker(options=False, format=date_format),
                                             input_formats=[date_format],
                                             help_text='When did this Game occur?')
         timezone = forms.ChoiceField(
@@ -280,6 +281,7 @@ def make_archive_game_general_info_form(gm):
             required=False,
             initial=timezone.get_current_timezone()
         )
+
     return ArchiveGeneralInfoForm
 
 class ArchivalOutcomeForm(forms.Form):
@@ -287,6 +289,10 @@ class ArchivalOutcomeForm(forms.Form):
                             max_length=200,
                             widget=forms.HiddenInput(),
                             required=True,)
+    attendance_id = forms.CharField(label=None,
+                            max_length=200,
+                            widget=forms.HiddenInput(),
+                            required=False,)
 
     attending_character = CharacterModelChoiceField(queryset=Character.objects.all(),
                                                     empty_label="Played a Ringer",
@@ -302,9 +308,13 @@ class ArchivalOutcomeForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(ArchivalOutcomeForm, self).__init__(*args, **kwargs)
         # user may have declared character dead after the game ended, so allow selecting dead characters
-        queryset = self.initial["invited_player"].character_set.filter(is_deleted=False)\
-            .exclude(character_death__is_void = False, character_death__game_attendance__isnull = False)\
-            .distinct()
+        if "attendance_id" in self.initial and self.initial["attendance_id"]:
+            queryset = self.initial["invited_player"].character_set.filter(is_deleted=False) \
+                .distinct()
+        else:
+            queryset = self.initial["invited_player"].character_set.filter(is_deleted=False)\
+                .exclude(character_death__is_void = False, character_death__game_attendance__isnull = False)\
+                .distinct()
         self.fields['attending_character'].queryset = queryset
 
 class RsvpAttendanceForm(forms.Form):

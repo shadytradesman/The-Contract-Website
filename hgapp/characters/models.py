@@ -3,11 +3,12 @@ import math
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models import Q
 from django.utils.datetime_safe import datetime
 from django.utils import timezone
 from guardian.shortcuts import assign_perm, remove_perm
 
-from hgapp.utilities import get_queryset_size
+from hgapp.utilities import get_queryset_size, get_object_or_none
 from cells.models import Cell
 from characters.signals import GrantAssetGift, VoidAssetGifts
 
@@ -46,6 +47,7 @@ BODY_STATUS = (
 )
 
 MIND_STATUS = (
+    'Miffed',
     'Agitated',
     'Distracted',
     'Rattled',
@@ -100,7 +102,6 @@ EXP_COST_SKILL_INITIAL = 2
 EXP_COST_TRAUMA_THERAPY = 3
 
 # STAT CONSTANTS
-BASE_MIND_LEVELS = 5
 BASE_BODY_LEVELS = 5
 
 
@@ -351,13 +352,15 @@ class Character(models.Model):
         else:
             return None
 
+    def needs_obit(self):
+        death = self.real_death()
+        if death:
+            return not death.obituary or len(death.obituary) == 0 or not death.cause_of_death or len(death.cause_of_death) == 0
+        else:
+            return False
+
     def void_deaths(self):
         return self.character_death_set.filter(is_void=True).all()
-
-    def delete_upcoming_attendances(self):
-        scheduled_game_attendances = self.scheduled_game_attendances()
-        for game_attendance in scheduled_game_attendances:
-            game_attendance.delete()
 
     def active_game_attendances(self):
         return [game for game in self.game_attendance_set.all() if game.relevant_game.is_active()]
@@ -401,7 +404,7 @@ class Character(models.Model):
         return rewards_to_be_spent
 
     def improvement_ok(self):
-        return self.number_of_victories() * 2 >  len(self.active_rewards())
+        return self.number_of_victories() * 2 > len(self.active_rewards())
 
     def __str__(self):
         string = self.name + " ["
@@ -468,7 +471,7 @@ class Character(models.Model):
         return int(total_exp - exp_cost)
 
     def exp_earned(self):
-        rewards = self.experiencereward_set.all()
+        rewards = self.experiencereward_set.filter(is_void=False).all()
         total_exp = EXP_NEW_CHAR
         for reward in rewards:
             total_exp = total_exp + reward.get_value()
@@ -598,8 +601,16 @@ class Character(models.Model):
         return BASE_BODY_LEVELS + math.ceil(brawn_value / 2)
 
     def num_mind_levels(self):
-        intelligence_value = self.stats_snapshot.attributevalue_set.get(relevant_attribute__scales_mind=True).value
-        return BASE_MIND_LEVELS + math.ceil(intelligence_value / 2)
+        mind_scaling_attrs = self.stats_snapshot.attributevalue_set.filter(relevant_attribute__scales_mind=True).all()
+        mind_val = 0
+        for attr in mind_scaling_attrs:
+            mind_val = mind_val + attr.value
+        if mind_val <= 3:
+            return 3
+        elif mind_val >= 9:
+            return 9
+        else:
+            return mind_val
 
     def get_attributes(self, is_physical):
         return self.stats_snapshot.attributevalue_set\
@@ -664,6 +675,12 @@ class ExperienceReward(models.Model):
                                            on_delete=models.CASCADE)
     rewarded_player = models.ForeignKey(settings.AUTH_USER_MODEL,
                                         on_delete=models.CASCADE)
+    is_void = models.BooleanField(default=False)
+
+
+    def mark_void(self):
+        self.is_void = True
+        self.save()
 
     # returns one of several potential classes. Intended to be used with visitor pattern
     def get_source(self):
@@ -724,11 +741,75 @@ class Attribute(Trait):
 class Ability(Trait):
     is_primary = models.BooleanField(default=False)
 
+class Roll(models.Model):
+    attribute = models.ForeignKey(Attribute,
+                                  on_delete=models.CASCADE,
+                                  null=True)
+    ability = models.ForeignKey(Ability,
+                                on_delete=models.CASCADE,
+                                null=True)
+    is_mind = models.BooleanField(default=False)
+    is_body = models.BooleanField(default=False)
+    difficulty = models.PositiveIntegerField(default=6)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['attribute', 'ability', 'difficulty', 'is_mind', 'is_body',], name='unique_roll'),
+            models.UniqueConstraint(fields=['is_mind', 'difficulty'], condition=Q(is_mind=True), name='one_mind_roll'),
+            models.UniqueConstraint(fields=['is_body', 'difficulty'], condition=Q(is_body=True), name='one_body_roll'),
+        ]
+        indexes = [
+            models.Index(fields=['is_mind', 'difficulty']),
+            models.Index(fields=['is_body', 'difficulty']),
+            models.Index(fields=['attribute', 'ability', 'difficulty',]),
+        ]
+
+    # To obtain the singleton rolls, use this static getter methods instead of directly creating the roll objects.
+    @staticmethod
+    def get_mind_roll(difficulty=6):
+        mind_roll = get_object_or_none(Roll, is_mind=True, difficulty=difficulty)
+        if mind_roll:
+            return mind_roll
+        else:
+            mind_roll = Roll(is_mind=True, difficulty=difficulty)
+            mind_roll.save()
+            return mind_roll
+
+    @staticmethod
+    def get_body_roll(difficulty=6):
+        body_roll = get_object_or_none(Roll, is_body=True, difficulty=difficulty)
+        if body_roll:
+            return body_roll
+        else:
+            mind_roll = Roll(is_body=True, difficulty=difficulty)
+            mind_roll.save()
+            return mind_roll
+
+    @staticmethod
+    def get_roll(attribute=None, ability=None, difficulty=6):
+        roll = get_object_or_none(Roll,
+                                  attribute=attribute,
+                                  ability=ability,
+                                  is_mind=False,
+                                  is_body=False,
+                                  difficulty=difficulty)
+        if roll:
+            return roll
+        else:
+            roll = Roll(attribute=attribute,
+                              ability=ability,
+                              is_mind=False,
+                              is_body=False,
+                              difficulty=difficulty)
+            roll.save()
+            return roll
+
 class Quirk(models.Model):
     name = models.CharField(max_length=150)
     value = models.PositiveIntegerField()
     description = models.CharField(max_length=2000)
     system = models.CharField(max_length=2000) # A "just the facts" summary
+    is_public = models.BooleanField(default=True)
     category = models.CharField(choices=QUIRK_CATEGORY,
                               max_length=50,
                               default=QUIRK_CATEGORY[1][0])
@@ -1117,8 +1198,11 @@ class Character_Death(models.Model):
     cause_of_death= models.CharField(max_length=200,
                                      null=True,
                                      blank=True)
-    def save(self, *args, **kwargs):
-        super(Character_Death, self).save(*args, **kwargs)
+
+    def mark_void(self):
+        self.is_void = True
+        self.save()
+
 
 class Graveyard_Header(models.Model):
     header = models.TextField()

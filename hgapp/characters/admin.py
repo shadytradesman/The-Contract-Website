@@ -2,7 +2,7 @@ from django.contrib import admin
 
 # Register your models here.
 from characters.models import Character, Graveyard_Header, Character_Death, Attribute, Ability, Asset, Liability, \
-    CharacterTutorial, ContractStats, Limit, LiabilityDetails, AssetDetails, AttributeValue, AbilityValue
+    CharacterTutorial, ContractStats, Limit, LiabilityDetails, AssetDetails, AttributeValue, AbilityValue, ExperienceReward
 
 
 class AbilityValueTabular(admin.TabularInline):
@@ -34,3 +34,4 @@ admin.site.register(Asset)
 admin.site.register(Liability)
 admin.site.register(CharacterTutorial)
 admin.site.register(Limit)
+admin.site.register(ExperienceReward)

@@ -17,13 +17,26 @@
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h1>
-                    Declaring a completed game in <a href="{% url 'cells:cells_view_cell' cell.id %}">{{cell.name}}</a>
+                    {% if game %}
+                        Adding attendances to Game where {{game.gm}} ran {{game.scenario.title}} in {{game.cell.name}}
+                    {% else %}
+                        Declaring a completed game in
+                        <a href="{% url 'cells:cells_view_cell' cell.id %}">{{cell.name}}</a>
+                    {% endif %}
                 </h1>
-                <h3><small>
-                    If you would like schedule an upcoming game, <a href="{% url 'games:games_create_game' %}">Click Here</a>
-                </small></h3>
+                {% if not game %}
+                    <h3><small>
+                        If you would like schedule an upcoming game, <a href="{% url 'games:games_create_game' %}">Click Here</a>
+                    </small></h3>
+                {% endif %}
             </div>
-            <form action="{% url 'games:games_create_ex_game_for_cell' cell_id=cell.id %}" method="post">
+            <form
+                {% if game %}
+                    action="{% url 'games:games_add_attendance' game.id %}"
+                {% else %}
+                    action="{% url 'games:games_create_ex_game_for_cell' cell_id=cell.id %}"
+                {% endif %}
+                method="post">
                 {% csrf_token %}
                 {{ gm_form.about.errors }}
                 {{ gm_form.management_form }}
@@ -34,15 +47,25 @@
                 {{ member_formset.about.errors }}
                 {{ member_formset.management_form }}
                 {{ member_formset.non_field_errors }}
+                {% if not game %}
                 <div class="container">
                     <h2>Who was the Game Master?</h2>
                     <div class="col-xs-9">
                         {{ gm_form |bootstrap }}
                     </div>
                 </div>
+                {% endif %}
                 <div class="container">
-                    <h2>Which Cell Members Attended?</h2>
-                    <small>Even though you can select it here, the GM cannot attend their own game.</small>
+                    <h2>
+                        {% if game %}
+                            Which additional Cell members attended?
+                        {% else %}
+                            Which Cell members attended?
+                        {% endif %}
+                    </h2>
+                    {% if not game %}
+                        <small>Even though you can select it here, the GM cannot attend their own game.</small>
+                    {% endif %}
                     <ul>
                         {% for form in member_formset %}
                             <li>

@@ -2,7 +2,7 @@
 
 {% load i18n %}
 {% load staticfiles %}
-{% block head_title %}Choose Base Power{% endblock %}
+{% block head_title %}Choose Effect{% endblock %}
 
 {% block body_class %}home{% endblock %}
 
@@ -19,7 +19,7 @@
             {% if character %}
                 for {{character.name}}
             {% endif %}
-            <small>Select the {{ category.name }} Base Power you wish to build from</small>
+            <small>Select the {{ category.name }} Effect you wish to wield</small>
         </h1>
         <div class="pull-left">
             <a href="{% url 'powers:powers_create' %}" >

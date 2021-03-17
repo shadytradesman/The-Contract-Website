@@ -29,13 +29,13 @@
         </small>
     </h4>
     <p>{{attendance.notes}}</p>
-    {% if attendance.associated_active_reward %}
+    {% if attendance.associated_character_reward %}
         <h5>
-            {% if attendance.associated_active_reward.relevant_power %}
+            {% if attendance.associated_character_reward.relevant_power %}
                 <b>Gift</b> spent on
-                <a href="{% url 'powers:powers_view_power' attendance.associated_active_reward.relevant_power.id %}">
-                    {{ attendance.associated_active_reward.relevant_power.creation_reason_action_text }}
-                    power: {{ attendance.associated_active_reward.relevant_power.name }}
+                <a href="{% url 'powers:powers_view_power' attendance.associated_character_reward.relevant_power.id %}">
+                    {{ attendance.associated_character_reward.relevant_power.creation_reason_action_text }}
+                    power: {{ attendance.associated_character_reward.relevant_power.name }}
                 </a>
             {% else %}
                 <b>Gift</b> has not yet been spent

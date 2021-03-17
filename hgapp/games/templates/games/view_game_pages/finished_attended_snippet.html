@@ -34,11 +34,17 @@
                              </div>
                             <br><br>
                         {% else %}
-                            {{invitation.attendance.attending_character.name}} has not yet spent their Gift for this game.
-                            {% if "edit_character" in char_perms %}
-                                <a href="{% url 'characters:characters_spend_reward' invitation.attendance.attending_character.id %}" class="btn btn-success">
-                                    Spend Available Gifts!
-                                </a>
+                            {% if reward.is_improvement %}
+                                {% user_display invitation.invited_player %} has not yet used their Improvement from this Game.
+                            {% elif reward.is_charon_coin %}
+                                {% user_display invitation.invited_player %} has not yet used their Charon Coin from this Game.
+                            {% else %}
+                                {{invitation.attendance.attending_character.name}} has not yet spent their Gift for this Game.
+                                {% if "edit_character" in char_perms %}
+                                    <a href="{% url 'characters:characters_spend_reward' invitation.attendance.attending_character.id %}" class="btn btn-success">
+                                        Spend Available Gifts!
+                                    </a>
+                                {% endif %}
                             {% endif %}
                         {% endif %}
                     {% endif %}

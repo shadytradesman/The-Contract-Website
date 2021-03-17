@@ -1,8 +1,9 @@
 from django.conf import settings
 from django.db import models
+from django.utils.html import escape
 
 # Create your models here.
-from characters.models import Character, HIGH_ROLLER_STATUS
+from characters.models import Character, HIGH_ROLLER_STATUS, Attribute, Roll
 from guardian.shortcuts import assign_perm, remove_perm
 from django.utils.html import mark_safe, escape, linebreaks
 
@@ -211,6 +212,9 @@ class Base_Power(models.Model):
 
     def example_powers(self):
         return Power_Full.objects.filter(base=self, tags__in=["example"])
+
+    def get_system(self):
+        return Base_Power_System.objects.filter(dice_system=DICE_SYSTEM[1][0]).get(base_power=self)
 
 class Base_Power_System(models.Model):
     base_power = models.ForeignKey(Base_Power,
@@ -427,7 +431,9 @@ class Power(models.Model):
                               on_delete=models.CASCADE,
                                    blank=True,
                                    null=True)
-    system = models.TextField(max_length = 2000)
+    system = models.TextField(max_length = 9000,
+                              blank=True,
+                              null=True)
     selected_enhancements = models.ManyToManyField(Enhancement,
                                                    blank=True,
                                                    through="Enhancement_Instance",
@@ -445,6 +451,12 @@ class Power(models.Model):
         permissions = (
             ('view_private_power', 'View private power'),
         )
+
+    def get_system(self):
+        if hasattr(self, "system") and self.system:
+            return self.system
+        else:
+            return self.base.get_system().system_text
 
     def player_manages_via_cell(self, player):
         if self.parent_power:
@@ -485,10 +497,14 @@ class Power(models.Model):
             remove_perm('view_private_power', player, self)
 
     def render_system(self):
-        default_system = linebreaks(escape(self.system))
+        default_system = linebreaks(escape(self.get_system()))
         value_by_name = {param_val.relevant_power_param.relevant_parameter.name :
                              param_val.relevant_power_param.relevant_parameter.get_value_for_level(level=param_val.value)
                          for param_val in self.parameter_value_set.all()}
+        for field_instance in self.systemfieldtextinstance_set.all():
+            value_by_name[field_instance.relevant_field.name] = field_instance.render_value()
+        for field_instance in self.systemfieldrollinstance_set.all():
+            value_by_name[field_instance.relevant_field.name] = field_instance.render_value()
         rendered_system = default_system
         for name, value in value_by_name.items():
             replaceable_name = str.format("[[{}]]",
@@ -502,7 +518,7 @@ class Power(models.Model):
         output = "{}\nA {} point {} {} power\nCreated by {}\n"
         output = output.format(self.name, self.get_point_value(), self.get_activation_style_display(), self.base.name, self.created_by.username)
         output = output + "{}\nDescription: {}\nSystem: {}\n"
-        output = output.format(self.flavor_text,self.description, self.system)
+        output = output.format(self.flavor_text,self.description, self.get_system())
         output = output + "Parameters:\n-------------\n"
         for parameter_value in self.parameter_value_set.all():
             output = output + "{}"
@@ -530,6 +546,13 @@ class Power(models.Model):
     def __str__(self):
         return self.name + " (" + self.description + ")"
 
+    def save(self, *args, **kwargs):
+        if hasattr(self, "system") and self.system:
+            if self.system == self.base.get_system().system_text:
+                self.system = None
+        super(Power, self).save(*args, **kwargs)
+
+
 class Power_Link(models.Model):
     parent_power = models.ForeignKey(Power_Full,
                                      related_name='parent_power',
@@ -538,12 +561,80 @@ class Power_Link(models.Model):
                                     related_name='child_power',
                                     on_delete=models.CASCADE)
 
+
+class SystemField(models.Model):
+    base_power_system = models.ForeignKey(Base_Power_System,
+                                   on_delete=models.CASCADE)
+    name = models.CharField(max_length = 250)
+    eratta = models.CharField(max_length = 1000, blank=True, null=True)
+
+    def __str__(self):
+        base_name = self.base_power_system.base_power.name
+        return "{} [{}]".format(self.name, base_name)
+
+    class Meta:
+        unique_together = (("base_power_system", "name"))
+        abstract = True
+
+
+class SystemFieldRoll(SystemField):
+    allow_mind = models.BooleanField(default=False)
+    allow_body = models.BooleanField(default=False)
+    allow_std_roll = models.BooleanField(default=True)
+    required_attribute = models.ForeignKey(Attribute,
+                                           on_delete=models.CASCADE,
+                                           null=True,
+                                           blank=True)
+    difficulty = models.PositiveIntegerField(null=True, blank=True)
+
+
+class SystemFieldText(SystemField):
+    pass
+
+
+class SystemFieldInstance(models.Model):
+    relevant_power = models.ForeignKey(Power, on_delete=models.CASCADE)
+
+    class Meta:
+        abstract = True
+
+
+class SystemFieldTextInstance(SystemFieldInstance):
+    relevant_field = models.ForeignKey(SystemFieldText,
+                                             on_delete=models.CASCADE)
+    value = models.CharField(max_length = 1000,
+                              null=True,
+                              blank=True)
+
+    class Meta:
+        unique_together = (("relevant_field", "relevant_power"))
+
+    def render_value(self):
+        return escape(self.value)
+
+
+class SystemFieldRollInstance(SystemFieldInstance):
+    relevant_field = models.ForeignKey(SystemFieldRoll,
+                                       on_delete=models.CASCADE)
+    roll = models.ForeignKey(Roll, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = (("relevant_field", "relevant_power"))
+
+    def render_value(self):
+        first_word = "Mind" if self.roll.is_mind else "Body" if self.roll.is_body else self.roll.attribute.name
+        if self.roll.ability:
+            roll_text = "{} + {}".format(first_word, self.roll.ability.name)
+        else:
+            roll_text = first_word
+        return "{}, Difficulty {}".format(roll_text, self.roll.difficulty)
+
 class Enhancement_Instance(models.Model):
     relevant_enhancement = models.ForeignKey(Enhancement,
                                              on_delete=models.PROTECT)
     relevant_power = models.ForeignKey(Power,
                                        on_delete=models.CASCADE)
-    detail = models.CharField(max_length = 150,
+    detail = models.CharField(max_length = 1500,
                               null=True,
                               blank=True)
 
@@ -568,7 +659,7 @@ class Drawback_Instance(models.Model):
     relevant_drawback = models.ForeignKey(Drawback, on_delete=models.CASCADE)
     relevant_power = models.ForeignKey(Power,
                                        on_delete=models.CASCADE)
-    detail = models.CharField(max_length=150,
+    detail = models.CharField(max_length=1500,
                               null=True,
                               blank=True)
 

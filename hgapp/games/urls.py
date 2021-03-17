@@ -29,6 +29,19 @@ urlpatterns = [
     # ex: .com/games/edit/g/112
     url(r'^edit/g/(?P<game_id>[\d]+)/$', views.edit_game, name='games_game_edit'),
 
+    # ex: .com/games/edit/attendance/g/112/
+    url(r'^add/attendance/g/(?P<game_id>[\d]+)/$',
+        views.add_attendance,
+        name='games_add_attendance'),
+
+    # ex: .com/games/edit-completed/g/112/p/9520+323+412/
+    # ex: .com/games/edit-completed/g/112/
+    url(r'^edit-completed/g/(?P<game_id>[\d]+)/p/(?P<players>[\d\+]*)/$',
+        views.edit_completed,
+        name='games_edit_completed'),
+    url(r'^edit-completed/g/(?P<game_id>[\d]+)/$',
+        views.edit_completed,
+        name='games_edit_completed'),
 
     # ex: .com/games/create/game/ex/cell/1
     url(r'^create/game/ex/cell/(?P<cell_id>[\d]+)/$',

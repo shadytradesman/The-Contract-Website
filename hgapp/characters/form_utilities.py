@@ -162,8 +162,7 @@ def delete_trauma_rev(character, trauma_rev, used_xp):
 def __get_charon_coin_form(user, existing_character=None, POST=None):
     if not user.is_authenticated:
         return None
-    avail_charon_coins = user.rewarded_player.filter(rewarded_character=None, is_charon_coin=True).filter(
-        is_void=False).all()
+    avail_charon_coins = user.profile.get_avail_charon_coins()
     coin_eligible = not existing_character or not existing_character.completed_games()
     if coin_eligible and (avail_charon_coins or (existing_character and existing_character.assigned_coin())):
         CharonCoinForm = make_charon_coin_form(existing_character)
@@ -428,9 +427,9 @@ def __get_asset_formsets(existing_character = None, POST = None):
         asset_formsets = __get_quirk_formsets_for_edit_context(POST=POST,
                                                                details_by_quirk_id=details_by_asset_id,
                                                                is_asset=True,
-                                                               all_quirks=Asset.objects.order_by('value').all())
+                                                               all_quirks=Asset.objects.filter(is_public=True).order_by('value').all())
     else:
-        for asset in Asset.objects.order_by('value').all():
+        for asset in Asset.objects.filter(is_public=True).order_by('value').all():
             asset_formsets.append(AssetFormSet(POST,
                                                initial=[{'id': asset.id, 'quirk': asset}],
                                                prefix="asset-" + str(asset.id)))
@@ -447,9 +446,9 @@ def __get_liability_formsets(existing_character = None, POST = None):
         liability_formsets = __get_quirk_formsets_for_edit_context(POST=POST,
                                                                    details_by_quirk_id=details_by_liability_id,
                                                                    is_asset=False,
-                                                                   all_quirks=Liability.objects.order_by('value').all())
+                                                                   all_quirks=Liability.objects.filter(is_public=True).order_by('value').all())
     else:
-        for liability in Liability.objects.order_by('value').all():
+        for liability in Liability.objects.filter(is_public=True).order_by('value').all():
             liability_formsets.append(LiabilityFormSet(POST,
                                                        initial=[{'id': liability.id, 'quirk': liability}],
                                                        prefix="liability-" + str(liability.id)))

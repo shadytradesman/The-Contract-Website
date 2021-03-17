@@ -25,5 +25,38 @@
 }
 
 .css-detail-field {
-    width: 60% !important;
+    max-width: 60% !important;
+}
+
+.css-field-form {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.css-roll-field-primary {
+    max-width: 45%;
+    display: inline-block;
+}
+
+.css-roll-field-plus {
+    width: 5%;
+    display: inline-block;
+    text-align: center;
+}
+
+.css-roll-field-difficulty {
+    padding-left: 5px;
+    display: inline-block;
+}
+
+.field-eratta {
+    padding-left: 5px;
+}
+
+h3 {
+    margin-top: 0px;
+}
+
+#reset-system-text {
+    padding-bottom: 8px;
 }

@@ -85,7 +85,6 @@ class Profile(models.Model):
     def get_invites_where_player_died(self, invites_with_death):
         return [invite for invite in invites_with_death if invite.attendance and invite.attendance.is_death()]
 
-
     def recompute_gm_title(self):
         gm_games = self.get_games_where_player_gmed()
         num_gm_games = gm_games.count()
@@ -105,6 +104,16 @@ class Profile(models.Model):
             .exclude(is_declined=True) \
             .order_by("relevant_game__end_time") \
             .all()
+
+    def get_avail_improvements(self):
+        return self.user.rewarded_player.filter(rewarded_character=None,
+                                            is_charon_coin=False).filter(is_void=False).all()
+
+    def get_avail_charon_coins(self):
+        return self.user.rewarded_player.filter(rewarded_character=None, is_charon_coin=True).filter(is_void=False).all()
+
+    def get_avail_exp_rewards(self):
+        return self.user.experiencereward_set.filter(is_void=False, rewarded_character=None).all()
 
     def get_games_where_player_gmed(self):
         return Game.objects.filter(gm=self.user).exclude(get_completed_game_excludes_query()) \

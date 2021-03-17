@@ -1,17 +1,39 @@
 from django.contrib import admin
 
 from .forms import EnhancementDrawbackPickerForm, TagPickerForm
+from django.utils.html import mark_safe
+
+from django.urls import reverse
 
 from .models import Enhancement, Parameter, Base_Power, Drawback, Power_Param, Power, Parameter_Value, \
     Base_Power_Category, Base_Power_System, PowerTag, PremadeCategory,\
-    Enhancement_Instance, Drawback_Instance, Power_Full, PowerTutorial
+    Enhancement_Instance, Drawback_Instance, Power_Full, PowerTutorial, SystemFieldText, SystemFieldRoll
 
 class PowerParamTabular(admin.TabularInline):
     model = Power_Param
     extra = 0
 
+class SystemFieldTextTabular(admin.TabularInline):
+    model = SystemFieldText
+    extra = 0
+
+class SystemFieldRollTabular(admin.TabularInline):
+    model = SystemFieldRoll
+    extra = 0
+
 class SystemInline(admin.StackedInline):
     model = Base_Power_System
+    fields = ['system_fields', 'base_power', 'dice_system', 'system_text', 'eratta',]
+    readonly_fields = ('system_fields',)
+
+    # description functions like a model field's verbose_name
+    def system_fields(self, instance):
+        if instance.id:
+            changeform_url = reverse(
+                'admin:powers_base_power_system_change', args=(instance.id,)
+            )
+            return mark_safe(u'<a href="%s" target="_blank">Edit System Fields</a>' % changeform_url)
+        return u''
     extra = 0
 
 class ParamValueTabular(admin.TabularInline):
@@ -45,6 +67,10 @@ class BasePowerAdmin(admin.ModelAdmin):
     inlines = [PowerParamTabular, SystemInline]
     filter_horizontal = ["enhancements", "drawbacks"]
 
+@admin.register(Base_Power_System)
+class BasePowerAdmin(admin.ModelAdmin):
+    inlines = [SystemFieldTextTabular, SystemFieldRollTabular]
+
 @admin.register(PowerTag)
 class PowerTagAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("tag",)}
@@ -70,8 +96,9 @@ class PowerAdmin(admin.ModelAdmin):
     list_display = ('name', 'base')
 
 admin.site.register(Power_Param)
-admin.site.register(Base_Power_System)
 admin.site.register(Parameter_Value)
 admin.site.register(Enhancement_Instance)
 admin.site.register(Drawback_Instance)
 admin.site.register(PowerTutorial)
+admin.site.register(SystemFieldText)
+admin.site.register(SystemFieldRoll)
