@@ -31,37 +31,54 @@
          role="tabpanel"
          aria-labelledby="collapse-power-{{power_full.id}}-heading">
         <p>
-            <b>System: <br></b>
             {{power_full.latest_revision.render_system}}
         </p>
         {% if power_full.latest_revision.enhancement_instance_set.all %}
             <p>
-                <b>Enhancements:</b>
+                <b>Enhancements</b>
+                <ul>
                 {% for instance in power_full.latest_revision.enhancement_instance_set.all %}
-                    <span class="power-badge-modifier"
-                          style="display: inline-block;"
-                          data-toggle="tooltip"
-                          data-html="true"
-                          title='{{instance.relevant_enhancement.description}}
-                          {{instance.relevant_enhancement.eratta|linebreaks}}'>
-                        {{instance.relevant_enhancement.name}}
-                    </span>
+                    <li>
+                        <b>{{instance.relevant_enhancement.name}}:</b> {{instance.relevant_enhancement.description}}
+                        {% if instance.relevant_enhancement.eratta%}
+                        <span data-toggle="tooltip" 
+                            title="{{instance.relevant_enhancement.eratta}}"
+                            data-placement="top">
+                            <i class="fa fa-question-circle fa-1x"></i>
+                        </span>
+                        {% endif %}
+                        {% if instance.detail%}
+                            <ul><li>
+                                {{instance.relevant_enhancement.detail_field_label}}: {{instance.detail}}
+                            </li></ul>
+                        {% endif %}
+                    </li>
                 {% endfor %}
+                </ul>
             </p>
         {% endif %}
         {% if power_full.latest_revision.drawback_instance_set.all %}
             <p>
-                <b>Drawbacks:</b>
+                <b>Drawbacks</b>
+                <ul>
                 {% for instance in power_full.latest_revision.drawback_instance_set.all %}
-                    <span style="display: inline-block;"
-                            class="power-badge-modifier"
-                          data-toggle="tooltip"
-                          data-html="true"
-                          title='{{instance.relevant_drawback.description|linebreaks}}
-                          {{instance.relevant_drawback.eratta|linebreaks}}'>
-                        {{instance.relevant_drawback.name}}
-                    </span>
+                    <li>
+                        <b>{{instance.relevant_drawback.name}}:</b> {{instance.relevant_drawback.description}}
+                        {% if instance.relevant_drawback.eratta%}
+                        <span data-toggle="tooltip" 
+                            title="{{instance.relevant_drawback.eratta}}"
+                            data-placement="top">
+                            <i class="fa fa-question-circle fa-1x"></i>
+                        </span>
+                    {% endif %}
+                        {% if instance.detail%}
+                            <ul><li>
+                                {{instance.relevant_drawback.detail_field_label}}: {{instance.detail}}
+                            </li></ul>
+                        {% endif %}
+                    </li>
                 {% endfor %}
+                </ul>
             </p>
         {% endif %}
         {% if power_full.example_description %}
