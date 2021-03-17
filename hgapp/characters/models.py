@@ -808,6 +808,7 @@ class Quirk(models.Model):
     value = models.PositiveIntegerField()
     description = models.CharField(max_length=2000)
     system = models.CharField(max_length=2000) # A "just the facts" summary
+    is_public = models.BooleanField(default=True)
     category = models.CharField(choices=QUIRK_CATEGORY,
                               max_length=50,
                               default=QUIRK_CATEGORY[1][0])

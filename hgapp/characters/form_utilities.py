@@ -427,9 +427,9 @@ def __get_asset_formsets(existing_character = None, POST = None):
         asset_formsets = __get_quirk_formsets_for_edit_context(POST=POST,
                                                                details_by_quirk_id=details_by_asset_id,
                                                                is_asset=True,
-                                                               all_quirks=Asset.objects.order_by('value').all())
+                                                               all_quirks=Asset.objects.filter(is_public=True).order_by('value').all())
     else:
-        for asset in Asset.objects.order_by('value').all():
+        for asset in Asset.objects.filter(is_public=True).order_by('value').all():
             asset_formsets.append(AssetFormSet(POST,
                                                initial=[{'id': asset.id, 'quirk': asset}],
                                                prefix="asset-" + str(asset.id)))
@@ -446,9 +446,9 @@ def __get_liability_formsets(existing_character = None, POST = None):
         liability_formsets = __get_quirk_formsets_for_edit_context(POST=POST,
                                                                    details_by_quirk_id=details_by_liability_id,
                                                                    is_asset=False,
-                                                                   all_quirks=Liability.objects.order_by('value').all())
+                                                                   all_quirks=Liability.objects.filter(is_public=True).order_by('value').all())
     else:
-        for liability in Liability.objects.order_by('value').all():
+        for liability in Liability.objects.filter(is_public=True).order_by('value').all():
             liability_formsets.append(LiabilityFormSet(POST,
                                                        initial=[{'id': liability.id, 'quirk': liability}],
                                                        prefix="liability-" + str(liability.id)))
