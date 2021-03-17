@@ -604,7 +604,12 @@ class Character(models.Model):
         mind_val = 0
         for attr in mind_scaling_attrs:
             mind_val = mind_val + attr.value
-        return mind_val
+        if mind_val <= 3:
+            return 3
+        elif mind_val >= 9:
+            return 9
+        else:
+            return mind_val
 
     def get_attributes(self, is_physical):
         return self.stats_snapshot.attributevalue_set\

@@ -153,9 +153,10 @@
                     &nbsp;
                 </div>
             </li>
-            <li>
-                <a data-toggle="pill" href="#restricted" class="js-quirk-cat-button">
-                Restricted
+            <li data-toggle="tooltip"
+                   title="Restricted Assets and Liabilities require the approval of your Cell's leader to take.">
+                <a data-toggle="pill" href="#restricted" class="js-quirk-cat-button" >
+                    Restricted
                 </a>
                 <div class="css-quirk-cat-caption-cont">
                     &nbsp;
@@ -218,7 +219,6 @@
             </div>
             <div id="mental" class="tab-pane fade">
                 <div class="row">
-
                     <div class="col-md-6 col-xs-12">
                         <h3 id="mental-assets">Mental Assets</h3>
                         {% for formset in asset_formsets %}
