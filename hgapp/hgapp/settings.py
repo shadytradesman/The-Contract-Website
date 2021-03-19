@@ -101,6 +101,7 @@ INSTALLED_APPS = [
     'overrides.apps.OverridesConfig',
     'cells.apps.CellsConfig',
     'info.apps.InfoConfig',
+    'journals.apps.JournalsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
