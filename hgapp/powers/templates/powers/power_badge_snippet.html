@@ -30,11 +30,11 @@
     <div class="panel-collapse collapse collapse-power-{{power_full.id}}"
          role="tabpanel"
          aria-labelledby="collapse-power-{{power_full.id}}-heading">
-        <p>
+        <div>
             {{power_full.latest_revision.render_system}}
-        </p>
+        </div>
         {% if power_full.latest_revision.enhancement_instance_set.all %}
-            <p>
+            <div>
                 <b>Enhancements</b>
                 <ul>
                 {% for instance in power_full.latest_revision.enhancement_instance_set.all %}
@@ -55,10 +55,10 @@
                     </li>
                 {% endfor %}
                 </ul>
-            </p>
+            </div>
         {% endif %}
         {% if power_full.latest_revision.drawback_instance_set.all %}
-            <p>
+            <div>
                 <b>Drawbacks</b>
                 <ul>
                 {% for instance in power_full.latest_revision.drawback_instance_set.all %}
@@ -79,7 +79,7 @@
                     </li>
                 {% endfor %}
                 </ul>
-            </p>
+            </div>
         {% endif %}
         {% if power_full.example_description %}
             <small style="font-style: italic; color: #808080;">Stock Power Tip: {{power_full.example_description|linebreaks}}</small>
