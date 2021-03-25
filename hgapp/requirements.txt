@@ -61,7 +61,7 @@ pyrsistent==0.16.0
 python-dateutil==2.6.0
 python-memcached==1.59
 pytz==2020.1
-PyYAML==5.3.1
+PyYAML==5.4
 requests==2.20.1
 rsa==3.4.2
 s3transfer==0.3.3
