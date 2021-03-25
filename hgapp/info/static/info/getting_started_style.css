@@ -1,13 +1,19 @@
-.css-art-horns {
+.css-art-front-music {
     float: left;
 }
 
-.css-sm-art-horns {
+.css-sm-art-front-music {
     width: 33%;
     margin-right: 40px;
 }
 
-.css-xs-art-horns {
+.css-xs-art-front-music {
     width: 100%;
     margin-bottom: 10px;
+}
+
+.css-discord-btn {
+   top: 2px;
+   position: relative;
+   font-size: 15px;
 }
