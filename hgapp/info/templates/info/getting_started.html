@@ -4,6 +4,7 @@
 {% load staticfiles %}
 {% load account_tags %}
 {% load hgapp_tags %}
+{% load cache %}
 
 {% block head_title %}Getting Started{% endblock %}
 
@@ -12,6 +13,7 @@
 {% endblock %}
 
 {% block body_base %}
+{% cache 50000 getting_started request.user.is_authenticated %}
 <div class="container">
     <h1 class="text-center">
         <i>So you want to sign The Contract . . .</i>
@@ -193,4 +195,5 @@
         </div>
     </div>
 </div>
+{% endcache %}
 {% endblock %}
