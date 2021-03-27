@@ -20,7 +20,7 @@
 
 {% block body_class %}home{% endblock %}
 {% block body_base %}
-{% comment %} {% cache 500 loggedouthome %} {% endcomment%}
+{% cache 50000 loggedouthome %}
 <div class="css-main-container">
     <span class="css-art-credit"><small>Art by <a href="https://www.artstation.com/tavaresart">Gwynn Tavares</a></small></span>
 
@@ -450,4 +450,5 @@
         </div>
     </div>
 </div>
+{% endcache %}
 {% endblock %}
