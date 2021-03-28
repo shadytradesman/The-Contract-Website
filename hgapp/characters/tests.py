@@ -1,5 +1,5 @@
 from django.test import TestCase
-from django.contrib.auth.models import AnonymousUser, User
+from django.contrib.auth.models import User
 from characters.models import Character, ContractStats, Asset, Liability, AssetDetails, LiabilityDetails, Attribute, \
     AttributeValue, Ability, AbilityValue, Roll
 from games.models import Reward

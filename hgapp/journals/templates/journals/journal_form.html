@@ -5,23 +5,31 @@
 {% load account_tags %}
 {% load bootstrap %}k
 
-{% block head_title %}Write Journal{% endblock %}
+{% block head_title %}
+    Write Journal
+{% endblock %}
+
+{% block extra_head %}
+    {{ form.media }}
+{% endblock %}
 
 {% block extra_styles %}
 {% endblock %}
 
-{% block extra_scripts %}
-{% endblock %}
-
 {% block body_base %}
-<h1 class="text-center">
-    Write a new Journal
-</h1>
 <div class="container">
+    <h1 class="text-center">
+        Writing in {{character.name}}'s Journal
+    </h1>
     <div class="panel panel-default">
         <div class="panel-body">
-            <form action="{% url 'journals:journal_write' game.id character.id %}" method="post">
-                {{form|bootstrap}}
+            <div class="thumbnail">
+                {{character.name}} played in {{game.scenario.title}}.
+            </div>
+            <form action="{% url 'journals:journal_write_game' game.id character.id %}" method="post">
+                {{form.title|bootstrap}}
+                {{form.content|bootstrap}}
+                {{form.is_downtime|bootstrap}}
                 <input class="btn btn-primary" type="submit" value="Done!" />
             </form>
         </div>

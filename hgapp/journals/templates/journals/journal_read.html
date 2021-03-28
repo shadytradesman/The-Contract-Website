@@ -1,0 +1,57 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+{% load staticfiles %}
+
+{% block head_title %}
+    {{character.name}}'s Journal
+{% endblock %}
+
+{% block extra_head %}
+    {{ form.media }}
+{% endblock %}
+
+{% block extra_styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'journals/journal_read_style.css' %}" />
+{% endblock %}
+
+{% block body_base %}
+<div class="container">
+    <h1 class="text-center">
+        {{character.name}}'s Journal
+    </h1>
+
+    <ul class="nav nav-tabs" role="tablist">
+        {% for journal_page in journal_pages %}
+            <li role="presentation" {% if journal_page.game.id == view_game_id %} class="active" {% endif %}>
+                <a href="#{{journal_page.id}}" aria-controls="{{journal_page.id}}" role="tab" data-toggle="tab">
+                    {{journal_page.header}}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="tab-content">
+                {% for journal_page in journal_pages %}
+                    <div role="tabpanel"
+                         class="tab-pane {% if journal_page.game.id == view_game_id %} active {% endif %}"
+                         id="{{journal_page.id}}">
+                        {% for journal in journal_page.journals %}
+                            <div class="thumbnail">
+                                <h3>
+                                    {{journal.title}}
+                                </h3>
+                                <div>
+                                    {{journal.content|safe}}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -260,7 +260,7 @@ class Game(models.Model):
             self.gm = self.creator
         if not hasattr(self, 'scenario'):
             scenario = Scenario(creator=self.gm,
-                                title="Scenario for " + str(self.title),
+                                title=str(self.title),
                                 description="Put details of the scenario here",
                                 suggested_status=HIGH_ROLLER_STATUS[0][0],
                                 max_players=5,
