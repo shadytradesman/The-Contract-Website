@@ -1,3 +1,10 @@
 .nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
     background-color: #20252d;
 }
+
+.css_empty_page {
+    border-style: dotted;
+    border-color: #40454d;
+    border-width: 1px;
+    border-bottom-width: 0px;
+}

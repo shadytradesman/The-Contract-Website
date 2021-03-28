@@ -14,6 +14,6 @@ class JournalForm(forms.Form):
                                   widget=TinyMCE(attrs={'cols': 80, 'rows': 30}),
                                   max_length=73000,
                                   help_text='Write in-character. You must write at least 250 words to recieve rewards.')
-    contains_spoilers = forms.BooleanField(label = "Downtime",
+    contains_spoilers = forms.BooleanField(label = "Contains Spoilers",
                                        required=False,
-                                       help_text = "This Journal describes the events occurring after the Game rather than the Game itself.")
+                                       help_text = "This journal contains spoilers for the Scenario")

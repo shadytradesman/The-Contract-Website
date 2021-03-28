@@ -24,12 +24,24 @@
     <div class="panel panel-default">
         <div class="panel-body">
             <div class="thumbnail">
-                {{character.name}} played in {{game.scenario.title}}.
+                {% if is_downtime %}
+                    Write in-character as {{character.name }} about what happened after the events of
+                    {{game.scenario.title}}. Remember, Experience points represent your Contractor spending their time training.
+                {% else %}
+                    {{character.name}} played in {{game.scenario.title}}.
+                {% endif %}
             </div>
-            <form action="{% url 'journals:journal_write_game' game.id character.id %}" method="post">
+            <form
+                    {% if is_downtime %}
+                        action="{% url 'journals:journal_write_downtime' game.id character.id %}"
+                    {% else %}
+                        action="{% url 'journals:journal_write_game' game.id character.id %}"
+                    {% endif %}
+                    method="post">
+                {% csrf_token %}
                 {{form.title|bootstrap}}
                 {{form.content|bootstrap}}
-                {{form.is_downtime|bootstrap}}
+                {{form.contains_spoilers|bootstrap}}
                 <input class="btn btn-primary" type="submit" value="Done!" />
             </form>
         </div>
