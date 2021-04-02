@@ -1,0 +1,104 @@
+<div role="tabpanel"
+     class="tab-pane {% if journal_page.game.id == view_game_id %} active {% endif %}"
+     id="{{journal_page.id}}">
+    {% if journal_page.death %}
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+                {% if journal_page.game %}
+                    <small class="css-game-link">
+                        <a href="{% url 'games:games_view_game' journal_page.game.id %}">
+                            {{ journal_page.game.scenario.title }}
+                        </a>
+                    </small>
+                {% endif %}
+                <div class="thumbnail">
+                    <div class="text-center">
+                        <h3>Here Lies {{character.name}}</h3>
+                        {% if journal_page.death.cause_of_death %}
+                        <div class="lead">Cause of Death: {{journal_page.death.cause_of_death}}</div>
+                        {% endif %}
+                    </div>
+                    {% if journal_page.death.obituary %}
+                        <div class="row">
+                            <div class="col-sm-10 col-sm-offset-1">
+                                <p>
+                                    {{journal_page.death.obituary|linebreaks}}
+                                </p>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+                {% if viewer_can_write %}
+                    <div class="text-center">
+                        <a href="{%url 'characters:characters_obituary' character.id %}" class="btn btn-default btn-sm text-center">
+                            Edit Obituary
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+    {% else %}
+        {% if journal_page.game_journal %}
+            <small class="css-game-link">
+                <a href="{% url 'games:games_view_game' journal_page.game.id %}">
+                    {{ journal_page.game.scenario.title }}
+                </a>
+            </small>
+            <div class="thumbnail">
+                <h3>
+                    {{journal_page.game_journal.title}}
+                </h3>
+                <div>
+                    {{journal_page.game_journal.content|safe}}
+                </div>
+                {% if viewer_can_write %}
+                <a class="btn btn-default"
+                   href="{% url 'journals:journal_edit' journal_page.game_journal.id %}">
+                    Edit Journal
+                </a>
+                {% endif %}
+            </div>
+        {% else %}
+            {% if viewer_can_write %}
+                <div class="alert alert-success text-center">
+                    You have not written a journal for this game yet.
+                    You will earn 1 Exp for {{character.name}} if you write an in-character journal about
+                    the events of the Game.
+                    <br>
+                    <a class="btn btn-primary"
+                       href="{% url 'journals:journal_write_game' journal_page.game.id character.id %}">
+                        Write Journal
+                    </a>
+                </div>
+            {% endif %}
+        {% endif %}
+        {% for journal in journal_page.downtime_journals %}
+        <small class="css-game-link">Downtime</small>
+        <div class="thumbnail">
+            <h3>
+                {{journal.title}}
+            </h3>
+            <div>
+                {{journal.content|safe}}
+            </div>
+        </div>
+        {% endfor %}
+        {% if viewer_can_write %}
+        <div class="text-center alert {% if journal_page.downtime_journals %} alert-info {% else %} alert-success {% endif %}">
+            {% if journal_page.downtime_journals %}
+                You may write additional Downtime journals, but you will not gain extra Experience from them.
+            {% else %}
+                You have not written a Downtime Journal for this Game yet.
+                You will earn 1 Exp for {{character.name}} if you write an in-character Journal at least
+                250 words in length explaining what occurred between this Game and the next.
+            {% endif %}
+            <br>
+            <a class="btn btn-primary"
+               href="{% url 'journals:journal_write_downtime' journal_page.game.id character.id %}">
+                Write Downtime Journal
+            </a>
+        </div>
+        {% endif %}
+    {% endif %}
+</div>

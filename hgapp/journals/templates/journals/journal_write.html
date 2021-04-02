@@ -32,7 +32,9 @@
                 {% endif %}
             </div>
             <form
-                    {% if is_downtime %}
+                    {% if journal %}
+                        action="{% url 'journals:journal_edit' journal.id %}"
+                    {% elif is_downtime %}
                         action="{% url 'journals:journal_write_downtime' game.id character.id %}"
                     {% else %}
                         action="{% url 'journals:journal_write_game' game.id character.id %}"
@@ -42,7 +44,7 @@
                 {{form.title|bootstrap}}
                 {{form.content|bootstrap}}
                 {{form.contains_spoilers|bootstrap}}
-                <input class="btn btn-primary" type="submit" value="Done!" />
+                <input class="btn btn-primary" type="submit" value="Submit" />
             </form>
         </div>
     </div>

@@ -2,6 +2,8 @@ from django.db import models
 from django.db.models import Q
 from django.conf import settings
 
+from bs4 import BeautifulSoup
+
 from django.urls import reverse
 
 from games.models import Game_Attendance
@@ -25,11 +27,24 @@ class Journal(models.Model):
     is_deleted = models.BooleanField(default=False)
     contains_spoilers = models.BooleanField(default=True)
 
-    def get_absolute_url(self):
-        return reverse('journals.views.JournalView', args=[str(self.id)])
-
     class Meta:
         constraints = [
             # You cannot have two non-deleted journals for the same game attendance
             models.UniqueConstraint(fields=['game_attendance'], condition=Q(is_downtime=False, is_deleted=False), name='one_journal_per_game'),
         ]
+
+    def __get_is_valid(self, content):
+        word_count = self.__get_wordcount(content)
+        # use slightly fewer words than what we tell people in case our counting sucks
+        return word_count >= 246
+
+    def __get_wordcount(self, content):
+        soup = BeautifulSoup(content)
+        return len(soup.text.split())
+        return count
+
+    def save(self, *args, **kwargs):
+        is_valid = self.__get_is_valid(self.content)
+        self.is_valid = is_valid
+        super(Journal, self).save(*args, **kwargs)
+
