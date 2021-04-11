@@ -6,10 +6,13 @@ from bs4 import BeautifulSoup
 
 from django.urls import reverse
 
-from games.models import Game_Attendance
+from games.models import Game_Attendance, Reward
 
-from characters.models import Character
+from characters.models import Character, ExperienceReward
 
+from hgapp.utilities import get_object_or_none
+
+NUM_JOURNALS_PER_IMPROVEMENT = 5
 
 class Journal(models.Model):
     title = models.CharField(max_length=400)
@@ -26,6 +29,10 @@ class Journal(models.Model):
     is_valid = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
     contains_spoilers = models.BooleanField(default=True)
+    experience_reward = models.OneToOneField(ExperienceReward,
+                                             null=True,
+                                             blank=True,
+                                             on_delete=models.SET_NULL)
 
     class Meta:
         constraints = [
@@ -33,18 +40,95 @@ class Journal(models.Model):
             models.UniqueConstraint(fields=['game_attendance'], condition=Q(is_downtime=False, is_deleted=False), name='one_journal_per_game'),
         ]
 
+    def set_content(self, content):
+        original_valid = self.is_valid
+        is_valid = self.__get_is_valid(content)
+        self.is_valid = is_valid
+        self.content = content
+        self.save()
+        if self.is_valid and not original_valid:
+            self.__grant_reward()
+        if original_valid and not self.is_valid:
+            self.__void_reward()
+
+    def get_improvement(self):
+        return get_object_or_none(Reward,
+                                  rewarded_player=self.game_attendance.get_player(),
+                                  relevant_game=self.game_attendance.relevant_game,
+                                  is_void=False,
+                                  is_journal=True)
+
+
+    def get_exp_reward(self):
+        if hasattr(self, "experience_reward") and self.experience_reward:
+            return self.experience_reward
+        else:
+            return None
+
+    def __void_reward(self):
+        if self.is_valid:
+            raise ValueError("can't void reward for a valid journal")
+        improvement = self.get_improvement()
+        if improvement:
+            improvement.mark_void()
+        exp_reward = self.get_exp_reward()
+        if exp_reward:
+            self.experience_reward.mark_void()
+            self.experience_reward = None
+            self.save()
+
+    def __grant_reward(self):
+        if not self.is_valid:
+            raise ValueError("can't grant a reward for an invalid journal")
+        if hasattr(self, "game_attendance") and self.game_attendance and \
+                hasattr(self.game_attendance, "attending_character") and self.game_attendance.attending_character:
+            character = self.game_attendance.attending_character
+            num_valid = Journal.objects.filter(game_attendance__attending_character=character.id,
+                                               is_valid=True).count()
+        else:
+            return
+        num_journal_rewards = Reward.objects.filter(is_journal=True,
+                                                    rewarded_character=character,
+                                                    is_improvement=True,
+                                                    is_void=False).count()
+        if num_journal_rewards < num_valid // NUM_JOURNALS_PER_IMPROVEMENT:
+            reward = Reward(relevant_game=self.game_attendance.relevant_game,
+                                   rewarded_character=character,
+                                   rewarded_player=character.player,
+                                   is_improvement=True,
+                                    is_journal=True)
+            reward.save()
+        else:
+            exp_reward = ExperienceReward(
+                rewarded_character=character,
+                rewarded_player=character.player,
+            )
+            exp_reward.save()
+            self.experience_reward = exp_reward
+            self.save()
+
+
     def __get_is_valid(self, content):
         word_count = self.__get_wordcount(content)
         # use slightly fewer words than what we tell people in case our counting sucks
         return word_count >= 246
 
     def __get_wordcount(self, content):
-        soup = BeautifulSoup(content)
+        soup = BeautifulSoup(content, features="html5lib")
         return len(soup.text.split())
-        return count
 
     def save(self, *args, **kwargs):
-        is_valid = self.__get_is_valid(self.content)
-        self.is_valid = is_valid
+        if not self.pk and self.content:
+            raise ValueError("Set Journal content through set_content()")
         super(Journal, self).save(*args, **kwargs)
 
+
+class JournalCover(models.Model):
+    title = models.CharField(max_length=400)
+    content = models.TextField(max_length=74000, null=True, blank=True)
+    character = models.ForeignKey(Character, on_delete=models.CASCADE)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['character'], name='one_cover_per_contractor'),
+        ]

@@ -11,6 +11,11 @@ from profiles.signals import make_profile_for_new_user
 
 from .models import Journal
 
+LIST_100_WORDS = [str(x) for x in range(100)]
+LIST_270_WORDS = [str(x) for x in range(270)]
+INVALID_JOURNAL_CONTENT = " ".join(LIST_100_WORDS)
+VALID_JOURNAL_CONTENT = " ".join(LIST_270_WORDS)
+
 class JournalModelTests(TestCase):
     def setUp(self):
         self.user1 = User.objects.create_user(
@@ -103,9 +108,40 @@ class JournalModelTests(TestCase):
         game_invite.save()
         self.game1.give_rewards()
 
+        self.games = []
+        self.char1_attendances = []
+        for x in range(10):
+            new_game = Game(
+                title="title",
+                creator=self.user2,
+                gm=self.user2,
+                created_date=timezone.now(),
+                scheduled_start_time=timezone.now(),
+                actual_start_time=timezone.now(),
+                end_time=timezone.now(),
+                status=GAME_STATUS[6][0],
+                cell=self.cell,
+            )
+            self.games.append(new_game)
+            new_game.save()
+            new_attendance = Game_Attendance(
+                relevant_game=self.games[x],
+                notes="notes",
+                outcome=WIN,
+                attending_character=self.char1,
+            )
+            self.char1_attendances.append(new_attendance)
+            new_attendance.save()
+            game_invite = Game_Invite(invited_player=self.user1,
+                                      relevant_game=new_game,
+                                      as_ringer=False)
+            game_invite.attendance = new_attendance
+            game_invite.save()
+            new_game.give_rewards()
+
     def __make_journal(self,
                        title="title",
-                       content="content",
+                       content=None,
                        writer=None,
                        game_attendance=None,
                        edit_date=timezone.now(),
@@ -157,3 +193,59 @@ class JournalModelTests(TestCase):
             self.__make_journal(writer=self.user1,
                                            game_attendance=self.attendance_game1_char1,
                                            is_downtime=False)
+
+    def test_journal_content_must_be_set_with_helper(self):
+        with self.assertRaises(ValueError):
+            self.__make_journal(writer=self.user1,
+                                game_attendance=self.attendance_game1_char1,
+                                content="content",
+                                is_downtime=False)
+
+    def test_journals_grant_correct_rewards(self):
+        for x in range(7):
+            journal = self.__make_journal(writer=self.user1,
+                                          game_attendance=self.char1_attendances[x],
+                                          is_downtime=False)
+            journal.set_content(VALID_JOURNAL_CONTENT)
+            if x == 4:
+                self.assertIsNotNone(journal.get_improvement())
+                self.assertIsNone(journal.get_exp_reward())
+            else:
+                self.assertIsNone(journal.get_improvement())
+                self.assertIsNotNone(journal.get_exp_reward())
+
+    def test_journals_void_rewards(self):
+        journals = []
+        for x in range(7):
+            journal = self.__make_journal(writer=self.user1,
+                                          game_attendance=self.char1_attendances[x],
+                                          is_downtime=False)
+            journal.set_content(VALID_JOURNAL_CONTENT)
+            journals.append(journal)
+        exp_journal = journals[0]
+        self.assertIsNone(exp_journal.get_improvement())
+        self.assertIsNotNone(exp_journal.get_exp_reward())
+        exp_journal.set_content(INVALID_JOURNAL_CONTENT)
+        exp_journal.refresh_from_db()
+        self.assertIsNone(exp_journal.get_improvement())
+        self.assertIsNone(exp_journal.get_exp_reward())
+        exp_journal.set_content(VALID_JOURNAL_CONTENT)
+        exp_journal.refresh_from_db()
+        self.assertIsNone(exp_journal.get_improvement())
+        self.assertIsNotNone(exp_journal.get_exp_reward())
+
+        improvement_journal = journals[4]
+        self.assertIsNotNone(improvement_journal.get_improvement())
+        self.assertIsNone(improvement_journal.get_exp_reward())
+        improvement_journal.set_content(INVALID_JOURNAL_CONTENT)
+        improvement_journal.refresh_from_db()
+        self.assertIsNone(improvement_journal.get_improvement())
+        self.assertIsNone(improvement_journal.get_exp_reward())
+        improvement_journal.set_content(VALID_JOURNAL_CONTENT)
+        improvement_journal.refresh_from_db()
+        self.assertIsNotNone(improvement_journal.get_improvement())
+        self.assertIsNone(improvement_journal.get_exp_reward())
+
+
+
+

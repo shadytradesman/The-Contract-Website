@@ -23,6 +23,9 @@ from characters.forms import make_character_form, CharacterDeathForm, ConfirmAss
 from characters.form_utilities import get_edit_context, character_from_post, update_character_from_post, \
     grant_trauma_to_character, delete_trauma_rev
 
+from journals.models import Journal, JournalCover
+
+from hgapp.utilities import get_object_or_none
 
 def __check_edit_perms(request, character, secret_key):
     if request.user.is_superuser:
@@ -177,6 +180,9 @@ def view_character(request, character_id, secret_key = None):
 
     equipment_form = EquipmentForm()
     bio_form = BioForm()
+
+    num_journal_entries = Journal.objects.filter(game_attendance__attending_character=character.id).count()
+    journal_cover = get_object_or_none(JournalCover, character=character.id)
     context = {
         'character': character,
         'user_can_edit': user_can_edit,
@@ -196,6 +202,8 @@ def view_character(request, character_id, secret_key = None):
         'bio_form': bio_form,
         'secret_key': secret_key,
         'secret_key_valid': secret_key_valid,
+        'num_journal_entries': num_journal_entries,
+        'journal_cover': journal_cover,
     }
     return render(request, 'characters/view_pages/view_character.html', context)
 

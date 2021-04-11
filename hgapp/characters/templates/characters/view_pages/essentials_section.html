@@ -17,6 +17,24 @@
             <p>
                 {{character.pres_tense_to_be}} <b>{{character.age}}</b> years old, and often appears as <b>{{character.appearance}}</b>.
             </p>
+            {% if num_journal_entries %}
+                <p>
+                    {{character.pronoun_possessive_capitalized}}
+                    {% if journal_cover %}
+                        journal,
+                    {% endif %}
+                    <a class="js-journal-link" href="{% url 'journals:journal_read' character.id %}">
+                        {% if journal_cover %}
+                            {{journal_cover.title}},
+                        {% else %}
+                            journal
+                        {% endif %}
+                    </a>
+                    has {{num_journal_entries}} {% if num_journal_entries > 1 %} entries{% else %} entry{%endif%}.
+                </p>
+            {% elif user_can_edit %}
+
+            {% endif %}
         </div>
     </div>
     {% if user_can_edit %}
@@ -49,6 +67,17 @@
                 </div>
             {% endif %}
         </div>
+        {% if num_journal_entries %}
+        <div class="row">
+            <div class="col-md-4 col-md-offset-4 text-center">
+                <a class="btn btn-sm btn-primary js-journal-link" href="{% url 'journals:journal_read' character.id %}">
+                    Read {{character.name}}'s Journal
+                </a>
+                <br>
+                <br>
+            </div>
+        </div>
+        {% endif %}
     </div>
     {% if character.background or user_can_edit %}
         <div id = "js-bio-expand-button">

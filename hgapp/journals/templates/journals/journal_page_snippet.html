@@ -1,7 +1,25 @@
+
+{% load staticfiles %}
+
 <div role="tabpanel"
-     class="tab-pane {% if journal_page.game.id == view_game_id %} active {% endif %}"
+     class="tab-pane {% if journal_page.id == view_game_id %} active {% endif %}"
      id="{{journal_page.id}}">
-    {% if journal_page.death %}
+    {% if journal_page.cover %}
+        <h2 class="text-center">
+            {{journal_page.cover.title}}
+        </h2>
+
+        <div class="css-journal-cover-content">
+            {{journal_page.cover.content|safe}}
+        </div>
+        {% if viewer_can_write %}
+        <a class="btn btn-default"
+           href="{% url 'journals:journal_edit_cover' character.id %}">
+            Edit Journal Cover
+        </a>
+        {% endif %}
+
+    {% elif journal_page.death %}
         <div class="row">
             <div class="col-md-10 col-md-offset-1">
                 {% if journal_page.game %}
@@ -41,6 +59,19 @@
     {% else %}
         {% if journal_page.game_journal %}
             <small class="css-game-link">
+                {% if journal_page.game_journal.is_valid %}
+                    <img class ="css-valid-quill-img"
+                         src="{% static 'journals/quill.svg' %}"
+                         data-toggle="tooltip"
+                         title='This journal entry is valid and granted a reward.'
+                    />
+                {% endif %}
+                {% if journal_page.game_journal.contains_spoilers %}
+                    <i class="fa fa-lock fa-1x"
+                       data-toggle="tooltip"
+                       title='This journal entry contains spoilers for a Scenario and cannot be viewed by those who have not discoverd it'
+                    ></i>
+                {% endif %}
                 <a href="{% url 'games:games_view_game' journal_page.game.id %}">
                     {{ journal_page.game.scenario.title }}
                 </a>

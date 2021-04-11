@@ -652,6 +652,7 @@ class Reward(models.Model):
     is_improvement = models.BooleanField(default=True)
     is_charon_coin = models.BooleanField(default=False)
     is_void = models.BooleanField(default=False)
+    is_journal = models.BooleanField(default=False)
 
     awarded_on = models.DateTimeField('awarded on')
     assigned_on = models.DateTimeField('assigned on',
@@ -700,8 +701,7 @@ class Reward(models.Model):
 
     def refund_and_unassign_from_character(self):
         character = None if self.is_charon_coin or self.is_improvement else self.rewarded_character
-        self.is_void = True
-        self.save()
+        self.mark_void()
         new_reward = Reward(relevant_game = self.relevant_game,
                             relevant_power = None,
                             rewarded_character = character,

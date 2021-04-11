@@ -9,9 +9,10 @@ from django.utils.decorators import method_decorator
 from django.urls import reverse
 from django.utils import timezone
 from django.core.exceptions import PermissionDenied
+from django.db import transaction
 
-from .forms import JournalForm
-from .models import Journal
+from .forms import JournalForm, JournalCoverForm
+from .models import Journal, JournalCover
 from hgapp.utilities import get_object_or_none
 
 from games.models import Game, Game_Attendance
@@ -37,15 +38,15 @@ class WriteJournal(View):
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
         if form.is_valid():
-            content = form.cleaned_data['content']
-            journal = Journal(title=form.cleaned_data['title'],
-                              content=content,
-                              writer=request.user,
-                              game_attendance=self.game_attendance,
-                              is_downtime=self.is_downtime,
-                              is_deleted=False,
-                              contains_spoilers=form.cleaned_data['contains_spoilers'])
-            journal.save()
+            with transaction.atomic():
+                journal = Journal(title=form.cleaned_data['title'],
+                                  writer=request.user,
+                                  game_attendance=self.game_attendance,
+                                  is_downtime=self.is_downtime,
+                                  is_deleted=False,
+                                  contains_spoilers=form.cleaned_data['contains_spoilers'])
+                journal.save()
+                journal.set_content(form.cleaned_data['content'])
             return HttpResponseRedirect(reverse('journals:journal_read', args=(self.character.id, self.game.id)))
         raise ValueError("Invalid journal form")
 
@@ -86,16 +87,72 @@ class EditJournal(WriteJournal):
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
         if form.is_valid():
+            title = form.cleaned_data['title']
             content = form.cleaned_data['content']
-            self.journal.content = content
-            self.journal.title = form.cleaned_data['title']
-            self.journal.edit_date = timezone.now()
-            self.journal.writer = request.user
-            self.journal.contains_spoilers = form.cleaned_data['contains_spoilers']
-            self.journal.save()
+            with transaction.atomic():
+                if not title or not content:
+                    self.journal.mark_void()
+                else:
+                    self.journal.title = title
+                    self.journal.edit_date = timezone.now()
+                    self.journal.writer = request.user
+                    self.journal.contains_spoilers = form.cleaned_data['contains_spoilers']
+                    self.journal.save()
+                    self.journal.set_content(content)
             return HttpResponseRedirect(reverse('journals:journal_read', args=(self.character.id, self.game.id)))
+        else:
+            raise ValueError("Invalid journal form.")
 
-        return render(request, self.template_name, {'form': form})
+class EditCover(View):
+    is_downtime = False # doesn't actually matter
+    cover = None
+    form_class = JournalCoverForm
+    template_name = 'journals/cover_edit.html'
+    initial = {}
+
+    def dispatch(self, *args, **kwargs):
+        self.character = get_object_or_404(Character, id=self.kwargs['character_id'])
+        self.__check_permissions()
+        self.cover = get_object_or_none(JournalCover, character=self.character)
+        if self.cover:
+            self.initial = {
+                "title": self.cover.title,
+                "content": self.cover.content,
+            }
+        return super().dispatch(*args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, self.__get_context_data())
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            with transaction.atomic():
+                title = form.cleaned_data['title']
+                content = form.cleaned_data['content']
+                if self.cover:
+                    self.cover.title = title
+                    self.cover.content = content
+                    self.cover.save()
+                else:
+                    self.cover = JournalCover(character = self.character,
+                                              title = title,
+                                              content = content)
+                    self.cover.save()
+            return HttpResponseRedirect(reverse('journals:journal_read', args=(self.character.id,)))
+        raise ValueError("Invalid journal cover form")
+
+    def __check_permissions(self):
+        if not self.character.player_can_edit(self.request.user):
+            raise PermissionDenied("You cannot edit this Contractor's Journal")
+
+    def __get_context_data(self):
+        context = {
+            'character': self.character,
+            'form': self.form_class(initial=self.initial),
+        }
+        return context
+
 
 class ReadJournal(View):
     template_name = 'journals/journal_read.html'
@@ -107,7 +164,16 @@ class ReadJournal(View):
         character = get_object_or_404(Character, id=self.kwargs['character_id'])
         viewer_can_write = character.player_can_edit(self.request.user)
         completed_attendances = character.completed_games()
+        cover = get_object_or_none(JournalCover, character=character)
         journal_pages = []
+        cover_id = "journal_page_cover"
+        journal_page = {
+            "header": "cover",
+            "id": cover_id,
+            "empty": False,
+            "cover": cover if cover else {"title":"", "content": ""},
+        }
+        journal_pages.append(journal_page)
         for i, attendance in enumerate(completed_attendances, start=1):
             if attendance.is_death():
                 continue
@@ -145,7 +211,7 @@ class ReadJournal(View):
             journal_pages.append(journal_page)
 
         context = {
-            'view_game_id': self.kwargs['game_id'] if 'game_id' in self.kwargs else None,
+            'view_game_id': "journal_page_{}".format(self.kwargs['game_id']) if 'game_id' in self.kwargs else cover_id,
             'character': character,
             'viewer_can_write': viewer_can_write,
             'journal_pages': journal_pages,

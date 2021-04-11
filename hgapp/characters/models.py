@@ -93,6 +93,7 @@ EXP_MVP = 2
 EXP_LOSS = 2
 EXP_WIN = 4
 EXP_GM = 4
+EXP_JOURNAL = 1
 EXP_NEW_CHAR = 150
 EXP_COST_QUIRK_MULTIPLIER = 3
 EXP_ADV_COST_ATTR_MULTIPLIER = 4
@@ -422,6 +423,14 @@ class Character(models.Model):
         else:
             return "They are"
 
+    def pronoun_possessive_capitalized(self):
+        if self.pronoun == PRONOUN[0][0]:
+            return "His"
+        if self.pronoun == PRONOUN[1][0]:
+            return "Her"
+        else:
+            return "Their"
+
     def kill(self):
         if self.is_dead():
             raise ValueError("cannot kill a dead character")
@@ -688,6 +697,8 @@ class ExperienceReward(models.Model):
             return self.game_attendance
         if hasattr(self, 'game'):
             return self.game
+        elif hasattr(self, 'journal'):
+            return self.journal
         raise ValueError("Experience reward has no source")
 
     def source_blurb(self):
@@ -695,6 +706,8 @@ class ExperienceReward(models.Model):
             return "from attending " + self.game_attendance.relevant_game.scenario.title
         elif hasattr(self, 'game'):
             return "from GMing " + self.game.scenario.title
+        elif hasattr(self, 'journal'):
+            return "from writing a journal"
         else:
             raise ValueError("Experience reward has no source")
 
@@ -713,6 +726,8 @@ class ExperienceReward(models.Model):
             return value
         if hasattr(self, 'game'):
             return EXP_GM
+        if hasattr(self, 'journal'):
+            return EXP_JOURNAL
         raise ValueError("Experience reward has no source")
 
     def get_history_blurb(self):
