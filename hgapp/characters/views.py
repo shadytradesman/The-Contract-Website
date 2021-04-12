@@ -22,6 +22,7 @@ from characters.forms import make_character_form, CharacterDeathForm, ConfirmAss
     DeleteCharacterForm, BioForm
 from characters.form_utilities import get_edit_context, character_from_post, update_character_from_post, \
     grant_trauma_to_character, delete_trauma_rev
+from characters.view_utilities import get_characters_next_journal_credit
 
 from journals.models import Journal, JournalCover
 
@@ -183,6 +184,7 @@ def view_character(request, character_id, secret_key = None):
 
     num_journal_entries = Journal.objects.filter(game_attendance__attending_character=character.id).count()
     journal_cover = get_object_or_none(JournalCover, character=character.id)
+    next_entry = get_characters_next_journal_credit(character) if user_can_edit else None
     context = {
         'character': character,
         'user_can_edit': user_can_edit,
@@ -204,6 +206,7 @@ def view_character(request, character_id, secret_key = None):
         'secret_key_valid': secret_key_valid,
         'num_journal_entries': num_journal_entries,
         'journal_cover': journal_cover,
+        'next_entry': next_entry,
     }
     return render(request, 'characters/view_pages/view_character.html', context)
 

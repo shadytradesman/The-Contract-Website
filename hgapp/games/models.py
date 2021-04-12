@@ -336,7 +336,7 @@ class Game_Attendance(models.Model):
         self.give_reward()
 
     def get_reward(self):
-        return get_object_or_none(Reward, rewarded_player=self.get_player(), relevant_game=self.relevant_game, is_void=False)
+        return get_object_or_none(Reward, rewarded_player=self.get_player(), relevant_game=self.relevant_game, is_void=False, is_journal=False)
 
     def get_player(self):
         if self.attending_character:
@@ -373,7 +373,12 @@ class Game_Attendance(models.Model):
             if not attending_character:
                 raise ValueError("Must pass character when changing ringer outcome to contractor outcome")
         # If we're changing attending character, do so
+        changed_character = False
         if attending_character:
+            if self.attending_character.id != attending_character.id:
+                changed_character = True
+                for journal in self.journal_set.all():
+                    journal.void_reward()
             self.attending_character = attending_character
             # Update invited player if necessary
             if hasattr(self, "game_invite") and self.game_invite:
@@ -384,6 +389,9 @@ class Game_Attendance(models.Model):
         self.is_confirmed = is_confirmed
         self.save()
         self.give_reward()
+        if changed_character:
+            for journal in self.journal_set.all():
+                journal.grant_reward()
 
     def give_reward(self):
         if not self.is_confirmed or self.get_reward():
@@ -736,7 +744,7 @@ class Reward(models.Model):
             return "Gift"
 
     def reason_text(self):
-        if self.relevant_game is not None:
+        if self.relevant_game:
             reason = ""
             if self.relevant_game.gm.id == self.rewarded_player.id:
                 reason = "running "
@@ -746,8 +754,10 @@ class Reward(models.Model):
                 reason = "playing in "
             reason = reason + self.relevant_game.scenario.title
             return reason
-        if self.source_asset is not None:
+        if self.source_asset:
             return "the Asset " + self.source_asset.relevant_asset.name
+        if not self.relevant_game and self.is_charon_coin:
+            return "losing a Contractor in a Side Game"
 
 
 class ScenarioTag(models.Model):

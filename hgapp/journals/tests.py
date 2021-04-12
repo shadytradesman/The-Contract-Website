@@ -246,6 +246,42 @@ class JournalModelTests(TestCase):
         self.assertIsNotNone(improvement_journal.get_improvement())
         self.assertIsNone(improvement_journal.get_exp_reward())
 
+    def test_journal_change_attendance(self):
+        journals = []
+        for x in range(7):
+            journal = self.__make_journal(writer=self.user1,
+                                          game_attendance=self.char1_attendances[x],
+                                          is_downtime=False)
+            journal.set_content(VALID_JOURNAL_CONTENT)
+            journals.append(journal)
+        exp_journal = journals[0]
+        self.assertIsNone(exp_journal.get_improvement())
+        self.assertIsNotNone(exp_journal.get_exp_reward())
+        self.assertEquals(exp_journal.get_exp_reward().rewarded_character, self.char1)
+        exp_journal.game_attendance.change_outcome(new_outcome='WIN', is_confirmed=True, attending_character=self.char1)
+        exp_journal.refresh_from_db()
+        self.assertIsNone(exp_journal.get_improvement())
+        self.assertIsNotNone(exp_journal.get_exp_reward())
+        self.assertEquals(exp_journal.get_exp_reward().rewarded_character, self.char1)
+        exp_journal.game_attendance.change_outcome(new_outcome='WIN', is_confirmed=True, attending_character=self.char2)
+        exp_journal.refresh_from_db()
+        self.assertIsNone(exp_journal.get_improvement())
+        self.assertIsNotNone(exp_journal.get_exp_reward())
+        self.assertEquals(exp_journal.get_exp_reward().rewarded_character, self.char2)
 
+        improvement_journal = journals[4]
+        self.assertIsNotNone(improvement_journal.get_improvement())
+        self.assertIsNone(improvement_journal.get_exp_reward())
+        self.assertEquals(improvement_journal.get_improvement().rewarded_character, self.char1)
+        improvement_journal.game_attendance.change_outcome(new_outcome='WIN', is_confirmed=True, attending_character=self.char1)
+        improvement_journal.refresh_from_db()
+        self.assertIsNotNone(improvement_journal.get_improvement())
+        self.assertIsNone(improvement_journal.get_exp_reward())
+        self.assertEquals(improvement_journal.get_improvement().rewarded_character, self.char1)
+        improvement_journal.game_attendance.change_outcome(new_outcome='WIN', is_confirmed=True, attending_character=self.char2)
+        improvement_journal.refresh_from_db()
+        self.assertIsNone(improvement_journal.get_improvement()) # it is char2s second journal. still no improvement rewarded
+        self.assertIsNotNone(improvement_journal.get_exp_reward())
+        self.assertEquals(improvement_journal.get_exp_reward().rewarded_character, self.char2)
 
 

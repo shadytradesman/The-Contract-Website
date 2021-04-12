@@ -15,6 +15,10 @@
     <link rel="stylesheet" type="text/css" href="{% static 'journals/journal_read_style.css' %}" />
 {% endblock %}
 
+{% block extra_scripts %}
+    <script src="{% static 'journals/journal_read_scripts.js' %}"></script>
+{% endblock %}
+
 {% block body_base %}
 <div class="container">
     <h1 class="text-center">
@@ -26,6 +30,7 @@
     <ul class="nav nav-tabs" role="tablist">
         {% for journal_page in journal_pages %}
             <li role="presentation"
+                id="js-tab-{{journal_page.id}}"
                 class="
                     {% if journal_page.id == view_game_id %} active {% endif %}
                     {% if journal_page.empty %} css_empty_page {% endif %}">

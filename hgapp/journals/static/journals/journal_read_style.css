@@ -30,6 +30,7 @@
 .css-quill-img {
     width: 20px !important;
     height: 20px !important;
+    filter: invert(0%) sepia(3%) saturate(6757%) hue-rotate(350deg) brightness(104%) contrast(97%);
 }
 
 .css-valid-quill-img {

@@ -17,6 +17,7 @@ from hgapp.utilities import get_object_or_none
 
 from games.models import Game, Game_Attendance
 from characters.models import Character
+from characters.view_utilities import get_characters_next_journal_credit
 
 @method_decorator(login_required(login_url='account_login'), name='dispatch')
 class WriteJournal(View):
@@ -29,7 +30,9 @@ class WriteJournal(View):
         self.game = get_object_or_404(Game, id=self.kwargs['game_id'])
         self.character = get_object_or_404(Character, id=self.kwargs['character_id'])
         self.game_attendance = get_object_or_404(Game_Attendance, attending_character=self.character, relevant_game=self.game)
-        self.__check_permissions()
+        redirect = self.__check_permissions()
+        if redirect:
+            return redirect
         return super().dispatch(*args, **kwargs)
 
     def get(self, request, *args, **kwargs):
@@ -51,8 +54,10 @@ class WriteJournal(View):
         raise ValueError("Invalid journal form")
 
     def __check_permissions(self):
-       if not self.character.player_can_edit(self.request.user):
-           raise PermissionDenied("You cannot edit this Contractor's Journal")
+        if not self.character.player_can_edit(self.request.user):
+            raise PermissionDenied("You cannot edit this Contractor's Journal")
+        if not (self.game.is_recorded() or self.game.is_finished() or self.game.is_archived()):
+            return HttpResponseRedirect(reverse('journals:journal_read', args=(self.character.id, self.game.id)))
 
     def __get_context_data(self):
         context = {
@@ -103,6 +108,7 @@ class EditJournal(WriteJournal):
         else:
             raise ValueError("Invalid journal form.")
 
+@method_decorator(login_required(login_url='account_login'), name='dispatch')
 class EditCover(View):
     is_downtime = False # doesn't actually matter
     cover = None
@@ -191,11 +197,16 @@ class ReadJournal(View):
                     journal_page["empty"] = True
                     journal_pages.append(journal_page)
             else:
-                journal_page["game_journal"] = get_object_or_none(Journal,
-                                                                  game_attendance=attendance,
-                                                                  is_deleted=False,
-                                                                  is_downtime=False)
+                game_journal = get_object_or_none(Journal,
+                                   game_attendance=attendance,
+                                   is_deleted=False,
+                                   is_downtime=False)
+                if game_journal:
+                    game_journal.inject_viewable(self.request.user)
+                journal_page["game_journal"] = game_journal
                 journal_page["downtime_journals"] = journals.filter(is_downtime=True).order_by("created_date").all()
+                for journal in journal_page["downtime_journals"]:
+                    journal.inject_viewable(self.request.user)
                 journal_pages.append(journal_page)
         death = character.real_death()
         if death:
@@ -210,6 +221,13 @@ class ReadJournal(View):
             }
             journal_pages.append(journal_page)
 
+        prev_page= None
+        for journal_page in journal_pages:
+            if prev_page:
+                prev_page['next_id'] = journal_page['id']
+                journal_page['prev_id'] = prev_page['id']
+            prev_page = journal_page
+
         context = {
             'view_game_id': "journal_page_{}".format(self.kwargs['game_id']) if 'game_id' in self.kwargs else cover_id,
             'character': character,
@@ -217,4 +235,21 @@ class ReadJournal(View):
             'journal_pages': journal_pages,
         }
         return context
+
+
+def write_next_journal(request, character_id):
+    character = get_object_or_404(Character, id=character_id)
+    if not character.player_can_edit(request.user):
+        raise PermissionDenied("You cannot edit this Contractor's Journal")
+    next_journal_attendance = get_characters_next_journal_credit(character)
+    if next_journal_attendance:
+        attendance = next_journal_attendance["attendance"]
+        if next_journal_attendance["is_downtime"]:
+            return HttpResponseRedirect(reverse('journals:journal_write_downtime',
+                                                args=(attendance.relevant_game.id, attendance.attending_character.id)))
+        else:
+            return HttpResponseRedirect(reverse('journals:journal_write_game',
+                                                args=(attendance.relevant_game.id, attendance.attending_character.id)))
+    else:
+        return HttpResponseRedirect(reverse('journals:journal_read', args=(character.id,)))
 

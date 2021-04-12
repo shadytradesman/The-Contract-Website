@@ -20,7 +20,7 @@ class Journal(models.Model):
     writer = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT)
-    # The game_attendance field is nullable for cases where a journal is written and the attendance is later deleted or altered.
+    # The game_attendance field is nullable for cases where a journal is written and the attendance is later deleted.
     # In these cases, the journal is "abandoned": still viewable by the writer, but otherwise unavailable.
     game_attendance = models.ForeignKey(Game_Attendance, null=True, blank=True, on_delete=models.CASCADE)
     created_date = models.DateTimeField('date created', auto_now_add=True)
@@ -47,9 +47,9 @@ class Journal(models.Model):
         self.content = content
         self.save()
         if self.is_valid and not original_valid:
-            self.__grant_reward()
+            self.grant_reward()
         if original_valid and not self.is_valid:
-            self.__void_reward()
+            self.void_reward()
 
     def get_improvement(self):
         return get_object_or_none(Reward,
@@ -65,9 +65,7 @@ class Journal(models.Model):
         else:
             return None
 
-    def __void_reward(self):
-        if self.is_valid:
-            raise ValueError("can't void reward for a valid journal")
+    def void_reward(self):
         improvement = self.get_improvement()
         if improvement:
             improvement.mark_void()
@@ -77,22 +75,17 @@ class Journal(models.Model):
             self.experience_reward = None
             self.save()
 
-    def __grant_reward(self):
+    def grant_reward(self):
         if not self.is_valid:
-            raise ValueError("can't grant a reward for an invalid journal")
+            return
         if hasattr(self, "game_attendance") and self.game_attendance and \
                 hasattr(self.game_attendance, "attending_character") and self.game_attendance.attending_character:
             character = self.game_attendance.attending_character
-            num_valid = Journal.objects.filter(game_attendance__attending_character=character.id,
-                                               is_valid=True).count()
         else:
             return
-        num_journal_rewards = Reward.objects.filter(is_journal=True,
-                                                    rewarded_character=character,
-                                                    is_improvement=True,
-                                                    is_void=False).count()
-        if num_journal_rewards < num_valid // NUM_JOURNALS_PER_IMPROVEMENT:
-            reward = Reward(relevant_game=self.game_attendance.relevant_game,
+        journals_until_improvement = self.get_num_journals_until_improvement(character)
+        if journals_until_improvement <= 0:
+            reward = Reward(relevant_game=Journal.game_attendance.relevant_game,
                                    rewarded_character=character,
                                    rewarded_player=character.player,
                                    is_improvement=True,
@@ -107,6 +100,15 @@ class Journal(models.Model):
             self.experience_reward = exp_reward
             self.save()
 
+    def get_num_journals_until_improvement(character):
+        num_valid = Journal.objects.filter(game_attendance__attending_character=character.id,
+                                           is_valid=True).count()
+        num_journal_rewards = Reward.objects.filter(is_journal=True,
+                                                    rewarded_character=character,
+                                                    is_improvement=True,
+                                                    is_void=False).count()
+        needed = NUM_JOURNALS_PER_IMPROVEMENT * (num_journal_rewards + 1)
+        return needed - num_valid
 
     def __get_is_valid(self, content):
         word_count = self.__get_wordcount(content)
@@ -116,6 +118,13 @@ class Journal(models.Model):
     def __get_wordcount(self, content):
         soup = BeautifulSoup(content, features="html5lib")
         return len(soup.text.split())
+
+    def player_can_view(self, player):
+        return not self.contains_spoilers or self.game_attendance.relevant_game.scenario.player_can_view(player)
+
+    ## Experimental field injection for journal read.
+    def inject_viewable(self, player):
+        self.is_viewale_by_reader = self.player_can_view(player)
 
     def save(self, *args, **kwargs):
         if not self.pk and self.content:

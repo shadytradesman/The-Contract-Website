@@ -323,6 +323,9 @@ class Character(models.Model):
     def completed_games(self):
         return self.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).order_by("relevant_game__end_time").all()
 
+    def completed_games_rev_sort(self):
+        return self.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).order_by("-relevant_game__end_time").all()
+
     def assigned_coin(self):
         coins = self.reward_set.filter(is_void=False, is_charon_coin=True).all()
         return coins[0] if coins else None

@@ -77,17 +77,23 @@
                 </a>
             </small>
             <div class="thumbnail">
-                <h3>
-                    {{journal_page.game_journal.title}}
-                </h3>
-                <div>
-                    {{journal_page.game_journal.content|safe}}
-                </div>
-                {% if viewer_can_write %}
-                <a class="btn btn-default"
-                   href="{% url 'journals:journal_edit' journal_page.game_journal.id %}">
-                    Edit Journal
-                </a>
+                {% if journal_page.game_journal.is_viewale_by_reader %}
+                    <h3>
+                        {{journal_page.game_journal.title}}
+                    </h3>
+                    <div>
+                        {{journal_page.game_journal.content|safe}}
+                    </div>
+                    {% if viewer_can_write %}
+                    <a class="btn btn-default"
+                       href="{% url 'journals:journal_edit' journal_page.game_journal.id %}">
+                        Edit Journal
+                    </a>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center">
+                        <b>You cannot view this Journal entry because it contains spoilers for a Scenario you have not discovered.</b>
+                    </div>
                 {% endif %}
             </div>
         {% else %}
@@ -132,4 +138,24 @@
         </div>
         {% endif %}
     {% endif %}
+    <div class="text-center">
+        {% if journal_page.prev_id %}
+            <a class="btn btn-default js-tab-nav"
+               href="#{{journal_page.prev_id}}"
+               aria-controls="{{journal_page.prev_id}}"
+               data-toggle="tab">
+                <span class="glyphicon glyphicon-backward"></span>
+                Previous Entry
+            </a>
+        {% endif %}
+        {% if journal_page.next_id %}
+            <a class="btn btn-default js-tab-nav"
+               href="#{{journal_page.next_id}}"
+               aria-controls="{{journal_page.next_id}}"
+               data-toggle="tab">
+                Next Entry
+                <span class="glyphicon glyphicon-forward"></span>
+            </a>
+        {% endif %}
+    </div>
 </div>

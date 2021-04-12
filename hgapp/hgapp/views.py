@@ -66,7 +66,7 @@ def home(request):
         new_characters = Character.objects.filter(private=False, is_deleted=False).order_by('-id')[:6]
         latest_blog_post = Post.objects.current().select_related("section", "blog").first()
         upcoming_games_running = request.user.game_creator.filter(status=GAME_STATUS[0][0]).all()
-        upcoming_games_invited = request.user.game_invite_set.filter(relevant_game__status=GAME_STATUS[0][0]).all()
+        upcoming_games_invited = request.user.game_invite_set.filter(relevant_game__status=GAME_STATUS[0][0], is_declined=False).all()
         active_games_attending =  request.user.game_set.filter(status=GAME_STATUS[1][0])
         active_games_creator = request.user.game_creator.filter(status=GAME_STATUS[1][0])
         active_games = list(chain(active_games_attending, active_games_creator))
