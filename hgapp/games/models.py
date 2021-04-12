@@ -227,6 +227,9 @@ class Game(models.Model):
     def get_attended_players(self):
         return self.invitations.filter(game_invite__is_declined=False).all()
 
+    def get_journaled_attendances(self):
+        return self.game_attendance_set.filter(is_confirmed=True, journal__isnull=False, journal__is_downtime=False).all()
+
     def not_attending(self, player):
         invite = get_object_or_none(self.game_invite_set.filter(invited_player=player))
         if invite:

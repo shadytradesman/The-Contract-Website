@@ -128,15 +128,37 @@ def edit_obituary(request, character_id, secret_key = None):
 
 
 def graveyard(request):
-    dead_characters = Character_Death.objects.filter(is_void=False).filter(relevant_character__private=False).order_by('-date_of_death').all()
+    dead_characters = Character_Death.objects.filter(is_void=False)\
+        .filter(relevant_character__private=False)\
+        .exclude(relevant_character__status='ANY')\
+        .order_by('-date_of_death')\
+        .all()
+    tombstones = {
+        'Any': [],
+        'Newbie': [],
+        'Novice': [],
+        'Seasoned': [],
+        'Veteran': [],
+    }
+    num_deaths = 0
+    for death in dead_characters:
+        num_deaths = num_deaths + 1
+        num_journals = Journal.objects.filter(game_attendance__attending_character=death.relevant_character).count()
+        tombstone = {
+            "death": death,
+            "num_journals": num_journals,
+        }
+        tombstones[death.relevant_character.get_status_display()].append(tombstone)
     num_headers = Graveyard_Header.objects.all().count()
     if num_headers > 0:
         header = Graveyard_Header.objects.all()[randint(0,num_headers-1)].header
     else:
         header = "RIP"
     context = {
+        'tombstones': tombstones,
         'character_deaths': dead_characters,
         'header': header,
+        'num_deaths': num_deaths,
     }
     return render(request, 'characters/graveyard.html', context)
 

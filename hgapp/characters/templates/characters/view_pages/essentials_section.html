@@ -32,8 +32,12 @@
                     </a>
                     has {{num_journal_entries}} {% if num_journal_entries > 1 %} entries{% else %} entry{%endif%}.
                 </p>
-            {% elif user_can_edit %}
-
+            {% elif user_can_edit and next_entry %}
+                <a class="btn btn-sm btn-success js-journal-link"
+                   href="{% url 'journals:journal_write_next' character.id %}">
+                    Earn Experience and Power Improvements
+                    for {{character.name}} by writing in {{character.get_pronoun_display}} journal!
+                </a>
             {% endif %}
         </div>
     </div>
@@ -75,24 +79,24 @@
                         Read {{character.name}}'s Journal
                     </a>
                 </div>
-            {% endif %}
-            {% if next_entry %}
+                {% if next_entry %}
                 <a class="btn btn-sm btn-success js-journal-link"
                    href="{% url 'journals:journal_write_next' character.id %}">
                     Earn
                     {% if next_entry.reward_is_improvement %}
-                        <b>an Improvement</b>
+                    <b>an Improvement</b>
                     {% else %}
-                        1 Exp
+                    1 Exp
                     {% endif %}
                     for {{character.name}} by writing a
                     {% if next_entry.is_downtime %}
-                        Downtime
+                    Downtime
                     {% else %}
-                        Game
+                    Game
                     {% endif %}
                     journal
                 </a>
+                {% endif %}
             {% endif %}
                 <br>
                 <br>

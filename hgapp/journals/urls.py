@@ -19,5 +19,5 @@ urlpatterns = [
     # ex: .com/journals/read/c/12
     path('read/c/<int:character_id>/', views.ReadJournal.as_view(), name='journal_read'),
     # ex: .com/journals/read/c/12/g/21
-    path('read/c/<int:character_id>/g/<int:game_id>/', views.ReadJournal.as_view(), name='journal_read'),
+    path('read/c/<int:character_id>/g/<int:game_id>/', views.ReadJournal.as_view(), name='journal_read_game'),
 ]
