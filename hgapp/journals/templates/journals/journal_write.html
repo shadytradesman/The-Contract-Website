@@ -19,17 +19,50 @@
 {% block body_base %}
 <div class="container">
     <h1 class="text-center">
-        Writing in {{character.name}}'s Journal
+        Writing in
+        <a href="{% url 'journals:journal_read' character.id %}">
+            {{character.name}}'s Journal
+        </a>
+
     </h1>
     <div class="panel panel-default">
         <div class="panel-body">
             <div class="thumbnail">
-                {% if is_downtime %}
-                    Write in-character as {{character.name }} about what happened after the events of
-                    {{game.scenario.title}}. Remember, Experience points represent your Contractor spending their time training.
-                {% else %}
-                    {{character.name}} played in {{game.scenario.title}}.
-                {% endif %}
+                <p>
+                    {% if is_downtime %}
+                        Write in-character as
+                        <a href="{% url 'characters:characters_view' character.id %}">{{character.name}}</a>
+                        about what happened after the events of
+                        <a href="{% url 'games:games_view_game' game.id %}">
+                            <b>{{game.scenario.title}}</b>.
+                        </a>
+                        Remember, Experience represents your Contractor spending their time
+                        training.
+                    {% else %}
+                        <h4>
+                            <a href="{% url 'characters:characters_view' character.id %}">{{character.name}}</a>
+                            {% if attendance.is_victory %}
+                                achieved victory
+                            {% elif attendance.is_loss %}
+                                failed
+                            {% elif attendance.is_death %}
+                                died
+                            {% else %}
+                                played
+                            {% endif %}
+                            in
+                            <a href="{% url 'games:games_view_game' game.id %}">
+                                <b>{{game.scenario.title}}</b>:
+                            </a>
+                        </h4>
+                        <i>{{game.scenario.summary}}</i>
+                        {% if attendance.notes %}
+                            <br><br>
+                            <b>Notes: </b>
+                            {{attendance.notes}}
+                        {% endif %}
+                    {% endif %}
+                </p>
             </div>
             <form
                     {% if journal %}

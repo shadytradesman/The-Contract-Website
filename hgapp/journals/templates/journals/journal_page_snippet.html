@@ -17,6 +17,21 @@
            href="{% url 'journals:journal_edit_cover' character.id %}">
             Edit Journal Cover
         </a>
+        <br>
+        <br>
+        <div class="text-center alert alert-info" role="alert">
+            <b>
+                The next journal you write will grant you
+                {% if next_reward_is_improvement %}
+                    an Improvement.
+                {% else %}
+                    1 Exp. You must write {{num_journals_until_improvement}} more
+                    journal{{num_journals_until_improvement|pluralize}} to get an Improvement.
+                {% endif %}
+
+            </b>
+            <br>
+        </div>
         {% endif %}
 
     {% elif journal_page.death %}
@@ -63,8 +78,13 @@
                     <img class ="css-valid-quill-img"
                          src="{% static 'journals/quill.svg' %}"
                          data-toggle="tooltip"
-                         title='This journal entry is valid and granted a reward.'
+                         title='This journal entry is valid and granted a Reward.'
                     />
+                {% else %}
+                    <i class="fa fa-exclamation-circle fa-1x"
+                       data-toggle="tooltip"
+                       title='This Journal is not 250 words and did not grant a Reward.'
+                    ></i>
                 {% endif %}
                 {% if journal_page.game_journal.contains_spoilers %}
                     <i class="fa fa-lock fa-1x"
@@ -100,7 +120,13 @@
             {% if viewer_can_write %}
                 <div class="alert alert-success text-center">
                     You have not written a journal for this game yet.
-                    You will earn 1 Exp for {{character.name}} if you write an in-character journal about
+                    You will earn
+                    {% if next_reward_improvement %}
+                        <b>an Improvement</b>
+                    {% else %}
+                        1 Exp
+                    {% endif %}
+                    for {{character.name}} if you write an in-character journal about
                     the events of the Game.
                     <br>
                     <a class="btn btn-primary"
@@ -111,23 +137,61 @@
             {% endif %}
         {% endif %}
         {% for journal in journal_page.downtime_journals %}
-        <small class="css-game-link">Downtime</small>
+        <small class="css-game-link">
+            {% if journal.is_valid %}
+            <img class ="css-valid-quill-img"
+                 src="{% static 'journals/quill.svg' %}"
+                 data-toggle="tooltip"
+                 title='This journal entry is valid and granted a Reward.'
+            />
+            {% else %}
+            <i class="fa fa-exclamation-circle fa-1x"
+               data-toggle="tooltip"
+               title='This Journal is not 250 words and did not grant a Reward.'
+            ></i>
+            {% endif %}
+            {% if journal.contains_spoilers %}
+            <i class="fa fa-lock fa-1x"
+               data-toggle="tooltip"
+               title='This journal entry contains spoilers for a Scenario and cannot be viewed by those who have not discoverd it'
+            ></i>
+            {% endif %}
+            Downtime
+        </small>
         <div class="thumbnail">
-            <h3>
-                {{journal.title}}
-            </h3>
-            <div>
-                {{journal.content|safe}}
+            {% if journal.is_viewale_by_reader %}
+                <h3>
+                    {{journal.title}}
+                </h3>
+                <div>
+                    {{journal.content|safe}}
+                </div>
+                {% if viewer_can_write %}
+                    <a class="btn btn-default"
+                       href="{% url 'journals:journal_edit' journal.id %}">
+                        Edit Journal
+                    </a>
+                {% endif %}
+            {% else %}
+            <div class="text-center">
+                <b>You cannot view this Journal entry because it contains spoilers for a Scenario you have not discovered.</b>
             </div>
+            {% endif %}
         </div>
         {% endfor %}
         {% if viewer_can_write %}
         <div class="text-center alert {% if journal_page.downtime_journals %} alert-info {% else %} alert-success {% endif %}">
             {% if journal_page.downtime_journals %}
-                You may write additional Downtime journals, but you will not gain extra Experience from them.
+                You may write additional Downtime journals, but you will not gain Experience or Improvements from them.
             {% else %}
                 You have not written a Downtime Journal for this Game yet.
-                You will earn 1 Exp for {{character.name}} if you write an in-character Journal at least
+                You will earn
+                {% if next_reward_improvement %}
+                    <b>an Improvement</b>
+                {% else %}
+                    1 Exp
+                {% endif %}
+                for {{character.name}} if you write an in-character Journal at least
                 250 words in length explaining what occurred between this Game and the next.
             {% endif %}
             <br>
@@ -145,7 +209,7 @@
                aria-controls="{{journal_page.prev_id}}"
                data-toggle="tab">
                 <span class="glyphicon glyphicon-backward"></span>
-                Previous Entry
+                Previous Page
             </a>
         {% endif %}
         {% if journal_page.next_id %}
@@ -153,7 +217,7 @@
                href="#{{journal_page.next_id}}"
                aria-controls="{{journal_page.next_id}}"
                data-toggle="tab">
-                Next Entry
+                Next Page
                 <span class="glyphicon glyphicon-forward"></span>
             </a>
         {% endif %}

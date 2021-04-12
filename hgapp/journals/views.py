@@ -63,6 +63,7 @@ class WriteJournal(View):
         context = {
             'game': self.game,
             'character': self.character,
+            'attendance': self.game_attendance,
             'form': self.form_class(initial=self.initial),
             'is_downtime': self.is_downtime,
             'journal': self.journal,
@@ -227,12 +228,15 @@ class ReadJournal(View):
                 prev_page['next_id'] = journal_page['id']
                 journal_page['prev_id'] = prev_page['id']
             prev_page = journal_page
-
+        num_journals_until_improvement = Journal.get_num_journals_until_improvement(character)  if viewer_can_write else 0
+        next_reward_is_improvement = num_journals_until_improvement <= 1
         context = {
             'view_game_id': "journal_page_{}".format(self.kwargs['game_id']) if 'game_id' in self.kwargs else cover_id,
             'character': character,
             'viewer_can_write': viewer_can_write,
             'journal_pages': journal_pages,
+            'next_reward_is_improvement': next_reward_is_improvement,
+            'num_journals_until_improvement': num_journals_until_improvement,
         }
         return context
 
