@@ -123,10 +123,7 @@ class CreatePowerForm(forms.Form):
     flavor = forms.CharField(label='Put a ribbon on it',
                              help_text='A snippet of text that introduces the Power in a flavorful way')
     description = forms.CharField(label='Description',
-                                  widget=forms.Textarea,
-                                  help_text='Describe what the Power looks like when it is used, how it works, '
-                                            'and its impact on the owner, target, and environment. All Powers '
-                                            'are obviously supernatural unless stated otherwise.')
+                                  widget=forms.Textarea)
     system = forms.CharField(label='System', widget=forms.Textarea,
                              help_text='Describe this Power\'s cost, associated roll(s), conditions, and determination of outcome. '
                                        'You can reference the value of a Parameter or field by typing its name in lowercase, '

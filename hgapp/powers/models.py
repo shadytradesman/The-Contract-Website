@@ -226,6 +226,9 @@ class Base_Power_System(models.Model):
     system_text = models.TextField()
     eratta = models.TextField(blank=True,
                               null=True)
+    default_description_prompt = models.TextField(blank=True,
+                                                  null=True)
+
     class Meta:
         unique_together = (("base_power", "dice_system"))
 

@@ -240,6 +240,14 @@
                 <div class="col-xs-12">
                     {{ form.description.errors }}
                     {{ form.description | bootstrap}}
+                    <p class="help-block css-description-help">
+                        Describe what the Power looks like when it is used, how it works, and its impact on the owner, target, and environment.
+                        {% if power_system.default_description_prompt %}
+                            <b>
+                                By default, {{ power_system.default_description_prompt|safe }}
+                            </b>
+                        {% endif %}
+                    </p>
                 </div>
             </div>
             <br>

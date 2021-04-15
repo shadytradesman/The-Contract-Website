@@ -53,7 +53,7 @@
 }
 
 .css-roll-field-speed {
-    padding-left: 5px;
+    padding-left: 0px;
     margin-bottom: 5px;
     margin-top: 5px;
     display: inline-block;
@@ -64,9 +64,14 @@
 }
 
 h3 {
-    margin-top: 0px;
+    margin-top: 5px;
 }
 
 #reset-system-text {
     padding-bottom: 8px;
+}
+
+.css-description-help {
+    position: relative !important;
+    bottom: 10px !important;
 }
