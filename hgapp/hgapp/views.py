@@ -6,6 +6,7 @@ from django.http import HttpResponseRedirect, HttpResponseForbidden
 from django.shortcuts import render, get_object_or_404
 from django.conf import settings
 import account.views
+from django.core.exceptions import PermissionDenied
 
 # Create your views here.
 from django.urls import reverse
@@ -98,6 +99,4 @@ def home(request):
         return render(request, 'logged_in_homepage.html', context)
 
 def csrf_failure(request, reason=""):
-    context = {
-    }
-    return render(request, 'csrf.html', context)
+    raise PermissionDenied("CSRF token failure. Refresh form and try again.")

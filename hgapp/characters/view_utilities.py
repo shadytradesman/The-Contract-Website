@@ -15,7 +15,7 @@ def get_characters_next_journal_credit(character):
     if not chosen_attendance:
         completed_attendances = character.completed_games_rev_sort()
         for attendance in completed_attendances:
-            downtime_journal = get_object_or_none(Journal, game_attendance=attendance, is_downtime=True)
+            downtime_journal = Journal.objects.filter(game_attendance=attendance, is_downtime=True).first()
             if not downtime_journal:
                 chosen_attendance = attendance
                 is_downtime = True
