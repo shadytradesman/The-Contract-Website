@@ -7,6 +7,7 @@ BODY_ = ("BODY", "Body")
 
 MIND_ = ("MIND", "Mind")
 
+PARRY_ = ("PARRY", "Dodge or parry")
 
 def set_field_html_name(cls, new_name):
     """
@@ -178,6 +179,8 @@ class SystemFieldRollForm(forms.Form):
                                                                 choices=ability_choices,
                                                                 required=False,
                                                                 widget=forms.Select(attrs={'class': 'form-control'}))
+            if sys_field.allow_parry:
+                attribute_choices.append(PARRY_)
             if sys_field.allow_mind:
                 attribute_choices.append(MIND_)
             if sys_field.allow_body:

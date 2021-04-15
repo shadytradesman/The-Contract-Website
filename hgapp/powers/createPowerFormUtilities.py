@@ -4,12 +4,12 @@ from django.shortcuts import get_object_or_404
 import json
 
 from .forms import CreatePowerForm, make_enhancement_form, make_drawback_form, make_parameter_form, \
-    SystemFieldRollForm, SystemFieldTextForm, MIND_, BODY_
+    SystemFieldRollForm, SystemFieldTextForm, MIND_, BODY_, PARRY_
 from .models import Enhancement_Instance, Drawback_Instance, Power, DICE_SYSTEM, Enhancement, Drawback, \
     Power_Param, SystemFieldText, SystemFieldRoll, SystemFieldTextInstance, SystemFieldRollInstance, \
     Parameter_Value, Base_Power_System, Power_Full, CREATION_REASON, PowerTutorial
 
-from characters.models import Roll, Attribute, Ability
+from characters.models import Roll, Attribute, Ability, NO_PARRY_INFO, REACTION, THROWN
 
 #TODO: use proper field sanitation instead of this cheat method
 bad_chars = set("\0\'\"\b\n\r\t\Z\\\%\_;*|,/=?")
@@ -148,6 +148,8 @@ def _get_roll_initial_attribute(roll):
         return MIND_
     elif roll.is_body:
         return BODY_
+    elif roll.parry_type != NO_PARRY_INFO:
+        return PARRY_
     else:
         raise ValueError("Unknown roll attribute")
 
@@ -352,17 +354,22 @@ def _get_roll_from_form_and_system(form, system_field):
     difficulty = 6
     if system_field.difficulty:
         difficulty = system_field.difficulty
-    if attr == BODY_[0] or attr == MIND_[0]:
+    if attr == BODY_[0] or attr == MIND_[0] or attr == PARRY_[0]:
         if attr == BODY_[0]:
             return Roll.get_body_roll(difficulty=difficulty)
-        else:
+        elif attr == MIND_[0]:
             return Roll.get_mind_roll(difficulty=difficulty)
+        elif attr == PARRY_[0]:
+            return Roll.get_roll(difficulty=difficulty, parry_type=system_field.parry_type, speed=REACTION)
+        else:
+            raise ValueError("Unexpected attr")
     else:
         attribute = get_object_or_404(Attribute, id=attr)
         ability = get_object_or_404(Ability, id=form.cleaned_data["ability_roll"])
         return Roll.get_roll(attribute = attribute,
                              ability = ability,
-                             difficulty = difficulty)
+                             difficulty = difficulty,
+                             speed=system_field.speed)
 
 
 def _create_power_from_post_and_base(base_power, request, power_full):

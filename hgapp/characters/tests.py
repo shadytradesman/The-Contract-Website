@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 from characters.models import Character, ContractStats, Asset, Liability, AssetDetails, LiabilityDetails, Attribute, \
-    AttributeValue, Ability, AbilityValue, Roll
+    AttributeValue, Ability, AbilityValue, Roll, NO_PARRY_INFO, NO_SPEED_INFO, UNAVOIDABLE, FREE_ACTION
 from games.models import Reward
 from cells.models import Cell
 from django.utils import timezone
@@ -374,13 +374,22 @@ class RollModelTests(TestCase):
             tutorial_text="tut"
         )
 
-    def make_roll(self, attribute=None, ability=None, is_mind=False, is_body=False, difficulty=6):
+    def make_roll(self,
+                  attribute=None,
+                  ability=None,
+                  is_mind=False,
+                  is_body=False,
+                  difficulty=6,
+                  parry_type=NO_PARRY_INFO,
+                  speed=NO_SPEED_INFO):
         Roll.objects.create(
             attribute=attribute,
             ability=ability,
             is_mind=is_mind,
             is_body=is_body,
-            difficulty=difficulty)
+            difficulty=difficulty,
+            parry_type=parry_type,
+            speed=speed)
 
     def test_save_valid_rolls(self):
         self.make_roll(self.attribute_1, self.ability_1)
@@ -393,15 +402,29 @@ class RollModelTests(TestCase):
 
     def test_no_duplicate_rolls(self):
         self.make_roll(self.attribute_1, self.ability_1)
-        self.assertEquals(Roll.objects.count(), 1)
         with transaction.atomic():
             with self.assertRaises(IntegrityError):
                 self.make_roll(self.attribute_1, self.ability_1)
+        self.assertEquals(Roll.objects.count(), 1)
+
         self.make_roll(self.attribute_1, self.ability_1, difficulty=5)
         with transaction.atomic():
             with self.assertRaises(IntegrityError):
                 self.make_roll(self.attribute_1, self.ability_1, difficulty=5)
         self.assertEquals(Roll.objects.count(), 2)
+
+        self.make_roll(self.attribute_1, self.ability_1, difficulty=5, parry_type=UNAVOIDABLE)
+        with transaction.atomic():
+            with self.assertRaises(IntegrityError):
+                self.make_roll(self.attribute_1, self.ability_1, difficulty=5, parry_type=UNAVOIDABLE)
+        self.assertEquals(Roll.objects.count(), 3)
+
+        self.make_roll(self.attribute_1, self.ability_1, difficulty=5, parry_type=UNAVOIDABLE, speed=FREE_ACTION)
+        with transaction.atomic():
+            with self.assertRaises(IntegrityError):
+                self.make_roll(self.attribute_1, self.ability_1, difficulty=5, parry_type=UNAVOIDABLE, speed=FREE_ACTION)
+        self.assertEquals(Roll.objects.count(), 4)
+
 
     def test_only_one_mind_roll_per_difficulty(self):
         self.make_roll(self.attribute_1, self.ability_1)
@@ -445,6 +468,12 @@ class RollModelTests(TestCase):
         self.assertEquals(roll2, roll4)
         self.assertEquals(Roll.objects.count(), 2)
 
+        roll5 = Roll.get_mind_roll(difficulty=7, speed=NO_SPEED_INFO) # Default is free action
+        self.assertEquals(Roll.objects.count(), 3)
+        roll6 = Roll.get_mind_roll(difficulty=7, speed=NO_SPEED_INFO)
+        self.assertEquals(roll5, roll6)
+        self.assertEquals(Roll.objects.count(), 3)
+
     def test_get_body_roll(self):
         roll = Roll.get_body_roll()
         roll2 = Roll.get_body_roll(7)
@@ -455,3 +484,9 @@ class RollModelTests(TestCase):
         roll4 = Roll.get_body_roll(7)
         self.assertEquals(roll2, roll4)
         self.assertEquals(Roll.objects.count(), 2)
+
+        roll5 = Roll.get_body_roll(difficulty=7, speed=NO_SPEED_INFO)  # Default is free action
+        self.assertEquals(Roll.objects.count(), 3)
+        roll6 = Roll.get_body_roll(difficulty=7, speed=NO_SPEED_INFO)
+        self.assertEquals(roll5, roll6)
+        self.assertEquals(Roll.objects.count(), 3)

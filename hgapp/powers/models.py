@@ -3,7 +3,8 @@ from django.db import models
 from django.utils.html import escape
 
 # Create your models here.
-from characters.models import Character, HIGH_ROLLER_STATUS, Attribute, Roll
+from characters.models import Character, HIGH_ROLLER_STATUS, Attribute, Roll, NO_PARRY_INFO, NO_SPEED_INFO, DODGE_ONLY, \
+    ATTACK_PARRY_TYPE, ROLL_SPEED, THROWN
 from guardian.shortcuts import assign_perm, remove_perm
 from django.utils.html import mark_safe, escape, linebreaks
 
@@ -581,11 +582,24 @@ class SystemFieldRoll(SystemField):
     allow_mind = models.BooleanField(default=False)
     allow_body = models.BooleanField(default=False)
     allow_std_roll = models.BooleanField(default=True)
+    allow_parry = models.BooleanField(default=False)
+    parry_type = models.CharField(choices=ATTACK_PARRY_TYPE,
+                                  max_length=30,
+                                  default=THROWN)
+    speed = models.CharField(choices=ROLL_SPEED,
+                             max_length=30,
+                             default=NO_SPEED_INFO)
     required_attribute = models.ForeignKey(Attribute,
                                            on_delete=models.CASCADE,
                                            null=True,
                                            blank=True)
     difficulty = models.PositiveIntegerField(null=True, blank=True)
+
+    def render_speed(self):
+        if self.speed == NO_SPEED_INFO:
+            return None
+        else:
+            return self.get_speed_display()
 
 
 class SystemFieldText(SystemField):
@@ -622,12 +636,23 @@ class SystemFieldRollInstance(SystemFieldInstance):
         unique_together = (("relevant_field", "relevant_power"))
 
     def render_value(self):
+        if self.roll.parry_type != NO_PARRY_INFO:
+            if self.roll.parry_type == DODGE_ONLY:
+                roll_text = "to dodge"
+            else:
+                roll_text = "to dodge or parry (as for {})".format(self.roll.get_parry_type_display())
+            if self.roll.speed != NO_SPEED_INFO:
+                roll_text = "{} as {}".format(roll_text, self.roll.get_speed_display())
+            return roll_text
         first_word = "Mind" if self.roll.is_mind else "Body" if self.roll.is_body else self.roll.attribute.name
         if self.roll.ability:
             roll_text = "{} + {}".format(first_word, self.roll.ability.name)
         else:
             roll_text = first_word
-        return "{}, Difficulty {}".format(roll_text, self.roll.difficulty)
+        roll_text = "{}, Difficulty {}".format(roll_text, self.roll.difficulty)
+        if self.roll.speed != NO_SPEED_INFO:
+            roll_text = "{} as {}".format(roll_text, self.roll.get_speed_display())
+        return roll_text
 
 class Enhancement_Instance(models.Model):
     relevant_enhancement = models.ForeignKey(Enhancement,

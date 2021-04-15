@@ -36,6 +36,7 @@
 .css-roll-field-primary {
     max-width: 45%;
     display: inline-block;
+    margin-top: 5px;
 }
 
 .css-roll-field-plus {
@@ -46,6 +47,15 @@
 
 .css-roll-field-difficulty {
     padding-left: 5px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    display: inline-block;
+}
+
+.css-roll-field-speed {
+    padding-left: 5px;
+    margin-bottom: 5px;
+    margin-top: 5px;
     display: inline-block;
 }
 

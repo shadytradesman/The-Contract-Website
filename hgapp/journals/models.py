@@ -100,6 +100,7 @@ class Journal(models.Model):
             self.experience_reward = exp_reward
             self.save()
 
+    @staticmethod
     def get_num_journals_until_improvement(character):
         num_valid = Journal.objects.filter(game_attendance__attending_character=character.id,
                                            is_valid=True).count()
@@ -122,7 +123,7 @@ class Journal(models.Model):
     def player_can_view(self, player):
         return not self.contains_spoilers or self.game_attendance.relevant_game.scenario.player_can_view(player)
 
-    ## Experimental field injection for journal read.
+    # Used in Journal read view to inject state into the object which is never stored to the DB, for convenience.
     def inject_viewable(self, player):
         self.is_viewale_by_reader = self.player_can_view(player)
 

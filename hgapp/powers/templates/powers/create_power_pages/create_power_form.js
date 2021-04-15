@@ -189,6 +189,11 @@ $(document).ready(function(){
 
     function setMindBody(id, isMindBody) {
         var select = $("select[id$=" + id + "-ability_roll]");
+        var options = select.children("option");
+        if (options.length == 0) {
+            console.log("No ability field");
+            return;
+        }
         var opt1 = select.children("option").get(1).value;
         if (wasMindBodyLast[id] != isMindBody) {
             console.log("Setting children of " + id + " to " + isMindBody);
@@ -206,12 +211,31 @@ $(document).ready(function(){
         wasMindBodyLast[id] = isMindBody;
     }
 
+    function setParrySpeed(attr_field, isParry) {
+        const defaultSpeed = $(attr_field).parent().parent().find(".js-roll-field-speed-val-default");
+        const parrySpeed = $(attr_field).parent().parent().find(".js-roll-field-speed-val-parry");
+        if (isParry) {
+            defaultSpeed.hide();
+            parrySpeed.show();
+        } else {
+            defaultSpeed.show();
+            parrySpeed.hide();
+        }
+        console.log("Default speed: ");
+        console.log(defaultSpeed);
+    }
+
     function updateSelectableRoll(attr_roll) {
         var idNum = get_id(attr_roll);
-        if (attr_roll.value == "BODY" || attr_roll.value == "MIND") {
+        if (attr_roll.value == "BODY" || attr_roll.value == "MIND" || attr_roll.value == "PARRY") {
             setMindBody(idNum, true);
-        }else{
+        } else {
             setMindBody(idNum, false);
+        }
+        if (attr_roll.value == "PARRY") {
+            setParrySpeed(attr_roll, true);
+        } else {
+            setParrySpeed(attr_roll, false);
         }
     }
 
