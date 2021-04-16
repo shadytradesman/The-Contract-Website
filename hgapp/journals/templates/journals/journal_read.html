@@ -1,0 +1,59 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+{% load staticfiles %}
+
+{% block head_title %}
+    {{character.name}}'s Journal
+{% endblock %}
+
+{% block extra_head %}
+    {{ form.media }}
+{% endblock %}
+
+{% block extra_styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'journals/journal_read_style.css' %}" />
+{% endblock %}
+
+{% block extra_scripts %}
+    <script src="{% static 'journals/journal_read_scripts.js' %}"></script>
+{% endblock %}
+
+{% block body_base %}
+<div class="container">
+    <h1 class="text-center">
+        <a href="{% url 'characters:characters_view' character.id %}">
+            {{character.name}}'s
+        </a>Journal
+    </h1>
+
+    <ul class="nav nav-tabs" role="tablist">
+        {% for journal_page in journal_pages %}
+            <li role="presentation"
+                id="js-tab-{{journal_page.id}}"
+                class="
+                    {% if journal_page.id == view_game_id %} active {% endif %}
+                    {% if journal_page.empty %} css_empty_page {% endif %}">
+                <a href="#{{journal_page.id}}" aria-controls="{{journal_page.id}}" role="tab" data-toggle="tab">
+                    {% if journal_page.death %}
+                        <img class ="css-dead-img" src="{% static 'characters/skull.svg' %}" />
+                    {% elif journal_page.cover %}
+                        <img class ="css-quill-img" src="{% static 'journals/quill.svg' %}" />
+                    {% else %}
+                        {{journal_page.header|safe}}
+                    {% endif %}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="tab-content">
+                {% for journal_page in journal_pages %}
+                    {% include "journals/journal_page_snippet.html" %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

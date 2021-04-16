@@ -23,6 +23,42 @@ HIGH_ROLLER_STATUS = (
     ('VETERAN', 'Veteran'),
 )
 
+NO_PARRY_INFO = "NO_INFO"
+UNAVOIDABLE = "UNAVOIDABLE"
+DODGE_ONLY = "DODGE_ONLY"
+UNARMED = "UNARMED"
+MELEE_EDGED = "MELEE_EDGED"
+MELEE_BLUNT = "MELEE_BLUNT"
+BOW = "BOW"
+THROWN = "THROWN"
+FIREARM = "FIREARM"
+ATTACK_PARRY_TYPE = (
+    (NO_PARRY_INFO, "not applicable"),
+    (UNAVOIDABLE, "an attack that cannot be dodged or parried"),
+    (DODGE_ONLY, "an attack that can only be dodged"),
+    (UNARMED, "an unarmed attack"),
+    (MELEE_EDGED, "an attack with an edged melee weapon"),
+    (MELEE_BLUNT, "an attack with a blunt melee weapon"),
+    (BOW, "an attack with a bow or crossbow"),
+    (THROWN, "an attack with a thrown weapon"),
+    (FIREARM, "an attack with a firearm"),
+)
+
+NO_SPEED_INFO = "NA"
+FREE_ACTION = "FREE"
+QUICK_ACTION = "ACTION_QUICK"
+SPLITTABLE_ACTION = "ACTION_SPLITTABLE"
+COMMITTED_ACTION = "ACTION_COMMITTED"
+REACTION = "REACTION"
+ROLL_SPEED = (
+    (NO_SPEED_INFO, "not applicable"),
+    (FREE_ACTION, "a Free Action"),
+    (QUICK_ACTION, "a Quick Action"),
+    (SPLITTABLE_ACTION, "an Action that may be split"),
+    (COMMITTED_ACTION, "a Committed Action"),
+    (REACTION, "a Reaction")
+)
+
 QUIRK_CATEGORY = (
     ('PHYSICAL', 'Physical'),
     ('BACKGROUND', 'Background'),
@@ -71,20 +107,22 @@ PENALTIES = (
 )
 
 EQUIPMENT_DEFAULT = """
+Track your current equipment here. You may start with anything your Contractor would reasonably have access to. 
+
 #### On Person
 
-* Clothes
+* Jeans
+* T-shirt
 * Wallet
 * Keys
-* flask of tears
-* Rugged no-metal belt that can be used as a pair of nunchucks
+* Smartphone
+* A pocket knife
 
-#### In Bag
+#### Purple Jansport backpack
 
-* Oxygen canister
-* Census-taker's liver
-* Fava Beans
-* Chianti
+* Rain jacket
+* Metal water bottle
+* Toiletries kit
 """
 
 # EXPERIENCE CONSTANTS
@@ -93,6 +131,7 @@ EXP_MVP = 2
 EXP_LOSS = 2
 EXP_WIN = 4
 EXP_GM = 4
+EXP_JOURNAL = 1
 EXP_NEW_CHAR = 150
 EXP_COST_QUIRK_MULTIPLIER = 3
 EXP_ADV_COST_ATTR_MULTIPLIER = 4
@@ -105,9 +144,9 @@ EXP_COST_TRAUMA_THERAPY = 3
 BASE_BODY_LEVELS = 5
 
 
-
 def random_string():
     return hashlib.sha224(bytes(random.randint(1, 99999999))).hexdigest()
+
 
 class Character(models.Model):
     name = models.CharField(max_length=100)
@@ -322,6 +361,9 @@ class Character(models.Model):
     def completed_games(self):
         return self.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).order_by("relevant_game__end_time").all()
 
+    def completed_games_rev_sort(self):
+        return self.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).order_by("-relevant_game__end_time").all()
+
     def assigned_coin(self):
         coins = self.reward_set.filter(is_void=False, is_charon_coin=True).all()
         return coins[0] if coins else None
@@ -421,6 +463,14 @@ class Character(models.Model):
             return "She is"
         else:
             return "They are"
+
+    def pronoun_possessive_capitalized(self):
+        if self.pronoun == PRONOUN[0][0]:
+            return "His"
+        if self.pronoun == PRONOUN[1][0]:
+            return "Her"
+        else:
+            return "Their"
 
     def kill(self):
         if self.is_dead():
@@ -688,6 +738,8 @@ class ExperienceReward(models.Model):
             return self.game_attendance
         if hasattr(self, 'game'):
             return self.game
+        elif hasattr(self, 'journal'):
+            return self.journal
         raise ValueError("Experience reward has no source")
 
     def source_blurb(self):
@@ -695,6 +747,8 @@ class ExperienceReward(models.Model):
             return "from attending " + self.game_attendance.relevant_game.scenario.title
         elif hasattr(self, 'game'):
             return "from GMing " + self.game.scenario.title
+        elif hasattr(self, 'journal'):
+            return "from writing a journal"
         else:
             raise ValueError("Experience reward has no source")
 
@@ -713,6 +767,8 @@ class ExperienceReward(models.Model):
             return value
         if hasattr(self, 'game'):
             return EXP_GM
+        if hasattr(self, 'journal'):
+            return EXP_JOURNAL
         raise ValueError("Experience reward has no source")
 
     def get_history_blurb(self):
@@ -750,13 +806,19 @@ class Roll(models.Model):
                                 null=True)
     is_mind = models.BooleanField(default=False)
     is_body = models.BooleanField(default=False)
+    parry_type = models.CharField(choices=ATTACK_PARRY_TYPE,
+                                  max_length=30,
+                                  default=NO_PARRY_INFO)
+    speed = models.CharField(choices=ROLL_SPEED,
+                             max_length=30,
+                             default=NO_SPEED_INFO)
     difficulty = models.PositiveIntegerField(default=6)
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['attribute', 'ability', 'difficulty', 'is_mind', 'is_body',], name='unique_roll'),
-            models.UniqueConstraint(fields=['is_mind', 'difficulty'], condition=Q(is_mind=True), name='one_mind_roll'),
-            models.UniqueConstraint(fields=['is_body', 'difficulty'], condition=Q(is_body=True), name='one_body_roll'),
+            models.UniqueConstraint(fields=['attribute', 'ability', 'difficulty', 'is_mind', 'is_body', 'parry_type', 'speed'], name='unique_roll'),
+            models.UniqueConstraint(fields=['is_mind', 'difficulty', 'parry_type', 'speed'], condition=Q(is_mind=True), name='one_mind_roll'),
+            models.UniqueConstraint(fields=['is_body', 'difficulty', 'parry_type', 'speed'], condition=Q(is_body=True), name='one_body_roll'),
         ]
         indexes = [
             models.Index(fields=['is_mind', 'difficulty']),
@@ -766,41 +828,45 @@ class Roll(models.Model):
 
     # To obtain the singleton rolls, use this static getter methods instead of directly creating the roll objects.
     @staticmethod
-    def get_mind_roll(difficulty=6):
-        mind_roll = get_object_or_none(Roll, is_mind=True, difficulty=difficulty)
+    def get_mind_roll(difficulty=6, parry_type=NO_PARRY_INFO, speed=FREE_ACTION):
+        mind_roll = get_object_or_none(Roll, is_mind=True, difficulty=difficulty, parry_type=parry_type, speed=speed)
         if mind_roll:
             return mind_roll
         else:
-            mind_roll = Roll(is_mind=True, difficulty=difficulty)
+            mind_roll = Roll(is_mind=True, difficulty=difficulty, parry_type=parry_type, speed=speed)
             mind_roll.save()
             return mind_roll
 
     @staticmethod
-    def get_body_roll(difficulty=6):
-        body_roll = get_object_or_none(Roll, is_body=True, difficulty=difficulty)
+    def get_body_roll(difficulty=6, parry_type=NO_PARRY_INFO, speed=FREE_ACTION):
+        body_roll = get_object_or_none(Roll, is_body=True, difficulty=difficulty, parry_type=parry_type, speed=speed)
         if body_roll:
             return body_roll
         else:
-            mind_roll = Roll(is_body=True, difficulty=difficulty)
+            mind_roll = Roll(is_body=True, difficulty=difficulty, parry_type=parry_type, speed=speed)
             mind_roll.save()
             return mind_roll
 
     @staticmethod
-    def get_roll(attribute=None, ability=None, difficulty=6):
+    def get_roll(attribute=None, ability=None, difficulty=6, parry_type=NO_PARRY_INFO, speed=NO_SPEED_INFO):
         roll = get_object_or_none(Roll,
                                   attribute=attribute,
                                   ability=ability,
                                   is_mind=False,
                                   is_body=False,
-                                  difficulty=difficulty)
+                                  difficulty=difficulty,
+                                  parry_type=parry_type,
+                                  speed=speed)
         if roll:
             return roll
         else:
             roll = Roll(attribute=attribute,
-                              ability=ability,
-                              is_mind=False,
-                              is_body=False,
-                              difficulty=difficulty)
+                        ability=ability,
+                        is_mind=False,
+                        is_body=False,
+                        difficulty=difficulty,
+                        parry_type=parry_type,
+                        speed=speed)
             roll.save()
             return roll
 

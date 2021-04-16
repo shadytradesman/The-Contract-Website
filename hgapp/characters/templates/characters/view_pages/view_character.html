@@ -48,7 +48,7 @@
                         {{ character.number_of_victories }}-Victory
                     {% endif %}
                     <b>{{ character.get_status_display }}</b>
-                    played by
+                    Contractor played by
                     {% if character.player %}
                         <a href="{% url 'profiles:profiles_view_profile' character.player.id %}">{% user_display character.player %}</a>
                     {% else %}

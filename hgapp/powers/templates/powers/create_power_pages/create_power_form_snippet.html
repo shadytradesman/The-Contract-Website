@@ -130,7 +130,7 @@
                     {% endif %}
                     {{ roll_fields.non_field_errors }}
                     {% for field in roll_fields %}
-                        <div class="field-form">
+                        <div class="css-field-form">
                             {{field.errors}}
                             {{field.system_field_id}}
                             <b>{{field.initial.system_field.name}}</b>
@@ -157,6 +157,17 @@
                                 <div class="css-roll-field-difficulty">
                                     Difficulty
                                         {{ field.initial.system_field.difficulty }}
+                                </div>
+                            {% endif %}
+                            {% if field.initial.system_field.render_speed %}
+                                <div class="css-roll-field-speed">
+                                    as
+                                    <span class="js-roll-field-speed-val-default">
+                                        {{ field.initial.system_field.render_speed }}
+                                    </span>
+                                    <span class="js-roll-field-speed-val-parry" style="display:hidden;">
+                                        a Reaction
+                                    </span>
                                 </div>
                             {% endif %}
                         </div>
@@ -229,6 +240,14 @@
                 <div class="col-xs-12">
                     {{ form.description.errors }}
                     {{ form.description | bootstrap}}
+                    <p class="help-block css-description-help">
+                        Describe what the Power looks like when it is used, how it works, and its impact on the owner, target, and environment.
+                        {% if power_system.default_description_prompt %}
+                            <b>
+                                By default, {{ power_system.default_description_prompt|safe }}
+                            </b>
+                        {% endif %}
+                    </p>
                 </div>
             </div>
             <br>

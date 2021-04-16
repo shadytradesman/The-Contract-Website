@@ -7,6 +7,7 @@ BODY_ = ("BODY", "Body")
 
 MIND_ = ("MIND", "Mind")
 
+PARRY_ = ("PARRY", "Dodge or parry")
 
 def set_field_html_name(cls, new_name):
     """
@@ -122,10 +123,7 @@ class CreatePowerForm(forms.Form):
     flavor = forms.CharField(label='Put a ribbon on it',
                              help_text='A snippet of text that introduces the Power in a flavorful way')
     description = forms.CharField(label='Description',
-                                  widget=forms.Textarea,
-                                  help_text='Describe what the Power looks like when it is used, how it works, '
-                                            'and its impact on the owner, target, and environment. All Powers '
-                                            'are obviously supernatural unless stated otherwise.')
+                                  widget=forms.Textarea)
     system = forms.CharField(label='System', widget=forms.Textarea,
                              help_text='Describe this Power\'s cost, associated roll(s), conditions, and determination of outcome. '
                                        'You can reference the value of a Parameter or field by typing its name in lowercase, '
@@ -178,6 +176,8 @@ class SystemFieldRollForm(forms.Form):
                                                                 choices=ability_choices,
                                                                 required=False,
                                                                 widget=forms.Select(attrs={'class': 'form-control'}))
+            if sys_field.allow_parry:
+                attribute_choices.append(PARRY_)
             if sys_field.allow_mind:
                 attribute_choices.append(MIND_)
             if sys_field.allow_body:

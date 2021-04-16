@@ -1,0 +1,41 @@
+.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
+    background-color: #20252d;
+    border-bottom-width: 2px;
+    border-bottom-color: #20252d;
+
+}
+
+.thumbnail {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.css-game-link {
+    margin-left: 5px;
+}
+
+.css_empty_page {
+    border-style: dotted;
+    border-color: #40454d;
+    border-width: 1px;
+    border-bottom-width: 0px;
+}
+
+.css-dead-img {
+    width: 20px !important;
+    height: 20px !important;
+    filter: invert(100%) sepia(3%) saturate(6757%) hue-rotate(350deg) brightness(104%) contrast(97%);
+}
+
+.css-quill-img {
+    width: 20px !important;
+    height: 20px !important;
+    filter: invert(0%) sepia(3%) saturate(6757%) hue-rotate(350deg) brightness(104%) contrast(97%);
+}
+
+.css-valid-quill-img {
+    width: 14px !important;
+    height: 14px !important;
+    filter: invert(20%) sepia(3%) saturate(4957%) hue-rotate(90deg) brightness(104%) contrast(97%);
+
+}

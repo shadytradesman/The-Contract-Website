@@ -1,0 +1,86 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+{% load staticfiles %}
+{% load account_tags %}
+{% load bootstrap %}k
+
+{% block head_title %}
+    Write Journal
+{% endblock %}
+
+{% block extra_head %}
+    {{ form.media }}
+{% endblock %}
+
+{% block extra_styles %}
+{% endblock %}
+
+{% block body_base %}
+<div class="container">
+    <h1 class="text-center">
+        Writing in
+        <a href="{% url 'journals:journal_read' character.id %}">
+            {{character.name}}'s Journal
+        </a>
+
+    </h1>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="thumbnail">
+                <p>
+                    {% if is_downtime %}
+                        Write in-character as
+                        <a href="{% url 'characters:characters_view' character.id %}">{{character.name}}</a>
+                        about what happened after the events of
+                        <a href="{% url 'games:games_view_game' game.id %}">
+                            <b>{{game.scenario.title}}</b>.
+                        </a>
+                        Remember, Experience represents your Contractor spending their time
+                        training.
+                    {% else %}
+                        <h4>
+                            <a href="{% url 'characters:characters_view' character.id %}">{{character.name}}</a>
+                            {% if attendance.is_victory %}
+                                achieved victory
+                            {% elif attendance.is_loss %}
+                                failed
+                            {% elif attendance.is_death %}
+                                died
+                            {% else %}
+                                played
+                            {% endif %}
+                            in
+                            <a href="{% url 'games:games_view_game' game.id %}">
+                                <b>{{game.scenario.title}}</b>:
+                            </a>
+                        </h4>
+                        <i>{{game.scenario.summary}}</i>
+                        {% if attendance.notes %}
+                            <br><br>
+                            <b>Notes: </b>
+                            {{attendance.notes}}
+                        {% endif %}
+                    {% endif %}
+                </p>
+            </div>
+            <form
+                    {% if journal %}
+                        action="{% url 'journals:journal_edit' journal.id %}"
+                    {% elif is_downtime %}
+                        action="{% url 'journals:journal_write_downtime' game.id character.id %}"
+                    {% else %}
+                        action="{% url 'journals:journal_write_game' game.id character.id %}"
+                    {% endif %}
+                    method="post">
+                {% csrf_token %}
+                {{form.title|bootstrap}}
+                {{form.content|bootstrap}}
+                {{form.contains_spoilers|bootstrap}}
+                <input class="btn btn-primary" type="submit" value="Submit" />
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

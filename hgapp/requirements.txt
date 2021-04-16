@@ -78,3 +78,6 @@ websocket-client==0.37.0
 wiki==0.5
 zipp==3.1.0
 setuptools>=36
+roman==3.3
+beautifulsoup4==4.9.3
+soupsieve==2.2.1

@@ -1,0 +1,53 @@
+
+<div class="panel panel-default">
+    <a data-toggle="collapse" data-parent="#accordion" href="#collapse{{tombstone.death.id}}">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                {{tombstone.death.relevant_character.name}}
+                <small>
+                    <b>The {{tombstone.death.relevant_character.concept_summary}}</b>
+                    <span class="pull-right">
+                        {% if tombstone.death.relevant_character.number_of_victories %}
+                            ({{tombstone.death.relevant_character.number_of_victories }}
+                            {% if tombstone.death.relevant_character.number_of_victories  == 1 %}
+                                Victory
+                            {% else %}
+                                Victories
+                            {% endif %}{% if tombstone.num_journals %}, {{tombstone.num_journals}} journals{%endif%})
+                        {% endif %}
+                    </span>
+                </small>
+            </h4>
+        </div>
+    </a>
+    <div id="collapse{{tombstone.death.id}}" class="panel-collapse collapse">
+        <div class="panel-body">
+            <div class="text-center">
+                <div class="lead" style="margin-bottom:5px;">
+                    Died {{tombstone.death.date_of_death|date:"F d, Y"}}
+                </div>
+                {% if tombstone.death.cause_of_death %}
+                    <div>
+                        Cause of death: {{tombstone.death.cause_of_death}}
+                    </div>
+                {% endif %}
+                <br>
+            </div>
+            {% if tombstone.death.obituary %}
+                {{tombstone.death.obituary|linebreaks}}
+            {% endif %}
+            <hr>
+            <small>
+                <a href="{% url 'characters:characters_view' tombstone.death.relevant_character.id %}">
+                    View Sheet
+                </a>
+                {% if tombstone.num_journals %}
+                -
+                <a href="{% url 'journals:journal_read' tombstone.death.relevant_character.id %}">
+                    Read {{tombstone.death.relevant_character.name}}'s Journal ({{tombstone.num_journals}} pages)
+                </a>
+                {% endif %}
+            </small>
+        </div>
+    </div>
+</div>

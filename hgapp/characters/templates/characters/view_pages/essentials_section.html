@@ -17,6 +17,28 @@
             <p>
                 {{character.pres_tense_to_be}} <b>{{character.age}}</b> years old, and often appears as <b>{{character.appearance}}</b>.
             </p>
+            {% if num_journal_entries %}
+                <p>
+                    {{character.pronoun_possessive_capitalized}}
+                    {% if journal_cover %}
+                        journal,
+                    {% endif %}
+                    <a class="js-journal-link" href="{% url 'journals:journal_read' character.id %}">
+                        {% if journal_cover %}
+                            {{journal_cover.title}},
+                        {% else %}
+                            journal
+                        {% endif %}
+                    </a>
+                    has {{num_journal_entries}} {% if num_journal_entries > 1 %} entries{% else %} entry{%endif%}.
+                </p>
+            {% elif user_can_edit and next_entry %}
+                <a class="btn btn-sm btn-success js-journal-link"
+                   href="{% url 'journals:journal_write_next' character.id %}">
+                    Earn Experience and Power Improvements
+                    for {{character.name}} by writing in {{character.get_pronoun_display}} journal!
+                </a>
+            {% endif %}
         </div>
     </div>
     {% if user_can_edit %}
@@ -48,6 +70,37 @@
                         <i class="fa fa-edit fa-2x"></i> Edit Biography
                 </div>
             {% endif %}
+        </div>
+        <div class="row text-center">
+            <div class="col-xs-12">
+            {% if num_journal_entries %}
+                <div class="col-md-4 col-md-offset-4 text-center">
+                    <a class="btn btn-sm btn-primary js-journal-link" href="{% url 'journals:journal_read' character.id %}">
+                        Read {{character.name}}'s Journal
+                    </a>
+                </div>
+                {% if next_entry %}
+                <a class="btn btn-sm btn-success js-journal-link"
+                   href="{% url 'journals:journal_write_next' character.id %}">
+                    Earn
+                    {% if next_entry.reward_is_improvement %}
+                    <b>an Improvement</b>
+                    {% else %}
+                    1 Exp
+                    {% endif %}
+                    for {{character.name}} by writing a
+                    {% if next_entry.is_downtime %}
+                    Downtime
+                    {% else %}
+                    Game
+                    {% endif %}
+                    journal
+                </a>
+                {% endif %}
+            {% endif %}
+                <br>
+                <br>
+            </div>
         </div>
     </div>
     {% if character.background or user_can_edit %}

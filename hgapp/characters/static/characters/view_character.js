@@ -566,6 +566,11 @@ function copyToClipboard(elem) {
     return succeed;
 }
 
+// Prevent bio form from collapsing and contracting when inner links are clicked
+$(".js-journal-link").click(function(event){
+  event.stopPropagation();
+});
+
 window.onload = function () {
     if (document.getElementById("copySecretLink")) {
         document.getElementById("copySecretLink").addEventListener("click", function() {

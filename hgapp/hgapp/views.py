@@ -6,6 +6,7 @@ from django.http import HttpResponseRedirect, HttpResponseForbidden
 from django.shortcuts import render, get_object_or_404
 from django.conf import settings
 import account.views
+from django.core.exceptions import PermissionDenied
 
 # Create your views here.
 from django.urls import reverse
@@ -66,7 +67,7 @@ def home(request):
         new_characters = Character.objects.filter(private=False, is_deleted=False).order_by('-id')[:6]
         latest_blog_post = Post.objects.current().select_related("section", "blog").first()
         upcoming_games_running = request.user.game_creator.filter(status=GAME_STATUS[0][0]).all()
-        upcoming_games_invited = request.user.game_invite_set.filter(relevant_game__status=GAME_STATUS[0][0]).all()
+        upcoming_games_invited = request.user.game_invite_set.filter(relevant_game__status=GAME_STATUS[0][0], is_declined=False).all()
         active_games_attending =  request.user.game_set.filter(status=GAME_STATUS[1][0])
         active_games_creator = request.user.game_creator.filter(status=GAME_STATUS[1][0])
         active_games = list(chain(active_games_attending, active_games_creator))
@@ -98,6 +99,4 @@ def home(request):
         return render(request, 'logged_in_homepage.html', context)
 
 def csrf_failure(request, reason=""):
-    context = {
-    }
-    return render(request, 'csrf.html', context)
+    raise PermissionDenied("CSRF token failure. Refresh form and try again.")

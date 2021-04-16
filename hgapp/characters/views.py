@@ -22,7 +22,11 @@ from characters.forms import make_character_form, CharacterDeathForm, ConfirmAss
     DeleteCharacterForm, BioForm
 from characters.form_utilities import get_edit_context, character_from_post, update_character_from_post, \
     grant_trauma_to_character, delete_trauma_rev
+from characters.view_utilities import get_characters_next_journal_credit
 
+from journals.models import Journal, JournalCover
+
+from hgapp.utilities import get_object_or_none
 
 def __check_edit_perms(request, character, secret_key):
     if request.user.is_superuser:
@@ -124,15 +128,37 @@ def edit_obituary(request, character_id, secret_key = None):
 
 
 def graveyard(request):
-    dead_characters = Character_Death.objects.filter(is_void=False).filter(relevant_character__private=False).order_by('-date_of_death').all()
+    dead_characters = Character_Death.objects.filter(is_void=False)\
+        .filter(relevant_character__private=False)\
+        .exclude(relevant_character__status='ANY')\
+        .order_by('-date_of_death')\
+        .all()
+    tombstones = {
+        'Any': [],
+        'Newbie': [],
+        'Novice': [],
+        'Seasoned': [],
+        'Veteran': [],
+    }
+    num_deaths = 0
+    for death in dead_characters:
+        num_deaths = num_deaths + 1
+        num_journals = Journal.objects.filter(game_attendance__attending_character=death.relevant_character).count()
+        tombstone = {
+            "death": death,
+            "num_journals": num_journals,
+        }
+        tombstones[death.relevant_character.get_status_display()].append(tombstone)
     num_headers = Graveyard_Header.objects.all().count()
     if num_headers > 0:
         header = Graveyard_Header.objects.all()[randint(0,num_headers-1)].header
     else:
         header = "RIP"
     context = {
+        'tombstones': tombstones,
         'character_deaths': dead_characters,
         'header': header,
+        'num_deaths': num_deaths,
     }
     return render(request, 'characters/graveyard.html', context)
 
@@ -177,6 +203,10 @@ def view_character(request, character_id, secret_key = None):
 
     equipment_form = EquipmentForm()
     bio_form = BioForm()
+
+    num_journal_entries = Journal.objects.filter(game_attendance__attending_character=character.id).count()
+    journal_cover = get_object_or_none(JournalCover, character=character.id)
+    next_entry = get_characters_next_journal_credit(character) if user_can_edit else None
     context = {
         'character': character,
         'user_can_edit': user_can_edit,
@@ -196,6 +226,9 @@ def view_character(request, character_id, secret_key = None):
         'bio_form': bio_form,
         'secret_key': secret_key,
         'secret_key_valid': secret_key_valid,
+        'num_journal_entries': num_journal_entries,
+        'journal_cover': journal_cover,
+        'next_entry': next_entry,
     }
     return render(request, 'characters/view_pages/view_character.html', context)
 

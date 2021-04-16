@@ -147,7 +147,7 @@
                     {% for game in completed_games %}
                     <li>
                         <a href="{% url 'games:games_view_game' game.id %}">
-                            {{ game.title }}
+                            {{ game.scenario.title }}
                         </a>
                         - run by {% user_display game.gm %} on {{ game.end_time }}
                     </li>

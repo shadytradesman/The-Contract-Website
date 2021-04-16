@@ -19,72 +19,82 @@
                     -
                     {{ invitation.attendance.get_outcome_display }}
                 </span>
-                <br>
-                Played by
-                 <a href="{% url 'profiles:profiles_view_profile' invitation.invited_player.id %}">
-                    <b>{% user_display invitation.invited_player %}</b>
-                </a>
-                <br>
-                {% with reward=invitation.attendance.get_reward %}
-                    {% if reward %}
-                        {% get_obj_perms request.user for invitation.attendance.attending_character as "char_perms" %}
-                        {% if reward.relevant_power %}
-                             <div class="col-xs-11">
-                                {% render_reward reward %}
-                             </div>
-                            <br><br>
-                        {% else %}
-                            {% if reward.is_improvement %}
-                                {% user_display invitation.invited_player %} has not yet used their Improvement from this Game.
-                            {% elif reward.is_charon_coin %}
-                                {% user_display invitation.invited_player %} has not yet used their Charon Coin from this Game.
-                            {% else %}
-                                {{invitation.attendance.attending_character.name}} has not yet spent their Gift for this Game.
-                                {% if "edit_character" in char_perms %}
-                                    <a href="{% url 'characters:characters_spend_reward' invitation.attendance.attending_character.id %}" class="btn btn-success">
-                                        Spend Available Gifts!
-                                    </a>
-                                {% endif %}
-                            {% endif %}
-                        {% endif %}
-                    {% endif %}
-                {% endwith %}
-                {% if invitation.attendance.character_death.cause_of_death %}
-                    Cause of death: {{ invitation.attendance.character_death.cause_of_death }}
+                <div  style="text-indent: 20px;">
+                    Played by
+                    <a href="{% url 'profiles:profiles_view_profile' invitation.invited_player.id %}">
+                        <b>{% user_display invitation.invited_player %}</b>
+                    </a>
                     <br>
-                {% endif %}
-                {% if invitation.attendance.notes %}
-                    <p>
-                        <br>
-                        {{invitation.attendance.notes}}
-                    </p>
-                {% endif %}
-                {% if not invitation.attendance.is_confirmed %}
-                    {% if invitation.is_declined %}
+                    {% with reward=invitation.attendance.get_reward %}
+                        {% if reward %}
+                        <p>
+                            {% get_obj_perms request.user for invitation.attendance.attending_character as "char_perms" %}
+                                {% if reward.relevant_power %}
+                                    <div class="col-xs-11">
+                                        {% render_reward reward %}
+                                    </div>
+                                {% else %}
+                                    {% if reward.is_improvement %}
+                                        {% user_display invitation.invited_player %} has not yet used their Improvement from this Game.
+                                    {% elif reward.is_charon_coin %}
+                                        {% user_display invitation.invited_player %} has not yet used their Charon Coin from this Game.
+                                    {% else %}
+                                        {{invitation.attendance.attending_character.name}} has not yet spent their Gift for this Game.
+                                        {% if "edit_character" in char_perms %}
+                                            <a href="{% url 'characters:characters_spend_reward' invitation.attendance.attending_character.id %}"
+                                               class="btn btn-success btn-xs"
+                                                style="text-indent: 0px;">
+                                                Accept Gift!
+                                            </a>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endif %}
+                        </p>
+                        {% endif %}
+                    {% endwith %}
+                    {% if invitation.attendance.character_death.cause_of_death %}
+                        Cause of death: {{ invitation.attendance.character_death.cause_of_death }}
+                    {% endif %}
+                    {% if invitation.attendance.notes %}
+                        <p>
+                            <i>{{invitation.attendance.notes}}</i>
+                        </p>
+                    {% endif %}
+                    {% if invitation.attendance.journal_set.first %}
+                        <p>
+                            <a href="{% url 'journals:journal_read_game' invitation.attendance.attending_character.id game.id %}"
+                                class="btn btn-default btn-xs"
+                               style="text-indent: 0px;">
+                                Read {{invitation.attendance.attending_character.name}}'s Journal entry for this Game
+                            </a>
+                        </p>
+                    {% endif %}
+                    {% if not invitation.attendance.is_confirmed %}
+                        {% if invitation.is_declined %}
                         <div class="alert alert-danger" role="alert">
                             <p>
                                 This player denied their attendance in this game.
                             </p>
                         </div>
-                    {% else %}
+                        {% else %}
                         <br>
                         <div class="alert row alert-warning col-xs-11" role="alert">
                             {% if invitation.invited_player.id is request.user.id  %}
-                                <p>
-                                    <a href="{% url 'games:games_confirm_attendance' invitation.attendance.id %}">
-                                        Click Here
-                                    </a>
-                                    to confirm or deny your attendance in this game.
-                                </p>
+                            <p>
+                                <a href="{% url 'games:games_confirm_attendance' invitation.attendance.id %}">
+                                    Click Here
+                                </a>
+                                to confirm or deny your attendance in this game.
+                            </p>
                             {% else %}
-                                <p>
-                                    This player has not yet confirmed their attendance.
-                                </p>
+                            <p>
+                                This player has not yet confirmed their attendance.
+                            </p>
                             {% endif %}
                         </div>
-                        <br><br><br>
+                        {% endif %}
                     {% endif %}
-                {% endif %}
+                </div>
             </li>
         <br>
         {% empty %}
