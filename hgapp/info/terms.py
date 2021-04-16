@@ -1,12 +1,12 @@
 TERMS= """
 
 The Contract Terms and Conditions
-Last updated November 20, 2020
+Last updated April 4, 2021
 
 
 AGREEMENT TO TERMS
 
-These Terms and Conditions constitute a legally binding agreement made between you, whether personally or on behalf of an entity (“you”) and Spencer Stecko (“we,” “us” or “our”), concerning your access to and use of the The Contract www.thecontractrpg.com website as well as any other media form, media channel, mobile website or mobile application related, linked, or otherwise connected thereto (collectively, the “Site”). 
+These Terms and Conditions constitute a legally binding agreement made between you, whether personally or on behalf of an entity (“you”) and Sapient Snake LLC (“we,” “us” or “our”), concerning your access to and use of the The Contract, www.thecontractrpg.com website, as well as any other media form, media channel, mobile website or mobile application related, linked, or otherwise connected thereto (collectively, the “Site”). 
 
 You agree that by accessing the Site, you have read, understood, and agree to be bound by all of these Terms and Conditions. If you do not agree with all of these Terms and Conditions, then you are expressly prohibited from using the Site and you must discontinue use immediately.
 
@@ -123,7 +123,7 @@ We are not liable for any statements or representations in your Contributions pr
 
 We do not assert any ownership over your Contributions, with exceptions outlined in the following paragraph (A). You retain full ownership of all of your Contributions and any intellectual property rights or other proprietary rights associated with your Contributions, with exceptions outlined in the following paragraph (A). 
 
-(A) Exceptions to ownership claims. Any contributions to The Contract’s content via the admin-only database editing sub-site ( any page proceeding with www.thecontractrpg.com/admin ) or to the Player’s Guide, grants an exclusive, non-revocable license to us and ownership over any characters, worlds, systems, or intellectual property elements described therein. These rights are  unrestricted, unlimited, irrevocable, perpetual, exclusive, non-transferable, royalty-free, fully-paid, worldwide rights, and allow us to host, use, copy, reproduce, disclose, sell, resell, publish, broadcast, retitle, archive, store, cache, publicly perform, publicly display, reformat, translate, transmit, excerpt (in whole or in part), and distribute such Contributions (including, without limitation, your image and voice) for any purpose, commercial, advertising, or otherwise, and to prepare derivative works of, or incorporate into other works, such Contributions, and grant and authorize sublicenses of the foregoing. The use and distribution may occur in any media formats and through any media channels. 
+(A) Exceptions to ownership claims. Any contributions to The Contract’s content via the admin-only database editing sub-site ( any page proceeding with www.thecontractrpg.com/admin ) or to the Player’s Guide, grants an exclusive, non-revocable license to us and ownership over any characters, worlds, systems, or intellectual property elements described therein. These rights are  unrestricted, unlimited, irrevocable, perpetual, exclusive, non-transferable, royalty-free, fully-paid, worldwide rights, and allow us to host, use, copy, reproduce, disclose, sell, resell, publish, broadcast, retitle, archive, store, cache, publicly perform, publicly display, reformat, translate, transmit, excerpt (in whole or in part), and distribute such Contributions (including, without limitation, your image and voice) for any purpose, commercial, advertising, or otherwise, and to prepare derivative works of, or incorporate into other works, such Contributions, and grant and authorize sublicenses of the foregoing. The use and distribution may occur in any media formats and through any media channels.
 
 You are solely responsible for your Contributions to the Site and you expressly agree to exonerate us from any and all responsibility and to refrain from any legal action against us regarding your Contributions.  
 
@@ -214,7 +214,7 @@ You can deactivate the connection between the Site and your Third-Party Account 
 
 SUBMISSIONS
 
-You acknowledge and agree that any questions, comments, suggestions, ideas, feedback, or other information regarding the Site ("Submissions") provided by you to us are non-confidential and shall become our sole property. We shall own exclusive rights, including all intellectual property rights, and shall be entitled to the unrestricted use and dissemination of these Submissions for any lawful purpose, commercial or otherwise, without acknowledgment or compensation to you. 
+You acknowledge and agree that any questions, comments, suggestions, ideas, feedback, or other information regarding the Site ("Submissions") provided by you to us are non-confidential and shall become our sole property. We shall own exclusive rights, including all intellectual property rights, and shall be entitled to the unrestricted use and dissemination of these Submissions for any lawful purpose, commercial or otherwise, without acknowledgment or compensation to you. This applies to feedback submitted through any platform or means of communication.
 
 You hereby waive all moral rights to any such Submissions, and you hereby warrant that any such Submissions are original with you or that you have the right to submit such Submissions. You agree there shall be no recourse against us for any alleged or actual infringement or misappropriation of any proprietary right in your Submissions. 
 
@@ -308,8 +308,8 @@ Please note that if you materially misrepresent that the disabled or removed con
 Designated Copyright Agent
 Spencer Stecko
 Attn: Copyright Agent
-Palo Alto, California
-thecontractgame@gmail.com
+Santa Rosa, California
+thecontractrpg@gmail.com
 
 COPYRIGHT INFRINGEMENTS
 
@@ -457,13 +457,13 @@ You hereby waive any and all defenses you may have based on the electronic form 
 CONTACT US 
 
 In order to resolve a complaint regarding the Site or to receive further information regarding use of the Site, please contact us at: 
-Spencer Stecko
-thecontractgame@gmail.com 
+Spencer Stecko, Sapient Snake LLC
+thecontractrpg@gmail.com 
 """
 
 EULA="""End-User License Agreement ("Agreement")
 
-Last updated: Jul 27 2020
+Last updated: April 4, 2021 
 
 Please read this End-User License Agreement ("Agreement") carefully before clicking the "I Agree" button, downloading or using The Contract
 
@@ -473,13 +473,13 @@ If you do not agree to the terms of this Agreement, do not click on the "I Agree
 
 License
 
-Spencer Stecko (“I,” “me,”  “we”, “us” or “our”) grants you a revocable, non-exclusive, non-transferable, limited license to download, install and use The Contract solely for your personal, non-commercial purposes strictly in accordance with the terms of this Agreement.
+Sapient Snake LLC (“I,” “me,”  “we”, “us” or “our”) grants you a revocable, non-exclusive, non-transferable, limited license to download, install and use The Contract solely for your personal, non-commercial purposes strictly in accordance with the terms of this Agreement.
 
 Restrictions
 
 You agree not to, and you will not permit others to:
 
-a) license, sell, rent, lease, assign, distribute, transmit, host, outsource, disclose or otherwise commercially exploit The Contract website or make The Contract website available to any third party.
+a) license, sell, rent, lease, assign, distribute, transmit, host, outsource, disclose or otherwise commercially exploit The Contract or make The Contract available to any third party.
 
 Modifications to Application
 
@@ -501,24 +501,27 @@ If any provision of this Agreement is held to be unenforceable or invalid, such 
 
 Amendments to this Agreement
 
-I reserve the right, at my sole discretion, to modify or replace this Agreement at any time. If a revision is material we will provide at least 30 (changes this) days' notice prior to any new terms taking effect. What constitutes a material change will be determined at our sole discretion.
+I reserve the right, at my sole discretion, to modify or replace this Agreement at any time. We will update the "Last Updated" date at the top of this agreement upon updating. We may not provide any additional notice of changes to this agreement.
 
 Contact Information
 
-If you have any questions about this Agreement, please contact us.
+If you have any questions about this Agreement, please contact us. 
+
+Spencer Stecko, Sapient Snake LLC
+thecontractrpg.com
 
 """
 
 PRIVACY = """
 PRIVACY POLICY
-Last updated July 27, 2020
+Last updated April 4, 2021
 
 SUMMARY
 We do not share or sell your personal information, if provided, and we only require an email address to access the site.
 
 INTRODUCTION
 
-The Contract (“we” or “us” or “our”) respects the privacy of our users (“user” or “you”). This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website www.thecontractrpg.com, including any other media form, media channel, mobile website, or mobile application related or connected thereto (collectively, the “Site”). Please read this privacy policy carefully.  If you do not agree with the terms of this privacy policy, please do not access the site. 
+Sapient Snake LLC (“we” or “us” or “our”) respects the privacy of our users (“user” or “you”). This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website www.thecontractrpg.com, including any other media form, media channel, mobile website, or mobile application related or connected thereto (collectively, the “Site”). Please read this privacy policy carefully.  If you do not agree with the terms of this privacy policy, please do not access the site. 
 
 We reserve the right to make changes to this Privacy Policy at any time and for any reason.  We will alert you about any changes by updating the “Last Updated” date of this Privacy Policy.  Any changes or modifications will be effective immediately upon posting the updated Privacy Policy on the Site, and you waive the right to receive specific notice of each such change or modification. 
 
@@ -647,7 +650,7 @@ If you are under 18 years of age, reside in California, and have a registered ac
 CONTACT US
 
 If you have questions or comments about this Privacy Policy, please contact us at:
-Spencer Stecko
-thecontractgame@gmail.com
+Spencer Stecko, Sapient Snake LLC
+thecontractrpg@gmail.com
 
 """

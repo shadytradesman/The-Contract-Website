@@ -4,6 +4,7 @@
 {% load staticfiles %}
 {% load account_tags %}
 {% load hgapp_tags %}
+{% load cache %}
 
 {% block head_title %}Getting Started{% endblock %}
 
@@ -12,68 +13,98 @@
 {% endblock %}
 
 {% block body_base %}
+{% cache 50000 getting_started request.user.is_authenticated %}
 <div class="container">
     <h1 class="text-center">
-        <i>So you want to sign The Contract. . .</i>
+        <i>So you want to sign The Contract . . .</i>
     </h1>
     <div class="panel panel-default">
         <div class="panel-body">
             <div class="row">
                 <div class="col-xs-12">
-                    {% gwynn_jpg  "horns" 'true' %}
+                    {% gwynn_jpg  "front-music" 'true' %}
                     <br>
                     <br>
-                    <p>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <p class="lead">
                         <div class="text-center">
-                            <i>
-                                Come closer, calf.<br><br>
-                                Ahhh, yes. I do see the spark inside you. But do you have the hunger?
-                                You've tested your limits; will you break them? Will you
-                                wager the pittance of your life for a chance to become something. . . <b>more?</b>
+                            <i class="lead">
+                                I hear the rhythm within you. But will you carry it?
+                                You've tested your limits. Will you break them? Will you
+                                wager your life's serenity for a chance to become something . . . <b>more?</b>
                                 <br>
                                 <br>
-                                Speak now, or slink back to the filth.
+                                Speak now. I'm listening.
                             </i>
                         </div>
                     </p>
                 </div>
             </div>
-            <h2 class="text-center">Explore The Contract</h2>
-            <p>
-                This page explains how to start playing The Contract, but before diving straight into
-                <a href="/wiki/rules/">The Player's Guide</a>, you may want to glance around.
-                <ul>
-                    {% if not user.is_authenticated %}
-                        <li>Visit <a href="/">The Homepage</a> for a high-level overview of The Contract.</li>
-                    {% endif %}
-                    <li>
-                        Try <a href="{% url 'characters:characters_create'%}">Creating your own Contractor</a>.
-                    </li>
-                    <li>
-                        Check out the premade <a href="{% url 'powers:powers_stock'%}">Stock Powers</a>, or
-                        <a href="{% url 'powers:powers_create'%}">try building your own</a>.
-                    </li>
-                    <li>
-                        Visit our <a href="https://discord.gg/xUZZegYNNy">Discord Server</a> and
-                        <a href="https://www.reddit.com/r/TheContract/">Subreddit</a> to find other Players and chat with
-                        The Contract's Developers.
-                    </li>
-                    {% if not user.is_authenticated %}
-                        <li>
-                            Consider <a href="{% url 'account_signup' %}">Making an account</a> to enter the full website.
-                        </li>
-                    {% endif %}
-                </ul>
+            <h2 class="text-center">
+                Explore The Contract
                 <br>
-                {% if user.is_authenticated %}
-                    I see you've already logged in. That's great! <a href="/">Your home page</a> acts as centralized
-                    location for exploring the site. You can go Home at any time by clicking the logo in the upper
-                    left.
+                <small>
+                    Before diving straight into
+                    <a href="/wiki/rules/">The Player's Guide</a>, you may want to glance around.
+                </small>
+            </h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>Join the Community</h4>
+                    The best way to learn The Contract is to play. Join our <a href="https://discord.gg/xUZZegYNNy">Discord Server</a>
+                    to find other players, ask questions, and chat with The Contract's Developers.
+                    <b>We run several Newbie-friendly Games each week for Players who want to try out The Contract.</b>
                     <br>
-                {% endif %}
-                Once you've satisfied your curiosity, it's time to start Playing!
-            </p>
-            <h1 class="text-center">Running The Contract</h1>
+                    <br>
+                    <div class="text-center">
+                        <a class="btn btn-default" href="https://discord.gg/xUZZegYNNy">
+                            <div>
+                                <img class="float-left" src="/static/overrides/other_graphics/Discord-Logo-Color.svg" style="width: 35px; height: 35px;">
+                                <span class="css-discord-btn"> Join Our Discord Server</span>
+                            </div>
+                        </a>
+                    </div>
+                    <br>
+                </div>
+                <div class="col-md-6">
+                    <h4>Try Things Out</h4>
+                    <p>
+                    <ul>
+                        {% if not user.is_authenticated %}
+                        <li>Visit <a href="/">The Homepage</a> for a high-level overview of The Contract.</li>
+                        {% endif %}
+                        <li>
+                            Try <a href="{% url 'characters:characters_create'%}">Creating your own Contractor</a>.
+                        </li>
+                        <li>
+                            Check out the premade <a href="{% url 'powers:powers_stock'%}">Stock Powers</a>, or
+                            <a href="{% url 'powers:powers_create'%}">try building your own</a>.
+                        </li>
+                        {% if not user.is_authenticated %}
+                        <li>
+                            Consider <a href="{% url 'account_signup' %}">Making an account</a> to experience the full website.
+                        </li>
+                        {% endif %}
+                    </ul>
+                    <br>
+                    {% if user.is_authenticated %}
+                        I see you've already logged in. That's great! <a href="/">Your home page</a> acts as centralized
+                        location for exploring the site. You can go Home at any time by clicking the logo in the upper
+                        left.
+                        <br>
+                    {% endif %}
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 text-center">
+                    <h2><small>Once you've satisfied your curiosity, it's time to start Playing!</small></h2>
+                </div>
+            </div>
+            <h2 class="text-center">Running The Contract</h2>
             <h3>Step 1 - Read <a href="/wiki/rules/">The Rules</a></h3>
             <p>
                 As the person introducing The Contract to your group, you will act as a rules resource.
@@ -164,4 +195,5 @@
         </div>
     </div>
 </div>
+{% endcache %}
 {% endblock %}

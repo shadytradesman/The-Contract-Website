@@ -34,7 +34,7 @@
     {% cache 500 nav-rules-toc %}
     <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-            Game Rules <span class="caret"></span>
+            Player's Guide <span class="caret"></span>
         </a>
         {% article_toc 'rules' %}
     </li>
@@ -59,6 +59,9 @@
             </a>
             <ul class="dropdown-menu">
                 <li>
+                    <a class="btn-primary" href="https://discord.gg/xUZZegYNNy">Visit Discord Server</a>
+                </li>
+                <li>
                     <a href="{% url 'characters:characters_create'%}">Create a Contractor</a>
                 </li>
                 <li>
@@ -71,12 +74,6 @@
                     <a href="{%url 'pinax_blog:blog' %}">
                          News and Updates
                     </a>
-                </li>
-                <li>
-                    <a href="https://discord.gg/xUZZegYNNy">Visit Discord Server</a>
-                </li>
-                <li>
-                    <a href="https://www.reddit.com/r/TheContract/">Visit Subreddit</a>
                 </li>
             </ul>
         </li>

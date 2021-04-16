@@ -675,12 +675,15 @@ def edit_completed(request, game_id, players = None):
 
 
 def _check_perms_for_edit_completed(request, game):
+    if request.user.is_superuser:
+        return
     if not request.user.is_authenticated:
         raise PermissionDenied("You must log in.")
     if not (game.is_finished() or game.is_archived() or game.is_recorded()):
         raise PermissionDenied("You can't add an attendance to a Game that isn't finished.")
-    if game.cell.player_can_manage_games(request.user):
-        return
+    if hasattr(game, "cell") and game.cell:
+        if game.cell.player_can_manage_games(request.user):
+            return
     if not request.user.has_perm('edit_game', game):
         raise PermissionDenied("You don't have permission to edit this Game")
 
