@@ -107,20 +107,22 @@ PENALTIES = (
 )
 
 EQUIPMENT_DEFAULT = """
+Track your current equipment here. You may start with anything your Contractor would reasonably have access to. 
+
 #### On Person
 
-* Clothes
+* Jeans
+* T-shirt
 * Wallet
 * Keys
-* flask of tears
-* Rugged no-metal belt that can be used as a pair of nunchucks
+* Smartphone
+* A pocket knife
 
-#### In Bag
+#### Purple Jansport backpack
 
-* Oxygen canister
-* Census-taker's liver
-* Fava Beans
-* Chianti
+* Rain jacket
+* Metal water bottle
+* Toiletries kit
 """
 
 # EXPERIENCE CONSTANTS
@@ -142,9 +144,9 @@ EXP_COST_TRAUMA_THERAPY = 3
 BASE_BODY_LEVELS = 5
 
 
-
 def random_string():
     return hashlib.sha224(bytes(random.randint(1, 99999999))).hexdigest()
+
 
 class Character(models.Model):
     name = models.CharField(max_length=100)
