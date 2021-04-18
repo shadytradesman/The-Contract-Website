@@ -12,7 +12,7 @@ from characters.models import Character, ExperienceReward
 
 from hgapp.utilities import get_object_or_none
 
-NUM_JOURNALS_PER_IMPROVEMENT = 5
+NUM_JOURNALS_PER_IMPROVEMENT = 4
 
 class Journal(models.Model):
     title = models.CharField(max_length=400)
@@ -103,7 +103,8 @@ class Journal(models.Model):
     @staticmethod
     def get_num_journals_until_improvement(character):
         num_valid = Journal.objects.filter(game_attendance__attending_character=character.id,
-                                           is_valid=True).count()
+                                           is_valid=True,
+                                           is_downtime=False).count()
         num_journal_rewards = Reward.objects.filter(is_journal=True,
                                                     rewarded_character=character,
                                                     is_improvement=True,
@@ -125,7 +126,7 @@ class Journal(models.Model):
 
     # Used in Journal read view to inject state into the object which is never stored to the DB, for convenience.
     def inject_viewable(self, player):
-        self.is_viewale_by_reader = self.player_can_view(player)
+        self.is_viewable_by_reader = self.player_can_view(player)
 
     def save(self, *args, **kwargs):
         if not self.pk and self.content:

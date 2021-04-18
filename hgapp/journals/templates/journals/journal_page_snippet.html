@@ -21,12 +21,12 @@
         <br>
         <div class="text-center alert alert-info" role="alert">
             <b>
-                The next journal you write will grant you
+                The next Game journal you write will grant you
                 {% if next_reward_is_improvement %}
                     an Improvement.
                 {% else %}
                     1 Exp. You must write {{num_journals_until_improvement}} more
-                    journal{{num_journals_until_improvement|pluralize}} to get an Improvement.
+                    Game journal{{num_journals_until_improvement|pluralize}} to get an Improvement.
                 {% endif %}
 
             </b>
@@ -97,7 +97,7 @@
                 </a>
             </small>
             <div class="thumbnail">
-                {% if journal_page.game_journal.is_viewale_by_reader %}
+                {% if journal_page.game_journal.is_viewable_by_reader %}
                     <h3>
                         {{journal_page.game_journal.title}}
                     </h3>
@@ -138,16 +138,16 @@
         {% endif %}
         {% for journal in journal_page.downtime_journals %}
         <small class="css-game-link">
-            {% if journal.is_valid %}
+            {% if journal.is_valid and not forloop.counter0 %}
             <img class ="css-valid-quill-img"
                  src="{% static 'journals/quill.svg' %}"
                  data-toggle="tooltip"
-                 title='This journal entry is valid and granted a Reward.'
+                 title='This journal entry is valid and granted 1 Exp.'
             />
-            {% else %}
+            {% elif not forloop.counter0 %}
             <i class="fa fa-exclamation-circle fa-1x"
                data-toggle="tooltip"
-               title='This Journal is not 250 words and did not grant a Reward.'
+               title='This Journal is not 250 words and did not grant any Exp.'
             ></i>
             {% endif %}
             {% if journal.contains_spoilers %}
@@ -159,7 +159,7 @@
             Downtime
         </small>
         <div class="thumbnail">
-            {% if journal.is_viewale_by_reader %}
+            {% if journal.is_viewable_by_reader %}
                 <h3>
                     {{journal.title}}
                 </h3>
@@ -182,15 +182,10 @@
         {% if viewer_can_write %}
         <div class="text-center alert {% if journal_page.downtime_journals %} alert-info {% else %} alert-success {% endif %}">
             {% if journal_page.downtime_journals %}
-                You may write additional Downtime journals, but you will not gain Experience or Improvements from them.
+                You may write additional Downtime journals, but you will not gain Experience from them.
             {% else %}
                 You have not written a Downtime Journal for this Game yet.
-                You will earn
-                {% if next_reward_improvement %}
-                    <b>an Improvement</b>
-                {% else %}
-                    1 Exp
-                {% endif %}
+                You will earn 1 Exp
                 for {{character.name}} if you write an in-character Journal at least
                 250 words in length explaining what occurred between this Game and the next.
             {% endif %}

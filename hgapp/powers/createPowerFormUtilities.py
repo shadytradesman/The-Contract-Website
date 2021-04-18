@@ -1,6 +1,7 @@
 from django.forms import formset_factory
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
+import bleach
 import json
 
 from .forms import CreatePowerForm, make_enhancement_form, make_drawback_form, make_parameter_form, \
@@ -10,10 +11,6 @@ from .models import Enhancement_Instance, Drawback_Instance, Power, DICE_SYSTEM,
     Parameter_Value, Base_Power_System, Power_Full, CREATION_REASON, PowerTutorial
 
 from characters.models import Roll, Attribute, Ability, NO_PARRY_INFO, REACTION, THROWN
-
-#TODO: use proper field sanitation instead of this cheat method
-bad_chars = set("\0\'\"\b\n\r\t\Z\\\%\_;*|,/=?")
-
 
 
 def get_create_power_context_from_base(base_power, character=None):
@@ -76,7 +73,7 @@ def get_create_power_context_from_power(power, new=True):
     drawback_forms = _get_drawback_formsets_from_power(power)
     parameter_forms = []
     for parameter_value in Parameter_Value.objects.filter(relevant_power=power).all():
-        init= [{'level_picker': parameter_value.value}]
+        init = [{'level_picker': parameter_value.value}]
         parameter_forms.append(formset_factory(make_parameter_form(parameter_value.relevant_power_param), extra = 0)(initial = init))
     requirements = _get_modifier_requirements(Enhancement.objects.filter(pk__in=power.base.enhancements.all()),
                                              Drawback.objects.filter(pk__in=power.base.drawbacks.all()))
@@ -297,7 +294,7 @@ def _get_enhancement_instances(post_data, enhancements, new_power):
                 detail_texts = post_data.getlist(enhancement.slug + "-e-detail_text")
             for on in post_data.getlist(enhancement.slug + "-e-is_selected"):
                 if detail_texts:
-                    new_detail_text = _remove_sql_trouble_chars(detail_texts.pop(0))
+                    new_detail_text = bleach.clean(detail_texts.pop(0))
                 else:
                     new_detail_text = ""
                 instances.append(Enhancement_Instance(relevant_enhancement=enhancement,
@@ -315,20 +312,13 @@ def _get_drawback_instances(post_data, drawbacks, new_power):
                 detail_texts = post_data.getlist(drawback.slug + "-d-detail_text")
             for on in post_data.getlist(drawback.slug + "-d-is_selected"):
                 if detail_texts:
-                    new_detail_text = _remove_sql_trouble_chars(detail_texts.pop(0))
+                    new_detail_text = bleach.clean(detail_texts.pop(0))
                 else:
                     new_detail_text = ""
                 instances.append(Drawback_Instance(relevant_drawback=drawback,
                                      relevant_power=new_power,
                                      detail=new_detail_text))
     return instances
-
-def _remove_sql_trouble_chars(field_string):
-    output_string = ""
-    for char in field_string:
-        if not char in bad_chars:
-            output_string = output_string + char
-    return output_string
 
 
 def _create_new_full_power(power_form, base):

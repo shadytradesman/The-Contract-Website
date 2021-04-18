@@ -202,12 +202,12 @@ class JournalModelTests(TestCase):
                                 is_downtime=False)
 
     def test_journals_grant_correct_rewards(self):
-        for x in range(7):
+        for x in range(6):
             journal = self.__make_journal(writer=self.user1,
                                           game_attendance=self.char1_attendances[x],
                                           is_downtime=False)
             journal.set_content(VALID_JOURNAL_CONTENT)
-            if x == 4:
+            if x == 3:
                 self.assertIsNotNone(journal.get_improvement())
                 self.assertIsNone(journal.get_exp_reward())
             else:
@@ -216,7 +216,7 @@ class JournalModelTests(TestCase):
 
     def test_journals_void_rewards(self):
         journals = []
-        for x in range(7):
+        for x in range(6):
             journal = self.__make_journal(writer=self.user1,
                                           game_attendance=self.char1_attendances[x],
                                           is_downtime=False)
@@ -234,7 +234,7 @@ class JournalModelTests(TestCase):
         self.assertIsNone(exp_journal.get_improvement())
         self.assertIsNotNone(exp_journal.get_exp_reward())
 
-        improvement_journal = journals[4]
+        improvement_journal = journals[3]
         self.assertIsNotNone(improvement_journal.get_improvement())
         self.assertIsNone(improvement_journal.get_exp_reward())
         improvement_journal.set_content(INVALID_JOURNAL_CONTENT)
@@ -248,7 +248,7 @@ class JournalModelTests(TestCase):
 
     def test_journal_change_attendance(self):
         journals = []
-        for x in range(7):
+        for x in range(6):
             journal = self.__make_journal(writer=self.user1,
                                           game_attendance=self.char1_attendances[x],
                                           is_downtime=False)
@@ -269,7 +269,7 @@ class JournalModelTests(TestCase):
         self.assertIsNotNone(exp_journal.get_exp_reward())
         self.assertEquals(exp_journal.get_exp_reward().rewarded_character, self.char2)
 
-        improvement_journal = journals[4]
+        improvement_journal = journals[3]
         self.assertIsNotNone(improvement_journal.get_improvement())
         self.assertIsNone(improvement_journal.get_exp_reward())
         self.assertEquals(improvement_journal.get_improvement().rewarded_character, self.char1)

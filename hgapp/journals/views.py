@@ -50,7 +50,7 @@ class WriteJournal(View):
                                   contains_spoilers=form.cleaned_data['contains_spoilers'])
                 journal.save()
                 journal.set_content(form.cleaned_data['content'])
-            return HttpResponseRedirect(reverse('journals:journal_read', args=(self.character.id, self.game.id)))
+            return HttpResponseRedirect(reverse('journals:journal_read_game', args=(self.character.id, self.game.id)))
         raise ValueError("Invalid journal form")
 
     def __check_permissions(self):
@@ -105,7 +105,7 @@ class EditJournal(WriteJournal):
                     self.journal.contains_spoilers = form.cleaned_data['contains_spoilers']
                     self.journal.save()
                     self.journal.set_content(content)
-            return HttpResponseRedirect(reverse('journals:journal_read', args=(self.character.id, self.game.id)))
+            return HttpResponseRedirect(reverse('journals:journal_read_game', args=(self.character.id, self.game.id)))
         else:
             raise ValueError("Invalid journal form.")
 

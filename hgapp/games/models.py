@@ -225,7 +225,7 @@ class Game(models.Model):
         return num_losses
 
     def get_attended_players(self):
-        return self.invitations.filter(game_invite__is_declined=False).all()
+        return self.invitations.filter(game_invite__is_declined=False, game_invite__attendance__isnull=False).all()
 
     def get_journaled_attendances(self):
         return self.game_attendance_set.filter(is_confirmed=True, journal__isnull=False, journal__is_downtime=False).all()

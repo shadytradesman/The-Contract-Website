@@ -50,6 +50,7 @@
             <input class="btn btn-primary" type="submit" value="Invite" />
         {% endif %}
     {% elif request.user.is_authenticated %}
+        {{ game.get_attended_players.count }} Player{{game.get_attended_players.count|pluralize}} RSVPed that they will attend.
         {% if my_invitation %}
             {% if my_invitation.attendance %}
                 {% if my_invitation.attendance.attending_character %}
