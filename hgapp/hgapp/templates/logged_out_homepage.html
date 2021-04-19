@@ -95,9 +95,22 @@
         <span id="css-art-front-time" style='background-image:url("{% static 'overrides/art/front-time.jpg' %}")'></span>
         <div class="css-affix-spacer"></div>
         <div id="css-contractors-text">
-            <h1 class="text-center">The Contractors</h1>
+            <h1 class="text-center">Contractors</h1>
             <div class="css-head-spacer"></div>
             <div class="css-backdropped-text">
+                <div class="text-center lead">
+                    By <a href="https://www.davidemeryauthor.com/">David Emery</a>
+                </div>
+                <div class="css-contractor-fiction">
+                    {{info.shown_fiction|safe}}
+                    <div class="lead text-center">
+                        <a href="{%url 'info:fiction' %}#continue-from-home">
+                            Continue Reading
+                        </a>
+                    </div>
+                </div>
+                <hr>
+                <br>
                 <div class="lead text-center">
                     <i>
                         "I am not like you. We share only our willingness to sign on the dotted line."
@@ -108,7 +121,7 @@
                 <p class="lead">
                     Players control Contractors: ambitious and competent individuals who risk their lives in the Harbingers’
                     Games. Each successful Game awakens their latent Powers, transforming them from ordinary humans into
-                    something more.
+                    something <i>more.</i>
                     <br>
                     <br>
                     <a href="{% url 'characters:characters_create' %}">
@@ -119,8 +132,8 @@
                 </p>
                 <h2 class="text-center">Powers for Any Concept</h2>
                 <p class="lead">
-                    Each victory grants the Contractors a Gift that can be used to purchase a new Power or improve an existing Power.
-                    Easily create unique, flavorful, and balanced Powers with The Contract's The Contract’s Power System.
+                    Each victory grants your Contractor a Gift that can be used to purchase a new Power or improve one they already have.
+                    Easily create unique, flavorful, and balanced Powers with The Contract’s Power System.
                 </p>
                 <p class="lead text-center">"I want to. . ."</p>
                 <ul class="nav nav-tabs nav-justified" role="tablist">
@@ -137,60 +150,6 @@
                 <!-- Tab panes -->
                 <div class="tab-content">
                     <div role="tabpanel" class="tab-pane fade in active" id="fireballs">
-                        <br>
-                        <div class="text-center lead">Select from <b>{{num_bases}}</b> Effects</div>
-                        <div class="text-center">
-                            <span style="display:inline-block;" class="thumbnail">
-                                <h4>Injure</h4>
-                                Deal a burst of damage
-                            </span>
-                            <span class="hidden-xs">
-                                <span style="display:inline-block;" class="thumbnail css-disabled">
-                                    <h4>Alternate Form</h4>
-                                    Take on a Powerful Alternate Form
-                                </span>
-                                <span style="display:inline-block;" class="thumbnail css-disabled">
-                                    <h4>Phase Out</h4>
-                                    Stop existing for a moment
-                                </span>
-                            </span>
-                        </div>
-                        <p class="lead text-center">Customize and Balance with <b>{{num_modifiers}}</b> Enhancements, Drawbacks, and Parameters </p>
-                        <div class="text-center">
-                            Drawback:
-                            <span style="display:inline-block;" class="thumbnail">
-
-                                <label for="quirk1"><input type="checkbox" id="quirk1" checked/> <b>Focus</b> (Activating this Power requires a specific kind of item.)</label>
-                                <br>
-                                <label for="id_form-0-detail_text">Object:</label>
-                                <input type="text" class="form-control" id="id_form-0-detail_text" name="id_form-0-detail_text"
-                                       style="max-width: 250px; display: inline-block;"
-                                        value="A lighter, match, or other fire source.">
-                            </span>
-                            <br>
-                            Enhancement:
-                            <span style="display:inline-block;" class="thumbnail">
-                                <label for="quirk2"><input type="checkbox" id="quirk2" checked> <b>Cantrip</b> (This Power has no Exertion cost, but its level is capped at
-                                    2 Gifts, and it cannot be upgraded further)</label>
-                            </span>
-                            <span class="hidden-xs">
-                                <br>
-                                Parameter:
-                                <span style="display:inline-block; width: 300px;" class="thumbnail">
-                                    Range
-                                    <select class="form-inline form-control" style="width: 150px;display:inline;">
-                                        <option value="1">Arm's Reach</option>
-                                        <option value="2" selected="">30 Feet</option>
-                                        <option value="3" >300 Feet (Default)</option>
-                                        <option value="4" >1000 Feet (Seasoned)</option>
-                                        <option value="5" >1 Mile</option>
-                                        <option value="6" >10 Miles (Veteran)</option>
-                                        <option value="7" >Unlimited</option>
-                                    </select>
-                                </span>
-                            </span>
-                        </div>
-                        <p class="lead text-center">Finish with a Description</p>
                         <div class="css-power-container">
                             {% with power_1 as power_full %}
                                 {% include "powers/power_badge_snippet.html" %}
@@ -198,51 +157,6 @@
                         </div>
                     </div>
                     <div role="tabpanel" class="tab-pane fade" id="werewolf">
-                        <br>
-                        <div class="text-center lead">Select from <b>{{num_bases}}</b> Effects</div>
-                        <div class="text-center">
-
-                            <span style="display:inline-block;" class="thumbnail css-disabled hidden-xs">
-                                <h4>Injure</h4>
-                                Deal a burst of damage
-                            </span>
-                            <span style="display:inline-block;" class="thumbnail">
-                                <h4>Alternate Form</h4>
-                                Take on a Powerful Alternate Form
-                            </span>
-                            <span style="display:inline-block;" class="thumbnail css-disabled hidden-xs">
-                                <h4>Phase Out</h4>
-                                Stop existing for a moment
-                            </span>
-                        </div>
-                        <p class="lead text-center">Customize and Balance with <b>{{num_modifiers}}</b> Enhancements, Drawbacks, and Parameters </p>
-                        <div class="text-center">
-                            Drawback:
-                            <span style="display:inline-block;" class="thumbnail">
-                                <label for="quirkb-1"><input type="checkbox" id="quirkb-1" checked/> <b>Paws</b> (You are incapable of fine object manipulation in your Alternate Form.)</label>
-                            </span>
-                            <br>
-                            <span class="hidden-xs">
-                                Enhancement:
-                                <span style="display:inline-block;" class="thumbnail hidden-xs">
-                                     <label for="quirkb-2"><input type="checkbox" id="quirkb-2" checked> <b>Willful End</b> (You may end this Power before its duration has elapsed.)</label>
-                                 </span>
-                                 <br>
-                            </span>
-                            Parameter:
-                            <span style="display:inline-block; width: 300px;" class="thumbnail">
-                                Duration
-                                <select class="form-inline form-control" style="width: 170px;display:inline;">
-                                    <option value="1">1 round</option>
-                                    <option value="1">3 rounds</option>
-                                    <option value="1" selected="">3 minutes (Default)</option>
-                                    <option value="1" >30 minutes</option>
-                                    <option value="1" >3 hours (Seasoned)</option>
-                                    <option value="1">1 Day (Veteran)</option>
-                                </select>
-                            </span>
-                        </div>
-                        <p class="lead text-center">Finish with a Description</p>
                         <div class="css-power-container">
                             {% with power_2 as power_full %}
                                 {% include "powers/power_badge_snippet.html" %}
@@ -250,31 +164,6 @@
                         </div>
                     </div>
                     <div role="tabpanel" class="tab-pane fade" id="time-traveler">
-                        <br>
-                        <div class="text-center lead">Select from <b>{{num_bases}}</b> Effects</div>
-                        <div class="text-center">
-                            <span style="display:inline-block;" class="thumbnail css-disabled hidden-xs">
-                                <h4>Injure</h4>
-                                Deal a burst of damage
-                            </span>
-                            <span style="display:inline-block;" class="thumbnail css-disabled hidden-xs">
-                                <h4>Alternate Form</h4>
-                                Take on a Powerful Alternate Form
-                            </span>
-                            <span style="display:inline-block;" class="thumbnail">
-                                <h4>Phase Out</h4>
-                                Stop existing for a moment
-                            </span>
-                        </div>
-                        <p class="lead text-center">Customize and Balance with <b>{{num_modifiers}}</b> Enhancements, Drawbacks, and Parameters </p>
-                        <div class="text-center">
-                            Enhancement:
-                            <span style="display:inline-block;" class="thumbnail">
-                                <label for="quirkc-1"><input type="checkbox" id="quirkc-1" checked/> <b>Too Slow!</b> (You may use this Power as a Reaction)</label>
-                            </span>
-                            <br>
-                        </div>
-                        <p class="lead text-center">Finish with a Description</p>
                         <div class="css-power-container">
                             {% with power_3 as power_full %}
                                 {% include "powers/power_badge_snippet.html" %}
@@ -283,6 +172,8 @@
                     </div>
                 </div>
                 <p class="lead text-center">
+                <div class="text-center lead">Select from <b>{{num_bases}}</b> Effects</div>
+                <p class="lead text-center">Customize and Balance with <b>{{num_modifiers}}</b> Enhancements, Drawbacks, and Parameters </p>
                     <br>
                     <b>Overwhelmed?</b> Choose from
                     <a href="{% url 'powers:powers_stock' %}">

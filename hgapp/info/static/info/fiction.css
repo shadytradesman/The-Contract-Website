@@ -1,0 +1,17 @@
+.panel-body {
+    padding-left: 50px;
+    padding-right: 50px;
+}
+
+@media (max-width: 768px) {
+    .panel-body {
+        padding: 10px;
+    }
+}
+
+/* anchor links fix */
+#continue-from-home::before {
+  display: block;
+  content: "";
+  height: 50px;
+}
