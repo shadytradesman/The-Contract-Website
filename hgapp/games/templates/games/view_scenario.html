@@ -12,7 +12,7 @@
 {% endblock %}
 {% block extra_scripts %}
     <script>
-        {% if scenario.is_public %}
+        {% if show_spoiler_warning %}
             scenarioPublic=true;
         {% else %}
             scenarioPublic=false;

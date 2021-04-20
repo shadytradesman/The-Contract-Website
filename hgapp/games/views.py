@@ -121,10 +121,12 @@ def edit_scenario(request, scenario_id):
 
 def view_scenario(request, scenario_id, game_id=None):
     scenario = get_object_or_404(Scenario, id=scenario_id)
-    if not scenario.player_can_view(request.user):
+    if not scenario.player_can_view(request.user) and not scenario.player_discovered(request.user):
         raise PermissionDenied("You don't have permission to view this scenario")
-    show_spoiler_warning = scenario.is_public() and \
-                           not (request.user.is_authenticated and scenario.player_discovered(request.user))
+    show_spoiler_warning = scenario.is_public() \
+                           and not (request.user.is_authenticated and scenario.player_discovered(request.user)) \
+                            or scenario.is_spoilable_for_player(request.user)
+
     if request.method == 'POST':
         form = GameFeedbackForm(request.POST)
         if form.is_valid() and game_id:
@@ -155,20 +157,24 @@ def view_scenario(request, scenario_id, game_id=None):
         }
         return render(request, 'games/view_scenario.html', context)
 
+
 def view_scenario_gallery(request):
     if not request.user.is_authenticated:
         raise PermissionDenied("You must be logged in to view your Scenario Gallery")
     owned_scenarios = request.user.scenario_creator.all()
-    discovered_scenarios = request.user.scenario_discovery_set.exclude(reason=DISCOVERY_REASON[1][0]).all()
+    discovered_scenarios = request.user.scenario_discovery_set.exclude(reason=DISCOVERY_REASON[1][0]).exclude(is_spoiled=False).all()
+    unlocked_scenarios = request.user.scenario_discovery_set.exclude(is_spoiled=True).all()
     num_new_cell_scenarios = len(Scenario.objects.filter(tags__slug="newcell").all())
     not_cell_leader = len(request.user.cell_set.filter(creator=request.user).all()) == 0
     context = {
         'owned_scenarios': owned_scenarios,
         'scenario_discoveries': discovered_scenarios,
+        'unlocked_discoveries': unlocked_scenarios,
         'num_new_cell_scenarios': num_new_cell_scenarios,
         'not_cell_leader': not_cell_leader,
     }
     return render(request, 'games/view_scenario_gallery.html', context)
+
 
 def create_game(request):
     if not request.user.is_authenticated:
@@ -226,6 +232,7 @@ def create_game(request):
             'form' : form,
         }
         return render(request, 'games/edit_game.html', context)
+
 
 def edit_game(request, game_id):
     game = get_object_or_404(Game, id=game_id)
@@ -728,5 +735,7 @@ def spoil_scenario(request, scenario_id):
             with transaction.atomic():
                 if not scenario.player_discovered(request.user):
                     scenario.unlocked_discovery(request.user)
+                elif scenario.is_spoilable_for_player(request.user):
+                    scenario.discovery_for_player(request.user).spoil()
             return JsonResponse({}, status=200)
         return JsonResponse({"error": ""}, status=400)
