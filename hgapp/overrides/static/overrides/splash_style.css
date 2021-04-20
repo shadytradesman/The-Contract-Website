@@ -369,3 +369,18 @@ body {
         z-index: 2;
     }
 }
+
+.css-contractor-fiction {
+    font-family: Helvetica, sans-serif !important;
+    font-size: 16px !important;
+    font-weight: 300 !important;
+    line-height: 1.4;
+}
+
+.css-contractor-fiction>p {
+    margin-bottom: 20px;
+}
+
+.css-contractor-fiction>p>span {
+    font-weight: 300 !important;
+}

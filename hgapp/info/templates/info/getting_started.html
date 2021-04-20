@@ -83,6 +83,13 @@
                             Check out the premade <a href="{% url 'powers:powers_stock'%}">Stock Powers</a>, or
                             <a href="{% url 'powers:powers_create'%}">try building your own</a>.
                         </li>
+                        <li>
+                            Read some
+                            <a href="{%url 'info:fiction' %}">
+                                The Contract fiction
+                            </a>
+                            to get a feel for the game.
+                        </li>
                         {% if not user.is_authenticated %}
                         <li>
                             Consider <a href="{% url 'account_signup' %}">Making an account</a> to experience the full website.

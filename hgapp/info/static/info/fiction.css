@@ -1,10 +1,12 @@
-.panel-body {
-    padding-left: 50px;
-    padding-right: 50px;
+@media (min-width: 769px) {
+    .css-contractor-fiction {
+        padding-left: 50px;
+        padding-right: 50px;
+    }
 }
 
 @media (max-width: 768px) {
-    .panel-body {
+    .css-contractor-fiction {
         padding: 10px;
     }
 }
@@ -14,4 +16,19 @@
   display: block;
   content: "";
   height: 50px;
+}
+
+.css-contractor-fiction {
+    font-family: Helvetica, sans-serif !important;
+    font-size: 16px !important;
+    font-weight: 300 !important;
+    line-height: 1.4;
+}
+
+.css-contractor-fiction>p {
+    margin-bottom: 20px;
+}
+
+.css-contractor-fiction>p>span {
+    font-weight: 300 !important;
 }
