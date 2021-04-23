@@ -1,3 +1,5 @@
 from django.db import models
 
-# Create your models here.
+class FrontPageInfo(models.Model):
+    shown_fiction = models.TextField(max_length=30000)
+    hidden_fiction = models.TextField(max_length=30000)

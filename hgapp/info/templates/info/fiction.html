@@ -1,0 +1,37 @@
+{% extends "site_base.html" %}
+
+{% block head_title %}Fiction{% endblock %}
+
+{% load staticfiles %}
+
+{% block extra_styles %}
+<link rel="stylesheet" type="text/css" href="{% static 'info/fiction.css' %}" />
+{% endblock %}
+
+{% block body_base %}
+<div class="container">
+    <div class="text-center">
+        <h1>
+            The Contract Vignettes
+            <br>
+            <small>
+                By <a href="https://www.davidemeryauthor.com/">David Emery</a>
+            </small>
+        </h1>
+    </div>
+        <div class="css-contractor-fiction">
+            <h2 class="text-center">
+                Introductions
+            </h2>
+            <br>
+            {{info.shown_fiction|safe}}
+            <span id="continue-from-home"></span>
+            {{info.hidden_fiction|safe}}
+            <hr>
+            <br>
+            <div class="text-center lead">
+                Written by <a href="https://www.davidemeryauthor.com/">David Emery</a>
+            </div>
+        </div>
+</div>
+{% endblock %}

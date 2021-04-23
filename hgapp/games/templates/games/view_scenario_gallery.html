@@ -23,6 +23,32 @@
                 You may view the full write-up of any Scenarios that appear below including spoilers, their Game history, and feedback from the GMs who have run them.
             </p>
         </div>
+        {% if unlocked_discoveries %}
+        <div class="panel-heading">
+            <h2>
+                Unlocked Scenarios
+                <br>
+                <small>These Scenarios are unlocked but not spoiled. You may play in them or click on them to view them.</small>
+            </h2>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                {% for scenario_discovery in unlocked_discoveries %}
+                    {% if forloop.counter|divisibleby:2 == 0 %}
+                        </div>
+                        <div class="row">
+                    {% endif %}
+                        <div class="col-md-6">
+                            {% with scenario=scenario_discovery.relevant_scenario %}
+                                {% with hide_spoilers='true' %}
+                                    {% include "games/scenario_badge_snippet.html" %}
+                                {% endwith %}
+                            {% endwith %}
+                        </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
         <div class="panel-heading">
             <h2>
                 My Scenarios

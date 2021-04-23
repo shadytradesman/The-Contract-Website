@@ -20,5 +20,7 @@
             Run {{scenario.num_finished_games}} time{{scenario.num_finished_games|pluralize}}.
         </small>
     </h4>
-    <p>{{scenario.summary}}</p>
+    {% if not hide_spoilers %}
+        <p>{{scenario.summary}}</p>
+    {% endif %}
 </div>
