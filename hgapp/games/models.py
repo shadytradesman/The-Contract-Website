@@ -75,11 +75,11 @@ class Game(models.Model):
                                     null=True,
                                     blank=True)
     status = models.CharField(choices=GAME_STATUS,
-                               max_length=25,
-                               default=GAME_STATUS[0])
+                              max_length=25,
+                              default=GAME_STATUS[0])
     attended_by = models.ManyToManyField(Character,
-                                        through="Game_Attendance",
-                                        through_fields=('relevant_game','attending_character'))
+                                         through="Game_Attendance",
+                                         through_fields=('relevant_game','attending_character'))
     invitations = models.ManyToManyField(settings.AUTH_USER_MODEL,
                                          through="Game_Invite")
     scenario_notes = models.TextField(max_length=10000,
@@ -225,7 +225,7 @@ class Game(models.Model):
         return num_losses
 
     def get_attended_players(self):
-        return self.invitations.filter(game_invite__is_declined=False).all()
+        return self.invitations.filter(game_invite__is_declined=False, game_invite__attendance__isnull=False).all()
 
     def get_journaled_attendances(self):
         return self.game_attendance_set.filter(is_confirmed=True, journal__isnull=False, journal__is_downtime=False).all()
@@ -554,8 +554,14 @@ class Scenario(models.Model):
     def player_can_view(self, player):
         return self.is_public() or player.has_perm("view_scenario", self)
 
+    def is_spoilable_for_player(self, player):
+        return Scenario_Discovery.objects.filter(relevant_scenario=self, discovering_player=player, is_spoiled=False).exists()
+
     def player_discovered(self, player):
         return Scenario_Discovery.objects.filter(relevant_scenario=self, discovering_player=player).exists()
+
+    def discovery_for_player(self, player):
+        return get_object_or_none(Scenario_Discovery, relevant_scenario=self, discovering_player=player)
 
     def choice_txt(self):
         return "{} ({}, {}-{} players)".format(self.title, self.get_suggested_status_display(), self.min_players, self.max_players)
@@ -571,7 +577,8 @@ class Scenario(models.Model):
             discovery = Scenario_Discovery (
                 discovering_player=player,
                 relevant_scenario=self,
-                reason=DISCOVERY_REASON[0][0]
+                reason=DISCOVERY_REASON[0][0],
+                is_spoiled=True
             )
             discovery.save()
 
@@ -580,7 +587,8 @@ class Scenario(models.Model):
             discovery = Scenario_Discovery (
                 discovering_player=player,
                 relevant_scenario=self,
-                reason=DISCOVERY_REASON[3][0]
+                reason=DISCOVERY_REASON[3][0],
+                is_spoiled=False,
             )
             discovery.save()
 
@@ -611,15 +619,23 @@ class Scenario_Discovery(models.Model):
     relevant_scenario = models.ForeignKey(Scenario,
                                           on_delete=models.CASCADE)
     reason = models.CharField(choices=DISCOVERY_REASON,
-                             max_length=25)
+                              max_length=25)
+    is_spoiled = models.BooleanField(default=True)
+
     # prevent double discoveries.
     class Meta:
         unique_together = (("discovering_player", "relevant_scenario"))
 
+    def spoil(self):
+        self.is_spoiled = True
+        self.save()
+        assign_perm('view_scenario', self.discovering_player, self.relevant_scenario)
+
     def save(self, *args, **kwargs):
         if self.pk is None:
             super(Scenario_Discovery, self).save(*args, **kwargs)
-            assign_perm('view_scenario', self.discovering_player, self.relevant_scenario)
+            if self.is_spoiled:
+                assign_perm('view_scenario', self.discovering_player, self.relevant_scenario)
             if self.reason == DISCOVERY_REASON[1][0]:
                 assign_perm('edit_scenario', self.discovering_player, self.relevant_scenario)
         else:

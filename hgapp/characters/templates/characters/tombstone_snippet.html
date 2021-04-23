@@ -5,7 +5,9 @@
             <h4 class="panel-title">
                 {{tombstone.death.relevant_character.name}}
                 <small>
-                    <b>The {{tombstone.death.relevant_character.concept_summary}}</b>
+                    <b>
+                        the {{tombstone.death.relevant_character.concept_summary}}
+                    </b>
                     <span class="pull-right">
                         {% if tombstone.death.relevant_character.number_of_victories %}
                             ({{tombstone.death.relevant_character.number_of_victories }}
@@ -29,6 +31,11 @@
                 {% if tombstone.death.cause_of_death %}
                     <div>
                         Cause of death: {{tombstone.death.cause_of_death}}
+                    </div>
+                {% else %}
+                    <div>
+                        Died trying to
+                        {{tombstone.death.relevant_character.ambition}}
                     </div>
                 {% endif %}
                 <br>

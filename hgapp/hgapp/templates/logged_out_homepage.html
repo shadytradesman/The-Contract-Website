@@ -72,7 +72,7 @@
             <div class="css-front-text-bullets">
                 <span class="lead">
                     <b>100% Free.</b> The Contract eschews traditional publishing in favor of a 100% free website.
-                    There are no source books to track down and buy. All new content, and updates are available
+                    There are no source books to track down and buy. All new content and updates are available
                     immediately to all Players, and the Website is rich with features that make learning and
                     running The Contract easy. Join our <a href="https://discord.gg/xUZZegYNNy">Discord Server</a> to find
                     other players or drop into one of our frequent, Newbie-friendly sessions.
@@ -95,201 +95,132 @@
         <span id="css-art-front-time" style='background-image:url("{% static 'overrides/art/front-time.jpg' %}")'></span>
         <div class="css-affix-spacer"></div>
         <div id="css-contractors-text">
-            <h1 class="text-center">The Contractors</h1>
+            <h1 class="text-center">Contractors</h1>
             <div class="css-head-spacer"></div>
             <div class="css-backdropped-text">
-                <div class="lead text-center">
-                    <i>
-                        "I am not like you. We share only our willingness to sign on the dotted line."
-                        <br>
-                        - Five, novice Contractor
-                    </i>
-                </div>
-                <p class="lead">
-                    Players control Contractors: ambitious and competent individuals who risk their lives in the Harbingers’
-                    Games. Each successful Game awakens their latent Powers, transforming them from ordinary humans into
-                    something more.
+            <div class="lead text-center">
+                <i>
+                    "I am not like you. We share only our willingness to sign on the dotted line."
                     <br>
-                    <br>
+                    - Five, novice Contractor
+                </i>
+            </div>
+            <p class="lead">
+                Players control Contractors: ambitious and competent individuals who risk their lives in the Harbingers’
+                Games. Each victory awakens their latent Powers,
+                transforming them from ordinary humans into something <i>more.</i>
+                <br>
+                <div class="text-center lead">
                     <a href="{% url 'characters:characters_create' %}">
-                        <b>Making a New Contractor</b>
+                        <b>Making a Contractor</b>
                     </a>
-                    is easy with The Contract’s Interactive Online Character Sheets. The website can track Experience,
-                    Injuries, Game history, and other stats to minimize tedious bookkeeping.
-                </p>
-                <h2 class="text-center">Powers for Any Concept</h2>
+                    could not be easier. Surviving, on the other hand . . .
+                </div>
+            </p>
+            <hr>
+                <div class="text-center">
+                    <div class="lead" style="margin-bottom: 5px; font-size: 28px;">
+                        Introductions
+                    </div>
+                    <span class="css-contractor-fiction">By <a href="https://www.davidemeryauthor.com/">David Emery</a> </span>
+                </div>
+                <br>
+                <div class="css-contractor-fiction">
+                    {{info.shown_fiction|safe}}
+                    <div class="lead text-center">
+                        <a href="{%url 'info:fiction' %}#continue-from-home">
+                            Continue Reading
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="dice" class="css-nav-section">
+        <span id="css-art-front-bamboo" style='background-image:url("{% static 'overrides/art/front-bamboo.jpg' %}")'></span>
+        <div class="css-affix-spacer"></div>
+        <div id="css-dice-text">
+            <h1 class="text-center">Powers</h1>
+            <div class="css-head-spacer"></div>
+            <div class="css-backdropped-text">
                 <p class="lead">
-                    Each victory grants the Contractors a Gift that can be used to purchase a new Power or improve an existing Power.
-                    Easily create unique, flavorful, and balanced Powers with The Contract's The Contract’s Power System.
+                    <b>Payment comes in many forms.</b> Each victory earns your Contractor a Gift that can be used to
+                    purchase a new Power or improve one they already have. Create unique, flavorful, and balanced Powers
+                    with The Contract’s Power System.
+                </p>
+                <p class="lead">
+                    <a href="{% url 'powers:powers_create' %}">
+                        Start from scratch
+                    </a>
+                    or choose from a collection of
+                    <a href="{% url 'powers:powers_stock' %}">
+                        {{num_stock}} premade Stock Powers
+                    </a>
+                    that can be gifted as-is or customized.
                 </p>
                 <p class="lead text-center">"I want to. . ."</p>
                 <ul class="nav nav-tabs nav-justified" role="tablist">
                     <li role="presentation"  class="active" ><a href="#fireballs"aria-controls="fireballs" role="tab" data-toggle="tab">
-                        <b>Throw fireballs!</b>
+                        <b>Start Fires!</b>
                     </a></li>
                     <li role="presentation"><a href="#werewolf" aria-controls="werewolf" role="tab" data-toggle="tab">
                         <b>Wolf out!</b>
                     </a></li>
                     <li role="presentation"><a href="#time-traveler" aria-controls="time-traveler" role="tab" data-toggle="tab">
-                        <b>Time travel!</b>
+                        <b>Be Pathetic!</b>
                     </a></li>
                 </ul>
                 <!-- Tab panes -->
                 <div class="tab-content">
                     <div role="tabpanel" class="tab-pane fade in active" id="fireballs">
-                        <br>
-                        <div class="text-center lead">Select from <b>{{num_bases}}</b> Effects</div>
-                        <div class="text-center">
-                            <span style="display:inline-block;" class="thumbnail">
-                                <h4>Injure</h4>
-                                Deal a burst of damage
-                            </span>
-                            <span class="hidden-xs">
-                                <span style="display:inline-block;" class="thumbnail css-disabled">
-                                    <h4>Alternate Form</h4>
-                                    Take on a Powerful Alternate Form
-                                </span>
-                                <span style="display:inline-block;" class="thumbnail css-disabled">
-                                    <h4>Phase Out</h4>
-                                    Stop existing for a moment
-                                </span>
-                            </span>
-                        </div>
-                        <p class="lead text-center">Customize and Balance with <b>{{num_modifiers}}</b> Enhancements, Drawbacks, and Parameters </p>
-                        <div class="text-center">
-                            Drawback:
-                            <span style="display:inline-block;" class="thumbnail">
-
-                                <label for="quirk1"><input type="checkbox" id="quirk1" checked/> <b>Focus</b> (Activating this Power requires a specific kind of item.)</label>
-                                <br>
-                                <label for="id_form-0-detail_text">Object:</label>
-                                <input type="text" class="form-control" id="id_form-0-detail_text" name="id_form-0-detail_text"
-                                       style="max-width: 250px; display: inline-block;"
-                                        value="A lighter, match, or other fire source.">
-                            </span>
-                            <br>
-                            Enhancement:
-                            <span style="display:inline-block;" class="thumbnail">
-                                <label for="quirk2"><input type="checkbox" id="quirk2" checked> <b>Cantrip</b> (This Power has no Exertion cost, but its level is capped at
-                                    2 Gifts, and it cannot be upgraded further)</label>
-                            </span>
-                            <span class="hidden-xs">
-                                <br>
-                                Parameter:
-                                <span style="display:inline-block; width: 300px;" class="thumbnail">
-                                    Range
-                                    <select class="form-inline form-control" style="width: 150px;display:inline;">
-                                        <option value="1">Arm's Reach</option>
-                                        <option value="2" selected="">30 Feet</option>
-                                        <option value="3" >300 Feet (Default)</option>
-                                        <option value="4" >1000 Feet (Seasoned)</option>
-                                        <option value="5" >1 Mile</option>
-                                        <option value="6" >10 Miles (Veteran)</option>
-                                        <option value="7" >Unlimited</option>
-                                    </select>
-                                </span>
-                            </span>
-                        </div>
-                        <p class="lead text-center">Finish with a Description</p>
                         <div class="css-power-container">
                             {% with power_1 as power_full %}
-                                {% include "powers/power_badge_snippet.html" %}
+                            {% include "powers/power_badge_snippet.html" %}
                             {% endwith %}
                         </div>
                     </div>
                     <div role="tabpanel" class="tab-pane fade" id="werewolf">
-                        <br>
-                        <div class="text-center lead">Select from <b>{{num_bases}}</b> Effects</div>
-                        <div class="text-center">
-
-                            <span style="display:inline-block;" class="thumbnail css-disabled hidden-xs">
-                                <h4>Injure</h4>
-                                Deal a burst of damage
-                            </span>
-                            <span style="display:inline-block;" class="thumbnail">
-                                <h4>Alternate Form</h4>
-                                Take on a Powerful Alternate Form
-                            </span>
-                            <span style="display:inline-block;" class="thumbnail css-disabled hidden-xs">
-                                <h4>Phase Out</h4>
-                                Stop existing for a moment
-                            </span>
-                        </div>
-                        <p class="lead text-center">Customize and Balance with <b>{{num_modifiers}}</b> Enhancements, Drawbacks, and Parameters </p>
-                        <div class="text-center">
-                            Drawback:
-                            <span style="display:inline-block;" class="thumbnail">
-                                <label for="quirkb-1"><input type="checkbox" id="quirkb-1" checked/> <b>Paws</b> (You are incapable of fine object manipulation in your Alternate Form.)</label>
-                            </span>
-                            <br>
-                            <span class="hidden-xs">
-                                Enhancement:
-                                <span style="display:inline-block;" class="thumbnail hidden-xs">
-                                     <label for="quirkb-2"><input type="checkbox" id="quirkb-2" checked> <b>Willful End</b> (You may end this Power before its duration has elapsed.)</label>
-                                 </span>
-                                 <br>
-                            </span>
-                            Parameter:
-                            <span style="display:inline-block; width: 300px;" class="thumbnail">
-                                Duration
-                                <select class="form-inline form-control" style="width: 170px;display:inline;">
-                                    <option value="1">1 round</option>
-                                    <option value="1">3 rounds</option>
-                                    <option value="1" selected="">3 minutes (Default)</option>
-                                    <option value="1" >30 minutes</option>
-                                    <option value="1" >3 hours (Seasoned)</option>
-                                    <option value="1">1 Day (Veteran)</option>
-                                </select>
-                            </span>
-                        </div>
-                        <p class="lead text-center">Finish with a Description</p>
                         <div class="css-power-container">
                             {% with power_2 as power_full %}
-                                {% include "powers/power_badge_snippet.html" %}
+                            {% include "powers/power_badge_snippet.html" %}
                             {% endwith %}
                         </div>
                     </div>
                     <div role="tabpanel" class="tab-pane fade" id="time-traveler">
-                        <br>
-                        <div class="text-center lead">Select from <b>{{num_bases}}</b> Effects</div>
-                        <div class="text-center">
-                            <span style="display:inline-block;" class="thumbnail css-disabled hidden-xs">
-                                <h4>Injure</h4>
-                                Deal a burst of damage
-                            </span>
-                            <span style="display:inline-block;" class="thumbnail css-disabled hidden-xs">
-                                <h4>Alternate Form</h4>
-                                Take on a Powerful Alternate Form
-                            </span>
-                            <span style="display:inline-block;" class="thumbnail">
-                                <h4>Phase Out</h4>
-                                Stop existing for a moment
-                            </span>
-                        </div>
-                        <p class="lead text-center">Customize and Balance with <b>{{num_modifiers}}</b> Enhancements, Drawbacks, and Parameters </p>
-                        <div class="text-center">
-                            Enhancement:
-                            <span style="display:inline-block;" class="thumbnail">
-                                <label for="quirkc-1"><input type="checkbox" id="quirkc-1" checked/> <b>Too Slow!</b> (You may use this Power as a Reaction)</label>
-                            </span>
-                            <br>
-                        </div>
-                        <p class="lead text-center">Finish with a Description</p>
                         <div class="css-power-container">
                             {% with power_3 as power_full %}
-                                {% include "powers/power_badge_snippet.html" %}
+                            {% include "powers/power_badge_snippet.html" %}
                             {% endwith %}
                         </div>
                     </div>
                 </div>
-                <p class="lead text-center">
+                <br>
+                <div class="lead text-center">
+                    Select from <b>{{num_bases}}</b> Effects.
+                    Customize with <b>{{num_modifiers}}</b> Enhancements, Drawbacks, and Parameters.
                     <br>
-                    <b>Overwhelmed?</b> Choose from
-                    <a href="{% url 'powers:powers_stock' %}">
-                        <b>a collection of {{num_stock}} premade Stock Powers</b>
-                    </a>
-                    that can be gifted as-is or customized.
-                </p>
+                </div>
+                <div class="lead">
+                    <b>Advancement Without Min-maxing.</b>
+                    Advancement is focused on giving Contractors tools to control chaotic situations, find advantages,
+                    and enable outside-the-box solutions.
+                    <ul>
+                        <li>
+                            Powers are more likely to open opportunities than they are to help in a direct confrontation.
+                        </li>
+                        <li>
+                            Deadly risk means even simple encounters demand a thoughtful approach.
+                        </li>
+                        <li>
+                            Dice bonuses from multiple sources do not stack; instead the largest bonus is used.
+                        </li>
+                    </ul>
+                </div>
+                <div class="lead text-center">
+                    <b>
+                        <a href="/wiki/rules">Read the Player's Guide</a>
+                    </b>
+                </div>
             </div>
         </div>
     </div>
@@ -301,14 +232,6 @@
             <div class="css-head-spacer"></div>
             <br>
             <div class="css-backdropped-text">
-                <div class="lead">
-                    <b>Set in a world</b> where videos of supernatural phenomena go viral every day. Here, witch
-                    hunts have merit. Tech billionaires and US Senators employ paranormal advisors and bodyguards, and
-                    everyone knows. Charlatans become pop culture icons, and each discovery inspires a new cult.
-                    The world is changing. The secret societies that pull humanity's strings scramble to adapt.
-                    <div class="text-center lead">Now's a good time to move up.</div>
-                </div>
-                <br>
                 <div class="lead text-center">
                     <i>
                         "When all doors lead to death, make a new door."
@@ -328,72 +251,43 @@
                     <div class="lead text-center">
                         <b>Four Scenarios included.</b>
                         <br>
-                        View one immediately, unlock more by <a href="/account/signup/"><b>Signing up</b></a>.
+                        View one immediately, unlock more by <a href="/account/signup/"><b>Signing up for free</b></a>.
                     </div>
-                    <br>
-                    <b>Deadly risk.</b> Just how deadly is up to you, but we put our thumb on the scale. GMs are handsomely
-                    rewarded for running a Game that achieves the "golden ratio" where at least one Contractor dies while another achieves victory. Players
-                    are likewise rewarded when one of their Contractors dies. However, no Game can require a Contractor's death.
-                    <br>
-                    <br>
-                    <b>One Shot at a Time.</b> Built from the ground up to follow Contractors through a series of one-shot
-                    sessions, The Contract is well-suited for consistent and shifting groups alike. Contractors are portable,
-                    but each Player Group (Cell) has its own world for Contractors to build (or destroy). The downtimes
-                    between Games are often just as important as the Games themselves.
+                    <div class="lead">
+                        <b>Deadly risk.</b> Just how deadly is up to you, but we put our thumb on the scale. GMs are handsomely
+                        rewarded for running a Game that achieves the "golden ratio" where at least one Contractor dies while another achieves victory. Players
+                        are likewise rewarded when one of their Contractors dies. However, no Game can require a Contractor's death.
+                        <br>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-    <div id="dice" class="css-nav-section">
-        <span id="css-art-front-bamboo" style='background-image:url("{% static 'overrides/art/front-bamboo.jpg' %}")'></span>
-        <div class="css-affix-spacer"></div>
-        <div id="css-dice-text">
-            <h1 class="text-center">The Dice</h1>
-            <div class="css-head-spacer"></div>
+            <br>
+            <h1 class="text-center">Cells</h1>
+            <br>
             <div class="css-backdropped-text">
                 <div class="lead">
-                    <b>D10 Pools.</b> The Contract describes Characters’ capabilities in terms of their Attributes and
-                    Abilities and uses a d10 dice pools system to model resolution for a wide variety of situations.
-                </div>
-                <div class="lead">
-                    <b>Quick, High-stakes Combat. </b>
-                    Combat feels like it does in real life: chaotic, brief, and brutal. Contractors quickly learn that
-                    raw destructive capability is less important than knowing <i>when</i> to fight, <i>who</i> to fight,
-                    and how to make an <i>unfair</i> fight.
-                    <ul>
-                        <li>
-                            It is far easier to be deadly than resilient. Fights usually last three rounds or less.
-                        </li>
-                        <li>
-                            Injuries are tracked individually, heal slowly, and may leave debilitating scars.
-                        </li>
-                        <li>
-                            Most Actions require a single roll.
-                        </li>
-                        <li>
-                            The Clash mechanic allows Characters on the defensive to attempt an all-or-nothing
-                            counterattack on their assailant.
-                        </li>
-                    </ul>
-                </div>
-                <div class="lead">
-                    <b>Advancement Without Min-maxing. </b>
-                    Advancement is focused on giving Contractors tools to control chaotic situations, find advantages,
-                    and enable outside-the-box solutions.
-                    <ul>
-                        <li>
-                            Contractors may start as world-class experts in their fields.
-                        </li>
-                        <li>
-                            Powers are more likely to open opportunities than they are to help in a direct confrontation.
-                        </li>
-                        <li>
-                            Dice bonuses from multiple sources do not stack; instead the largest bonus is used.
-                        </li>
-                    </ul>
-                </div>
-                <div class="lead text-center">
-                    <b><a href="/wiki/rules">Read the Rules</a></b>
+                    <b>A Shared World.</b> Cells are a group of Players with a shared setting. They may have anywhere
+                    from a few to a few dozen members. Contractors who share a Cell spend the Downtime between Games in
+                    the same setting, making moves that may dramatically change the world.
+                    <br><br>
+                    <div class="text-center">
+                        Each Cell defines its own setting.
+                    </div>
+                    <br>
+                    <b>The Default Cell</b> is one where videos of supernatural phenomena go viral every day. Here, witch
+                    hunts have merit. Billionaires and Senators employ paranormal advisers and bodyguards, and
+                    everyone knows. Charlatans become pop culture icons, and each revelation inspires a new cult.
+                    The world is changing. The secret societies that pull humanity's strings scramble to adapt.
+                    <div class="text-center lead">Now's a good time to move up.</div>
+                    <br>
+                    <b>One Shot at a Time.</b> Any group of Players in a Cell can organize a Game, and any member may GM.
+                    Contractors can be invited to join Games in other Cells, after which they are returned home, provided
+                    they survive. The Website's bookkeeping features allow you to vet potential Contractors and Players so
+                    you can find a good match.
+                    <a href="https://www.thecontractrpg.com/wiki/Rules/1-basics/b-setting-and-cells/">
+                        Read more about Settings and Cells
+                    </a>
+                    <br>
                 </div>
             </div>
         </div>
@@ -409,39 +303,39 @@
                 <div class="lead">
                     <b>Free and Accessible.</b> The Contract is available in its entirety for free on this website.
                     All new content is available immediately to all Players, and, unlike paper-published RPGs, The
-                    Contract can easily be patched and balanced as public play reveals issues.
+                    Contract is regularly patched as public play reveals balance issues.
                 </div>
                  <div class="lead">
                     <b>Say Goodbye to Tedious Bookkeeping.</b> The Contract's Website offers far more than a convenient
-                     <a href="{% url 'characters:characters_create' %}">Character creator</a>
+                     <a href="{% url 'characters:characters_create' %}">Contractor Creator</a>
                      and
-                     <a href="{% url 'powers:powers_create' %}">custom Power builder.</a>
-                     We provide automated tools for tracking who played in which Games, who succeeded and failed, and
-                     how they spent their Experience and Gifts. We keep a detailed history of every edit to each
-                     Character and Power. Cell Leaders can also help their less dedicated players manage their
-                     Characters and Powers.
+                     <a href="{% url 'powers:powers_create' %}">Custom Power Builder.</a>
+                     Automated bookkeeping tools allow you to easily record who attended which Games, how Contractors
+                     spent their Gifts and Experience, which Players have seen which Scenarios, and how your Cell's world
+                     is changing. GMs are given titles that allow you to quickly determine how deadly their Games tend to be.
+                     Cell Leaders can also help their less dedicated players manage their Contractors and Powers.
                 </div>
                 <div class="lead">
                     <b>Save your Brain for the Game.</b> The website's game-ready Character Sheets track Injuries, Penalties,
-                    and other stats directly online. They also surface rules and info with helpful mouse-over tooltips. Don't
+                    and other stats directly online. We surface rules and information with helpful mouse-over tooltips. Don't
                     bother memorizing the formulas; we'll do all the calculations for you.
                 </div>
                 <div class="lead">
-                    <b>Build Content to Share.</b> Create, discover, and share Scenarios with the community. See the obituaries of
-                    fallen Contractors in <a href="{% url 'characters:characters_graveyard' %}">the Graveyard.</a> Share your
-                    Contractors, Powers, and Journals, or keep them to yourself by making them private to anyone who isn't
-                    actively GMing a Game for you.
+                    <b>Build Content to Share.</b> Create, discover, and share Scenarios with the community. Write in-character
+                    Journals to gain Experience and Power Improvements. See the obituaries of fallen Contractors in
+                    <a href="{% url 'characters:characters_graveyard' %}">the Graveyard.</a> Share the details of your
+                    Contractors, or mark them private to anyone who isn't actively GMing a Game for you.
                 </div>
                 <div class="lead text-center">
                     The <a href="/account/signup/">Sign Up page</a> lists and unlocks more features.
                 </div>
                 <div class="lead">
                     <b>We don't try to do it all.</b> The Contract is not designed to replace a tabletop, real or virtual, and we
-                    do not offer chat, maps, tokens, communal dice-rolling, or similar features. We recommend using Roll20 for that.
-                    We also do not offer any matchmaking services. We utilize
-                    <a href="https://discord.gg/xUZZegYNNy">Discord</a> and
-                    <a href="https://www.reddit.com/r/TheContract/">Reddit</a> instead of an on-site forum.
-                    <br><br>
+                    do not offer maps, tokens, communal dice-rolling, or similar features. We recommend using either a
+                    real tabletop, Roll20, or Discord with The Contract's site.
+                    We organize regular community-run Games for newbies on our
+                    <a href="https://discord.gg/xUZZegYNNy">Discord Server</a>
+                    and are currently working on adding more looking-for-group and matchmaking features for the site.
                     This website is
                     <a href="https://github.com/shadytradesman/The-Contract-Website">100% Open Source</a>, so anyone can
                     help develop and maintain it.

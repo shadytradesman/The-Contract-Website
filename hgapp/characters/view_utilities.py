@@ -20,7 +20,7 @@ def get_characters_next_journal_credit(character):
                 chosen_attendance = attendance
                 is_downtime = True
     if chosen_attendance:
-        reward_is_improvement = Journal.get_num_journals_until_improvement(character) <= 1
+        reward_is_improvement = Journal.get_num_journals_until_improvement(character) <= 1 and not is_downtime
         return {"attendance": chosen_attendance, "is_downtime": is_downtime, "reward_is_improvement": reward_is_improvement}
     else:
         return None

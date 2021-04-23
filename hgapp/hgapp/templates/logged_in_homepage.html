@@ -35,7 +35,6 @@
             {% include "_messages.html" %}
             <br><br>
         </div>
-        {% include "logged_in_alerts.html" %}
         <div class="row css-home-row" style="background-color: rgba(0, 0, 0, 0.3);">
             <div class="col-sm-4">
                 <h2>Contractors</h2>
@@ -46,9 +45,9 @@
                         {% if avail_charon_coins %}
                             <br>
                             <small class="text-center">
-                                You have <b>{{avail_charon_coins | length}}</b> Coin{{avail_charon_coins|pluralize}} of Charon
+                                You have <b>{{avail_charon_coins | length}}</b> Charon Coin{{avail_charon_coins|pluralize}}
                                 <br>
-                                You may spend {{avail_charon_coins|pluralize:"it,one"}} to start a new Contractor with a free Gift
+                                Spend {{avail_charon_coins|pluralize:"it,one"}} to start a new Contractor with a Gift
                             </small>
                         {% endif %}
                         </a>

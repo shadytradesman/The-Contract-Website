@@ -61,6 +61,13 @@
                             <b>Notes: </b>
                             {{attendance.notes}}
                         {% endif %}
+                        <br>
+                        <b>Attending Contractors:</b>
+                        <ul>
+                            {% for character in game.attended_by.all %}
+                                <li>{{character.name}} the {{character.concept_summary}}</li>
+                            {% endfor %}
+                        </ul>
                     {% endif %}
                 </p>
             </div>

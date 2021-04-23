@@ -11,6 +11,7 @@ function setAffix() {
     })
 
     const $contractors = $('#contractors');
+    console.log("outer height: " + $contractors.outerHeight(true));
     const contractorsEnd =  document.body.scrollHeight - $contractors.position().top - $contractors.outerHeight(true);
     $('#css-art-front-time').affix({
       offset: {

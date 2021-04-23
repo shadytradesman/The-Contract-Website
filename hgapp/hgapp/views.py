@@ -19,6 +19,7 @@ from powers.models import Power_Full, Enhancement, Drawback, Parameter, Base_Pow
 from games.models import GAME_STATUS
 from hgapp.forms import SignupForm
 from blog.models import Post
+from info.models import FrontPageInfo
 
 
 class SignupView(account.views.SignupView):
@@ -40,10 +41,11 @@ def home(request):
         power_2 = Power_Full.objects.filter(tags__in=["splash2"]).all()[0]
         power_3 = Power_Full.objects.filter(tags__in=["splash3"]).all()[0]
         num_enhancements = Enhancement.objects.all().count()
-        num_drawbacks =  Drawback.objects.all().count()
+        num_drawbacks = Drawback.objects.all().count()
         num_params = Parameter.objects.all().count()
         num_bases = Base_Power.objects.filter(is_public=True).all().count()
         num_stock = Power_Full.objects.filter(tags__slug="example").all().count()
+        info = FrontPageInfo.objects.first()
         context = {
             'power_1': power_1,
             'power_2': power_2,
@@ -51,6 +53,7 @@ def home(request):
             'num_bases': num_bases,
             'num_modifiers': num_enhancements + num_drawbacks + num_params,
             'num_stock': num_stock,
+            'info': info,
         }
         return render(request, 'logged_out_homepage.html', context)
     else:
