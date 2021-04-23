@@ -652,7 +652,7 @@ class Character(models.Model):
 
     def num_mind_levels(self):
         mind_scaling_attrs = self.stats_snapshot.attributevalue_set.filter(relevant_attribute__scales_mind=True).all()
-        mind_val = 0
+        mind_val = 1
         for attr in mind_scaling_attrs:
             mind_val = mind_val + attr.value
         if mind_val <= 3:
