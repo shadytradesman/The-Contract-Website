@@ -20,4 +20,9 @@ urlpatterns = [
     path('read/c/<int:character_id>/', views.ReadJournal.as_view(), name='journal_read'),
     # ex: .com/journals/read/c/12/g/21
     path('read/c/<int:character_id>/g/<int:game_id>/', views.ReadJournal.as_view(), name='journal_read_game'),
+    # ex: .com/journals/read/j/21
+    path('read/j/<int:journal_id>/', views.ReadJournal.as_view(), name='journal_read_id'),
+
+    # ex: .com/journals/latest
+    path('latest', views.CommunityJournals.as_view(), name='community_journals'),
 ]

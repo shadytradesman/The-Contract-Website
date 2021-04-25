@@ -1,0 +1,71 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+{% load staticfiles %}
+
+{% block head_title %}
+Community Journals
+{% endblock %}
+
+{% block extra_head %}
+{{ form.media }}
+{% endblock %}
+
+{% block extra_styles %}
+{% endblock %}
+
+{% block extra_scripts %}
+{% endblock %}
+
+{% block body_base %}
+<div class="container">
+    <h1 class="text-center">
+        Latest Community Journals
+    </h1>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <p>
+                This Page links to the latest <b>{{journals|length}}</b> Journals written for Contractors in all Cells.
+                <br>
+                Journals that contain spoilers for Scenarios you have not discovered will not appear on this list. Nor will
+                Journals for any private Contractors.
+            </p>
+            <ul class="list-unstyled">
+                {% for journal in journals %}
+                    <li>
+                        <div class="thumbnail">
+                            <a href="{% url 'profiles:profiles_view_profile' journal.game_attendance.attending_character.player.profile.id %}">
+                                {{journal.game_attendance.attending_character.player.username}}
+                            </a>
+                            wrote a
+                            <a href="{% url 'journals:journal_read_id' journal.id %}">
+                                {% if journal.is_downtime %}
+                                    Downtime
+                                {% else %}
+                                    Game
+                                {% endif %}
+                                Journal
+                            </a>
+                            for
+                            <a href="{% url 'characters:characters_view' journal.game_attendance.attending_character.id %}">
+                                {{journal.game_attendance.attending_character.name}}
+                            </a>
+                            on
+
+                            {{ journal.created_date }}
+
+                            <a href="{% url 'journals:journal_read_id' journal.id %}">
+                            {% if journal.title %}
+                                <h4>{{journal.title}}</h4>
+                            {% else %}
+                                <h4>An untitled Journal</h4>
+                            {% endif %}
+                            </a>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

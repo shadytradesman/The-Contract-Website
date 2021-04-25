@@ -555,9 +555,13 @@ class Scenario(models.Model):
         return self.is_public() or player.has_perm("view_scenario", self)
 
     def is_spoilable_for_player(self, player):
+        if player.is_anonymous:
+            return False
         return Scenario_Discovery.objects.filter(relevant_scenario=self, discovering_player=player, is_spoiled=False).exists()
 
     def player_discovered(self, player):
+        if player.is_anonymous:
+            return False
         return Scenario_Discovery.objects.filter(relevant_scenario=self, discovering_player=player).exists()
 
     def discovery_for_player(self, player):

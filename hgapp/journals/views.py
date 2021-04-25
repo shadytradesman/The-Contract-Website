@@ -96,15 +96,12 @@ class EditJournal(WriteJournal):
             title = form.cleaned_data['title']
             content = form.cleaned_data['content']
             with transaction.atomic():
-                if not title or not content:
-                    self.journal.mark_void()
-                else:
-                    self.journal.title = title
-                    self.journal.edit_date = timezone.now()
-                    self.journal.writer = request.user
-                    self.journal.contains_spoilers = form.cleaned_data['contains_spoilers']
-                    self.journal.save()
-                    self.journal.set_content(content)
+                self.journal.title = title
+                self.journal.edit_date = timezone.now()
+                self.journal.writer = request.user
+                self.journal.contains_spoilers = form.cleaned_data['contains_spoilers']
+                self.journal.save()
+                self.journal.set_content(content)
             return HttpResponseRedirect(reverse('journals:journal_read_game', args=(self.character.id, self.game.id)))
         else:
             raise ValueError("Invalid journal form.")
@@ -168,7 +165,13 @@ class ReadJournal(View):
         return render(request, self.template_name, self.__get_context_data())
 
     def __get_context_data(self):
-        character = get_object_or_404(Character, id=self.kwargs['character_id'])
+        if self.kwargs['journal_id']:
+            journal = get_object_or_404(Journal, id=self.kwargs['journal_id'])
+            character = journal.game_attendance.attending_character
+            game_id = journal.game_attendance.relevant_game.id
+        else:
+            character = get_object_or_404(Character, id=self.kwargs['character_id'])
+            game_id = self.kwargs['game_id'] if 'game_id' in self.kwargs else None
         viewer_can_write = character.player_can_edit(self.request.user)
         completed_attendances = character.completed_games()
         cover = get_object_or_none(JournalCover, character=character)
@@ -231,7 +234,7 @@ class ReadJournal(View):
         num_journals_until_improvement = Journal.get_num_journals_until_improvement(character)  if viewer_can_write else 0
         next_reward_is_improvement = num_journals_until_improvement <= 1
         context = {
-            'view_game_id': "journal_page_{}".format(self.kwargs['game_id']) if 'game_id' in self.kwargs else cover_id,
+            'view_game_id': "journal_page_{}".format( game_id if game_id else cover_id),
             'character': character,
             'viewer_can_write': viewer_can_write,
             'journal_pages': journal_pages,
@@ -257,3 +260,25 @@ def write_next_journal(request, character_id):
     else:
         return HttpResponseRedirect(reverse('journals:journal_read', args=(character.id,)))
 
+class CommunityJournals(View):
+    template_name = 'journals/community_journals.html'
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, self.__get_context_data())
+
+    def __get_context_data(self):
+        journal_query = Journal.objects.filter(game_attendance__attending_character__private=False)
+        if self.request.user.is_anonymous:
+            journal_query.filter(contains_spoilers=False)
+        public_journals = journal_query.order_by('created_date').all()[:100]
+        max_journals_to_display = 35
+        displayed_journals = []
+        for journal in public_journals:
+            if max_journals_to_display <= len(displayed_journals):
+                break
+            if journal.player_can_view(self.request.user):
+                displayed_journals.append(journal)
+        context = {
+            "journals": displayed_journals,
+        }
+        return context
