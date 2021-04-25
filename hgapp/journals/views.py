@@ -270,8 +270,8 @@ class CommunityJournals(View):
         journal_query = Journal.objects.filter(game_attendance__attending_character__private=False)
         if self.request.user.is_anonymous:
             journal_query.filter(contains_spoilers=False)
-        public_journals = journal_query.order_by('created_date').all()[:100]
-        max_journals_to_display = 35
+        public_journals = journal_query.order_by('-created_date').all()[:100]
+        max_journals_to_display = 50
         displayed_journals = []
         for journal in public_journals:
             if max_journals_to_display <= len(displayed_journals):
