@@ -165,7 +165,7 @@ class ReadJournal(View):
         return render(request, self.template_name, self.__get_context_data())
 
     def __get_context_data(self):
-        if self.kwargs['journal_id']:
+        if 'journal_id' in self.kwargs:
             journal = get_object_or_404(Journal, id=self.kwargs['journal_id'])
             character = journal.game_attendance.attending_character
             game_id = journal.game_attendance.relevant_game.id
@@ -234,7 +234,7 @@ class ReadJournal(View):
         num_journals_until_improvement = Journal.get_num_journals_until_improvement(character)  if viewer_can_write else 0
         next_reward_is_improvement = num_journals_until_improvement <= 1
         context = {
-            'view_game_id': "journal_page_{}".format( game_id if game_id else cover_id),
+            'view_game_id': "journal_page_{}".format(game_id) if game_id else cover_id,
             'character': character,
             'viewer_can_write': viewer_can_write,
             'journal_pages': journal_pages,
