@@ -1194,20 +1194,36 @@ class TraitValue(models.Model):
     class Meta:
         abstract = True
 
+    def get_class(self):
+        return TraitValue
+
     def save(self, *args, **kwargs):
         if self.previous_revision:
             if self.previous_revision.relevant_stats.is_snapshot:
                 raise ValueError("A Trait's parent revision cannot be owned by a snapshot.")
+        if hasattr(self, "previous_revision") and self.previous_revision and not self.relevant_stats.is_snapshot:
+            if self.get_class().objects.filter(previous_revision=self.previous_revision,
+                                           relevant_stats__is_snapshot=False).exists():
+                raise ValueError("No two non-snapshots can have the same previous revision")
         super(TraitValue, self).save(*args, **kwargs)
+
+
+
 
 class AttributeValue(TraitValue):
     relevant_attribute = models.ForeignKey(Attribute,
                                        on_delete=models.CASCADE)
+
     class Meta:
         unique_together = (("relevant_attribute", "relevant_stats"))
         indexes = [
             models.Index(fields=['relevant_stats']),
+            models.Index(fields=['previous_revision']),
         ]
+
+    def get_class(self):
+        return AttributeValue
+
 
 class AbilityValue(TraitValue):
     relevant_ability = models.ForeignKey(Ability,
@@ -1216,7 +1232,12 @@ class AbilityValue(TraitValue):
         unique_together = (("relevant_ability", "relevant_stats"))
         indexes = [
             models.Index(fields=['relevant_stats']),
+            models.Index(fields=['previous_revision']),
         ]
+
+    def get_class(self):
+        return AbilityValue
+
 
 class LimitRevision(models.Model):
     relevant_limit = models.ForeignKey(Limit,
@@ -1244,10 +1265,18 @@ class TraumaRevision(models.Model):
                                           on_delete=models.CASCADE)  # Used in revisioning to determine value change.
     is_deleted = models.BooleanField(default=False)
     was_bought_off = models.BooleanField(default=False)
+
     class Meta:
         indexes = [
             models.Index(fields=['relevant_stats']),
         ]
+
+    def save(self, *args, **kwargs):
+        if hasattr(self, "previous_revision") and self.previous_revision and not self.relevant_stats.is_snapshot:
+            if TraumaRevision.objects.filter(previous_revision=self.previous_revision, relevant_stats__is_snapshot=False).exists():
+                raise ValueError("No two non-snapshots can have the same previous revision")
+        super(TraumaRevision, self).save(*args, **kwargs)
+
 
 class SourceRevision(models.Model):
     relevant_source = models.ForeignKey(Source,

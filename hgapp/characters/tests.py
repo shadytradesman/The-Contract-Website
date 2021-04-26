@@ -1,7 +1,8 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 from characters.models import Character, ContractStats, Asset, Liability, AssetDetails, LiabilityDetails, Attribute, \
-    AttributeValue, Ability, AbilityValue, Roll, NO_PARRY_INFO, NO_SPEED_INFO, UNAVOIDABLE, FREE_ACTION
+    AttributeValue, Ability, AbilityValue, Roll, NO_PARRY_INFO, NO_SPEED_INFO, UNAVOIDABLE, FREE_ACTION, TraumaRevision, \
+    Trauma
 from games.models import Reward
 from cells.models import Cell
 from django.utils import timezone
@@ -341,9 +342,147 @@ class CharacterModelTests(TestCase):
         self.assertFalse(self.char_full.assigned_coin())
         self.char_full.refund_coin()
 
+    def test_trauma_revision_linage(self):
+        test_trauma = Trauma.objects.create(description="test")
+        old_stats_rev = ContractStats(assigned_character=self.char_full)
+        old_stats_rev.save()
+        og_rev = TraumaRevision(
+            relevant_trauma=test_trauma,
+            relevant_stats=old_stats_rev,
+            previous_revision=None,
+        )
+        og_rev.save()
+        new_stats_rev = ContractStats(assigned_character=self.char_full)
+        new_stats_rev.save()
+        trauma_rev = TraumaRevision(
+            relevant_trauma=test_trauma,
+            relevant_stats=new_stats_rev,
+            previous_revision=None,
+            is_deleted=True,
+        )
+        trauma_rev.save()
+        trauma_rev2 = TraumaRevision(
+            relevant_trauma=test_trauma,
+            relevant_stats=new_stats_rev,
+            previous_revision=None,
+            is_deleted=True,
+        )
+        trauma_rev2.save()
+        trauma_rev3 = TraumaRevision(
+            relevant_trauma=test_trauma,
+            relevant_stats=new_stats_rev,
+            previous_revision=og_rev,
+            is_deleted=True,
+        )
+        trauma_rev3.save()
 
+        trauma_rev4 = TraumaRevision(
+            relevant_trauma=test_trauma,
+            relevant_stats=new_stats_rev,
+            previous_revision=og_rev,
+            is_deleted=True,
+        )
+        with self.assertRaises(ValueError):
+            trauma_rev4.save()
+        new_snapshot = ContractStats(assigned_character=self.char_full, is_snapshot=True)
+        new_snapshot.save()
+        trauma_rev5 = TraumaRevision(
+            relevant_trauma=test_trauma,
+            relevant_stats=new_snapshot,
+            previous_revision=og_rev,
+            is_deleted=True,
+        )
+        trauma_rev5.save()
+        trauma_rev6 = TraumaRevision(
+            relevant_trauma=test_trauma,
+            relevant_stats=new_snapshot,
+            previous_revision=og_rev,
+            is_deleted=True,
+        )
+        trauma_rev6.save()
 
-            #TEST TODOS
+    def test_ability_revision_linage(self):
+        old_stats_rev = ContractStats(assigned_character=self.char_full)
+        old_stats_rev.save()
+        og_rev = AbilityValue.objects.create(relevant_stats=old_stats_rev,
+                                    relevant_ability=self.ability,
+                                    previous_revision=None,
+                                    value=1)
+        stats1 = ContractStats.objects.create(assigned_character=self.char_full)
+        AbilityValue.objects.create(relevant_stats=stats1,
+                                    relevant_ability=self.ability,
+                                    previous_revision=None,
+                                    value=1)
+        stats2 = ContractStats.objects.create(assigned_character=self.char_full)
+        AbilityValue.objects.create(relevant_stats=stats2,
+                                    relevant_ability=self.ability,
+                                    previous_revision=None,
+                                    value=1)
+        stats3 = ContractStats.objects.create(assigned_character=self.char_full)
+        AbilityValue.objects.create(relevant_stats=stats3,
+                                    relevant_ability=self.ability,
+                                    previous_revision=og_rev,
+                                    value=1)
+        stats4 = ContractStats.objects.create(assigned_character=self.char_full)
+        with self.assertRaises(ValueError):
+            AbilityValue.objects.create(relevant_stats=stats4,
+                                        relevant_ability=self.ability,
+                                        previous_revision=og_rev,
+                                        value=1)
+        new_snapshot = ContractStats(assigned_character=self.char_full, is_snapshot=True)
+        new_snapshot.save()
+        AbilityValue.objects.create(relevant_stats=new_snapshot,
+                                    relevant_ability=self.ability,
+                                    previous_revision=og_rev,
+                                    value=1)
+        snapshot2 = ContractStats.objects.create(assigned_character=self.char_full, is_snapshot=True)
+        AbilityValue.objects.create(relevant_stats=snapshot2,
+                                    relevant_ability=self.ability,
+                                    previous_revision=og_rev,
+                                    value=1)
+
+    def test_attribute_revision_linage(self):
+        old_stats_rev = ContractStats(assigned_character=self.char_full)
+        old_stats_rev.save()
+        og_rev = AttributeValue.objects.create(relevant_stats=old_stats_rev,
+                                             relevant_attribute=self.attribute_str,
+                                             previous_revision=None,
+                                             value=1)
+        new_stats_rev = ContractStats(assigned_character=self.char_full)
+        new_stats_rev.save()
+        AttributeValue.objects.create(relevant_stats=new_stats_rev,
+                                    relevant_attribute=self.attribute_str,
+                                    previous_revision=None,
+                                    value=1)
+        stats1 = ContractStats.objects.create(assigned_character=self.char_full)
+        AttributeValue.objects.create(relevant_stats=stats1,
+                                    relevant_attribute=self.attribute_str,
+                                    previous_revision=None,
+                                    value=1)
+        stats2 = ContractStats.objects.create(assigned_character=self.char_full)
+        AttributeValue.objects.create(relevant_stats=stats2,
+                                    relevant_attribute=self.attribute_str,
+                                    previous_revision=og_rev,
+                                    value=1)
+        stats3 = ContractStats.objects.create(assigned_character=self.char_full)
+        with self.assertRaises(ValueError):
+            AttributeValue.objects.create(relevant_stats=stats3,
+                                        relevant_attribute=self.attribute_str,
+                                        previous_revision=og_rev,
+                                        value=1)
+        new_snapshot = ContractStats(assigned_character=self.char_full, is_snapshot=True)
+        new_snapshot.save()
+        AttributeValue.objects.create(relevant_stats=new_snapshot,
+                                    relevant_attribute=self.attribute_str,
+                                    previous_revision=og_rev,
+                                    value=1)
+        snapshot2 = ContractStats.objects.create(assigned_character=self.char_full, is_snapshot=True)
+        AttributeValue.objects.create(relevant_stats=snapshot2,
+                                    relevant_attribute=self.attribute_str,
+                                    previous_revision=og_rev,
+                                    value=1)
+
+        #TEST TODOS
         # character.unspent_experience()
         # stats.exp_cost()
         # stats history
