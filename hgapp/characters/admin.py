@@ -2,7 +2,8 @@ from django.contrib import admin
 
 # Register your models here.
 from characters.models import Character, Graveyard_Header, Character_Death, Attribute, Ability, Asset, Liability, \
-    CharacterTutorial, ContractStats, Limit, LiabilityDetails, AssetDetails, AttributeValue, AbilityValue, ExperienceReward
+    CharacterTutorial, ContractStats, Limit, LiabilityDetails, AssetDetails, AttributeValue, AbilityValue, ExperienceReward, \
+    TraumaRevision
 
 
 class AbilityValueTabular(admin.TabularInline):
@@ -21,9 +22,13 @@ class LiabilitiesDetailsTabular(admin.TabularInline):
     model = LiabilityDetails
     extra = 0
 
+class TraumaRevisionTabular(admin.TabularInline):
+    model = TraumaRevision
+    extra = 0
+
 @admin.register(ContractStats)
 class ContractStatsAdmin(admin.ModelAdmin):
-    inlines = [AbilityValueTabular, AttributeValueTabular, AssetDetailsTabular, LiabilitiesDetailsTabular]
+    inlines = [AbilityValueTabular, AttributeValueTabular, AssetDetailsTabular, LiabilitiesDetailsTabular, TraumaRevisionTabular]
 
 admin.site.register(Character)
 admin.site.register(Character_Death)
