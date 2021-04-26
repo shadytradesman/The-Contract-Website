@@ -1,5 +1,7 @@
 import math
 
+import logging
+
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
@@ -14,6 +16,8 @@ from characters.signals import GrantAssetGift, VoidAssetGifts
 
 import random
 import hashlib
+
+logger = logging.getLogger("app." + __name__)
 
 HIGH_ROLLER_STATUS = (
     ('ANY', 'Any'),
@@ -532,6 +536,7 @@ class Character(models.Model):
 
     # WARNING: this is an expensive call
     def regen_stats_snapshot(self):
+        self.refresh_from_db()
         stat_diffs = self.contractstats_set.filter(is_snapshot=False).order_by("id", "created_time").all()
         asset_details = []
         liability_details = []
@@ -542,51 +547,58 @@ class Character(models.Model):
         source_revisions = []
         cost = 0
         for diff in stat_diffs:
-            for detail in diff.assetdetails_set.all():
-                cost = cost + diff.calc_quirk_ex_cost(detail)
-                if detail.previous_revision:
-                    asset_details.remove(detail.previous_revision)
-                if not detail.is_deleted:
-                    asset_details.append(detail)
-            for detail in diff.liabilitydetails_set.all():
-                cost = cost - diff.calc_quirk_ex_cost(detail)
-                if detail.previous_revision:
-                    liability_details.remove(detail.previous_revision)
-                if not detail.is_deleted:
-                    liability_details.append(detail)
-            for value in diff.attributevalue_set.all():
-                if value.previous_revision:
-                    cost = cost + diff.calc_attr_change_ex_cost(value.previous_revision.value, value.value)
-                    attribute_values.remove(value.previous_revision)
-                else:
-                    cost = cost + diff.calc_attr_change_ex_cost(1, value.value)
-                attribute_values.append(value)
-            for value in diff.abilityvalue_set.all():
-                if value.previous_revision:
-                    cost = cost + diff.calc_ability_change_ex_cost(value.previous_revision.value, value.value)
-                    ability_values.remove(value.previous_revision)
-                else:
-                    cost = cost + diff.calc_ability_change_ex_cost(0, value.value)
-                if value.value > 0:
-                    ability_values.append(value)
-            for rev in diff.limitrevision_set.all():
-                if rev.previous_revision:
-                    limit_revisions.remove(rev.previous_revision)
-                if not rev.is_deleted:
-                    limit_revisions.append(rev)
-            for rev in diff.traumarevision_set.all():
-                cost = cost + diff.calc_trauma_xp_cost(rev)
-                if rev.previous_revision:
-                    trauma_revisions.remove(rev.previous_revision)
-                if not rev.is_deleted:
-                    trauma_revisions.append(rev)
-            for rev in diff.sourcerevision_set.all():
-                if rev.previous_revision:
-                    source_revisions.remove(rev.previous_revision)
-                    cost = cost + diff.calc_source_change_ex_cost(rev.previous_revision.max, rev.max)
-                else:
-                    cost = cost + diff.calc_source_change_ex_cost(1, rev.max)
-                source_revisions.append(rev)
+            try:
+                for detail in diff.assetdetails_set.all():
+                    cost = cost + diff.calc_quirk_ex_cost(detail)
+                    if detail.previous_revision:
+                        asset_details.remove(detail.previous_revision)
+                    if not detail.is_deleted:
+                        asset_details.append(detail)
+                for detail in diff.liabilitydetails_set.all():
+                    cost = cost - diff.calc_quirk_ex_cost(detail)
+                    if detail.previous_revision:
+                        liability_details.remove(detail.previous_revision)
+                    if not detail.is_deleted:
+                        liability_details.append(detail)
+                for value in diff.attributevalue_set.all():
+                    if value.previous_revision:
+                        cost = cost + diff.calc_attr_change_ex_cost(value.previous_revision.value, value.value)
+                        attribute_values.remove(value.previous_revision)
+                    else:
+                        cost = cost + diff.calc_attr_change_ex_cost(1, value.value)
+                    attribute_values.append(value)
+                for value in diff.abilityvalue_set.all():
+                    if value.previous_revision:
+                        cost = cost + diff.calc_ability_change_ex_cost(value.previous_revision.value, value.value)
+                        ability_values.remove(value.previous_revision)
+                    else:
+                        cost = cost + diff.calc_ability_change_ex_cost(0, value.value)
+                    if value.value > 0:
+                        ability_values.append(value)
+                for rev in diff.limitrevision_set.all():
+                    if rev.previous_revision:
+                        limit_revisions.remove(rev.previous_revision)
+                    if not rev.is_deleted:
+                        limit_revisions.append(rev)
+                for rev in diff.traumarevision_set.all():
+                    cost = cost + diff.calc_trauma_xp_cost(rev)
+                    if rev.previous_revision:
+                        trauma_revisions.remove(rev.previous_revision)
+                    if not rev.is_deleted:
+                        trauma_revisions.append(rev)
+                for rev in diff.sourcerevision_set.all():
+                    if rev.previous_revision:
+                        source_revisions.remove(rev.previous_revision)
+                        cost = cost + diff.calc_source_change_ex_cost(rev.previous_revision.max, rev.max)
+                    else:
+                        cost = cost + diff.calc_source_change_ex_cost(1, rev.max)
+                    source_revisions.append(rev)
+            except ValueError as e:
+                logger.error('Error regenerating stats snapshot. stats_diff: %s\n\n stats_diffs: %s\n\n exception: %s',
+                             str(diff),
+                             str(stat_diffs),
+                             str(e))
+                raise e
 
         self.stats_snapshot.clear()
         for deet in asset_details:
