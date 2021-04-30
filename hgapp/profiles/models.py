@@ -1,6 +1,9 @@
 from django.db import models
 from django.conf import settings
+from django.contrib.auth.models import Permission
+from .apps import ProfilesConfig
 
+from django.utils import timezone
 from games.models import Game
 from games.games_constants import get_completed_game_invite_excludes_query, get_completed_game_excludes_query
 
@@ -59,9 +62,21 @@ class Profile(models.Model):
     gm_suffix = models.CharField(choices=GM_SUFFIX,
                                  max_length=25,
                                  default=GM_SUFFIX[0][0])
+    view_adult_content = models.BooleanField(default=False)
+    date_set_adult_content = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
         return self.user.username
+
+    # This should be the only way you set the user's adult content prefs
+    def update_view_adult_content(self, view_adult_content):
+        if view_adult_content != self.view_adult_content:
+            self.view_adult_content = view_adult_content
+            self.date_set_adult_content = timezone.now()
+            self.save()
+
+    def can_view_adult(self):
+        return self.view_adult_content
 
     def recompute_titles(self):
         self.recompute_player_title()

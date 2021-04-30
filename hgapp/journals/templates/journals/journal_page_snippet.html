@@ -89,8 +89,15 @@
                 {% if journal_page.game_journal.contains_spoilers %}
                     <i class="fa fa-lock fa-1x"
                        data-toggle="tooltip"
-                       title='This journal entry contains spoilers for a Scenario and cannot be viewed by those who have not discoverd it'
+                       title='This Journal entry contains spoilers for a Scenario and cannot be viewed by those who have not discoverd it'
                     ></i>
+                {% endif %}
+                {% if journal_page.game_journal.is_nsfw %}
+                    <span
+                          data-toggle="tooltip"
+                          title="This Journal entry contains 18+ content">
+                        🔞
+                    </span>
                 {% endif %}
                 <a href="{% url 'games:games_view_game' journal_page.game.id %}">
                     {{ journal_page.game.scenario.title }}
@@ -104,16 +111,27 @@
                     <div>
                         {{journal_page.game_journal.content|safe}}
                     </div>
-                    {% if viewer_can_write %}
-                    <a class="btn btn-default"
-                       href="{% url 'journals:journal_edit' journal_page.game_journal.id %}">
-                        Edit Journal
-                    </a>
-                    {% endif %}
                 {% else %}
-                    <div class="text-center">
-                        <b>You cannot view this Journal entry because it contains spoilers for a Scenario you have not discovered.</b>
-                    </div>
+                    {% if journal_page.game_journal.hidden_reason == "spoilers" %}
+                        <div class="text-center">
+                            <b>You cannot view this Journal entry because it contains spoilers for a Scenario you have not discovered.</b>
+                        </div>
+                    {% elif journal_page.game_journal.hidden_reason == "nsfw" %}
+                        <div class="text-center">
+                            <b>You cannot view this Journal entry because it contains 18+ content.</b>
+                            <br>
+                            You can adjust your content settings by
+                            <a href="{% url 'profiles:profiles_edit' %}">
+                                editing your Profile.
+                            </a>
+                        </div>
+                    {% endif %}
+                {% endif %}
+                {% if viewer_can_write %}
+                <a class="btn btn-default"
+                   href="{% url 'journals:journal_edit' journal_page.game_journal.id %}">
+                    Edit Journal
+                </a>
                 {% endif %}
             </div>
         {% else %}
@@ -156,6 +174,13 @@
                title='This journal entry contains spoilers for a Scenario and cannot be viewed by those who have not discoverd it'
             ></i>
             {% endif %}
+            {% if journal.is_nsfw %}
+                <span
+                    data-toggle="tooltip"
+                    title="This Journal entry contains 18+ content">
+                    🔞
+                </span>
+            {% endif %}
             Downtime
         </small>
         <div class="thumbnail">
@@ -166,16 +191,27 @@
                 <div>
                     {{journal.content|safe}}
                 </div>
-                {% if viewer_can_write %}
-                    <a class="btn btn-default"
-                       href="{% url 'journals:journal_edit' journal.id %}">
-                        Edit Journal
-                    </a>
-                {% endif %}
             {% else %}
-            <div class="text-center">
-                <b>You cannot view this Journal entry because it contains spoilers for a Scenario you have not discovered.</b>
-            </div>
+                {% if journal.hidden_reason == "spoilers" %}
+                    <div class="text-center">
+                        <b>You cannot view this Journal entry because it contains spoilers for a Scenario you have not discovered.</b>
+                    </div>
+                {% elif journal.hidden_reason == "nsfw" %}
+                    <div class="text-center">
+                        <b>You cannot view this Journal entry because it contains 18+ content.</b>
+                        <br>
+                        You can adjust your content settings by
+                        <a href="{% url 'profiles:profiles_edit' %}">
+                            editing your Profile.
+                        </a>
+                    </div>
+                {% endif %}
+            {% endif %}
+            {% if viewer_can_write %}
+                <a class="btn btn-default"
+                   href="{% url 'journals:journal_edit' journal_page.game_journal.id %}">
+                    Edit Journal
+                </a>
             {% endif %}
         </div>
         {% endfor %}

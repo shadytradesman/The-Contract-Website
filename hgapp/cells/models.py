@@ -199,7 +199,7 @@ class CellMembership(models.Model):
 
     def add_user_to_current_group(self):
         groupName = self.relevant_cell.getGroupName(self.role)
-        group = Group.objects.get(name = groupName)
+        group = Group.objects.get(name=groupName)
         self.member_player.groups.add(group)
 
     def remove_user_from_all_groups(self):

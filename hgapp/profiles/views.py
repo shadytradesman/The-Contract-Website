@@ -52,7 +52,6 @@ class ProfileView(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ProfileView, self).get_context_data(**kwargs)
-        self.profile.recompute_titles() #TODO: Delete this any time after Feb 2021 for a big perf boost.
 
         context = self.populate_contractor_stats_context(context)
         context = self.populate_gm_stats_context(context)
@@ -133,6 +132,7 @@ def profile_edit(request):
             profile.about = form.cleaned_data['about']
             with transaction.atomic():
                 profile.save()
+                profile.update_view_adult_content(form.cleaned_data['view_adult'])
             return HttpResponseRedirect(reverse('profiles:profiles_view_profile', args=(profile.id,)))
         else:
             print(form.errors)
@@ -141,6 +141,7 @@ def profile_edit(request):
         form = EditProfileForm(
             initial={
                 'about': profile.about,
+                'view_adult': profile.view_adult_content,
             }
         )
         context = {

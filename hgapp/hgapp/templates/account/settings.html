@@ -16,6 +16,12 @@
                 {{ form|bootstrap }}
                 <button class="btn btn-primary" type="submit">{% trans "Save" %}</button>
             </form>
+            <h4>
+                If you would like to edit your profile or preferences,
+                <a href="{% url 'profiles:profiles_edit' %}">
+                    click here.
+                </a>
+            </h4>
         </div>
     </div>
 {% endblock %}

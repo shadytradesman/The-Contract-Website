@@ -16,9 +16,12 @@ class JournalForm(forms.Form):
                                   max_length=73000,
                                   required=False,
                                   help_text='Write in-character. You must write at least 250 words to recieve rewards.')
-    contains_spoilers = forms.BooleanField(label = "Contains Spoilers",
+    contains_spoilers = forms.BooleanField(label="Contains Spoilers",
                                        required=False,
-                                       help_text = "This journal contains spoilers for the Scenario")
+                                       help_text="Select if this journal contains spoilers for the Scenario.")
+    is_nsfw = forms.BooleanField(label="Contains 18+ Content",
+                                 required=False,
+                                 help_text="Select if this journal contains content unsuitable for those under the age of 18.")
 
 
 class JournalCoverForm(forms.Form):
