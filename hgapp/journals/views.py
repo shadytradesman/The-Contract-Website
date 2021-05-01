@@ -47,6 +47,7 @@ class WriteJournal(View):
                                   game_attendance=self.game_attendance,
                                   is_downtime=self.is_downtime,
                                   is_deleted=False,
+                                  is_nsfw=form.cleaned_data['is_nsfw'],
                                   contains_spoilers=form.cleaned_data['contains_spoilers'])
                 journal.save()
                 journal.set_content(form.cleaned_data['content'])
@@ -72,9 +73,15 @@ class WriteJournal(View):
 
 class WriteGameJournal(WriteJournal):
     is_downtime = False
+    initial = {
+        "contains_spoilers": True
+    }
 
 class WriteDowntimeJournal(WriteJournal):
     is_downtime = True
+    initial = {
+        "contains_spoilers": False
+    }
 
 class EditJournal(WriteJournal):
     is_downtime = False # doesn't actually matter
@@ -85,6 +92,7 @@ class EditJournal(WriteJournal):
             "title": self.journal.title,
             "content": self.journal.content,
             "contains_spoilers": self.journal.contains_spoilers,
+            "is_nsfw": self.journal.is_nsfw,
         }
         self.kwargs["game_id"] = self.journal.game_attendance.relevant_game.id
         self.kwargs["character_id"] = self.journal.game_attendance.attending_character.id
@@ -100,6 +108,7 @@ class EditJournal(WriteJournal):
                 self.journal.edit_date = timezone.now()
                 self.journal.writer = request.user
                 self.journal.contains_spoilers = form.cleaned_data['contains_spoilers']
+                self.journal.is_nsfw = form.cleaned_data['is_nsfw']
                 self.journal.save()
                 self.journal.set_content(content)
             return HttpResponseRedirect(reverse('journals:journal_read_game', args=(self.character.id, self.game.id)))
@@ -269,7 +278,7 @@ class CommunityJournals(View):
     def __get_context_data(self):
         journal_query = Journal.objects.filter(game_attendance__attending_character__private=False)
         if self.request.user.is_anonymous:
-            journal_query.filter(contains_spoilers=False)
+            journal_query.filter(contains_spoilers=False, is_nsfw=False)
         public_journals = journal_query.order_by('-created_date').all()[:100]
         max_journals_to_display = 50
         displayed_journals = []

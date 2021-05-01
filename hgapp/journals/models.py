@@ -26,6 +26,7 @@ class Journal(models.Model):
     created_date = models.DateTimeField('date created', auto_now_add=True)
     edit_date = models.DateTimeField('date last edited', null=True, blank=True)
     is_downtime = models.BooleanField(default=False)
+    is_nsfw = models.BooleanField(default=False)
     is_valid = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
     contains_spoilers = models.BooleanField(default=True)
@@ -122,11 +123,28 @@ class Journal(models.Model):
         return len(soup.text.split())
 
     def player_can_view(self, player):
+        return self.player_satisfies_nsfw_requirements(player) and self.player_satisfies_spoiler_requirements(player)
+
+    def player_satisfies_nsfw_requirements(self, player):
+        return not self.is_nsfw or (hasattr(player, "profile") and player.profile.view_adult_content)
+
+    def player_satisfies_spoiler_requirements(self, player):
         return not self.contains_spoilers or self.game_attendance.relevant_game.scenario.player_can_view(player)
 
     # Used in Journal read view to inject state into the object which is never stored to the DB, for convenience.
     def inject_viewable(self, player):
-        self.is_viewable_by_reader = self.player_can_view(player)
+        passes_spoilers = self.player_satisfies_spoiler_requirements(player)
+        if not passes_spoilers:
+            self.is_viewable_by_reader = False
+            self.hidden_reason = "spoilers"
+            return
+        passes_nsfw = self.player_satisfies_nsfw_requirements(player)
+        if not passes_nsfw:
+            self.is_viewable_by_reader = False
+            self.hidden_reason = "nsfw"
+            return
+        self.is_viewable_by_reader = True
+
 
     def save(self, *args, **kwargs):
         if not self.pk and self.content:

@@ -88,6 +88,7 @@ def make_game_form(user, game_status):
         )
         queryset = user.cell_set.all()
         if game_status == str(GAME_STATUS[0][0]):
+            # Game is scheduled
             scenario = ScenarioModelChoiceField(queryset=user.scenario_set.all(),
                                               empty_label="Create New Scenario",
                                               required=False,
@@ -115,7 +116,13 @@ def make_game_form(user, game_status):
                                                               "members.",)
             required_character_status = forms.ChoiceField(choices=HIGH_ROLLER_STATUS,
                                                           help_text='Players will only be able to RSVP with Contractors of the selected Status.')
+            only_over_18 = forms.BooleanField(initial=False,
+                                              required=False,
+                                              label='Only allow 18+ Players',
+                                              help_text="If selected, only Players over the age of 18 will be able"
+                                                        " to attend.", )
         else:
+            # Game not scheduled
             scheduled_start_time = forms.DateTimeField(initial=datetime.today(),
                                                    disabled=True,
                                                    help_text='You can no longer change the scheduled start time.',
@@ -132,6 +139,9 @@ def make_game_form(user, game_status):
             required_character_status = forms.ChoiceField(disabled=True,
                                                           choices=HIGH_ROLLER_STATUS,
                                                           help_text='You can no longer change required Status.')
+            only_over_18 = forms.BooleanField(disabled=True,
+                                              label='Only allow 18+ Players',
+                                              help_text="You can no longer change the 18+ requirement.")
 
         def default_date(self):
             if self.initial:

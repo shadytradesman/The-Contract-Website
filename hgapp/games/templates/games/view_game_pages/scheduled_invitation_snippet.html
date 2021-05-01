@@ -50,7 +50,9 @@
             <input class="btn btn-primary" type="submit" value="Invite" />
         {% endif %}
     {% elif request.user.is_authenticated %}
-        {{ game.get_attended_players.count }} Player{{game.get_attended_players.count|pluralize}} RSVPed that they will attend.
+        {{ game.get_attended_players.count }} Player{{game.get_attended_players.count|pluralize}}
+        RSVPed that they will attend so far.
+        <hr>
         {% if my_invitation %}
             {% if my_invitation.attendance %}
                 {% if my_invitation.attendance.attending_character %}
@@ -62,22 +64,44 @@
                     <h5> <a href="{% url 'games:games_accept_invite' game.id %}">Click here to change character</a></h5>
                     <h5> <a href="{% url 'games:games_decline_invite' game.id %}">Click here to cancel your attendance</a></h5>
                 {% else %}
-                    <h3>You are set to attend this game as a ringer (NPC).</h3>
+                    <h3>You are set to attend this game as an NPC Ringer.</h3>
                     <h5> <a href="{% url 'games:games_decline_invite' game.id %}">Click here to cancel your attendance</a></h5>
                 {% endif %}
             {% elif my_invitation.is_declined %}
-                <h3>You have declined your invitation to this game.</h3>
+                <h3>You have declined your invitation to this Game.</h3>
                 <h5><a href="{% url 'games:games_accept_invite' game.id %}">You may still RSVP if you change your mind</a></h5>
             {% else %}
-                <h3>You have been invited to attend this game!</h3>
-                <h5> <a href="{% url 'games:games_accept_invite' game.id %}">Click here to RSVP</a></h5>
+                <h3 class="text-center">You have been invited to attend this Game</h3>
+                {% if nsfw_blocked %}
+                    <h5 class="text-center">
+                        But the GM has marked it as 18+, and your content settings do not allow you to RSVP.
+                        <br>
+                        You can adjust your content settings by
+                        <a href="{% url 'profiles:profiles_edit' %}">
+                            editing your Profile.
+                        </a>
+                    </h5>
+                {% else %}
+                    <h5> <a href="{% url 'games:games_accept_invite' game.id %}">Click here to RSVP</a></h5>
+                {% endif %}
             {% endif %}
         {% elif game.open_invitations %}
-            <h3>This game is open for self-invites!</h3>
-            {% if view_scenario %}
-                <h5>Since you already have access to this Scenario, you should only attend as a Ringer.</h5>
-            {% endif %}
-            <h5><a href="{% url 'games:games_accept_invite' game.id %}">Click here to RSVP</a></h5>
+            <h3 class="text-center">This Game is open for self-invites!</h3>
+            {% if nsfw_blocked %}
+                <h5 class="text-center">
+                    But the GM has marked it as 18+, and your content settings do not allow you to RSVP.
+                    <br>
+                    You can adjust your content settings by
+                    <a href="{% url 'profiles:profiles_edit' %}">
+                        editing your Profile.
+                    </a>
+                </h5>
+                {% else %}
+                    {% if view_scenario %}
+                        <h5 class="text-center">Since you already have access to this Scenario, you should only attend as a Ringer.</h5>
+                    {% endif %}
+                    <h5 class="text-center"> <a href="{% url 'games:games_accept_invite' game.id %}">Click here to RSVP</a></h5>
+                {% endif %}
         {% else %}
             <h3>You have not been invited to this game.</h3>
         {% endif %}

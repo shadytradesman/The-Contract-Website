@@ -129,14 +129,23 @@
                             {% endif %}
                         </p>
                         <h4>
+                            {% if game.is_nsfw %}
+                            <span style="font-size: 20px;"
+                                  data-toggle="tooltip"
+                                  title="This Game only allows Players over the age of 18">
+                                        🔞
+                            </span>
+                            {% endif %}
                             <small>
                                 Bring your favorite
-                                <b>
-                                    {% if not game.get_required_character_status_display == "Any" %}
+                                {% if not game.get_required_character_status_display == "Any" %}
+                                    <b>
                                         {{game.get_required_character_status_display}}
-                                    {% endif %}
-                                </b>
-                                Character
+                                    </b>
+                                    Contractor
+                                {% else %}
+                                    Contractor, regardless of Status.
+                                {% endif %}
                             </small>
                         </h4>
                     {% endif %}

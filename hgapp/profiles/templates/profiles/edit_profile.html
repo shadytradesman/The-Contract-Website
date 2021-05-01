@@ -14,16 +14,18 @@
 
 {% block body_base %}
 <div class="container">
-    <section>
-        <h1>{{profile.user.username}}'s Profile</h1>
-         {{ form.about.errors }}
-         <form action="{% url 'profiles:profiles_edit' %}" method="post">
-            {{ form.non_field_errors }}
-            {% csrf_token %}
-            {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-            {{ form.about | bootstrap }}
-            <input class="btn btn-primary" type="submit" value="Done!" />
-        </form>
-    </section>
+    <h1 class="text-center">Editing Profile</h1>
+    <div class="panel panel-default">
+        <div class="panel-body">
+             {{ form.about.errors }}
+             <form action="{% url 'profiles:profiles_edit' %}" method="post">
+                 {{ form.non_field_errors }}
+                 {% csrf_token %}
+                 {{ form.about | bootstrap }}
+                 {{form.view_adult | bootstrap }}
+                 <input class="btn btn-primary" type="submit" value="Done!" />
+            </form>
+        </div>
+    </div>
 </div>
 {% endblock %}

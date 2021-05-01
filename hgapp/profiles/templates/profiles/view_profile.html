@@ -32,12 +32,26 @@
                         </h3>
                         <small>
                             Member Since {{profile.user.date_joined|date}}
-                            |
                             {% if profile.user == request.user %}
+                                <br>
+                                {% if profile.view_adult_content %}
+                                    <b>
+                                        18+ content enabled
+                                    </b>
+                                {% else %}
+                                    <span style="font-size: 20px;"
+                                          data-toggle="tooltip"
+                                          title="You cannot currently view 18+ content. Edit Profile to change.">
+                                        🔞
+                                    </span>
+                                    18+ content disabled
+                                {% endif %}
+                                |
                                 <a href="{% url 'profiles:profiles_edit' %}">
                                     <i class="fa fa-edit"></i> {% trans "Edit Profile" %}
                                 </a>
                             {% else %}
+                                |
                                 <a href="{% url 'postman:write' profile.user.username %}">
                                     <i class="fa fa-envelope-o fa-1x"></i> Send {{profile.user.username}} a Message
                                 </a>
