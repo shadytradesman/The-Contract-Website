@@ -197,6 +197,7 @@ def create_game(request):
                 created_date = timezone.now(),
                 scheduled_start_time = start_time,
                 open_invitations = form.cleaned_data['open_invitations'],
+                is_nsfw= form.cleaned_data['only_over_18'],
                 status = GAME_STATUS[0][0],
                 cell = form.cleaned_data['cell']
             )
@@ -214,13 +215,7 @@ def create_game(request):
                             game_invite.as_ringer = True
                         game_invite.save()
                         game_invite.notify_invitee(request, game)
-            game_url = reverse('games:games_view_game', args=(game.id,))
-            messages.add_message(request, messages.SUCCESS, mark_safe("Your Game has been created Successfully."
-                                                                      "<br>"
-                                                                      "<a href='"
-                                                                      + game_url +
-                                                                      "'> Click Here</a> "
-                                                                      "if you do not want to invite anyone else at this time."))
+            messages.add_message(request, messages.SUCCESS, mark_safe("Your Game has been created Successfully."))
             return HttpResponseRedirect(reverse('games:games_invite_players', args=(game.id,)))
         else:
             print(form.errors)
@@ -243,7 +238,8 @@ def edit_game(request, game_id):
      'start_time': convert_to_localtime(game.scheduled_start_time),
      'cell': game.cell,
      'open_invitations': game.open_invitations,
-     }
+     'only_over_18': game.is_nsfw,
+    }
     GameForm = make_game_form(user=request.user, game_status=game.status)
     if request.method == 'POST':
         if not request.user.has_perm('edit_game', game):
@@ -264,6 +260,7 @@ def edit_game(request, game_id):
                 game.required_character_status = form.cleaned_data['required_character_status']
                 game.scenario=form.cleaned_data['scenario']
                 game.cell = form.cleaned_data['cell']
+                game.is_nsfw = form.cleaned_data['only_over_18']
                 if form.cleaned_data['scenario']:
                     game.scenario = form.cleaned_data['scenario']
             with transaction.atomic():
@@ -302,12 +299,14 @@ def view_game(request, game_id):
         initial_data = {"message": game.hook}
         invite_form = CustomInviteForm(initial=initial_data)
     can_edit = request.user.is_authenticated and request.user.has_perm('edit_game', game)
+    nsfw_blocked = game.is_nsfw and (request.user.is_anonymous or not request.user.profile.view_adult_content)
     context = {
         'game': game,
         'can_view_scenario': can_view_scenario,
         'my_invitation': my_invitation,
         'invite_form': invite_form,
         'can_edit': can_edit,
+        'nsfw_blocked': nsfw_blocked,
     }
     return render(request, 'games/view_game_pages/view_game.html', context)
 
@@ -367,6 +366,8 @@ def accept_invite(request, game_id):
     invite = get_object_or_none(request.user.game_invite_set.filter(relevant_game=game))
     if not invite and not game.open_invitations:
         raise PermissionDenied("This is awkward. . . You, uh, haven't been invited to this Game")
+    if game.is_nsfw and not request.user.profile.view_adult_content:
+        raise PermissionDenied("Your content settings do now allow you to RSVP to this Game.")
     if request.method == 'POST':
         if not invite:
             # player self-invite

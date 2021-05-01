@@ -94,6 +94,7 @@ class Game(models.Model):
                                           null=True,
                                           blank=True,
                                           on_delete=models.CASCADE)
+    is_nsfw = models.BooleanField(default=False)
 
     class Meta:
         permissions = (
