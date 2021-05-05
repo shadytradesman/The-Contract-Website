@@ -24,7 +24,7 @@ ROLE = (
 CELL_PERMISSIONS = (
     ('admin', "Administrate"),
     ('manage_memberships', 'Manage Memberships'),
-    ('manage_roles', 'Manage Role Permissions'),
+    ('manage_roles', 'Manage Role Permissions'), # unused, could be anything.
     ('post_events', 'Post World Events'),
     ('manage_member_characters', 'Manage Member Characters'),
     ('edit_world', 'Edit The World Description'),
@@ -46,19 +46,32 @@ class Cell(models.Model):
     members = models.ManyToManyField(settings.AUTH_USER_MODEL,
                                      through="CellMembership",
                                      through_fields=('relevant_cell', 'member_player'))
+
+    # Invites
     invitations = models.ManyToManyField(settings.AUTH_USER_MODEL,
                                          through="CellInvite",
                                          related_name='cell_invites')
-    invite_link_secret_key = models.CharField(default = random_string,
+    invite_link_secret_key = models.CharField(default=random_string,
                                               max_length=64)
+    allow_self_invites = models.BooleanField(default=False)
 
-
-    #TODO: add dice system support.
     # Setting information
-    setting_name =  models.CharField(max_length=200)
-    setting_description = models.TextField(max_length=40000,
-                                      null=True,
-                                      blank=True)
+    setting_name = models.CharField(max_length=200) # prepopulate name field with this value for migration purposes
+    setting_sheet_blurb = models.CharField(max_length=500, default=" ")
+    setting_summary = models.CharField(max_length=10000, null=True, blank=True)
+    setting_description = models.TextField(max_length=70000,
+                                           null=True,
+                                           blank=True)
+    setting_create_char_info = models.CharField(max_length=10000, null=True, blank=True)
+
+    # Cell Info
+    cell_sell = models.CharField(max_length=10000, null=True, blank=True)
+    house_rules = models.CharField(max_length=50000, null=True, blank=True)
+    community_link = models.CharField(max_length=1000, null=True, blank=True)
+    is_listed_publicly = models.BooleanField(default=False)
+    are_contractors_portable = models.BooleanField(default=True)
+    #TODO: how are games played? In person, on roll-20, on discord? online?
+
 
     def player_can_edit_characters(self, player):
         return player.has_perm(CELL_PERMISSIONS[4][0], self)
@@ -182,8 +195,8 @@ class WorldEvent(models.Model):
         on_delete=models.CASCADE)
     created_date = models.DateTimeField('date created',
                                         auto_now_add=True)
-    headline =  models.CharField(max_length=200)
-    event_description = models.TextField(max_length=40000,
+    headline = models.CharField(max_length=1000)
+    event_description = models.TextField(max_length=50000,
                                       null=True,
                                       blank=True)
 
@@ -260,6 +273,7 @@ class PermissionsSettings(models.Model):
         if permission == CELL_PERMISSIONS[6]:
             return self.can_manage_games
         raise ValueError("Permission not found")
+
 
     def updatePermissions(self):
         groupName = self.relevant_cell.getGroupName(self.role)

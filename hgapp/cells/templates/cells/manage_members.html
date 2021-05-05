@@ -11,71 +11,79 @@
 
 {% block body_base %}
 <div class="container">
-    <br>
+    <div class="text-center">
+        <h1>
+            Manage Memberships for <a href="{% url 'cells:cells_view_cell' cell.id %}">{{cell.name}}</a>
+        </h1>
+        <h3><small>
+            If you would like to invite players
+            <a href="{% url 'cells:cells_invite_players' cell.id %}">
+                Click Here
+            </a>
+        </small></h3>
+    </div>
     <div class="panel-group">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h1>
-                    Manage Memberships for <a href="{% url 'cells:cells_view_cell' cell.id %}">{{cell.name}}</a>
-                </h1>
-                <h3><small>
-                    If you would like to invite players
-                    <a href="{% url 'cells:cells_invite_players' cell.id %}">
-                        Click Here
-                    </a>
-                </small></h3>
+                <h3>Members and Roles</h3>
             </div>
-            {% for form in formset %}
-                <form id="kick-{{form.initial.player_id}}"
-                      action="{% url 'cells:cells_kick_player' cell_id=cell.id user_id=form.initial.player_id %}"
-                      method="post">
+            <div class="panel-body">
+                {% for form in formset %}
+                    <form id="kick-{{form.initial.player_id}}"
+                          action="{% url 'cells:cells_kick_player' cell_id=cell.id user_id=form.initial.player_id %}"
+                          method="post">
                         {{ form.non_field_errors }}
                         {% csrf_token %}
-                </form>
-            {% endfor %}
-            <form id="manage_form" action="{% url 'cells:cells_manage_members' cell.id %}" method="post">
-                {{ formset.about.errors }}
-                {{ formset.management_form }}
-                {{ formset.non_field_errors }}
-                {% csrf_token %}
-                {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+                    </form>
+                {% endfor %}
+                <form id="manage_form" action="{% url 'cells:cells_manage_members' cell.id %}" method="post">
+                    {{ formset.about.errors }}
+                    {{ formset.management_form }}
+                    {{ formset.non_field_errors }}
+                    {% csrf_token %}
+                    {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
-                <div class="container">
-                    <dl class="dl-horizontal">
-                    {% for form in formset %}
-                        {{form.player_id.as_hidden}}
-                        <br>
-
-                        <dt>
-                            <span class = "lead">{% user_display form.initial.username %} </span>
-                        </dt>
-                        <dd>
-                            <p>Currently a {{form.initial.role}}</p>
-                            <div class="form-inline ">
-                                <p>Change role: {{form.role}}</p>
+                    <div class="row">
+                        {% for form in formset %}
+                        {% if forloop.counter0|divisibleby:3 %}
                             </div>
-                        <p>
-                        <button type="button" class="btn btn-warning btn-xs" data-toggle="collapse" data-target="#kick-{{form.initial.username}}">Kick Player</button>
-                        <div id="kick-{{form.initial.username}}" class="collapse">
-                        Are you sure?
-                            <input
-                                    form="kick-{{form.initial.player_id}}"
-                                    type="submit"
-                                    class="btn btn-danger btn-sm"
-                                    value="Remove {% user_display form.initial.username %} from {{cell.name}}"
-                            />
-                            <button type="button" class="btn btn-info btn-sm" data-toggle="collapse" data-target="#kick-{{form.initial.username}}">Never mind</button>
+                            <div class="row">
+                        {% endif %}
+                        <div class="col-md-4 col-sm-6 col-xs-12">
+                            <br>
+                            {{form.player_id.as_hidden}}
+                            <span class = "lead">{% user_display form.initial.username %} </span>
+                            <span>- {{form.initial.role_display}}</span>
+                            <div class="form-inline ">
+                                Change role: {{form.role}}
+                                <span style="margin-left: 10px;">
+                                    <button type="button" class="btn btn-warning btn-xs" data-toggle="collapse" data-target="#kick-{{form.initial.username}}">Kick Player</button>
+                                </span>
+                            </div>
+                            <div id="kick-{{form.initial.username}}" class="collapse" style="margin-top: 5px;">
+                                Are you sure?
+                                <input
+                                        form="kick-{{form.initial.player_id}}"
+                                        type="submit"
+                                        class="btn btn-danger btn-sm"
+                                        value="Kick {% user_display form.initial.username %}"
+                                        style="margin-left: 10px;"
+                                />
+                                <button type="button" style="margin-left: 10px;"
+                                        class="btn btn-info btn-sm" data-toggle="collapse" data-target="#kick-{{form.initial.username}}">
+                                    Never mind
+                                </button>
+                            </div>
                         </div>
-                        </p>
-                        </dd>
-                    {% endfor %}
-                    </dl>
+                        {% endfor %}
+                        </div>
+                    </div>
+                    <div class = "panel-footer">
+                        <input class="btn btn-primary" type="submit" value="Submit Changes" form="manage_form"/>
+                    </div>
+                </form>
 
-                </div>
-                <div class = "panel-footer">
-                    <input class="btn btn-primary" type="submit" value="Submit Changes" form="manage_form"/>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>

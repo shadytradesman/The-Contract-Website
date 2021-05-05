@@ -15,7 +15,7 @@
         <h1>
         {{ cell.name }}
         </h1>
-        Cell Founded by <a href="{% url 'profiles:profiles_view_profile' cell.creator.profile.id %}">{% user_display cell.creator %}</a>
+        Founded by <a href="{% url 'profiles:profiles_view_profile' cell.creator.profile.id %}">{% user_display cell.creator %}</a>
     </div>
 
             {% include "_messages.html" %}
@@ -23,7 +23,7 @@
     <ul class="nav nav-pills nav-justified navbar-default">
         {% if request.user.is_authenticated and can_manage_memberships %}
             <li>
-                <a href="{% url 'cells:cells_invite_players' cell.id %}">Invite Players</a>
+                <a href="{% url 'cells:cells_invite_players' cell.id %}">Find or Invite Players</a>
             </li>
             <li>
                 <a href="{% url 'cells:cells_manage_members' cell.id %}">Manage Memberships</a>
@@ -31,23 +31,23 @@
         {% endif %}
         {% if request.user.is_authenticated and can_edit_world %}
             <li>
-                <a href="{% url 'cells:cells_edit_cell' cell.id %}">
-                    {% if can_administer %}
-                        Edit Cell and Setting
-                    {% else %}
-                        Edit Setting
-                    {% endif %}
+                <a href="{% url 'cells:cells_edit' cell.id %}">
+                    Edit World
                 </a>
             </li>
         {% endif %}
         {% if request.user.is_authenticated and user_membership %}
             <li>
-                <a href="{% url 'cells:cells_leave_cell' cell.id %}">Leave Cell</a>
+                <a href="{% url 'cells:cells_leave_cell' cell.id %}">
+                    Leave Cell
+                </a>
             </li>
         {% endif %}
         {% if request.user.is_authenticated and can_manage_games %}
             <li>
-                <a href="{% url 'games:games_create_ex_game_for_cell' cell.id %}">Declare a Completed Game</a>
+                <a href="{% url 'games:games_create_ex_game_for_cell' cell.id %}">
+                    Declare a Completed Game
+                </a>
             </li>
         {% endif %}
     </ul>
@@ -69,7 +69,7 @@
             <div class="panel-body">
                 <div id="collapseSetting" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="settingHeading">
                     <p>
-                        {{cell.setting_description | markdown | linebreaks}}
+                        {{ cell.setting_description | safe }}
                     </p>
                 </div>
             </div>

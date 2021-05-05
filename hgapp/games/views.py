@@ -142,7 +142,7 @@ def view_scenario(request, scenario_id, game_id=None):
         return HttpResponseRedirect(reverse('games:games_view_scenario', args=(scenario.id,)))
     else:
         game_feedback = None
-        games_run = Game.objects.filter(gm_id=request.user.id, scenario_id=scenario.id).all()
+        games_run = Game.objects.filter(gm_id=request.user.id, scenario_id=scenario.id).order_by("end_time").all()
         games_run = [x for x in games_run if not x.is_scheduled() and not x.is_active()]
         games_run_no_feedback = Game.objects.filter(gm_id=request.user.id, scenario_id=scenario.id, scenario_notes=None).all()
         games_run_no_feedback = [x for x in games_run_no_feedback if not x.is_scheduled() and not x.is_active()]

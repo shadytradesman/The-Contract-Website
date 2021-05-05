@@ -6,13 +6,13 @@ from . import views
 app_name = 'cells'
 urlpatterns = [
     # ex: .com/cells/create/
-    url(r'^create/$', views.create_cell, name='cells_create'),
+    url(r'^create/$', views.EditWorld.as_view(), name='cells_create'),
+
+    # ex: .com/cells/edit/c/123
+    url(r'^edit/c/(?P<cell_id>[\d]+)/$', views.EditWorld.as_view(), name='cells_edit'),
 
     # ex: .com/cells/view/c/123
     url(r'^view/c/(?P<cell_id>[\d]+)/$', views.view_cell, name='cells_view_cell'),
-
-    # ex: .com/cells/edit/c/123
-    url(r'^edit/c/(?P<cell_id>[\d]+)/$', views.edit_cell, name='cells_edit_cell'),
 
     # ex: .com/cells/invite/c/123
     url(r'^invite/c/(?P<cell_id>[\d]+)/$', views.invite_players, name='cells_invite_players'),
