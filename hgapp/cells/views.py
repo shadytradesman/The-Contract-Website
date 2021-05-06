@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.views import View
 from django.shortcuts import render
 from django.db import transaction
-from cells.forms import EditCellForm, CustomInviteForm, RsvpForm, PlayerRoleForm, KickForm, EditWorldForm
+from cells.forms import CustomInviteForm, RsvpForm, PlayerRoleForm, KickForm, EditWorldForm, EditWorldEventForm
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
@@ -10,7 +10,7 @@ from django.contrib import messages
 from django.utils.safestring import mark_safe
 
 from hgapp.utilities import get_object_or_none
-from .models import Cell, ROLE, CellInvite
+from .models import Cell, ROLE, CellInvite, WorldEvent
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from games.models import Scenario
@@ -20,46 +20,6 @@ from postman.api import pm_write
 from django.utils.safestring import SafeText
 from django.forms import formset_factory
 
-def create_cell(request):
-    if not request.user.is_authenticated:
-        raise PermissionDenied("You must be logged in to create a cell")
-    if not request.user.profile.confirmed_agreements:
-        return HttpResponseRedirect(reverse('profiles:profiles_terms'))
-    if request.method == 'POST':
-        form = EditCellForm(request.POST)
-        if form.is_valid():
-            cell = Cell(
-                name = form.cleaned_data['name'],
-                creator = request.user,
-                setting_name = form.cleaned_data['setting_name'],
-                setting_description = form.cleaned_data['setting_description'],
-            )
-            new_cell_scenarios = Scenario.objects.filter(tags__slug="newcell").all()
-            with transaction.atomic():
-                cell.save()
-                for scenario in new_cell_scenarios:
-                    scenario.unlocked_discovery(request.user)
-            if len(request.user.cell_set.filter(creator=request.user).all()) == 1:
-                gallery_url = reverse('games:games_view_scenario_gallery')
-                num_unlocked = len(new_cell_scenarios)
-                messages.add_message(request, messages.SUCCESS, mark_safe("<h4 class=\"text-center\">By creating this Cell "
-                                                                          "you have unlocked <b>" + str(num_unlocked) + "</b> premade stock Scenarios!"
-                                                                          "<br>"
-                                                                          "<a href='"
-                                                                          + gallery_url +
-                                                                          "'> Click Here</a> "
-                                                                          "to visit your Scenario Gallery</h4>"))
-            return HttpResponseRedirect(reverse('cells:cells_view_cell', args=(cell.id,)))
-        else:
-            print(form.errors)
-            return None
-    else:
-        # Build a Cell form
-        form = EditCellForm()
-        context = {
-            'form' : form,
-        }
-        return render(request, 'cells/edit_cell.html', context)
 
 @method_decorator(login_required(login_url='account_login'), name='dispatch')
 class EditWorld(View):
@@ -138,62 +98,54 @@ class EditWorld(View):
         }
         return context
 
-#
-# @method_decorator(login_required(login_url='account_login'), name='dispatch')
-# class EditWorld(View):
-#     form_class = EditWorldForm
-#     template_name = 'cells/edit.html'
-#     initial = {}
-#     cell = None
-#
-#     def dispatch(self, *args, **kwargs):
-#         self.cell = get_object_or_404(Cell, id=self.kwargs['cell_id'])
-#         self.__check_permissions()
-#         self.initial = {
-#             "name": self.cell.name,
-#             "setting_sheet_blurb": self.cell.setting_sheet_blurb,
-#             "setting_description": self.cell.setting_description,
-#             "setting_summary": self.cell.setting_summary,
-#             "setting_create_char_info": self.cell.setting_create_char_info,
-#             "are_contractors_portable": self.cell.are_contractors_portable,
-#             "house_rules": self.cell.house_rules,
-#         }
-#         return super().dispatch(*args, **kwargs)
-#
-#     def get(self, request, *args, **kwargs):
-#         return render(request, self.template_name, self.__get_context_data())
-#
-#     def post(self, request, *args, **kwargs):
-#         form = self.form_class(request.POST)
-#         if form.is_valid():
-#             new_cell_scenarios = Scenario.objects.filter(tags__slug="newcell").all()
-#             with transaction.atomic():
-#                 self.cell.name = form.cleaned_data['name']
-#                 self.cell.setting_name = form.cleaned_data['name']
-#                 self.cell.setting_sheet_blurb = form.cleaned_data['setting_sheet_blurb']
-#                 self.cell.setting_description = form.cleaned_data['setting_description']
-#                 self.cell.setting_summary = form.cleaned_data['setting_summary']
-#                 self.cell.setting_create_char_info = form.cleaned_data['setting_create_char_info']
-#                 self.cell.house_rules = form.cleaned_data['house_rules']
-#                 self.cell.are_contractors_portable = form.cleaned_data['are_contractors_portable']
-#                 self.cell.save()
-#                 if request.user == self.cell.creator:
-#                     for scenario in new_cell_scenarios:
-#                         scenario.unlocked_discovery(request.user)
-#             return HttpResponseRedirect(reverse('cells:cells_view_cell', args=(self.cell.id,)))
-#         raise ValueError("Invalid edit setting form")
-#
-#     def __check_permissions(self):
-#         if not self.cell.player_can_edit_world(self.request.user):
-#             raise PermissionDenied("You don't have permissions to edit this Cell's setting.")
-#
-#     def __get_context_data(self):
-#         context = {
-#             'cell': self.cell,
-#             'form': self.form_class(initial=self.initial),
-#         }
-#         return context
-#
+@method_decorator(login_required(login_url='account_login'), name='dispatch')
+class PostWorldEvent(View):
+    form_class = EditWorldEventForm
+    template_name = 'cells/post_world_event.html'
+    initial = {}
+    cell = None
+    world_event = None
+
+    def dispatch(self, *args, **kwargs):
+        self.cell = get_object_or_404(Cell, id=self.kwargs['cell_id'])
+        self.__check_permissions()
+        if "world_event_id" in self.kwargs:
+            self.world_event = get_object_or_404(WorldEvent, id=self.kwargs['world_event_id'])
+            self.initial = {
+                "headline": self.world_event.headline,
+                "event_description": self.world_event.event_description,
+            }
+        return super().dispatch(*args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, self.__get_context_data())
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            posting_new_event = not self.world_event
+            if posting_new_event:
+                self.world_event = WorldEvent(creator=request.user,
+                                              parent_cell=self.cell,)
+            self.world_event.headline = form.cleaned_data["headline"]
+            self.world_event.event_description = form.cleaned_data["event_description"]
+            with transaction.atomic():
+                self.world_event.save()
+            return HttpResponseRedirect(reverse('cells:cells_view_cell', args=(self.cell.id,)))
+        raise ValueError("Invalid edit setting form")
+
+    def __check_permissions(self):
+        if not self.cell.player_can_post_world_events(self.request.user):
+            raise PermissionDenied("You don't have permission to post World Events here.")
+
+    def __get_context_data(self):
+        context = {
+            'cell': self.cell,
+            'form': self.form_class(initial=self.initial),
+            'world_event': self.world_event,
+        }
+        return context
+
 
 def view_cell(request, cell_id):
     cell = get_object_or_404(Cell, id=cell_id)
@@ -210,14 +162,16 @@ def view_cell(request, cell_id):
     can_edit_characters = cell.player_can_edit_characters(request.user)
     can_administer = cell.player_can_admin(request.user)
     can_manage_games = cell.player_can_manage_games(request.user)
+    can_post_world_events = cell.player_can_post_world_events(request.user)
     memberships_and_characters = ()
     for role in ROLE:
         for membership in cell.cellmembership_set.filter(role = role[0]):
             characters = ()
-            for character in membership.member_player.character_set.filter(cell = cell, is_deleted=False):
+            for character in membership.member_player.character_set.filter(cell=cell, is_deleted=False):
                 if not character.is_dead():
                     characters = characters + (character,)
             memberships_and_characters = memberships_and_characters + ((membership, characters,),)
+    my_cell_contractors = request.user.character_set.filter(cell=cell, is_deleted=False)
     upcoming_games = cell.game_set.filter(status = GAME_STATUS[0][0])
     completed_games = cell.completed_games()
 
@@ -229,10 +183,12 @@ def view_cell(request, cell_id):
         'user_membership': user_membership,
         'can_administer': can_administer,
         'can_manage_games': can_manage_games,
+        'can_post_world_events': can_post_world_events,
         'memberships_and_characters': memberships_and_characters,
         'upcoming_games': upcoming_games,
         'completed_games': completed_games,
         'invite': invite,
+        'my_cell_contractors': my_cell_contractors,
     }
     return render(request, 'cells/view_cell.html', context)
 

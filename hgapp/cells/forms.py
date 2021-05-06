@@ -4,9 +4,6 @@ from tinymce.widgets import TinyMCE
 from overrides.widgets import CustomStylePagedown
 from .models import ROLE
 
-class EditCellForm:
-    pass
-
 class EditWorldForm(forms.Form):
     name = forms.CharField(label='Name',
                                    max_length=195,
@@ -88,3 +85,15 @@ class PlayerRoleForm(forms.Form):
                             widget=forms.TextInput(attrs={'form': 'manage_form'}))
     role = forms.ChoiceField(choices=ROLE,
                              widget=forms.Select(attrs={'form': 'manage_form', 'class': 'form-control form-inline'}))
+
+
+
+class EditWorldEventForm(forms.Form):
+    headline = forms.CharField(label='Headline',
+                           max_length=900,
+                           help_text='')
+    event_description = forms.CharField(label='Content',
+                                          widget=TinyMCE(attrs={'cols': 70, 'rows': 10}),
+                                          max_length=49000,
+                                          required=False,
+                                          help_text='')

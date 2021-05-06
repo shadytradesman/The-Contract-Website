@@ -1,0 +1,21 @@
+.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
+    background-color: #20252d;
+    border-bottom-width: 2px;
+    border-bottom-color: #20252d !important;
+
+}
+
+.panel-default {
+    border-color: #20252d;
+}
+.panel{
+    border-color: #20252d;
+}
+
+.nav-justified-sm > li {
+    display: table-cell;
+    width: 1%;
+}
+.nav-justified-sm > li > a {
+    margin-bottom: 0 !important;
+}

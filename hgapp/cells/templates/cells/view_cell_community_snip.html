@@ -1,0 +1,11 @@
+
+{% load account_tags %}
+{{cell.name}} was Founded by <a href="{% url 'profiles:profiles_view_profile' cell.creator.profile.id %}">{% user_display cell.creator %}</a>
+<br>
+Community Link
+<br>
+House Rules / Are Contractors Portable
+<br>
+Roster
+<br>
+Games record

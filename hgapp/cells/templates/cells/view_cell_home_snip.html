@@ -1,0 +1,24 @@
+{% if upcoming_games %}
+<div class="panel panel-default">
+    <h3 class="panel-heading">
+        Upcoming Games
+    </h3>
+    <ul>
+        {% for game in upcoming_games %}
+        <li>
+            <a href="{% url 'games:games_view_game' game.id %}">
+                {{ game.title }}
+            </a>
+            for <b>{{game.get_required_character_status_display}}</b> Contractors.
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+Upcoming Games
+<br>
+world events
+<br>
+Latest Games
+<br>
+Latest Journals

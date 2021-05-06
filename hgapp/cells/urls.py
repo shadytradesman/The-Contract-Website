@@ -17,6 +17,11 @@ urlpatterns = [
     # ex: .com/cells/invite/c/123
     url(r'^invite/c/(?P<cell_id>[\d]+)/$', views.invite_players, name='cells_invite_players'),
 
+    # ex: .com/cells/post-event/c/123
+    url(r'^post-event/c/(?P<cell_id>[\d]+)/$', views.PostWorldEvent.as_view(), name='cells_post_world_event'),
+    # ex: .com/cells/post-event/c/123/event-id/32/
+    url(r'^post-event/c/(?P<cell_id>[\d]+)/event-id/(?P<world_event_id>[\d]+)$', views.PostWorldEvent.as_view(), name='cells_edit_world_event'),
+
     # ex: .com/cells/invite/c/123/link-reset
     url(r'^invite/c/(?P<cell_id>[\d]+)/link-reset/$', views.reset_invite_link, name='cells_reset_invite_link'),
 

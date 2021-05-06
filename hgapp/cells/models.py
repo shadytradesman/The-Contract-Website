@@ -73,17 +73,20 @@ class Cell(models.Model):
     #TODO: how are games played? In person, on roll-20, on discord? online?
 
 
-    def player_can_edit_characters(self, player):
-        return player.has_perm(CELL_PERMISSIONS[4][0], self)
-
     def player_can_admin(self, player):
         return player.has_perm(CELL_PERMISSIONS[0][0], self)
 
-    def player_can_edit_world(self, player):
-        return player.has_perm(CELL_PERMISSIONS[5][0], self)
-
     def player_can_manage_memberships(self, player):
         return player.has_perm(CELL_PERMISSIONS[1][0], self)
+
+    def player_can_post_world_events(self, player):
+        return player.has_perm(CELL_PERMISSIONS[3][0], self)
+
+    def player_can_edit_characters(self, player):
+        return player.has_perm(CELL_PERMISSIONS[4][0], self)
+
+    def player_can_edit_world(self, player):
+        return player.has_perm(CELL_PERMISSIONS[5][0], self)
 
     def player_can_manage_games(self, player):
         return player.has_perm(CELL_PERMISSIONS[6][0], self)

@@ -1,10 +1,15 @@
 {% extends "site_base.html" %}
 
 {% load i18n %}
+{% load staticfiles %}
 
 {% block head_title %}Viewing Cell{% endblock %}
 
 {% block body_class %}home{% endblock %}
+
+{% block extra_styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'cells/view_cell.css' %}" />
+{% endblock %}
 
 {% load account_tags %}
 {% load markdown_deux_tags %}
@@ -15,42 +20,11 @@
         <h1>
         {{ cell.name }}
         </h1>
-        Founded by <a href="{% url 'profiles:profiles_view_profile' cell.creator.profile.id %}">{% user_display cell.creator %}</a>
+        A World {{cell.setting_sheet_blurb}}.
     </div>
-
-            {% include "_messages.html" %}
+    {% include "_messages.html" %}
     <br>
-    <ul class="nav nav-pills nav-justified navbar-default">
-        {% if request.user.is_authenticated and can_manage_memberships %}
-            <li>
-                <a href="{% url 'cells:cells_invite_players' cell.id %}">Find or Invite Players</a>
-            </li>
-            <li>
-                <a href="{% url 'cells:cells_manage_members' cell.id %}">Manage Memberships</a>
-            </li>
-        {% endif %}
-        {% if request.user.is_authenticated and can_edit_world %}
-            <li>
-                <a href="{% url 'cells:cells_edit' cell.id %}">
-                    Edit World
-                </a>
-            </li>
-        {% endif %}
-        {% if request.user.is_authenticated and user_membership %}
-            <li>
-                <a href="{% url 'cells:cells_leave_cell' cell.id %}">
-                    Leave Cell
-                </a>
-            </li>
-        {% endif %}
-        {% if request.user.is_authenticated and can_manage_games %}
-            <li>
-                <a href="{% url 'games:games_create_ex_game_for_cell' cell.id %}">
-                    Declare a Completed Game
-                </a>
-            </li>
-        {% endif %}
-    </ul>
+    {% include "cells/view_cell_navbar_snip.html" %}
     <br>
     {% if invite %}
         <div class="alert alert-success text-center">
@@ -59,8 +33,30 @@
             <h4><a href="{% url 'cells:cells_rsvp_invite' cell.id %}">Click here to RSVP</a></h4>
         </div>
     {% endif %}
+    <div>
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs nav-justified nav-justified-sm" role="tablist">
+            <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Home</a></li>
+            <li role="presentation"><a href="#community" aria-controls="community" role="tab" data-toggle="tab">Community</a></li>
+            <li role="presentation"><a href="#setting" aria-controls="setting" role="tab" data-toggle="tab">Setting</a></li>
+        </ul>
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="home">
+                        {% include "cells/view_cell_home_snip.html" %}
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="community">
+                        {% include "cells/view_cell_community_snip.html" %}
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="setting">
+                        {% include "cells/view_cell_setting_snip.html" %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-        <div class=" panel panel-default">
             <h3 class = "panel-heading" role="tab" id="settingHeading">
                 <a role="button" data-toggle="collapse" href="#collapseSetting" aria-expanded="true" aria-controls="collapseSetting">
                     Setting - <b>{{ cell.setting_name }}</b>
@@ -121,23 +117,6 @@
                 </ul>
             </div>
         </div>
-        {% if upcoming_games %}
-            <div class="panel panel-default">
-                <h3 class="panel-heading">
-                    Upcoming Games
-                </h3>
-                <ul>
-                    {% for game in upcoming_games %}
-                    <li>
-                        <a href="{% url 'games:games_view_game' game.id %}">
-                            {{ game.title }}
-                        </a>
-                        for <b>{{game.get_required_character_status_display}}</b> level characters
-                    </li>
-                {% endfor %}
-                </ul>
-            </div>
-        {% endif %}
         {% if completed_games %}
             <div class=" panel panel-default">
                 <h3 class="panel-heading">
