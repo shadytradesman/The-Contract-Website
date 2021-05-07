@@ -1,22 +1,45 @@
 {% if upcoming_games %}
-<div class="panel panel-default">
-    <h3 class="panel-heading">
-        Upcoming Games
-    </h3>
-    <ul>
-        {% for game in upcoming_games %}
-        <li>
+    {% for game in upcoming_games %}
+        <div class="alert alert-info text-center" role="alert">
+            <h4 class="text-center" style="display: inline-block; margin-bottom: 0px;">
+                Upcoming Game -
+                <a href="{% url 'profiles:profiles_view_profile' game.gm.id %}">
+                    {{game.gm.username}}
+                </a>
+                will run
+                <a href="{% url 'games:games_view_game' game.id %}">
+                    {{game.title}}
+                </a>
+                in {{game.scheduled_start_time|timeuntil}}.
+            </h4>
             <a href="{% url 'games:games_view_game' game.id %}">
-                {{ game.title }}
+                (Click to view)
             </a>
-            for <b>{{game.get_required_character_status_display}}</b> Contractors.
-        </li>
-        {% endfor %}
-    </ul>
-</div>
+        </div>
+    {% endfor %}
 {% endif %}
-Upcoming Games
-<br>
+{% if world_events %}
+    <h2 class="text-center">Latest World Events</h2>
+    {% for event in world_events|slice:":2" %}
+        <div class="thumbnail">
+            <h3>
+                {{event.headline}}
+            </h3>
+            {{event.event_description|safe}}
+        </div>
+    {% endfor %}
+{% elif can_post_world_events %}
+    <h3 class="text-center">{{cell.name}} does not have any World Events yet</h3>
+    <div class="thumbnail text-center">
+        Use <b>World Events</b> to announce important developments in {{cell.name}}.
+        <br>
+        These may be the result of a Game, the actions of a Contractor, or a special event. Contractors and NPCs in this
+        World may hear about these events and choose to investigate.
+        <br>
+        <a href="{% url 'cells:cells_post_world_event' cell.id %}">Post a new World Event</a>
+    </div>
+{% endif %}
+
 world events
 <br>
 Latest Games

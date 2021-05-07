@@ -87,7 +87,6 @@ class PlayerRoleForm(forms.Form):
                              widget=forms.Select(attrs={'form': 'manage_form', 'class': 'form-control form-inline'}))
 
 
-
 class EditWorldEventForm(forms.Form):
     headline = forms.CharField(label='Headline',
                            max_length=900,

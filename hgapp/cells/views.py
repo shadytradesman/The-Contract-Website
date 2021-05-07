@@ -174,6 +174,7 @@ def view_cell(request, cell_id):
     my_cell_contractors = request.user.character_set.filter(cell=cell, is_deleted=False)
     upcoming_games = cell.game_set.filter(status = GAME_STATUS[0][0])
     completed_games = cell.completed_games()
+    world_events = WorldEvent.objects.filter(parent_cell=cell).order_by("-created_date").all()
 
     context = {
         'cell': cell,
@@ -189,6 +190,7 @@ def view_cell(request, cell_id):
         'completed_games': completed_games,
         'invite': invite,
         'my_cell_contractors': my_cell_contractors,
+        'world_events': world_events,
     }
     return render(request, 'cells/view_cell.html', context)
 

@@ -13,7 +13,11 @@
 {% endblock %}
 
 {% block head_title %}
-    Editing World
+    {% if cell %}
+        Editing World
+    {% else %}
+        New World
+    {% endif %}
 {% endblock %}
 
 {% block extra_head %}
