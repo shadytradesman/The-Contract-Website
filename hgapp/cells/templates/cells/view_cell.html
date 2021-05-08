@@ -11,6 +11,10 @@
     <link rel="stylesheet" type="text/css" href="{% static 'cells/view_cell.css' %}" />
 {% endblock %}
 
+{% block extra_scripts %}
+    <script src="{% static 'js/view_cell.js' %}"></script>
+{% endblock %}
+
 {% load account_tags %}
 {% load markdown_deux_tags %}
 
@@ -38,9 +42,9 @@
         <ul class="nav nav-tabs nav-justified nav-justified-sm" role="tablist">
             <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Home</a></li>
             <li role="presentation"><a href="#community" aria-controls="community" role="tab" data-toggle="tab">Community</a></li>
-            <li role="presentation"><a href="#setting" aria-controls="setting" role="tab" data-toggle="tab">Setting</a></li>
+            <li role="presentation"><a id="settingTab" href="#setting" aria-controls="setting" role="tab" data-toggle="tab">Setting</a></li>
         </ul>
-        <div class="panel panel-default">
+        <div class="panel panel-default css-cell-body">
             <div class="panel-body">
                 <div class="tab-content">
                     <div role="tabpanel" class="tab-pane active" id="home">
@@ -57,19 +61,6 @@
         </div>
     </div>
     <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-            <h3 class = "panel-heading" role="tab" id="settingHeading">
-                <a role="button" data-toggle="collapse" href="#collapseSetting" aria-expanded="true" aria-controls="collapseSetting">
-                    Setting - <b>{{ cell.setting_name }}</b>
-                </a>
-            </h3>
-            <div class="panel-body">
-                <div id="collapseSetting" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="settingHeading">
-                    <p>
-                        {{ cell.setting_description | safe }}
-                    </p>
-                </div>
-            </div>
-        </div>
         <div class = "panel panel-default">
             <h3 class = "panel-heading" role="tab" id="rosterHeading">
                 <a role="button" data-toggle="collapse" href="#collapseRoster" aria-expanded="true" aria-controls="collapseRoster">

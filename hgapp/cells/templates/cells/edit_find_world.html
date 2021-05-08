@@ -11,11 +11,7 @@
 {% endblock %}
 
 {% block head_title %}
-    {% if world_event %}
-        Editing World Event
-    {% else %}
-        Post World Event
-    {% endif %}
+    Editing World Posting
 {% endblock %}
 
 {% block extra_head %}
@@ -30,26 +26,24 @@ home
 <div class="container">
     {{ form.about.errors }}
     <h1 class="text-center">
-        {% if world_event %}
-            Editing World Event
-        {% else %}
-            New World Event in {{cell.name}}
-        {% endif %}
+        Editing {{cell.name}}' Recruitment Settings
     </h1>
-    {% if world_event %}
-        <form action="{% url 'cells:cells_edit_world_event' cell.id world_event.id %}" method="post">
-    {% else %}
-        <form action="{% url 'cells:cells_post_world_event' cell.id %}" method="post">
-    {% endif %}
+    <form action="{% url 'cells:cells_edit_find_world' cell.id %}" method="post">
             {{ form.non_field_errors }}
             {% csrf_token %}
             <div class="panel panel-default">
                 <div class="panel-body">
-                    {{form.headline |bootstrap }}
-                    {{form.event_description | bootstrap}}
-                    {% if world_event %}
-                        {{ form.should_delete|bootstrap}}
-                    {% endif %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{form.list_publicly|bootstrap}}
+                        </div>
+                        <div class="col-md-6">
+                            {{form.allow_self_invites|bootstrap}}
+                        </div>
+                    </div>
+                    {{form.cell_sell|bootstrap}}
+                    {{form.community_link|bootstrap}}
+                    {{form.is_community_link_public|bootstrap}}
                     <div class="text-center">
                         <input class="btn btn-primary btn-lg" type="submit" value="Done!" />
                     </div>

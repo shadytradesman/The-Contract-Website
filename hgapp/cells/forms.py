@@ -55,19 +55,22 @@ class CustomInviteForm(forms.Form):
 class RecruitmentForm(forms.Form):
     list_publicly = forms.BooleanField(label='List Publicly',
                                        required=False,
-                                       help_text='If checked, your Cell will appear on the "Looking for Cell" page.')
+                                       help_text='If checked, your World will appear on the "Find Worlds" page.')
     allow_self_invites = forms.BooleanField(label='Allow Self-Invites',
                                             required=False,
-                                            help_text='If checked, anyone with an account may join your Cell.')
-    cell_sell = forms.CharField(label='Cell Sell',
+                                            help_text='If checked, anyone with an account may join your World.')
+    cell_sell = forms.CharField(label='World Sell',
                                 widget=forms.Textarea,
                                 max_length=9800,
                                 required=False,
-                                help_text='Summarize your Cell (not setting) to prospective Players.')
+                                help_text='Summarize your World (not just setting) to prospective Players.')
     community_link = forms.CharField(label='Community Link',
                                      max_length=1000,
                                      required=False,
-                                     help_text='Link to a forum, Discord Server, or other site where this Cell hangs out.')
+                                     help_text='Link to a forum, Discord Server, or other site where the members of this World hang out.')
+    is_community_link_public = forms.BooleanField(label='Show Community Link to Non-Members',
+                                       required=False,
+                                       help_text='If checked, your World\'s Community Link will be visible to non-members' )
 
 
 class RsvpForm(forms.Form):
@@ -96,3 +99,7 @@ class EditWorldEventForm(forms.Form):
                                           max_length=49000,
                                           required=False,
                                           help_text='')
+    should_delete = forms.BooleanField(label='Delete Event',
+                                       initial=False,
+                                       required=False,
+                                       help_text='If checked, this World Event will be deleted.')

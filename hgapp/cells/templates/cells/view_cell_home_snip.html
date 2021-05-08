@@ -1,6 +1,6 @@
 {% if upcoming_games %}
     {% for game in upcoming_games %}
-        <div class="alert alert-info text-center" role="alert">
+        <div class="alert alert-info text-center css-upcoming-game" role="alert">
             <h4 class="text-center" style="display: inline-block; margin-bottom: 0px;">
                 Upcoming Game -
                 <a href="{% url 'profiles:profiles_view_profile' game.gm.id %}">
@@ -12,6 +12,7 @@
                 </a>
                 in {{game.scheduled_start_time|timeuntil}}.
             </h4>
+            <div class="clearfix visible-sm-block"></div>
             <a href="{% url 'games:games_view_game' game.id %}">
                 (Click to view)
             </a>
@@ -19,14 +20,20 @@
     {% endfor %}
 {% endif %}
 {% if world_events %}
-    <h2 class="text-center">Latest World Events</h2>
+    <h2 class="text-center" style="margin-bottom:5px;">Latest World Events</h2>
+    <div class="text-center" style="margin-bottom:5px">
+        {% if can_post_world_events %}
+        <a href="{% url 'cells:cells_post_world_event' cell.id %}">
+            <small>Post a new World Event</small>
+        </a>
+        -
+        {% endif %}
+        <a id="js-all-world-tab" href="#allWorldEvents" >
+            <small>View all World Events</small>
+        </a>
+    </div>
     {% for event in world_events|slice:":2" %}
-        <div class="thumbnail">
-            <h3>
-                {{event.headline}}
-            </h3>
-            {{event.event_description|safe}}
-        </div>
+        {% include "cells/world_event_snip.html" %}
     {% endfor %}
 {% elif can_post_world_events %}
     <h3 class="text-center">{{cell.name}} does not have any World Events yet</h3>
@@ -39,9 +46,13 @@
         <a href="{% url 'cells:cells_post_world_event' cell.id %}">Post a new World Event</a>
     </div>
 {% endif %}
+<div class="row">
+    <div class="col-md-6">
 
-world events
-<br>
+    </div>
+</div>
+
+
 Latest Games
 <br>
 Latest Journals

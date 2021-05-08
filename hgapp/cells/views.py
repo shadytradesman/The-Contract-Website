@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.views import View
 from django.shortcuts import render
 from django.db import transaction
-from cells.forms import CustomInviteForm, RsvpForm, PlayerRoleForm, KickForm, EditWorldForm, EditWorldEventForm
+from cells.forms import CustomInviteForm, RsvpForm, PlayerRoleForm, KickForm, EditWorldForm, EditWorldEventForm, RecruitmentForm
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
@@ -10,7 +10,7 @@ from django.contrib import messages
 from django.utils.safestring import mark_safe
 
 from hgapp.utilities import get_object_or_none
-from .models import Cell, ROLE, CellInvite, WorldEvent
+from .models import Cell, ROLE, CellInvite, WorldEvent, CellMembership
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from games.models import Scenario
@@ -98,6 +98,54 @@ class EditWorld(View):
         }
         return context
 
+
+@method_decorator(login_required(login_url='account_login'), name='dispatch')
+class EditFindWorld(View):
+    form_class = RecruitmentForm
+    template_name = 'cells/edit_find_world.html'
+    initial = {}
+    cell = None
+    INITIAL_DATA_CELL_ID = 1
+
+    def dispatch(self, *args, **kwargs):
+        self.cell = get_object_or_404(Cell, id=self.kwargs['cell_id'])
+        self.__check_permissions()
+        self.initial = {
+            "list_publicly": self.cell.is_listed_publicly,
+            "allow_self_invites": self.cell.allow_self_invites,
+            "cell_sell": self.cell.cell_sell,
+            "community_link": self.cell.community_link,
+            "is_community_link_public": self.cell.is_community_link_public,
+        }
+        return super().dispatch(*args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, self.__get_context_data())
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            self.cell.is_listed_publicly = form.cleaned_data['list_publicly']
+            self.cell.allow_self_invites = form.cleaned_data['allow_self_invites']
+            self.cell.cell_sell = form.cleaned_data['cell_sell']
+            self.cell.community_link = form.cleaned_data['community_link']
+            self.cell.is_community_link_public = form.cleaned_data["is_community_link_public"]
+            with transaction.atomic():
+                self.cell.save()
+            return HttpResponseRedirect(reverse('cells:cells_view_cell', args=(self.cell.id,)))
+        raise ValueError("Invalid edit setting form")
+
+    def __check_permissions(self):
+        if not self.cell.player_can_manage_memberships(self.request.user):
+            raise PermissionDenied("You don't have permissions to edit the recruitment materials.")
+
+    def __get_context_data(self):
+        context = {
+            'cell': self.cell,
+            'form': self.form_class(initial=self.initial),
+        }
+        return context
+
 @method_decorator(login_required(login_url='account_login'), name='dispatch')
 class PostWorldEvent(View):
     form_class = EditWorldEventForm
@@ -108,13 +156,13 @@ class PostWorldEvent(View):
 
     def dispatch(self, *args, **kwargs):
         self.cell = get_object_or_404(Cell, id=self.kwargs['cell_id'])
-        self.__check_permissions()
         if "world_event_id" in self.kwargs:
             self.world_event = get_object_or_404(WorldEvent, id=self.kwargs['world_event_id'])
             self.initial = {
                 "headline": self.world_event.headline,
                 "event_description": self.world_event.event_description,
             }
+        self.__check_permissions()
         return super().dispatch(*args, **kwargs)
 
     def get(self, request, *args, **kwargs):
@@ -127,6 +175,11 @@ class PostWorldEvent(View):
             if posting_new_event:
                 self.world_event = WorldEvent(creator=request.user,
                                               parent_cell=self.cell,)
+            else:
+                if form.cleaned_data["should_delete"]:
+                    with transaction.atomic():
+                        self.world_event.delete()
+                    return HttpResponseRedirect(reverse('cells:cells_view_cell', args=(self.cell.id,)))
             self.world_event.headline = form.cleaned_data["headline"]
             self.world_event.event_description = form.cleaned_data["event_description"]
             with transaction.atomic():
@@ -135,8 +188,13 @@ class PostWorldEvent(View):
         raise ValueError("Invalid edit setting form")
 
     def __check_permissions(self):
-        if not self.cell.player_can_post_world_events(self.request.user):
-            raise PermissionDenied("You don't have permission to post World Events here.")
+        if not self.world_event:
+            if not self.cell.player_can_post_world_events(self.request.user):
+                raise PermissionDenied("You don't have permission to post World Events here.")
+        else:
+            if not self.cell.player_can_edit_world(self.request.user) and not self.world_event.creator == self.request.user:
+                raise PermissionDenied("You don't have permission to edit this World Event.")
+
 
     def __get_context_data(self):
         context = {
@@ -176,6 +234,8 @@ def view_cell(request, cell_id):
     completed_games = cell.completed_games()
     world_events = WorldEvent.objects.filter(parent_cell=cell).order_by("-created_date").all()
 
+    can_view_community_link = cell.is_community_link_public or CellMembership.objects.filter(relevant_cell=cell, member_player=request.user)
+
     context = {
         'cell': cell,
         'can_edit_world': can_edit_world,
@@ -191,6 +251,7 @@ def view_cell(request, cell_id):
         'invite': invite,
         'my_cell_contractors': my_cell_contractors,
         'world_events': world_events,
+        'can_view_community_link': can_view_community_link,
     }
     return render(request, 'cells/view_cell.html', context)
 

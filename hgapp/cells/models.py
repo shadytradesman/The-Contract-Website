@@ -68,6 +68,7 @@ class Cell(models.Model):
     cell_sell = models.CharField(max_length=10000, null=True, blank=True)
     house_rules = models.CharField(max_length=50000, null=True, blank=True)
     community_link = models.CharField(max_length=1000, null=True, blank=True)
+    is_community_link_public = models.BooleanField(default=False)
     is_listed_publicly = models.BooleanField(default=False)
     are_contractors_portable = models.BooleanField(default=True)
     #TODO: how are games played? In person, on roll-20, on discord? online?

@@ -11,6 +11,9 @@ urlpatterns = [
     # ex: .com/cells/edit/c/123
     url(r'^edit/c/(?P<cell_id>[\d]+)/$', views.EditWorld.as_view(), name='cells_edit'),
 
+    # ex: .com/cells/edit/c/123
+    url(r'^edit-find-world/c/(?P<cell_id>[\d]+)/$', views.EditFindWorld.as_view(), name='cells_edit_find_world'),
+
     # ex: .com/cells/view/c/123
     url(r'^view/c/(?P<cell_id>[\d]+)/$', views.view_cell, name='cells_view_cell'),
 

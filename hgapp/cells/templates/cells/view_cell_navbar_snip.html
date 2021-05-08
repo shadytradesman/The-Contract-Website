@@ -41,7 +41,10 @@
         <ul class="dropdown-menu" aria-labelledby="dLabel">
             {% if request.user.is_authenticated and can_manage_memberships %}
             <li>
-                <a href="{% url 'cells:cells_invite_players' cell.id %}">Find or Invite Players</a>
+                <a href="{% url 'cells:cells_invite_players' cell.id %}">Invite Players</a>
+            </li>
+            <li>
+                <a href="{% url 'cells:cells_edit_find_world' cell.id %}">Edit Recruitment Settings</a>
             </li>
             <li>
                 <a href="{% url 'cells:cells_manage_members' cell.id %}">Manage Memberships</a>

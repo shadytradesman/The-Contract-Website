@@ -107,7 +107,7 @@ def update_character_from_post(user, POST, existing_character):
     if char_form.is_valid():
         char_form.save(commit=False)
         existing_character.edit_date = timezone.now()
-        if user.is_authenticated and char_form.cleaned_data['cell']:
+        if user.is_authenticated and 'cell' in char_form.changed_data:
             existing_character.cell = char_form.cleaned_data['cell']
         existing_character.save()
         if existing_character.private != char_form.cleaned_data['private']:

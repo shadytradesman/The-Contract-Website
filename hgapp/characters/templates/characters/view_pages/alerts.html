@@ -7,6 +7,41 @@
             </p>
         </div>
     {% endif %}
+    {% if not character.cell  %}
+        {% if character.number_of_victories > 3 %}
+            <div class="alert alert-danger text-center css-char-alert" role="alert">
+                <p>
+                    {{character.name}} does not have a home World despite having {{character.number_of_victories}} Victories.
+                    They should not play in any Games until they have a home.
+                    <br>
+                    <a href="{% url 'cells:find_world' ">
+                        Find a World to join
+                    </a>
+                    and then
+                    <a href="{% url 'characters:characters_edit' character.id secret_key %}" >
+                        Edit {{character.name}}
+                    </a>
+                    to add them to it.
+                </p>
+            </div>
+        {% else %}
+            <div class="alert alert-warning text-center css-char-alert" role="alert">
+                <p>
+                    {{character.name}} does not have a home World. They cannot interact with Contractors on their Downtime
+                    and must choose a home before playing more than 3 Games.
+                    <br>
+                    <a href="{% url 'cells:find_world' ">
+                        Find a World to join
+                    </a>
+                    and then
+                    <a href="{% url 'characters:characters_edit' character.id secret_key %}" >
+                        Edit {{character.name}}
+                    </a>
+                    to add them to it.
+                </p>
+            </div>
+        {% endif %}
+    {% endif %}
     {% if character.get_power_cost_total != character.active_spent_rewards|length %}
         <div class="alert alert-danger text-center css-char-alert" role="alert">
             <p>

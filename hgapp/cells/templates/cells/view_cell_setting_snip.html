@@ -1,5 +1,18 @@
-Setting Summary
-<br>
-expandable setting description
-<br>
-Latest World Events
+<div class="lead css-setting-summary">
+    {{cell.setting_summary|linebreaks}}
+</div>
+<h3 class="text-center">Full Setting Description</h3>
+<div class="thumbnail expandable-outer js-expandable-collapsed" role="button" style="padding-left: 20px; padding-right: 20px;">
+    {{cell.setting_description|safe}}
+</div>
+<div id="allWorldEvents">
+    <h3 class="text-center">World Events</h3>
+    {% if can_post_world_events %}
+        <div class="text-center">
+            <a href="{% url 'cells:cells_post_world_event' cell.id %}">Post a new World Event</a>
+        </div>
+    {% endif %}
+    {% for event in world_events %}
+        {% include "cells/world_event_snip.html" %}
+    {% endfor %}
+</div>
