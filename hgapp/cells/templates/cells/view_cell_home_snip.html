@@ -1,3 +1,5 @@
+{% load account_tags %}
+
 {% if upcoming_games %}
     {% for game in upcoming_games %}
         <div class="alert alert-info text-center css-upcoming-game" role="alert">
@@ -48,11 +50,76 @@
 {% endif %}
 <div class="row">
     <div class="col-md-6">
-
+        <div class="text-center">
+            <h4>Latest Journals</h4>
+        </div>
+        {% if latest_journals %}
+            {% for journal in latest_journals|slice:":3" %}
+                {% include "cells/view_cell_journal_snip.html" %}
+            {% endfor %}
+            <div class="text-center">
+                <a class="btn btn-primary btn-sm" data-toggle="collapse" href="#moreJournals" role="button" aria-expanded="false" aria-controls="moreJournals">
+                    More Journals
+                </a>
+            </div>
+            <div class="collapse" id="moreJournals">
+                {% for journal in latest_journals|slice:"3:" %}
+                    {% include "cells/view_cell_journal_snip.html" %}
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center">
+                <p>
+                    You cannot view any Journals written for Games that occurred in this World.
+                </p>
+            </div>
+        {% endif %}
+    </div>
+    <div class="col-md-6">
+        <div class="text-center">
+            <h4>Latest Completed Games</h4>
+            <small>{{cell.num_completed_games}} Games have been run in this World</small>
+        </div>
+        {% if completed_games %}
+            {% for game in completed_games|slice:":3" %}
+                <div>
+                <small>
+                    {{ game.end_time|timesince }} ago:
+                    <a href="{% url 'profiles:profiles_view_profile' game.gm.id %}">
+                        {% user_display game.gm %}
+                    </a>
+                    ran
+                    <a href="{% url 'games:games_view_game' game.id %}">
+                        {{ game.scenario.title }}
+                    </a>
+                </small>
+                    <div class="thumbnail">
+                        {% include "cells/view_cell_game_snip.html" %}
+                    </div>
+                </div>
+            {% endfor %}
+            <br>
+            <div class="text-center">
+                <a class="btn btn-primary btn-sm" data-toggle="collapse" href="#moreGames" role="button" aria-expanded="false" aria-controls="moreGames">
+                    All Completed Games
+                </a>
+            </div>
+            <div class="collapse" id="moreGames">
+                {% for game in completed_games|slice:"3:" %}
+                <div>
+                    <small>
+                        {{ game.end_time|timesince }} ago:
+                        <a href="{% url 'profiles:profiles_view_profile' game.gm.id %}">
+                            {% user_display game.gm %}
+                        </a>
+                        ran
+                        <a href="{% url 'games:games_view_game' game.id %}">
+                            {{ game.scenario.title }}
+                        </a>
+                    </small>
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
     </div>
 </div>
-
-
-Latest Games
-<br>
-Latest Journals

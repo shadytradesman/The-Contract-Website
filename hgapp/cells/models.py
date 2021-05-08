@@ -43,6 +43,8 @@ class Cell(models.Model):
         on_delete=models.PROTECT)
     created_date = models.DateTimeField('date created',
                                         auto_now_add=True)
+    find_world_date = models.DateTimeField('find world date',
+                                           auto_now_add=True)
     members = models.ManyToManyField(settings.AUTH_USER_MODEL,
                                      through="CellMembership",
                                      through_fields=('relevant_cell', 'member_player'))
@@ -159,9 +161,15 @@ class Cell(models.Model):
         return self.cellmembership_set.count()
 
     def completed_games(self):
+        return self.completed_games_queryset().all()
+
+    def num_completed_games(self):
+        return self.completed_games_queryset().count()
+
+    def completed_games_queryset(self):
         return self.game_set \
-            .exclude(get_completed_game_excludes_query()) \
-            .order_by("end_time").all()
+            .exclude(get_completed_game_excludes_query())\
+            .order_by("-end_time")
 
     def num_games_player_participated(self, player):
         completed_games = self.completed_games()

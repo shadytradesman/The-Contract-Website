@@ -363,7 +363,7 @@ class Character(models.Model):
         return not self.private or player.has_perm("view_private_character", self) or self.player_has_cell_edit_perms(player)
 
     def completed_games(self):
-        return self.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).order_by("relevant_game__end_time").all()
+        return self.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).order_by("-relevant_game__end_time").all()
 
     def completed_games_rev_sort(self):
         return self.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).order_by("-relevant_game__end_time").all()

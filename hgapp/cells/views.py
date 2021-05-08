@@ -15,6 +15,7 @@ from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from games.models import Scenario
 from games.games_constants import GAME_STATUS
+from journals.models import Journal
 from django.core.exceptions import PermissionDenied
 from postman.api import pm_write
 from django.utils.safestring import SafeText
@@ -207,20 +208,28 @@ class PostWorldEvent(View):
 
 def view_cell(request, cell_id):
     cell = get_object_or_404(Cell, id=cell_id)
-    #TODO: View permissions? Private cells?
-    can_manage_memberships = cell.player_can_manage_memberships(request.user)
-    can_edit_world = cell.player_can_edit_world(request.user)
     user_membership = None
     invite = None
+    can_manage_memberships = None
+    can_edit_world = None
+    can_edit_characters = None
+    can_administer = None
+    can_manage_games = None
+    can_post_world_events = None
+    my_cell_contractors = None
     if request.user.is_authenticated:
-        invite = get_object_or_none(cell.open_invitations().filter(invited_player=request.user))
-        user_membership = cell.get_player_membership(request.user)
         if not request.user.profile.confirmed_agreements:
             return HttpResponseRedirect(reverse('profiles:profiles_terms'))
-    can_edit_characters = cell.player_can_edit_characters(request.user)
-    can_administer = cell.player_can_admin(request.user)
-    can_manage_games = cell.player_can_manage_games(request.user)
-    can_post_world_events = cell.player_can_post_world_events(request.user)
+        invite = get_object_or_none(cell.open_invitations().filter(invited_player=request.user))
+        user_membership = cell.get_player_membership(request.user)
+        can_manage_memberships = cell.player_can_manage_memberships(request.user)
+        can_edit_world = cell.player_can_edit_world(request.user)
+        can_edit_characters = cell.player_can_edit_characters(request.user)
+        can_administer = cell.player_can_admin(request.user)
+        can_manage_games = cell.player_can_manage_games(request.user)
+        can_post_world_events = cell.player_can_post_world_events(request.user)
+        my_cell_contractors = request.user.character_set.filter(cell=cell, is_deleted=False)
+
     memberships_and_characters = ()
     for role in ROLE:
         for membership in cell.cellmembership_set.filter(role = role[0]):
@@ -229,12 +238,27 @@ def view_cell(request, cell_id):
                 if not character.is_dead():
                     characters = characters + (character,)
             memberships_and_characters = memberships_and_characters + ((membership, characters,),)
-    my_cell_contractors = request.user.character_set.filter(cell=cell, is_deleted=False)
     upcoming_games = cell.game_set.filter(status = GAME_STATUS[0][0])
     completed_games = cell.completed_games()
     world_events = WorldEvent.objects.filter(parent_cell=cell).order_by("-created_date").all()
 
-    can_view_community_link = cell.is_community_link_public or CellMembership.objects.filter(relevant_cell=cell, member_player=request.user)
+    can_view_community_link = cell.is_community_link_public or user_membership
+    community_link = cell.community_link if can_view_community_link else None
+
+    journal_query = Journal.objects.filter(game_attendance__attending_character__private=False)\
+        .filter(game_attendance__relevant_game__cell=cell)
+    if request.user.is_anonymous:
+        journal_query.filter(contains_spoilers=False, is_nsfw=False)
+    elif not request.user.profile.view_adult_content:
+        journal_query.filter(is_nsfw=False)
+    public_journals = journal_query.order_by('-created_date').all()[:20]
+    max_journals_to_display = 20
+    displayed_journals = []
+    for journal in public_journals:
+        if max_journals_to_display <= len(displayed_journals):
+            break
+        if journal.player_can_view(request.user):
+            displayed_journals.append(journal)
 
     context = {
         'cell': cell,
@@ -251,7 +275,8 @@ def view_cell(request, cell_id):
         'invite': invite,
         'my_cell_contractors': my_cell_contractors,
         'world_events': world_events,
-        'can_view_community_link': can_view_community_link,
+        'community_link': community_link,
+        'latest_journals': displayed_journals,
     }
     return render(request, 'cells/view_cell.html', context)
 
@@ -309,15 +334,15 @@ def rsvp_invite(request, cell_id, secret_key = None, accept = None):
         return HttpResponseRedirect(reverse('cells:cells_view_cell', args=(cell.id,)))
     invite = get_object_or_none(cell.open_invitations().filter(invited_player=request.user))
     if not invite:
-        if not secret_key or not cell.invite_link_secret_key == secret_key:
-            raise PermissionDenied("This Cell invite link has expired. Ask for a new one.")
+        if not cell.allow_self_invites and (not secret_key or not cell.invite_link_secret_key == secret_key):
+            raise PermissionDenied("You have not been invited to this World or your invite link has expired. Ask for a new one.")
     if request.method == 'POST':
         form = RsvpForm(request.POST)
         if form.is_valid():
             with transaction.atomic():
                 if is_accepted and invite:
                     invite.accept()
-                elif is_accepted and cell.invite_link_secret_key == secret_key:
+                elif is_accepted and not invite:
                     cell.addPlayer(request.user, ROLE[2])
                 elif invite:
                     invite.reject()

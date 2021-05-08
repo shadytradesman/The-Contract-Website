@@ -28,20 +28,33 @@
     </div>
     {% include "_messages.html" %}
     <br>
-    {% include "cells/view_cell_navbar_snip.html" %}
-    <br>
-    {% if invite %}
+    {% if user_membership %}
+        {% include "cells/view_cell_navbar_snip.html" %}
+        <br>
+    {% elif invite %}
         <div class="alert alert-success text-center">
-            <h2>You have been invited to join this cell</h2>
-            <br>
+            <h3>You have been invited to join this World</h3>
             <h4><a href="{% url 'cells:cells_rsvp_invite' cell.id %}">Click here to RSVP</a></h4>
+        </div>
+    {% elif cell.allow_self_invites %}
+        <div class="alert alert-success text-center">
+        <h3 style="margin-top: 5px;">This World allows self-invites</h3>
+        {% if user.is_anonymous %}
+            But you must
+            <a href="{% url 'account_signup' %}">Sign up</a>
+            or
+            <a href="{% url 'account_login' %}">Log in</a>
+            to join.
+        {% else %}
+            <h4><a href="{% url 'cells:cells_rsvp_invite' cell.id %}">Click here to join</a></h4>
+        {% endif %}
         </div>
     {% endif %}
     <div>
         <!-- Nav tabs -->
         <ul class="nav nav-tabs nav-justified nav-justified-sm" role="tablist">
-            <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Home</a></li>
-            <li role="presentation"><a href="#community" aria-controls="community" role="tab" data-toggle="tab">Community</a></li>
+            <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Latest Updates</a></li>
+            <li role="presentation"><a href="#community" aria-controls="community" role="tab" data-toggle="tab">Members</a></li>
             <li role="presentation"><a id="settingTab" href="#setting" aria-controls="setting" role="tab" data-toggle="tab">Setting</a></li>
         </ul>
         <div class="panel panel-default css-cell-body">
@@ -59,72 +72,6 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-        <div class = "panel panel-default">
-            <h3 class = "panel-heading" role="tab" id="rosterHeading">
-                <a role="button" data-toggle="collapse" href="#collapseRoster" aria-expanded="true" aria-controls="collapseRoster">
-                    Roster
-                </a>
-            </h3>
-            <div id="collapseRoster" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="rosterHeading">
-                <ul>
-                    {% for membership_and_characters in memberships_and_characters %}
-                        <li class = "panel-heading">
-                            <span class = "lead">
-                                <strong>
-                                    <a href="{% url 'profiles:profiles_view_profile' membership_and_characters.0.member_player.id %}">
-                                        {% user_display membership_and_characters.0.member_player %}
-                                    </a>
-                                </strong>
-                                - {{ membership_and_characters.0.get_role_display }}
-                            </span>
-                            {% if membership_and_characters.1 %}
-                                <br>
-                                Playing
-                                <ul>
-                                {% for character in membership_and_characters.1 %}
-                                    <li>
-                                        <a href="{% url 'characters:characters_view' character.id %}">
-                                            {{ character.name }}
-                                        </a>
-                                        <small>
-                                            - a {{character.number_of_victories }} Gift {{ character.get_status_display }} Character
-                                        </small>
-                                        {% if character.unspent_rewards|length > 0 and can_edit_characters %}
-                                            <ul><li>
-                                                <a class="btn-success"
-                                                   href="{% url 'characters:characters_spend_reward' character.id %}">
-                                                    Allocate {{ character.name }}'s rewards on behalf of {% user_display membership_and_characters.0.member_player %}
-                                                </a>
-                                            </li></ul>
-                                        {% endif %}
-                                    </li>
-                                {% endfor %}
-                                </ul>
-                            {% endif %}
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </div>
-        {% if completed_games %}
-            <div class=" panel panel-default">
-                <h3 class="panel-heading">
-                    Completed Games
-                </h3>
-                <ul>
-                    {% for game in completed_games %}
-                    <li>
-                        <a href="{% url 'games:games_view_game' game.id %}">
-                            {{ game.scenario.title }}
-                        </a>
-                        - run by {% user_display game.gm %} on {{ game.end_time }}
-                    </li>
-                {% endfor %}
-                </ul>
-            </div>
-        {% endif %}
     </div>
 </div>
 {% endblock %}

@@ -1,11 +1,56 @@
-
 {% load account_tags %}
-{{cell.name}} was Founded by <a href="{% url 'profiles:profiles_view_profile' cell.creator.profile.id %}">{% user_display cell.creator %}</a>
-<br>
-Community Link
-<br>
-House Rules / Are Contractors Portable
-<br>
-Roster
-<br>
-Games record
+<h4 class="text-center">
+    {% if community_link %}
+        <br>
+        Connect with this World's Community:
+        <a href="{{community_link}}">
+            {{community_link}}
+        </a>
+    {% endif %}
+</h4>
+<div class="text-center">
+    {{cell.name}} was created by
+<a href="{% url 'profiles:profiles_view_profile' cell.creator.profile.id %}">
+    {% user_display cell.creator %}
+</a>
+{{cell.created_date|timesince}} ago
+</div>
+<div class="row">
+    {% for membership_and_characters in memberships_and_characters %}
+        <div class="col-md-6">
+            <div class="thumbnail">
+                <h4 class="text-center">
+                    <a href="{% url 'profiles:profiles_view_profile' membership_and_characters.0.member_player.id %}">
+                        {% user_display membership_and_characters.0.member_player %}
+                    </a>
+                    <br>
+                    <small>World {{ membership_and_characters.0.get_role_display }}</small>
+                </h4>
+                {% if membership_and_characters.1 %}
+                <div class="row">
+                    {% for character in membership_and_characters.1 %}
+                        <div class="col-md-6">
+                            <a href="{% url 'characters:characters_view' character.id %}">
+                                <b>
+                                    {{character.name}} the {{character.concept_summary}}
+                                </b>
+                            </a>
+                            <br>
+                            <small>
+                                A {{character.number_of_victories }}-Victory {{ character.get_status_display }} Contractor
+                            </small>
+                            {% if character.unspent_rewards|length > 0 and can_edit_characters %}
+                            <br>
+                                <a class="btn btn-success btn-xs"
+                                   href="{% url 'characters:characters_spend_reward' character.id %}">
+                                    Spend Rewards
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+</div>

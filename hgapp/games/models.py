@@ -102,6 +102,11 @@ class Game(models.Model):
             ('edit_game', 'Edit game'),
         )
 
+    def player_can_edit(self, player):
+        if player.is_superuser:
+            return True
+        return player.is_authenticated and (player.has_perm('edit_game', self) or self.cell.player_can_manage_games(player))
+
     def is_scheduled(self):
         return self.status == GAME_STATUS[0][0]
 

@@ -1,0 +1,23 @@
+
+{% load account_tags %}
+    {% for invitation in game.game_invite_set.all %}
+<div>
+    <span class = "lead">
+        {{ invitation.attendance.get_outcome_display }} -
+    </span>
+    <strong>
+    {% if invitation.attendance.attending_character %}
+        <a href="{% url 'characters:characters_view' invitation.attendance.attending_character.id %}">
+            {{invitation.attendance.attending_character.name}}
+            the
+            {{invitation.attendance.attending_character.concept_summary}}
+        </a>
+    {% else %}
+        An NPC ringer Played by
+        <a href="{% url 'profiles:profiles_view_profile' invitation.invited_player.id %}">
+            <b>{% user_display invitation.invited_player %}</b>
+        </a>
+    {% endif %}
+</strong>
+</div>
+    {% endfor %}

@@ -242,7 +242,7 @@ def edit_game(request, game_id):
     }
     GameForm = make_game_form(user=request.user, game_status=game.status)
     if request.method == 'POST':
-        if not request.user.has_perm('edit_game', game):
+        if not game.player_can_edit(request.user):
             raise PermissionDenied("You don't have permission to edit this Game event")
         form = GameForm(request.POST, initial=initial_data)
         if form.is_valid():
@@ -260,6 +260,7 @@ def edit_game(request, game_id):
                 game.required_character_status = form.cleaned_data['required_character_status']
                 game.scenario=form.cleaned_data['scenario']
                 game.cell = form.cleaned_data['cell']
+                game.cell
                 game.is_nsfw = form.cleaned_data['only_over_18']
                 if form.cleaned_data['scenario']:
                     game.scenario = form.cleaned_data['scenario']
@@ -286,6 +287,8 @@ def edit_game(request, game_id):
         }
         return render(request, 'games/edit_game.html', context)
 
+
+
 def view_game(request, game_id):
     game = get_object_or_404(Game, id=game_id)
     can_view_scenario = False
@@ -295,10 +298,10 @@ def view_game(request, game_id):
     if request.user.has_perm("view_scenario", game.scenario):
         can_view_scenario = True
     invite_form = None
-    if request.user.has_perm('edit_game', game) and game.is_scheduled():
+    can_edit = game.player_can_edit(request.user)
+    if can_edit and game.is_scheduled():
         initial_data = {"message": game.hook}
         invite_form = CustomInviteForm(initial=initial_data)
-    can_edit = request.user.is_authenticated and request.user.has_perm('edit_game', game)
     nsfw_blocked = game.is_nsfw and (request.user.is_anonymous or not request.user.profile.view_adult_content)
     context = {
         'game': game,
@@ -314,7 +317,7 @@ def view_game(request, game_id):
 def cancel_game(request, game_id):
     game = get_object_or_404(Game, id=game_id)
     if request.method == 'POST':
-        if not request.user.has_perm('edit_game', game):
+        if not game.player_can_edit(request.user):
             raise PermissionDenied("You don't have permission to edit this Game event")
         if not game.is_scheduled() and not game.is_active():
             raise PermissionDenied("You cannot cancel a game that has been completed")
@@ -322,7 +325,7 @@ def cancel_game(request, game_id):
             game.transition_to_canceled()
         return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
     else:
-        if not request.user.has_perm('edit_game', game):
+        if not game.player_can_edit(request.user):
             raise PermissionDenied("You don't have permission to edit this Game event")
         context = {
             'game': game,
@@ -331,7 +334,7 @@ def cancel_game(request, game_id):
 
 def invite_players(request, game_id):
     game = get_object_or_404(Game, id=game_id)
-    if not request.user.has_perm('edit_game', game) or not game.is_scheduled():
+    if not game.player_can_edit(request.user) or not game.is_scheduled():
         raise PermissionDenied("You don't have permission to edit this Game event, or it has already started")
     initial_data = {"message": game.hook}
     if request.method == 'POST':
@@ -438,7 +441,7 @@ def decline_invite(request, game_id):
 #TODO: Enforce or advise on number of players constraints
 def start_game(request, game_id, char_error=" ", player_error=" "):
     game = get_object_or_404(Game, id=game_id)
-    if not request.user.has_perm('edit_game', game):
+    if not game.player_can_edit(request.user):
         raise PermissionDenied("You don't have permission to edit this Game event")
     if not game.is_scheduled():
         raise PermissionDenied("This Game has already started")
@@ -523,7 +526,7 @@ def start_game(request, game_id, char_error=" ", player_error=" "):
 
 def end_game(request, game_id):
     game = get_object_or_404(Game, id=game_id)
-    if not request.user.has_perm('edit_game', game):
+    if not game.player_can_edit(request.user):
         raise PermissionDenied("You don't have permission to edi this Game Event")
     if not game.is_active():
         raise PermissionDenied("You can't end a Game event that isn't in progress")
@@ -692,7 +695,7 @@ def _check_perms_for_edit_completed(request, game):
     if hasattr(game, "cell") and game.cell:
         if game.cell.player_can_manage_games(request.user):
             return
-    if not request.user.has_perm('edit_game', game):
+    if not game.player_can_edit(request.user):
         raise PermissionDenied("You don't have permission to edit this Game")
 
 def confirm_attendance(request, attendance_id, confirmed=None):
