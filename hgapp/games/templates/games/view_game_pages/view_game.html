@@ -150,6 +150,14 @@
                         </h4>
                     {% endif %}
                 </div>
+                {% if game.cell and game.cell.house_rules %}
+                <div class="thumbnail expandable-outer js-expandable-collapsed">
+                    <h3>
+                        {{game.cell.name}} House Rules
+                    </h3>
+                    {{game.cell.house_rules|safe}}
+                </div>
+                {% endif %}
                 {% if game.is_scheduled %}
                     {% include "games/view_game_pages/scheduled_invitation_snippet.html" %}
                 {% elif game.is_active %}

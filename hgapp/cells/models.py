@@ -44,7 +44,8 @@ class Cell(models.Model):
     created_date = models.DateTimeField('date created',
                                         auto_now_add=True)
     find_world_date = models.DateTimeField('find world date',
-                                           auto_now_add=True)
+                                           null=True,
+                                           blank=True)
     members = models.ManyToManyField(settings.AUTH_USER_MODEL,
                                      through="CellMembership",
                                      through_fields=('relevant_cell', 'member_player'))
@@ -74,6 +75,41 @@ class Cell(models.Model):
     is_listed_publicly = models.BooleanField(default=False)
     are_contractors_portable = models.BooleanField(default=True)
     #TODO: how are games played? In person, on roll-20, on discord? online?
+
+    game_death_ratio = models.FloatField(null=True, blank=True) # num contractors died in game / (num survived +1)
+
+    def get_danger_display(self):
+        if not self.game_death_ratio:
+            self.calculate_death_ratio()
+        num_games = self.num_completed_games()
+        if num_games < 3:
+            return None
+        elif self.game_death_ratio < 0.01 and num_games > 4:
+            result = "Pillow"
+        elif self.game_death_ratio < 0.05:
+            result = "Safe"
+        elif self.game_death_ratio < 0.13:
+            result = "Average"
+        elif self.game_death_ratio < 0.25:
+            result = "Dangerous"
+        elif self.game_death_ratio < 0.4:
+            result = "Deadly"
+        elif self.game_death_ratio < 1:
+            result = "Hell"
+        else:
+            result = "Slaughterhouse"
+
+        return "<span class=\"css-difficulty css-difficulty-{}\">{}</span>".format(result, result)
+
+    def calculate_death_ratio(self):
+        completed_games = self.game_set.exclude(get_completed_game_excludes_query()).all()
+        num_survived = 0
+        num_died = 0
+        for game in completed_games:
+            num_died = num_died + game.number_deaths()
+            num_survived = num_survived + game.number_victories() + game.number_losses()
+        self.game_death_ratio = num_died / (num_survived + 1) # prevent divide-by-zero errors
+        self.save()
 
 
     def player_can_admin(self, player):
@@ -188,6 +224,9 @@ class Cell(models.Model):
                 settings.save()
             self.addPlayer(player=self.creator, role=ROLE[0])
         else:
+            super(Cell, self).save(*args, **kwargs)
+        if not hasattr(self, "find_world_date") or not self.find_world_date:
+            self.find_world_date = self.created_date
             super(Cell, self).save(*args, **kwargs)
 
     def open_invitations(self):

@@ -61,7 +61,7 @@ class RecruitmentForm(forms.Form):
                                             help_text='If checked, anyone with an account may join your World.')
     cell_sell = forms.CharField(label='World Sell',
                                 widget=forms.Textarea,
-                                max_length=9800,
+                                max_length=1500,
                                 required=False,
                                 help_text='Summarize your World (not just setting) to prospective Players.')
     community_link = forms.CharField(label='Community Link',

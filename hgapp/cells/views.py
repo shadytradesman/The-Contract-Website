@@ -462,3 +462,20 @@ def kick_player(request, cell_id, user_id):
         return HttpResponseRedirect(reverse('cells:cells_manage_members', args=(cell.id,)))
     else:
         return HttpResponseRedirect(reverse('cells:cells_manage_members', args=(cell.id,)))
+
+
+class FindWorld(View):
+    template_name = 'cells/find_world.html'
+
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, self.__get_context_data())
+
+    def __get_context_data(self):
+        public_cells = Cell.objects.filter(is_listed_publicly=True).order_by('-find_world_date').all()
+        context = {
+            'public_cells': public_cells,
+        }
+        return context

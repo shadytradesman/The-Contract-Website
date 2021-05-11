@@ -1,4 +1,12 @@
 {% load account_tags %}
+{% if not user_membership %}
+<div class="thumbnail">
+    <div class="expandable-outer js-expandable-collapsed">
+        <h3>Curious about joining {{cell.name}}?</h3>
+        {{cell.cell_sell|linebreaks}}
+    </div>
+</div>
+{% endif %}
 <h4 class="text-center">
     {% if community_link %}
         <br>
@@ -29,11 +37,12 @@
                 {% if membership_and_characters.1 %}
                 <div class="row">
                     {% for character in membership_and_characters.1 %}
-                        <div class="col-md-6">
+                        <div class="col-md-6 text-center">
                             <a href="{% url 'characters:characters_view' character.id %}">
                                 <b>
-                                    {{character.name}} the {{character.concept_summary}}
+                                    {{character.name}}
                                 </b>
+                                 the {{character.concept_summary}}
                             </a>
                             <br>
                             <small>

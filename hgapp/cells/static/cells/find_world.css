@@ -1,0 +1,47 @@
+.css-difficulty {
+    padding: 2px;
+    border: 1px solid black;
+    border-radius: 2px;
+    font-weight: bold;
+    font-size: 12px;
+    position: absolute;
+    top: 10px;
+}
+
+.css-difficulty-Pillow {
+    border-color: skyblue;
+    color: black;
+    background: rgb(248,254,75);
+    background: linear-gradient(70deg, rgba(75,255,100,1) 0%, rgba(91,254,202,1) 29%, rgba(106,195,255,1) 68%, rgba(114,184,255,1) 100%);
+}
+
+.css-difficulty-Safe {
+    border-color: skyblue;
+    color: skyblue;
+}
+
+.css-difficulty-Average {
+    border-color:#d4d946;
+    color: #d4d946;
+}
+
+.css-difficulty-Dangerous {
+    border-color: #d9a746;
+    color: #d9a746;
+}
+
+.css-difficulty-Deadly {
+    border-color: #e77d4a;
+    color: #e77d4a;
+}
+
+.css-difficulty-Hell {
+    background: darkred;
+    border-color: #e7554a;
+    color: #e7554a;
+}
+
+.css-difficulty-Slaughterhouse {
+    background: black;
+    border-color: red;
+}

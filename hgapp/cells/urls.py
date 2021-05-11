@@ -52,4 +52,7 @@ urlpatterns = [
 
     # ex: .com/cells/leave/c/123
     url(r'^leave/c/(?P<cell_id>[\d]+)/$', views.leave_cell, name='cells_leave_cell'),
+
+    # ex: .com/cells/find
+    url(r'^find/$', views.FindWorld.as_view(), name='cells_find_world'),
 ]

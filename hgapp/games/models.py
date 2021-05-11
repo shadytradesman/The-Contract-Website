@@ -158,6 +158,8 @@ class Game(models.Model):
         self.end_time = timezone.now()
         self.save()
         self.give_rewards()
+        if hasattr(self, "cell") and self.cell:
+            self.cell.calculate_death_ratio()
 
     def give_rewards(self):
         if not self.is_finished() and not self.is_recorded():
@@ -286,6 +288,8 @@ class Game(models.Model):
             super(Game, self).save(*args, **kwargs)
         if self.is_recorded() or self.is_archived():
             self.update_participant_titles()
+            if hasattr(self, "cell") and self.cell:
+                self.cell.calculate_death_ratio()
 
     def __str__(self):
         return "[" + self.status + "] " + self.scenario.title + " run by: " + self.gm.username
