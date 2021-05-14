@@ -75,7 +75,7 @@ def make_character_form(user, existing_character=None):
                 'name': _('Name'),
                 'private': _("If checked, Character will not be publicly viewable."),
                 'pronoun': _(""),
-                'tagline': _('A subtitle that introduces your Character in a flavorful way'),
+                'tagline': _('A subtitle that introduces your Contractor in a flavorful way'),
                 'appearance': _('A brief description of your Character\'s outward appearance.'),
                 'concept_summary': _('Archetype Summary (ex: "skater punk werewolf", "cannibal chef", or "golden-age comic book hero")'),
                 'ambition': _('Ambition. Why does this character risk their life in the games? Good ambitions can shape '

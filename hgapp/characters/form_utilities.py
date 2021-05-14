@@ -19,7 +19,7 @@ logger = logging.getLogger("app." + __name__)
 # logic for Character creation and editing
 # TRANSACTIONS HAPPEN IN VIEW LAYER
 # See tests.py for hints on how revisioning works.
-def get_edit_context(user, existing_character=None, secret_key=None):
+def get_edit_context(user, existing_character=None, secret_key=None, cell=None):
     char_form = make_character_form(user, existing_character)(instance=existing_character)
     AttributeFormSet = formset_factory(AttributeForm, extra=0)
     AbilityFormSet = formset_factory(AbilityForm, extra=1)
@@ -74,10 +74,11 @@ def get_edit_context(user, existing_character=None, secret_key=None):
                       "EXP_ADV_COST_SOURCE_MULTIPLIER": EXP_ADV_COST_SOURCE_MULTIPLIER,},
         'secret_key': secret_key if secret_key else "",
         'show_tutorial': show_tutorial,
+        'cell': cell,
     }
     return context
 
-def character_from_post(user, POST):
+def character_from_post(user, POST, cell):
     char_form = make_character_form(user)(POST)
     if char_form.is_valid():
         new_character = char_form.save(commit=False)

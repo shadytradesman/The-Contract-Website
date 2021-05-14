@@ -6,9 +6,9 @@
     <h2 class = "text-center" data-toggle="tooltip" title='{{tutorial.core_info|safe}}'>
         Essentials
         <br>
-    <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#tutorialModal">
-        What Makes a Contractor?
-    </button>
+        <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#tutorialModal">
+            What Makes a Contractor?
+        </button>
     </h2>
 
     <div class="panel-body">
@@ -65,35 +65,44 @@
                 <span class="css-essential-text visible-md-block visible-lg-block"> .</span>
             </div>
         </div>
+        {% if cell %}
+            <div class="row">
+                <div class="col-xs-12 css-essential-cell-setting text-center" style="margin-top: 5px;">
+                    They hail from <b>{{cell.name}}</b>, a world {{cell.setting_sheet_blurb}}.
+                </div>
+            </div>
+            {% if cell.setting_create_char_info %}
+                <div class="row" style="margin-top: 10px;">
+                    <div class="col-xs-12 expandable-outer js-expandable-collapsed">
+                        {{cell.setting_create_char_info|safe}}
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
         <hr>
         <div class="row">
-            <div class="col-xs-12">
-                {% if user.is_authenticated %}
-                    <div id="css-checked-field" class="css-essential-field">
+            {% if user.is_authenticated %}
+                <div class="col-md-4 col-xs-6">
+                    <div class="css-essential-field" style="margin-top: 15px;">
                         {{ char_form.private | bootstrap}}
                     </div>
-                {% endif %}
-
-                {% if char_form.cell %}
-                    <div id="css-cell-field" class="css-essential-field">
-                        {{ char_form.cell | bootstrap}}
-                    </div>
-                {% endif %}
-                <span class="css-essential-text visible-md-block visible-lg-block"> </span>
+                </div>
+            {% endif %}
+            <div class="col-md-4 col-xs-6">
                 <div id="css-tagline-field" class="css-essential-field">
                     {{ char_form.tagline | bootstrap}}
                 </div>
             </div>
+                {% if charon_coin_form %}
+                    <div class="col-md-4 col-xs-12 text-center" style="margin-top: 15px;">
+                        <div class="alert alert-info ">
+                            <label data-toggle="tooltip" data-placement="bottom" title='{{tutorial.charon_coin}}'>
+                                {{ charon_coin_form.spend_coin }} Spend a Charon Coin on this Character
+                            </label>
+                        </div>
+                    </div>
+                {% endif %}
         </div>
-        {% if charon_coin_form %}
-            <div class="row">
-                <div class="col-xs-10 col-xs-offset-1 alert alert-info text-center" role="alert" >
-                    <label data-toggle="tooltip" data-placement="bottom" title='{{tutorial.charon_coin}}'>
-                        {{ charon_coin_form.spend_coin }} Spend a Charon Coin on this Character
-                    </label>
-                </div>
-            </div>
-        {% endif %}
     </div>
 </div>
 {% if character %}

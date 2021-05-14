@@ -25,6 +25,7 @@ from characters.form_utilities import get_edit_context, character_from_post, upd
 from characters.view_utilities import get_characters_next_journal_credit
 
 from journals.models import Journal, JournalCover
+from cells.models import Cell
 
 from hgapp.utilities import get_object_or_none
 
@@ -38,17 +39,29 @@ def __check_edit_perms(request, character, secret_key):
     if not requester_can_edit:
         raise PermissionDenied("You do not have permission to edit this Character")
 
-def create_character(request):
+def create_character_world(request, cell_id=None):
     if request.user.is_authenticated and not request.user.profile.confirmed_agreements:
         return HttpResponseRedirect(reverse('profiles:profiles_terms'))
+    cell = get_object_or_404(Cell, id=cell_id) if cell_id else None
     if request.method == 'POST':
         with transaction.atomic():
-            new_character = character_from_post(request.user, request.POST)
+            new_character = character_from_post(request.user, request.POST, cell)
         url_args = (new_character.id,) if request.user.is_authenticated else (new_character.id, new_character.edit_secret_key,)
         return HttpResponseRedirect(reverse('characters:characters_view', args=url_args))
     else:
-        context = get_edit_context(user=request.user)
+        context = get_edit_context(user=request.user, cell=cell)
         return render(request, 'characters/edit_pages/edit_character.html', context)
+
+def choose_world_create(request):
+    cells = []
+    if request.user.is_authenticated:
+        cells = request.user.cell_set.all()
+    tutorial = get_object_or_404(CharacterTutorial)
+    context = {
+        "cells": cells,
+        "tutorial": tutorial,
+    }
+    return render(request, 'characters/edit_pages/choose_world.html', context)
 
 def edit_character(request, character_id, secret_key = None):
     if request.user.is_authenticated and not request.user.profile.confirmed_agreements:

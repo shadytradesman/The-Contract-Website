@@ -1,0 +1,88 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+{% load staticfiles %}
+
+{% block head_title %}
+    Choose Contractor's World
+{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% block extra_styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'cells/choose_world.css' %}" />
+{% endblock %}
+
+{% block extra_scripts %}
+{% endblock %}
+
+{% load account_tags %}
+
+{% block body_base %}
+<div class="container">
+    {% include "characters/edit_pages/choose_world_modal.html" %}
+    <div class="text-center">
+        <h1>
+            Where are you from?
+        </h1>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#tutorialModal">
+                What are Worlds?
+            </button>
+            <br>
+            <br>
+            <div class="row">
+                {% for cell in cells %}
+                    {% if forloop.counter|divisibleby:2 == 0 %}
+                    </div>
+                    <div class="row">
+                    {% endif %}
+                        <div class="col-md-6">
+                            <a href="{% url 'characters:characters_create_world' cell.id %}">
+                                <div class="thumbnail">
+                                    <h4 class="text-center">
+                                        {{cell.name}}
+                                        <br>
+                                        <small>
+                                            A world {{cell.setting_sheet_blurb}}.
+                                        </small>
+                                    </h4>
+                                </div>
+                            </a>
+                        </div>
+                {% endfor %}
+            </div>
+            {% if cells %}
+            <hr>
+            {% endif %}
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="thumbnail">
+                        <a href="{% url 'cells:cells_find_world' %}" >
+                            Find a World
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="thumbnail">
+                        <a href="{% url 'cells:cells_create' %}" class="btn btn-primary">
+                            Create a new World
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="thumbnail">
+                        <a href="{% url 'characters:characters_create_no_world' %}">
+                            Create a Free Agent
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
