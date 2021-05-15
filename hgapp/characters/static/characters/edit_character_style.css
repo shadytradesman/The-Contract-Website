@@ -39,6 +39,17 @@ input[type="number"] {
     display: inline !important;
 }
 
+.css-cell-select label {
+    border: 1px solid black;
+    border-radius: 3px;
+    padding: 3px;
+}
+
+.css-cell-select {
+    display: inline-block;
+    margin-top: 5px;
+}
+
 .thumbnail {
     padding: 10px;
 }
@@ -262,6 +273,10 @@ input[type="number"] {
     z-index: 9999;
 }
 
+#worldTutorialModal {
+    z-index: 9999;
+}
+
 .css-big-modal-lg {
     position: relative;
     left: 70px;
@@ -273,3 +288,5 @@ input[type="number"] {
     margin-left: auto;
     margin-right: auto;
 }
+
+

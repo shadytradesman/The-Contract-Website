@@ -4,8 +4,6 @@
 
 <div class="panel panel-default">
     <h2 class = "text-center" data-toggle="tooltip" title='{{tutorial.core_info|safe}}'>
-        Essentials
-        <br>
         <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#tutorialModal">
             What Makes a Contractor?
         </button>
@@ -65,20 +63,53 @@
                 <span class="css-essential-text visible-md-block visible-lg-block"> .</span>
             </div>
         </div>
-        {% if cell %}
-            <div class="row">
-                <div class="col-xs-12 css-essential-cell-setting text-center" style="margin-top: 5px;">
-                    They hail from <b>{{cell.name}}</b>, a world {{cell.setting_sheet_blurb}}.
+        <div class="row">
+            <div class="col-xs-12 css-essential-cell-setting text-center" style="margin-top: 5px;">
+                They are from
+                <span class="form-inline">
+                    {{char_form.cell}}<span class="visible-sm-inline visible-md-inline visible-lg-inline">,</span>
+                </span>
+                a World <span id="js-cell-setting-blurb">{{cell.setting_sheet_blurb}}</span>.
+            </div>
+        </div>
+        <div id="js-setting-container" class="row" style="margin-top: 10px;{% if not cell %} display: none;{% endif %}">
+            <div class="col-xs-12">
+                <div id="js-setting-content" class="col-xs-12 thumbnail expandable-outer js-expandable-collapsed" >
+                    {{cell.setting_create_char_info|safe}}
                 </div>
             </div>
-            {% if cell.setting_create_char_info %}
-                <div class="row" style="margin-top: 10px;">
-                    <div class="col-xs-12 expandable-outer js-expandable-collapsed">
-                        {{cell.setting_create_char_info|safe}}
+        </div>
+        <div id="js-setting-warning" class="row" style="margin-top: 10px; {% if cell %} display: none;{% endif %}">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="alert alert-info">
+                    <h4 class="text-center">
+                        <span class="js-contractor-name">
+                            Your Contractor
+                        </span>
+                        has no World.
+                    </h4>
+                    <div class="text-center">
+                        <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#worldTutorialModal">
+                            What are Worlds?
+                        </button>
                     </div>
+                    <p>
+                        Contractors without a World live in modern day Earth. They cannot interact with other Contractors
+                        between Games.
+                        You must select a World for your Contractor before their fourth Game.
+                        <br>
+                        When you are finished creating your Contractor, you can
+                        <a href="{% url 'cells:cells_find_world' %}" >
+                            find a World
+                        </a>
+                        or
+                        <a href="{% url 'cells:cells_create' %}" >
+                            create your own.
+                        </a>
+                    </p>
                 </div>
-            {% endif %}
-        {% endif %}
+            </div>
+        </div>
         <hr>
         <div class="row">
             {% if user.is_authenticated %}

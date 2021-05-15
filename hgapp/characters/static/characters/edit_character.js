@@ -332,3 +332,39 @@ $(document).ready(function(){
         $('#tutorialModal').modal({});
     }
 });
+
+const cellInfos = JSON.parse(document.getElementById('cellInfos').textContent);
+$(function(){
+    function handleCellChange() {        // define event handler
+        var $this = $(this);
+        var cellInfo = cellInfos[$this.val()];
+        if (cellInfo) {
+            $("#js-cell-setting-blurb").html(cellInfo[0]);
+            $("#js-setting-warning").hide();
+            if (cellInfo.length == 2) {
+                $("#js-setting-content").html(cellInfo[1]);
+                $("#js-setting-container").show();
+            } else {
+                $("#js-setting-container").hide();
+            }
+        } else {
+            $("#js-cell-setting-blurb").html("isolated");
+            $("#js-setting-container").hide();
+            $("#js-setting-warning").show();
+        }
+    }
+    $("#id_cell").change(handleCellChange);
+    $("#id_cell").change();
+});
+
+$(function(){
+    function handleNameChange() {
+        var $this = $(this);
+        if ($this.val()) {
+            $(".js-contractor-name").text($this.val());
+        } else {
+            $(".js-contractor-name").text("New Contractor");
+        }
+    }
+    $("#id_name").keyup(handleNameChange);
+});

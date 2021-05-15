@@ -1,5 +1,5 @@
 {% load staticfiles %}
-<div class="modal fade" id="tutorialModal" tabindex="-1" role="dialog" aria-labelledby="tutorialModalLabel">
+<div class="modal fade" id="worldTutorialModal" tabindex="-1" role="dialog" aria-labelledby="worldTutorialModalLabel">
   <div class="modal-dialog modal-lg css-big-modal-lg visible-md-block visible-lg-block" role="document">
     <div class="modal-content">
         <img src="{% static 'overrides/art/fox-lg-modal.jpg' %}" class="css-big-modal-image">
@@ -8,19 +8,19 @@
         <h2 class="modal-title">What are Worlds?</h2>
       </div>
       <div class="modal-body css-big-modal-body">
-          <span class="lead">You are exceptional.</span>
+          <span class="lead">a.</span>
           <p>
-              {{tutorial.modal_1|safe}}
+              {{tutorial.world_modal_1|safe}}
           </p>
           <br>
           <span class="lead">You will sign The Contract.</span>
           <p>
-              {{tutorial.modal_2|safe}}
+              {{tutorial.world_modal_2|safe}}
           </p>
           <br>
           <span class="lead">Incredible Powers sleep within you.</span>
           <p>
-              {{tutorial.modal_3|safe}}
+              {{tutorial.world_modal_3|safe}}
           </p>
       </div>
       <div class="modal-footer" style="width:598px;position:relative;left:300px;">

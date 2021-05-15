@@ -1,4 +1,5 @@
 from django.forms import formset_factory
+from django.template.defaultfilters import linebreaks
 
 import logging
 
@@ -20,7 +21,7 @@ logger = logging.getLogger("app." + __name__)
 # TRANSACTIONS HAPPEN IN VIEW LAYER
 # See tests.py for hints on how revisioning works.
 def get_edit_context(user, existing_character=None, secret_key=None, cell=None):
-    char_form = make_character_form(user, existing_character)(instance=existing_character)
+    char_form = make_character_form(user, existing_character, supplied_cell=cell)(instance=existing_character)
     AttributeFormSet = formset_factory(AttributeForm, extra=0)
     AbilityFormSet = formset_factory(AbilityForm, extra=1)
     attributes = Attribute.objects.order_by('name')
@@ -54,6 +55,14 @@ def get_edit_context(user, existing_character=None, secret_key=None, cell=None):
     charon_coin_form = None
     if user.is_authenticated:
         charon_coin_form = __get_charon_coin_form(user, existing_character, POST=None)
+    cell_info = {}
+    for cell1 in char_form.fields["cell"].queryset.all():
+        sheet_blurb = cell1.setting_create_char_info if cell1.setting_create_char_info \
+            else linebreaks(cell1.setting_summary) if cell1.setting_summary else None
+        cell_info[cell1.pk] = [cell1.setting_sheet_blurb]
+        if sheet_blurb:
+            cell_info[cell1.pk].append(sheet_blurb)
+
     context = {
         'char_form': char_form,
         'attribute_formset': attribute_formset,
@@ -75,6 +84,7 @@ def get_edit_context(user, existing_character=None, secret_key=None, cell=None):
         'secret_key': secret_key if secret_key else "",
         'show_tutorial': show_tutorial,
         'cell': cell,
+        'cell_info': cell_info,
     }
     return context
 

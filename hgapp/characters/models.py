@@ -1347,3 +1347,6 @@ class CharacterTutorial(models.Model):
     modal_1 = models.TextField(max_length=3000)
     modal_2 = models.TextField(max_length=3000)
     modal_3 = models.TextField(max_length=3000)
+    world_modal_1 = models.TextField(max_length=3000, default="placeholder")
+    world_modal_2 = models.TextField(max_length=3000, default="placeholder")
+    world_modal_3 = models.TextField(max_length=3000, default="placeholder")

@@ -23,14 +23,16 @@
     {% include "characters/edit_pages/choose_world_modal.html" %}
     <div class="text-center">
         <h1>
-            Where are you from?
+            What World are you from?
         </h1>
     </div>
     <div class="panel panel-default">
         <div class="panel-body">
-            <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#tutorialModal">
-                What are Worlds?
-            </button>
+            <div class="text-center">
+                <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#tutorialModal">
+                    What are Worlds?
+                </button>
+            </div>
             <br>
             <br>
             <div class="row">
@@ -59,27 +61,35 @@
             {% endif %}
             <div class="row">
                 <div class="col-md-6">
-                    <div class="thumbnail">
-                        <a href="{% url 'cells:cells_find_world' %}" >
-                            Find a World
-                        </a>
-                    </div>
+                    <a href="{% url 'cells:cells_find_world' %}" >
+                        <div class="thumbnail">
+                            <h4 class="text-center">
+                                Find a World
+                            </h4>
+                        </div>
+                    </a>
                 </div>
                 <div class="col-md-6">
-                    <div class="thumbnail">
-                        <a href="{% url 'cells:cells_create' %}" class="btn btn-primary">
-                            Create a new World
-                        </a>
-                    </div>
+                    <a href="{% url 'cells:cells_create' %}" >
+                        <div class="thumbnail">
+                            <h4 class="text-center">
+                                Create a new World
+                            </h4>
+                        </div>
+                    </a>
                 </div>
             </div>
             <div class="row">
                 <div class="col-xs-12">
-                    <div class="thumbnail">
-                        <a href="{% url 'characters:characters_create_no_world' %}">
-                            Create a Free Agent
-                        </a>
-                    </div>
+                    <a href="{% url 'characters:characters_create_no_world' %}">
+                        <div class="thumbnail"
+                            style="background-image: url({% static 'overrides/art/doors_bg.jpg' %});"
+                        >
+                            <h4 class="text-center">
+                                Create a Free Agent
+                            </h4>
+                        </div>
+                    </a>
                 </div>
             </div>
         </div>

@@ -63,7 +63,7 @@ PHYS_MENTAL = (
     ("1", "Mental"),
 )
 
-def make_character_form(user, existing_character=None):
+def make_character_form(user, existing_character=None, supplied_cell=None):
     class CharacterForm(ModelForm):
         class Meta:
             model = Character
@@ -112,16 +112,28 @@ def make_character_form(user, existing_character=None):
     if user.is_authenticated:
         queryset = user.cell_set.all()
         cell = forms.ModelChoiceField(queryset=queryset,
-                                      empty_label="Free Agent (No Cell)",
+                                      #widget=forms.RadioSelect(attrs={'class': 'css-cell-select list-inline list-unstyled'}),
+                                      widget=forms.Select(attrs={'class': 'form-control'}),
+                                      empty_label="Nowhere",
                                       help_text="Select a Cell for your Character. "
                                                 "This defines your Character's home world and allows "
                                                 "Cell leaders to help you with record-keeping. "
                                                 "NOTE: Cell leaders will be able to view and edit your Character.",
                                       required=False,
+
                                       )
+        if supplied_cell:
+            cell.initial = supplied_cell
         if existing_character:
             cell.initial = existing_character.cell
-        form.base_fields["cell"] = cell
+    else:
+        cell = forms.ModelChoiceField(queryset=None,
+                                      widget=forms.Select(attrs={'class': 'form-control'}),
+                                      empty_label="Nowhere",
+                                      required=False,
+                                      )
+    form.base_fields["cell"] = cell
+
     return form
 
 class CharacterDeathForm(ModelForm):
