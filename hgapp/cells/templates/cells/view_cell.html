@@ -38,7 +38,7 @@
         </div>
     {% elif cell.allow_self_invites %}
         <div class="alert alert-success text-center">
-        <b style="margin-top: 5px;">This World allows self-invites</b>
+        <b style="margin-top: 5px;">This World has open memberships.</b>
         {% if user.is_anonymous %}
             But you must
             <a href="{% url 'account_signup' %}">Sign up</a>

@@ -26,13 +26,25 @@ home
 <div class="container">
     {{ form.about.errors }}
     <h1 class="text-center">
-        Editing {{cell.name}}' Recruitment Settings
+        Editing {{cell.name}}'s Recruitment Settings
     </h1>
     <form action="{% url 'cells:cells_edit_find_world' cell.id %}" method="post">
             {{ form.non_field_errors }}
             {% csrf_token %}
             <div class="panel panel-default">
                 <div class="panel-body">
+                    <div class="row">
+                        <div class="col-xs-12 col-md-10 col-md-offset-1 alert alert-info">
+                            <h5 class="text-center">
+                                These settings determine how your World apears on the
+                                <a href="{% url 'cells:cells_find_world' %}">
+                                    Find a World
+                                </a>
+                                page. If you would like to invite Players directly,
+                                <a href="{% url 'cells:cells_invite_players' cell.id %}">click here.</a>
+                            </h5>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col-md-6">
                             {{form.list_publicly|bootstrap}}

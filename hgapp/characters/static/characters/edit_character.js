@@ -53,10 +53,12 @@ $(document).on("click", ".val-adjuster-source", function() {
 });
 
 $(document).on("input keyup mouseup", ".ability-value-input", function() {
+    isDirty = true;
     updateAbilityExp($(this).parent());
 });
 
 $(document).on("input keyup mouseup", ".source-value-input", function() {
+    isDirty = true;
     updateSourceExp($(this).parent());
 });
 
@@ -359,6 +361,7 @@ $(function(){
 
 $(function(){
     function handleNameChange() {
+        isDirty = true;
         var $this = $(this);
         if ($this.val()) {
             $(".js-contractor-name").text($this.val());

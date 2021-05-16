@@ -16,6 +16,10 @@
 {% block extra_styles %}
 {% endblock %}
 
+{% block extra_scripts %}
+    <script src="{% static 'journals/journal_write_scripts.js' %}"></script>
+{% endblock %}
+
 {% block body_base %}
 <div class="container">
     <h1 class="text-center">
@@ -79,7 +83,7 @@
                     {% else %}
                         action="{% url 'journals:journal_write_game' game.id character.id %}"
                     {% endif %}
-                    method="post">
+                    method="post" onsubmit="setFormSubmitting()">
                 {% csrf_token %}
                 {{form.title|bootstrap}}
                 {{form.content|bootstrap}}

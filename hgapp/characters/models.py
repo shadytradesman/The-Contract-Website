@@ -337,6 +337,10 @@ class Character(models.Model):
             return HIGH_ROLLER_STATUS[4][0]
 
     def save(self, *args, **kwargs):
+        if self.ambition[-1] == '.':
+            self.ambition = self.ambition[:-1 or None]
+        if self.appearance[-1] == '.':
+            self.appearance = self.appearance[:-1 or None]
         self.status = self.calculate_status()
         if self.pk is None:
             super(Character, self).save(*args, **kwargs)

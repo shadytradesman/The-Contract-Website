@@ -56,21 +56,23 @@ class RecruitmentForm(forms.Form):
     list_publicly = forms.BooleanField(label='List Publicly',
                                        required=False,
                                        help_text='If checked, your World will appear on the "Find Worlds" page.')
-    allow_self_invites = forms.BooleanField(label='Allow Self-Invites',
+    allow_self_invites = forms.BooleanField(label='Open Memberships',
                                             required=False,
                                             help_text='If checked, anyone with an account may join your World.')
     cell_sell = forms.CharField(label='World Sell',
                                 widget=forms.Textarea,
                                 max_length=1500,
                                 required=False,
-                                help_text='Summarize your World (not just setting) to prospective Players.')
+                                help_text='Summarize your World to prospective Players. What is the setting? What kinds of '
+                                          'Players should join and how?')
     community_link = forms.CharField(label='Community Link',
                                      max_length=1000,
                                      required=False,
                                      help_text='Link to a forum, Discord Server, or other site where the members of this World hang out.')
     is_community_link_public = forms.BooleanField(label='Show Community Link to Non-Members',
-                                       required=False,
-                                       help_text='If checked, your World\'s Community Link will be visible to non-members' )
+                                                  required=False,
+                                                  initial=True,
+                                                  help_text='If checked, your World\'s Community Link will be visible to non-members' )
 
 
 class RsvpForm(forms.Form):

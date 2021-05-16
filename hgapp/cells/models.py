@@ -76,41 +76,53 @@ class Cell(models.Model):
     are_contractors_portable = models.BooleanField(default=True)
     #TODO: how are games played? In person, on roll-20, on discord? online?
 
-    game_death_ratio = models.FloatField(null=True, blank=True) # num contractors died in game / (num survived +1)
+    game_victory = models.IntegerField(null=True, blank=True)
+    game_loss = models.IntegerField(null=True, blank=True)
+    game_death = models.IntegerField(null=True, blank=True)
 
     def get_danger_display(self):
-        if not self.game_death_ratio:
-            self.calculate_death_ratio()
+        if not self.game_victory or not self.game_loss or not self.game_death:
+            self.update_safety_stats()
         num_games = self.num_completed_games()
+        game_death_ratio = self.death_ratio()
         if num_games < 3:
             return None
-        elif self.game_death_ratio < 0.01 and num_games > 4:
+        elif game_death_ratio < 0.01 and num_games > 4:
             result = "Pillow"
-        elif self.game_death_ratio < 0.05:
+        elif game_death_ratio < 0.05:
             result = "Safe"
-        elif self.game_death_ratio < 0.13:
+        elif game_death_ratio < 0.13:
             result = "Average"
-        elif self.game_death_ratio < 0.25:
+        elif game_death_ratio < 0.25:
             result = "Dangerous"
-        elif self.game_death_ratio < 0.4:
+        elif game_death_ratio < 0.4:
             result = "Deadly"
-        elif self.game_death_ratio < 1:
+        elif game_death_ratio < 1:
             result = "Hell"
         else:
             result = "Slaughterhouse"
 
         return "<span class=\"css-difficulty css-difficulty-{}\">{}</span>".format(result, result)
 
-    def calculate_death_ratio(self):
+    def death_ratio(self):
+        return self.game_death / (self.game_victory + self.game_loss + 1) # prevent divide-by-zero errors
+
+    def update_safety_stats(self):
         completed_games = self.game_set.exclude(get_completed_game_excludes_query()).all()
-        num_survived = 0
+        num_victory = 0
         num_died = 0
+        num_loss = 0
         for game in completed_games:
             num_died = num_died + game.number_deaths()
-            num_survived = num_survived + game.number_victories() + game.number_losses()
-        self.game_death_ratio = num_died / (num_survived + 1) # prevent divide-by-zero errors
+            num_victory = num_victory + game.number_victories()
+            num_loss = num_loss + game.number_losses()
+        self.game_victory = num_victory
+        self.game_loss = num_loss
+        self.game_death = num_died
         self.save()
 
+    def get_danger_tooltip(self):
+        return "Victories: {} <br>Losses: {} <br>Deaths: {}".format(self.game_victory, self.game_loss, self.game_death)
 
     def player_can_admin(self, player):
         return player.has_perm(CELL_PERMISSIONS[0][0], self)
@@ -212,6 +224,8 @@ class Cell(models.Model):
         return len([game for game in completed_games if game.player_participated(player)])
 
     def save(self, *args, **kwargs):
+        if self.setting_sheet_blurb and self.setting_sheet_blurb[-1] == '.':
+            self.setting_sheet_blurb = self.setting_sheet_blurb[:-1 or None]
         if self.pk is None:
             super(Cell, self).save(*args, **kwargs)
             for role in ROLE:

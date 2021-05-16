@@ -2,6 +2,7 @@
 
 {% load i18n %}
 {% load bootstrap %}
+{% load staticfiles %}
 
 {% block extra_head %}
     {{ form.media }}
@@ -10,6 +11,10 @@
 {% block head_title %}Editing Scenario{% endblock %}
 
 {% block body_class %}home{% endblock %}
+
+{% block extra_scripts %}
+    <script src="{% static 'games/edit_scenario.js' %}"></script>
+{% endblock %}
 
 {% block body_base %}
 <div class="container">
@@ -21,15 +26,15 @@
         {% endif %}
     </div>
     {% if scenario %}
-        <form action="{% url 'games:games_scenario_edit' scenario.id %}" method="post">
+        <form action="{% url 'games:games_scenario_edit' scenario.id %}" method="post" onsubmit="setFormSubmitting()">
     {% else %}
-        <form action="{% url 'games:games_create_scenario' %}" method="post">
+        <form action="{% url 'games:games_create_scenario' %}" method="post" onsubmit="setFormSubmitting()">
     {% endif %}
         <div class="panel panel-default">
             <div class="panel-body">
                 <div class="row text-center">
                     <div class="alert alert-info col-md-6 col-md-offset-3">
-                        For tips on writing Scenarios, <a href="/wiki/guides-and-tutorials/writing-scenarios/" style="text-decoration: underline;">read the Guide!</a>
+                        For tips on writing Scenarios, <a href="/wiki/Rules/5a-writing-scenarios/" style="text-decoration: underline;">read the Guide!</a>
                     </div>
                 </div>
                 {{ form.about.errors }}

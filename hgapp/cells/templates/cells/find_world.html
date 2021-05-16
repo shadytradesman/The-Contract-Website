@@ -37,9 +37,9 @@
                 <div class="col-md-6">
                     <div class="thumbnail">
                         {% if cell.get_danger_display %}
-                        <span class="pull-left">
-                            {{cell.get_danger_display|safe}}
-                        </span>
+                            <span class="pull-left" data-html="true" data-toggle="tooltip" title='{{cell.get_danger_tooltip|safe}}'>
+                                {{cell.get_danger_display|safe}}
+                            </span>
                         {% endif %}
                         <h3 class="text-center">
                             <a href="{% url 'cells:cells_view_cell' cell.id %}">
