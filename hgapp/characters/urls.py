@@ -16,11 +16,9 @@ urlpatterns = [
     url(r'^archive/c/(?P<character_id>[\d]+)/$', views.archive_character, name='characters_archive'),
 
     # ex: .com/characters/create/
-    url(r'^create/$', views.choose_world_create, name='characters_create'),
+    url(r'^create/$', views.create_character_world, name='characters_create'),
     # ex: .com/characters/create/world/123
     url(r'^create/world/(?P<cell_id>[\d]+)$', views.create_character_world, name='characters_create_world'),
-    # ex: .com/characters/create/no-world
-    url(r'^create/no-world/$', views.create_character_world, name='characters_create_no_world'),
 
     # ex: .com/characters/graveyard/
     url(r'^graveyard/$', views.graveyard, name='characters_graveyard'),

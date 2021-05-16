@@ -220,6 +220,10 @@ def view_character(request, character_id, secret_key = None):
     num_journal_entries = Journal.objects.filter(game_attendance__attending_character=character.id).count()
     journal_cover = get_object_or_none(JournalCover, character=character.id)
     next_entry = get_characters_next_journal_credit(character) if user_can_edit else None
+
+    show_more_home_games_warning = character.number_completed_games() > 3 \
+                                   and (character.number_completed_games_in_home_cell() < character.number_completed_games_out_of_home_cell())
+
     context = {
         'character': character,
         'user_can_edit': user_can_edit,
@@ -242,6 +246,7 @@ def view_character(request, character_id, secret_key = None):
         'num_journal_entries': num_journal_entries,
         'journal_cover': journal_cover,
         'next_entry': next_entry,
+        'show_more_home_games_warning': show_more_home_games_warning,
     }
     return render(request, 'characters/view_pages/view_character.html', context)
 

@@ -5,6 +5,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from overrides.widgets import CustomStylePagedown
 
 from characters.models import Character, BasicStats, Character_Death, BattleScar
+from cells.models import Cell
 
 ATTRIBUTE_VALUES = {
     "Brawn": (
@@ -110,24 +111,21 @@ def make_character_form(user, existing_character=None, supplied_cell=None):
 
     form = CharacterForm
     if user.is_authenticated:
-        queryset = user.cell_set.all()
+        if existing_character:
+            queryset = existing_character.player.cell_set.all()
+        else:
+            queryset = user.cell_set.all()
         cell = forms.ModelChoiceField(queryset=queryset,
-                                      #widget=forms.RadioSelect(attrs={'class': 'css-cell-select list-inline list-unstyled'}),
                                       widget=forms.Select(attrs={'class': 'form-control'}),
                                       empty_label="Nowhere",
-                                      help_text="Select a Cell for your Character. "
-                                                "This defines your Character's home world and allows "
-                                                "Cell leaders to help you with record-keeping. "
-                                                "NOTE: Cell leaders will be able to view and edit your Character.",
                                       required=False,
-
                                       )
         if supplied_cell:
             cell.initial = supplied_cell
         if existing_character:
             cell.initial = existing_character.cell
     else:
-        cell = forms.ModelChoiceField(queryset=None,
+        cell = forms.ModelChoiceField(queryset=Cell.objects.none(),
                                       widget=forms.Select(attrs={'class': 'form-control'}),
                                       empty_label="Nowhere",
                                       required=False,

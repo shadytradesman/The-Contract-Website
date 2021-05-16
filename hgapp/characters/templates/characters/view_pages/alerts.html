@@ -1,166 +1,190 @@
-<div class="row text-center">
-    {% if character.private %}
-        <div class="alert alert-warning text-center css-char-alert" role="alert">
-            <p>
-                <i class="fa fa-user-secret fa-2x"></i>
-                {{character.name}} and their Powers cannot be viewed by others because they are <b>Private</b>.
-            </p>
-        </div>
-    {% endif %}
-    {% if not character.cell  %}
-        {% if character.number_of_victories > 3 %}
-            <div class="alert alert-danger text-center css-char-alert" role="alert">
-                <p>
-                    {{character.name}} does not have a home World despite having {{character.number_of_victories}} Victories.
-                    They should not play in any Games until they have a home.
-                    <br>
-                    <a href="{% url 'cells:find_world' ">
-                        Find a World to join
-                    </a>
-                    and then
-                    <a href="{% url 'characters:characters_edit' character.id secret_key %}" >
-                        Edit {{character.name}}
-                    </a>
-                    to add them to it.
-                </p>
-            </div>
-        {% else %}
-            <div class="alert alert-warning text-center css-char-alert" role="alert">
-                <p>
-                    {{character.name}} does not have a home World. They cannot interact with Contractors on their Downtime
-                    and must choose a home before playing more than 3 Games.
-                    <br>
-                    <a href="{% url 'cells:find_world' ">
-                        Find a World to join
-                    </a>
-                    and then
-                    <a href="{% url 'characters:characters_edit' character.id secret_key %}" >
-                        Edit {{character.name}}
-                    </a>
-                    to add them to it.
-                </p>
-            </div>
-        {% endif %}
-    {% endif %}
-    {% if character.get_power_cost_total != character.active_spent_rewards|length %}
-        <div class="alert alert-danger text-center css-char-alert" role="alert">
-            <p>
-                {{character.name}}'s Power value does not match their spent Gifts! </br>
-                <b>Power Value: </b>{{character.get_power_cost_total}}
-                <b>Spent Rewards: </b>{{character.active_spent_rewards|length}}
-            </p>
-        </div>
-    {% endif %}
-    {% if character.unspent_experience < 0 %}
-            <div class="alert alert-danger text-center css-char-alert" role="alert">
-                <p>
-                    {{character.name}} has overspent Experience</br>
-                    <b>Remaining: </b>{{character.unspent_experience}} Exp.
-                    (<b>Earned: </b> {{character.exp_earned}} - <b>Spent: </b> {{character.exp_cost}})
-                </p>
-            </div>
-    {% endif %}
-    {% if character.unspent_experience > 2 and user_can_edit %}
-            <a href="{% url 'characters:characters_edit' character.id secret_key %}">
-                <div class="alert alert-success btn btn-success css-char-alert" role="alert">
-                    Spend {{character.name}}'s <b>{{character.unspent_experience}}</b> unspent Experience
-                </div>
-            </a>
-    {% endif %}
-    {% if user_can_edit and character.unspent_rewards|length > 0 %}
-            <a href="{% url 'characters:characters_spend_reward' character.id %}">
-                <div class="alert alert-success btn btn-success css-char-alert" role="alert">
-                    Spend Available Gifts
-                </div>
-            </a>
-    {% endif %}
-    {% if next_entry %}
-        <a href="{% url 'journals:journal_write_next' character.id %}">
-            <div class="alert alert-success btn btn-success css-char-alert" role="alert">
-                Earn
-                {% if next_entry.reward_is_improvement %}
-                <b>an Improvement</b>
-                {% else %}
-                1 Exp
-                {% endif %}
-                for {{character.name}}
-                <div class="visible-xs-block"></div>
-                by writing a
-                {% if next_entry.is_downtime %}
-                Downtime
-                {% else %}
-                Game
-                {% endif %}
-                journal
-            </div>
-        </a>
-    {% endif %}
-</div>
+
 {% if secret_key and secret_key_valid and not request.user.is_authenticated %}
-    <div class="row">
-        <div class="col-md-8 col-md-offset-2 alert alert-warning css-char-alert text-center" role="alert">
+<div class="row">
+    <div class="col-md-8 col-md-offset-2 alert alert-warning css-char-alert text-center" role="alert">
+        <br>
+        <h3>This Contractor is <b>Unclaimed</b></h3>
+        <p>
+            <a href="{% url 'account_login' %}" class="btn btn-primary">Log in</a> and visit this page to claim {{character.name}}
+            and start Playing.
             <br>
-            <h3>This Character is <b>Unclaimed</b></h3>
-            <p>
-                <a href="{% url 'account_login' %}" class="btn btn-primary">Log in</a> and visit this page to claim {{character.name}} and unlock the rest of the site's functionality.
+            Until you do, anyone with the Edit URL will be able to edit this Contractor or claim it as their own.
+        </p>
+        <div class="row">
+            <div class="col-md-6">
                 <br>
-                Until you do, anyone with the Edit URL will be able to edit this Character or claim it as their own.
-            </p>
-            <div class="row">
-                <div class="col-md-6">
-                    <br>
-                    <h4>
-                        <b>Share URL</b>
-                    </h4>
-                    Share this URL with others
-                    <br>
-                    <div class="row">
-                        <div class="col-xs-1 col-xs-offset-1">
-                            <a class="btn btn-default" id="copyShareLink"><i class="fa fa-copy"></i> copy</a>
-                        </div>
-                        <div class="col-xs-8 col-xs-offset-2">
-                            <input id="shareCopyField"
-                           class="form-control"
-                           type="text"
-                           value="https://{{ request.META.HTTP_HOST }}{% url 'characters:characters_view' character.id %}"
-                           id="shareLinkInput">
-                        </div>
+                <h4>
+                    <b>Share URL</b>
+                </h4>
+                Share this URL with others
+                <br>
+                <div class="row">
+                    <div class="col-xs-1 col-xs-offset-1">
+                        <a class="btn btn-default" id="copyShareLink"><i class="fa fa-copy"></i> copy</a>
                     </div>
-                </div>
-                <div class="col-md-6">
-                    <br>
-                    <h4><b>Edit URL</b></h4>
-                    Save this URL for yourself.
-                    <br>
-                    <div class="row">
-                        <div class="col-xs-1 col-xs-offset-1">
-                            <a class="btn btn-default" id="copySecretLink"><i class="fa fa-copy"></i> copy</a>
-                        </div>
-                        <div class="col-xs-8 col-xs-offset-2">
-                            <input id="secretCopyField"
-                           class="form-control"
-                           type="text"
-                           value="https://{{ request.META.HTTP_HOST }}{% url 'characters:characters_view' character.id secret_key %}"
-                           id="secretLinkInput">
-                        </div>
+                    <div class="col-xs-8 col-xs-offset-2">
+                        <input id="shareCopyField"
+                               class="form-control"
+                               type="text"
+                               value="https://{{ request.META.HTTP_HOST }}{% url 'characters:characters_view' character.id %}"
+                               id="shareLinkInput">
                     </div>
                 </div>
             </div>
-            <br>
-            <p>If you lose the Edit URL before you claim this Character, no one will ever be able to edit them again.</p>
-            <br>
+            <div class="col-md-6">
+                <br>
+                <h4><b>Edit URL</b></h4>
+                Save this URL for yourself.
+                <br>
+                <div class="row">
+                    <div class="col-xs-1 col-xs-offset-1">
+                        <a class="btn btn-default" id="copySecretLink"><i class="fa fa-copy"></i> copy</a>
+                    </div>
+                    <div class="col-xs-8 col-xs-offset-2">
+                        <input id="secretCopyField"
+                               class="form-control"
+                               type="text"
+                               value="https://{{ request.META.HTTP_HOST }}{% url 'characters:characters_view' character.id secret_key %}"
+                               id="secretLinkInput">
+                    </div>
+                </div>
+            </div>
         </div>
+        <br>
+        <p>If you lose the Edit URL before you claim this Contractor, no one will ever be able to edit them again.</p>
+        <br>
     </div>
+</div>
 {% endif %}
 {% if secret_key and secret_key_valid and request.user.is_authenticated %}
-    <div class="row">
-        <form id="claim-form" action="{% url 'characters:characters_claim' character.id secret_key %}" method="post" >
-            {% csrf_token %}
-            <div class="col-md-8 col-md-offset-2 alert alert-success text-center css-char-alert" role="alert">
-                <button type="submit" class="btn btn-success">
-                    <h3>Claim This Character</h3>
-                </button>
-            </div>
-        </form>
+<div class="row">
+    <form id="claim-form" action="{% url 'characters:characters_claim' character.id secret_key %}" method="post" >
+        {% csrf_token %}
+        <div class="col-md-8 col-md-offset-2 alert alert-success text-center css-char-alert" role="alert">
+            <button type="submit" class="btn btn-success">
+                <h3>Claim This Character</h3>
+            </button>
+        </div>
+    </form>
+</div>
+{% endif %}
+
+{% if character.private %}
+    <div class="alert alert-warning text-center css-char-alert" role="alert">
+        <p>
+            <i class="fa fa-user-secret fa-2x"></i>
+            {{character.name}} and their Powers cannot be viewed by others because they are <b>Private</b>.
+        </p>
     </div>
+{% endif %}
+{% if not character.cell  %}
+    {% if character.number_of_victories > 3 %}
+        <div class="alert alert-danger text-center css-char-alert" role="alert">
+            <p>
+                {{character.name}} does not have a home World despite completing {{character.number_completed_games}} Games.
+                They should not play in any Games until they have a home.
+                {% if user_can_edit %}
+                    <br>
+                    <a href="{% url 'cells:find_world' ">
+                        Find a World to join
+                    </a>
+                    or
+                    <a href="{% url 'cells:cells_create' %}" >
+                        create your own
+                    </a>
+                    and then
+                    <a href="{% url 'characters:characters_edit' character.id secret_key %}" >
+                        edit {{character.name}}
+                    </a>
+                    to add them to it.
+                {% endif %}
+            </p>
+        </div>
+    {% else %}
+        <div class="alert alert-warning text-center css-char-alert" role="alert">
+            <p>
+                {{character.name}} does not have a home World. They cannot interact with Contractors on their Downtimes.
+                They must choose a World before their fourth Game.
+                {% if user_can_edit %}
+                    <br>
+                    <a href="{% url 'cells:find_world' ">
+                        Find a World to join
+                    </a>
+                    or
+                    <a href="{% url 'cells:cells_create' %}" >
+                        create your own
+                    </a>
+                    and then
+                    <a href="{% url 'characters:characters_edit' character.id secret_key %}" >
+                        edit {{character.name}}
+                    </a>
+                    to add them to it.
+                {% endif %}
+            </p>
+        </div>
+    {% endif %}
+{% endif %}
+{% if show_more_home_games_warning %}
+    <div class="alert alert-warning text-center css-char-alert" role="alert">
+        <p>
+            {{character.name}} has played more Games out of their home World than in it.</br>
+            <b>Games in home World: </b>{{character.number_completed_games_in_home_cell}}
+            <b>Games in other Worlds: </b>{{character.number_completed_games_out_of_home_cell}}
+            <br>
+            They can only play in Games in their home World until that's where the majority of their Games have taken place.
+        </p>
+    </div>
+{% endif %}
+{% if character.get_power_cost_total != character.active_spent_rewards|length %}
+    <div class="alert alert-danger text-center css-char-alert" role="alert">
+        <p>
+            {{character.name}}'s Power value does not match their spent Gifts! </br>
+            <b>Power Value: </b>{{character.get_power_cost_total}}
+            <b>Spent Rewards: </b>{{character.active_spent_rewards|length}}
+        </p>
+    </div>
+{% endif %}
+{% if character.unspent_experience < 0 %}
+        <div class="alert alert-danger text-center css-char-alert" role="alert">
+            <p>
+                {{character.name}} has overspent Experience</br>
+                <b>Remaining: </b>{{character.unspent_experience}} Exp.
+                (<b>Earned: </b> {{character.exp_earned}} - <b>Spent: </b> {{character.exp_cost}})
+            </p>
+        </div>
+{% endif %}
+{% if character.unspent_experience > 2 and user_can_edit %}
+        <a href="{% url 'characters:characters_edit' character.id secret_key %}">
+            <div class="alert alert-success btn btn-success css-char-alert" role="alert">
+                Spend {{character.name}}'s <b>{{character.unspent_experience}}</b> unspent Experience
+            </div>
+        </a>
+{% endif %}
+{% if user_can_edit and character.unspent_rewards|length > 0 %}
+        <a href="{% url 'characters:characters_spend_reward' character.id %}">
+            <div class="alert alert-success btn btn-success css-char-alert" role="alert">
+                Spend Available Gifts
+            </div>
+        </a>
+{% endif %}
+{% if next_entry %}
+    <a href="{% url 'journals:journal_write_next' character.id %}">
+        <div class="alert alert-success btn btn-success css-char-alert" role="alert">
+            Earn
+            {% if next_entry.reward_is_improvement %}
+            <b>an Improvement</b>
+            {% else %}
+            1 Exp
+            {% endif %}
+            for {{character.name}}
+            <div class="visible-xs-block"></div>
+            by writing a
+            {% if next_entry.is_downtime %}
+            Downtime
+            {% else %}
+            Game
+            {% endif %}
+            journal
+        </div>
+    </a>
 {% endif %}
