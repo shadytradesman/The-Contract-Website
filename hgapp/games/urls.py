@@ -88,6 +88,9 @@ urlpatterns = [
     # ex: .com/games/decline/g/110
     url(r'^decline/g/(?P<game_id>[\d]+)/$', views.decline_invite, name='games_decline_invite'),
 
+    # ex: .com/games/looking-for-game/
+    url(r'^looking-for-game/$', views.LookingForGame.as_view(), name='games_looking_for_game'),
+
     # ex: .com/games/allocate_improvement/i/219
     url(r'^allocate_improvement/i/(?P<improvement_id>[\d]+)/$', views.allocate_improvement, name='games_allocate_improvement'),
 

@@ -10,6 +10,7 @@
 
 {% block extra_scripts %}
     <script src="{% static 'overrides/wiki-macro-scripts.js' %}"></script>
+    <script src="{% static 'cells/edit.js' %}"></script>
 {% endblock %}
 
 {% block head_title %}
@@ -39,9 +40,9 @@
         {% endif %}
     </h1>
     {% if cell %}
-        <form action="{% url 'cells:cells_edit' cell.id %}" method="post">
+        <form action="{% url 'cells:cells_edit' cell.id %}" method="post", onsubmit="setFormSubmitting()">
     {% else %}
-        <form action="{% url 'cells:cells_create' %}" method="post">
+        <form action="{% url 'cells:cells_create' %}" method="post", onsubmit="setFormSubmitting()">
     {% endif %}
         {{ form.non_field_errors }}
         {% csrf_token %}

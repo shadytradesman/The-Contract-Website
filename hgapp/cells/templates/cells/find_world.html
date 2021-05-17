@@ -27,6 +27,12 @@
         <div class="panel-body">
             <p class="text-center">
                 These Worlds are looking for new Players! They are ordered by recent Game activity.
+                <br><br>
+                If you are looking for a Game to play in, visit
+                <a href="{% url 'games:games_looking_for_game' %}">
+                    the Looking-For-Game page
+                </a>
+                instead.
             </p>
             <div class="row">
             {% for cell in public_cells %}
@@ -75,14 +81,3 @@
     </div>
 </div>
 {% endblock %}
-Cell Name
-Cell world sentence
-Cell world blurb
-Cell community link (if public)
-Cell Sell
-Last Game Time
-Cell stats:
-    Cell danger rating
-    num members
-    num contractors
-    num games played

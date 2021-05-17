@@ -112,7 +112,8 @@ def make_game_form(user):
         invitation_mode = forms.ChoiceField(label="Who can RSVP?",
                                             choices=INVITE_MODE,
                                             initial=INVITE_MODE[2],
-                                            help_text='Determine who is allowed to RSVP to this Game.')
+                                            help_text='Determine who is allowed to RSVP to this Game. Specifically '
+                                                      'invited Players may always RSVP unless the Game is closed.')
         list_in_lfg = forms.BooleanField(initial=True,
                                          required=False,
                                          label='List on LFG',
@@ -138,7 +139,7 @@ def make_game_form(user):
                                                  required=False,
                                                  widget=forms.CheckboxSelectMultiple(attrs={'class': 'list-unstyled list-inline'}),
                                                  help_text='How will the Players communicate during the Game? Select all'
-                                                           ' that apply')
+                                                           ' that apply.')
 
         def default_date(self):
             if self.initial and 'start_time' in self.initial:

@@ -1,0 +1,43 @@
+.css-danger-rating {
+    padding: 2px;
+    border: 1px solid black;
+    border-radius: 2px;
+}
+
+.css-danger-Pillow {
+    border: 1px solid skyblue;
+    color: black;
+    background: rgb(248,254,75);
+    background: linear-gradient(70deg, rgba(75,255,100,1) 0%, rgba(91,254,202,1) 29%, rgba(106,195,255,1) 68%, rgba(114,184,255,1) 100%);
+}
+
+.css-danger-Benevolent {
+    border-color: skyblue;
+    color: skyblue;
+}
+
+.css-danger-Just {
+    border-color:#d4d946;
+    color: #d4d946;
+}
+
+.css-danger-Sadistic {
+    border-color: #d9a746;
+    color: #d9a746;
+}
+
+.css-danger-Sadistic {
+    border-color: #e77d4a;
+    color: #e77d4a;
+}
+
+.css-danger-Cruel{
+    background: darkred;
+    border-color: #e7554a;
+    color: #e7554a;
+}
+
+.css-difficulty-Slaughterhouse {
+    background: black;
+    border-color: red;
+}

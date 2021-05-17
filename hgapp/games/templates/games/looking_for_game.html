@@ -1,4 +1,119 @@
-This page lists upcoming Games that welcome drop-in Contractors. It is especially useful to brand new Players looking to
-try out The Contract and Players from established groups who want to take their Contractors on the occasional online Game.
+{% extends "site_base.html" %}
 
-If you are looking for a community or group of Players, use the Find World page.
+{% load i18n %}
+{% load staticfiles %}
+{% load account_tags %}
+
+{% block head_title %}
+    Looking for Game
+{% endblock %}
+
+{% block extra_head %}
+{% endblock %}
+
+{% block extra_styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'games/looking_for_game.css' %}" />
+{% endblock %}
+
+{% block extra_scripts %}
+{% endblock %}
+
+{% block body_base %}
+<div class="container">
+    <h1 class="text-center">
+        Looking For Game
+    </h1>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <p class="text-center">
+                This page lists upcoming Games that welcome drop-in Contractors. It is especially useful to brand new Players looking to
+                try out The Contract and Players from established groups who want to take their Contractors on the occasional online Game.
+                <br><br>
+                If you are looking for a playgroup or community,
+                <a href="{% url 'cells:cells_find_world' %}">
+                    find a World
+                </a>
+                instead.
+            </p>
+            <div class="row">
+                {% for game in games %}
+                {% if forloop.counter|divisibleby:2 == 0 %}
+                    </div>
+                    <div class="row">
+                {% endif %}
+                <div class="col-md-6">
+                    <div class="thumbnail">
+                        <small style="margin-left:5px;">
+                            <b>Start time:</b>
+                            {{game.scheduled_start_time|timeuntil}}
+                            ({{game.scheduled_start_time}}
+                            {% if request.user.account %}
+                            {{request.user.account.timezone}}
+                            {% endif %}
+                            )
+                        </small>
+                        <h3 class="text-center" style="margin-top:10px;">
+                            <a href="{% url 'games:games_view_game' game.id %}">
+                                {{game.scenario.title}}
+                            </a>
+                        </h3>
+                        <p>
+                        </p>
+                        <div class="row">
+                            <div class="col-xs-6">
+                                <b>Game Master: </b>
+                                <a href="{% url 'profiles:profiles_view_profile' game.gm.id %}">
+                                    {% user_display game.gm %}
+                                </a>
+                                <br>
+                                <b>In World: </b>
+                                <a href="{% url 'cells:cells_view_cell' game.cell.id %}">
+                                    {{game.cell.name}}
+                                </a>
+                            </div>
+                            <div class="col-xs-6">
+                                <b>GM Title:</b>
+                                {% if game.gm.profile.gm_prefix %}
+                                <span class="css-danger-rating css-danger-{{game.gm.profile.get_gm_prefix_display}}">
+                                {{game.gm.profile.get_gm_prefix_display}}
+                                {% else %}
+                                <span>
+                                {% endif %}
+                                {{game.gm.profile.get_gm_suffix_display}}
+                                </span>
+                                <br>
+                                <b>Status:</b>
+                                {{game.get_required_character_status_display}}
+                            </div>
+                        </div>
+                        {% if game.mediums %}
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <b>Medium:</b>
+                                {% for medium in game.mediums.all %}
+                                    <span class="css-game-medium" style="color: {{medium.color|safe}};">
+                                        {{medium.medium}}
+                                    </span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        <hr>
+                        <div class="expandable-outer js-expandable-collapsed">
+                            {{game.hook|linebreaks}}
+                            {% if cell.is_community_link_public and cell.community_link %}
+                            <div>
+                                <a href="cell.community_link">
+                                    <b>Visit this World's off-site community.</b>
+                                </a>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -8,6 +8,9 @@ from django.contrib import messages
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
+from django.views import View
+
+import datetime
 
 from games.forms import CreateScenarioForm, CellMemberAttendedForm, make_game_form, make_allocate_improvement_form, \
     CustomInviteForm, make_accept_invite_form, ValidateAttendanceForm, DeclareOutcomeForm, GameFeedbackForm, \
@@ -769,3 +772,27 @@ def spoil_scenario(request, scenario_id):
                     scenario.discovery_for_player(request.user).spoil()
             return JsonResponse({}, status=200)
         return JsonResponse({"error": ""}, status=400)
+
+class LookingForGame(View):
+    template_name = 'games/looking_for_game.html'
+
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, self.__get_context_data())
+
+    def __get_context_data(self):
+        now = datetime.datetime.now()
+        an_hour_ago = now - datetime.timedelta(hours=1)
+        games_query = Game.objects.filter(
+            list_in_lfg=True,
+            status=GAME_STATUS[0][0],
+            scheduled_start_time__gte=an_hour_ago)
+        if self.request.user.is_anonymous or not self.request.user.profile.view_adult_content:
+            games_query = games_query.exclude(is_nsfw=True)
+        games = games_query.order_by('scheduled_start_time').all()
+        context = {
+            'games': games,
+        }
+        return context
