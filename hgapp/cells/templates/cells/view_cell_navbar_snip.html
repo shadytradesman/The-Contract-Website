@@ -1,7 +1,7 @@
 {% if user_membership %}
 <ul class="nav nav-pills nav-justified navbar-default">
         <li>
-            <a href="{% url 'games:games_create_game' %}">
+            <a href="{% url 'games:games_create_game_world' cell.id %}">
                 Schedule Game
             </a>
         </li>

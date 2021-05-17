@@ -40,7 +40,7 @@
                         {{ invite.invite_text|linebreaks }}
                     </div>
                 {% endif %}
-                <h4>Required Character Status: <b>{{invite.relevant_game.get_required_character_status_display}}</b></h4>
+                <h4>Required Contractor Status: <b>{{invite.relevant_game.get_required_character_status_display}}</b></h4>
                 {% if not form.fields.attending_character.choices %}
                     <h3 class="text-danger">You do not have any valid characters.</h3>
                 {% else %}

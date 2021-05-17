@@ -39,7 +39,8 @@ def __check_edit_perms(request, character, secret_key):
     if not requester_can_edit:
         raise PermissionDenied("You do not have permission to edit this Character")
 
-def create_character_world(request, cell_id=None):
+
+def create_character(request, cell_id=None):
     if request.user.is_authenticated and not request.user.profile.confirmed_agreements:
         return HttpResponseRedirect(reverse('profiles:profiles_terms'))
     cell = get_object_or_404(Cell, id=cell_id) if cell_id else None
@@ -52,16 +53,6 @@ def create_character_world(request, cell_id=None):
         context = get_edit_context(user=request.user, cell=cell)
         return render(request, 'characters/edit_pages/edit_character.html', context)
 
-def choose_world_create(request):
-    cells = []
-    if request.user.is_authenticated:
-        cells = request.user.cell_set.all()
-    tutorial = get_object_or_404(CharacterTutorial)
-    context = {
-        "cells": cells,
-        "tutorial": tutorial,
-    }
-    return render(request, 'characters/edit_pages/choose_world.html', context)
 
 def edit_character(request, character_id, secret_key = None):
     if request.user.is_authenticated and not request.user.profile.confirmed_agreements:

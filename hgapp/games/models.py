@@ -20,6 +20,15 @@ DECLINED = 'DECLINED'
 RINGER_VICTORY = 'RINGER_VICTORY'
 RINGER_FAILURE = 'RINGER_FAILURE'
 
+REQUIRED_HIGH_ROLLER_STATUS = (
+    ('ANY', 'Any'),
+    ('NEWBIE_OR_NOVICE', 'Newbie or Novice'),
+    ('NEWBIE', 'Newbie'),
+    ('NOVICE', 'Novice'),
+    ('SEASONED', 'Seasoned'),
+    ('VETERAN', 'Veteran'),
+)
+
 OUTCOME = (
     (WIN, 'Victory'),
     (LOSS, 'Loss'),
@@ -34,6 +43,17 @@ DISCOVERY_REASON = (
     ('CREATED', 'Created'),
     ('SHARED', 'Shared'),
     ('UNLOCKED', 'Unlocked'),
+)
+
+INVITE_ONLY = 'INVITE_ONLY'
+WORLD_MEMBERS = 'WORLD_MEMBERS'
+ANYONE = 'ANYONE'
+CLOSED = 'CLOSED'
+INVITE_MODE = (
+    (INVITE_ONLY, 'Invited Players Only'),
+    (WORLD_MEMBERS, 'World Members Only'),
+    (ANYONE, 'Any Player'),
+    (CLOSED, 'Closed for RSVPs'),
 )
 
 def migrate_add_gms(apps, schema_editor):
@@ -57,13 +77,10 @@ class Game(models.Model):
     scenario = models.ForeignKey(
         "Scenario",
         on_delete=models.PROTECT)
-    required_character_status = models.CharField(choices=HIGH_ROLLER_STATUS,
+    required_character_status = models.CharField(choices=REQUIRED_HIGH_ROLLER_STATUS,
                                        max_length=25,
-                                       default=HIGH_ROLLER_STATUS[0][0])
+                                       default=REQUIRED_HIGH_ROLLER_STATUS[0][0])
     title = models.CharField(max_length=130)
-    hook = models.TextField(max_length=5000,
-                            null=True,
-                            blank=True)
     created_date = models.DateTimeField('date created',
                                         auto_now_add=True)
     scheduled_start_time = models.DateTimeField('scheduled start time',
@@ -86,7 +103,6 @@ class Game(models.Model):
     scenario_notes = models.TextField(max_length=10000,
                                       null=True,
                                       blank=True)
-    open_invitations = models.BooleanField(default=True)
     cell = models.ForeignKey(Cell,
                              null=True, # for migration reasons. All games should have cells.
                              blank=True, # for migration reasons. All games should have cells.
@@ -95,7 +111,22 @@ class Game(models.Model):
                                           null=True,
                                           blank=True,
                                           on_delete=models.CASCADE)
+
+    # Invitation stuff
+    hook = models.TextField(max_length=7000,
+                            null=True,
+                            blank=True)
+    open_invitations = models.BooleanField(default=True) # deprecated. Use invitation_mode instead.
     is_nsfw = models.BooleanField(default=False)
+    list_in_lfg = models.BooleanField(default=False)
+    allow_ringers = models.BooleanField(default=False)
+    invitation_mode = models.CharField(choices=INVITE_MODE,
+                              max_length=25,
+                              default=INVITE_MODE[0])
+    gametime_url = models.CharField(max_length=2500, blank=True, null=True)
+    max_rsvp = models.IntegerField(blank=True, null=True)
+    mediums = models.ManyToManyField("GameMedium",
+                                     blank=True)
 
     class Meta:
         permissions = (
@@ -270,7 +301,7 @@ class Game(models.Model):
     def save(self, *args, **kwargs):
         if not hasattr(self, 'gm'):
             self.gm = self.creator
-        if not hasattr(self, 'scenario'):
+        if not hasattr(self, 'scenario') or not self.scenario:
             scenario = Scenario(creator=self.gm,
                                 title=str(self.title),
                                 description="Put details of the scenario here",
@@ -799,5 +830,18 @@ class ScenarioTag(models.Model):
     slug = models.SlugField("Unique URL-Safe Name",
                             max_length=40,
                             primary_key=True)
+
     def __str__(self):
         return self.tag
+
+
+class GameMedium(models.Model):
+    medium = models.CharField(max_length=40)
+    slug = models.SlugField("Unique URL-Safe Name",
+                            max_length=40,
+                            primary_key=True)
+    color = models.CharField("Css Color",
+                             max_length=40)
+
+    def __str__(self):
+        return self.medium

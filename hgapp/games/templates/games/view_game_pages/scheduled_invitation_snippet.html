@@ -28,7 +28,7 @@
                 {% endif %}
             </li>
             {% empty %}
-                <p> No players invited yet! <a href="{% url 'games:games_invite_players' game.id %}">Invite Some!</a></p>
+                <p> No players invited yet.</p>
                 {% if game.open_invitations %}
                     <p>This game also accepts self-invitations, so just share this page with anyone you want to invite.</p>
                 {% endif %}

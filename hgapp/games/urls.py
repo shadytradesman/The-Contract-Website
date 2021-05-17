@@ -25,6 +25,8 @@ urlpatterns = [
 
     # ex: .com/games/create/game/
     url(r'^create/game/$', views.create_game, name='games_create_game'),
+    # ex: .com/games/create/game/
+    url(r'^create/game/w/(?P<cell_id>[\d]+)/$', views.create_game, name='games_create_game_world'),
 
     # ex: .com/games/edit/g/112
     url(r'^edit/g/(?P<game_id>[\d]+)/$', views.edit_game, name='games_game_edit'),

@@ -104,6 +104,7 @@
                             in <a href="{% url 'cells:cells_view_cell' game.cell.id %}">{{ game.cell.name }}</a>
                         {% endif %}
                         {% if game.is_scheduled %}
+                            in {{ game.scheduled_start_time|timeuntil }}:
                             on {{ game.scheduled_start_time|date:'M d, Y' }} at {{ game.scheduled_start_time|date:'g:iA' }}
                             {% if request.user.account %}
                                 {{request.user.account.timezone}}
@@ -151,12 +152,13 @@
                     {% endif %}
                 </div>
                 {% if game.cell and game.cell.house_rules %}
-                <div class="thumbnail expandable-outer js-expandable-collapsed">
-                    <h3>
-                        {{game.cell.name}} House Rules
-                    </h3>
-                    {{game.cell.house_rules|safe}}
-                </div>
+                    <br>
+                    <div class="thumbnail expandable-outer js-expandable-collapsed">
+                        <h3>
+                            {{game.cell.name}} House Rules
+                        </h3>
+                        {{game.cell.house_rules|safe}}
+                    </div>
                 {% endif %}
                 {% if game.is_scheduled %}
                     {% include "games/view_game_pages/scheduled_invitation_snippet.html" %}

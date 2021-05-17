@@ -338,6 +338,7 @@ $(document).ready(function(){
 const cellInfos = JSON.parse(document.getElementById('cellInfos').textContent);
 $(function(){
     function handleCellChange() {        // define event handler
+        isDirty = true;
         var $this = $(this);
         var cellInfo = cellInfos[$this.val()];
         if (cellInfo) {
