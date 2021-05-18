@@ -318,12 +318,12 @@ class Character(models.Model):
     def number_completed_games_in_home_cell(self):
         if not hasattr(self, "cell") or not self.cell:
             return 0
-        return self.game_attendance_set.exclude(outcome=None, is_confirmed=False).filter(relevant_game__cell=self.cell).count()
+        return self.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).filter(relevant_game__cell=self.cell).count()
 
     def number_completed_games_out_of_home_cell(self):
         if not hasattr(self, "cell") or not self.cell:
             return self.number_completed_games()
-        return self.game_attendance_set.exclude(outcome=None, is_confirmed=False).exclude(relevant_game__cell=self.cell).count()
+        return self.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).exclude(relevant_game__cell=self.cell).count()
 
     def calculate_status(self):
         num_victories = self.number_of_victories()
@@ -380,10 +380,10 @@ class Character(models.Model):
         return not self.private or player.has_perm("view_private_character", self) or self.player_has_cell_edit_perms(player)
 
     def completed_games(self):
-        return self.game_attendance_set.exclude(outcome=None, is_confirmed=False).order_by("-relevant_game__end_time").all()
+        return self.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).order_by("-relevant_game__end_time").all()
 
     def completed_games_rev_sort(self):
-        return self.game_attendance_set.exclude(outcome=None, is_confirmed=False).order_by("-relevant_game__end_time").all()
+        return self.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).order_by("-relevant_game__end_time").all()
 
     def assigned_coin(self):
         coins = self.reward_set.filter(is_void=False, is_charon_coin=True).all()

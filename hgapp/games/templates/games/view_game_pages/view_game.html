@@ -7,167 +7,168 @@
 {% block body_class %}home{% endblock %}
 
 {% load account_tags %}
+{% load games_tags %}
 {% load markdown_deux_tags %}
 
 {% block body_base %}
-	<div class="container">
-        <br>
-        <h1 class="text-center">
-            {% if game.is_scheduled %}
-                Upcoming Game
-            {% elif game.is_active%}
-                Ongoing Game
-            {% elif game.canceled %}
-                Canceled Game
-            {% else %}
-                Completed Game
-            {% endif %}
-        </h1>
-        {% include "_messages.html" %}
-        {% if can_edit %}
-            <br>
-            <ul class="nav nav-pills nav-justified navbar-default">
+<div class="container">
+    <br>
+    <h1 class="text-center">
+        {{game.get_header_display|safe}}
+    </h1>
+    {% include "_messages.html" %}
+    {% include "games/view_game_pages/navbar_snippet.html" %}
+    <div class="panel-group">
+        <div class="panel panel-default">
+            <h3 class="text-center">
+                <a href="{% url 'profiles:profiles_view_profile' game.creator.id %}">
+                    {% if request.user == game.gm %}
+                        You
+                    {% else %}
+                        {% user_display game.gm %}
+                    {% endif %}
+                </a>
                 {% if game.is_scheduled %}
-                    <li><a href="{% url 'games:games_game_edit' game.id %}">Edit Game</a></li>
+                    will run
+                {% elif game.is_active%}
+                    {% if request.user == game.gm %}
+                        are
+                    {% else %}
+                        is
+                    {% endif %}
+                    currently running
+                {% elif game.canceled %}
+                    was going to run
+                {% else %}
+                    ran
                 {% endif %}
-                {% if game.is_finished or game.is_recorded %}
-                    <li class="active">
-                        <a href="{% url 'games:games_edit_completed' game.id %}">Edit Attendances and Outcomes</a>
-                    </li>
-                    <li class="">
-                        <a href="{% url 'games:games_add_attendance' game.id %}">Add Attendances</a>
-                    </li>
+                {% if can_view_scenario %}
+                    <a href="{% url 'games:games_view_scenario' game.scenario.id %}">{{game.scenario.title}}</a>
+                {% else %}
+                    {{ game.scenario.title }}
                 {% endif %}
-                {% if game.is_active or game.is_scheduled %}
-                    <li><a href="{% url 'games:games_cancel_game' game.id %}">Cancel Game</a></li>
+                {% if can_view_scenario %}
+                    {% if game.scenario.summary %}
+                        <br>
+                        <small>
+                            {{game.scenario.summary}}
+                        </small>
+                    {% endif %}
                 {% endif %}
-                {% if game.is_scheduled %}
-                    <li class="active"><a href="{% url 'games:games_start_game' game.id %}">Start Game</a></li>
-                {% endif %}
-                {% if game.is_active %}
-                    <li class="active"><a href="{% url 'games:games_end_game' game.id %}">Finish Game</a></li>
-                {% endif %}
-
-            </ul>
-            <br>
-        {% endif %}
-        <div class="panel-group">
-            <div class="panel panel-default">
-                <h3 class="text-center">
-                    <a href="{% url 'profiles:profiles_view_profile' game.creator.id %}">
-                        {% if request.user == game.gm %}
-                            You
-                        {% else %}
-                            {% user_display game.gm %}
-                        {% endif %}
-                    </a>
+            </h3>
+                <h4 class="text-center">
+                    This Game
                     {% if game.is_scheduled %}
-                        will run
+                        will take place
                     {% elif game.is_active%}
-                        {% if request.user == game.gm %}
-                            are
-                        {% else %}
-                            is
-                        {% endif %}
-                        currently running
-                    {% elif game.canceled %}
-                        was going to run
+                        is taking place
+                    {% elif game.is_canceled%}
+                        would have taken place
                     {% else %}
-                        ran
+                        took place
                     {% endif %}
-                    {% if can_view_scenario %}
-                        <a href="{% url 'games:games_view_scenario' game.scenario.id %}">{{game.scenario.title}}</a>
+                    {% if game.cell %}
+                        in <a href="{% url 'cells:cells_view_cell' game.cell.id %}">{{ game.cell.name }}</a>
+                    {% endif %}
+                    {% if game.is_scheduled %}
+                        in {{ game.scheduled_start_time|timeuntil }}:
+                        on {{ game.scheduled_start_time|date:'M d, Y' }} at {{ game.scheduled_start_time|date:'g:iA' }}
+                        {% if request.user.account %}
+                            {{request.user.account.timezone}}
+                        {% endif %}
+                    {% elif game.is_active%}
+                    {% elif game.is_canceled%}
+                        but was canceled and never occurred
                     {% else %}
-                        {{ game.scenario.title }}
-                    {% endif %}
-                    {% if can_view_scenario %}
-                        {% if game.scenario.summary %}
-                            <br>
-                            <small>
-                                {{game.scenario.summary}}
-                            </small>
+                        on {{ game.end_time|date:'M d, Y' }} at {{ game.end_time|date:'g:iA' }}
+                        {% if request.user.account %}
+                            {{request.user.account.timezone}}
                         {% endif %}
                     {% endif %}
-                </h3>
-                    <h4 class="text-center">
-                        This Game
-                        {% if game.is_scheduled %}
-                            will take place
-                        {% elif game.is_active%}
-                            is taking place
-                        {% elif game.is_canceled%}
-                            would have taken place
-                        {% else %}
-                            took place
-                        {% endif %}
-                        {% if game.cell %}
-                            in <a href="{% url 'cells:cells_view_cell' game.cell.id %}">{{ game.cell.name }}</a>
-                        {% endif %}
-                        {% if game.is_scheduled %}
-                            in {{ game.scheduled_start_time|timeuntil }}:
-                            on {{ game.scheduled_start_time|date:'M d, Y' }} at {{ game.scheduled_start_time|date:'g:iA' }}
-                            {% if request.user.account %}
-                                {{request.user.account.timezone}}
-                            {% endif %}
-                        {% elif game.is_active%}
-                        {% elif game.is_canceled%}
-                            but was canceled and never occurred
-                        {% else %}
-                            on {{ game.end_time|date:'M d, Y' }} at {{ game.end_time|date:'g:iA' }}
-                            {% if request.user.account %}
-                                {{request.user.account.timezone}}
-                            {% endif %}
-                        {% endif %}
-                    </h4>
-                <div class="panel-heading">
-                    {% if game.is_scheduled and game.hook %}
-                        <p class="lead">Invitation</p>
-                        <p>
-                            {% if request.user.is_authenticated and my_invitation %}
-                                {{ my_invitation.invite_text }}
-                            {% else %}
-                                {{ game.hook|linebreaks }}
-                            {% endif %}
-                        </p>
-                        <h4>
-                            {% if game.is_nsfw %}
-                            <span style="font-size: 20px;"
-                                  data-toggle="tooltip"
-                                  title="This Game only allows Players over the age of 18">
-                                        🔞
-                            </span>
-                            {% endif %}
-                            <small>
-                                Bring your favorite
-                                {% if not game.get_required_character_status_display == "Any" %}
-                                    <b>
-                                        {{game.get_required_character_status_display}}
-                                    </b>
-                                    Contractor
-                                {% else %}
-                                    Contractor, regardless of Status.
-                                {% endif %}
-                            </small>
-                        </h4>
-                    {% endif %}
-                </div>
-                {% if game.cell and game.cell.house_rules %}
-                    <br>
-                    <div class="thumbnail expandable-outer js-expandable-collapsed">
-                        <h3>
-                            {{game.cell.name}} House Rules
-                        </h3>
-                        {{game.cell.house_rules|safe}}
+                </h4>
+            {% if game.is_scheduled or game.is_active %}
+            {% if gametime_url %}
+            <div class="row">
+                <div class="col-md-10 col-md-offset-1 text-center">
+                    <div role="alert" class="alert alert-info">
+                        <b>
+                            Gametime link:
+                        <a href="{{gametime_url}}">
+                            {{gametime_url}}
+                        </a>
+                        </b>
                     </div>
-                {% endif %}
-                {% if game.is_scheduled %}
-                    {% include "games/view_game_pages/scheduled_invitation_snippet.html" %}
-                {% elif game.is_active %}
-                    {% include "games/view_game_pages/active_attending_snippet.html" %}
-                {% elif game.is_finished or game.is_archived or game.is_void or game.is_recorded %}
-                    {% include "games/view_game_pages/finished_attended_snippet.html" %}
+
+                </div>
+            </div>
+            {% endif %}
+            {% endif %}
+            <div class="panel-heading">
+                {% if game.is_scheduled and game.hook %}
+                    <p>
+                        {% if request.user.is_authenticated and my_invitation %}
+                            {{ my_invitation.invite_text }}
+                        {% else %}
+                            {{ game.hook|linebreaks }}
+                        {% endif %}
+                    </p>
+                    <h4>
+                        {% if game.is_nsfw %}
+                        <span style="font-size: 20px;"
+                              data-toggle="tooltip"
+                              title="This Game only allows Players over the age of 18">
+                                    🔞
+                        </span>
+                        {% endif %}
+                        <small>
+                            Bring your favorite
+                            {% if not game.get_required_character_status_display == "Any" %}
+                                <b>
+                                    {{game.get_required_character_status_display}}
+                                </b>
+                                Contractor
+                            {% else %}
+                                Contractor, regardless of Status.
+                            {% endif %}
+                            <br>
+                            <b>{{game.gm.username}}'s GM title: </b> {% render_gm_title game.gm %}
+                            {% if game.mediums.all|length %}
+                                <br>
+                                <b>Medium:</b>
+                                {% render_game_mediums game %}
+                            {% endif %}
+                            {% if not game.gm == request.user and request.user.is_authenticated %}
+                                <br>
+                                <a href="{% url 'postman:write' game.gm.username %}">
+                                    <i class="fa fa-envelope-o fa-1x"></i> Send {{game.gm.username}} a message.
+                                </a>
+                            {% endif %}
+                            {% if request.user.is_anonymous %}
+                                <br>
+                                <a href="{% url 'account_login' %}">Log in</a>
+                                and RSVP to view this Game's game-time communication link.
+                            {% endif %}
+                        </small>
+                    </h4>
                 {% endif %}
             </div>
+            {% if game.cell and game.cell.house_rules %}
+                <br>
+                <div class="thumbnail expandable-outer js-expandable-collapsed">
+                    <h3>
+                        {{game.cell.name}} House Rules
+                    </h3>
+                    {{game.cell.house_rules|safe}}
+                </div>
+            {% endif %}
+            {% if game.is_scheduled %}
+                {% include "games/view_game_pages/scheduled_invitation_snippet.html" %}
+            {% elif game.is_active %}
+                {% include "games/view_game_pages/active_attending_snippet.html" %}
+            {% elif game.is_finished or game.is_archived or game.is_void or game.is_recorded %}
+                {% include "games/view_game_pages/finished_attended_snippet.html" %}
+            {% endif %}
         </div>
     </div>
+</div>
 {% endblock %}

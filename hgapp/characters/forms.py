@@ -124,6 +124,8 @@ def make_character_form(user, existing_character=None, supplied_cell=None):
             cell.initial = supplied_cell
         if existing_character:
             cell.initial = existing_character.cell
+        elif queryset.first():
+            cell.initial = queryset.first()
     else:
         cell = forms.ModelChoiceField(queryset=Cell.objects.none(),
                                       widget=forms.Select(attrs={'class': 'form-control'}),

@@ -62,6 +62,12 @@ class Profile(models.Model):
     gm_suffix = models.CharField(choices=GM_SUFFIX,
                                  max_length=25,
                                  default=GM_SUFFIX[0][0])
+    num_games_gmed = models.IntegerField(blank=True, null=True)
+    num_gm_kills = models.IntegerField(blank=True, null=True)
+    num_gm_victories = models.IntegerField(blank=True, null=True)
+    num_gm_losses = models.IntegerField(blank=True, null=True)
+    num_golden_ratios = models.IntegerField(blank=True, null=True)
+
     view_adult_content = models.BooleanField(default=False)
     date_set_adult_content = models.DateTimeField(blank=True, null=True)
 
@@ -75,10 +81,35 @@ class Profile(models.Model):
             self.date_set_adult_content = timezone.now()
             self.save()
 
+    def update_gm_stats_if_necessary(self):
+        if not hasattr(self, "num_games_gmed") or not self.num_games_gmed:
+            self.update_gm_stats()
+
+    def update_gm_stats(self):
+        gm_games = self.get_games_where_player_gmed()
+        num_gm_games = gm_games.count()
+        num_gm_kills = 0
+        num_golden_ratio_games = 0
+        num_gm_victories = 0
+        num_gm_losses = 0
+        for game in gm_games:
+            num_gm_kills = num_gm_kills + game.number_deaths()
+            num_gm_victories = num_gm_victories + game.number_victories()
+            num_gm_losses = num_gm_losses + game.number_losses()
+            if game.achieves_golden_ratio():
+                num_golden_ratio_games = num_golden_ratio_games + 1
+        self.num_games_gmed = num_gm_games
+        self.num_gm_losses = num_gm_losses
+        self.num_gm_kills = num_gm_kills
+        self.num_gm_victories = num_gm_victories
+        self.num_golden_ratios = num_golden_ratio_games
+        self.save()
+
     def can_view_adult(self):
         return self.view_adult_content
 
     def recompute_titles(self):
+        self.update_gm_stats()
         self.recompute_player_title()
         self.recompute_gm_title()
 
@@ -101,16 +132,11 @@ class Profile(models.Model):
         return [invite for invite in invites_with_death if invite.attendance and invite.attendance.is_death()]
 
     def recompute_gm_title(self):
-        gm_games = self.get_games_where_player_gmed()
-        num_gm_games = gm_games.count()
-        self.gm_suffix = self._gm_suffix_from_num_gm_games(num_gm_games)[0]
+        self.gm_suffix = self._gm_suffix_from_num_gm_games(self.num_games_gmed)[0]
 
-        num_killed_contractors = 0
-        for game in gm_games:
-            num_killed_contractors = num_killed_contractors + game.number_deaths()
         # gm_prefix can be None, so we return the db value here
-        self.gm_prefix = self._gm_prefix_from_stats(num_gm_games=num_gm_games,
-                                                    num_killed_contractors=num_killed_contractors)
+        self.gm_prefix = self._gm_prefix_from_stats(num_gm_games=self.num_games_gmed,
+                                                    num_killed_contractors=self.num_gm_kills)
         self.save()
 
     def completed_game_invites(self):
@@ -134,6 +160,10 @@ class Profile(models.Model):
         return Game.objects.filter(gm=self.user).exclude(get_completed_game_excludes_query()) \
                 .order_by("end_time") \
                 .all()
+
+    def get_gm_title_tooltip(self):
+        return "Games GMed: {}<br>Contractors killed: {}<br>Victories awarded: {} <br>Losses awarded: {}"\
+            .format(self.num_games_gmed, self.num_gm_kills, self.num_gm_victories, self.num_gm_losses)
 
     def _player_prefix_from_counts(self, num_completed, num_deadly_games, num_deaths_on_games):
         if num_completed < 3:

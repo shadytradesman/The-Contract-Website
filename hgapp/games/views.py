@@ -320,6 +320,7 @@ def edit_game(request, game_id):
 
 def view_game(request, game_id):
     game = get_object_or_404(Game, id=game_id)
+    game.gm.profile.update_gm_stats_if_necessary()  # remove after world patch
     can_view_scenario = False
     my_invitation = None
     if request.user.is_authenticated:
@@ -332,6 +333,8 @@ def view_game(request, game_id):
         initial_data = {"message": game.hook}
         invite_form = CustomInviteForm(initial=initial_data)
     nsfw_blocked = game.is_nsfw and (request.user.is_anonymous or not request.user.profile.view_adult_content)
+    can_rsvp = game.player_can_rsvp(request.user)
+    gametime_url = None if not my_invitation or not game.gametime_url else game.gametime_url
     context = {
         'game': game,
         'can_view_scenario': can_view_scenario,
@@ -339,6 +342,8 @@ def view_game(request, game_id):
         'invite_form': invite_form,
         'can_edit': can_edit,
         'nsfw_blocked': nsfw_blocked,
+        'can_rsvp': can_rsvp,
+        'gametime_url': gametime_url,
     }
     return render(request, 'games/view_game_pages/view_game.html', context)
 
@@ -396,10 +401,10 @@ def accept_invite(request, game_id):
     if not game.is_scheduled() or game.creator.id == request.user.id or game.gm.id == request.user.id:
         raise PermissionDenied("This Game has already started, or you're the GM!")
     invite = get_object_or_none(request.user.game_invite_set.filter(relevant_game=game))
-    if not invite and not game.open_invitations:
-        raise PermissionDenied("This is awkward. . . You, uh, haven't been invited to this Game")
     if game.is_nsfw and not request.user.profile.view_adult_content:
         raise PermissionDenied("Your content settings do now allow you to RSVP to this Game.")
+    if not game.player_can_rsvp(request.user):
+        raise PermissionDenied("You cannot RSVP to this Game.")
     if request.method == 'POST':
         if not invite:
             # player self-invite
@@ -792,6 +797,8 @@ class LookingForGame(View):
         if self.request.user.is_anonymous or not self.request.user.profile.view_adult_content:
             games_query = games_query.exclude(is_nsfw=True)
         games = games_query.order_by('scheduled_start_time').all()
+        for game in games:
+            game.gm.profile.update_gm_stats_if_necessary() # remove after world patch
         context = {
             'games': games,
         }

@@ -122,7 +122,7 @@ class Game(models.Model):
     allow_ringers = models.BooleanField(default=False)
     invitation_mode = models.CharField(choices=INVITE_MODE,
                               max_length=25,
-                              default=INVITE_MODE[0])
+                              default=INVITE_MODE[0][0])
     gametime_url = models.CharField(max_length=2500, blank=True, null=True)
     max_rsvp = models.IntegerField(blank=True, null=True)
     mediums = models.ManyToManyField("GameMedium",
@@ -137,6 +137,35 @@ class Game(models.Model):
         if player.is_superuser:
             return True
         return player.is_authenticated and (player.has_perm('edit_game', self) or self.cell.player_can_manage_games(player))
+
+    def player_can_rsvp(self, player):
+        if player.is_superuser:
+            return True
+        if not player.is_authenticated or self.invitation_mode == CLOSED or not self.is_scheduled():
+            return False
+        if self.is_nsfw and not player.profile.view_adult_content:
+            return False
+        player_invitation = get_object_or_none(player.game_invite_set.filter(relevant_game=self.id))
+        if player_invitation:
+            return True
+        if self.invitation_mode == INVITE_ONLY:
+            return False
+        if self.invitation_mode == WORLD_MEMBERS:
+            if not self.cell.get_player_membership(player):
+                return False
+            else:
+                return True
+        # ANYONE case
+        return True
+
+    def get_header_display(self):
+        if self.is_scheduled():
+            return "Upcoming Game"
+        if self.is_active():
+            return "Ongoing Game"
+        if self.is_canceled():
+            return "Canceled Game"
+        return "Completed Game"
 
     def is_scheduled(self):
         return self.status == GAME_STATUS[0][0]

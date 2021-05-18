@@ -119,21 +119,20 @@ def make_game_form(user):
                                          label='List on LFG',
                                          help_text="If checked, this Game will appear on the Looking-For-Game page. Do "
                                                    "not list in-person Games on the LFG page.")
+        max_rsvp = forms.IntegerField(label="Capacity",
+                                      required=False,
+                                      help_text="Optional. Specify a limit on how many Players can RSVP to this Game.",
+                                      widget=forms.NumberInput(attrs={'class': 'ability-value-input form-control'}))
         allow_ringers = forms.BooleanField(initial=True,
                                            required=False,
                                            label='Allow Ringers',
                                            help_text="If checked, Players will be able to RSVP as an NPC Ringer. (Note: "
                                                      "other Players cannot see who has RSVPed until after the Game.)")
-        max_rsvp = forms.IntegerField(label="Capacity",
-                                      required=False,
-                                      help_text="Optional. Specify a limit on how many Players can RSVP to this Game.",
-                                      widget=forms.NumberInput(attrs={'class': 'ability-value-input form-control'}))
-
         gametime_url = forms.CharField(label='Communication URL',
                                        max_length=1500,
                                        help_text='Optional. A link to the location (video call, Discord server, Roll20 '
                                                  'room, etc.) where the Game will take place. It is revealed to Players after '
-                                                 'they RSVP.',
+                                                 'they are invited or RSVP.',
                                        required=False)
         mediums = forms.ModelMultipleChoiceField(queryset=GameMedium.objects.order_by("medium").all(),
                                                  required=False,
@@ -149,6 +148,9 @@ def make_game_form(user):
 
     return CreateGameForm
 
+class CharDisplayModelChoiceField(ModelChoiceField):
+    def label_from_instance(self, character):
+        return "{} ({} Victories)".format(character.name, character.number_of_victories())
 
 def make_accept_invite_form(invitation):
     class AcceptInviteForm(forms.Form):
@@ -168,23 +170,19 @@ def make_accept_invite_form(invitation):
             queryset = Character.objects.filter(id__in=users_living_character_ids).filter(status=HIGH_ROLLER_STATUS[4][0])
         else:
             raise ValueError("unanticipated required roller status")
-        if invitation.as_ringer:
-            attending_character = forms.ModelChoiceField(
+        if invitation.as_ringer or invitation.relevant_game.allow_ringers:
+            attending_character = CharDisplayModelChoiceField(
                 queryset=queryset,
                  empty_label="Play an NPC Ringer",
                  required=False)
         else:
-            attending_character = CharacterModelChoiceField(queryset=queryset,
+            attending_character = CharDisplayModelChoiceField(queryset=queryset,
                                                      empty_label=None,
                                                      help_text="Declare which character you're attending with. Private "
                                                                "Characters and their powers will be revealed to the "
                                                                "Game creator if selected.",
                                                      required=True)
     return AcceptInviteForm
-
-class CharacterModelChoiceField(ModelChoiceField):
-    def label_from_instance(self, obj):
-        return obj.name
 
 
 class ValidateAttendanceForm(forms.Form):
@@ -310,7 +308,7 @@ class ArchivalOutcomeForm(forms.Form):
                             widget=forms.HiddenInput(),
                             required=False,)
 
-    attending_character = CharacterModelChoiceField(queryset=Character.objects.all(),
+    attending_character = CharDisplayModelChoiceField(queryset=Character.objects.all(),
                                                     empty_label="Played a Ringer",
                                                     help_text="Declare which character this player brought.",
                                                     required=False)

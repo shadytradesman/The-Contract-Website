@@ -1,0 +1,5 @@
+{% for medium in game.mediums.all %}
+<span class="css-game-medium" style="color: {{medium.color|safe}}; border-color: {{medium.color|safe}}">
+    {{medium.medium}}
+</span>
+{% endfor %}
