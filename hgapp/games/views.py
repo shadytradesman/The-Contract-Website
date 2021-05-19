@@ -333,7 +333,9 @@ def view_game(request, game_id):
         initial_data = {"message": game.hook}
         invite_form = CustomInviteForm(initial=initial_data)
     nsfw_blocked = game.is_nsfw and (request.user.is_anonymous or not request.user.profile.view_adult_content)
-    can_rsvp = game.player_can_rsvp(request.user)
+    reason_cannot_rsvp = game.reason_player_cannot_rsvp(request.user)
+    can_rsvp = not reason_cannot_rsvp
+
     gametime_url = None if not my_invitation or not game.gametime_url else game.gametime_url
     context = {
         'game': game,
@@ -341,8 +343,9 @@ def view_game(request, game_id):
         'my_invitation': my_invitation,
         'invite_form': invite_form,
         'can_edit': can_edit,
-        'nsfw_blocked': nsfw_blocked,
         'can_rsvp': can_rsvp,
+        'reason_cannot_rsvp': reason_cannot_rsvp,
+        'nsfw_blocked': nsfw_blocked,
         'gametime_url': gametime_url,
     }
     return render(request, 'games/view_game_pages/view_game.html', context)
@@ -395,16 +398,10 @@ def invite_players(request, game_id):
         return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
 
 def accept_invite(request, game_id):
-    if not request.user.is_authenticated or request.user.is_anonymous:
-        raise PermissionDenied("You must log in to accept this Game invite")
     game = get_object_or_404(Game, id=game_id)
-    if not game.is_scheduled() or game.creator.id == request.user.id or game.gm.id == request.user.id:
-        raise PermissionDenied("This Game has already started, or you're the GM!")
-    invite = get_object_or_none(request.user.game_invite_set.filter(relevant_game=game))
-    if game.is_nsfw and not request.user.profile.view_adult_content:
-        raise PermissionDenied("Your content settings do now allow you to RSVP to this Game.")
     if not game.player_can_rsvp(request.user):
-        raise PermissionDenied("You cannot RSVP to this Game.")
+        raise PermissionDenied(game.reason_player_cannot_rsvp(request.user))
+    invite = get_object_or_none(request.user.game_invite_set.filter(relevant_game=game.id))
     if request.method == 'POST':
         if not invite:
             # player self-invite

@@ -138,25 +138,45 @@ class Game(models.Model):
             return True
         return player.is_authenticated and (player.has_perm('edit_game', self) or self.cell.player_can_manage_games(player))
 
+    def invite_instructions(self):
+        if self.invitation_mode == CLOSED:
+            return "Edit the Game to open it for RSVPs."
+        if self.invitation_mode == INVITE_ONLY:
+            return "Invite Players using the form below."
+        if self.invitation_mode == WORLD_MEMBERS:
+            return "Simply share this page with any World members you wish to invite, or invite any Player using the form below."
+        else:
+            return "Simply share this page with any Player you wish to invite."
+
     def player_can_rsvp(self, player):
+        return not self.reason_player_cannot_rsvp(player)
+
+    def reason_player_cannot_rsvp(self, player):
+        if not player.is_authenticated or player.is_anonymous:
+            return "You must log in to accept this Game invite"
+        if self.gm == player:
+            return "GMs cannot RSVP to their own Games"
         if player.is_superuser:
-            return True
-        if not player.is_authenticated or self.invitation_mode == CLOSED or not self.is_scheduled():
-            return False
+            return None
+        if hasattr(self, "max_rsvp") and self.max_rsvp and self.get_attended_players().count() >= self.max_rsvp:
+            return "This Game is full"
+        if self.invitation_mode == CLOSED or not self.is_scheduled():
+            return "This Game is closed for RSVPs."
         if self.is_nsfw and not player.profile.view_adult_content:
-            return False
+            return "This Game is marked for adults. Your content settings do not allow you to participate."
         player_invitation = get_object_or_none(player.game_invite_set.filter(relevant_game=self.id))
         if player_invitation:
-            return True
+            return None
         if self.invitation_mode == INVITE_ONLY:
-            return False
+            return "This Game only allows those with an invitation to RSVP."
         if self.invitation_mode == WORLD_MEMBERS:
             if not self.cell.get_player_membership(player):
-                return False
+                return "This Game only allows those who are a member of its World to RSVP without an invite."
             else:
-                return True
+                return None
         # ANYONE case
-        return True
+        return None
+
 
     def get_header_display(self):
         if self.is_scheduled():
