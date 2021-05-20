@@ -136,7 +136,9 @@ class Game(models.Model):
     def player_can_edit(self, player):
         if player.is_superuser:
             return True
-        return player.is_authenticated and (player.has_perm('edit_game', self) or self.cell.player_can_manage_games(player))
+        return player.is_authenticated and (player.has_perm('edit_game', self) \
+                                            or self.cell.player_can_manage_games(player)\
+                                            or self.cell.player_can_run_games(player))
 
     def invite_instructions(self):
         if self.invitation_mode == CLOSED:

@@ -1,0 +1,44 @@
+{% load staticfiles %}
+{% load account_tags %}
+<div class="text-center">
+    <h1>
+        {{ character.name }}
+        <br>
+        <small>
+            {{ character.tagline }}
+        </small>
+    </h1>
+    <p>
+        A
+        {% if character.number_of_victories %}
+        {{ character.number_of_victories }}-Victory
+        {% endif %}
+        <b>{{ character.get_status_display }}</b>
+        Contractor played by
+        {% if character.player %}
+        <a href="{% url 'profiles:profiles_view_profile' character.player.id %}">{% user_display character.player %}</a>
+        {% else %}
+        an anonymous user
+        {% endif %}
+        {% if character.cell %}
+        in
+        <a href="{% url 'cells:cells_view_cell' character.cell.id %}">{{ character.cell.name }}</a>
+        {% else %}
+        as a Free Agent
+        {% endif %}
+    </p>
+    {% if character.is_dead %}
+    <img src="{% static 'characters/skull.svg' %}"/>
+    <h3>This character is dead. RIP</h3>
+    {% if character.private %}
+    <h3 class="text-warning">Hey, this character is dead and private. You should consider making them public so they appear in the graveyard.</h3>
+    {% endif %}
+    {%if character.real_death.obituary %}
+    {{character.real_death.obituary | linebreaks}}
+    {% elif request.user.id == character.player.id %}
+    <a href="{%url 'characters:characters_obituary' character.id secret_key %}" class="btn btn-default">
+        Edit Obituary
+    </a>
+    {% endif %}
+    {% endif %}
+</div>

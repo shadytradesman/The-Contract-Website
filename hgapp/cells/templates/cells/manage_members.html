@@ -82,7 +82,29 @@
                         <input class="btn btn-primary" type="submit" value="Submit Changes" form="manage_form"/>
                     </div>
                 </form>
-
+                <div class="panel-body">
+                    <h4>Current Role Permissions</h4>
+                    {% if can_edit_perms %}
+                        To edit role permissions,
+                        <a href="{% url 'cells:cells_manage_roles' cell.id %}">
+                            click here.
+                        </a>
+                    {% endif %}
+                    <div class="row">
+                        {% for role, permissions in perms_by_role.items %}
+                            <div class="col-md-4 col-sm-6">
+                                <ul class="">
+                                    <span class="lead">{{role}}</span>
+                                        {% for permission in permissions %}
+                                        <li>
+                                            {{permission}}
+                                        </li>
+                                        {% endfor %}
+                                </ul>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
         </div>
     </div>

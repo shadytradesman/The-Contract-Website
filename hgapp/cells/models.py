@@ -22,18 +22,17 @@ ROLE = (
 
 # NEVER CHANGE THIS ORDERING.
 CELL_PERMISSIONS = (
-    ('admin', "Administrate"),
-    ('manage_memberships', 'Manage Memberships'),
-    ('manage_roles', 'Manage Role Permissions'), # unused, could be anything.
+    ('admin', "Administrate"), # change roles, everything else.
+    ('manage_memberships', 'Manage Memberships'), #ranks and recruitment
+    ('manage_roles', 'Run Games'), # change to: can run games?
     ('post_events', 'Post World Events'),
-    ('manage_member_characters', 'Manage Member Characters'),
-    ('edit_world', 'Edit The World Description'),
+    ('manage_member_characters', 'Manage Contractors'),
+    ('edit_world', 'Edit World'),
     ('manage_games', 'Manage Games'),
 )
 
 def random_string():
     return hashlib.sha224(bytes(random.randint(1, 99999999))).hexdigest()
-
 
 class Cell(models.Model):
     name = models.CharField(max_length=200)
@@ -130,6 +129,9 @@ class Cell(models.Model):
     def player_can_manage_memberships(self, player):
         return player.has_perm(CELL_PERMISSIONS[1][0], self)
 
+    def player_can_run_games(self, player):
+        return player.has_perm(CELL_PERMISSIONS[2][0], self)
+
     def player_can_post_world_events(self, player):
         return player.has_perm(CELL_PERMISSIONS[3][0], self)
 
@@ -144,6 +146,9 @@ class Cell(models.Model):
 
     def get_player_membership(self, player):
         return get_object_or_none(self.cellmembership_set.filter(member_player=player))
+
+    def get_permissions_for_role(self, role):
+        return get_object_or_none(PermissionsSettings, relevant_cell=self, role=role)
 
     def __str__(self):
         return self.name
@@ -339,6 +344,21 @@ class PermissionsSettings(models.Model):
             return self.can_manage_games
         raise ValueError("Permission not found")
 
+    def enabled_permissions(self):
+        permissions = []
+        if self.can_manage_memberships:
+            permissions.append(CELL_PERMISSIONS[1])
+        if self.can_manage_roles:
+            permissions.append(CELL_PERMISSIONS[2])
+        if self.can_post_events:
+            permissions.append(CELL_PERMISSIONS[3])
+        if self.can_manage_memberships:
+            permissions.append(CELL_PERMISSIONS[4])
+        if self.can_edit_world:
+            permissions.append(CELL_PERMISSIONS[5])
+        if self.can_manage_member_characters:
+            permissions.append(CELL_PERMISSIONS[6])
+        return permissions
 
     def updatePermissions(self):
         groupName = self.relevant_cell.getGroupName(self.role)

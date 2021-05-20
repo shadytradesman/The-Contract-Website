@@ -75,7 +75,9 @@ def make_game_form(user):
             required=False,
             initial=user.account.timezone
         )
-        queryset = user.cell_set.all()
+        all_cells = user.cell_set.all()
+        cell_ids = {cell.id for cell in all_cells if cell.player_can_run_games(user)}
+        queryset = user.cell_set.filter(id__in=cell_ids).all()
         scenario = ScenarioModelChoiceField(queryset=user.scenario_set.all(),
                                           empty_label="Create New Scenario",
                                           required=False,

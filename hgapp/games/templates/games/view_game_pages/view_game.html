@@ -103,8 +103,8 @@
             </div>
             {% endif %}
             {% endif %}
-            <div class="panel-heading">
-                {% if game.is_scheduled and game.hook %}
+            {% if game.is_scheduled and game.hook %}
+                <div class="panel-heading">
                     <p>
                         {% if request.user.is_authenticated and my_invitation %}
                             {{ my_invitation.invite_text }}
@@ -150,8 +150,8 @@
                             {% endif %}
                         </small>
                     </h4>
-                {% endif %}
-            </div>
+                </div>
+            {% endif %}
             {% if game.cell and game.cell.house_rules %}
                 <br>
                 <div class="thumbnail expandable-outer js-expandable-collapsed">

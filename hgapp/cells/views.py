@@ -2,12 +2,15 @@ from django.contrib.auth.models import User
 from django.views import View
 from django.shortcuts import render
 from django.db import transaction
-from cells.forms import CustomInviteForm, RsvpForm, PlayerRoleForm, KickForm, EditWorldForm, EditWorldEventForm, RecruitmentForm
+from cells.forms import CustomInviteForm, RsvpForm, PlayerRoleForm, KickForm, EditWorldForm, EditWorldEventForm, \
+    RecruitmentForm, RolePermissionForm
+from cells.models import CELL_PERMISSIONS
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.contrib import messages
 from django.utils.safestring import mark_safe
+from collections import defaultdict
 
 from hgapp.utilities import get_object_or_none
 from .models import Cell, ROLE, CellInvite, WorldEvent, CellMembership
@@ -181,7 +184,7 @@ class PostWorldEvent(View):
                     with transaction.atomic():
                         self.world_event.delete()
                     return HttpResponseRedirect(reverse('cells:cells_view_cell', args=(self.cell.id,)))
-            self.world_event.headline = form.cleaned_data["headline"]
+            self.world_event.headline = form.cleaned_data["headline"] if "headline" in form.cleaned_data else " "
             self.world_event.event_description = form.cleaned_data["event_description"]
             with transaction.atomic():
                 self.world_event.save()
@@ -216,6 +219,7 @@ def view_cell(request, cell_id):
     can_administer = None
     can_manage_games = None
     can_post_world_events = None
+    can_gm = None
     my_cell_contractors = None
     if request.user.is_authenticated:
         if not request.user.profile.confirmed_agreements:
@@ -228,6 +232,7 @@ def view_cell(request, cell_id):
         can_administer = cell.player_can_admin(request.user)
         can_manage_games = cell.player_can_manage_games(request.user)
         can_post_world_events = cell.player_can_post_world_events(request.user)
+        can_gm = cell.player_can_run_games(request.user)
         my_cell_contractors = request.user.character_set.filter(cell=cell, is_deleted=False)
 
     memberships_and_characters = ()
@@ -269,6 +274,7 @@ def view_cell(request, cell_id):
         'can_administer': can_administer,
         'can_manage_games': can_manage_games,
         'can_post_world_events': can_post_world_events,
+        'can_gm': can_gm,
         'memberships_and_characters': memberships_and_characters,
         'upcoming_games': upcoming_games,
         'completed_games': completed_games,
@@ -413,9 +419,9 @@ def manage_members(request, cell_id):
     if not cell.player_can_manage_memberships(request.user):
         raise PermissionDenied("You don't have permission to manage the memberships of this Cell")
     cell_members = cell.cellmembership_set.order_by("role").all()
-    FormSet = formset_factory(PlayerRoleForm, extra=0)
+    MemberFormSet = formset_factory(PlayerRoleForm, extra=0)
     if request.method == 'POST':
-        membership_formset = FormSet(request.POST)
+        membership_formset = MemberFormSet(request.POST)
         if membership_formset.is_valid():
             with transaction.atomic():
                 for form in membership_formset:
@@ -433,15 +439,22 @@ def manage_members(request, cell_id):
             print(membership_formset.errors)
             return None
     else:
-        membership_formset = FormSet(initial=[{'player_id': x.member_player.id,
+        membership_formset = MemberFormSet(initial=[{'player_id': x.member_player.id,
                                                'role': x.role,
                                                'username': x.member_player,
                                                'role_display': x.get_role_display()} for x in cell_members])
         kick_form = KickForm()
+        perms_by_role = defaultdict(list)
+        for role in ROLE:
+            for x in cell.get_permissions_for_role(role[0]).enabled_permissions():
+                perms_by_role[role[1]].append(x[1])
+        can_edit_perms = cell.player_can_admin(request.user)
         context = {
             'formset': membership_formset,
             'kick_form': kick_form,
             'cell': cell,
+            'perms_by_role': dict(perms_by_role),
+            'can_edit_perms': can_edit_perms,
         }
         return render(request, 'cells/manage_members.html', context)
 
@@ -477,5 +490,70 @@ class FindWorld(View):
         public_cells = Cell.objects.filter(is_listed_publicly=True).order_by('-find_world_date').all()
         context = {
             'public_cells': public_cells,
+        }
+        return context
+
+@method_decorator(login_required(login_url='account_login'), name='dispatch')
+class ManageRoles(View):
+    form_class = RolePermissionForm
+    template_name = 'cells/edit_roles.html'
+    initial = {}
+    cell = None
+    INITIAL_DATA_CELL_ID = 1
+
+    def dispatch(self, *args, **kwargs):
+        self.cell = get_object_or_404(Cell, id=self.kwargs['cell_id'])
+        self.__check_permissions()
+        self.initial = []
+        for role in ROLE[1:]:
+            perms = self.cell.get_permissions_for_role(role[0])
+            self.initial.append({
+                'role_display': role[1],
+                'role': role[0],
+                'can_manage_memberships': perms.can_manage_memberships,
+                'can_gm_games': perms.can_manage_roles,
+                'can_post_events': perms.can_post_events,
+                'can_manage_member_characters': perms.can_manage_member_characters,
+                'can_edit_world': perms.can_edit_world,
+                'can_manage_games': perms.can_manage_games,
+            })
+        return super().dispatch(*args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, self.__get_context_data())
+
+    def post(self, request, *args, **kwargs):
+        RolePermissionFormSet = formset_factory(self.form_class, extra=0)
+        formset = RolePermissionFormSet(request.POST)
+        if formset.is_valid():
+            with transaction.atomic():
+                for form in formset:
+                    if form.cleaned_data['role'] == ROLE[0][0]:
+                        raise ValueError("cannot edit administrator permissions")
+                    perms = self.cell.get_permissions_for_role(form.cleaned_data['role'])
+                    if not perms:
+                        raise ValueError("Cannot find perms for role")
+                    perms.can_manage_memberships = form.cleaned_data['can_manage_memberships']
+                    perms.can_manage_roles = form.cleaned_data['can_gm_games']
+                    perms.can_post_events = form.cleaned_data['can_post_events']
+                    perms.can_manage_member_characters = form.cleaned_data['can_manage_member_characters']
+                    perms.can_edit_world = form.cleaned_data['can_edit_world']
+                    perms.can_manage_games = form.cleaned_data['can_manage_games']
+                    perms.save()
+            return HttpResponseRedirect(reverse('cells:cells_view_cell', args=(self.cell.id,)))
+        raise ValueError("Invalid role permissions form.")
+
+    def __check_permissions(self):
+        if self.cell:
+            if not self.cell.player_can_admin(self.request.user):
+                raise PermissionDenied("You don't have permissions to edit this World's roles.")
+
+    def __get_context_data(self):
+        RolePermissionFormSet = formset_factory(self.form_class, extra=0)
+        formset = RolePermissionFormSet(initial=self.initial)
+        context = {
+            'cell': self.cell,
+            'formset': formset,
+            'permissions': CELL_PERMISSIONS[1:],
         }
         return context

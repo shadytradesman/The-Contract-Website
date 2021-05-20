@@ -47,6 +47,9 @@ urlpatterns = [
     # ex: .com/cells/members/c/123
     url(r'^members/c/(?P<cell_id>[\d]+)/$', views.manage_members, name='cells_manage_members'),
 
+    # ex: .com/cells/roles/c/123
+    url(r'^roles/c/(?P<cell_id>[\d]+)/$', views.ManageRoles.as_view(), name='cells_manage_roles'),
+
     # ex: .com/cells/kick/c/123/p/4141
     url(r'^kick/c/(?P<cell_id>[\d]+)/u/(?P<user_id>[\d]+)/$', views.kick_player, name='cells_kick_player'),
 

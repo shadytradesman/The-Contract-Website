@@ -91,11 +91,23 @@ class PlayerRoleForm(forms.Form):
     role = forms.ChoiceField(choices=ROLE,
                              widget=forms.Select(attrs={'form': 'manage_form', 'class': 'form-control form-inline'}))
 
+class RolePermissionForm(forms.Form):
+    # attrs must be set to allow forms with other submit target urls to exist within other forms in template.
+    role = forms.CharField(label=None,
+                                max_length=200,
+                                widget=forms.HiddenInput())
+    can_manage_memberships = forms.BooleanField(required=False)
+    can_gm_games = forms.BooleanField(required=False)
+    can_post_events = forms.BooleanField(required=False)
+    can_manage_member_characters = forms.BooleanField(required=False)
+    can_edit_world = forms.BooleanField(required=False)
+    can_manage_games = forms.BooleanField(required=False)
 
 class EditWorldEventForm(forms.Form):
     headline = forms.CharField(label='Headline',
                            max_length=900,
-                           help_text='')
+                           help_text='',
+                               required=False)
     event_description = forms.CharField(label='Content',
                                           widget=TinyMCE(attrs={'cols': 70, 'rows': 10}),
                                           max_length=49000,

@@ -21,7 +21,8 @@ from .game_form_utilities import get_context_for_create_finished_game, change_ti
     get_gm_form, get_outsider_formset, get_member_formset, get_players_for_new_attendances
 from .games_constants import GAME_STATUS
 
-
+from cells.forms import EditWorldEventForm
+from cells.models import WorldEvent
 
 from games.models import Scenario, Game, DISCOVERY_REASON, Game_Invite, Game_Attendance, Reward
 
@@ -199,22 +200,24 @@ def create_game(request, cell_id=None):
             form_cell = form.cleaned_data['cell']
             if not form_cell.get_player_membership(request.user):
                 raise PermissionDenied("You are not a member of this World.")
+            if not (form_cell.player_can_manage_games(request.user) or form_cell.player_can_run_games(request.user)):
+                raise PermissionDenied("You do not have permission to run Games in this World")
             game = Game(
-                    title = title,
-                    creator = request.user,
-                    gm = request.user,
-                    required_character_status = form.cleaned_data['required_character_status'],
-                    hook = form.cleaned_data['hook'],
-                    created_date = timezone.now(),
-                    scheduled_start_time = start_time,
-                    status = GAME_STATUS[0][0],
-                    cell = form_cell,
-                    invitation_mode=form.cleaned_data['invitation_mode'],
-                    list_in_lfg=form.cleaned_data['list_in_lfg'],
-                    allow_ringers=form.cleaned_data['allow_ringers'],
-                    max_rsvp=form.cleaned_data['max_rsvp'],
-                    gametime_url=form.cleaned_data['gametime_url'],
-            )
+            title = title,
+                creator = request.user,
+                gm = request.user,
+                required_character_status = form.cleaned_data['required_character_status'],
+                hook = form.cleaned_data['hook'],
+                created_date = timezone.now(),
+                scheduled_start_time = start_time,
+                status = GAME_STATUS[0][0],
+                cell = form_cell,
+                invitation_mode=form.cleaned_data['invitation_mode'],
+                list_in_lfg=form.cleaned_data['list_in_lfg'],
+                allow_ringers=form.cleaned_data['allow_ringers'],
+                max_rsvp=form.cleaned_data['max_rsvp'],
+                gametime_url=form.cleaned_data['gametime_url'],
+        )
             if 'only_over_18' in form.cleaned_data:
                 game.is_nsfw = form.cleaned_data['only_over_18']
             if form.cleaned_data['scenario']:
@@ -575,7 +578,11 @@ def end_game(request, game_id):
         declare_outcome_formset = DeclareOutcomeFormset(request.POST,
                                             initial=initial_data)
         game_feedback_form = GameFeedbackForm(request.POST)
-        if declare_outcome_formset.is_valid() and game_feedback_form.is_valid():
+        world_event_form = None
+        if game.cell.player_can_post_world_events(request.user):
+            world_event_form = EditWorldEventForm(request.POST)
+        if declare_outcome_formset.is_valid() and game_feedback_form.is_valid() \
+                and (not world_event_form or world_event_form.is_valid()):
             with transaction.atomic():
                 for form in declare_outcome_formset:
                     attendance = get_object_or_404(Game_Attendance, id=form.cleaned_data['hidden_attendance'].id)
@@ -585,6 +592,13 @@ def end_game(request, game_id):
                     attendance.save()
                 if game_feedback_form.cleaned_data['scenario_notes']:
                     game.scenario_notes = game_feedback_form.cleaned_data['scenario_notes']
+                if world_event_form and \
+                        (world_event_form.cleaned_data['headline'] or world_event_form.cleaned_data['event_description']):
+                    world_event = WorldEvent(creator=request.user,
+                                             parent_cell=game.cell,)
+                    world_event.headline = world_event_form.cleaned_data["headline"] if "headline" in world_event_form.cleaned_data else " "
+                    world_event.event_description = world_event_form.cleaned_data["event_description"]
+                    world_event.save()
                 game.save()
                 game.transition_to_finished()
             return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
@@ -594,9 +608,13 @@ def end_game(request, game_id):
     else:
         formset = DeclareOutcomeFormset(initial=initial_data)
         game_feedback = GameFeedbackForm()
+        world_event_form = None
+        if game.cell.player_can_post_world_events(request.user):
+            world_event_form = EditWorldEventForm()
         context = {
             'formset':formset,
             'feedback_form':game_feedback,
+            'world_event_form': world_event_form,
             'game':game,
         }
         return render(request, 'games/end_game.html', context)

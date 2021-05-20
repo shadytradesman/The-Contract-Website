@@ -1,76 +1,85 @@
 {% if user_membership %}
 <ul class="nav nav-pills nav-justified navbar-default">
+    {% if can_gm %}
         <li>
             <a href="{% url 'games:games_create_game_world' cell.id %}">
                 Schedule Game
             </a>
         </li>
-        {% if my_cell_contractors %}
-        <li class="dropdown">
-            <a id="dLabelContractors" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                My Local Contractors
-                <span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="dLabel">
-                <li>
-                    <a href="{% url 'characters:characters_create_world' cell.id %}" class="btn-primary">
-                        Create a {{cell.name}} Contractor
-                    </a>
-                </li>
-                {% for contractor in my_cell_contractors %}
-                    <li>
-                        <a href="{% url 'characters:characters_view' contractor.id %}">
-                            {{contractor.name}}
-                        </a>
-                    </li>
-                {% endfor %}
-            </ul>
-        </li>
-        {% else %}
-            <li>
-                <a href="{% url 'characters:characters_create_world' cell.id %}">
-                    Create a {{cell.name}} Contractor
-                </a>
-            </li>
-        {% endif %}
+    {% endif %}
+    {% if my_cell_contractors %}
     <li class="dropdown">
-        <a id="dLabel" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Manage World
+        <a id="dLabelContractors" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            My Local Contractors
             <span class="caret"></span>
         </a>
         <ul class="dropdown-menu" aria-labelledby="dLabel">
-            {% if request.user.is_authenticated and can_edit_world %}
             <li>
-                <a href="{% url 'cells:cells_edit' cell.id %}">
-                    Edit World
+                <a href="{% url 'characters:characters_create_world' cell.id %}" class="btn-primary">
+                    Create a {{cell.name}} Contractor
                 </a>
             </li>
-            {% endif %}
-            {% if request.user.is_authenticated and can_manage_memberships %}
-            <li>
-                <a href="{% url 'cells:cells_edit_find_world' cell.id %}">Edit Recruitment Settings</a>
-            </li>
-            <li>
-                <a href="{% url 'cells:cells_invite_players' cell.id %}">Invite Players</a>
-            </li>
-            <li>
-                <a href="{% url 'cells:cells_manage_members' cell.id %}">Manage Memberships</a>
-            </li>
-            {% endif %}
-            {% if can_post_world_events %}
-            <li>
-                <a href="{% url 'cells:cells_post_world_event' cell.id %}">Post World Event</a>
-            </li>
-            {% endif %}
-            {% if request.user.is_authenticated and can_manage_games %}
-            <li>
-                <a href="{% url 'games:games_create_ex_game_for_cell' cell.id %}">
-                    Declare a Completed Game
-                </a>
-            </li>
-            {% endif %}
+            {% for contractor in my_cell_contractors %}
+                <li>
+                    <a href="{% url 'characters:characters_view' contractor.id %}">
+                        {{contractor.name}}
+                    </a>
+                </li>
+            {% endfor %}
         </ul>
     </li>
+    {% else %}
+        <li>
+            <a href="{% url 'characters:characters_create_world' cell.id %}">
+                Create a {{cell.name}} Contractor
+            </a>
+        </li>
+    {% endif %}
+    {% if can_edit_world or can_manage_memberships or can_manage_games %}
+        <li class="dropdown">
+            <a id="dLabel" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Manage World
+                <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="dLabel">
+                {% if can_edit_world %}
+                <li>
+                    <a href="{% url 'cells:cells_edit' cell.id %}">
+                        Edit World
+                    </a>
+                </li>
+                {% endif %}
+                {% if can_manage_memberships %}
+                <li>
+                    <a href="{% url 'cells:cells_edit_find_world' cell.id %}">Edit Recruitment Settings</a>
+                </li>
+                <li>
+                    <a href="{% url 'cells:cells_invite_players' cell.id %}">Invite Players</a>
+                </li>
+                <li>
+                    <a href="{% url 'cells:cells_manage_members' cell.id %}">Manage Memberships</a>
+                </li>
+                {% endif %}
+                {% if request.user.is_authenticated and can_administer %}
+                    <li>
+                        <a href="{% url 'cells:cells_manage_roles' cell.id %}">Edit Role Permissions</a>
+                    </li>
+                {% endif %}
+                {% if can_post_world_events %}
+                <li>
+                    <a href="{% url 'cells:cells_post_world_event' cell.id %}">Post World Event</a>
+                </li>
+                {% endif %}
+                {% if request.user.is_authenticated and can_manage_games %}
+                <li>
+                    <a href="{% url 'games:games_create_ex_game_for_cell' cell.id %}">
+                        Declare a Completed Game
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </li>
+    {% endif %}
     <li>
         <a href="{% url 'cells:cells_leave_cell' cell.id %}">
             Leave World

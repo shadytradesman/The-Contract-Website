@@ -23,9 +23,9 @@ def default_manage_roles(role):
     if role == cells.models.ROLE[0][0]:
         return True
     if role == cells.models.ROLE[1][0]:
-        return False
+        return True
     if role == cells.models.ROLE[2][0]:
-        return False
+        return True
     if role == cells.models.ROLE[3][0]:
         return False
     raise ValueError('invalid role')
