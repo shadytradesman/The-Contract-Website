@@ -78,7 +78,7 @@ def delete_character(request, character_id):
     if request.method == 'POST':
         if DeleteCharacterForm(request.POST).is_valid():
             with transaction.atomic():
-                character.delete()
+                character.delete_char()
         else:
             raise ValueError("could not delete character")
         return HttpResponseRedirect(reverse('home'))

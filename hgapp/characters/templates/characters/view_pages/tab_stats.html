@@ -1,0 +1,51 @@
+{% load staticfiles %}
+{% load games_tags %}
+{% load markdown_deux_tags %}
+
+
+
+<div class="row">
+    <div class="col-xs-12">
+        {% include "characters/view_pages/essentials_section.html" %}
+    </div>
+</div>
+{% include "characters/view_pages/attributes_and_abilities.html" %}
+<div class="row ">
+    <div class="col-md-4 css-health-section">
+        {% include "characters/view_pages/left_column.html" %}
+    </div>
+    <div class="col-md-8">
+        <div class="row css-health-section">
+
+            <div class="col-md-6">
+                {% include "characters/view_pages/center_column.html" %}
+            </div>
+            <div class="col-md-6">
+                {% include "characters/view_pages/right_column.html" %}
+            </div>
+        </div>
+        <div class="col-md-12">
+            <h2 class="text-center" data-toggle="tooltip" title='{{tutorial.powers_view}}'>
+                Powers
+            </h2>
+            {% for power_full in character.power_full_set.all %}
+                <div class="row">
+                    {% if request.user.is_authenticated and request.user.id == character.player.id and character.unspent_rewards|length > 0 %}
+                        <div class= "col-md-2">
+                            <a href="{% url 'powers:powers_edit_power' power_full.id %}" class="btn btn-success">
+                                <i class="fa fa-plus-square fa-4x"></i>
+                            </a>
+                        </div>
+                        <div class= "col-md-10">
+                    {% else %}
+                        <div class= "col-md-12">
+                    {% endif %}
+                    {% include "powers/power_badge_snippet.html" %}
+                    </div>
+                </div>
+            {% empty %}
+                <h4 class="text-center">{{character.name}} doesn't have any powers yet. What a noob :(</h4>
+            {% endfor %}
+        </div>
+    </div>
+</div>

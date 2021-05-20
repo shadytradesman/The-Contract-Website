@@ -26,7 +26,7 @@ home
 <div class="container">
     {{ form.about.errors }}
     <h1 class="text-center">
-        Editing Permissions for {{cell.name}}
+        Editing Permissions for <a href="{% url 'cells:cells_view_cell' cell.id %}">{{cell.name}}</a>
     </h1>
     <form action="{% url 'cells:cells_manage_roles' cell.id %}" method="post">
             {{ formset.about.errors }}

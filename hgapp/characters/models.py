@@ -349,8 +349,8 @@ class Character(models.Model):
             self.set_default_permissions()
             super(Character, self).save(*args, **kwargs)
 
-    def delete(self):
-        self.is_deleted=True
+    def delete_char(self):
+        self.is_deleted = True
         self.save()
 
     def player_has_cell_edit_perms(self, player):
