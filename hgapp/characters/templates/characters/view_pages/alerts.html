@@ -160,7 +160,7 @@
             </div>
         </a>
 {% endif %}
-{% if user_can_edit and character.unspent_rewards|length > 0 %}
+{% if user_can_edit and available_gift %}
         <a href="{% url 'characters:characters_spend_reward' character.id %}">
             <div class="alert alert-success btn btn-success css-char-alert" role="alert">
                 Spend Available Gifts

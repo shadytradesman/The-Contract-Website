@@ -1,0 +1,178 @@
+{% load games_tags %}
+{% load markdown_deux_tags %}
+
+{% if chracter.background or user_can_edit %}
+    <h3>Biography</h3>
+    <div class="thumbnail">
+        {% if character.background %}
+        <div class="css-bio-text">
+            <div id="js-bio-text">
+                {{character.background | markdown}}
+            </div>
+            {% if user_can_edit %}
+            <div id="js-edit-bio-button" class="btn btn-default btn-xs">
+                <i class="fa fa-edit fa-2x"></i> Edit Biography
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+        {% if user_can_edit %}
+        <form id="bio-form"
+              data-post-url="{% url 'characters:post_bio' character.id secret_key %}">
+            <div id="js-bio-form" style="display:none;">
+                {{ bio_form.about.errors }}
+                {{ bio_form.non_field_errors }}
+                {% csrf_token %}
+                {{ bio_form.bio}}
+                <div style="margin-top: 5px; margin-bottom: 5px;">
+                    <input class="btn btn-sm btn-default" type="submit" value="Save">
+                    <small><a href="https://commonmark.org/help/">Markdown</a> enabled</small>
+                </div>
+            </div>
+        </form>
+        {% endif %}
+    </div>
+{% endif %}
+{% if num_journal_entries or user_can_edit %}
+    <a href="{% url 'journals:journal_read' character.id %}">
+        <h3>
+            {% if journal_cover %}
+                {{journal_cover.title}}
+            {% else %}
+                journal
+            {% endif %}
+        </h3>
+    </a>
+    {% if user_can_edit %}
+        {% if next_entry %}
+        <a class="btn btn-sm btn-success js-journal-link"
+           href="{% url 'journals:journal_write_next' character.id %}">
+            Earn
+            {% if next_entry.reward_is_improvement %}
+            <b>an Improvement</b>
+            {% else %}
+            1 Exp
+            {% endif %}
+            for {{character.name}} by writing a
+            {% if next_entry.is_downtime %}
+            Downtime
+            {% else %}
+            Game
+            {% endif %}
+            journal
+        </a>
+        <br>
+        {% endif %}
+    {% endif %}
+    {% if latest_journals %}
+        Latest {{ latest_journals|length }} of {{num_journal_entries}} entries
+        {% for journal in latest_journals %}
+            <div class="thumbnail expandable-outer js-expandable-collapsed" role="button" >
+                <a href="{% url 'journals:journal_read_id' journal.id %}">
+                    {% if journal.title %}
+                    <h4>{{journal.title}}</h4>
+                    {% else %}
+                    <h4>An untitled Journal</h4>
+                    {% endif %}
+                </a>
+                {{journal.content|safe}}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endif %}
+<hr>
+<h3 data-toggle="tooltip" title='{{tutorial.character_timeline}}'>
+    Timeline
+</h3>
+<p>
+    <b>{{ character.number_of_victories }}</b> Victories - <b>{{ character.number_of_losses }}</b> Losses
+    <br>
+    {% if unspent_experience < 0 %}
+<h4 class="text-danger">{{character.name}} has overspent Experience</h4>
+{% endif %}
+<b>Remaining: </b>{{unspent_experience}} Exp.
+(<b>Earned: </b> {{exp_earned}} - <b>Spent: </b> {{exp_cost}})
+</p>
+{% for date, event_list in timeline.items %}
+<h4>{{ date }}</h4>
+<ul>
+    {% for event in event_list %}
+    {% if event.0 == "game"%}
+    {% with event.1 as attendance %}
+    {% include "games/game_attendance_badge_snippet.html" %}
+    {% endwith %}
+    {% elif event.0 == "exp_reward" %}
+    <li class="css-timeline-item css-timeline-exp">
+        <b>{{event.1.get_history_blurb.0}}</b>
+        {{event.1.get_history_blurb.1}}
+    </li>
+    {% else %}
+    {% for phrase in event.1.get_change_phrases %} {# This is expensive. TODO: make ajax? #}
+    <li class="css-timeline-item css-timeline-exp">
+        <b>{{phrase.0}} Exp:</b> {{phrase.1}}
+    </li>
+    {% endfor %}
+    {% endif %}
+    {% endfor %}
+</ul>
+{% empty %}
+<h4>{{character.name}} Has never edited their stats or attended a Game</h4>
+{% endfor %}
+{% if character.basic_stats.advancement_history %}
+<h3>Advancement History</h3>
+<p>{{character.basic_stats.advancement_history |linebreaks}}</p>
+{% endif %}
+<h2>Gifts and Improvements</h2>
+{% if character.unspent_rewards|length > 0 %}
+<h4>Character has {{character.unspent_rewards|length}} unspent rewards</h4>
+<ul >
+    {% for reward in character.unspent_rewards %}
+    <li>{% render_reward reward %}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% if character.spent_rewards|length > 0 %}
+<h4>Gift / Reward History</h4>
+<ul >
+    {% for reward in character.spent_rewards %}
+    <li>{% render_reward reward %}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% if character.wish_list %}
+<div class="container">
+    <h3>Wish List</h3>
+    <div class="container">
+        <p>{{character.wish_list | linebreaks}}</p>
+    </div>
+</div>
+{% endif %}
+{% if character.to_do_list %}
+<div class="container">
+    <h3>To-Do List</h3>
+    <div class="container">
+        <p>{{character.to_do_list | linebreaks}}</p>
+    </div>
+</div>
+{% endif %}
+{% if character.notes %}
+<div class="container">
+    <h3>Other Notes</h3>
+    <div class="container">
+        <p>{{character.notes | markdown | linebreaks}}</p>
+    </div>
+</div>
+{% endif %}
+{% if character.void_deaths %}
+    <div class="container text-danger">
+        <h2>Voided Deaths</h2>
+        <h4>You should probably know about these. . .</h4>
+        <ul>
+            {% for death in character.void_deaths %}
+            <div class="container">
+                <li>{{death.date_of_death}} - {{death.cause_of_death }}</li>
+            </div>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}

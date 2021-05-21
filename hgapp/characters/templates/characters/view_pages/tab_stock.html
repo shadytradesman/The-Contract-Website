@@ -1,0 +1,47 @@
+{% load markdown_deux_tags %}
+<div class="row">
+    <div class="col-md-6">
+        <h3 class="text-center" data-toggle="tooltip" title='{{tutorial.powers_view}}'>
+            Powers
+        </h3>
+        {% for power_full in character.power_full_set.all %}
+            <div class="row">
+                <div class= "col-md-12">
+                    {% include "powers/power_badge_snippet.html" %}
+                </div>
+            </div>
+        {% empty %}
+            <h4 class="text-center">{{character.name}} doesn't have any powers yet. What a noob :(</h4>
+        {% endfor %}
+    </div>
+    <div class="col-md-6">
+        <h3 class="text-center" data-toggle="tooltip" title='{{tutorial.equipment|safe}}'>
+            Equipment
+        </h3>
+        {% if user_can_edit %}
+        <form id="equipment-form"
+              data-post-url="{% url 'characters:post_equipment' character.id secret_key %}">
+            <div id="js-equipment-form" style="display:none;">
+                {{ equipment_form.about.errors }}
+                {{ equipment_form.non_field_errors }}
+                {% csrf_token %}
+                {{equipment_form.equipment}}
+                <input class="btn btn-sm btn-default" type="submit" value="Save">
+                <small><a href="https://commonmark.org/help/">Markdown</a> enabled</small>
+            </div>
+        </form>
+        {% endif %}
+        <div id="js-equipment-display">
+            <span id="js-equipment-text">{{character.equipment | markdown}}</span>
+            {% if user_can_edit %}
+                <div id="js-edit-equipment-button" class="btn btn-default btn-xs">
+                    <i class="fa fa-edit fa-2x"></i> Edit
+                </div>
+            {% endif %}
+        </div>
+        <hr>
+        <h3 class="text-center" data-toggle="tooltip" title='{{tutorial.artifacts|safe}}'>
+            Artifacts
+        </h3>
+    </div>
+</div>

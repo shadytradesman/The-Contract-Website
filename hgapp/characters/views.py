@@ -209,12 +209,24 @@ def view_character(request, character_id, secret_key = None):
     bio_form = BioForm()
 
     num_journal_entries = Journal.objects.filter(game_attendance__attending_character=character.id).count()
+    latest_journals = []
+    if num_journal_entries > 0:
+        journal_query = Journal.objects.filter(game_attendance__attending_character=character.id).order_by('-created_date')
+        if request.user.is_anonymous or not request.user.profile.view_adult_content:
+            journal_query = journal_query.exclude(is_nsfw=True)
+        journals = journal_query.all()
+        for journal in journals:
+            if len(latest_journals) > 2:
+                break
+            if journal.player_can_view(request.user):
+                latest_journals.append(journal)
+
     journal_cover = get_object_or_none(JournalCover, character=character.id)
     next_entry = get_characters_next_journal_credit(character) if user_can_edit else None
 
     show_more_home_games_warning = character.number_completed_games() > 3 \
                                    and (character.number_completed_games_in_home_cell() < character.number_completed_games_out_of_home_cell())
-
+    available_gift = character.unspent_rewards().count() > 0
     context = {
         'character': character,
         'user_can_edit': user_can_edit,
@@ -237,7 +249,9 @@ def view_character(request, character_id, secret_key = None):
         'num_journal_entries': num_journal_entries,
         'journal_cover': journal_cover,
         'next_entry': next_entry,
+        'latest_journals': latest_journals,
         'show_more_home_games_warning': show_more_home_games_warning,
+        'available_gift': available_gift,
     }
     return render(request, 'characters/view_pages/view_character.html', context)
 

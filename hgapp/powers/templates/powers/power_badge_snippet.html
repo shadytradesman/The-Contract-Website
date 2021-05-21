@@ -7,6 +7,11 @@
     aria-expanded="false"
     aria-controls="collapse-power-{{power_full.id}}">
     <h4>
+        {% if user_can_edit and available_gift %}
+            <a href="{% url 'powers:powers_edit_power' power_full.id %}" class="btn btn-success btn-xs">
+                <i class="fa fa-plus-square fa-2x"></i>
+            </a>
+        {% endif %}
         <a href="{% url 'powers:powers_view_power_full' power_full.id %}">
             {{power_full.latest_revision.name}}
         </a>

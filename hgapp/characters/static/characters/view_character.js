@@ -481,7 +481,6 @@ $("#equipment-form").submit(function (e) {
 var bioValue = JSON.parse(document.getElementById('bio').textContent);
 $($("#js-bio-form").children("textarea").val(bioValue));
 $(document).on("click", "#js-edit-bio-button", function(){
-    document.getElementById("collapse-biography-heading").setAttribute("data-toggle", "");
     $("#js-bio-text").css("display","none");
     $("#js-edit-bio-button").css("display","none");
     $("#js-bio-form").css("display","block");
@@ -505,7 +504,6 @@ $("#bio-form").submit(function (e) {
             $("#js-edit-bio-button").css("display","inline-block");
             $("#js-bio-form").css("display","none");
             $("#js-bio-expand-button").css("display","inline-block");
-            document.getElementById("collapse-biography-heading").setAttribute("data-toggle", "collapse");
         },
         error: function (response) {
             console.log(response);

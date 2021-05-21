@@ -469,6 +469,9 @@ class Character(models.Model):
     def improvement_ok(self):
         return self.number_of_victories() * 2 > len(self.active_rewards())
 
+    def get_powers_for_render(self):
+        return self.power_full_set.all()
+
     def __str__(self):
         string = self.name + " ["
         if hasattr(self, 'player') and self.player:
@@ -1361,9 +1364,13 @@ class CharacterTutorial(models.Model):
     recover_mind = models.TextField(max_length=3000)
     exert_body = models.TextField(max_length=3000)
     charon_coin = models.TextField(max_length=3000)
+    conditions = models.TextField(max_length=3000, default="placeholder")
+    circumstances = models.TextField(max_length=3000, default="placeholder")
+    artifacts = models.TextField(max_length=3000, default="placeholder")
     modal_1 = models.TextField(max_length=3000)
     modal_2 = models.TextField(max_length=3000)
     modal_3 = models.TextField(max_length=3000)
     world_modal_1 = models.TextField(max_length=3000, default="placeholder")
     world_modal_2 = models.TextField(max_length=3000, default="placeholder")
     world_modal_3 = models.TextField(max_length=3000, default="placeholder")
+

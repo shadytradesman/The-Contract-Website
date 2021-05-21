@@ -22,6 +22,10 @@ h1 {
 
 .css-health-section {
     background-color: #353e4b;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #a6763a;
+    border-top: 1px solid #a6763a;
+    margin-bottom: 10px;
 }
 
 .stat-value {
@@ -102,6 +106,7 @@ input[type="number"] {
 
 .css-health-area {
     padding-bottom: 15px;
+    padding-top: 5px;
 }
 
 .css-source-button {
