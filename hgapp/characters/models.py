@@ -306,6 +306,26 @@ class Character(models.Model):
             total = total + power.get_point_value()
         return total
 
+    def world_element_cell_choices(self):
+        cell_choices = set()
+        queryset = self.player.cell_set.all()
+        cell_choices.add(queryset)
+        games_attended = self.game_set.all()
+        cell_ids = set()
+        for cell in queryset:
+            cell_ids.add(cell.pk)
+        for game in games_attended:
+            cell_ids.add(game.cell.pk)
+        return Cell.objects.filter(pk__in=cell_ids).all()
+
+    def world_element_initial_cell(self):
+        active_attendances = self.active_game_attendances()
+        if active_attendances:
+            return active_attendances[0].cell
+        if hasattr(self, "cell") and self.cell:
+            return self.cell
+        return None
+
     def number_completed_games(self):
         return self.game_attendance_set.exclude(outcome=None, is_confirmed=False).count()
 
@@ -729,6 +749,31 @@ class BattleScar(models.Model):
     character = models.ForeignKey(Character,
                                    on_delete=models.CASCADE)
     description = models.CharField(max_length=500)
+
+class WorldElement(models.Model):
+    character = models.ForeignKey(Character,
+                                  on_delete=models.CASCADE)
+    name = models.CharField(max_length=500)
+    description = models.CharField(max_length=1000)
+    system = models.CharField(max_length=1000)
+    cell = models.ForeignKey(Cell,
+                             blank=True,
+                             null=True,
+                             on_delete=models.CASCADE)
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        abstract = True
+
+class Condition(WorldElement):
+    pass
+
+class Circumstance(WorldElement):
+    pass
+
+class Artifact(WorldElement):
+    pass
 
 class Injury(models.Model):
     character = models.ForeignKey(Character,

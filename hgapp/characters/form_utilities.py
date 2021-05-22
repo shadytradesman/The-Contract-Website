@@ -6,7 +6,8 @@ import logging
 from characters.models import Character, BasicStats, Character_Death, Graveyard_Header, Attribute, Ability, \
     CharacterTutorial, Asset, Liability, AttributeValue, ContractStats, AbilityValue, LiabilityDetails, AssetDetails, \
     Limit, LimitRevision, Trauma, TraumaRevision, EXP_NEW_CHAR, EXP_ADV_COST_ATTR_MULTIPLIER, \
-    EXP_ADV_COST_SKILL_MULTIPLIER, EXP_COST_QUIRK_MULTIPLIER, EXP_ADV_COST_SOURCE_MULTIPLIER, Source, SourceRevision
+    EXP_ADV_COST_SKILL_MULTIPLIER, EXP_COST_QUIRK_MULTIPLIER, EXP_ADV_COST_SOURCE_MULTIPLIER, Source, SourceRevision, \
+    Condition, Circumstance, Artifact
 from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, AbilityForm, \
     AssetForm, LiabilityForm, LimitForm, PHYS_MENTAL, SourceForm, make_charon_coin_form
 from collections import defaultdict
@@ -595,3 +596,12 @@ def __save_edit_abilities_from_formset(formset, stats):
         else:
             logger.error('Bad ability edit form: %s', str(form.errors))
             raise ValueError("invalid ability form in edit")
+
+def get_world_element_class_from_url_string(element):
+    if element == "condition":
+        return Condition
+    if element == "circumstance":
+        return Circumstance
+    if element == "artifact":
+        return Artifact
+    return None

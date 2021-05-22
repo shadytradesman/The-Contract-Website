@@ -512,8 +512,6 @@ $("#bio-form").submit(function (e) {
     })
 })
 
-
-
 function copyToClipboard(elem) {
 	  // create hidden text element, if it doesn't already exist
     var targetId = "_hiddenCopyText_";
@@ -564,11 +562,6 @@ function copyToClipboard(elem) {
     return succeed;
 }
 
-// Prevent bio form from collapsing and contracting when inner links are clicked
-$(".js-journal-link").click(function(event){
-  event.stopPropagation();
-});
-
 window.onload = function () {
     if (document.getElementById("copySecretLink")) {
         document.getElementById("copySecretLink").addEventListener("click", function() {
@@ -577,3 +570,53 @@ window.onload = function () {
         copyToClipboard(document.getElementById("shareCopyField"));});
     }
 };
+
+// add world element
+$(".js-world-element-form").submit(function (e) {
+    e.preventDefault();
+    var serializedData = $(this).serialize();
+    var delUrl = $(this).attr("data-delete-world-element-url");
+
+    $.ajax({
+        type: 'POST',
+        url: $(this).attr("data-new-world-element-url"),
+        data: serializedData,
+        success: function (response) {
+            $(this).trigger('reset');
+            //$("#id_description").focus();
+            var instance = JSON.parse(response["instance"]);
+            var fields = instance[0]["fields"];
+            delUrl = delUrl.replace(/worldElementIdJs/g, JSON.parse(response["id"]));
+            var tmplMarkup = $('#scar-template').html();
+            var compiledTmpl = tmplMarkup.replace(/__description__/g, fields["description"||""]);
+            var compiledTmpl = compiledTmpl.replace(/__delUrl__/g, delUrl);
+            $("#js-scar-container").append(
+                compiledTmpl
+            )
+            $("#js-no-scars").remove();
+        },
+        error: function (response) {
+            console.log(response);
+            alert(response["responseJSON"]["error"]);
+        }
+    })
+})
+
+// delete world-element
+$("#js-scar-container").on("submit",".js-delete-scar-form", function (e) {
+    e.preventDefault();
+    var serializedData = $(this).serialize();
+    var scarForm = $(this);
+    $.ajax({
+        type: 'POST',
+        url: $(this).attr("data-del-scar-url"),
+        data: serializedData,
+        success: function (response) {
+            scarForm.parent().parent().remove();
+        },
+        error: function (response) {
+            console.log(response);
+            alert(response["responseJSON"]["error"]);
+        }
+    })
+})

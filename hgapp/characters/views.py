@@ -19,9 +19,9 @@ from characters.models import Character, BasicStats, Character_Death, Graveyard_
 from powers.models import Power_Full
 from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, AbilityForm, \
     AssetForm, LiabilityForm, BattleScarForm, TraumaForm, InjuryForm, SourceValForm, make_allocate_gm_exp_form, EquipmentForm,\
-    DeleteCharacterForm, BioForm
+    DeleteCharacterForm, BioForm, make_world_element_form
 from characters.form_utilities import get_edit_context, character_from_post, update_character_from_post, \
-    grant_trauma_to_character, delete_trauma_rev
+    grant_trauma_to_character, delete_trauma_rev, get_world_element_class_from_url_string
 from characters.view_utilities import get_characters_next_journal_credit
 
 from journals.models import Journal, JournalCover
@@ -227,6 +227,16 @@ def view_character(request, character_id, secret_key = None):
     show_more_home_games_warning = character.number_completed_games() > 3 \
                                    and (character.number_completed_games_in_home_cell() < character.number_completed_games_out_of_home_cell())
     available_gift = character.unspent_rewards().count() > 0
+    circumstance_form = None
+    condition_form = None
+    artifact_form = None
+    if user_can_edit:
+        world_element_cell_choices = character.world_element_cell_choices()
+        world_element_initial_cell = character.world_element_initial_cell()
+        circumstance_form = make_world_element_form(world_element_cell_choices, world_element_initial_cell)
+        condition_form = make_world_element_form(world_element_cell_choices, world_element_initial_cell)
+        artifact_form = make_world_element_form(world_element_cell_choices, world_element_initial_cell)
+
     context = {
         'character': character,
         'user_can_edit': user_can_edit,
@@ -252,6 +262,9 @@ def view_character(request, character_id, secret_key = None):
         'latest_journals': latest_journals,
         'show_more_home_games_warning': show_more_home_games_warning,
         'available_gift': available_gift,
+        'circumstance_form': circumstance_form,
+        'condition_form': condition_form,
+        'artifact_form': artifact_form,
     }
     return render(request, 'characters/view_pages/view_character.html', context)
 
@@ -528,4 +541,45 @@ def post_bio(request, character_id, secret_key = None):
         else:
             return JsonResponse({"error": form.errors}, status=400)
 
+    return JsonResponse({"error": ""}, status=400)
+
+
+
+def post_world_element(request, character_id, element, secret_key = None):
+    if request.is_ajax and request.method == "POST":
+        WorldElement = get_world_element_class_from_url_string(element)
+        if not WorldElement:
+            return JsonResponse({"error": "Invalid world element"}, status=400)
+        character = get_object_or_404(Character, id=character_id)
+        __check_edit_perms(request, character, secret_key)
+        world_element_cell_choices = character.world_element_cell_choices()
+        world_element_initial_cell = character.world_element_initial_cell()
+        form = make_world_element_form(world_element_cell_choices, world_element_initial_cell)(request.POST)
+        if form.is_valid():
+            new_element = WorldElement(
+                character=character,
+                name=form.cleaned_data['name'],
+                description=form.cleaned_data['description'],
+                system=form.cleaned_data['system'],
+                cell=form.cleaned_data['cell'],
+            )
+            with transaction.atomic():
+                new_element.save()
+            ser_instance = serializers.serialize('json', [new_element, ])
+            return JsonResponse({"instance": ser_instance, "id": new_element.id}, status=200)
+        else:
+            return JsonResponse({"error": form.errors}, status=400)
+    return JsonResponse({"error": ""}, status=400)
+
+def delete_world_element(request, element_id, element, secret_key = None):
+    if request.is_ajax and request.method == "POST":
+        WorldElement = get_world_element_class_from_url_string(element)
+        if not WorldElement:
+            return JsonResponse({"error": "Invalid world element"}, status=400)
+        ext_element = get_object_or_404(WorldElement, id=element_id)
+        character = ext_element.character
+        __check_edit_perms(request, character, secret_key)
+        with transaction.atomic():
+            ext_element.delete()
+        return JsonResponse({}, status=200)
     return JsonResponse({"error": ""}, status=400)

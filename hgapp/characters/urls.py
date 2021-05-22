@@ -53,6 +53,10 @@ urlpatterns = [
     url(r'^post/ajax/c/(?P<character_id>[\d]+)/scar/$', views.post_scar, name="post_scar"),
     url(r'^post/ajax/c/(?P<character_id>[\d]+)/scar/(?P<secret_key>[\da-z]*)$', views.post_scar, name="post_scar"),
 
+    url(r'^post/ajax/delete-scar/s/(?P<scar_id>[\d\w]+)/(?P<secret_key>[\da-z]*)$', views.delete_scar,
+        name="delete_scar"),
+    url(r'^post/ajax/delete-scar/s/(?P<scar_id>[\d\w]+)/$', views.delete_scar, name="delete_scar"),
+
     url(r'^post/ajax/c/(?P<character_id>[\d]+)/equipment/(?P<secret_key>[\da-z]*)$', views.post_equipment, name="post_equipment"),
     url(r'^post/ajax/c/(?P<character_id>[\d]+)/equipment/$', views.post_equipment, name="post_equipment"),
 
@@ -60,8 +64,6 @@ urlpatterns = [
         name="post_bio"),
     url(r'^post/ajax/c/(?P<character_id>[\d]+)/bio/$', views.post_bio, name="post_bio"),
 
-    url(r'^post/ajax/delete-scar/s/(?P<scar_id>[\d\w]+)/(?P<secret_key>[\da-z]*)$', views.delete_scar, name="delete_scar"),
-    url(r'^post/ajax/delete-scar/s/(?P<scar_id>[\d\w]+)/$', views.delete_scar, name="delete_scar"),
 
     url(r'^post/ajax/c/(?P<character_id>[\d]+)/trauma/(?P<secret_key>[\da-z]*)$', views.post_trauma, name="post_trauma"),
     url(r'^post/ajax/c/(?P<character_id>[\d]+)/trauma/$', views.post_trauma, name="post_trauma"),
@@ -88,4 +90,16 @@ urlpatterns = [
     url(r'^post/ajax/update-source/s/(?P<source_id>[\d]+)/(?P<secret_key>[\da-z]*)$', views.set_source_val,
         name="set_source_val"),
 
+    url(r'^post/ajax/c/(?P<character_id>[\d]+)/world-element/(?P<element>[\w]+)/$',
+        views.post_world_element,
+        name="post_world_element"),
+    url(r'^post/ajax/c/(?P<character_id>[\d]+)/world-element/(?P<element>[\w]+)/(?P<secret_key>[\da-z]*)$',
+        views.post_world_element,
+        name="post_world_element"),
+    url(r'^post/ajax/c/(?P<element_id>[\d\w]+)/del-world-element/(?P<element>[\w]+)/$',
+        views.delete_world_element,
+        name="delete_world_element"),
+    url(r'^post/ajax/c/(?P<element_id>[\d\w]+)/del-world-element/(?P<element>[\w]+)/(?P<secret_key>[\da-z]*)$',
+        views.delete_world_element,
+        name="delete_world_element"),
 ]

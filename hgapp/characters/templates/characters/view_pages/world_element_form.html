@@ -1,0 +1,14 @@
+{% load bootstrap %}
+<form class="js-world-element-form"
+      data-new-world-element-url="{% url 'characters:post_world_element' character.id element secret_key %}"
+      data-delete-world-element-url="{% url 'characters:delete_world_element' 'worldElementIdJs' element secret_key %}">
+    {% csrf_token %}
+    <div class="form-inline">
+        {{condition_form.name|bootstrap}} {{condition_form.cell|bootstrap}}
+    </div>
+    {{condition_form.description|bootstrap}}
+    {{condition_form.system|bootstrap}}
+    <div class="text-center">
+        <input type="submit" class="btn btn-primary" value="Add {{element|capfirst}}" />
+    </div>
+</form>

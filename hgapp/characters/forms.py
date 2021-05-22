@@ -347,3 +347,26 @@ def make_charon_coin_form(character=None):
 
 class DeleteCharacterForm(forms.Form):
     pass
+
+def make_world_element_form(cell_choices=None, initial_cell=None):
+    if not cell_choices:
+        return None
+
+    class WorldElementForm(forms.Form):
+        name = forms.CharField(max_length=500,
+                                      label=None,
+                                      widget=forms.TextInput(attrs={'class': 'form-control'}))
+        description = forms.CharField(max_length=1000,
+                                      label=None,
+                                      widget=forms.TextInput(attrs={'class': 'form-control'}))
+        system = forms.CharField(max_length=1000,
+                                 label="System (optional)",
+                                 required=False,
+                                 widget=forms.TextInput(attrs={'class': 'form-control'}))
+        cell = forms.ModelChoiceField(label="World",
+                                      queryset=cell_choices,
+                                      widget=forms.Select(attrs={'class': 'form-control'}),
+                                      initial=initial_cell if initial_cell else cell_choices.first(),
+                                      required=True,
+                                      )
+    return WorldElementForm
