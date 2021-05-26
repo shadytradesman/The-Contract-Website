@@ -53,6 +53,8 @@ class Journal(models.Model):
             self.void_reward()
 
     def get_improvement(self):
+        if self.is_downtime:
+            return None
         return get_object_or_none(Reward,
                                   rewarded_player=self.game_attendance.get_player(),
                                   relevant_game=self.game_attendance.relevant_game,
