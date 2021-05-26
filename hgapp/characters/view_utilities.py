@@ -1,5 +1,6 @@
 from journals.models import Journal
 from hgapp.utilities import get_object_or_none
+from collections import defaultdict
 
 # If applicable, returns an object containing info about what journal a character can write for a reward.
 def get_characters_next_journal_credit(character):
@@ -24,3 +25,9 @@ def get_characters_next_journal_credit(character):
         return {"attendance": chosen_attendance, "is_downtime": is_downtime, "reward_is_improvement": reward_is_improvement}
     else:
         return None
+
+def get_world_element_default_dict(world_element_cell_choices):
+    # It is important that cells that may not /yet/ have elements in them be included.
+    return defaultdict(list, {k: [] for k in world_element_cell_choices if world_element_cell_choices})
+
+

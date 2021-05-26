@@ -209,7 +209,7 @@
             {% endif %}
             {% if viewer_can_write %}
                 <a class="btn btn-default"
-                   href="{% url 'journals:journal_edit' journal_page.game_journal.id %}">
+                   href="{% url 'journals:journal_edit' journal.id %}">
                     Edit Journal
                 </a>
             {% endif %}

@@ -587,13 +587,15 @@ $(".js-world-element-form").submit(function (e) {
             var instance = JSON.parse(response["instance"]);
             var fields = instance[0]["fields"];
             delUrl = delUrl.replace(/worldElementIdJs/g, JSON.parse(response["id"]));
-            var tmplMarkup = $('#scar-template').html();
-            var compiledTmpl = tmplMarkup.replace(/__description__/g, fields["description"||""]);
+            var tmplMarkup = $('#world-entity-template').html();
+            var compiledTmpl = tmplMarkup.replace(/__world_entity_description__/g, fields["description"||""]);
+            var compiledTmpl = tmplMarkup.replace(/__world_entity_name__/g, fields["name"||""]);
+            var compiledTmpl = tmplMarkup.replace(/__world_entity_system__/g, fields["system"||""]);
             var compiledTmpl = compiledTmpl.replace(/__delUrl__/g, delUrl);
-            $("#js-scar-container").append(
-                compiledTmpl
-            )
-            $("#js-no-scars").remove();
+            var elementContainer = $(this).closest(".js-world-element-container");
+            var newContentContainer = elementContainer.find(".js-world-element-content-" + response["cellId"]);
+            newContentContainer.append(compiledTmpl);
+//            $("#js-no-scars").remove();
         },
         error: function (response) {
             console.log(response);

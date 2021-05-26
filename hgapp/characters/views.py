@@ -22,7 +22,7 @@ from characters.forms import make_character_form, CharacterDeathForm, ConfirmAss
     DeleteCharacterForm, BioForm, make_world_element_form
 from characters.form_utilities import get_edit_context, character_from_post, update_character_from_post, \
     grant_trauma_to_character, delete_trauma_rev, get_world_element_class_from_url_string
-from characters.view_utilities import get_characters_next_journal_credit
+from characters.view_utilities import get_characters_next_journal_credit, get_world_element_default_dict
 
 from journals.models import Journal, JournalCover
 from cells.models import Cell
@@ -230,12 +230,28 @@ def view_character(request, character_id, secret_key = None):
     circumstance_form = None
     condition_form = None
     artifact_form = None
+    world_element_initial_cell = character.world_element_initial_cell()
+    world_element_cell_choices = None
     if user_can_edit:
         world_element_cell_choices = character.world_element_cell_choices()
-        world_element_initial_cell = character.world_element_initial_cell()
         circumstance_form = make_world_element_form(world_element_cell_choices, world_element_initial_cell)
         condition_form = make_world_element_form(world_element_cell_choices, world_element_initial_cell)
         artifact_form = make_world_element_form(world_element_cell_choices, world_element_initial_cell)
+
+    artifacts = get_world_element_default_dict(world_element_cell_choices)
+    for artifact in character.artifact_set.all():
+        artifacts[artifact.cell].append(artifact)
+    artifacts = dict(artifacts)
+
+    circumstances = get_world_element_default_dict(world_element_cell_choices)
+    for circumstance in character.circumstance_set.all():
+        circumstances[circumstance.cell].append(circumstance)
+    circumstances = dict(circumstances)
+
+    conditions = get_world_element_default_dict(world_element_cell_choices)
+    for condition in character.condition_set.all():
+        conditions[condition.cell].append(condition)
+    conditions = dict(conditions)
 
     context = {
         'character': character,
@@ -265,6 +281,9 @@ def view_character(request, character_id, secret_key = None):
         'circumstance_form': circumstance_form,
         'condition_form': condition_form,
         'artifact_form': artifact_form,
+        'artifacts_by_cell': artifacts,
+        'conditions_by_cell': conditions,
+        'circumstances_by_cell': circumstances,
     }
     return render(request, 'characters/view_pages/view_character.html', context)
 
@@ -566,7 +585,7 @@ def post_world_element(request, character_id, element, secret_key = None):
             with transaction.atomic():
                 new_element.save()
             ser_instance = serializers.serialize('json', [new_element, ])
-            return JsonResponse({"instance": ser_instance, "id": new_element.id}, status=200)
+            return JsonResponse({"instance": ser_instance, "id": new_element.id, "cellId": new_element.cell.id}, status=200)
         else:
             return JsonResponse({"error": form.errors}, status=400)
     return JsonResponse({"error": ""}, status=400)
