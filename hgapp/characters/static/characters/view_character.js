@@ -576,26 +576,27 @@ $(".js-world-element-form").submit(function (e) {
     e.preventDefault();
     var serializedData = $(this).serialize();
     var delUrl = $(this).attr("data-delete-world-element-url");
+    var elementContainer = $(this).closest(".js-world-element-container");
+    var form = $(this);
 
     $.ajax({
         type: 'POST',
         url: $(this).attr("data-new-world-element-url"),
         data: serializedData,
         success: function (response) {
-            $(this).trigger('reset');
+            form.trigger('reset');
             //$("#id_description").focus();
             var instance = JSON.parse(response["instance"]);
             var fields = instance[0]["fields"];
             delUrl = delUrl.replace(/worldElementIdJs/g, JSON.parse(response["id"]));
             var tmplMarkup = $('#world-entity-template').html();
             var compiledTmpl = tmplMarkup.replace(/__world_entity_description__/g, fields["description"||""]);
-            var compiledTmpl = tmplMarkup.replace(/__world_entity_name__/g, fields["name"||""]);
-            var compiledTmpl = tmplMarkup.replace(/__world_entity_system__/g, fields["system"||""]);
+            var compiledTmpl = compiledTmpl.replace(/__world_entity_name__/g, fields["name"||""]);
+            var compiledTmpl = compiledTmpl.replace(/__world_entity_system__/g, fields["system"||""]);
             var compiledTmpl = compiledTmpl.replace(/__delUrl__/g, delUrl);
-            var elementContainer = $(this).closest(".js-world-element-container");
             var newContentContainer = elementContainer.find(".js-world-element-content-" + response["cellId"]);
             newContentContainer.append(compiledTmpl);
-//            $("#js-no-scars").remove();
+            newContentContainer.prev().show();
         },
         error: function (response) {
             console.log(response);
@@ -605,16 +606,16 @@ $(".js-world-element-form").submit(function (e) {
 })
 
 // delete world-element
-$("#js-scar-container").on("submit",".js-delete-scar-form", function (e) {
+$(".js-world-element-container").on("submit",".js-delete-world-element-form", function (e) {
     e.preventDefault();
     var serializedData = $(this).serialize();
-    var scarForm = $(this);
+    var worldElement = $(this);
     $.ajax({
         type: 'POST',
-        url: $(this).attr("data-del-scar-url"),
+        url: $(this).attr("data-del-world-element-url"),
         data: serializedData,
         success: function (response) {
-            scarForm.parent().parent().remove();
+            worldElement.parent().parent().remove();
         },
         error: function (response) {
             console.log(response);

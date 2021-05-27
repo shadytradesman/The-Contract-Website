@@ -26,18 +26,18 @@
 
 {% block body_base %}
 <script type="text/html" id="world-entity-template">
-    <div class="jss-world-entity-value">
-        <b>
-            __world_entity_name__
-        </b>
-        <span>__world_entity_description__</span>
-        <i>__world_entity_system__</i>
-        <span class="pull-right">
+    <div class="css-world-entity-value">
+        <span class="pull-left css-world-element-delete">
             <form class="js-delete-world-element-form" data-del-world-element-url=__delUrl__>
                 {% csrf_token %}
                 <input type="submit" class="btn btn-xs btn-danger" value="X" />
             </form>
         </span>
+        <span class="css-world-element-name">
+            __world_entity_name__
+        </span>
+        <span class="css-world-element-description">__world_entity_description__</span>
+        <span class="css-world-element-system">__world_entity_system__</span>
     </div>
 </script>
 <div class="container">

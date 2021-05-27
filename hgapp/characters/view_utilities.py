@@ -28,6 +28,9 @@ def get_characters_next_journal_credit(character):
 
 def get_world_element_default_dict(world_element_cell_choices):
     # It is important that cells that may not /yet/ have elements in them be included.
-    return defaultdict(list, {k: [] for k in world_element_cell_choices if world_element_cell_choices})
+    if world_element_cell_choices:
+        return defaultdict(list, {k: [] for k in world_element_cell_choices})
+    else:
+        return defaultdict(list)
 
 

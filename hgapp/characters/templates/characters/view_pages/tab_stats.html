@@ -26,35 +26,104 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-md-5">
+    <div class="col-md-6">
         <h3 class="text-center">Assets And Liabilities</h3>
-        {% for asset_details in character.stats_snapshot.assetdetails_set.all %}
-        <li>
-            <b>[+{{asset_details.relevant_asset.value}}] {{asset_details.relevant_asset.name}}:</b>
-            {{asset_details.relevant_asset.system}}
-            {% if asset_details.details %}
-            <br>
-            <b>{{asset_details.relevant_asset.details_field_name}}</b>
-            {{asset_details.details}}
-            {% endif %}
-        </li>
-        {% endfor %}
-        {% for liability_details in character.stats_snapshot.liabilitydetails_set.all %}
-        <li>
-            <b>[-{{liability_details.relevant_liability.value}}] {{liability_details.relevant_liability.name}}:</b>
-            {{liability_details.relevant_liability.system}}
-            {% if liability_details.details %}
-            <br>
-            <b>{{liability_details.relevant_liability.details_field_name}}</b>
-            {{liability_details.details}}
-            {% endif %}
-        </li>
-        {% endfor %}
+        {% if assets %}
+            <span class="css-condition-cell-header">
+                Assets
+            </span>
+            {% for asset_details in assets %}
+                <div class="css-quirk-container">
+                    <b>
+                        <span class="css-quirk-value">
+                            -{{asset_details.relevant_asset.value}}
+                        </span>
+                    </b>
+                    <span class="css-quirk-content">
+                        <b class="css-quirk-name">
+                            {{asset_details.relevant_asset.name}}:
+                        </b>
+                        {{asset_details.relevant_asset.system}}
+                        {% if asset_details.details %}
+                            <div class="css-quirk-details">
+                                <b>{{asset_details.relevant_asset.details_field_name}}:</b>
+                                {{asset_details.details}}
+                            </div>
+                        {% endif %}
+                    </span>
+                </div>
+            {% endfor %}
+        {% endif %}
+        {% if liabilities %}
+            <span class="css-condition-cell-header">
+                Liabilities
+            </span>
+            {% for liability_details in liabilities %}
+                <div class="css-quirk-container">
+                    <b>
+                        <span class="css-quirk-value">
+                            -{{liability_details.relevant_liability.value}}
+                        </span>
+                    </b>
+                    <span class="css-quirk-content">
+                        <b class="css-quirk-name">
+                            {{liability_details.relevant_liability.name}}:
+                        </b>
+                        {{liability_details.relevant_liability.system}}
+                        {% if liability_details.details %}
+                            <div class="css-quirk-details">
+                                <b>{{liability_details.relevant_liability.details_field_name}}:</b>
+                                {{liability_details.details}}
+                            </div>
+                        {% endif %}
+                    </span>
+                </div>
+            {% endfor %}
+        {% endif %}
     </div>
-    <div class="col-md-7">
+    <div class="col-md-6">
         <h3 class="text-center" data-toggle="tooltip" title='{{tutorial.conditions|safe}}'>
             Conditions
         </h3>
+        <div class="js-world-element-container">
+            {% for cell, conditions in conditions_by_cell.items %}
+            <div class="css-condition-section">
+                    <span class="css-condition-cell-header"
+                          {% if conditions|length == 0 %}
+                              style="display:none;"
+                          {% endif %}
+                    >
+                        <a href="{% url 'cells:cells_view_cell' cell.id %}">
+                            {{cell.name}}
+                        </a>
+                    </span>
+                <div class="js-world-element-content-{{cell.id}}">
+                    {% for condition in conditions %}
+                    <div class="css-world-entity-value">
+                        {% if user_can_edit %}
+                            <span class="pull-left css-world-element-delete">
+                                <form class="js-delete-world-element-form"
+                                      data-del-world-element-url="{% url 'characters:delete_world_element' condition.id 'condition' secret_key %}">
+                                    {% csrf_token %}
+                                    <input type="submit" class="btn btn-xs btn-danger" value="X" />
+                                </form>
+                            </span>
+                        {% endif %}
+                        <span class="css-world-element-name">
+                            {{condition.name}}
+                        </span>
+                        <span class="css-world-element-description">
+                            {{condition.description}}
+                        </span>
+                        <span class="css-world-element-system">
+                            {{condition.system}}
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+
         {% if condition_form %}
             <div class="text-center">
                 <a class="btn btn-default btn-sm wiki-entry-collapsible text-center">New Condition</a>
@@ -67,6 +136,7 @@
                 </div>
             </div>
         {% endif %}
+        </div>
     </div>
 </div>
 <div class="row">
@@ -75,24 +145,57 @@
             Circumstances
         </h3>
         <div class="js-world-element-container">
-            <div class="panel-group" id="accordion">
+            <div class="panel-group" id="accordion" aria-multiselectable="true" role="tablist">
                 {% for cell, circumstances in circumstances_by_cell.items %}
-                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse-circumstance-{{cell.id}}">
-                        <div class="panel-heading">
-                            <h4>{{cell.name}}</h4>
+                <div class="panel panel-default css-circumstance-section">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse-circumstance-{{cell.id}}"
+                        aria-controls="collapse-circumstance-{{cell.id}}"
+                       {% if cell.id == initial_cell.id %}
+                           aria-expanded="true"
+                       {% else %}
+                           aria-expanded="false"
+                       {% endif %}
+                        {% if circumstances|length == 0 %}
+                        style="display:none;"
+                        {% endif %}>
+                        <div class="panel-heading css-circumstance-heading" role="tab" id="circumstance-heading-{{cell.id}}">
+                            <h5 class="panel-title">{{cell.name}}</h5>
                         </div>
                     </a>
-                    <div id="collapse-circumstance-{{cell.id}}" class="panel-collapse collapse">
+                    <div id="collapse-circumstance-{{cell.id}}"
+                         class="panel-collapse collapse js-world-element-content-{{cell.id}} panel-body css-circumstance-container
+                         {% if cell.id == initial_cell.id %} in {% endif %}"
+                         labelledby="circumstance-heading-{{cell.id}}"
+                         {% if cell.id == initial_cell.id %}
+                         aria-expanded="true"
+                         {% else %}
+                         aria-expanded="false"
+                         {% endif %}
+                    >
                         {% for circumstance in circumstances %}
-                            <div class="js-world-element-content-{{cell.id}}">
-                                <b>
+                            <div class="css-world-entity-value">
+                                {% if user_can_edit %}
+                                    <span class="pull-left css-world-element-delete">
+                                        <form class="js-delete-world-element-form"
+                                              data-del-world-element-url="{% url 'characters:delete_world_element' circumstance.id 'circumstance' secret_key %}">
+                                            {% csrf_token %}
+                                            <input type="submit" class="btn btn-xs btn-danger" value="X" />
+                                        </form>
+                                    </span>
+                                {% endif %}
+                                <span class="css-world-element-name">
                                     {{circumstance.name}}
-                                </b>
-                                <span>{{circumstance.description}}</span>
-                                <i>{{circumstance.system}}</i>
+                                </span>
+                                <span class="css-world-element-description">
+                                    {{circumstance.description}}
+                                </span>
+                                <span class="css-world-element-system">
+                                    {{circumstance.system}}
+                                </span>
                             </div>
                         {% endfor %}
                     </div>
+                </div>
                 {% endfor %}
             </div>
             {% if circumstance_form %}

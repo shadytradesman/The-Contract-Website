@@ -233,6 +233,7 @@ def view_character(request, character_id, secret_key = None):
     world_element_initial_cell = character.world_element_initial_cell()
     world_element_cell_choices = None
     if user_can_edit:
+        # We only need these choices if the user can edit, both for forms and for char sheet.
         world_element_cell_choices = character.world_element_cell_choices()
         circumstance_form = make_world_element_form(world_element_cell_choices, world_element_initial_cell)
         condition_form = make_world_element_form(world_element_cell_choices, world_element_initial_cell)
@@ -253,6 +254,8 @@ def view_character(request, character_id, secret_key = None):
         conditions[condition.cell].append(condition)
     conditions = dict(conditions)
 
+    assets = character.stats_snapshot.assetdetails_set.all()
+    liabilities = character.stats_snapshot.liabilitydetails_set.all()
     context = {
         'character': character,
         'user_can_edit': user_can_edit,
@@ -284,6 +287,9 @@ def view_character(request, character_id, secret_key = None):
         'artifacts_by_cell': artifacts,
         'conditions_by_cell': conditions,
         'circumstances_by_cell': circumstances,
+        'initial_cell': world_element_initial_cell,
+        'assets': assets,
+        'liabilities': liabilities,
     }
     return render(request, 'characters/view_pages/view_character.html', context)
 

@@ -19,7 +19,7 @@
 </div>
 {% for row in health_display %}
     <div class="row">
-        <div class="col-xs-4 text-right">
+        <div class="col-xs-4 text-right css-status-text">
             {{row.0}}
         </div>
         <div class="col-xs-1 text-center health-box">
@@ -51,7 +51,7 @@
                 </span>
             {% endif %}
         </div>
-        <div class="col-xs-4 text-left" >
+        <div class="col-sm-4 col-xs-3 text-left css-status-text" >
             {{ row.4 }}
         </div>
     </div>

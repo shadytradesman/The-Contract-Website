@@ -1,23 +1,37 @@
-.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
-    background-color: #20252d;
-    border-bottom-width: 2px;
-    border-bottom-color: #20252d !important;
-
-}
-
-.panel-default {
-    border-color: #20252d;
-}
-.panel{
-    border-color: #20252d;
-}
-
 .nav-justified-sm > li {
     display: table-cell;
     width: 1%;
 }
+
+.nav-tabs.nav-justified>li>a {
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+
 .nav-justified-sm > li > a {
     margin-bottom: 0 !important;
+    border-bottom-color: #a6763a ;
+    border-bottom-width: 1px ;
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+
+@media (max-width: 767px) {
+  .nav-tabs.nav-justified>.active>a {
+    border-bottom-color: #20252d;
+    border-bottom-width: 0px;
+  }
+  .nav-tabs.nav-justified>.active>a, .nav-tabs.nav-justified>.active>a:focus, .nav-tabs.nav-justified>.active>a:hover {
+    border-bottom-color: #20252d;
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+  }
+}
+
+.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
+    background-color: #20252d;
+    border-bottom-width: 1px !important;
+    border-bottom-color: #20252d !important;
 }
 
 .css-cell-body {
@@ -28,6 +42,14 @@
     border-right-color: #a6763a !important;
     border-radius: 0px;
 }
+
+.panel-default {
+    border-color: #20252d;
+}
+.panel{
+    border-color: #20252d;
+}
+
 
 @media (min-width: 991px) {
     .css-upcoming-game {
