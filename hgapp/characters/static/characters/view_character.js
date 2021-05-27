@@ -597,6 +597,7 @@ $(".js-world-element-form").submit(function (e) {
             var newContentContainer = elementContainer.find(".js-world-element-content-" + response["cellId"]);
             newContentContainer.append(compiledTmpl);
             newContentContainer.prev().show();
+            newContentContainer.parent().show();
         },
         error: function (response) {
             console.log(response);

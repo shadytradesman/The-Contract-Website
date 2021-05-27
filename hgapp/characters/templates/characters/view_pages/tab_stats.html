@@ -147,7 +147,11 @@
         <div class="js-world-element-container">
             <div class="panel-group" id="accordion" aria-multiselectable="true" role="tablist">
                 {% for cell, circumstances in circumstances_by_cell.items %}
-                <div class="panel panel-default css-circumstance-section">
+                <div class="panel panel-default css-circumstance-section"
+                     {% if circumstances|length == 0 %}
+                     style="display:none;"
+                     {% endif %}
+                >
                     <a data-toggle="collapse" data-parent="#accordion" href="#collapse-circumstance-{{cell.id}}"
                         aria-controls="collapse-circumstance-{{cell.id}}"
                        {% if cell.id == initial_cell.id %}
@@ -155,9 +159,7 @@
                        {% else %}
                            aria-expanded="false"
                        {% endif %}
-                        {% if circumstances|length == 0 %}
-                        style="display:none;"
-                        {% endif %}>
+                    >
                         <div class="panel-heading css-circumstance-heading" role="tab" id="circumstance-heading-{{cell.id}}">
                             <h5 class="panel-title">{{cell.name}}</h5>
                         </div>
