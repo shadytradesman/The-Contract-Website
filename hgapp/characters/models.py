@@ -308,6 +308,8 @@ class Character(models.Model):
 
     def world_element_cell_choices(self):
         cell_choices = set()
+        if not hasattr(self, "player") or not self.player:
+            return cell_choices
         queryset = self.player.cell_set.all()
         cell_choices.add(queryset)
         games_attended = self.game_set.all()

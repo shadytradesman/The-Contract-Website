@@ -48,6 +48,22 @@
         {% csrf_token %}
         <div class="panel panel-default">
             <div class="panel-body">
+                {% if not cell %}
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 text-center">
+                        <div role="alert" class="alert alert-info text-center">
+                            <p>
+                                <b>
+                                    The default values on this form are provided for your convenience.
+                                </b>
+                            </p>
+                            <p>
+                                Use or replace them as desired.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
                 <div class="row">
                     <div class="col-xs-12">
                         <div id="css-name-field" class="css-essential-field">
@@ -101,6 +117,11 @@
                 </div>
                 <div class="text-center">
                     <input class="btn btn-primary btn-lg" type="submit" value="Done!" />
+                    <div>
+                        <small>
+                            You may edit your World at any time.
+                        </small>
+                    </div>
                 </div>
             </div>
         </div>

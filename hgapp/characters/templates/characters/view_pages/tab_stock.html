@@ -43,6 +43,29 @@
         <h3 class="text-center" data-toggle="tooltip" title='{{tutorial.artifacts|safe}}'>
             Artifacts
         </h3>
+        {% if not artifacts_by_cell %}
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="alert alert-info text-center">
+                        <p>
+                            <b>Artifacts are GM-created objects and equipment.</b>
+                        </p>
+                        <p>
+                            Examples of Artifacts include healing potions, scrolls, sci-fi technology, or any supernatural
+                            item that was not created with The Contract's Power system.
+                            Artifacts are not subject to standardized balance.
+                            Therefore, their effects may be altered or ignored outside the World where they were obtained.
+                        </p>
+                        {% if user_can_edit %}
+                        <p>
+                            Until you participate in a Game or join a World, you cannot add
+                            Artifacts to your Contractor.
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
         <div class="js-world-element-container">
             {% for cell, artifacts in artifacts_by_cell.items %}
             <div class="css-condition-section">

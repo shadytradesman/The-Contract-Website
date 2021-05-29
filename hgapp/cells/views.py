@@ -31,7 +31,7 @@ class EditWorld(View):
     template_name = 'cells/edit.html'
     initial = {}
     cell = None
-    INITIAL_DATA_CELL_ID = 1
+    INITIAL_DATA_CELL_ID = 2
 
     def dispatch(self, *args, **kwargs):
         if 'cell_id' in self.kwargs:
@@ -109,7 +109,6 @@ class EditFindWorld(View):
     template_name = 'cells/edit_find_world.html'
     initial = {}
     cell = None
-    INITIAL_DATA_CELL_ID = 1
 
     def dispatch(self, *args, **kwargs):
         self.cell = get_object_or_404(Cell, id=self.kwargs['cell_id'])

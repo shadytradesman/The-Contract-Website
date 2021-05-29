@@ -85,6 +85,29 @@
         <h3 class="text-center" data-toggle="tooltip" title='{{tutorial.conditions|safe}}'>
             Conditions
         </h3>
+        {% if not circumstances_by_cell %}
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="alert alert-info text-center">
+                        <p>
+                            <b>Conditions are GM-assigned status effects.</b>
+                        </p>
+                        <p>
+                            Examples of Conditions include supernatural curses, enchantments, and diseases.
+                            Conditions are created by GMs and World leaders and are not subject to any standardized balance.
+                            Therefore, their effects may be altered or ignored outside the World where they were obtained.
+                            For example, lycanthropy may be contagious in one World, but not another.
+                        </p>
+                        {% if user_can_edit %}
+                        <p>
+                            Until you participate in a Game or join a World, you cannot add
+                            Conditions to your Contractor.
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
         <div class="js-world-element-container">
             {% for cell, conditions in conditions_by_cell.items %}
             <div class="css-condition-section">
@@ -144,6 +167,28 @@
         <h3 class="text-center" data-toggle="tooltip" title='{{tutorial.circumstances|safe}}'>
             Circumstances
         </h3>
+        {% if not circumstances_by_cell %}
+            <div class="row">
+                <div class="col-sm-8 col-sm-offset-2">
+                    <div class="alert alert-info text-center">
+                        <p>
+                            <b>Circumstances describe your Contractor's situation in various Worlds.</b>
+
+                        </p>
+                        <p>
+                            Enemies, wealth, notoriety, status, contacts, fame, and imprisonment are all examples of potential
+                            Circumstances.
+                        </p>
+                        {% if user_can_edit %}
+                        <p>
+                            Until you participate in a Game or join a World, you cannot add
+                            Circumstances to your Contractor.
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
         <div class="js-world-element-container">
             <div class="panel-group" id="accordion" aria-multiselectable="true" role="tablist">
                 {% for cell, circumstances in circumstances_by_cell.items %}

@@ -25,15 +25,26 @@
     </h1>
     <div class="panel panel-default">
         <div class="panel-body">
-            <p class="text-center">
-                These Worlds are looking for new Players! They are ordered by recent Game activity.
-                <br><br>
-                If you are looking for a Game to play in, visit
-                <a href="{% url 'games:games_looking_for_game' %}">
-                    the Looking-For-Game page
-                </a>
-                instead.
-            </p>
+            <div class="row">
+                <div class="col-md-10 col-md-offset-1 text-center">
+                    <div role="alert" class="alert alert-info text-center">
+                        <p>
+                            These Worlds are looking for new Players! They are ordered by recent Game activity.
+                        </p>
+                        <p>
+                            If you want to start your own World
+                            <a href="{% url 'cells:cells_create' %}" class="btn btn-default btn-xs">
+                                click here
+                            </a>
+                            <br>
+                            If you are looking for a Game to play in, visit
+                            <a href="{% url 'games:games_looking_for_game' %}" class="btn btn-default btn-xs">
+                                Looking-For-Game
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
             <div class="row">
             {% for cell in public_cells %}
                 <div class="col-md-6">
@@ -61,7 +72,7 @@
                                     {{cell.cell_sell|linebreaks}}
                                     {% if cell.is_community_link_public and cell.community_link %}
                                         <div>
-                                            <a href="cell.community_link">
+                                            <a href="{{cell.community_link}}">
                                                 <b>Visit this World's off-site community.</b>
                                             </a>
                                         </div>

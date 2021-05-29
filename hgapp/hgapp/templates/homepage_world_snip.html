@@ -35,7 +35,7 @@
                 {% for invite in cell_invites %}
                     <p>
                         <a href="{% url 'cells:cells_view_cell' invite.relevant_cell.id %}">
-                            Join {{ invite.relevant_cell }}
+                            {{ invite.relevant_cell }}
                         </a>
                     </p>
                 {% endfor %}
