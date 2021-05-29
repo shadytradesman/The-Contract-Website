@@ -309,8 +309,14 @@ ul.dropdown-menu ul {
 /* End Wiki Style */
 
 .css-backgrounded {
-    background-position: center;
+    background-position: top left;
     background-repeat: no-repeat;
+    background-size: cover;
+}
+@media (max-width: 767px) {
+    .css-backgrounded {
+        background-size: cover;
+    }
 }
 
 .tox-tinymce {

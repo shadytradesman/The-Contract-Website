@@ -34,7 +34,7 @@
         <div class="panel-body">
             <div class="row">
                 {% for scenario_discovery in unlocked_discoveries %}
-                    {% if forloop.counter|divisibleby:2 == 0 %}
+                    {% if forloop.counter|divisibleby:2 %}
                         </div>
                         <div class="row">
                     {% endif %}
@@ -60,7 +60,7 @@
             <br>
             <div class="row">
                 {% for scenario in owned_scenarios %}
-                    {% if forloop.counter|divisibleby:2 == 0 %}
+                    {% if forloop.counter|divisibleby:2 %}
                         </div>
                         <div class="row">
                     {% endif %}
@@ -95,7 +95,7 @@
             {% endif %}
             <div class="row">
                 {% for scenario_discovery in scenario_discoveries %}
-                    {% if forloop.counter|divisibleby:2 == 0 %}
+                    {% if forloop.counter|divisibleby:2 %}
                         </div>
                         <div class="row">
                     {% endif %}

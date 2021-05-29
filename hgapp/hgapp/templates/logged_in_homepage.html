@@ -12,288 +12,44 @@
     <link rel="stylesheet" type="text/css" href="{% static 'overrides/homepage_style.css' %}" />
 {% endblock %}
 
+{% block extra_scripts %}
+    <script src="{% static 'overrides/wiki-macro-scripts.js' %}"></script>
+{% endblock %}
+
 {% block body_base %}
 <div class="container">
+
+
+    <div class="text-center">
+        <h1>{% blocktrans %}Welcome, {% endblocktrans %}{% user_display request.user %} </h1>
+        <br>
+        {% include "_messages.html" %}
+    </div>
     <div>
         {% with latest_blog_post as post %}
-            <h4 class="css-blog-header">
-                <a href="{%url 'pinax_blog:blog' %}">
-                    Site News
-                </a>
-                <small>
-                    {{ post.published|date:"jS F Y" }}
-                </small>
-                : <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
-            </h4>
+        <h4 class="css-blog-header">
+            <a href="{%url 'pinax_blog:blog' %}">
+                Site News
+            </a>
+            <small>
+                {{ post.published|date:"jS F Y" }}
+            </small>
+            : <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+        </h4>
         {% endwith %}
-
-    </div>
-    <div class="upper-section css-backgrounded" style="background-image: url({% static 'overrides/art/doors_bg.jpg' %});">
-        <div class="text-center">
-            <br>
-            <h1>{% blocktrans %}Welcome, {% endblocktrans %}{% user_display request.user %} </h1>
-            {% include "_messages.html" %}
-            <br><br>
-        </div>
-        <div class="row css-home-row" style="background-color: rgba(0, 0, 0, 0.3);">
-            <div class="col-sm-4">
-                <h2>Contractors</h2>
-                <ul class="nav nav-pills nav-stacked">
-                    <li role="presentation">
-                        <a href="{% url 'characters:characters_create' %}" class="btn btn-primary">
-                        Create a new Contractor
-                        {% if avail_charon_coins %}
-                            <br>
-                            <small class="text-center">
-                                You have <b>{{avail_charon_coins | length}}</b> Charon Coin{{avail_charon_coins|pluralize}}
-                                <br>
-                                Spend {{avail_charon_coins|pluralize:"it,one"}} to start a new Contractor with a Gift
-                            </small>
-                        {% endif %}
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'characters:characters_graveyard' %}" class="btn btn-default">Visit the Graveyard</a>
-                    </li>
-                </ul>
-            </div>
-            <div class="col-sm-4">
-                <h2>Powers</h2>
-                <ul class="nav nav-pills nav-stacked">
-                    <li role="presentation" >
-                        <a href="{% url 'powers:powers_create' %}" class="btn btn-primary">
-                            Create a new Power
-                        </a>
-                    </li>
-                    <li role="presentation">
-                        <a href="{% url 'powers:powers_stock' %}" class="btn btn-default">
-                            Browse Premade Stock Powers
-                        </a>
-                    </li>
-                </ul>
-            </div>
-            <div class="col-sm-4">
-                <h2>Games</h2>
-                <ul class="nav nav-pills nav-stacked">
-                    <li role="presentation" > <a class="btn btn-primary" href="{% url 'games:games_enter_game' %}">Enter a Game</a></li>
-                    <li role="presentation" > <a class="btn btn-default" href="{% url 'games:games_view_scenario_gallery' %}">Scenario Gallery</a></li>
-                </ul>
-                <br>
-            </div>
-        </div>
-
     </div>
     <div class="row">
-        <div class="col-sm-4">
-            {% if not living_characters and not dead_characters %}
+        <div class="col-md-6">
+            {% include "homepage_contractors_snip.html" %}
             <br>
-                <div class="alert alert-warning text-center">
-                    <h3>Who will you become?</h3>
-                    <p>You haven't made any Contractors yet.</p>
-                    <br>
-                    <a href="{% url 'characters:characters_create' %}" class="btn btn-primary btn-lg">Time to change that</a>
-                </div>
-            {% endif %}
-            {% if avail_exp_rewards %}
-                <br>
-                <div class="alert alert-success text-center css-home-alert">
-                    <b>{{avail_exp_rewards|length}} Unspent Experience Reward{{avail_exp_rewards|pluralize}}</b>
-                    <br>
-                    Choose who will benefit!
-                    <br>
-                    <a href="{% url 'characters:characters_allocate_gm_exp' %}" class="btn btn-primary">
-                        Grant Rewards
-                    </a>
-                </div>
-            {% endif %}
-            {% if avail_improvements %}
-                <div class="alert alert-success text-center css-home-alert">
-                    <a href="{% url 'games:games_allocate_improvement_generic' %}" class="btn btn-primary">Allocate Golden Ratio Rewards</a>
-                </div>
-            {% endif %}
-            {% if living_characters or dead_characters%}
-                {% if living_characters %}
-                    <h4>My Living Contractors</h4>
-                    {% for character in living_characters %}
-                        <a href="{% url 'characters:characters_view' character.id %}">
-                            <div class="panel panel-default text-center">
-                                <h4>
-                                    {{ character.name }}
-                                    <br>
-                                    <small>The {{ character.concept_summary}}</small>
-                                </h4>
-                                {% if character.unspent_rewards|length > 0 %}
-                                    <a class="btn btn-success btn-xs" href="{% url 'characters:characters_spend_reward' character.id %}">
-                                        Spend {{ character.name }}'s Rewards
-                                    </a>
-                                {% endif %}
-                                {% if character.unspent_experience > 2 %}
-                                <a href="{% url 'characters:characters_edit' character.id %}" class="btn btn-success btn-xs">
-                                    Spend {{character.name}}'s {{character.unspent_experience}} Exp
-                                </a>
-                                {% endif %}
-                            </div>
-                        </a>
-                    {% endfor %}
-                {% endif %}
-                {% if dead_characters %}
-                    <h4>My Deceased Contractors</h4>
-                    {% for character in dead_characters %}
-                        <a href="{% url 'characters:characters_view' character.id %}">
-                            <div class="panel panel-default text-center">
-                                <h4>
-                                    {{ character.name }}
-                                    <br>
-                                    <small>The {{ character.concept_summary}}</small>
-                                    {% if character.needs_obit %}
-                                        <br>
-                                        <a href="{%url 'characters:characters_obituary' character.id %}" class="btn btn-info btn-xs">
-                                            Write {{ character.name }}'s Epitaph
-                                        </a>
-                                    {% endif %}
-                                </h4>
-                            </div>
-                        </a>
-                    {% endfor %}
-                {% endif %}
-            {% endif %}
+            {% include "homepage_powers_snip.html" %}
+            <br>
         </div>
-        <div class="col-sm-8">
-            <div class="row">
-                <div class="col-sm-6">
-                    {% if powers %}
-                        <h4>My Unassigned Powers</h4>
-                        <div class="panel-group">
-                            {% for power_full in powers %}
-                                {% if not power_full.character %}
-                                    <a href="{% url 'powers:powers_view_power_full' power_full.id %}">
-                                        <div class="panel css-home-panel">
-                                                {{ power_full.name }}
-                                        </div>
-                                    </a>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                </div>
-                <div class="col-sm-6">
-                    {% if active_games or attendance_invites_to_confirm or upcoming_games_running or upcoming_games_invited %}
-                        <br>
-                    {% endif %}
-                    {% if active_games %}
-                        <div class="alert alert-warning text-center css-home-alert">
-                            <h4>Ongoing Game!</h4>
-                            <ul class="nav nav-pills nav-stacked">
-                                {% for game in active_games %}
-                                    <li>
-                                        <a href="{% url 'games:games_view_game' game.id %}"><b>{{game.title}}</b> at {{game.scheduled_start_time}}</a>
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    {% endif %}
-                    {% if attendance_invites_to_confirm %}
-                        <div class="alert alert-warning text-center css-home-alert">
-                            <b>A GM has declared that you attended a Game</b>
-                            <p>
-                                Confirm or deny your attendance
-                            </p>
-                            <ul class="nav nav-pills nav-stacked">
-                                {% for invite in attendance_invites_to_confirm %}
-                                    <li>
-                                        <a href="{% url 'games:games_confirm_attendance' invite.attendance.id %}">
-                                            <b>{{invite.attendance.relevant_game.title}}</b> at {{invite.attendance.relevant_game.scheduled_start_time}}
-                                        </a>
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    {% endif %}
-                    {% if upcoming_games_running %}
-                        <div class="alert alert-info text-center css-home-alert">
-                            <b>Upcoming Games You are Running</b>
-                            <ul class="nav nav-pills nav-stacked">
-                                {% for game in upcoming_games_running %}
-                                    <li>
-                                        <a href="{% url 'games:games_view_game' game.id %}"><b>{{game.title}}</b> at {{game.scheduled_start_time}}</a>
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    {% endif %}
-                    {% if upcoming_games_invited %}
-                        <div class="alert alert-success text-center css-home-alert">
-                            <b>Upcoming Games you can Attend</b>
-                            <ul class="nav nav-pills nav-stacked">
-                                {% for game_invite in upcoming_games_invited %}
-                                    <li>
-                                        <a href="{% url 'games:games_view_game' game_invite.relevant_game.id %}">
-                                            {% if game_invite.attendance %}
-                                                <b>Attending - </b>
-                                            {% else %}
-                                                <b>Invited - </b>
-                                            {% endif %}
-                                            <b>
-                                                {{game_invite.relevant_game.title}}
-                                            </b> at {{game_invite.relevant_game.scheduled_start_time}}
-                                        </a>
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    {% endif %}
-                    {% if active_games or attendance_invites_to_confirm or upcoming_games_running or upcoming_games_invited %}
-                        <hr>
-                    {% endif %}
-                    <h2>Worlds</h2>
-                    <ul class="nav nav-pills nav-stacked">
-                        <li role="presentation">
-                            <a href="{% url 'cells:cells_create' %}" class="btn btn-primary">
-                                Create a new World
-                            </a>
-                            {% if not cell_invites and not cells %}
-                                <br>
-                                <div class="alert alert-warning text-center">
-                                    <h3>You aren't in any Cells</h3>
-                                    <p>Ask your friends to invite you or</p>
-                                    <br>
-                                    <a href="{% url 'cells:cells_create' %}" class="btn btn-info btn-lg">Start your own</a>
-                                </div>
-                            {% endif %}
-                        </li>
-                        <li role="presentation">
-                            <a href="{% url 'cells:cells_find_world' %}" class="btn btn-primary">
-                                Find Worlds
-                            </a>
-                        </li>
-                    </ul>
-                    {% if cell_invites %}
-                        <br>
-                        <div class="alert alert-success text-center css-home-alert">
-                            You've been invited to join
-                            <ul class="nav nav-pills nav-stacked nav-sm">
-                                {% for invite in cell_invites %}
-                                    <li><a href="{% url 'cells:cells_view_cell' invite.relevant_cell.id %}">{{ invite.relevant_cell }}</a></li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    {% endif %}
-                    {% if cells %}
-                        <h4>My Cells</h4>
-                        <ul class="nav nav-pills nav-stacked">
-                            {% for cell in cells %}
-                                <a href="{% url 'cells:cells_view_cell' cell.id %}">
-                                    <div class="panel css-home-panel">
-                                        <b>{{cell.name}}</b>
-                                    </div>
-                                </a>
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
-                </div>
-            </div>
-            <div class="row">
-            </div>
+        <div class="col-md-6">
+            {% include "homepage_games_snip.html" %}
+            <br>
+            {% include "homepage_world_snip.html" %}
+            <br>
         </div>
 
     </div>
@@ -302,18 +58,20 @@
         <h1 class="text-center">{% blocktrans %}Community{% endblocktrans %}</h1>
         <p class="lead text-center">
             <div class="text-center">
-                        <a class="btn btn-default" href="https://discord.gg/xUZZegYNNy">
-                            <div>
-                                <img class="float-left" src="/static/overrides/other_graphics/Discord-Logo-Color.svg" style="width: 30px; height: 30px;">
-                                <span class="css-discord-btn"> Join Our Discord Server</span>
-                            </div>
-                        </a>
+                <a class="btn btn-default btn-lg" href="https://discord.gg/xUZZegYNNy">
+                    <div>
+                        <img class="float-left" src="/static/overrides/other_graphics/Discord-Logo-Color.svg" style="width: 30px; height: 30px; position: absolute;">
+                        <span style="padding-left: 35px;"> Join Our Discord Server</span>
+                    </div>
+                </a>
+                <br class="visible-xs-block ">
+                <br class="visible-xs-block ">
+                <a href="{% url 'journals:community_journals' %}" class="btn btn-default btn-lg">
+                    Read Community Journals
+                </a>
             </div>
             <div>
                 <h4 class="text-center">
-                    <a href="{% url 'journals:community_journals' %}">
-                        Read Community Journals
-                    </a>
                 </h4>
             </div>
         </p>
