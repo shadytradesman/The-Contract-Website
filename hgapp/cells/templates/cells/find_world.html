@@ -36,10 +36,6 @@
             </p>
             <div class="row">
             {% for cell in public_cells %}
-                {% if forloop.counter|divisibleby:2 %}
-                    </div>
-                    <div class="row">
-                {% endif %}
                 <div class="col-md-6">
                     <div class="thumbnail">
                         {% if cell.get_danger_display %}
@@ -75,6 +71,10 @@
                         </p>
                     </div>
                 </div>
+                {% if forloop.counter|divisibleby:2 %}
+                    </div>
+                    <div class="row">
+                {% endif %}
             {% endfor %}
             </div>
         </div>

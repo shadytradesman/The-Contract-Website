@@ -1,9 +1,6 @@
 {% load staticfiles %}
 
-<div class="css-backgrounded"
-     style="background-image: url({% static 'overrides/art/unicorn_games_bg.jpg' %});
-            background-position: bottom center;">
-<div class="css-background-dim">
+<div class="css-backgrounded">
     <div class="row css-home-row">
         <div class="col-xs-12 css-transparent-overlay">
             <h2 class="pull-left css-header-title">Games</h2>
@@ -21,12 +18,11 @@
             </div>
         </div>
     </div>
-    <br>
     <div class="row css-home-row">
+        {% if active_games or attendance_invites_to_confirm or upcoming_games_running or upcoming_games_invited %}
+        <br>
+        {% endif %}
         <div class="col-md-10 col-md-offset-1">
-            {% if active_games or attendance_invites_to_confirm or upcoming_games_running or upcoming_games_invited %}
-            <br>
-            {% endif %}
             {% if active_games %}
             <div class="alert alert-warning text-center css-home-alert">
                 <h4>Ongoing Game!</h4>
@@ -91,5 +87,4 @@
             {% endif %}
         </div>
     </div>
-</div>
 </div>

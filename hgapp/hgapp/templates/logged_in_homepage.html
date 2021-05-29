@@ -18,16 +18,17 @@
 
 {% block body_base %}
 <div class="container">
-
-
+    <br>
+     <div class="upper-section css-backgrounded" style="background-image: url({% static 'overrides/art/doors_bg.jpg' %});">
+         <br>
     <div class="text-center">
-        <h1>{% blocktrans %}Welcome, {% endblocktrans %}{% user_display request.user %} </h1>
+        <h1>Welcome, {% user_display request.user %} </h1>
         <br>
         {% include "_messages.html" %}
     </div>
-    <div>
+    <div class="css-transparent-overlay-dark" style="padding-top: 5px; padding-left: 10px; padding-bottom: 10px;">
         {% with latest_blog_post as post %}
-        <h4 class="css-blog-header">
+        <h4 class="css-blog-header" style="margin-bottom: 0px;">
             <a href="{%url 'pinax_blog:blog' %}">
                 Site News
             </a>
@@ -38,6 +39,8 @@
         </h4>
         {% endwith %}
     </div>
+     </div>
+    <br>
     <div class="row">
         <div class="col-md-6">
             {% include "homepage_contractors_snip.html" %}
