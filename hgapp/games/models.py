@@ -121,7 +121,7 @@ class Game(models.Model):
     list_in_lfg = models.BooleanField(default=False)
     allow_ringers = models.BooleanField(default=False)
     invitation_mode = models.CharField(choices=INVITE_MODE,
-                              max_length=25,
+                              max_length=55,
                               default=INVITE_MODE[0][0])
     gametime_url = models.CharField(max_length=2500, blank=True, null=True)
     max_rsvp = models.IntegerField(blank=True, null=True)

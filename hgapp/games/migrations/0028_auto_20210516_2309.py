@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='game',
             name='invitation_mode',
-            field=models.CharField(choices=[('INVITE_ONLY', 'Invited Players Only'), ('WORLD_MEMBERS', 'World Members Only'), ('ANYONE', 'Anyone'), ('CLOSED', 'Closed for RSVPs')], default=('INVITE_ONLY', 'Invited Players Only'), max_length=25),
+            field=models.CharField(choices=[('INVITE_ONLY', 'Invited Players Only'), ('WORLD_MEMBERS', 'World Members Only'), ('ANYONE', 'Anyone'), ('CLOSED', 'Closed for RSVPs')], default=('INVITE_ONLY', 'Invited Players Only'), max_length=50),
         ),
         migrations.AddField(
             model_name='game',
