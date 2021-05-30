@@ -13,7 +13,7 @@
             </a>
         {% endif %}
         <a href="{% url 'powers:powers_view_power_full' power_full.id %}">
-            {{power_full.latest_revision.name}}
+            {{latest_revision.name}}
         </a>
         <small>
             - {{power_full.get_point_value}} Gift
@@ -31,18 +31,18 @@
             {% endif %}
         </small>
     </h4>
-    <p><i>{{power_full.latest_revision.description|linebreaks}}</i></p>
+    <p><i>{{latest_revision.description|linebreaks}}</i></p>
     <div class="panel-collapse collapse collapse-power-{{power_full.id}}"
          role="tabpanel"
          aria-labelledby="collapse-power-{{power_full.id}}-heading">
         <div>
-            {{power_full.latest_revision.render_system}}
+            {{latest_revision.render_system}}
         </div>
-        {% if power_full.latest_revision.enhancement_instance_set.all %}
+        {% if latest_revision.enhancement_instance_set.all %}
             <div>
                 <b>Enhancements</b>
                 <ul>
-                {% for instance in power_full.latest_revision.enhancement_instance_set.all %}
+                {% for instance in latest_revision.enhancement_instance_set.all %}
                     <li>
                         <b>{{instance.relevant_enhancement.name}}:</b> {{instance.relevant_enhancement.description}}
                         {% if instance.relevant_enhancement.eratta%}
@@ -62,11 +62,11 @@
                 </ul>
             </div>
         {% endif %}
-        {% if power_full.latest_revision.drawback_instance_set.all %}
+        {% if latest_revision.drawback_instance_set.all %}
             <div>
                 <b>Drawbacks</b>
                 <ul>
-                {% for instance in power_full.latest_revision.drawback_instance_set.all %}
+                {% for instance in latest_revision.drawback_instance_set.all %}
                     <li>
                         <b>{{instance.relevant_drawback.name}}:</b> {{instance.relevant_drawback.description}}
                         {% if instance.relevant_drawback.eratta%}
@@ -91,7 +91,7 @@
         {% endif %}
     </div>
     {% if power_full.tags.all %}
-        <a href="{% url 'powers:powers_create_power_from _existing' power_full.latest_revision.id %}"
+        <a href="{% url 'powers:powers_create_power_from _existing' latest_revision.id %}"
            class="btn btn-default btn-xs">
             Customize
         </a>

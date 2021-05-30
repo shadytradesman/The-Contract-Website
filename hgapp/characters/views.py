@@ -341,6 +341,7 @@ def toggle_power(request, character_id, power_full_id):
                     rewards_to_be_spent = character.reward_cost_for_power(power_full)
                     for reward in rewards_to_be_spent:
                         reward.assign_to_power(power_full.latest_revision())
+                character.update_bonuses_from_power(power_full)
             return HttpResponseRedirect(reverse('characters:characters_power_picker', args=(character.id,)))
         else:
             print(assignment_form.errors)

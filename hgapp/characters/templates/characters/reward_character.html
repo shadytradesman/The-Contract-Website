@@ -10,6 +10,7 @@
 {% load markdown_deux_tags %}
 {% load staticfiles %}
 {% load games_tags %}
+{% load power_tags %}
 
 {% block body_base %}
 <div class="container">
@@ -57,11 +58,11 @@
                                     <a href="{% url 'powers:powers_edit_power' power_full.id %}" class="btn btn-success"><i class="fa fa-plus-square fa-4x"></i></a>
                                 </div>
                                 <div class= "col-sm-11">
-                                     {% include "powers/power_badge_snippet.html" %}
+                                    {% power_badge power_full %}
                                 </div>
                             {% else %}
                                 <div class= "col-sm-12">
-                                     {% include "powers/power_badge_snippet.html" %}
+                                    {% power_badge power_full %}
                                 </div>
                             {% endif %}
                         </div>

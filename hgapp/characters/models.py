@@ -77,7 +77,9 @@ PRONOUN = (
 )
 
 BODY_STATUS = (
-    'Bruised',
+    'Scuffed',
+    'Scuffed',
+    'Annoyed',
     'Bruised',
     'Hurt',
     'Injured',
@@ -87,6 +89,7 @@ BODY_STATUS = (
 )
 
 MIND_STATUS = (
+    'Alert',
     'Miffed',
     'Agitated',
     'Distracted',
@@ -150,6 +153,7 @@ BASE_BODY_LEVELS = 5
 
 def random_string():
     return hashlib.sha224(bytes(random.randint(1, 99999999))).hexdigest()
+
 
 
 class Character(models.Model):
@@ -701,14 +705,14 @@ class Character(models.Model):
         self.stats_snapshot.save()
 
     def num_body_levels(self):
-        brawn_value = self.stats_snapshot.attributevalue_set.get(relevant_attribute__scales_body=True).value
+        brawn_value = self.stats_snapshot.attributevalue_set.get(relevant_attribute__scales_body=True).val_with_bonuses()
         return BASE_BODY_LEVELS + math.ceil(brawn_value / 2)
 
     def num_mind_levels(self):
         mind_scaling_attrs = self.stats_snapshot.attributevalue_set.filter(relevant_attribute__scales_mind=True).all()
         mind_val = 1
         for attr in mind_scaling_attrs:
-            mind_val = mind_val + attr.value
+            mind_val = mind_val + attr.val_with_bonuses()
         if mind_val <= 3:
             return 3
         elif mind_val >= 9:
@@ -746,6 +750,39 @@ class Character(models.Model):
                 MIND_STATUS[-(x - 1)] if MIND_STATUS[-(x - 2)] and x - 2 >= 0 and x <= mind_levels else "",
             ))
         return health_rows
+
+    def get_bonus_for_attribute(self, attribute):
+        existing_bonus = get_object_or_none(AttributeBonus, character=self, attribute=attribute)
+        return existing_bonus.value if existing_bonus else 0
+
+    def set_bonus_for_attribute(self, attribute, value):
+        existing_bonus = get_object_or_none(AttributeBonus, character=self, attribute=attribute)
+        if existing_bonus:
+            existing_bonus.value = value
+            existing_bonus.save()
+        else:
+            new_bonus = AttributeBonus(character=self,
+                                       attribute=attribute,
+                                       value=value)
+            new_bonus.save()
+
+    def reset_attribute_bonuses(self):
+        attributes = self.stats_snapshot.attributevalue_set.all()
+        for attribute in attributes:
+            self.set_bonus_for_attribute(attribute.relevant_attribute, 0)
+        powers = self.power_full_set.all()
+        bonus_by_attribute = {}
+        for power in powers:
+            bonuses = power.latest_revision().get_attribute_bonuses()
+            for attr, bonus in bonuses:
+                curr_bonus = bonus_by_attribute.get(attr, 0)
+                if bonus > curr_bonus:
+                    bonus_by_attribute[attr] = bonus
+        for attribute_value in attributes:
+            attr = attribute_value.relevant_attribute
+            if attr in bonus_by_attribute:
+                self.set_bonus_for_attribute(attr, bonus_by_attribute.get(attr))
+
 
 class BattleScar(models.Model):
     character = models.ForeignKey(Character,
@@ -1288,6 +1325,9 @@ class AttributeValue(TraitValue):
             models.Index(fields=['previous_revision']),
         ]
 
+    def val_with_bonuses(self):
+        return self.value + self.relevant_stats.assigned_character.get_bonus_for_attribute(attribute=self.relevant_attribute)
+
     def get_class(self):
         return AttributeValue
 
@@ -1420,4 +1460,15 @@ class CharacterTutorial(models.Model):
     world_modal_1 = models.TextField(max_length=3000, default="placeholder")
     world_modal_2 = models.TextField(max_length=3000, default="placeholder")
     world_modal_3 = models.TextField(max_length=3000, default="placeholder")
+
+class AttributeBonus(models.Model):
+    character = models.ForeignKey('Character', on_delete=models.CASCADE)
+    attribute = models.ForeignKey('Attribute', on_delete=models.CASCADE)
+    value = models.PositiveIntegerField()
+
+    class Meta:
+        unique_together = (("character", "attribute"))
+        indexes = [
+            models.Index(fields=['character', 'attribute']),
+        ]
 

@@ -1,4 +1,5 @@
 {% load bootstrap %}
+{% load power_tags %}
 
 {% block extra_scripts %}
     {{ power_system.system_text|json_script:"defaultSystem"}}
@@ -51,7 +52,7 @@
                     <div id="examplepowers" class="collapse">
                         {% for power_full in base_power.example_powers.all %}
                             {% with power=power_full.power_set.first %}
-                                {% include "powers/power_badge_snippet.html" %}
+                                {% power_badge power_full %}
                             {% endwith %}
                         {% endfor %}
                     </div>

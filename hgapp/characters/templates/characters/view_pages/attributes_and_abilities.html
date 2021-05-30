@@ -5,16 +5,16 @@
     {% for attribute_value in physical_attributes %}
         <div class="col-md-2 col-xs-6">
             <h4 data-toggle="tooltip" title='{{attribute_value.relevant_attribute.tutorial_text}}'>
-                <span class="stat-value visible-xs-inline">{{attribute_value.value}}</span>
+                <span class="stat-value visible-xs-inline">{{attribute_value.val_with_bonuses}}</span>
                 {{attribute_value.relevant_attribute.name}}
-                <span class="stat-value hidden-xs">{{attribute_value.value}}</span>
+                <span class="stat-value hidden-xs">{{attribute_value.val_with_bonuses}}</span>
             </h4>
         </div>
     {% endfor %}
     {% for attribute_value in mental_attributes %}
         <div class="col-md-2 col-xs-6">
             <h4 data-toggle="tooltip" title='{{attribute_value.relevant_attribute.tutorial_text}}'>
-                <span class="stat-value">{{attribute_value.value}}</span>
+                <span class="stat-value">{{attribute_value.val_with_bonuses}}</span>
                 {{attribute_value.relevant_attribute.name}}
             </h4>
         </div>

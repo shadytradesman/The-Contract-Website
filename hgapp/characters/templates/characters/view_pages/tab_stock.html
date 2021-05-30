@@ -1,4 +1,5 @@
 {% load markdown_deux_tags %}
+{% load power_tags %}
 <div class="row">
     <div class="col-md-6">
         <h3 class="text-center" data-toggle="tooltip" title='{{tutorial.powers_view}}'>
@@ -7,7 +8,7 @@
         {% for power_full in character.power_full_set.all %}
             <div class="row">
                 <div class= "col-md-12">
-                    {% include "powers/power_badge_snippet.html" %}
+                    {% power_badge power_full %}
                 </div>
             </div>
         {% empty %}

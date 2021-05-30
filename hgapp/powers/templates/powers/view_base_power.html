@@ -1,6 +1,7 @@
 {% extends "site_base.html" %}
 
 {% load i18n %}
+{% load power_tags %}
 
 {% block head_title %}Viewing Effect{% endblock %}
 
@@ -121,9 +122,7 @@
                 <div class="example_powers">
                     <h1>Example Powers</h1>
                     {% for power_full in base_power.example_powers %}
-                        {% with power=power_full.power_set.first%}
-                            {% include "powers/power_badge_snippet.html" %}
-                        {% endwith %}
+                            {% power_badge power_full %}
                     {% empty %}
                     <h2>No Example Powers Yet</h2>
                     {% endfor %}

@@ -6,6 +6,7 @@
 {% load i18n %}
 {% load staticfiles %}
 {% load cache %}
+{% load power_tags %}
 
 {% block extra_styles %}
     <link rel="stylesheet" type="text/css" href="{% static 'overrides/splash_style.css' %}" />
@@ -189,23 +190,17 @@
                 <div class="tab-content">
                     <div role="tabpanel" class="tab-pane fade in active" id="fireballs">
                         <div class="css-power-container">
-                            {% with power_1 as power_full %}
-                                {% include "powers/power_badge_snippet.html" %}
-                            {% endwith %}
+                            {% power_badge power_1 %}
                         </div>
                     </div>
                     <div role="tabpanel" class="tab-pane fade" id="werewolf">
                         <div class="css-power-container">
-                            {% with power_2 as power_full %}
-                                {% include "powers/power_badge_snippet.html" %}
-                            {% endwith %}
+                            {% power_badge power_2 %}
                         </div>
                     </div>
                     <div role="tabpanel" class="tab-pane fade" id="time-traveler">
                         <div class="css-power-container">
-                            {% with power_3 as power_full %}
-                                {% include "powers/power_badge_snippet.html" %}
-                            {% endwith %}
+                            {% power_badge power_3 %}
                         </div>
                     </div>
                 </div>

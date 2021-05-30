@@ -4,7 +4,7 @@ from django.utils.html import escape
 
 # Create your models here.
 from characters.models import Character, HIGH_ROLLER_STATUS, Attribute, Roll, NO_PARRY_INFO, NO_SPEED_INFO, DODGE_ONLY, \
-    ATTACK_PARRY_TYPE, ROLL_SPEED, THROWN
+    ATTACK_PARRY_TYPE, ROLL_SPEED, THROWN, Attribute
 from guardian.shortcuts import assign_perm, remove_perm
 from django.utils.html import mark_safe, escape, linebreaks
 
@@ -124,6 +124,10 @@ class Parameter(models.Model):
                                  null=True)
     eratta = models.TextField(blank=True,
                               null=True)
+    attribute_bonus = models.ForeignKey(Attribute,
+                                  blank=True,
+                                  null=True,
+                                  on_delete=models.CASCADE)
     def display(self):
         return " ".join([self.name])
 
@@ -286,6 +290,10 @@ class Power_Full(models.Model):
     example_description = models.CharField(max_length = 9000,
                                            blank=True,
                                            null=True)
+    latest_rev = models.ForeignKey("Power",
+                              on_delete=models.CASCADE,
+                              blank=True,
+                              null=True)
 
     class Meta:
         permissions = (
@@ -332,7 +340,12 @@ class Power_Full(models.Model):
                self.player_manages_via_cell(player)
 
     def latest_revision(self):
-        return self.power_set.order_by('-pub_date').all()[0]
+        if hasattr(self, "latest_rev") and self.latest_rev:
+            return self.latest_rev
+        else:
+            self.latest_rev = self.power_set.order_by('-pub_date').all()[0]
+            self.save()
+            return self.latest_rev
 
     def get_point_value(self):
         return self.power_set.order_by('-pub_date').all()[0].get_point_value()
@@ -500,6 +513,17 @@ class Power(models.Model):
         if player != self.created_by:
             remove_perm('view_private_power', player, self)
 
+    def get_attribute_bonuses(self):
+        bonuses = []
+        params = self.parameter_value_set \
+            .select_related('relevant_power_param__relevant_parameter')\
+            .filter(relevant_power_param__relevant_parameter__attribute_bonus__isnull=False)\
+            .all()
+        for param in params:
+            bonuses.append((param.relevant_power_param.relevant_parameter.attribute_bonus, int(param.get_level_description())))
+        return bonuses
+
+
     def render_system(self):
         default_system = linebreaks(escape(self.get_system()))
         value_by_name = {param_val.relevant_power_param.relevant_parameter.name :
@@ -551,10 +575,15 @@ class Power(models.Model):
         return self.name + " (" + self.description + ")"
 
     def save(self, *args, **kwargs):
+        new_power = not self.pk
         if hasattr(self, "system") and self.system:
             if self.system == self.base.get_system().system_text:
                 self.system = None
         super(Power, self).save(*args, **kwargs)
+        if new_power and hasattr(self, "parent_power") and self.parent_power:
+            parent = self.parent_power
+            parent.latest_rev = self
+            parent.save()
 
 
 class Power_Link(models.Model):
