@@ -184,7 +184,7 @@
                             {% endif %}
                         </div>
                     </div>
-                    {% if forloop.last and forloop.counter > 5 %}
+                    {% if forloop.last and forloop.counter > 4 %}
                         </div>
                     {% endif %}
                 {% empty %}
@@ -279,7 +279,7 @@
                                 {% include "games/scenario_badge_snippet.html" %}
                             </div>
                         {% endwith %}
-                        {% if forloop.last and forloop.counter > 5 %}
+                        {% if forloop.last and forloop.counter > 4 %}
                             </div>
                         {% endif %}
                     {% endfor %}

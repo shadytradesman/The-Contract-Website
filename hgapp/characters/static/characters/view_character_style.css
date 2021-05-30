@@ -22,6 +22,10 @@ h1 {
 
 .css-health-section {
     background-color: #353e4b;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #a6763a;
+    border-top: 1px solid #a6763a;
+    margin-bottom: 10px;
 }
 
 .stat-value {
@@ -102,6 +106,10 @@ input[type="number"] {
 
 .css-health-area {
     padding-bottom: 15px;
+    padding-top: 5px;
+}
+
+.css-status-text {
 }
 
 .css-source-button {
@@ -148,4 +156,168 @@ input[type="number"] {
 
 .css-bio-text {
     padding: 10px;
+}
+
+.css-circumstance-section {
+    background-color: #353e4b;
+}
+
+.css-circumstance-section .css-world-entity-value {
+    padding-right: 40px;
+}
+
+.css-circumstance-section .css-world-element-delete {
+    padding-right: 10px;
+    height: 12px;
+}
+
+.css-circumstance-section .css-world-element-name {
+    display: block;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.css-circumstance-section .css-world-element-description {
+    left: 30px;
+    position: relative;
+}
+
+.css-circumstance-section .css-world-element-system {
+    display: block;
+    font-style: italic;
+    left: 30px;
+    position: relative;
+    opacity: 0.8;
+}
+
+.css-condition-cell-header {
+    display: block;
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    margin-top: 10px;
+}
+
+.css-condition-section .css-world-element-delete {
+    padding-right: 10px;
+    height: 12px;
+}
+
+.css-condition-section .css-world-entity-value {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding-left: 30px;
+}
+
+.css-condition-section .css-world-element-name {
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.css-condition-section .css-world-element-name::after {
+    content: ":";
+    position: relative;
+    right: 2px;
+}
+
+.css-condition-section .css-world-element-system {
+    font-style: italic;
+    opacity: 0.8;
+}
+
+.css-condition-section .css-world-element-system::after {
+  content: ")";
+}
+
+.css-condition-section .css-world-element-system::before {
+  content: "(";
+}
+
+.css-quirk-value {
+    position: absolute;
+    border-color: transparent;
+    font-size: 16px;
+}
+
+.css-quirk-container {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.css-quirk-details {
+}
+
+.css-quirk-content {
+    display: inline-block;
+    position: relative;
+    padding-left: 30px;
+}
+
+.css-quirk-name {
+    font-size: 15px;
+}
+
+.nav-justified-sm > li {
+    display: table-cell;
+    width: 1%;
+}
+
+.nav-tabs.nav-justified>li>a {
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+
+.nav-justified-sm > li > a {
+    margin-bottom: 0 !important;
+    border-bottom-color: #a6763a ;
+    border-bottom-width: 1px ;
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+
+@media (max-width: 767px) {
+  .nav-tabs.nav-justified>.active>a {
+    border-bottom-color: #20252d;
+    border-bottom-width: 0px;
+  }
+  .nav-tabs.nav-justified>.active>a, .nav-tabs.nav-justified>.active>a:focus, .nav-tabs.nav-justified>.active>a:hover {
+    border-bottom-color: #20252d;
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+  }
+}
+
+.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
+    background-color: #20252d;
+    border-bottom-width: 1px !important;
+    border-bottom-color: #20252d !important;
+}
+
+.css-cell-body {
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-color: #20252d;
+    border-left-color: #a6763a !important;
+    border-right-color: #a6763a !important;
+    border-radius: 0px;
+}
+
+.css-attributes {
+    text-align: center;
+}
+
+@media (max-width: 767px) {
+    .css-attributes {
+        text-align: left;
+    }
+}
+
+.css-physical-ability {
+    text-align: right;
+}
+
+@media (max-width: 767px) {
+    .css-physical-ability {
+        text-align: left;
+    }
 }

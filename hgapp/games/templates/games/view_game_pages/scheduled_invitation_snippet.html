@@ -2,38 +2,48 @@
 {% load bootstrap %}
 
 <div class="panel-body">
-    {% if request.user.is_authenticated and request.user.id == game.creator.id %}
+    {% if user.is_authenticated and user == game.gm %}
         <h3>
-            Invited Players
+            Invitations
         </h3>
         <ul>
             {% for invitation in game.game_invite_set.all %}
             <li>
-                <a href="{% url 'profiles:profiles_view_profile' invitation.invited_player.id %}"><b>{% user_display invitation.invited_player %}</b></a>
+                <a href="{% url 'profiles:profiles_view_profile' invitation.invited_player.id %}">
+                    <b>{% user_display invitation.invited_player %}</b> the {{invitation.invited_player.profile.get_player_prefix_display}} {{invitation.invited_player.profile.get_player_suffix_display}}
+                </a>
+                <br>
                 {% if invitation.attendance %}
-                    {% if invitation.attendance.attending_character %}
-                        Playing <a href="{% url 'characters:characters_view' invitation.attendance.attending_character.id %}">{{invitation.attendance.attending_character.name}}</a>
-                    {% else %}
-                        Playing a ringer
-                    {% endif %}
+                        {% if invitation.attendance.attending_character %}
+                            <b>Playing</b>
+                            <a href="{% url 'characters:characters_view' invitation.attendance.attending_character.id %}">
+                                {{invitation.attendance.attending_character.name}}
+                            </a>
+                        {% else %}
+                            Playing an NPC ringer
+                        {% endif %}
                 {% elif invitation.is_declined %}
-                    <p>Declined</p>
+                    Declined.
                 {% else %}
-                    <p>Awaiting response.</p>
+                    Awaiting response.
                 {% endif %}
                 {% if invitation.invitee_can_view_scenario %}
-                    <p class="text-danger">
+                    <br>
+                    <span class="text-danger">
                         This Player has already discovered this Scenario and should only play an NPC Ringer.
-                    </p>
+                    </span>
                 {% endif %}
             </li>
             {% empty %}
-                <p> No players invited yet! <a href="{% url 'games:games_invite_players' game.id %}">Invite Some!</a></p>
-                {% if game.open_invitations %}
-                    <p>This game also accepts self-invitations, so just share this page with anyone you want to invite.</p>
-                {% endif %}
+                <p> No players invited yet.</p>
             {% endfor %}
         </ul>
+        <p>
+            <b>This Game's RSVP mode:</b> {{game.get_invitation_mode_display}}.
+        </p>
+        <p>
+            {{game.invite_instructions|safe}}
+        </p>
         {% if invite_form %}
             <hr>
             <h3>
@@ -49,75 +59,73 @@
             {{ invite_form.invite_as_ringer | bootstrap }}
             <input class="btn btn-primary" type="submit" value="Invite" />
         {% endif %}
-    {% elif request.user.is_authenticated %}
-        {{ game.get_attended_players.count }} Player{{game.get_attended_players.count|pluralize}}
-        RSVPed that they will attend so far.
-        <hr>
-        {% if my_invitation %}
-            {% if my_invitation.attendance %}
-                {% if my_invitation.attendance.attending_character %}
-                    <h3>You are set to attend this game with
-                        <a href="{% url 'characters:characters_view' my_invitation.attendance.attending_character.id %}">
-                                {{my_invitation.attendance.attending_character.name}}
-                        </a>
-                    </h3>
-                    <h5> <a href="{% url 'games:games_accept_invite' game.id %}">Click here to change character</a></h5>
-                    <h5> <a href="{% url 'games:games_decline_invite' game.id %}">Click here to cancel your attendance</a></h5>
+    {% else %}
+        So far, {{ game.get_attended_players.count }} Player{{game.get_attended_players.count|pluralize}}
+        RSVPed that they will attend.
+        {% if game.max_rsvp %}
+            {{ game.gm.username}} has set a maximum of {{game.max_rsvp}} RSVPs.
+        {% endif %}
+        {% if request.user.is_authenticated %}
+            {% if my_invitation %}
+                {% if my_invitation.attendance %}
+                    {% if my_invitation.attendance.attending_character %}
+                        <h3>You are set to attend this game with
+                            <a href="{% url 'characters:characters_view' my_invitation.attendance.attending_character.id %}">
+                                    {{my_invitation.attendance.attending_character.name}}
+                            </a>
+                        </h3>
+                        <h5> <a href="{% url 'games:games_accept_invite' game.id %}">Click here to change character</a></h5>
+                        <h5> <a href="{% url 'games:games_decline_invite' game.id %}">Click here to cancel your attendance</a></h5>
+                    {% else %}
+                        <h3>You are set to attend this game as an NPC Ringer.</h3>
+                        <h5> <a href="{% url 'games:games_decline_invite' game.id %}">Click here to cancel your attendance</a></h5>
+                    {% endif %}
+                {% elif my_invitation.is_declined %}
+                    <h3>You have declined your invitation to this Game.</h3>
+                    {% if can_rsvp %}
+                        <h5><a href="{% url 'games:games_accept_invite' game.id %}">You may still RSVP if you change your mind</a></h5>
+                    {% endif %}
                 {% else %}
-                    <h3>You are set to attend this game as an NPC Ringer.</h3>
-                    <h5> <a href="{% url 'games:games_decline_invite' game.id %}">Click here to cancel your attendance</a></h5>
-                {% endif %}
-            {% elif my_invitation.is_declined %}
-                <h3>You have declined your invitation to this Game.</h3>
-                <h5><a href="{% url 'games:games_accept_invite' game.id %}">You may still RSVP if you change your mind</a></h5>
-            {% else %}
-                <h3 class="text-center">You have been invited to attend this Game</h3>
-                {% if nsfw_blocked %}
-                    <h5 class="text-center">
-                        But the GM has marked it as 18+, and your content settings do not allow you to RSVP.
-                        <br>
-                        You can adjust your content settings by
-                        <a href="{% url 'profiles:profiles_edit' %}">
-                            editing your Profile.
-                        </a>
-                    </h5>
-                {% else %}
-                    <h5> <a href="{% url 'games:games_accept_invite' game.id %}">Click here to RSVP</a></h5>
+                    <h3 class="text-center">You have been invited to attend this Game</h3>
                 {% endif %}
             {% endif %}
-        {% elif game.open_invitations %}
-            <h3 class="text-center">This Game is open for self-invites!</h3>
-            {% if nsfw_blocked %}
-                <h5 class="text-center">
-                    But the GM has marked it as 18+, and your content settings do not allow you to RSVP.
-                    <br>
-                    You can adjust your content settings by
-                    <a href="{% url 'profiles:profiles_edit' %}">
-                        editing your Profile.
+            {% if can_rsvp %}
+                <h4 class="text-center">
+                    <a href="{% url 'games:games_accept_invite' game.id %}" class="btn btn-xl btn-success">
+                        Click here to RSVP
                     </a>
-                </h5>
-                {% else %}
-                    {% if view_scenario %}
-                        <h5 class="text-center">Since you already have access to this Scenario, you should only attend as a Ringer.</h5>
-                    {% endif %}
-                    <h5 class="text-center"> <a href="{% url 'games:games_accept_invite' game.id %}">Click here to RSVP</a></h5>
+                </h4>
+                {% if can_view_scenario %}
+                    <div class="alert alert-warning text-center">
+                        <h4>You have already discovered this Scenario</h4>
+                        <p>
+                            You have already discovered the Scenario
+                            <a href="{% url 'games:games_view_scenario' game.scenario.id %}">{{game.scenario.title}}</a>
+                            and have access to the full writeup, including spoilers.
+                            <br>
+                            You should only play in this Game as an NPC Ringer.
+                        </p>
+                    </div>
                 {% endif %}
+            {% else %}
+                <div class="alert alert-info text-center">
+                    <h3>You cannot RSVP to this Game at this time.</h3>
+                    <p>
+                        {{ reason_cannot_rsvp }}
+                        {% if nsfw_blocked %}
+                            You can adjust your content settings by
+                            <a href="{% url 'profiles:profiles_edit' %}">
+                                editing your Profile.
+                            </a>
+                        {% endif %}
+                    </p>
+                </div>
+            {% endif %}
         {% else %}
-            <h3>You have not been invited to this game.</h3>
+            <h3 class="text-center">
+                <a href="{% url 'account_login' %}">Log in</a>
+                to RSVP
+            </h3>
         {% endif %}
-        {% if can_view_scenario %}
-            <div class="alert alert-warning text-center">
-                <h3>You have already discovered this Scenario</h3>
-                <p>
-                    You have already discovered the Scenario
-                    <a href="{% url 'games:games_view_scenario' game.scenario.id %}">{{game.scenario.title}}</a>
-                    and have access to the full writeup, including spoilers.
-                    <br>
-                    You should only play in this Game as an NPC Ringer.
-                </p>
-            </div>
-        {% endif %}
-    {% else %}
-        <h3>Log in to check invite status</h3>
     {% endif %}
 </div>

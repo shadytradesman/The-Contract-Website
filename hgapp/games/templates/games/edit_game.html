@@ -12,8 +12,12 @@
 {% block extra_scripts %}
     {% include "games/datepicker.js" %}
     <script src="{% static 'overrides/wiki-macro-scripts.js' %}"></script>
+    <script src="{% static 'games/edit_game.js' %}"></script>
 {% endblock %}
 
+{% block extra_styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'games/edit_game.css' %}" />
+{% endblock %}
 
 {% block head_title %}
 {% if game %}
@@ -29,11 +33,13 @@
 <div class="container">
     {{ form.about.errors }}
     <div class="text-center">
-        {% if game %}
-            <h1>Editing {{game.title}}</h1>
-        {% else %}
-            <h1>Create a new Game Event</h1>
-        {% endif %}
+        <h1>
+            {% if game %}
+                Editing Game for {{game.scenario.title}}
+            {% else %}
+                Schedule a Game
+            {% endif %}
+        </h1>
     </div>
     <div class="panel panel-default">
         <div class="panel-body">
@@ -51,28 +57,34 @@
                             <br>
                             <div class="col-md-8 col-md-offset-2 thumbnail text-left">
                                 <p>
-                                   Once this form is submitted, Players may RSVP and declare which Contractor they will
-                                    bring.
-                                   When you are ready to begin, visit the Game's page, click the "Start Game" button,
-                                    and confirm which Players and Contractors are attending. Be sure to do this before you
-                                    start playing. Otherwise, you will want to declared a completed Game.
-                                   <br><br>
-                                   While the Game is Active, Players will not be able bring their Contractor on other
-                                    Games.
-                                   Private Characters will be revealed to you.
-                                   If the Game is Active for more than 24 hours, any Player will be able to cancel the
-                                    Game.
+                                   This form creates a Game event that helps coordinate running a Game. If you would like
+                                    to record a completed Game,
+                                    <a href="{% url 'games:games_enter_game' %}">
+                                        click here.
+                                    </a>
+                                    <br><br>
+                                    Players who you invite or who find your Game on the LFG page may RSVP and declare
+                                    which Contractors they intend to bring. These Contractors will be revealed to you if they
+                                    are Private.
+                                    <br><br>
+                                   When you are ready to start playing, visit your Game's page, click the "Start Game" button,
+                                    and confirm which Players and Contractors are attending. While the Game is Active,
+                                    Players will not be able bring their Contractor on other Games.
                                    <br><br>
                                    When the Game is over, transition its status to Finished and declare the outcome for
                                     each Contractor.
                                    Surviving Contractors will receive Experience and, if they won, Gifts. Those less
-                                    fortunate are declared deceased.
-                                   You are awarded Experience for GMing. If at least one Contractor died and at least
-                                    one achieves victory, you are given an Improvement for one of your Characters'
+                                    fortunate are interned in
+                                    <a href="{%url 'characters:characters_graveyard' %}">
+                                        the Graveyard.
+                                    </a>
+                                    Regardless of the outcome, the Game's Scenario is revealed to the Players in their
+                                    Scenario Gallery, and they will be able to view any in-character Journals written
+                                    about it. As the GM, you can leave feedback about your experience running it.
+                                    <br><br>
+                                    You are awarded 4 Experience for GMing. If at least one Contractor died and at least
+                                    one achieves Victory, you are given an Improvement to use on one of your Contractors'
                                     Powers.
-                                   <br><br>
-                                   The Scenario is revealed to the Players in their Scenario Gallery, and you will be
-                                    able to leave feedback about your experience running it.
                                </p>
                             </div>
                         </div>
@@ -81,20 +93,29 @@
                 {{ form.non_field_errors }}
                 {% csrf_token %}
                 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-                {% if game.is_scheduled or not game%}
-                    {{ form.cell | bootstrap}}
-                    {% if not form.cell.field.choices.queryset.all|length %}
-                        <div class="row">
-                            <div class="alert-danger col-xs-7 col-xs-offset-2">
-                                <h4>You are not a member of any <a href="/wiki/Rules/1-basics/b-setting-and-cells/">cells</a></h4>
-                                <p>
-                                    All Games must take place inside a Cell. Ask your friends for an invite or
-                                    <a href="{% url 'cells:cells_create' %}">make your own</a>!
-                                </p>
-                            </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        {{ form.cell | bootstrap}}
+                    </div>
+                    <div class="col-sm-6">
+                        {{ form.invite_all_members | bootstrap}}
+                    </div>
+                </div>
+                {% if not form.cell.field.choices.queryset.all|length %}
+                    <div class="row">
+                        <div class="alert-danger col-xs-7 col-xs-offset-2">
+                            <h4>You are not a member of any <a href="/wiki/Rules/1-basics/b-setting-and-cells/">Worlds</a></h4>
+                            <p>
+                                All Games must take place inside a World. Ask your friends for an invite,
+                                <a href="{% url 'cells:find_world' ">
+                                    find a World to join,
+                                </a>
+                                or
+                                <a href="{% url 'cells:cells_create' %}">make your own</a>!
+                            </p>
                         </div>
-                        <br>
-                    {% endif %}
+                    </div>
+                    <br>
                 {% endif %}
 
                 <div class="row">
@@ -104,7 +125,9 @@
                         {% endif %}
                     </div>
                     <div class="col-md-6">
-                        {{ form.title | bootstrap}}
+                        <div id="js-scenario-title">
+                            {{ form.title | bootstrap}}
+                        </div>
                     </div>
                 </div>
                 {% if game.is_scheduled %}
@@ -122,20 +145,63 @@
                     {% endif %}
                 {% endif %}
                 <div class="row">
+                    <div class="col-md-6">
+                        {{ form.scheduled_start_time | bootstrap }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.timezone | bootstrap }}
+                    </div>
+                </div>
+                <div class="row">
                     <div class="col-md-4">
                         {{ form.required_character_status | bootstrap }}
                     </div>
                     <div class="col-md-4">
-                        {{ form.scheduled_start_time | bootstrap }}
+                        {{ form.invitation_mode | bootstrap }}
                     </div>
                     <div class="col-md-4">
-                        {{ form.timezone | bootstrap }}
+                        {{ form.allow_ringers | bootstrap }}
                     </div>
                 </div>
-                {{ form.only_over_18 | bootstrap }}
+                {% if form.only_over_18 %}
+                    {{ form.only_over_18 | bootstrap }}
+                {% endif %}
                 {{ form.hook | bootstrap}}
-                {{ form.open_invitations | bootstrap }}
-                {{ form.invite_all_members | bootstrap}}
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form.list_in_lfg | bootstrap }}
+                    </div>
+                    <div class="col-md-6 form-inline css-ability-form">
+                        <div>
+                            <label>
+                                {{form.max_rsvp.label}}
+                            </label>
+                        </div>
+                        <span class="ability-form"
+                              data-initial-val="{{form.initial.value}}"
+                              data-max-value="20"
+                              data-min-value="0">
+                            {{ form.max_rsvp }}
+                        </span>
+                        <div class="help-block">
+                            {{form.max_rsvp.help_text}}
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div id="css-mediums" >
+                            <label>Play Mediums</label>
+                            {{ form.mediums }}
+                            <div class="help-block">
+                                {{ form.mediums.help_text}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.gametime_url | bootstrap }}
+                    </div>
+                </div>
                 <div class="text-center">
                     <input class="btn btn-primary" type="submit" value="
                             {% if game %}
@@ -144,8 +210,6 @@
                                 Schedule Game
                             {% endif %}
                             "/>
-                    <br>
-                    <small>You will be taken to a page where you may invite specific Players.</small>
                 </div>
             </form>
         </div>

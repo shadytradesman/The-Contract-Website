@@ -171,6 +171,8 @@ def create_power_for_new_edit(base_power, request, power_full):
         new_power.creation_reason = _get_power_creation_reason(new_power, old_power)
         new_power.creation_reason_expanded_text = _get_power_creation_reason_expanded_text(new_power, old_power)
         new_power.save()
+        if hasattr(power_full, "character") and power_full.character:
+            power_full.character.reset_attribute_bonuses()
         return new_power
 
     
@@ -191,6 +193,8 @@ def create_new_power_and_parent(base_power, request, character=None):
         new_power.creation_reason = CREATION_REASON[0][0]
         new_power.creation_reason_expanded_text = "Initial power creation"
         new_power.save()
+        if character:
+            character.reset_attribute_bonuses()
         return new_power
     else:
         print(form.errors)

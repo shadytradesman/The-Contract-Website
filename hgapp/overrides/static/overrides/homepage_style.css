@@ -5,7 +5,7 @@
 }
 
 .css-home-alert {
-    padding: 5px;
+    padding: 10px;
 }
 
 .css-home-alert .nav>li>a {
@@ -21,4 +21,37 @@
 .css-blog-header {
     margin-top: 5px;
     padding-top: 5px;
+}
+
+.css-header-buttons {
+    padding-top: 15px;
+    float: right !important;
+}
+
+@media (max-width: 767px) {
+    .css-header-buttons {
+        width: 100%;
+        float: left !important;
+        padding-top: 0px;
+        padding-bottom: 10px;
+    }
+}
+
+.css-header-title {
+    margin-top: 15px;
+}
+
+.css-transparent-overlay-dark {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.css-transparent-overlay {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.css-backgrounded {
+    background-color: @panel-bg !important;
+    background-position: center left;
+    background-repeat: no-repeat;
+    background-size: cover;
 }

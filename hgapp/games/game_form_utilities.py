@@ -94,6 +94,8 @@ def handle_edit_completed_game(request, game, new_player_list):
                     _update_or_add_attendance(request, form, game)
                 game.refresh_from_db()
                 game.recalculate_golden_ratio(original_game_ratio)
+                if hasattr(game, "cell") and game.cell:
+                    game.cell.update_safety_stats()
         else:
             raise ValueError("Invalid outcome formset in completed edit")
     else:

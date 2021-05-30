@@ -1,0 +1,30 @@
+#css-mediums>ul {
+    margin-bottom: 0px;
+}
+
+#css-mediums>ul>li {
+    border-radius: 3px;
+    padding: 3px;
+    padding-bottom: 0px;
+    margin-left: 5px;
+    margin-right: 5px;
+    margin-top: 5px;
+}
+
+/* Hide HTML5 Up and Down arrows. */
+input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+.ability-value-input {
+    width: 55px !important;
+    padding: 5px !important;
+    text-align:center;
+    font-size:16px;
+    display: inline !important;
+}

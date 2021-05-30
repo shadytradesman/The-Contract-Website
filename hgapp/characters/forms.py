@@ -5,6 +5,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from overrides.widgets import CustomStylePagedown
 
 from characters.models import Character, BasicStats, Character_Death, BattleScar
+from cells.models import Cell
 
 ATTRIBUTE_VALUES = {
     "Brawn": (
@@ -63,7 +64,7 @@ PHYS_MENTAL = (
     ("1", "Mental"),
 )
 
-def make_character_form(user, existing_character=None):
+def make_character_form(user, existing_character=None, supplied_cell=None):
     class CharacterForm(ModelForm):
         class Meta:
             model = Character
@@ -75,7 +76,7 @@ def make_character_form(user, existing_character=None):
                 'name': _('Name'),
                 'private': _("If checked, Character will not be publicly viewable."),
                 'pronoun': _(""),
-                'tagline': _('A subtitle that introduces your Character in a flavorful way'),
+                'tagline': _('A subtitle that introduces your Contractor in a flavorful way'),
                 'appearance': _('A brief description of your Character\'s outward appearance.'),
                 'concept_summary': _('Archetype Summary (ex: "skater punk werewolf", "cannibal chef", or "golden-age comic book hero")'),
                 'ambition': _('Ambition. Why does this character risk their life in the games? Good ambitions can shape '
@@ -110,18 +111,29 @@ def make_character_form(user, existing_character=None):
 
     form = CharacterForm
     if user.is_authenticated:
-        queryset = user.cell_set.all()
+        if existing_character:
+            queryset = existing_character.player.cell_set.all()
+        else:
+            queryset = user.cell_set.all()
         cell = forms.ModelChoiceField(queryset=queryset,
-                                      empty_label="Free Agent (No Cell)",
-                                      help_text="Select a Cell for your Character. "
-                                                "This defines your Character's home world and allows "
-                                                "Cell leaders to help you with record-keeping. "
-                                                "NOTE: Cell leaders will be able to view and edit your Character.",
+                                      widget=forms.Select(attrs={'class': 'form-control'}),
+                                      empty_label="Nowhere",
                                       required=False,
                                       )
+        if supplied_cell:
+            cell.initial = supplied_cell
         if existing_character:
             cell.initial = existing_character.cell
-        form.base_fields["cell"] = cell
+        elif queryset.first():
+            cell.initial = queryset.first()
+    else:
+        cell = forms.ModelChoiceField(queryset=Cell.objects.none(),
+                                      widget=forms.Select(attrs={'class': 'form-control'}),
+                                      empty_label="Nowhere",
+                                      required=False,
+                                      )
+    form.base_fields["cell"] = cell
+
     return form
 
 class CharacterDeathForm(ModelForm):
@@ -335,3 +347,26 @@ def make_charon_coin_form(character=None):
 
 class DeleteCharacterForm(forms.Form):
     pass
+
+def make_world_element_form(cell_choices=None, initial_cell=None):
+    if not cell_choices:
+        return None
+
+    class WorldElementForm(forms.Form):
+        name = forms.CharField(max_length=500,
+                                      label=None,
+                                      widget=forms.TextInput(attrs={'class': 'form-control'}))
+        description = forms.CharField(max_length=1000,
+                                      label=None,
+                                      widget=forms.TextInput(attrs={'class': 'form-control'}))
+        system = forms.CharField(max_length=1000,
+                                 label="System (optional)",
+                                 required=False,
+                                 widget=forms.TextInput(attrs={'class': 'form-control'}))
+        cell = forms.ModelChoiceField(label="World",
+                                      queryset=cell_choices,
+                                      widget=forms.Select(attrs={'class': 'form-control'}),
+                                      initial=initial_cell if initial_cell else cell_choices.first(),
+                                      required=True,
+                                      )
+    return WorldElementForm

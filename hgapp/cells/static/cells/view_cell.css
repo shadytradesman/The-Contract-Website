@@ -1,0 +1,80 @@
+.nav-justified-sm > li {
+    display: table-cell;
+    width: 1%;
+}
+
+.nav-tabs.nav-justified>li>a {
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+
+.nav-justified-sm > li > a {
+    margin-bottom: 0 !important;
+    border-bottom-color: #a6763a ;
+    border-bottom-width: 1px ;
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+
+@media (max-width: 767px) {
+  .nav-tabs.nav-justified>.active>a {
+    border-bottom-color: #20252d;
+    border-bottom-width: 0px;
+  }
+  .nav-tabs.nav-justified>.active>a, .nav-tabs.nav-justified>.active>a:focus, .nav-tabs.nav-justified>.active>a:hover {
+    border-bottom-color: #20252d;
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+  }
+}
+
+.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
+    background-color: #20252d;
+    border-bottom-width: 1px !important;
+    border-bottom-color: #20252d !important;
+}
+
+.css-cell-body {
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-color: #20252d;
+    border-left-color: #a6763a !important;
+    border-right-color: #a6763a !important;
+    border-radius: 0px;
+}
+
+.panel-default {
+    border-color: #20252d;
+}
+.panel{
+    border-color: #20252d;
+}
+
+
+@media (min-width: 991px) {
+    .css-upcoming-game {
+        width: 80%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+#allWorldEvents::before {
+  display: block;
+  content: "";
+  height: 50px;
+}
+
+#allWorldEvents {
+  position: relative;
+  bottom: 50px;
+}
+
+.css-setting-summary {
+    padding: 15px;
+    margin-bottom: -10px;
+}
+
+.alert {
+padding: 5px;
+}

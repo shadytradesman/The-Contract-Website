@@ -25,6 +25,8 @@ urlpatterns = [
 
     # ex: .com/games/create/game/
     url(r'^create/game/$', views.create_game, name='games_create_game'),
+    # ex: .com/games/create/game/
+    url(r'^create/game/w/(?P<cell_id>[\d]+)/$', views.create_game, name='games_create_game_world'),
 
     # ex: .com/games/edit/g/112
     url(r'^edit/g/(?P<game_id>[\d]+)/$', views.edit_game, name='games_game_edit'),
@@ -85,6 +87,9 @@ urlpatterns = [
 
     # ex: .com/games/decline/g/110
     url(r'^decline/g/(?P<game_id>[\d]+)/$', views.decline_invite, name='games_decline_invite'),
+
+    # ex: .com/games/looking-for-game/
+    url(r'^looking-for-game/$', views.LookingForGame.as_view(), name='games_looking_for_game'),
 
     # ex: .com/games/allocate_improvement/i/219
     url(r'^allocate_improvement/i/(?P<improvement_id>[\d]+)/$', views.allocate_improvement, name='games_allocate_improvement'),

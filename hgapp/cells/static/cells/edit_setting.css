@@ -1,0 +1,48 @@
+.css-essential-field {
+    float: left;
+}
+
+.css-essential-field input {
+    font-size: 16px;
+}
+.css-essential-field select {
+    font-size: 16px;
+}
+
+#css-name-field {
+    max-width: 270px;
+}
+#css-concept-field {
+    max-width: 100%;
+}
+
+@media (min-width: 991px) {
+    #css-concept-field {
+        max-width: 700px;
+    }
+    #css-name-field {
+    min-width: 220px;
+    }
+}
+
+.css-new-row {
+    height: 90px;
+}
+
+.css-essential-text {
+    padding-left: 5px;
+    padding-right: 5px;
+    float: left;
+    font-size: 16px;
+    position:relative;
+    top: 7px;
+    margin-bottom: 22px;
+}
+
+.css-essential-help {
+    color: #737373;
+}
+
+.form-group {
+    margin-top: -15px;
+}

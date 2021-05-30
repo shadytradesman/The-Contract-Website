@@ -1,11 +1,13 @@
 from django.forms import formset_factory
+from django.template.defaultfilters import linebreaks
 
 import logging
 
 from characters.models import Character, BasicStats, Character_Death, Graveyard_Header, Attribute, Ability, \
     CharacterTutorial, Asset, Liability, AttributeValue, ContractStats, AbilityValue, LiabilityDetails, AssetDetails, \
     Limit, LimitRevision, Trauma, TraumaRevision, EXP_NEW_CHAR, EXP_ADV_COST_ATTR_MULTIPLIER, \
-    EXP_ADV_COST_SKILL_MULTIPLIER, EXP_COST_QUIRK_MULTIPLIER, EXP_ADV_COST_SOURCE_MULTIPLIER, Source, SourceRevision
+    EXP_ADV_COST_SKILL_MULTIPLIER, EXP_COST_QUIRK_MULTIPLIER, EXP_ADV_COST_SOURCE_MULTIPLIER, Source, SourceRevision, \
+    Condition, Circumstance, Artifact
 from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, AbilityForm, \
     AssetForm, LiabilityForm, LimitForm, PHYS_MENTAL, SourceForm, make_charon_coin_form
 from collections import defaultdict
@@ -19,8 +21,8 @@ logger = logging.getLogger("app." + __name__)
 # logic for Character creation and editing
 # TRANSACTIONS HAPPEN IN VIEW LAYER
 # See tests.py for hints on how revisioning works.
-def get_edit_context(user, existing_character=None, secret_key=None):
-    char_form = make_character_form(user, existing_character)(instance=existing_character)
+def get_edit_context(user, existing_character=None, secret_key=None, cell=None):
+    char_form = make_character_form(user, existing_character, supplied_cell=cell)(instance=existing_character)
     AttributeFormSet = formset_factory(AttributeForm, extra=0)
     AbilityFormSet = formset_factory(AbilityForm, extra=1)
     attributes = Attribute.objects.order_by('name')
@@ -54,6 +56,14 @@ def get_edit_context(user, existing_character=None, secret_key=None):
     charon_coin_form = None
     if user.is_authenticated:
         charon_coin_form = __get_charon_coin_form(user, existing_character, POST=None)
+    cell_info = {}
+    for cell1 in char_form.fields["cell"].queryset.all():
+        sheet_blurb = cell1.setting_create_char_info if cell1.setting_create_char_info \
+            else linebreaks(cell1.setting_summary) if cell1.setting_summary else None
+        cell_info[cell1.pk] = [cell1.setting_sheet_blurb]
+        if sheet_blurb:
+            cell_info[cell1.pk].append(sheet_blurb)
+
     context = {
         'char_form': char_form,
         'attribute_formset': attribute_formset,
@@ -74,10 +84,12 @@ def get_edit_context(user, existing_character=None, secret_key=None):
                       "EXP_ADV_COST_SOURCE_MULTIPLIER": EXP_ADV_COST_SOURCE_MULTIPLIER,},
         'secret_key': secret_key if secret_key else "",
         'show_tutorial': show_tutorial,
+        'cell': cell,
+        'cell_info': cell_info,
     }
     return context
 
-def character_from_post(user, POST):
+def character_from_post(user, POST, cell):
     char_form = make_character_form(user)(POST)
     if char_form.is_valid():
         new_character = char_form.save(commit=False)
@@ -107,7 +119,7 @@ def update_character_from_post(user, POST, existing_character):
     if char_form.is_valid():
         char_form.save(commit=False)
         existing_character.edit_date = timezone.now()
-        if user.is_authenticated and char_form.cleaned_data['cell']:
+        if user.is_authenticated and 'cell' in char_form.changed_data:
             existing_character.cell = char_form.cleaned_data['cell']
         existing_character.save()
         if existing_character.private != char_form.cleaned_data['private']:
@@ -584,3 +596,12 @@ def __save_edit_abilities_from_formset(formset, stats):
         else:
             logger.error('Bad ability edit form: %s', str(form.errors))
             raise ValueError("invalid ability form in edit")
+
+def get_world_element_class_from_url_string(element):
+    if element == "condition":
+        return Condition
+    if element == "circumstance":
+        return Circumstance
+    if element == "artifact":
+        return Artifact
+    return None

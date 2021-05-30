@@ -1,0 +1,102 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+{% load staticfiles %}
+
+{% block head_title %}
+    Find a World
+{% endblock %}
+
+{% block extra_head %}
+{{ form.media }}
+{% endblock %}
+
+{% block extra_styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'cells/find_world.css' %}" />
+{% endblock %}
+
+{% block extra_scripts %}
+{% endblock %}
+
+{% block body_base %}
+<div class="container">
+    {% include "characters/edit_pages/choose_world_modal.html" %}
+    <h1 class="text-center">
+        Find a World
+    </h1>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-10 col-md-offset-1 text-center">
+                    <div role="alert" class="alert alert-info text-center">
+                        <div class="text-center">
+                            <p>
+                            <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#worldTutorialModal">
+                                What are Worlds?
+                            </button>
+                            </p>
+                        </div>
+                        <p>
+                            These Worlds are looking for new Players! They are ordered by recent Game activity.
+                        </p>
+                        <p>
+                            If you want to start your own World
+                            <a href="{% url 'cells:cells_create' %}" class="btn btn-default btn-xs">
+                                click here
+                            </a>
+                            <br>
+                            If you are looking for a Game to play in, visit
+                            <a href="{% url 'games:games_looking_for_game' %}" class="btn btn-default btn-xs">
+                                Looking For Game
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+            {% for cell in public_cells %}
+                <div class="col-md-6">
+                    <div class="thumbnail">
+                        {% if cell.get_danger_display %}
+                            <span class="pull-left" data-html="true" data-toggle="tooltip" title='{{cell.get_danger_tooltip|safe}}'>
+                                {{cell.get_danger_display|safe}}
+                            </span>
+                        {% endif %}
+                        <h3 class="text-center">
+                            <a href="{% url 'cells:cells_view_cell' cell.id %}">
+                                {{cell.name}}
+                            </a>
+                            <br>
+                            <small>A world {{cell.setting_sheet_blurb}}.</small>
+                        </h3>
+                        <p class="text-center">
+                            {{cell.members.count}} member{{cell.members.count|pluralize}}
+                            |
+                            {{cell.character_set.count}} Contractor{{cell.character_set.count|pluralize}}
+                            |
+                            {{cell.num_completed_games}} completed Game{{cell.num_completed_games|pluralize}}
+                            {% if cell.cell_sell %}
+                                <div class="expandable-outer js-expandable-collapsed">
+                                    {{cell.cell_sell|linebreaks}}
+                                    {% if cell.is_community_link_public and cell.community_link %}
+                                        <div>
+                                            <a href="{{cell.community_link}}">
+                                                <b>Visit this World's off-site community.</b>
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                {% if forloop.counter|divisibleby:2 %}
+                    </div>
+                    <div class="row">
+                {% endif %}
+            {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

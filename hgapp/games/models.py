@@ -4,6 +4,7 @@ from characters.models import Character, HIGH_ROLLER_STATUS, Character_Death, Ex
 from powers.models import Power
 from cells.models import Cell
 from django.utils import timezone
+import datetime
 from guardian.shortcuts import assign_perm
 from postman.api import pm_write
 from django.urls import reverse
@@ -19,6 +20,15 @@ DECLINED = 'DECLINED'
 RINGER_VICTORY = 'RINGER_VICTORY'
 RINGER_FAILURE = 'RINGER_FAILURE'
 
+REQUIRED_HIGH_ROLLER_STATUS = (
+    ('ANY', 'Any'),
+    ('NEWBIE_OR_NOVICE', 'Newbie or Novice'),
+    ('NEWBIE', 'Newbie'),
+    ('NOVICE', 'Novice'),
+    ('SEASONED', 'Seasoned'),
+    ('VETERAN', 'Veteran'),
+)
+
 OUTCOME = (
     (WIN, 'Victory'),
     (LOSS, 'Loss'),
@@ -33,6 +43,17 @@ DISCOVERY_REASON = (
     ('CREATED', 'Created'),
     ('SHARED', 'Shared'),
     ('UNLOCKED', 'Unlocked'),
+)
+
+INVITE_ONLY = 'INVITE_ONLY'
+WORLD_MEMBERS = 'WORLD_MEMBERS'
+ANYONE = 'ANYONE'
+CLOSED = 'CLOSED'
+INVITE_MODE = (
+    (INVITE_ONLY, 'Invited Players Only'),
+    (WORLD_MEMBERS, 'World Members Only'),
+    (ANYONE, 'Any Player'),
+    (CLOSED, 'Closed for RSVPs'),
 )
 
 def migrate_add_gms(apps, schema_editor):
@@ -56,13 +77,10 @@ class Game(models.Model):
     scenario = models.ForeignKey(
         "Scenario",
         on_delete=models.PROTECT)
-    required_character_status = models.CharField(choices=HIGH_ROLLER_STATUS,
+    required_character_status = models.CharField(choices=REQUIRED_HIGH_ROLLER_STATUS,
                                        max_length=25,
-                                       default=HIGH_ROLLER_STATUS[0][0])
+                                       default=REQUIRED_HIGH_ROLLER_STATUS[0][0])
     title = models.CharField(max_length=130)
-    hook = models.TextField(max_length=5000,
-                            null=True,
-                            blank=True)
     created_date = models.DateTimeField('date created',
                                         auto_now_add=True)
     scheduled_start_time = models.DateTimeField('scheduled start time',
@@ -85,7 +103,6 @@ class Game(models.Model):
     scenario_notes = models.TextField(max_length=10000,
                                       null=True,
                                       blank=True)
-    open_invitations = models.BooleanField(default=True)
     cell = models.ForeignKey(Cell,
                              null=True, # for migration reasons. All games should have cells.
                              blank=True, # for migration reasons. All games should have cells.
@@ -94,12 +111,83 @@ class Game(models.Model):
                                           null=True,
                                           blank=True,
                                           on_delete=models.CASCADE)
+
+    # Invitation stuff
+    hook = models.TextField(max_length=7000,
+                            null=True,
+                            blank=True)
+    open_invitations = models.BooleanField(default=True) # deprecated. Use invitation_mode instead.
     is_nsfw = models.BooleanField(default=False)
+    list_in_lfg = models.BooleanField(default=False)
+    allow_ringers = models.BooleanField(default=False)
+    invitation_mode = models.CharField(choices=INVITE_MODE,
+                              max_length=25,
+                              default=INVITE_MODE[0][0])
+    gametime_url = models.CharField(max_length=2500, blank=True, null=True)
+    max_rsvp = models.IntegerField(blank=True, null=True)
+    mediums = models.ManyToManyField("GameMedium",
+                                     blank=True)
 
     class Meta:
         permissions = (
             ('edit_game', 'Edit game'),
         )
+
+    def player_can_edit(self, player):
+        if player.is_superuser:
+            return True
+        return player.is_authenticated and (player.has_perm('edit_game', self) \
+                                            or self.cell.player_can_manage_games(player)\
+                                            or self.cell.player_can_run_games(player))
+
+    def invite_instructions(self):
+        if self.invitation_mode == CLOSED:
+            return "Edit the Game to open it for RSVPs."
+        if self.invitation_mode == INVITE_ONLY:
+            return "Invite Players using the form below."
+        if self.invitation_mode == WORLD_MEMBERS:
+            return "Simply share this page with any World members you wish to invite, or invite any Player using the form below."
+        else:
+            return "Simply share this page with any Player you wish to invite."
+
+    def player_can_rsvp(self, player):
+        return not self.reason_player_cannot_rsvp(player)
+
+    def reason_player_cannot_rsvp(self, player):
+        if not player.is_authenticated or player.is_anonymous:
+            return "You must log in to accept this Game invite"
+        if self.gm == player:
+            return "GMs cannot RSVP to their own Games"
+        if player.is_superuser:
+            return None
+        if hasattr(self, "max_rsvp") and self.max_rsvp and self.get_attended_players().count() >= self.max_rsvp:
+            return "This Game is full"
+        if self.invitation_mode == CLOSED or not self.is_scheduled():
+            return "This Game is closed for RSVPs."
+        if self.is_nsfw and not player.profile.view_adult_content:
+            return "This Game is marked for adults. Your content settings do not allow you to participate."
+        player_invitation = get_object_or_none(player.game_invite_set.filter(relevant_game=self.id))
+        if player_invitation:
+            return None
+        if self.invitation_mode == INVITE_ONLY:
+            return "This Game only allows those with an invitation to RSVP."
+        if self.invitation_mode == WORLD_MEMBERS:
+            if not self.cell.get_player_membership(player):
+                return "This Game only allows those who are a member of its World to RSVP without an invite."
+            else:
+                return None
+        # ANYONE case
+        return None
+
+
+    def get_header_display(self):
+        if self.is_scheduled():
+            return "Upcoming Game"
+        if self.is_active():
+            return "Ongoing Game"
+        if self.is_canceled():
+            return "Canceled Game"
+        return "Completed Game"
 
     def is_scheduled(self):
         return self.status == GAME_STATUS[0][0]
@@ -152,6 +240,8 @@ class Game(models.Model):
         self.end_time = timezone.now()
         self.save()
         self.give_rewards()
+        if hasattr(self, "cell") and self.cell:
+            self.cell.update_safety_stats()
 
     def give_rewards(self):
         if not self.is_finished() and not self.is_recorded():
@@ -262,7 +352,7 @@ class Game(models.Model):
     def save(self, *args, **kwargs):
         if not hasattr(self, 'gm'):
             self.gm = self.creator
-        if not hasattr(self, 'scenario'):
+        if not hasattr(self, 'scenario') or not self.scenario:
             scenario = Scenario(creator=self.gm,
                                 title=str(self.title),
                                 description="Put details of the scenario here",
@@ -280,6 +370,8 @@ class Game(models.Model):
             super(Game, self).save(*args, **kwargs)
         if self.is_recorded() or self.is_archived():
             self.update_participant_titles()
+            if hasattr(self, "cell") and self.cell:
+                self.cell.update_safety_stats()
 
     def __str__(self):
         return "[" + self.status + "] " + self.scenario.title + " run by: " + self.gm.username
@@ -789,5 +881,18 @@ class ScenarioTag(models.Model):
     slug = models.SlugField("Unique URL-Safe Name",
                             max_length=40,
                             primary_key=True)
+
     def __str__(self):
         return self.tag
+
+
+class GameMedium(models.Model):
+    medium = models.CharField(max_length=40)
+    slug = models.SlugField("Unique URL-Safe Name",
+                            max_length=40,
+                            primary_key=True)
+    color = models.CharField("Css Color",
+                             max_length=40)
+
+    def __str__(self):
+        return self.medium

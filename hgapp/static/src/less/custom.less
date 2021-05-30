@@ -12,7 +12,7 @@ body {
 @dark-border: darken(@panel-bg, 20%);
 @brand-danger: #BB3B35;
 @brand-success: #499773;
-@brand-warning: #cb8e28;
+@brand-warning: #ab6e08;
 @brand-primary: #648091;
 @brand-info: #6171a2;
 @btn-bg: #5a5f6c;
@@ -29,7 +29,7 @@ body {
 @hr-border: @border-color;
 
 @text-muted: @subtitle-color;
-@link-color: lighten(@brand-primary, 20%);
+@link-color: lighten(@brand-primary, 25%);
 
 @panel-default-heading-bg: lighten(@panel-bg, 5.5%);
 @panel-default-text: @text-color;
@@ -308,11 +308,6 @@ ul.dropdown-menu ul {
 
 /* End Wiki Style */
 
-.css-backgrounded {
-    background-position: center;
-    background-repeat: no-repeat;
-}
-
 .tox-tinymce {
     border-color: @border-color !important;
 }
@@ -320,4 +315,88 @@ ul.dropdown-menu ul {
 #tinymce {
     background-color: @panel-bg !important;
     padding: 5px !important;
+}
+
+
+/* Expandables! */
+
+.js-expandable-collapsed {
+    max-height: 150px;
+    overflow: hidden;
+    position:relative;
+}
+
+.js-expandable-collapsed:before {
+  content:'';
+  position:absolute;
+  height: 75px;
+  width: 100%;
+  right: 0px;
+  top: 75px;
+ background:linear-gradient(
+    to bottom,
+    rgba(53, 62, 75, 0),
+    rgba(53, 62, 75, 1) 75%
+  ) !important;
+  z-index:1;
+}
+
+.js-expandable-collapsed:after {
+  content:'click to show more';
+  position:absolute;
+  text-align: center;
+  height: 25px;
+  width: 100%;
+  top: 125px;
+  right: 0px;
+  z-index:1;
+  font-style: italic;
+}
+
+/* GM DANGER RATING ICONS */
+
+.css-gm-danger-rating {
+    padding: 2px;
+    border: 1px solid black;
+    border-radius: 2px;
+}
+
+.css-gm-danger-Pillow {
+    border: 1px solid skyblue;
+    color: black;
+    background: rgb(248,254,75);
+    background: linear-gradient(70deg, rgba(75,255,100,1) 0%, rgba(91,254,202,1) 29%, rgba(106,195,255,1) 68%, rgba(114,184,255,1) 100%);
+}
+
+.css-gm-danger-Benevolent {
+    border-color: skyblue;
+    color: skyblue;
+}
+
+.css-gm-danger-Just {
+    border-color:#d4d946;
+    color: #d4d946;
+}
+
+.css-gm-danger-Sadistic {
+    border-color: #d9a746;
+    color: #d9a746;
+}
+
+.css-gm-danger-Cruel{
+    background: darkred;
+    border-color: #e7554a;
+    color: #e7554a;
+}
+
+/* GAME MEDIUMS */
+
+.css-game-medium {
+    padding: 2px;
+    margin: 5px;
+    margin-left: 2px;
+    margin-right: 3px;
+    border: 1px solid black;
+    border-radius: 2px;
+    display: inline-block;
 }

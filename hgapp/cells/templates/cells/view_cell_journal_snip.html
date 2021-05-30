@@ -1,0 +1,29 @@
+<small>
+    {{ journal.created_date|timesince }} ago:
+    <a href="{% url 'characters:characters_view' journal.game_attendance.attending_character.id %}">
+        {{journal.game_attendance.attending_character.name}}
+    </a>
+    wrote a
+    <a href="{% url 'journals:journal_read_id' journal.id %}">
+        {% if journal.is_downtime %}
+        Downtime
+        {% else %}
+        Game
+        {% endif %}
+        Journal
+    </a>
+    for
+    <a href="{% url 'games:games_view_game' journal.game_attendance.relevant_game.id %}">
+        {{journal.game_attendance.relevant_game.scenario.title }}
+    </a>
+    <div class="thumbnail expandable-outer js-expandable-collapsed" role="button" >
+        <a href="{% url 'journals:journal_read_id' journal.id %}">
+            {% if journal.title %}
+            <h4>{{journal.title}}</h4>
+            {% else %}
+            <h4>An untitled Journal</h4>
+            {% endif %}
+        </a>
+        {{journal.content|safe}}
+    </div>
+</small>

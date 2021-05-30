@@ -1,14 +1,6 @@
 {% load markdown_deux_tags %}
 
-<div class="text-center char-essentials"
-     id="collapse-biography-heading"
-     {% if character.background or user_can_edit %}
-     role="button" data-toggle="collapse"
-     data-target=".collapse-biography"
-     aria-expanded="false"
-     aria-controls="collapse-biography"
-     {% endif %}
-    >
+<div class="text-center char-essentials" >
     <div class ="row">
         <div class="col-xs-12">
             <h5>
@@ -17,6 +9,13 @@
             <p>
                 {{character.pres_tense_to_be}} <b>{{character.age}}</b> years old, and often appears as <b>{{character.appearance}}</b>.
             </p>
+            {% if character.cell %}
+                <p>
+                    {{character.name}} lives in
+                    <a href="{% url 'cells:cells_view_cell' character.cell.id %}">{{ character.cell.name }}</a>,
+                    a World {{ character.cell.setting_sheet_blurb}}.
+                </p>
+            {% endif %}
             {% if num_journal_entries %}
                 <p>
                     {{character.pronoun_possessive_capitalized}}
@@ -42,77 +41,4 @@
             {% endif %}
         </div>
     </div>
-    {% if user_can_edit %}
-        <form id="bio-form"
-              data-post-url="{% url 'characters:post_bio' character.id secret_key %}">
-            <div id="js-bio-form" style="display:none;">
-                {{ bio_form.about.errors }}
-                {{ bio_form.non_field_errors }}
-                {% csrf_token %}
-                {{ bio_form.bio}}
-
-                <div style="margin-top: 5px; margin-bottom: 5px;">
-                    <input class="btn btn-sm btn-default" type="submit" value="Save">
-                    <small><a href="https://commonmark.org/help/">Markdown</a> enabled</small>
-                </div>
-            </div>
-        </form>
-    {% endif %}
-    <div id="js-bio-display"
-         class="panel-collapse collapse collapse-biography text-left"
-         role="tabpanel"
-         aria-labelledby="collapse-biography-heading">
-        <div class="css-bio-text">
-            <div id="js-bio-text">
-                {{character.background | markdown}}
-            </div>
-            {% if user_can_edit %}
-                <div id="js-edit-bio-button" class="btn btn-default btn-xs">
-                        <i class="fa fa-edit fa-2x"></i> Edit Biography
-                </div>
-            {% endif %}
-        </div>
-        <div class="row text-center">
-            <div class="col-xs-12">
-            {% if num_journal_entries %}
-                <div class="col-md-4 col-md-offset-4 text-center">
-                    <a class="btn btn-sm btn-primary js-journal-link" href="{% url 'journals:journal_read' character.id %}">
-                        Read {{character.name}}'s Journal
-                    </a>
-                </div>
-                {% if next_entry %}
-                <a class="btn btn-sm btn-success js-journal-link"
-                   href="{% url 'journals:journal_write_next' character.id %}">
-                    Earn
-                    {% if next_entry.reward_is_improvement %}
-                    <b>an Improvement</b>
-                    {% else %}
-                    1 Exp
-                    {% endif %}
-                    for {{character.name}} by writing a
-                    {% if next_entry.is_downtime %}
-                    Downtime
-                    {% else %}
-                    Game
-                    {% endif %}
-                    journal
-                </a>
-                {% endif %}
-            {% endif %}
-                <br>
-                <br>
-            </div>
-        </div>
-    </div>
-    {% if character.background or user_can_edit %}
-        <div id = "js-bio-expand-button">
-            <div
-                class="collapse collapse-biography in"
-                role="tabpanel"
-                aria-labelledby="collapse-biography-heading">
-                <small class="visible-xs-block visible-sm-block text-center"><i>Tap to show bio</i></small>
-                <small class="visible-md-block visible-lg-block text-center"><i>Click to show bio</i></small>
-            </div>
-        </div>
-    {% endif %}
 </div>

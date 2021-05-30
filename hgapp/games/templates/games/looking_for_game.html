@@ -1,0 +1,119 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+{% load staticfiles %}
+{% load account_tags %}
+{% load games_tags %}
+
+{% block head_title %}
+    Looking for Game
+{% endblock %}
+
+{% block extra_head %}
+{% endblock %}
+
+{% block extra_styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'games/looking_for_game.css' %}" />
+{% endblock %}
+
+{% block extra_scripts %}
+{% endblock %}
+
+{% block body_base %}
+<div class="container">
+    <h1 class="text-center">
+        Looking For Game
+    </h1>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-10 col-md-offset-1 text-center">
+                    <div role="alert" class="alert alert-info">
+                        <p>
+                            This page lists upcoming Games that welcome drop-in Contractors from other Worlds.
+                            It's a great place for brand new Players who want to try out The Contract
+                            and Players with consistent groups who want to take their Contractors on some online Games.
+                        </p>
+                        <p>
+                            If you'd like to schedule your own Game
+                            <a href="{% url 'games:games_create_game' %}" class="btn btn-default btn-xs">
+                                click here
+                            </a>
+                            <br>
+                            If you are looking for a regular playgroup, visit
+                            <a href="{% url 'cells:cells_find_world' %}" class="btn btn-default btn-xs">
+                                Find a World
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                {% for game in games %}
+                {% if forloop.counter|divisibleby:2 == 0 %}
+                    </div>
+                    <div class="row">
+                {% endif %}
+                <div class="col-md-6">
+                    <div class="thumbnail">
+                        <h3 class="text-center" style="margin-top:10px;">
+                            <a href="{% url 'games:games_view_game' game.id %}">
+                                {{game.scenario.title}}
+                            </a>
+                        </h3>
+                        <p class="text-center">
+                            <b>Start time:</b>
+                            {{game.scheduled_start_time|timeuntil}}
+                            ({{game.scheduled_start_time}}
+                            {% if request.user.account %}
+                            {{request.user.account.timezone}}
+                            {% endif %}
+                            )
+                        </p>
+                        <div class="row">
+                            <div class="col-xs-6">
+                                <b>Game Master: </b>
+                                <a href="{% url 'profiles:profiles_view_profile' game.gm.id %}">
+                                    {% user_display game.gm %}
+                                </a>
+                                <br>
+                                <b>In World: </b>
+                                <a href="{% url 'cells:cells_view_cell' game.cell.id %}">
+                                    {{game.cell.name}}
+                                </a>
+                            </div>
+                            <div class="col-xs-6">
+                                <b>GM Title:</b>
+                                {% render_gm_title game.gm %}
+                                <br>
+                                <b>Status:</b>
+                                {{game.get_required_character_status_display}}
+                            </div>
+                        </div>
+                        {% if game.mediums.all|length %}
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <b>Medium:</b>
+                                {% render_game_mediums game %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        <hr>
+                        <div class="expandable-outer js-expandable-collapsed">
+                            {{game.hook|linebreaks}}
+                            <div class="text-center">
+                                <i><small>
+                                    <a href="{% url 'games:games_view_game' game.id %}">
+                                        (click to RSVP or learn more)
+                                    </a>
+                                </small></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

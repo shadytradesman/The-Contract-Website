@@ -20,6 +20,7 @@ class ProfileView(generic.DetailView):
 
     def get_queryset(self):
         self.profile = get_object_or_404(Profile, pk=self.kwargs['pk'])
+        self.profile.update_gm_stats_if_necessary()
         self.cells = self.profile.user.cell_set.all()
 
         characters = self.profile.user.character_set.filter(is_deleted=False)
@@ -97,30 +98,21 @@ class ProfileView(generic.DetailView):
         cells_gmed = set()
         contractors_gmed = set()
         players_gmed = set()
-        num_gm_kills = 0
-        num_golden_ratio_games = 0
-        num_gm_victories = 0
-        num_gm_losses = 0
         for game in self.games_gmed:
-            num_gm_kills = num_gm_kills + game.number_deaths()
-            num_gm_victories = num_gm_victories + game.number_victories()
-            num_gm_losses = num_gm_losses + game.number_losses()
             if game.cell:
                 cells_gmed.add(game.cell.id)
             for attendance in game.game_attendance_set.all():
                 if attendance.attending_character:
                     contractors_gmed.add(attendance.attending_character.id)
                     players_gmed.add(attendance.attending_character.player.id)
-            if game.achieves_golden_ratio():
-                num_golden_ratio_games = num_golden_ratio_games + 1
-        context['num_gm_games'] = self.games_gmed.count()
+        context['num_gm_games'] = self.profile.num_games_gmed
         context['num_cells_gmed'] = len(cells_gmed)
         context['num_contractors_gmed'] = len(contractors_gmed)
         context['num_players_gmed'] = len(players_gmed)
-        context['num_gm_kills'] = num_gm_kills
-        context['num_golden_ratio_games'] = num_golden_ratio_games
-        context['num_gm_victories'] = num_gm_victories
-        context['num_gm_losses'] = num_gm_losses
+        context['num_gm_kills'] = self.profile.num_gm_kills
+        context['num_golden_ratio_games'] = self.profile.num_golden_ratios
+        context['num_gm_victories'] = self.profile.num_gm_victories
+        context['num_gm_losses'] = self.profile.num_gm_losses
         return context
 
 

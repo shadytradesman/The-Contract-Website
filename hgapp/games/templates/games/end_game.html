@@ -3,56 +3,100 @@
 
 {% load i18n %}
 {% load bootstrap %}
+{% load staticfiles %}
 
 {% block extra_head %}
+    {{ world_event_form.media }}
     {{ form.media }}
 {% endblock %}
 
-{% block head_title %}Accepting game invite{% endblock %}
+{% block extra_scripts %}
+    <script src="{% static 'overrides/wiki-macro-scripts.js' %}"></script>
+{% endblock %}
+{% block head_title %}
+    Ending Game
+{% endblock %}
 
 {% load account_tags %}
 {% block body_class %}home{% endblock %}
 
 {% block body_base %}
-        <div class="container">
-            {{ form.about.errors }}
-            <h1>Declare Game End Outcomes for {{game.title}}</h1>
-            <form action="{% url 'games:games_end_game' game.id %}" method="post" class="form-inline">
-            {{ formset.non_field_errors }}
-            {{ formset.management_form }}
-            {% csrf_token %}
-            {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-            {% for form in formset %}
-                {{ form.hidden_attendance }}
-                <div class="container">
-                    <h4>Outcome for <b>{% user_display form.attendance.game_invite.invited_player %}</b> </h4>
-                    <h5>
-                        Playing
-                        {% if form.attendance.attending_character %}
+<div class="container">
+    <div class="text-center">
+        <h1>Declare Game End Outcomes for {{game.title}}</h1>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <form action="{% url 'games:games_end_game' game.id %}" method="post" >
+                {{ form.about.errors }}
+                {{ formset.non_field_errors }}
+                {{ formset.management_form }}
+                {% csrf_token %}
+                <div class="row">
+                {% for form in formset %}
+                    {{ form.hidden_attendance }}
+                    <div class="col-md-6">
+                        <h4 class="text-center">
+                            Outcome for <b>{% user_display form.attendance.game_invite.invited_player %}</b>
+                            <br>
+                            <small>
+                                Playing
+                                {% if form.attendance.attending_character %}
                                 {{form.attendance.attending_character.name}}
-                        {% else %}
+                                {% else %}
                                 an NPC Ringer
-                        {% endif %}
-                    </h5>
-                    <div class="container">
-                        {{ form.outcome | bootstrap }}
+                                {% endif %}
+                            </small>
+                        </h4>
+                        <div >
+                            {{ form.outcome | bootstrap }}
+                        </div>
+                        <div >
+                            {{ form.notes | bootstrap }}
+                        </div>
                     </div>
-                    <div class="container">
-                        {{ form.notes | bootstrap }}
+                {% endfor %}
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>How did it go?</h4>
+                        {{feedback_form | bootstrap}}
                     </div>
                 </div>
-            {% endfor %}
-                <div class="container">
-                    {{feedback_form | bootstrap}}
-                </div>
-                <p>
-                    Once the game has ended, it can no longer be canceled. The outcome you give characters in this screen is final.
-                    Any private characters will once again be unviewable.
-                    The Scenario will be revealed to the players.
+                {% if world_event_form %}
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <a class="wiki-entry-collapsible btn btn-sm btn-default">
+                                Add World Event
+                            </a>
+                            <div class="collapse-content clearfix"
+                                 style="display:none;" >
+                                <h4>Post new World Event to {{game.cell.name}}</h4>
+                                {{ world_event_form.headline | bootstrap }}
+                                {{ world_event_form.event_description | bootstrap}}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                <br>
+                <p class="text-center">
+                    Once the game has ended, it can no longer be canceled.
+                    Any private Contractors will again be unviewable,
+                    and the Scenario will be revealed to the Players.
                 </p>
-            <div class="container">
-                <input class="btn btn-primary" type="submit" value="End Game" />
+                <div class="text-center">
+                    <input class="btn btn-primary" type="submit" value="End Game" />
+                </div>
+            <div class="row">
+                <div class="col-xs-6 text-center">
+                </div>
             </div>
+            </form>
         </div>
-    </form>
+    </div>
+</div>
+
+<div class="container">
+    </div>
+</form>
 {% endblock %}

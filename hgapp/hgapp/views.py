@@ -16,7 +16,7 @@ from guardian.shortcuts import assign_perm
 from characters.models import Character
 from powers.models import Power_Full, Enhancement, Drawback, Parameter, Base_Power
 
-from games.models import GAME_STATUS
+from games.models import GAME_STATUS, Scenario
 from hgapp.forms import SignupForm
 from blog.models import Post
 from info.models import FrontPageInfo
@@ -46,6 +46,8 @@ def home(request):
         num_bases = Base_Power.objects.filter(is_public=True).all().count()
         num_stock = Power_Full.objects.filter(tags__slug="example").all().count()
         info = FrontPageInfo.objects.first()
+        num_stock_scenarios = Scenario.objects.filter(tags__isnull=False).count()
+        num_community_scenarios = Scenario.objects.filter(tags__isnull=True).count()
         context = {
             'power_1': power_1,
             'power_2': power_2,
@@ -54,6 +56,8 @@ def home(request):
             'num_modifiers': num_enhancements + num_drawbacks + num_params,
             'num_stock': num_stock,
             'info': info,
+            'num_stock_scenarios': num_stock_scenarios,
+            'num_community_scenarios': num_community_scenarios,
         }
         return render(request, 'logged_out_homepage.html', context)
     else:

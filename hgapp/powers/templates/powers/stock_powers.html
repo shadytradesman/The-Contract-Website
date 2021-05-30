@@ -2,6 +2,7 @@
 
 {% load i18n %}
 {% load cache %}
+{% load power_tags %}
 
 {% block head_title %}Premade Powers{% endblock %}
 
@@ -48,7 +49,7 @@
                                  id="{{category.slug}}">
                                 <div class="panel-body">
                                     {% for power_full in power_list %}
-                                        {% include "powers/power_badge_snippet.html" %}
+                                        {% power_badge power_full %}
                                     {% endfor %}
                                 </div>
                             </div>
@@ -82,7 +83,7 @@
                             <div role="tabpanel" class="tab-pane  {% if forloop.counter0 == 0 %}active{% endif %}" id="{{category.slug}}">
                                 <div class="panel-body">
                                     {% for power_full in power_list %}
-                                        {% include "powers/power_badge_snippet.html" %}
+                                        {% power_badge power_full %}
                                     {% endfor %}
                                 </div>
                             </div>
@@ -118,7 +119,7 @@
                         <div id="collapse{{category.slug}}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="{{category.slug}}Heading">
                             <div class="panel-body">
                                 {% for power_full in power_list %}
-                                    {% include "powers/power_badge_snippet.html" %}
+                                    {% power_badge power_full %}
                                 {% endfor %}
                             </div>
                         </div>
@@ -151,7 +152,7 @@
                         <div id="collapse{{category.slug}}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="{{category.slug}}Heading">
                             <div class="panel-body">
                                 {% for power_full in power_list %}
-                                    {% include "powers/power_badge_snippet.html" %}
+                                    {% power_badge power_full %}
                                 {% endfor %}
                             </div>
                         </div>

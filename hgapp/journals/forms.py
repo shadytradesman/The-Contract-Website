@@ -1,9 +1,4 @@
 from django import forms
-from django.forms import ModelChoiceField
-from django.shortcuts import get_object_or_404
-from django.utils.datetime_safe import datetime
-from account.conf import settings
-from django.utils import timezone
 
 from tinymce.widgets import TinyMCE
 

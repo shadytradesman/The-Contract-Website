@@ -1,0 +1,123 @@
+{% load markdown_deux_tags %}
+{% load power_tags %}
+<div class="row">
+    <div class="col-md-6">
+        <h3 class="text-center" data-toggle="tooltip" title='{{tutorial.powers_view}}'>
+            Powers
+        </h3>
+        {% for power_full in character.power_full_set.all %}
+            <div class="row">
+                <div class= "col-md-12">
+                    {% power_badge power_full %}
+                </div>
+            </div>
+        {% empty %}
+            <h4 class="text-center">{{character.name}} doesn't have any powers yet. What a noob :(</h4>
+        {% endfor %}
+    </div>
+    <div class="col-md-6">
+        <h3 class="text-center" data-toggle="tooltip" title='{{tutorial.equipment|safe}}'>
+            Equipment
+        </h3>
+        {% if user_can_edit %}
+        <form id="equipment-form"
+              data-post-url="{% url 'characters:post_equipment' character.id secret_key %}">
+            <div id="js-equipment-form" style="display:none;">
+                {{ equipment_form.about.errors }}
+                {{ equipment_form.non_field_errors }}
+                {% csrf_token %}
+                {{equipment_form.equipment}}
+                <input class="btn btn-sm btn-default" type="submit" value="Save">
+                <small><a href="https://commonmark.org/help/">Markdown</a> enabled</small>
+            </div>
+        </form>
+        {% endif %}
+        <div id="js-equipment-display">
+            <span id="js-equipment-text">{{character.equipment | markdown}}</span>
+            {% if user_can_edit %}
+                <div id="js-edit-equipment-button" class="btn btn-default btn-xs">
+                    <i class="fa fa-edit fa-2x"></i> Edit
+                </div>
+            {% endif %}
+        </div>
+        <hr>
+        <h3 class="text-center" data-toggle="tooltip" title='{{tutorial.artifacts|safe}}'>
+            Artifacts
+        </h3>
+        {% if not artifacts_by_cell %}
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="alert alert-info text-center">
+                        <p>
+                            <b>Artifacts are GM-created objects and equipment.</b>
+                        </p>
+                        <p>
+                            Examples of Artifacts include healing potions, scrolls, sci-fi technology, or any supernatural
+                            item that was not created with The Contract's Power system.
+                            Artifacts are not subject to standardized balance.
+                            Therefore, their effects may be altered or ignored outside the World where they were obtained.
+                        </p>
+                        {% if user_can_edit %}
+                        <p>
+                            Until you participate in a Game or join a World, you cannot add
+                            Artifacts to your Contractor.
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        <div class="js-world-element-container">
+            {% for cell, artifacts in artifacts_by_cell.items %}
+            <div class="css-condition-section">
+                    <span class="css-condition-cell-header"
+                          {% if artifacts|length == 0 %}
+                          style="display:none;"
+                          {% endif %}
+                    >
+                        <a href="{% url 'cells:cells_view_cell' cell.id %}">
+                            {{cell.name}}
+                        </a>
+                    </span>
+                <div class="js-world-element-content-{{cell.id}}">
+                    {% for artifact in artifacts %}
+                    <div class="css-world-entity-value">
+                        {% if user_can_edit %}
+                        <span class="pull-left css-world-element-delete">
+                                <form class="js-delete-world-element-form"
+                                      data-del-world-element-url="{% url 'characters:delete_world_element' artifact.id 'artifact' secret_key %}">
+                                    {% csrf_token %}
+                                    <input type="submit" class="btn btn-xs btn-danger" value="X" />
+                                </form>
+                            </span>
+                        {% endif %}
+                        <span class="css-world-element-name">
+                            {{artifact.name}}
+                        </span>
+                        <span class="css-world-element-description">
+                            {{artifact.description}}
+                        </span>
+                        <span class="css-world-element-system">
+                            {{artifact.system}}
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+
+            {% if artifact_form %}
+            <div class="text-center">
+                <a class="btn btn-default btn-sm wiki-entry-collapsible text-center">New Artifact</a>
+                <div class="collapse-content clearfix" style="display:none;">
+                    <div class="text-left">
+                        {% with 'artifact' as element %}
+                        {% include "characters/view_pages/world_element_form.html" %}
+                        {% endwith %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>

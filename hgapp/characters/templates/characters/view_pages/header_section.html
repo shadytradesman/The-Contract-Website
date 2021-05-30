@@ -4,11 +4,11 @@
     {% if user_can_edit %}
         <ul class="nav nav-pills nav-justified">
             <li><a href="{% url 'characters:characters_edit' character.id secret_key %}" class="btn btn-default">
-                Edit Character
+                Edit Contractor
             </a></li>
             {% if request.user == character.player %}
                 <li><a href="{% url 'characters:characters_delete' character.id %}" class="btn btn-default">
-                    Delete Character
+                    Delete Contractor
                 </a></li>
             {% endif %}
             {% if character.player %}
@@ -16,7 +16,7 @@
                     Assign Powers
                 </a></li>
                 <li><a href="{% url 'characters:characters_archive' character.id %}" class="btn btn-default">
-                    Download Character as plain text
+                    Download Contractor as plain text
                 </a></li>
                 {% if character.is_dead %}
                     <li><a href="{%url 'characters:characters_obituary' character.id %}" class="btn btn-default">
@@ -24,7 +24,7 @@
                     </a></li>
                 {% else %}
                     <li><a href="{%url 'characters:characters_obituary' character.id %}" class="btn btn-default">
-                        Declare Character Death
+                        Declare Contractor Death
                     </a></li>
                 {% endif %}
             {%endif %}

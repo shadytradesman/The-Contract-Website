@@ -1,0 +1,38 @@
+{% if cell.setting_summary %}
+    <div class="lead css-setting-summary">
+        {{cell.setting_summary|linebreaks}}
+    </div>
+{% endif %}
+{% if cell.house_rules %}
+<h3 class="text-center">House Rules</h3>
+<div class="text-center">
+    <small>
+        Contractors from {{cell.name}}
+        <b>
+            {% if cell.are_contractors_portable %}
+            Are portable, and may play in Games in other Worlds.
+            {% else %}
+            Are NOT portable, and may NOT visit other Worlds to play Games.
+            {% endif %}
+        </b>
+    </small>
+</div>
+<div class="thumbnail expandable-outer js-expandable-collapsed" role="button" style="padding-left: 20px; padding-right: 20px;">
+    {{cell.setting_description|safe}}
+</div>
+{% endif %}
+<h3 class="text-center">Full Setting Description</h3>
+<div class="thumbnail expandable-outer js-expandable-collapsed" role="button" style="padding-left: 20px; padding-right: 20px;">
+    {{cell.setting_description|safe}}
+</div>
+<div id="allWorldEvents">
+    <h3 class="text-center">World Events</h3>
+    {% if can_post_world_events %}
+        <div class="text-center">
+            <a href="{% url 'cells:cells_post_world_event' cell.id %}">Post a new World Event</a>
+        </div>
+    {% endif %}
+    {% for event in world_events %}
+        {% include "cells/world_event_snip.html" %}
+    {% endfor %}
+</div>

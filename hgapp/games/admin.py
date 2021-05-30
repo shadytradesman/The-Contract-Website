@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from games.models import Game, Game_Attendance, Scenario_Discovery, Reward, ScenarioTag
+from games.models import Game, Game_Attendance, Scenario_Discovery, Reward, ScenarioTag, GameMedium
 
 
 @admin.register(ScenarioTag)
@@ -11,3 +11,4 @@ admin.site.register(Game)
 admin.site.register(Game_Attendance)
 admin.site.register(Scenario_Discovery)
 admin.site.register(Reward)
+admin.site.register(GameMedium)

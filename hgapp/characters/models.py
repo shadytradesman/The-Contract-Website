@@ -77,7 +77,9 @@ PRONOUN = (
 )
 
 BODY_STATUS = (
-    'Bruised',
+    'Scuffed',
+    'Scuffed',
+    'Annoyed',
     'Bruised',
     'Hurt',
     'Injured',
@@ -87,6 +89,7 @@ BODY_STATUS = (
 )
 
 MIND_STATUS = (
+    'Alert',
     'Miffed',
     'Agitated',
     'Distracted',
@@ -150,6 +153,7 @@ BASE_BODY_LEVELS = 5
 
 def random_string():
     return hashlib.sha224(bytes(random.randint(1, 99999999))).hexdigest()
+
 
 
 class Character(models.Model):
@@ -306,11 +310,46 @@ class Character(models.Model):
             total = total + power.get_point_value()
         return total
 
+    def world_element_cell_choices(self):
+        cell_choices = set()
+        if not hasattr(self, "player") or not self.player:
+            return cell_choices
+        queryset = self.player.cell_set.all()
+        cell_choices.add(queryset)
+        games_attended = self.game_set.all()
+        cell_ids = set()
+        for cell in queryset:
+            cell_ids.add(cell.pk)
+        for game in games_attended:
+            cell_ids.add(game.cell.pk)
+        return Cell.objects.filter(pk__in=cell_ids).all()
+
+    def world_element_initial_cell(self):
+        active_attendances = self.active_game_attendances()
+        if active_attendances:
+            return active_attendances[0].cell
+        if hasattr(self, "cell") and self.cell:
+            return self.cell
+        return None
+
+    def number_completed_games(self):
+        return self.game_attendance_set.exclude(outcome=None, is_confirmed=False).count()
+
     def number_of_victories(self):
-        return get_queryset_size(self.game_attendance_set.exclude(is_confirmed=False).filter(outcome="WIN"))
+        return get_queryset_size(self.game_attendance_set.filter(is_confirmed=True, outcome="WIN"))
 
     def number_of_losses(self):
-        return get_queryset_size(self.game_attendance_set.exclude(is_confirmed=False).filter(outcome="LOSS"))
+        return get_queryset_size(self.game_attendance_set.filter(is_confirmed=True, outcome="LOSS"))
+
+    def number_completed_games_in_home_cell(self):
+        if not hasattr(self, "cell") or not self.cell:
+            return 0
+        return self.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).filter(relevant_game__cell=self.cell).count()
+
+    def number_completed_games_out_of_home_cell(self):
+        if not hasattr(self, "cell") or not self.cell:
+            return self.number_completed_games()
+        return self.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).exclude(relevant_game__cell=self.cell).count()
 
     def calculate_status(self):
         num_victories = self.number_of_victories()
@@ -324,6 +363,10 @@ class Character(models.Model):
             return HIGH_ROLLER_STATUS[4][0]
 
     def save(self, *args, **kwargs):
+        if self.ambition[-1] == '.':
+            self.ambition = self.ambition[:-1 or None]
+        if self.appearance[-1] == '.':
+            self.appearance = self.appearance[:-1 or None]
         self.status = self.calculate_status()
         if self.pk is None:
             super(Character, self).save(*args, **kwargs)
@@ -332,8 +375,8 @@ class Character(models.Model):
             self.set_default_permissions()
             super(Character, self).save(*args, **kwargs)
 
-    def delete(self):
-        self.is_deleted=True
+    def delete_char(self):
+        self.is_deleted = True
         self.save()
 
     def player_has_cell_edit_perms(self, player):
@@ -363,7 +406,7 @@ class Character(models.Model):
         return not self.private or player.has_perm("view_private_character", self) or self.player_has_cell_edit_perms(player)
 
     def completed_games(self):
-        return self.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).order_by("relevant_game__end_time").all()
+        return self.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).order_by("-relevant_game__end_time").all()
 
     def completed_games_rev_sort(self):
         return self.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).order_by("-relevant_game__end_time").all()
@@ -451,6 +494,9 @@ class Character(models.Model):
 
     def improvement_ok(self):
         return self.number_of_victories() * 2 > len(self.active_rewards())
+
+    def get_powers_for_render(self):
+        return self.power_full_set.all()
 
     def __str__(self):
         string = self.name + " ["
@@ -659,14 +705,14 @@ class Character(models.Model):
         self.stats_snapshot.save()
 
     def num_body_levels(self):
-        brawn_value = self.stats_snapshot.attributevalue_set.get(relevant_attribute__scales_body=True).value
+        brawn_value = self.stats_snapshot.attributevalue_set.get(relevant_attribute__scales_body=True).val_with_bonuses()
         return BASE_BODY_LEVELS + math.ceil(brawn_value / 2)
 
     def num_mind_levels(self):
         mind_scaling_attrs = self.stats_snapshot.attributevalue_set.filter(relevant_attribute__scales_mind=True).all()
         mind_val = 1
         for attr in mind_scaling_attrs:
-            mind_val = mind_val + attr.value
+            mind_val = mind_val + attr.val_with_bonuses()
         if mind_val <= 3:
             return 3
         elif mind_val >= 9:
@@ -705,10 +751,68 @@ class Character(models.Model):
             ))
         return health_rows
 
+    def get_bonus_for_attribute(self, attribute):
+        existing_bonus = get_object_or_none(AttributeBonus, character=self, attribute=attribute)
+        return existing_bonus.value if existing_bonus else 0
+
+    def set_bonus_for_attribute(self, attribute, value):
+        existing_bonus = get_object_or_none(AttributeBonus, character=self, attribute=attribute)
+        if existing_bonus:
+            existing_bonus.value = value
+            existing_bonus.save()
+        else:
+            new_bonus = AttributeBonus(character=self,
+                                       attribute=attribute,
+                                       value=value)
+            new_bonus.save()
+
+    def reset_attribute_bonuses(self):
+        attributes = self.stats_snapshot.attributevalue_set.all()
+        for attribute in attributes:
+            self.set_bonus_for_attribute(attribute.relevant_attribute, 0)
+        powers = self.power_full_set.all()
+        bonus_by_attribute = {}
+        for power in powers:
+            bonuses = power.latest_revision().get_attribute_bonuses()
+            for attr, bonus in bonuses:
+                curr_bonus = bonus_by_attribute.get(attr, 0)
+                if bonus > curr_bonus:
+                    bonus_by_attribute[attr] = bonus
+        for attribute_value in attributes:
+            attr = attribute_value.relevant_attribute
+            if attr in bonus_by_attribute:
+                self.set_bonus_for_attribute(attr, bonus_by_attribute.get(attr))
+
+
 class BattleScar(models.Model):
     character = models.ForeignKey(Character,
                                    on_delete=models.CASCADE)
     description = models.CharField(max_length=500)
+
+class WorldElement(models.Model):
+    character = models.ForeignKey(Character,
+                                  on_delete=models.CASCADE)
+    name = models.CharField(max_length=500)
+    description = models.CharField(max_length=1000)
+    system = models.CharField(max_length=1000)
+    cell = models.ForeignKey(Cell,
+                             blank=True,
+                             null=True,
+                             on_delete=models.CASCADE)
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        abstract = True
+
+class Condition(WorldElement):
+    pass
+
+class Circumstance(WorldElement):
+    pass
+
+class Artifact(WorldElement):
+    pass
 
 class Injury(models.Model):
     character = models.ForeignKey(Character,
@@ -1221,6 +1325,9 @@ class AttributeValue(TraitValue):
             models.Index(fields=['previous_revision']),
         ]
 
+    def val_with_bonuses(self):
+        return self.value + self.relevant_stats.assigned_character.get_bonus_for_attribute(attribute=self.relevant_attribute)
+
     def get_class(self):
         return AttributeValue
 
@@ -1344,6 +1451,24 @@ class CharacterTutorial(models.Model):
     recover_mind = models.TextField(max_length=3000)
     exert_body = models.TextField(max_length=3000)
     charon_coin = models.TextField(max_length=3000)
+    conditions = models.TextField(max_length=3000, default="placeholder")
+    circumstances = models.TextField(max_length=3000, default="placeholder")
+    artifacts = models.TextField(max_length=3000, default="placeholder")
     modal_1 = models.TextField(max_length=3000)
     modal_2 = models.TextField(max_length=3000)
     modal_3 = models.TextField(max_length=3000)
+    world_modal_1 = models.TextField(max_length=3000, default="placeholder")
+    world_modal_2 = models.TextField(max_length=3000, default="placeholder")
+    world_modal_3 = models.TextField(max_length=3000, default="placeholder")
+
+class AttributeBonus(models.Model):
+    character = models.ForeignKey('Character', on_delete=models.CASCADE)
+    attribute = models.ForeignKey('Attribute', on_delete=models.CASCADE)
+    value = models.PositiveIntegerField()
+
+    class Meta:
+        unique_together = (("character", "attribute"))
+        indexes = [
+            models.Index(fields=['character', 'attribute']),
+        ]
+

@@ -9,6 +9,10 @@
     {{ form.media }}
 {% endblock %}
 
+{% block extra_scripts %}
+<script src="{% static 'js/invite.js' %}"></script>
+{% endblock %}
+
 {% block head_title %}
     Invite Players
 {% endblock %}
@@ -20,10 +24,10 @@
 {% block body_base %}
     <div class="container">
         {{ form.about.errors }}
-        <h1>Invite players to <a href="{% url 'cells:cells_view_cell' cell.id %}">{{cell.name}}</a></h1>
+        <h1 class="text-center">Invite players to <a href="{% url 'cells:cells_view_cell' cell.id %}">{{cell.name}}</a></h1>
         <div class="panel panel-default">
             <div class="panel-body">
-                <h3>By username</h3>
+                <h2>By username</h2>
                 <div class="row">
                     <form action="{% url 'cells:cells_invite_players' cell.id %}" method="post">
                     {{ form.non_field_errors }}
@@ -33,8 +37,24 @@
                     <div class="col-xs-4"><input class="btn btn-primary" type="submit" value="Send Invitation" /></div>
                     </form>
                 </div>
-                <h3>Using invite link</h3>
-                <p>Anyone with this link will be able to join your cell.</p>
+                {% if cell.open_invitations %}
+                <h4>Open Invitations</h4>
+                <ul>
+                    {% for invite in cell.open_invitations %}
+                    <div style="padding: 5px">
+                        <li>
+                            <strong><a href="{% url 'profiles:profiles_view_profile' invite.invited_player.profile.id %}">{% user_display invite.invited_player %}</a></strong>
+                            {% localtime on %}
+                            - {{ invite.created_date }}
+                            {% endlocaltime %}
+                            <a href="{%url 'cells:cells_revoke_invite' cell.id invite.id%}"><button class="btn btn-xs btn-default">Revoke</button></a>
+                        </li>
+                    </div>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                <h2>Using invite link</h2>
+                <p>Anyone with this link will be able to join your World.</p>
                 <div class="row">
                     <div class="col-xs-1">
                         <a class="btn btn-default" id="copySecretLink"><i class="fa fa-copy"></i> copy</a>
@@ -55,21 +75,25 @@
                     {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
                     <input class="btn btn-primary" type="submit" value="Reset Link"/>
                 </form>
-                <h2>Open Invitations</h2>
-                <ul>
-                    {% for invite in cell.open_invitations %}
-                    <div style="padding: 5px">
-                        <li>
-                            <strong><a href="{% url 'profiles:profiles_view_profile' invite.invited_player.profile.id %}">{% user_display invite.invited_player %}</a></strong>
-                            {% localtime on %}
-                                - {{ invite.created_date }}
-                            {% endlocaltime %}
-                            <a href="{%url 'cells:cells_revoke_invite' cell.id invite.id%}"><button class="btn btn-xs btn-default">Revoke</button></a>
-                        </li>
-                        </div>
-                    {% endfor %}
-                </ul>
-                <p>Invited players can RSVP by visiting this url:</p>
+                <h4>General RSVP Link</h4>
+                <p>
+                    <b>
+                        {% if cell.allow_self_invites %}
+                            This World allows self-invites.
+                        {% else %}
+                            Players must be invited to join this World.
+                        {% endif %}
+                    </b>
+                    You may change this behavior in <a href="{% url 'cells:cells_edit_find_world' cell.id %}">Recruitment Settings</a>
+                </p>
+                <p>
+                    {% if cell.allow_self_invites %}
+                        Any Player
+                    {% else %}
+                        Invited Players
+                    {% endif %}
+                    can RSVP by visiting this url:
+                </p>
                 <div class="row">
                     <div class="col-xs-1"><a class="btn btn-default" id="copyRsvpLink"><i class="fa fa-copy"></i> Copy</a></div>
                     <div class="col-xs-4"><input class="form-control" id="rsvpCopyField" type="text" value="https://{{ request.META.HTTP_HOST }}{% url 'cells:cells_rsvp_invite' cell.id %}" id="rsvpLinkInput"> </div>
@@ -78,9 +102,4 @@
         </div>
     </div>
 </div>
-{% endblock %}
-
-
-{% block extra_scripts %}
-    <script src="{% static 'js/invite.js' %}"></script>
 {% endblock %}

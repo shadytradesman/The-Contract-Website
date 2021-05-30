@@ -18,6 +18,7 @@
             showTutorial=false;
         {% endif %}
     </script>
+    {{cell_info|json_script:"cellInfos"}}
     <script src="{% static 'characters/edit_character.js' %}"></script>
     <script src="{% static 'overrides/wiki-macro-scripts.js' %}"></script>
 {% endblock %}
@@ -42,77 +43,25 @@
 {% include "characters/edit_pages/asset_script_snippet.html" %}
 {% include "characters/edit_pages/liability_script_snippet.html" %}
 <div class="container">
-    <div class="modal fade" id="tutorialModal" tabindex="-1" role="dialog" aria-labelledby="tutorialModalLabel">
-      <div class="modal-dialog modal-lg css-big-modal-lg visible-md-block visible-lg-block" role="document">
-        <div class="modal-content">
-            <img src="{% static 'overrides/art/fox-lg-modal.jpg' %}" class="css-big-modal-image">
-          <div class="modal-header text-center css-big-modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true" class="text-primary">&times;</span></button>
-            <h2 class="modal-title">What Makes a Contractor?</h2>
-          </div>
-          <div class="modal-body css-big-modal-body">
-              <span class="lead">You are exceptional.</span>
-              <p>
-                  {{tutorial.modal_1|safe}}
-              </p>
-              <br>
-              <span class="lead">You will sign The Contract.</span>
-              <p>
-                  {{tutorial.modal_2|safe}}
-              </p>
-              <br>
-              <span class="lead">Incredible Powers sleep within you.</span>
-              <p>
-                  {{tutorial.modal_3|safe}}
-              </p>
-          </div>
-          <div class="modal-footer" style="width:598px;position:relative;left:300px;">
-              <div class="text-center">
-            <button type="button" class="btn btn-default" data-dismiss="modal" role="button" data-slide="next">Let's do this</button>
-                  </div>
-          </div>
-        </div>
-      </div>
-      <div class="modal-dialog modal-lg visible-sm-block visible-xs-block" role="document">
-        <div class="modal-content">
-          <div class="modal-header text-center">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true" class="text-primary">&times;</span></button>
-            <h3 class="modal-title">What Makes a Contractor?</h3>
-          </div>
-          <div class="modal-body">
-              <h4 class="text-center">You are exceptional.</h4>
-              <img class="css-sm-modal-image" src="{% static 'overrides/art/fox-lg-modal.jpg' %}">
-              <p>
-                  {{tutorial.modal_1|safe}}
-              </p>
-              <br>
-              <h4 class="text-center">You will sign The Contract.</h4>
-              <p>
-                  {{tutorial.modal_2|safe}}
-              </p>
-              <br>
-              <h4 class="text-center">Incredible Powers sleep within you.</h4>
-              <p>
-                  {{tutorial.modal_3|safe}}
-              </p>
-              <img class="css-sm-modal-image" src="{% static 'overrides/art/ocean-lg-modal.jpg' %}">
-          </div>
-          <div class="modal-footer">
-              <div class="text-center">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Let's do this</button>
-                  </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    {% include "characters/edit_pages/choose_world_modal.html" %}
+    {% include "characters/edit_pages/what_is_contractor_modal.html" %}
 
     {{ attribute_formset.about.errors }}
     {{ char_form.about.errors }}
     {% if character %}
-        <h1 class = "text-center">Editing {{character.name}}</h1>
+        <h1 class = "text-center">
+            Editing
+            <span class="js-contractor-name">
+                {{character.name}}
+            </span>
+        </h1>
             <form action="{% url 'characters:characters_edit' character.id secret_key %}" method="post" onsubmit="setFormSubmitting()">
     {% else %}
-        <h1 class = "text-center">New Contractor</h1>
+        <h1 class = "text-center">
+            <span class="js-contractor-name">
+                New Contractor
+            </span>
+        </h1>
         <div class="visible-sm-block visible-xs-block text-center"><small>Tap on any element for more information.</small></div>
         <form action="{% url 'characters:characters_create' %}" method="post" onsubmit="setFormSubmitting()">
     {% endif %}

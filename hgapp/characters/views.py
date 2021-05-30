@@ -19,12 +19,13 @@ from characters.models import Character, BasicStats, Character_Death, Graveyard_
 from powers.models import Power_Full
 from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, AbilityForm, \
     AssetForm, LiabilityForm, BattleScarForm, TraumaForm, InjuryForm, SourceValForm, make_allocate_gm_exp_form, EquipmentForm,\
-    DeleteCharacterForm, BioForm
+    DeleteCharacterForm, BioForm, make_world_element_form
 from characters.form_utilities import get_edit_context, character_from_post, update_character_from_post, \
-    grant_trauma_to_character, delete_trauma_rev
-from characters.view_utilities import get_characters_next_journal_credit
+    grant_trauma_to_character, delete_trauma_rev, get_world_element_class_from_url_string
+from characters.view_utilities import get_characters_next_journal_credit, get_world_element_default_dict
 
 from journals.models import Journal, JournalCover
+from cells.models import Cell
 
 from hgapp.utilities import get_object_or_none
 
@@ -38,17 +39,20 @@ def __check_edit_perms(request, character, secret_key):
     if not requester_can_edit:
         raise PermissionDenied("You do not have permission to edit this Character")
 
-def create_character(request):
+
+def create_character(request, cell_id=None):
     if request.user.is_authenticated and not request.user.profile.confirmed_agreements:
         return HttpResponseRedirect(reverse('profiles:profiles_terms'))
+    cell = get_object_or_404(Cell, id=cell_id) if cell_id else None
     if request.method == 'POST':
         with transaction.atomic():
-            new_character = character_from_post(request.user, request.POST)
+            new_character = character_from_post(request.user, request.POST, cell)
         url_args = (new_character.id,) if request.user.is_authenticated else (new_character.id, new_character.edit_secret_key,)
         return HttpResponseRedirect(reverse('characters:characters_view', args=url_args))
     else:
-        context = get_edit_context(user=request.user)
+        context = get_edit_context(user=request.user, cell=cell)
         return render(request, 'characters/edit_pages/edit_character.html', context)
+
 
 def edit_character(request, character_id, secret_key = None):
     if request.user.is_authenticated and not request.user.profile.confirmed_agreements:
@@ -74,7 +78,7 @@ def delete_character(request, character_id):
     if request.method == 'POST':
         if DeleteCharacterForm(request.POST).is_valid():
             with transaction.atomic():
-                character.delete()
+                character.delete_char()
         else:
             raise ValueError("could not delete character")
         return HttpResponseRedirect(reverse('home'))
@@ -205,8 +209,53 @@ def view_character(request, character_id, secret_key = None):
     bio_form = BioForm()
 
     num_journal_entries = Journal.objects.filter(game_attendance__attending_character=character.id).count()
+    latest_journals = []
+    if num_journal_entries > 0:
+        journal_query = Journal.objects.filter(game_attendance__attending_character=character.id).order_by('-created_date')
+        if request.user.is_anonymous or not request.user.profile.view_adult_content:
+            journal_query = journal_query.exclude(is_nsfw=True)
+        journals = journal_query.all()
+        for journal in journals:
+            if len(latest_journals) > 2:
+                break
+            if journal.player_can_view(request.user):
+                latest_journals.append(journal)
+
     journal_cover = get_object_or_none(JournalCover, character=character.id)
     next_entry = get_characters_next_journal_credit(character) if user_can_edit else None
+
+    show_more_home_games_warning = character.number_completed_games() > 3 \
+                                   and (character.number_completed_games_in_home_cell() < character.number_completed_games_out_of_home_cell())
+    available_gift = character.unspent_rewards().count() > 0
+    circumstance_form = None
+    condition_form = None
+    artifact_form = None
+    world_element_initial_cell = character.world_element_initial_cell()
+    world_element_cell_choices = None
+    if user_can_edit:
+        # We only need these choices if the user can edit, both for forms and for char sheet.
+        world_element_cell_choices = character.world_element_cell_choices()
+        circumstance_form = make_world_element_form(world_element_cell_choices, world_element_initial_cell)
+        condition_form = make_world_element_form(world_element_cell_choices, world_element_initial_cell)
+        artifact_form = make_world_element_form(world_element_cell_choices, world_element_initial_cell)
+
+    artifacts = get_world_element_default_dict(world_element_cell_choices)
+    for artifact in character.artifact_set.all():
+        artifacts[artifact.cell].append(artifact)
+    artifacts = dict(artifacts)
+
+    circumstances = get_world_element_default_dict(world_element_cell_choices)
+    for circumstance in character.circumstance_set.all():
+        circumstances[circumstance.cell].append(circumstance)
+    circumstances = dict(circumstances)
+
+    conditions = get_world_element_default_dict(world_element_cell_choices)
+    for condition in character.condition_set.all():
+        conditions[condition.cell].append(condition)
+    conditions = dict(conditions)
+
+    assets = character.stats_snapshot.assetdetails_set.all()
+    liabilities = character.stats_snapshot.liabilitydetails_set.all()
     context = {
         'character': character,
         'user_can_edit': user_can_edit,
@@ -229,6 +278,18 @@ def view_character(request, character_id, secret_key = None):
         'num_journal_entries': num_journal_entries,
         'journal_cover': journal_cover,
         'next_entry': next_entry,
+        'latest_journals': latest_journals,
+        'show_more_home_games_warning': show_more_home_games_warning,
+        'available_gift': available_gift,
+        'circumstance_form': circumstance_form,
+        'condition_form': condition_form,
+        'artifact_form': artifact_form,
+        'artifacts_by_cell': artifacts,
+        'conditions_by_cell': conditions,
+        'circumstances_by_cell': circumstances,
+        'initial_cell': world_element_initial_cell,
+        'assets': assets,
+        'liabilities': liabilities,
     }
     return render(request, 'characters/view_pages/view_character.html', context)
 
@@ -280,6 +341,7 @@ def toggle_power(request, character_id, power_full_id):
                     rewards_to_be_spent = character.reward_cost_for_power(power_full)
                     for reward in rewards_to_be_spent:
                         reward.assign_to_power(power_full.latest_revision())
+                character.update_bonuses_from_power(power_full)
             return HttpResponseRedirect(reverse('characters:characters_power_picker', args=(character.id,)))
         else:
             print(assignment_form.errors)
@@ -505,4 +567,45 @@ def post_bio(request, character_id, secret_key = None):
         else:
             return JsonResponse({"error": form.errors}, status=400)
 
+    return JsonResponse({"error": ""}, status=400)
+
+
+
+def post_world_element(request, character_id, element, secret_key = None):
+    if request.is_ajax and request.method == "POST":
+        WorldElement = get_world_element_class_from_url_string(element)
+        if not WorldElement:
+            return JsonResponse({"error": "Invalid world element"}, status=400)
+        character = get_object_or_404(Character, id=character_id)
+        __check_edit_perms(request, character, secret_key)
+        world_element_cell_choices = character.world_element_cell_choices()
+        world_element_initial_cell = character.world_element_initial_cell()
+        form = make_world_element_form(world_element_cell_choices, world_element_initial_cell)(request.POST)
+        if form.is_valid():
+            new_element = WorldElement(
+                character=character,
+                name=form.cleaned_data['name'],
+                description=form.cleaned_data['description'],
+                system=form.cleaned_data['system'],
+                cell=form.cleaned_data['cell'],
+            )
+            with transaction.atomic():
+                new_element.save()
+            ser_instance = serializers.serialize('json', [new_element, ])
+            return JsonResponse({"instance": ser_instance, "id": new_element.id, "cellId": new_element.cell.id}, status=200)
+        else:
+            return JsonResponse({"error": form.errors}, status=400)
+    return JsonResponse({"error": ""}, status=400)
+
+def delete_world_element(request, element_id, element, secret_key = None):
+    if request.is_ajax and request.method == "POST":
+        WorldElement = get_world_element_class_from_url_string(element)
+        if not WorldElement:
+            return JsonResponse({"error": "Invalid world element"}, status=400)
+        ext_element = get_object_or_404(WorldElement, id=element_id)
+        character = ext_element.character
+        __check_edit_perms(request, character, secret_key)
+        with transaction.atomic():
+            ext_element.delete()
+        return JsonResponse({}, status=200)
     return JsonResponse({"error": ""}, status=400)

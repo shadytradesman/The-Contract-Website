@@ -2,22 +2,13 @@ from django import forms
 
 from characters.models import HIGH_ROLLER_STATUS
 from django.forms import ModelChoiceField
-from django.shortcuts import get_object_or_404
-from django.utils.datetime_safe import datetime
 from account.conf import settings
 from django.utils import timezone
 
-from games.models import Scenario
-
-from games.models import OUTCOME, ScenarioTag
-from games.games_constants import GAME_STATUS
+from games.models import OUTCOME, ScenarioTag, REQUIRED_HIGH_ROLLER_STATUS, INVITE_MODE, GameMedium
 from characters.models import Character
 
-from games.models import Game_Attendance
-
 from bootstrap3_datetime.widgets import DateTimePicker
-
-from overrides.widgets import CustomStylePagedown
 
 from tinymce.widgets import TinyMCE
 
@@ -67,118 +58,133 @@ class CustomInviteForm(forms.Form):
                                           required=False,
                                           help_text="Invite this player to play an NPC. The Scenario will be revealed to them if they accept.")
 
-def make_game_form(user, game_status):
+def make_game_form(user):
     class CreateGameForm(forms.Form):
         date_format= '%m/%d/%Y %I:%M %p'
-        title = forms.CharField(label='Game Name',
+        title = forms.CharField(label='Scenario Name',
                                max_length=100,
-                               help_text='The Game\'s Name.',
-                               required=True,)
+                               help_text='The name for the newly-created Scenario.',
+                               required=False)
         hook = forms.CharField(label='Invitation Text',
                                widget=forms.Textarea,
                                max_length=5000,
-                               help_text='Entice Players to RSVP or provide information.')
-
-
+                               help_text='Entice Players and provide information.')
         timezone = forms.ChoiceField(
             label= ("My Timezone"),
             choices=settings.ACCOUNT_TIMEZONES,
             required=False,
             initial=user.account.timezone
         )
-        queryset = user.cell_set.all()
-        if game_status == str(GAME_STATUS[0][0]):
-            # Game is scheduled
-            scenario = ScenarioModelChoiceField(queryset=user.scenario_set.all(),
-                                              empty_label="Create New Scenario",
-                                              required=False,
-                                              help_text='Select the Scenario that the game will follow.')
-            scheduled_start_time = forms.DateTimeField(widget=DateTimePicker(options=False),
-                                                       input_formats=[date_format],
-                                                       help_text='For planning only. Places no restrictions on starting the Game.')
-            open_invitations = forms.BooleanField(label="Open Invitations",
-                                                  required=False,
-                                                  initial=True,
-                                                  help_text="If checked, Players will be able to invite themselves to the Game. "
-                                                            "You will still be able to declare which Contractors may actually attend as you start the Game.",)
-            cell = forms.ModelChoiceField(queryset=queryset,
-                                          empty_label="Select a Cell",
-                                          help_text="Select a Cell for this Game. This defines the setting of the Game. "
-                                                    "Cell leaders have the power to edit or void the Games "
-                                                    "run in their cells.",
-                                          required=True)
+        all_cells = user.cell_set.all()
+        cell_ids = {cell.id for cell in all_cells if cell.player_can_run_games(user)}
+        queryset = user.cell_set.filter(id__in=cell_ids).all()
+        scenario = ScenarioModelChoiceField(queryset=user.scenario_set.all(),
+                                          empty_label="Create New Scenario",
+                                          required=False,
+                                          help_text='Select the Scenario that the Game will follow.')
+        scheduled_start_time = forms.DateTimeField(widget=DateTimePicker(options=False),
+                                                   input_formats=[date_format],
+                                                   help_text='For planning purposes. Places no actual restrictions on starting the Game.')
+        cell = forms.ModelChoiceField(label="World",
+                                      queryset=queryset,
+                                      empty_label="Select a World",
+                                      help_text="Select a World for this Game. This generally defines the setting of "
+                                                "the Game, although some Scenarios may see the Contractors spirited away "
+                                                "to other dimensions, pocket realms, or similar. "
+                                                "World leaders have the power to edit or void Games "
+                                                "run in their World.",
+                                      required=True)
 
-            invite_all_members = forms.BooleanField(initial=False,
-                                                    required=False,
-                                                    label='Invite all Cell Members',
-                                                    help_text="Automatically send an invite to all members of the chosen"
-                                                              " Cell. This will send a notification to all Cell "
-                                                              "members.",)
-            required_character_status = forms.ChoiceField(choices=HIGH_ROLLER_STATUS,
-                                                          help_text='Players will only be able to RSVP with Contractors of the selected Status.')
+        invite_all_members = forms.BooleanField(initial=False,
+                                                required=False,
+                                                label='Invite all World Members',
+                                                help_text="Automatically send an invite and notification to all members "
+                                                          "of the chosen World. ")
+        required_character_status = forms.ChoiceField(label="Required Contractor Status",
+                                                      choices=REQUIRED_HIGH_ROLLER_STATUS,
+                                                      help_text='Players will only be able to RSVP with Contractors of the selected Status.')
+        if user.profile.view_adult_content:
             only_over_18 = forms.BooleanField(initial=False,
                                               required=False,
                                               label='Only allow 18+ Players',
                                               help_text="If selected, only Players over the age of 18 will be able"
-                                                        " to attend.", )
-        else:
-            # Game not scheduled
-            scheduled_start_time = forms.DateTimeField(initial=datetime.today(),
-                                                   disabled=True,
-                                                   help_text='You can no longer change the scheduled start time.',
-                                                   required=False)
-            open_invitations = forms.BooleanField(label="Open Invitations",
-                                                  required=False,
-                                                  disabled=True,
-                                                  initial=True,
-                                                  help_text="Invites are closed.", )
-            invite_all_members = forms.BooleanField(disabled=True,
-                                                    help_text="Invites are closed.",
-                                                    required=False,
-                                                    )
-            required_character_status = forms.ChoiceField(disabled=True,
-                                                          choices=HIGH_ROLLER_STATUS,
-                                                          help_text='You can no longer change required Status.')
-            only_over_18 = forms.BooleanField(disabled=True,
-                                              label='Only allow 18+ Players',
-                                              help_text="You can no longer change the 18+ requirement.")
+                                                        " to attend. This does not imply anything about the content of "
+                                                        " the Game.", )
+
+        invitation_mode = forms.ChoiceField(label="Who can RSVP?",
+                                            choices=INVITE_MODE,
+                                            initial=INVITE_MODE[2],
+                                            help_text='Determine who is allowed to RSVP to this Game. Specifically '
+                                                      'invited Players may always RSVP unless the Game is closed.')
+        list_in_lfg = forms.BooleanField(initial=True,
+                                         required=False,
+                                         label='List on LFG',
+                                         help_text="If checked, this Game will appear on the Looking-For-Game page. Do "
+                                                   "not list in-person Games on the LFG page.")
+        max_rsvp = forms.IntegerField(label="Capacity",
+                                      required=False,
+                                      help_text="Optional. Specify a limit on how many Players can RSVP to this Game.",
+                                      widget=forms.NumberInput(attrs={'class': 'ability-value-input form-control'}))
+        allow_ringers = forms.BooleanField(initial=True,
+                                           required=False,
+                                           label='Allow Ringers',
+                                           help_text="If checked, Players will be able to RSVP as an NPC Ringer. (Note: "
+                                                     "other Players cannot see who has RSVPed until after the Game.)")
+        gametime_url = forms.CharField(label='Communication URL',
+                                       max_length=1500,
+                                       help_text='Optional. A link to the location (video call, Discord server, Roll20 '
+                                                 'room, etc.) where the Game will take place. It is revealed to Players after '
+                                                 'they are invited or RSVP.',
+                                       required=False)
+        mediums = forms.ModelMultipleChoiceField(queryset=GameMedium.objects.order_by("medium").all(),
+                                                 required=False,
+                                                 widget=forms.CheckboxSelectMultiple(attrs={'class': 'list-unstyled list-inline'}),
+                                                 help_text='How will the Players communicate during the Game? Select all'
+                                                           ' that apply.')
 
         def default_date(self):
-            if self.initial:
+            if self.initial and 'start_time' in self.initial:
                 #if you pass this in with the same name as the field, you get initial value issues
                 return self.initial['start_time'].strftime(self.date_format)
             return None
 
     return CreateGameForm
 
+class CharDisplayModelChoiceField(ModelChoiceField):
+    def label_from_instance(self, character):
+        return "{} ({} Victories)".format(character.name, character.number_of_victories())
 
 def make_accept_invite_form(invitation):
     class AcceptInviteForm(forms.Form):
         users_living_character_ids = [char.id for char in invitation.invited_player.character_set.filter(is_deleted=False).all() if not char.is_dead()]
         required_status = invitation.relevant_game.required_character_status
-        if required_status == HIGH_ROLLER_STATUS[0][0]:
+        if required_status == REQUIRED_HIGH_ROLLER_STATUS[0][0]: # any
             queryset = Character.objects.filter(id__in=users_living_character_ids)
-        elif required_status == HIGH_ROLLER_STATUS[1][0] or required_status == HIGH_ROLLER_STATUS[2][0]:
+        elif required_status == REQUIRED_HIGH_ROLLER_STATUS[1][0]: # newbie or novice
             queryset = Character.objects.filter(id__in=users_living_character_ids).filter(status__in=[HIGH_ROLLER_STATUS[1][0], HIGH_ROLLER_STATUS[2][0]])
+        elif required_status == REQUIRED_HIGH_ROLLER_STATUS[2][0]:  # newbie only
+            queryset = Character.objects.filter(id__in=users_living_character_ids).filter(status=HIGH_ROLLER_STATUS[1][0])
+        elif required_status == REQUIRED_HIGH_ROLLER_STATUS[3][0]:  # novice only
+            queryset = Character.objects.filter(id__in=users_living_character_ids).filter(status=HIGH_ROLLER_STATUS[2][0])
+        elif required_status == REQUIRED_HIGH_ROLLER_STATUS[4][0]:  # seasoned only
+            queryset = Character.objects.filter(id__in=users_living_character_ids).filter(status=HIGH_ROLLER_STATUS[3][0])
+        elif required_status == REQUIRED_HIGH_ROLLER_STATUS[5][0]:  # veteran only
+            queryset = Character.objects.filter(id__in=users_living_character_ids).filter(status=HIGH_ROLLER_STATUS[4][0])
         else:
-            queryset = Character.objects.filter(id__in=users_living_character_ids).filter(status=invitation.relevant_game.required_character_status)
-        if invitation.as_ringer:
-            attending_character = forms.ModelChoiceField(
+            raise ValueError("unanticipated required roller status")
+        if invitation.as_ringer or invitation.relevant_game.allow_ringers:
+            attending_character = CharDisplayModelChoiceField(
                 queryset=queryset,
                  empty_label="Play an NPC Ringer",
                  required=False)
         else:
-            attending_character = CharacterModelChoiceField(queryset=queryset,
+            attending_character = CharDisplayModelChoiceField(queryset=queryset,
                                                      empty_label=None,
                                                      help_text="Declare which character you're attending with. Private "
                                                                "Characters and their powers will be revealed to the "
                                                                "Game creator if selected.",
                                                      required=True)
     return AcceptInviteForm
-
-class CharacterModelChoiceField(ModelChoiceField):
-    def label_from_instance(self, obj):
-        return obj.name
 
 
 class ValidateAttendanceForm(forms.Form):
@@ -304,7 +310,7 @@ class ArchivalOutcomeForm(forms.Form):
                             widget=forms.HiddenInput(),
                             required=False,)
 
-    attending_character = CharacterModelChoiceField(queryset=Character.objects.all(),
+    attending_character = CharDisplayModelChoiceField(queryset=Character.objects.all(),
                                                     empty_label="Played a Ringer",
                                                     help_text="Declare which character this player brought.",
                                                     required=False)
@@ -326,6 +332,7 @@ class ArchivalOutcomeForm(forms.Form):
                 .exclude(character_death__is_void = False, character_death__game_attendance__isnull = False)\
                 .distinct()
         self.fields['attending_character'].queryset = queryset
+
 
 class RsvpAttendanceForm(forms.Form):
     pass

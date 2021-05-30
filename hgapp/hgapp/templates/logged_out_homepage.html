@@ -6,6 +6,7 @@
 {% load i18n %}
 {% load staticfiles %}
 {% load cache %}
+{% load power_tags %}
 
 {% block extra_styles %}
     <link rel="stylesheet" type="text/css" href="{% static 'overrides/splash_style.css' %}" />
@@ -31,11 +32,9 @@
 
         <div id="css-front-text" class="css-backdropped-text">
             <span class="lead">
-                <b>The Contract</b> is a TableTop Role Playing Game about ambitious individuals who agree to go on deadly missions
-                in exchange for fantastic Powers.
-                Set in a world where the advent of camera phones confirmed the existence of
-                the supernatural instead of disproving it, the Contractors operate on the front lines between the mundane and
-                extraordinary. Those who survive are forged into some of the most fearsome beings in existence.
+                <b>The Contract</b> is a TableTop Role Playing Game about ambitious individuals who agree to go on
+                deadly missions in exchange for fantastic Powers. Competition is fierce, but those who survive are
+                forged into some of the most fearsome beings in the multiverse.
             </span>
         </div>
         <div id="css-front-bullets-section" class="css-backdropped-text">
@@ -46,8 +45,7 @@
             <br>
             <span class="lead">
                 <b>Be Unique.</b> Craft novel Powers for your Contractors using The Contract's robust Power-building
-                system. Any Character concept-- from a psychic gambler to an undercover alien-- is easy to
-                create, progress, and balance.
+                system. Any character concept-- from a psychic gambler to an undercover alien-- is easy to achieve.
             </span>
             </div>
             <br>
@@ -62,10 +60,21 @@
             <br>
             <div class="css-front-text-bullets">
                 <span class="lead">
-                    <b>Any Group. Any Time.</b> Each session of The Contract is a self-contained Game.
-                    You don’t need to cancel if one of your Players can’t make it, and each Player who shows can
-                    play and advance their favorite Contractor. The responsibility of
-                    the Game Master (GM) also rotates as desired, preventing “forever GM” burnout.
+                    <b>Any Group. Any Time.</b>
+                    Each session of The Contract is a self-contained Game. You don’t need to
+                    cancel if one of your Players can’t make it, and each Player who shows can play and advance their
+                    favorite Contractor. The responsibility of the Game Master (GM) rotates as desired, preventing
+                    "forever GM" burnout.
+                </span>
+            </div>
+            <br>
+            <div class="css-front-text-bullets">
+                <span class="lead">
+                    <b>Change the World.</b>
+                    The Contract can be played in any setting, and each group of Players defines their own shared World.
+                    However, <i>the boundaries between Worlds can be crossed.</i> You can invite Contractors from other
+                    Worlds to risk their lives in your Games or seek advancement for your own Contractors by
+                    bringing them to Games in other Worlds.
                 </span>
             </div>
             <br>
@@ -74,9 +83,16 @@
                     <b>100% Free.</b> The Contract eschews traditional publishing in favor of a 100% free website.
                     There are no source books to track down and buy. All new content and updates are available
                     immediately to all Players, and the Website is rich with features that make learning and
-                    running The Contract easy. Join our <a href="https://discord.gg/xUZZegYNNy">Discord Server</a> to find
-                    other players or drop into one of our frequent, Newbie-friendly sessions.
-                </span>
+                    running The Contract easy. Find
+                    <a href="{% url 'cells:cells_find_world' %}" >
+                        a play group
+                    </a>
+                    and
+                    <a href="{% url 'games:games_looking_for_game' %}">
+                        upcoming Games
+                    </a>
+                    that match your preferences, and join our <a href="https://discord.gg/xUZZegYNNy">Discord Server</a>
+                    to connect with our community, learn the ropes, or drop into one of our frequent newbie-friendly Games.
             </div>
             <br>
             <div id="get-started-wrapper" class="text-center">
@@ -174,23 +190,17 @@
                 <div class="tab-content">
                     <div role="tabpanel" class="tab-pane fade in active" id="fireballs">
                         <div class="css-power-container">
-                            {% with power_1 as power_full %}
-                            {% include "powers/power_badge_snippet.html" %}
-                            {% endwith %}
+                            {% power_badge power_1 %}
                         </div>
                     </div>
                     <div role="tabpanel" class="tab-pane fade" id="werewolf">
                         <div class="css-power-container">
-                            {% with power_2 as power_full %}
-                            {% include "powers/power_badge_snippet.html" %}
-                            {% endwith %}
+                            {% power_badge power_2 %}
                         </div>
                     </div>
                     <div role="tabpanel" class="tab-pane fade" id="time-traveler">
                         <div class="css-power-container">
-                            {% with power_3 as power_full %}
-                            {% include "powers/power_badge_snippet.html" %}
-                            {% endwith %}
+                            {% power_badge power_3 %}
                         </div>
                     </div>
                 </div>
@@ -249,45 +259,55 @@
                     <br>
                     <br>
                     <div class="lead text-center">
-                        <b>Four Scenarios included.</b>
+                        <b>
+                            Unlimited Content
+                        </b>
                         <br>
-                        View one immediately, unlock more by <a href="/account/signup/"><b>Signing up for free</b></a>.
+                        Immediately access <b>{{num_stock_scenarios}}</b> Scenarios written by The Contract's developers.
+                        <br>
+                        Discover <b>{{num_community_scenarios}}</b> Scenarios written by the community.
                     </div>
                     <div class="lead">
-                        <b>Deadly risk.</b> Just how deadly is up to you, but we put our thumb on the scale. GMs are handsomely
-                        rewarded for running a Game that achieves the "golden ratio" where at least one Contractor dies while another achieves victory. Players
-                        are likewise rewarded when one of their Contractors dies. However, no Game can require a Contractor's death.
+                        <b>Deadly risk.</b> Just how deadly is up to you, but Rewards for Players and GMs encourage
+                        killing Contractors when they deserve it. Automatic danger-ratings for Players and GMs make it
+                        easy to find a group that matches your personal appetite for risk.
                         <br>
                     </div>
                 </div>
             </div>
             <br>
-            <h1 class="text-center">Cells</h1>
+            <h1 class="text-center">Worlds</h1>
             <br>
             <div class="css-backdropped-text">
                 <div class="lead">
-                    <b>A Shared World.</b> Cells are a group of Players with a shared setting. They may have anywhere
-                    from a few to a few dozen members. Contractors who share a Cell spend the Downtime between Games in
-                    the same setting, making moves that may dramatically change the world.
+                    <b>Ambition to change the World.</b>
+                    Contractors risk their lives for a reason. In the Downtime between Games, they make moves, bend
+                    society to their ideals, form alliances, and fend off enemies they make on their rise to power.
+                    Their actions change the World and impact the Contractors who share it.
+                    <br>
+                    <br>
+                    <b>A Shared World.</b> Worlds are a shared setting for a group of Contractors. World leaders have
+                    unlimited power to define their setting and impose house rules. Despite this freedom, Contractors
+                    who visit form other Worlds remain balanced.
                     <br><br>
                     <div class="text-center">
-                        Each Cell defines its own setting.
+                        <a href="{% url 'cells:cells_find_world' %}" >
+                            Find a World to join.
+                        </a>
                     </div>
                     <br>
-                    <b>The Default Cell</b> is one where videos of supernatural phenomena go viral every day. Here, witch
-                    hunts have merit. Billionaires and Senators employ paranormal advisers and bodyguards, and
+                    <b>The Default Setting</b> is one where videos of supernatural phenomena go viral every day. Here, witch
+                    hunts have merit. Billionaires and Senators employ paranormal advisors and bodyguards, and
                     everyone knows. Charlatans become pop culture icons, and each revelation inspires a new cult.
                     The world is changing. The secret societies that pull humanity's strings scramble to adapt.
                     <div class="text-center lead">Now's a good time to move up.</div>
                     <br>
-                    <b>One Shot at a Time.</b> Any group of Players in a Cell can organize a Game, and any member may GM.
-                    Contractors can be invited to join Games in other Cells, after which they are returned home, provided
-                    they survive. The Website's bookkeeping features allow you to vet potential Contractors and Players so
-                    you can find a good match.
-                    <a href="https://www.thecontractrpg.com/wiki/Rules/1-basics/b-setting-and-cells/">
-                        Read more about Settings and Cells
-                    </a>
-                    <br>
+                    <div class="text-center">
+                        <a href="https://www.thecontractrpg.com/wiki/Rules/1-basics/b-setting-and-cells/">
+                            Read more about Worlds
+                        </a>
+
+                    </div>
                 </div>
             </div>
         </div>

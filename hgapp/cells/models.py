@@ -22,18 +22,17 @@ ROLE = (
 
 # NEVER CHANGE THIS ORDERING.
 CELL_PERMISSIONS = (
-    ('admin', "Administrate"),
-    ('manage_memberships', 'Manage Memberships'),
-    ('manage_roles', 'Manage Role Permissions'),
+    ('admin', "Administrate"), # change roles, everything else.
+    ('manage_memberships', 'Manage Memberships'), #ranks and recruitment
+    ('manage_roles', 'Run Games'), # change to: can run games?
     ('post_events', 'Post World Events'),
-    ('manage_member_characters', 'Manage Member Characters'),
-    ('edit_world', 'Edit The World Description'),
+    ('manage_member_characters', 'Manage Contractors'),
+    ('edit_world', 'Edit World'),
     ('manage_games', 'Manage Games'),
 )
 
 def random_string():
     return hashlib.sha224(bytes(random.randint(1, 99999999))).hexdigest()
-
 
 class Cell(models.Model):
     name = models.CharField(max_length=200)
@@ -43,40 +42,113 @@ class Cell(models.Model):
         on_delete=models.PROTECT)
     created_date = models.DateTimeField('date created',
                                         auto_now_add=True)
+    find_world_date = models.DateTimeField('find world date',
+                                           null=True,
+                                           blank=True)
     members = models.ManyToManyField(settings.AUTH_USER_MODEL,
                                      through="CellMembership",
                                      through_fields=('relevant_cell', 'member_player'))
+
+    # Invites
     invitations = models.ManyToManyField(settings.AUTH_USER_MODEL,
                                          through="CellInvite",
                                          related_name='cell_invites')
-    invite_link_secret_key = models.CharField(default = random_string,
+    invite_link_secret_key = models.CharField(default=random_string,
                                               max_length=64)
+    allow_self_invites = models.BooleanField(default=False)
 
-
-    #TODO: add dice system support.
     # Setting information
-    setting_name =  models.CharField(max_length=200)
-    setting_description = models.TextField(max_length=40000,
-                                      null=True,
-                                      blank=True)
+    setting_name = models.CharField(max_length=200) # prepopulate name field with this value for migration purposes
+    setting_sheet_blurb = models.CharField(max_length=500, default=" ")
+    setting_summary = models.CharField(max_length=10000, null=True, blank=True)
+    setting_description = models.TextField(max_length=70000,
+                                           null=True,
+                                           blank=True)
+    setting_create_char_info = models.CharField(max_length=10000, null=True, blank=True)
 
-    def player_can_edit_characters(self, player):
-        return player.has_perm(CELL_PERMISSIONS[4][0], self)
+    # Cell Info
+    cell_sell = models.CharField(max_length=10000, null=True, blank=True)
+    house_rules = models.CharField(max_length=50000, null=True, blank=True)
+    community_link = models.CharField(max_length=1000, null=True, blank=True)
+    is_community_link_public = models.BooleanField(default=False)
+    is_listed_publicly = models.BooleanField(default=False)
+    are_contractors_portable = models.BooleanField(default=True)
+    #TODO: how are games played? In person, on roll-20, on discord? online?
+
+    game_victory = models.IntegerField(null=True, blank=True)
+    game_loss = models.IntegerField(null=True, blank=True)
+    game_death = models.IntegerField(null=True, blank=True)
+
+    def get_danger_display(self):
+        if not self.game_victory or not self.game_loss or not self.game_death:
+            self.update_safety_stats()
+        num_games = self.num_completed_games()
+        game_death_ratio = self.death_ratio()
+        if num_games < 3:
+            return None
+        elif game_death_ratio < 0.01 and num_games > 4:
+            result = "Pillow"
+        elif game_death_ratio < 0.05:
+            result = "Safe"
+        elif game_death_ratio < 0.13:
+            result = "Average"
+        elif game_death_ratio < 0.25:
+            result = "Dangerous"
+        elif game_death_ratio < 0.4:
+            result = "Deadly"
+        elif game_death_ratio < 1:
+            result = "Hell"
+        else:
+            result = "Slaughterhouse"
+
+        return "<span class=\"css-difficulty css-difficulty-{}\">{}</span>".format(result, result)
+
+    def death_ratio(self):
+        return self.game_death / (self.game_victory + self.game_loss + 1) # prevent divide-by-zero errors
+
+    def update_safety_stats(self):
+        completed_games = self.game_set.exclude(get_completed_game_excludes_query()).all()
+        num_victory = 0
+        num_died = 0
+        num_loss = 0
+        for game in completed_games:
+            num_died = num_died + game.number_deaths()
+            num_victory = num_victory + game.number_victories()
+            num_loss = num_loss + game.number_losses()
+        self.game_victory = num_victory
+        self.game_loss = num_loss
+        self.game_death = num_died
+        self.save()
+
+    def get_danger_tooltip(self):
+        return "Victories: {} <br>Losses: {} <br>Deaths: {}".format(self.game_victory, self.game_loss, self.game_death)
 
     def player_can_admin(self, player):
         return player.has_perm(CELL_PERMISSIONS[0][0], self)
 
-    def player_can_edit_world(self, player):
-        return player.has_perm(CELL_PERMISSIONS[5][0], self)
-
     def player_can_manage_memberships(self, player):
         return player.has_perm(CELL_PERMISSIONS[1][0], self)
+
+    def player_can_run_games(self, player):
+        return player.has_perm(CELL_PERMISSIONS[2][0], self)
+
+    def player_can_post_world_events(self, player):
+        return player.has_perm(CELL_PERMISSIONS[3][0], self)
+
+    def player_can_edit_characters(self, player):
+        return player.has_perm(CELL_PERMISSIONS[4][0], self)
+
+    def player_can_edit_world(self, player):
+        return player.has_perm(CELL_PERMISSIONS[5][0], self)
 
     def player_can_manage_games(self, player):
         return player.has_perm(CELL_PERMISSIONS[6][0], self)
 
     def get_player_membership(self, player):
         return get_object_or_none(self.cellmembership_set.filter(member_player=player))
+
+    def get_permissions_for_role(self, role):
+        return get_object_or_none(PermissionsSettings, relevant_cell=self, role=role)
 
     def __str__(self):
         return self.name
@@ -142,15 +214,23 @@ class Cell(models.Model):
         return self.cellmembership_set.count()
 
     def completed_games(self):
+        return self.completed_games_queryset().all()
+
+    def num_completed_games(self):
+        return self.completed_games_queryset().count()
+
+    def completed_games_queryset(self):
         return self.game_set \
-            .exclude(get_completed_game_excludes_query()) \
-            .order_by("end_time").all()
+            .exclude(get_completed_game_excludes_query())\
+            .order_by("-end_time")
 
     def num_games_player_participated(self, player):
         completed_games = self.completed_games()
         return len([game for game in completed_games if game.player_participated(player)])
 
     def save(self, *args, **kwargs):
+        if self.setting_sheet_blurb and self.setting_sheet_blurb[-1] == '.':
+            self.setting_sheet_blurb = self.setting_sheet_blurb[:-1 or None]
         if self.pk is None:
             super(Cell, self).save(*args, **kwargs)
             for role in ROLE:
@@ -163,6 +243,9 @@ class Cell(models.Model):
                 settings.save()
             self.addPlayer(player=self.creator, role=ROLE[0])
         else:
+            super(Cell, self).save(*args, **kwargs)
+        if not hasattr(self, "find_world_date") or not self.find_world_date:
+            self.find_world_date = self.created_date
             super(Cell, self).save(*args, **kwargs)
 
     def open_invitations(self):
@@ -182,8 +265,8 @@ class WorldEvent(models.Model):
         on_delete=models.CASCADE)
     created_date = models.DateTimeField('date created',
                                         auto_now_add=True)
-    headline =  models.CharField(max_length=200)
-    event_description = models.TextField(max_length=40000,
+    headline = models.CharField(max_length=1000)
+    event_description = models.TextField(max_length=50000,
                                       null=True,
                                       blank=True)
 
@@ -260,6 +343,22 @@ class PermissionsSettings(models.Model):
         if permission == CELL_PERMISSIONS[6]:
             return self.can_manage_games
         raise ValueError("Permission not found")
+
+    def enabled_permissions(self):
+        permissions = []
+        if self.can_manage_memberships:
+            permissions.append(CELL_PERMISSIONS[1])
+        if self.can_manage_roles:
+            permissions.append(CELL_PERMISSIONS[2])
+        if self.can_post_events:
+            permissions.append(CELL_PERMISSIONS[3])
+        if self.can_manage_memberships:
+            permissions.append(CELL_PERMISSIONS[4])
+        if self.can_edit_world:
+            permissions.append(CELL_PERMISSIONS[5])
+        if self.can_manage_member_characters:
+            permissions.append(CELL_PERMISSIONS[6])
+        return permissions
 
     def updatePermissions(self):
         groupName = self.relevant_cell.getGroupName(self.role)

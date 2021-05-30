@@ -1,0 +1,130 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+{% load bootstrap %}
+{% load staticfiles %}
+
+{% block extra_styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'cells/edit_setting.css' %}" />
+{% endblock %}
+
+{% block extra_scripts %}
+    <script src="{% static 'overrides/wiki-macro-scripts.js' %}"></script>
+    <script src="{% static 'cells/edit.js' %}"></script>
+{% endblock %}
+
+{% block head_title %}
+    {% if cell %}
+        Editing World
+    {% else %}
+        New World
+    {% endif %}
+{% endblock %}
+
+{% block extra_head %}
+{{ form.media }}
+{% endblock %}
+
+{% block body_class %}
+    home
+{% endblock %}
+
+{% block body_base %}
+<div class="container">
+    {{ form.about.errors }}
+    <h1 class="text-center">
+        {% if cell %}
+            Editing {{cell.name}}
+        {% else %}
+            Creating a new World
+        {% endif %}
+    </h1>
+    {% if cell %}
+        <form action="{% url 'cells:cells_edit' cell.id %}" method="post", onsubmit="setFormSubmitting()">
+    {% else %}
+        <form action="{% url 'cells:cells_create' %}" method="post", onsubmit="setFormSubmitting()">
+    {% endif %}
+        {{ form.non_field_errors }}
+        {% csrf_token %}
+        <div class="panel panel-default">
+            <div class="panel-body">
+                {% if not cell %}
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 text-center">
+                        <div role="alert" class="alert alert-info text-center">
+                            <p>
+                                <b>
+                                    The default values on this form are provided for your convenience.
+                                </b>
+                            </p>
+                            <p>
+                                Use or replace them as desired.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div id="css-name-field" class="css-essential-field">
+                            {{ form.name }}
+                            <figcaption class="help-block">
+                                {{ form.name.help_text|safe}}
+                            </figcaption>
+                        </div>
+                        <div class="clearfix visible-xs-block visible-md-block visible-sm-block"></div>
+                        <span class="css-essential-text"> is a world </span>
+                        <div id="css-concept-field" class="css-essential-field"  >
+                            {{ form.setting_sheet_blurb }}
+                            <figcaption class="help-block">
+                                {{ form.setting_sheet_blurb.help_text|safe}}
+                            </figcaption>
+                        </div>
+                        <span class="css-essential-text visible-lg-block"> .</span>
+                    </div>
+                </div>
+                {{form.setting_summary|bootstrap}}
+                <h3>Full Description</h3>
+                <p>
+                    Spill the beans. Describe your World's setting in as much detail as you like. At a bare minimum, you should
+                    answer:
+                    <ul>
+                        <li>How commonplace is the supernatural in this World?</li>
+                        <li>Are the Games (Contractors, Harbingers) known? By who?</li>
+                    </ul>
+                {{ form.setting_description | bootstrap }}
+                </p>
+                <br>
+                {% if not cell %}
+                    <a class="btn btn-default btn-sm wiki-entry-collapsible">Additional Customization Options</a>
+                {% endif %}
+                <div class="collapse-content clearfix"
+                     {% if not cell %} style="display:none;" {% endif %}>
+                    <h3>House Rules</h3>
+                    <p>
+                        {{ form.house_rules.help_text }}
+                        <br>
+                        {{ form.house_rules }}
+                        <br>
+                        {{ form.are_contractors_portable|bootstrap }}
+                    </p>
+                    <h3>Contractor Creation Prompt</h3>
+                    <p>
+                        This text will be shown to anyone creating a Contractor in this World. What sorts of people become
+                        Contractors in this setting? If absent, your World's Summary will be used.
+                        {{ form.setting_create_char_info | bootstrap }}
+                    </p>
+                </div>
+                <div class="text-center">
+                    <input class="btn btn-primary btn-lg" type="submit" value="Done!" />
+                    <div>
+                        <small>
+                            You may edit your World at any time.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

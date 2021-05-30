@@ -1,0 +1,100 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+{% load bootstrap %}
+{% load staticfiles %}
+
+{% block extra_styles %}
+{% endblock %}
+
+{% block extra_scripts %}
+{% endblock %}
+
+{% block head_title %}
+    Editing World Permissions
+{% endblock %}
+
+{% block extra_head %}
+{{ form.media }}
+{% endblock %}
+
+{% block body_class %}
+home
+{% endblock %}
+
+{% block body_base %}
+<div class="container">
+    {{ form.about.errors }}
+    <h1 class="text-center">
+        Editing Permissions for <a href="{% url 'cells:cells_view_cell' cell.id %}">{{cell.name}}</a>
+    </h1>
+    <form action="{% url 'cells:cells_manage_roles' cell.id %}" method="post">
+            {{ formset.about.errors }}
+            {{ formset.management_form }}
+            {{ formset.non_field_errors }}
+            {% csrf_token %}
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="text-center">
+                        If you would like to manage role assignments
+                        <a href="{% url 'cells:cells_manage_members' cell.id %}">
+                            click here.
+                        </a>
+                    </div>
+                    <br>
+                    <br>
+                    <div class="row">
+                        <div class="col-xs-1">
+                        </div>
+                        <div class="col-xs-11">
+                            <div class="row">
+                                {% for perm in permissions %}
+                                <div class="col-xs-2">
+                                    <small>{{ perm.1 }}</small>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-1">
+                            Leader
+                        </div>
+                        <div class="col-xs-11">
+                            <div class="row">
+                                {% for perm in permissions %}
+                                <div class="col-xs-2">
+                                    <input type="checkbox" checked disabled>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% for form in formset %}
+                    <div class="row">
+                        <div class="col-xs-1">
+                            {{ form.role }}
+                            {{form.initial.role_display}}
+                        </div>
+                        <div class="col-xs-11">
+                            <div class="row">
+                                {% for field in form %}
+                                {% if not forloop.first %}
+                                <div class="col-xs-2">
+                                    {{field}}
+                                </div>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="text-center">
+                    <input class="btn btn-primary btn-lg" type="submit" value="Done!" />
+                </div>
+                <br>
+            </div>
+        </form>
+</div>
+{% endblock %}

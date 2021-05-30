@@ -1,0 +1,126 @@
+{% load account_tags %}
+
+{% if upcoming_games %}
+    {% for game in upcoming_games %}
+        <div class="alert alert-info text-center css-upcoming-game" role="alert">
+            <h4 class="text-center" style="display: inline-block; margin-bottom: 0px;">
+                Upcoming Game -
+                <a href="{% url 'profiles:profiles_view_profile' game.gm.id %}">
+                    {{game.gm.username}}
+                </a>
+                will run
+                <a href="{% url 'games:games_view_game' game.id %}">
+                    {{game.title}}
+                </a>
+                in {{game.scheduled_start_time|timeuntil}}.
+            </h4>
+            <div class="clearfix visible-sm-block"></div>
+            <a href="{% url 'games:games_view_game' game.id %}">
+                (Click to view)
+            </a>
+        </div>
+    {% endfor %}
+{% endif %}
+{% if world_events %}
+    <h2 class="text-center" style="margin-bottom:5px;">Latest World Events</h2>
+    <div class="text-center" style="margin-bottom:5px">
+        {% if can_post_world_events %}
+        <a href="{% url 'cells:cells_post_world_event' cell.id %}">
+            <small>Post a new World Event</small>
+        </a>
+        -
+        {% endif %}
+        <a id="js-all-world-tab" href="#allWorldEvents" >
+            <small>View all World Events</small>
+        </a>
+    </div>
+    {% for event in world_events|slice:":2" %}
+        {% include "cells/world_event_snip.html" %}
+    {% endfor %}
+{% elif can_post_world_events %}
+    <h3 class="text-center">{{cell.name}} does not have any World Events yet</h3>
+    <div class="thumbnail text-center">
+        Use <b>World Events</b> to announce important developments in {{cell.name}}.
+        <br>
+        These may be the result of a Game, the actions of a Contractor, or a special event. Contractors and NPCs in this
+        World may hear about these events and choose to investigate.
+        <br>
+        <a href="{% url 'cells:cells_post_world_event' cell.id %}">Post a new World Event</a>
+    </div>
+{% endif %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="text-center">
+            <h4>Latest Journals</h4>
+        </div>
+        {% if latest_journals %}
+            {% for journal in latest_journals|slice:":3" %}
+                {% include "cells/view_cell_journal_snip.html" %}
+            {% endfor %}
+            <div class="text-center">
+                <a class="btn btn-primary btn-sm" data-toggle="collapse" href="#moreJournals" role="button" aria-expanded="false" aria-controls="moreJournals">
+                    More Journals
+                </a>
+            </div>
+            <div class="collapse" id="moreJournals">
+                {% for journal in latest_journals|slice:"3:" %}
+                    {% include "cells/view_cell_journal_snip.html" %}
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center">
+                <p>
+                    You cannot view any Journals written for Games that occurred in this World.
+                </p>
+            </div>
+        {% endif %}
+    </div>
+    <div class="col-md-6">
+        <div class="text-center">
+            <h4>Latest Completed Games</h4>
+            <small>{{cell.num_completed_games}} Games have been run in this World</small>
+        </div>
+        {% if completed_games %}
+            {% for game in completed_games|slice:":3" %}
+                <div>
+                <small>
+                    {{ game.end_time|timesince }} ago:
+                    <a href="{% url 'profiles:profiles_view_profile' game.gm.id %}">
+                        {% user_display game.gm %}
+                    </a>
+                    ran
+                    <a href="{% url 'games:games_view_game' game.id %}">
+                        {{ game.scenario.title }}
+                    </a>
+                </small>
+                    <div class="thumbnail">
+                        {% include "cells/view_cell_game_snip.html" %}
+                    </div>
+                </div>
+            {% endfor %}
+            {% if completed_games|slice:"3:" %}
+            <div class="text-center">
+                <a class="btn btn-primary btn-sm" data-toggle="collapse" href="#moreGames" role="button" aria-expanded="false" aria-controls="moreGames">
+                    All Completed Games
+                </a>
+            </div>
+            <div class="collapse" id="moreGames">
+                {% for game in completed_games|slice:"3:" %}
+                <div>
+                    <small>
+                        {{ game.end_time|timesince }} ago:
+                        <a href="{% url 'profiles:profiles_view_profile' game.gm.id %}">
+                            {% user_display game.gm %}
+                        </a>
+                        ran
+                        <a href="{% url 'games:games_view_game' game.id %}">
+                            {{ game.scenario.title }}
+                        </a>
+                    </small>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>

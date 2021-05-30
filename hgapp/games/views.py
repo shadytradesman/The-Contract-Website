@@ -8,6 +8,9 @@ from django.contrib import messages
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
+from django.views import View
+
+import datetime
 
 from games.forms import CreateScenarioForm, CellMemberAttendedForm, make_game_form, make_allocate_improvement_form, \
     CustomInviteForm, make_accept_invite_form, ValidateAttendanceForm, DeclareOutcomeForm, GameFeedbackForm, \
@@ -18,7 +21,8 @@ from .game_form_utilities import get_context_for_create_finished_game, change_ti
     get_gm_form, get_outsider_formset, get_member_formset, get_players_for_new_attendances
 from .games_constants import GAME_STATUS
 
-
+from cells.forms import EditWorldEventForm
+from cells.models import WorldEvent
 
 from games.models import Scenario, Game, DISCOVERY_REASON, Game_Invite, Game_Attendance, Reward
 
@@ -142,7 +146,7 @@ def view_scenario(request, scenario_id, game_id=None):
         return HttpResponseRedirect(reverse('games:games_view_scenario', args=(scenario.id,)))
     else:
         game_feedback = None
-        games_run = Game.objects.filter(gm_id=request.user.id, scenario_id=scenario.id).all()
+        games_run = Game.objects.filter(gm_id=request.user.id, scenario_id=scenario.id).order_by("end_time").all()
         games_run = [x for x in games_run if not x.is_scheduled() and not x.is_active()]
         games_run_no_feedback = Game.objects.filter(gm_id=request.user.id, scenario_id=scenario.id, scenario_notes=None).all()
         games_run_no_feedback = [x for x in games_run_no_feedback if not x.is_scheduled() and not x.is_active()]
@@ -176,11 +180,15 @@ def view_scenario_gallery(request):
     return render(request, 'games/view_scenario_gallery.html', context)
 
 
-def create_game(request):
+def create_game(request, cell_id=None):
     if not request.user.is_authenticated:
         raise PermissionDenied("You must be logged in to create a Game")
+    cell = None
+    if cell_id:
+        cell = get_object_or_404(Cell, id=cell_id)
+    GameForm = make_game_form(user=request.user)
     if request.method == 'POST':
-        form = make_game_form(user=request.user, game_status=GAME_STATUS[0][0])(request.POST)
+        form = GameForm(request.POST)
         if form.is_valid():
             start_time = form.cleaned_data['scheduled_start_time']
             if "timezone" in form.cleaned_data:
@@ -188,23 +196,35 @@ def create_game(request):
                 account.timezone = form.cleaned_data["timezone"]
                 account.save()
                 start_time = change_time_to_current_timezone(start_time)
+            title = form.cleaned_data['title'] if "title" in form.cleaned_data and form.cleaned_data['title'] else "untitled"
+            form_cell = form.cleaned_data['cell']
+            if not form_cell.get_player_membership(request.user):
+                raise PermissionDenied("You are not a member of this World.")
+            if not (form_cell.player_can_manage_games(request.user) or form_cell.player_can_run_games(request.user)):
+                raise PermissionDenied("You do not have permission to run Games in this World")
             game = Game(
-                title = form.cleaned_data['title'],
+            title = title,
                 creator = request.user,
                 gm = request.user,
                 required_character_status = form.cleaned_data['required_character_status'],
                 hook = form.cleaned_data['hook'],
                 created_date = timezone.now(),
                 scheduled_start_time = start_time,
-                open_invitations = form.cleaned_data['open_invitations'],
-                is_nsfw= form.cleaned_data['only_over_18'],
                 status = GAME_STATUS[0][0],
-                cell = form.cleaned_data['cell']
-            )
+                cell = form_cell,
+                invitation_mode=form.cleaned_data['invitation_mode'],
+                list_in_lfg=form.cleaned_data['list_in_lfg'],
+                allow_ringers=form.cleaned_data['allow_ringers'],
+                max_rsvp=form.cleaned_data['max_rsvp'],
+                gametime_url=form.cleaned_data['gametime_url'],
+        )
+            if 'only_over_18' in form.cleaned_data:
+                game.is_nsfw = form.cleaned_data['only_over_18']
             if form.cleaned_data['scenario']:
                 game.scenario = form.cleaned_data['scenario']
             with transaction.atomic():
                 game.save()
+                game.mediums.set(form.cleaned_data['mediums'])
                 if form.cleaned_data['invite_all_members']:
                     for member in game.cell.cellmembership_set.exclude(member_player = game.gm):
                         game_invite = Game_Invite(invited_player=member.member_player,
@@ -222,7 +242,7 @@ def create_game(request):
             return None
     else:
         # Build a game form.
-        form = make_game_form(user=request.user, game_status=GAME_STATUS[0][0])
+        form = GameForm(initial={"cell": cell})
         context = {
             'form' : form,
         }
@@ -231,22 +251,30 @@ def create_game(request):
 
 def edit_game(request, game_id):
     game = get_object_or_404(Game, id=game_id)
-    initial_data = {'title': game.title,
+    initial_data = {
      'hook': game.hook,
      'scenario': game.scenario,
      'required_character_status': game.required_character_status,
      'start_time': convert_to_localtime(game.scheduled_start_time),
      'cell': game.cell,
-     'open_invitations': game.open_invitations,
      'only_over_18': game.is_nsfw,
+     'invitation_mode': game.invitation_mode,
+     'list_in_lfg': game.list_in_lfg,
+     'allow_ringers': game.allow_ringers,
+     'max_rsvp': game.max_rsvp,
+     'gametime_url': game.gametime_url,
+     'mediums': game.mediums.all(),
     }
-    GameForm = make_game_form(user=request.user, game_status=game.status)
+    GameForm = make_game_form(user=request.user)
+    if not game.player_can_edit(request.user):
+        raise PermissionDenied("You don't have permission to edit this Game event.")
+    if not game.is_scheduled():
+        raise PermissionDenied("You cannot edit a Game event once it has started.")
     if request.method == 'POST':
-        if not request.user.has_perm('edit_game', game):
-            raise PermissionDenied("You don't have permission to edit this Game event")
         form = GameForm(request.POST, initial=initial_data)
         if form.is_valid():
-            game.title=form.cleaned_data['title']
+            title = form.cleaned_data['title'] if "title" in form.cleaned_data and form.cleaned_data['title'] else "untitled"
+            game.title = title
             game.hook=form.cleaned_data['hook']
             start_time = form.cleaned_data['scheduled_start_time']
             if "timezone" in form.cleaned_data:
@@ -254,18 +282,23 @@ def edit_game(request, game_id):
                 account.timezone = form.cleaned_data["timezone"]
                 account.save()
                 start_time = change_time_to_current_timezone(start_time)
-            if game.is_scheduled():
-                game.open_invitations = form.cleaned_data['open_invitations']
-                game.scheduled_start_time = start_time
-                game.required_character_status = form.cleaned_data['required_character_status']
-                game.scenario=form.cleaned_data['scenario']
-                game.cell = form.cleaned_data['cell']
+            game.scheduled_start_time = start_time
+            game.required_character_status = form.cleaned_data['required_character_status']
+            game.scenario=form.cleaned_data['scenario']
+            game.cell = form.cleaned_data['cell']
+            game.invitation_mode = form.cleaned_data['invitation_mode']
+            game.list_in_lfg = form.cleaned_data['list_in_lfg']
+            game.allow_ringers = form.cleaned_data['allow_ringers']
+            game.max_rsvp = form.cleaned_data['max_rsvp']
+            game.gametime_url = form.cleaned_data['gametime_url']
+            if 'only_over_18' in form.cleaned_data:
                 game.is_nsfw = form.cleaned_data['only_over_18']
-                if form.cleaned_data['scenario']:
-                    game.scenario = form.cleaned_data['scenario']
+            if form.cleaned_data['scenario']:
+                game.scenario = form.cleaned_data['scenario']
             with transaction.atomic():
                 game.save()
-                if game.is_scheduled() and hasattr(form.changed_data, 'invite_all_members') and form.cleaned_data['invite_all_members']:
+                game.mediums.set(form.cleaned_data['mediums'])
+                if hasattr(form.changed_data, 'invite_all_members') and form.cleaned_data['invite_all_members']:
                     for member in game.cell.cellmembership_set.exclude(member_player=game.gm):
                         game_invite = Game_Invite(invited_player=member.member_player,
                                                   relevant_game=game,
@@ -286,8 +319,11 @@ def edit_game(request, game_id):
         }
         return render(request, 'games/edit_game.html', context)
 
+
+
 def view_game(request, game_id):
     game = get_object_or_404(Game, id=game_id)
+    game.gm.profile.update_gm_stats_if_necessary()  # remove after world patch
     can_view_scenario = False
     my_invitation = None
     if request.user.is_authenticated:
@@ -295,18 +331,25 @@ def view_game(request, game_id):
     if request.user.has_perm("view_scenario", game.scenario):
         can_view_scenario = True
     invite_form = None
-    if request.user.has_perm('edit_game', game) and game.is_scheduled():
+    can_edit = game.player_can_edit(request.user)
+    if can_edit and game.is_scheduled():
         initial_data = {"message": game.hook}
         invite_form = CustomInviteForm(initial=initial_data)
-    can_edit = request.user.is_authenticated and request.user.has_perm('edit_game', game)
     nsfw_blocked = game.is_nsfw and (request.user.is_anonymous or not request.user.profile.view_adult_content)
+    reason_cannot_rsvp = game.reason_player_cannot_rsvp(request.user)
+    can_rsvp = not reason_cannot_rsvp
+
+    gametime_url = None if not my_invitation or not game.gametime_url else game.gametime_url
     context = {
         'game': game,
         'can_view_scenario': can_view_scenario,
         'my_invitation': my_invitation,
         'invite_form': invite_form,
         'can_edit': can_edit,
+        'can_rsvp': can_rsvp,
+        'reason_cannot_rsvp': reason_cannot_rsvp,
         'nsfw_blocked': nsfw_blocked,
+        'gametime_url': gametime_url,
     }
     return render(request, 'games/view_game_pages/view_game.html', context)
 
@@ -314,7 +357,7 @@ def view_game(request, game_id):
 def cancel_game(request, game_id):
     game = get_object_or_404(Game, id=game_id)
     if request.method == 'POST':
-        if not request.user.has_perm('edit_game', game):
+        if not game.player_can_edit(request.user):
             raise PermissionDenied("You don't have permission to edit this Game event")
         if not game.is_scheduled() and not game.is_active():
             raise PermissionDenied("You cannot cancel a game that has been completed")
@@ -322,7 +365,7 @@ def cancel_game(request, game_id):
             game.transition_to_canceled()
         return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
     else:
-        if not request.user.has_perm('edit_game', game):
+        if not game.player_can_edit(request.user):
             raise PermissionDenied("You don't have permission to edit this Game event")
         context = {
             'game': game,
@@ -331,7 +374,7 @@ def cancel_game(request, game_id):
 
 def invite_players(request, game_id):
     game = get_object_or_404(Game, id=game_id)
-    if not request.user.has_perm('edit_game', game) or not game.is_scheduled():
+    if not game.player_can_edit(request.user) or not game.is_scheduled():
         raise PermissionDenied("You don't have permission to edit this Game event, or it has already started")
     initial_data = {"message": game.hook}
     if request.method == 'POST':
@@ -358,16 +401,10 @@ def invite_players(request, game_id):
         return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
 
 def accept_invite(request, game_id):
-    if not request.user.is_authenticated or request.user.is_anonymous:
-        raise PermissionDenied("You must log in to accept this Game invite")
     game = get_object_or_404(Game, id=game_id)
-    if not game.is_scheduled() or game.creator.id == request.user.id or game.gm.id == request.user.id:
-        raise PermissionDenied("This Game has already started, or you're the GM!")
-    invite = get_object_or_none(request.user.game_invite_set.filter(relevant_game=game))
-    if not invite and not game.open_invitations:
-        raise PermissionDenied("This is awkward. . . You, uh, haven't been invited to this Game")
-    if game.is_nsfw and not request.user.profile.view_adult_content:
-        raise PermissionDenied("Your content settings do now allow you to RSVP to this Game.")
+    if not game.player_can_rsvp(request.user):
+        raise PermissionDenied(game.reason_player_cannot_rsvp(request.user))
+    invite = get_object_or_none(request.user.game_invite_set.filter(relevant_game=game.id))
     if request.method == 'POST':
         if not invite:
             # player self-invite
@@ -438,7 +475,7 @@ def decline_invite(request, game_id):
 #TODO: Enforce or advise on number of players constraints
 def start_game(request, game_id, char_error=" ", player_error=" "):
     game = get_object_or_404(Game, id=game_id)
-    if not request.user.has_perm('edit_game', game):
+    if not game.player_can_edit(request.user):
         raise PermissionDenied("You don't have permission to edit this Game event")
     if not game.is_scheduled():
         raise PermissionDenied("This Game has already started")
@@ -523,7 +560,7 @@ def start_game(request, game_id, char_error=" ", player_error=" "):
 
 def end_game(request, game_id):
     game = get_object_or_404(Game, id=game_id)
-    if not request.user.has_perm('edit_game', game):
+    if not game.player_can_edit(request.user):
         raise PermissionDenied("You don't have permission to edi this Game Event")
     if not game.is_active():
         raise PermissionDenied("You can't end a Game event that isn't in progress")
@@ -541,7 +578,11 @@ def end_game(request, game_id):
         declare_outcome_formset = DeclareOutcomeFormset(request.POST,
                                             initial=initial_data)
         game_feedback_form = GameFeedbackForm(request.POST)
-        if declare_outcome_formset.is_valid() and game_feedback_form.is_valid():
+        world_event_form = None
+        if game.cell.player_can_post_world_events(request.user):
+            world_event_form = EditWorldEventForm(request.POST)
+        if declare_outcome_formset.is_valid() and game_feedback_form.is_valid() \
+                and (not world_event_form or world_event_form.is_valid()):
             with transaction.atomic():
                 for form in declare_outcome_formset:
                     attendance = get_object_or_404(Game_Attendance, id=form.cleaned_data['hidden_attendance'].id)
@@ -551,6 +592,13 @@ def end_game(request, game_id):
                     attendance.save()
                 if game_feedback_form.cleaned_data['scenario_notes']:
                     game.scenario_notes = game_feedback_form.cleaned_data['scenario_notes']
+                if world_event_form and \
+                        (world_event_form.cleaned_data['headline'] or world_event_form.cleaned_data['event_description']):
+                    world_event = WorldEvent(creator=request.user,
+                                             parent_cell=game.cell,)
+                    world_event.headline = world_event_form.cleaned_data["headline"] if "headline" in world_event_form.cleaned_data else " "
+                    world_event.event_description = world_event_form.cleaned_data["event_description"]
+                    world_event.save()
                 game.save()
                 game.transition_to_finished()
             return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
@@ -560,9 +608,13 @@ def end_game(request, game_id):
     else:
         formset = DeclareOutcomeFormset(initial=initial_data)
         game_feedback = GameFeedbackForm()
+        world_event_form = None
+        if game.cell.player_can_post_world_events(request.user):
+            world_event_form = EditWorldEventForm()
         context = {
             'formset':formset,
             'feedback_form':game_feedback,
+            'world_event_form': world_event_form,
             'game':game,
         }
         return render(request, 'games/end_game.html', context)
@@ -692,7 +744,7 @@ def _check_perms_for_edit_completed(request, game):
     if hasattr(game, "cell") and game.cell:
         if game.cell.player_can_manage_games(request.user):
             return
-    if not request.user.has_perm('edit_game', game):
+    if not game.player_can_edit(request.user):
         raise PermissionDenied("You don't have permission to edit this Game")
 
 def confirm_attendance(request, attendance_id, confirmed=None):
@@ -740,3 +792,29 @@ def spoil_scenario(request, scenario_id):
                     scenario.discovery_for_player(request.user).spoil()
             return JsonResponse({}, status=200)
         return JsonResponse({"error": ""}, status=400)
+
+class LookingForGame(View):
+    template_name = 'games/looking_for_game.html'
+
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, self.__get_context_data())
+
+    def __get_context_data(self):
+        now = datetime.datetime.now()
+        an_hour_ago = now - datetime.timedelta(hours=1)
+        games_query = Game.objects.filter(
+            list_in_lfg=True,
+            status=GAME_STATUS[0][0],
+            scheduled_start_time__gte=an_hour_ago)
+        if self.request.user.is_anonymous or not self.request.user.profile.view_adult_content:
+            games_query = games_query.exclude(is_nsfw=True)
+        games = games_query.order_by('scheduled_start_time').all()
+        for game in games:
+            game.gm.profile.update_gm_stats_if_necessary() # remove after world patch
+        context = {
+            'games': games,
+        }
+        return context
