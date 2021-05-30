@@ -50,7 +50,7 @@
 }
 
 .css-backgrounded {
-    background-color: @panel-bg !important;
+    background-color: #20252d !important;
     background-position: center left;
     background-repeat: no-repeat;
     background-size: cover;

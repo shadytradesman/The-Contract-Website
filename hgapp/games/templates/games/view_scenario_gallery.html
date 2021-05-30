@@ -34,10 +34,6 @@
         <div class="panel-body">
             <div class="row">
                 {% for scenario_discovery in unlocked_discoveries %}
-                    {% if forloop.counter|divisibleby:2 %}
-                        </div>
-                        <div class="row">
-                    {% endif %}
                         <div class="col-md-6">
                             {% with scenario=scenario_discovery.relevant_scenario %}
                                 {% with hide_spoilers='true' %}
@@ -45,6 +41,10 @@
                                 {% endwith %}
                             {% endwith %}
                         </div>
+                    {% if forloop.counter|divisibleby:2 %}
+                        </div>
+                        <div class="row">
+                    {% endif %}
                 {% endfor %}
             </div>
         </div>
@@ -60,13 +60,13 @@
             <br>
             <div class="row">
                 {% for scenario in owned_scenarios %}
+                    <div class="col-md-6">
+                        {% include "games/scenario_badge_snippet.html" %}
+                    </div>
                     {% if forloop.counter|divisibleby:2 %}
                         </div>
                         <div class="row">
                     {% endif %}
-                    <div class="col-md-6">
-                        {% include "games/scenario_badge_snippet.html" %}
-                    </div>
                 {% empty %}
                     </div>
                     <p class="text-warning">You haven't written any Scenarios yet. Try <a href="{% url 'games:games_create_scenario' %}">creating your own.</a></p>
@@ -87,7 +87,7 @@
                 <div class="alert alert-success text-center">
                     <h4>
                         <a href="{% url 'cells:cells_create'%}">
-                            Create a Cell
+                            Create a World
                         </a>
                         to unlock <b>{{num_new_cell_scenarios}}</b> stock Scenarios to get you started!
                     </h4>
@@ -95,15 +95,15 @@
             {% endif %}
             <div class="row">
                 {% for scenario_discovery in scenario_discoveries %}
-                    {% if forloop.counter|divisibleby:2 %}
-                        </div>
-                        <div class="row">
-                    {% endif %}
                     <div class="col-md-6">
                         {% with scenario=scenario_discovery.relevant_scenario %}
                             {% include "games/scenario_badge_snippet.html" %}
                         {% endwith %}
                     </div>
+                    {% if forloop.counter|divisibleby:2 %}
+                        </div>
+                        <div class="row">
+                    {% endif %}
                 {% empty %}
                     </div>
                     <p class="text-warning">You haven't discovered any Scenarios yet.</p>

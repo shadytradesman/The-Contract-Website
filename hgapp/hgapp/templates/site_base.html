@@ -66,9 +66,50 @@
                 <a class="css-nav-butt btn-primary" href="{% url 'info:getting_started' %}">Start Playing</a>
             </li>
         {% elif request.user.is_authenticated %}
-            <li class="hidden-sm">
-                <a class="css-nav-butt btn-default" href="/wiki/guides-and-tutorials/">Tutorials</a>
-            </li
+            <li class="dropdown hidden-sm">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                    Quick Access <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a href="{% url 'cells:cells_find_world' %}" >
+                            Find World
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'games:games_looking_for_game' %}" >
+                            Find Game
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'games:games_create_game' %}">
+                            Schedule Game
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'games:games_view_scenario_gallery' %}">
+                            Scenario Gallery
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'characters:characters_create'%}">Create Contractor</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'characters:characters_graveyard' %}">Visit Graveyard</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'powers:powers_stock'%}">Stock Powers</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'powers:powers_create'%}">Create Power</a>
+                    </li>
+                    <li>
+                        <a href="{%url 'pinax_blog:blog' %}">
+                             News and Updates
+                        </a>
+                    </li>
+                </ul>
+            </li>
         {% else %}
             <li>
                 <a class="css-nav-butt btn-warning" href="{% url 'info:getting_started' %}">Start Playing</a>

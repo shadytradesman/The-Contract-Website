@@ -63,7 +63,7 @@
                     {% endif %}
                     <div class="text-center">
                         <h3>
-                            Cells
+                            Worlds
                         </h3>
                     </div>
                     {% if cells %}
@@ -83,7 +83,7 @@
                             {% endfor %}
                         </ul>
                     {% else %}
-                        <h4 class="text-center"><small>{{profile.user.username}} is not a member of any Cells</small></h4>
+                        <h4 class="text-center"><small>{{profile.user.username}} is not a member of any Worlds</small></h4>
                     {% endif %}
                 </div>
                 <div class="col-md-6">
@@ -113,7 +113,7 @@
                         </h3>
                         <p>
                             <b>{{profile.user.username}}</b> has run <b>{{num_gm_games}}</b> Game{{num_gm_games|pluralize}}
-                            in <b>{{num_cells_gmed}}</b> Cell{{num_cells_gmed|pluralize}}
+                            in <b>{{num_cells_gmed}}</b> World{{num_cells_gmed|pluralize}}
                             for <b>{{num_contractors_gmed}}</b> Contractor{{num_contractors_gmed|pluralize}} and
                             <b>{{num_players_gmed}}</b> Player{{num_players_gmed|pluralize}}.
 
@@ -180,7 +180,7 @@
                                 from
                                 <a href="{% url 'cells:cells_view_cell' character.cell.id %}">{{ character.cell.name }}</a>
                             {% else %}
-                                without a home Cell
+                                without a home World
                             {% endif %}
                         </div>
                     </div>
@@ -219,7 +219,7 @@
                                 from
                                 <a href="{% url 'cells:cells_view_cell' character.cell.id %}">{{ character.cell.name }}</a>
                             {% else %}
-                                without a home Cell
+                                without a home World
                             {% endif %}
                         </div>
                     </div>

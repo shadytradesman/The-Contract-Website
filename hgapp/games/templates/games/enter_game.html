@@ -47,9 +47,9 @@
                         </a>
                         <br>
                     {% empty %}
-                        <i class="text-danger">You may declare archival Games only if you are a Judge or Leader of a Cell.</i>
+                        <i class="text-danger">You may declare archival Games only if you have the "Manage Games" permission in their World.</i>
                         <br><br>
-                        <a href="{% url 'cells:cells_create' %}" class="btn btn-info">Start a new Cell</a>
+                        <a href="{% url 'cells:cells_create' %}" class="btn btn-info">Start a new World</a>
                     {% endfor %}
                 </div>
             </div>
