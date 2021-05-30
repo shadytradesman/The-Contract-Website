@@ -321,7 +321,8 @@ class Character(models.Model):
         for cell in queryset:
             cell_ids.add(cell.pk)
         for game in games_attended:
-            cell_ids.add(game.cell.pk)
+            if hasattr(game, "cell") and game.cell:
+                cell_ids.add(game.cell.pk)
         return Cell.objects.filter(pk__in=cell_ids).all()
 
     def world_element_initial_cell(self):
