@@ -328,7 +328,9 @@ class Character(models.Model):
     def world_element_initial_cell(self):
         active_attendances = self.active_game_attendances()
         if active_attendances:
-            return active_attendances[0].cell
+            game = active_attendances[0].relevant_game
+            if hasattr(game, "cell") and game.cell:
+                return game.cell
         if hasattr(self, "cell") and self.cell:
             return self.cell
         return None
