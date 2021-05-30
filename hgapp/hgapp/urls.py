@@ -34,7 +34,7 @@ urlpatterns = [
     url(r"^profile/", include ("profiles.urls"), name="profile"),
     url(r"^characters/", include ("characters.urls"), name="character"),
     url(r"^games/", include("games.urls"), name="games"),
-    url(r"^cells/", include("cells.urls"), name="cells"),
+    url(r"^worlds/", include("cells.urls"), name="cells"),
     url(r"info/", include("info.urls"), name="info"),
     url(r"journals/", include("journals.urls"), name="journals"),
     url(r"^tinymce/", include("tinymce.urls")),

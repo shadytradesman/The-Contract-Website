@@ -20,6 +20,7 @@
 
 {% block body_base %}
 <div class="container">
+    {% include "characters/edit_pages/choose_world_modal.html" %}
     <h1 class="text-center">
         Find a World
     </h1>
@@ -28,6 +29,13 @@
             <div class="row">
                 <div class="col-md-10 col-md-offset-1 text-center">
                     <div role="alert" class="alert alert-info text-center">
+                        <div class="text-center">
+                            <p>
+                            <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#worldTutorialModal">
+                                What are Worlds?
+                            </button>
+                            </p>
+                        </div>
                         <p>
                             These Worlds are looking for new Players! They are ordered by recent Game activity.
                         </p>
@@ -39,7 +47,7 @@
                             <br>
                             If you are looking for a Game to play in, visit
                             <a href="{% url 'games:games_looking_for_game' %}" class="btn btn-default btn-xs">
-                                Looking-For-Game
+                                Looking For Game
                             </a>
                         </p>
                     </div>

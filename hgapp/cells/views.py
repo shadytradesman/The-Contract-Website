@@ -18,6 +18,7 @@ from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from games.models import Scenario
 from games.games_constants import GAME_STATUS
+from characters.models import CharacterTutorial
 from journals.models import Journal
 from django.core.exceptions import PermissionDenied
 from postman.api import pm_write
@@ -489,6 +490,7 @@ class FindWorld(View):
         public_cells = Cell.objects.filter(is_listed_publicly=True).order_by('-find_world_date').all()
         context = {
             'public_cells': public_cells,
+            'tutorial': get_object_or_404(CharacterTutorial),
         }
         return context
 
