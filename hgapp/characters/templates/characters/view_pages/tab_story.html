@@ -4,16 +4,11 @@
 {% if chracter.background or user_can_edit %}
     <h3>Biography</h3>
     <div class="thumbnail">
-        {% if character.background %}
+        {% if character.background or user_can_edit %}
         <div class="css-bio-text">
             <div id="js-bio-text">
                 {{character.background | markdown}}
             </div>
-            {% if user_can_edit %}
-            <div id="js-edit-bio-button" class="btn btn-default btn-xs">
-                <i class="fa fa-edit fa-2x"></i> Edit Biography
-            </div>
-            {% endif %}
         </div>
         {% endif %}
         {% if user_can_edit %}
@@ -30,6 +25,9 @@
                 </div>
             </div>
         </form>
+        <div id="js-edit-bio-button" class="btn btn-default btn-xs">
+            <i class="fa fa-edit fa-2x"></i> Edit Biography
+        </div>
         {% endif %}
     </div>
 {% endif %}
