@@ -861,11 +861,12 @@ class Reward(models.Model):
 
     def reason_text(self):
         if self.relevant_game:
-            reason = ""
             if self.relevant_game.gm.id == self.rewarded_player.id:
                 reason = "running "
             elif self.is_charon_coin:
                 reason = "dying in "
+            elif self.is_journal:
+                reason = "writing a Journal for "
             else:
                 reason = "playing in "
             reason = reason + self.relevant_game.scenario.title

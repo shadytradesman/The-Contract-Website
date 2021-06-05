@@ -222,6 +222,7 @@ def create_game(request, cell_id=None):
                 game.is_nsfw = form.cleaned_data['only_over_18']
             if form.cleaned_data['scenario']:
                 game.scenario = form.cleaned_data['scenario']
+                game.title = game.scenario.title
             with transaction.atomic():
                 game.save()
                 game.mediums.set(form.cleaned_data['mediums'])
@@ -295,6 +296,7 @@ def edit_game(request, game_id):
                 game.is_nsfw = form.cleaned_data['only_over_18']
             if form.cleaned_data['scenario']:
                 game.scenario = form.cleaned_data['scenario']
+                game.title = game.scenario.title
             with transaction.atomic():
                 game.save()
                 game.mediums.set(form.cleaned_data['mediums'])
