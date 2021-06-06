@@ -784,6 +784,12 @@ class Reward(models.Model):
                                             null=True,
                                             blank=True)
 
+    def __str__(self):
+        return "{} {} ({})".format(self.type_text(),
+                                   self.rewarded_player.username,
+                                   self.rewarded_character.name if self.rewarded_character else "unassigned")
+
+
     def grant_to_character(self, character):
         if not character:
             raise ValueError("must provide character when assigning reward!")
@@ -874,7 +880,7 @@ class Reward(models.Model):
             return reason
         if self.source_asset:
             return "the Asset " + self.source_asset.relevant_asset.name
-        if not self.relevant_game and self.is_charon_coin:
+        if self.is_charon_coin:
             return "losing a Contractor in a Side Game"
 
 
