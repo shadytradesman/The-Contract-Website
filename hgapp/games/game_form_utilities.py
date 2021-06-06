@@ -94,8 +94,7 @@ def handle_edit_completed_game(request, game, new_player_list):
                     _update_or_add_attendance(request, form, game)
                 game.refresh_from_db()
                 game.recalculate_golden_ratio(original_game_ratio)
-                if hasattr(game, "cell") and game.cell:
-                    game.cell.update_safety_stats()
+                game.update_profile_stats()
         else:
             raise ValueError("Invalid outcome formset in completed edit")
     else:
@@ -216,6 +215,7 @@ def create_archival_game(request, general_form, cell, outcome_formset):
             game_invite.attendance = attendance
             game_invite.save()
         game.give_rewards()
+        game.update_profile_stats()
 
 
 def get_context_for_choose_attending(cell, game=None):

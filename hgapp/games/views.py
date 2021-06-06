@@ -743,9 +743,6 @@ def _check_perms_for_edit_completed(request, game):
         raise PermissionDenied("You must log in.")
     if not (game.is_finished() or game.is_archived() or game.is_recorded()):
         raise PermissionDenied("You can't add an attendance to a Game that isn't finished.")
-    if hasattr(game, "cell") and game.cell:
-        if game.cell.player_can_manage_games(request.user):
-            return
     if not game.player_can_edit(request.user):
         raise PermissionDenied("You don't have permission to edit this Game")
 
@@ -763,6 +760,7 @@ def confirm_attendance(request, attendance_id, confirmed=None):
             with transaction.atomic():
                 if confirmed == 'y':
                     attendance.confirm_and_reward()
+                    attendance.relevant_game.update_profile_stats()
                 else:
                     invite = attendance.game_invite
                     invite.is_declined = True

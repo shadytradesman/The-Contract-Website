@@ -5,9 +5,9 @@
     <h2>
         Attendance
     </h2>
-    <ul>
         {% for invitation in game.game_invite_set.all %}
-            <li>
+            <div class="row">
+                <div class="col-xs-12">
                 <span class = "lead">
                     <strong>
                         {% if invitation.attendance.attending_character %}
@@ -30,8 +30,10 @@
                         <p>
                             {% get_obj_perms request.user for invitation.attendance.attending_character as "char_perms" %}
                                 {% if reward.relevant_power %}
-                                    <div class="col-xs-11">
-                                        {% render_reward reward %}
+                                    <div class="row">
+                                        <div class="col-xs-10 col-xs-offset-1">
+                                            {% render_reward reward %}
+                                        </div>
                                     </div>
                                 {% else %}
                                     {% if reward.is_improvement %}
@@ -78,7 +80,7 @@
                         </div>
                         {% else %}
                         <br>
-                        <div class="alert row alert-warning col-xs-11" role="alert">
+                        <div class="alert row alert-warning col-xs-10 col-xs-offset-1" role="alert">
                             {% if invitation.invited_player.id is request.user.id  %}
                             <p>
                                 <a href="{% url 'games:games_confirm_attendance' invitation.attendance.id %}">
@@ -95,12 +97,11 @@
                         {% endif %}
                     {% endif %}
                 </div>
-            </li>
-        <br>
+            </div>
+            </div>
         {% empty %}
             <p>
                 No players attended this game. <br>
             </p>
         {% endfor %}
-    </ul>
 </div>

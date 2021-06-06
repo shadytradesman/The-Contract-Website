@@ -137,8 +137,7 @@ class Game(models.Model):
         if player.is_superuser:
             return True
         return player.is_authenticated and (player.has_perm('edit_game', self) \
-                                            or self.cell.player_can_manage_games(player)\
-                                            or self.cell.player_can_run_games(player))
+                                            or self.cell.player_can_manage_games(player))
 
     def invite_instructions(self):
         if self.invitation_mode == CLOSED:
@@ -240,8 +239,7 @@ class Game(models.Model):
         self.end_time = timezone.now()
         self.save()
         self.give_rewards()
-        if hasattr(self, "cell") and self.cell:
-            self.cell.update_safety_stats()
+        self.update_profile_stats()
 
     def give_rewards(self):
         if not self.is_finished() and not self.is_recorded():
@@ -349,6 +347,11 @@ class Game(models.Model):
         for invite in self.invitations.all():
             invite.profile.recompute_titles()
 
+    def update_profile_stats(self):
+        self.update_participant_titles()
+        if hasattr(self, "cell") and self.cell:
+            self.cell.update_safety_stats()
+
     def save(self, *args, **kwargs):
         if not hasattr(self, 'gm'):
             self.gm = self.creator
@@ -368,10 +371,8 @@ class Game(models.Model):
             assign_perm('edit_game', self.creator, self)
         else:
             super(Game, self).save(*args, **kwargs)
-        if self.is_recorded() or self.is_archived():
-            self.update_participant_titles()
-            if hasattr(self, "cell") and self.cell:
-                self.cell.update_safety_stats()
+        if self.is_recorded() or self.is_archived() or self.is_finished():
+            self.update_profile_stats()
 
     def __str__(self):
         return "[" + self.status + "] " + self.scenario.title + " run by: " + self.gm.username
