@@ -218,6 +218,10 @@ class Base_Power(models.Model):
     def example_powers(self):
         return Power_Full.objects.filter(base=self, tags__in=["example"])
 
+    def used_power_fulls(self):
+        return Power_Full.objects.filter(base=self, character__isnull=False, is_deleted=False)
+
+
     def get_system(self):
         return Base_Power_System.objects.filter(dice_system=DICE_SYSTEM[1][0]).get(base_power=self)
 

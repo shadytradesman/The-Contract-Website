@@ -38,6 +38,13 @@ def powers_and_examples(request):
     }
     return render(request, 'powers/powers_and_examples.html', context)
 
+def powers_and_effects(request):
+    base_powers_list = Base_Power.objects.filter(is_public=True).order_by('name').all()
+    context = {
+        'base_powers_list': base_powers_list,
+    }
+    return render(request, 'powers/powers_and_effects.html', context)
+
 def create_category(request, category_slug, character_id=None):
     powers_list = Base_Power.objects.filter(category = category_slug, is_public = True)
     category = get_object_or_404(Base_Power_Category, pk=category_slug)
