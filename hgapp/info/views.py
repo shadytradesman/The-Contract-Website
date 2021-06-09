@@ -22,3 +22,10 @@ def fiction(request):
         "info": info,
     }
     return render(request, 'info/fiction.html', context)
+
+def quickstart(request):
+    info = FrontPageInfo.objects.first()
+    context= {
+        "info": info,
+    }
+    return render(request, 'info/quickstart.html', context)

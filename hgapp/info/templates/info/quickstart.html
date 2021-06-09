@@ -1,0 +1,31 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+{% load staticfiles %}
+{% load account_tags %}
+{% load hgapp_tags %}
+{% load cache %}
+
+{% block head_title %}Quick Start Guide{% endblock %}
+
+{% block extra_styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'info/quickstart.css' %}" />
+{% endblock %}
+{% block extra_scripts %}
+    <script src="{% static 'info/resolution_tutorial.js' %}"></script>
+{% endblock %}
+
+{% block body_base %}
+{% cache 50000 quickstart %}
+<div class="container">
+    <h1 class="text-center">
+        Quick Start Guide
+    </h1>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            {% include "info/resolution_tutorial_snip.html" %}
+        </div>
+    </div>
+</div>
+{% endcache %}
+{% endblock %}

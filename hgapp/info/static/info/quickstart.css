@@ -1,0 +1,62 @@
+.css-quickstart-container {
+    background-color: #262d37;
+    padding: 10px;
+}
+
+.css-quickstart-action {
+    background-color: #191c23;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.css-quickstart-action-text {
+    display: inline-block;
+    min-width: 75%;
+}
+
+.css-quickstart-gm-text {
+    margin-top: 10px;
+}
+
+.css-qs-roll-results {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.css-quickstart-die {
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+}
+
+
+.css-quickstart-die-val {
+    font-size: 22px;
+    position: relative;
+    top: 14px;
+    left: 19px;
+}
+
+.css-quickstart-die-outcome {
+   font-size: 18px;
+    display: inline-block;
+    width: 50px;
+    position: relative;
+    left: 15px;
+}
+
+.css-qs-attributes {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: left;
+}
+
+.css-qs-attributes > div {
+    margin-left: 15px;
+    margin-right: 15px;
+}

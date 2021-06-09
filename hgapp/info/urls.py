@@ -14,4 +14,7 @@ urlpatterns = [
 
     # ex: .com/info/fiction/
     url(r"^fiction/$", views.fiction, name="fiction"),
+
+    # ex: .com/info/quickstart/
+    url(r"^quickstart/$", views.quickstart, name="quickstart"),
 ]
