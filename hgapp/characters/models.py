@@ -410,7 +410,7 @@ class Character(models.Model):
         return not self.private or player.has_perm("view_private_character", self) or self.player_has_cell_edit_perms(player)
 
     def completed_games(self):
-        return self.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).order_by("-relevant_game__end_time").all()
+        return self.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).order_by("relevant_game__end_time").all()
 
     def completed_games_rev_sort(self):
         return self.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).order_by("-relevant_game__end_time").all()
@@ -880,7 +880,7 @@ class ExperienceReward(models.Model):
             raise ValueError("Experience reward has no source")
 
     def get_value(self):
-        if hasattr(self, 'custom_value'):
+        if hasattr(self, 'custom_value') and self.custom_value:
             return self.custom_value
         if hasattr(self, 'game_attendance'):
             attendance = self.game_attendance

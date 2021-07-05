@@ -186,7 +186,7 @@ def view_character(request, character_id, secret_key = None):
                  "user_can_edit": user_can_edit}
         return render(request, 'characters/legacy_character.html', context)
 
-    completed_games = [(x.relevant_game.end_time, "game", x) for x in character.completed_games()] # completed_games() does ordering
+    completed_games = [(x.relevant_game.end_time, "game", x) for x in character.completed_games_rev_sort()] # completed_games() does ordering
     character_edit_history = [(x.created_time, "edit", x) for x in
                               character.contractstats_set.filter(is_snapshot=False).order_by("created_time").all()[1:]]
     exp_rewards = [(x.created_time, "exp_reward", x) for x in character.experiencereward_set.filter(is_void=False).order_by("created_time").all()]

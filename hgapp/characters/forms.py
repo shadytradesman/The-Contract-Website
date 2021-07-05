@@ -74,14 +74,14 @@ def make_character_form(user, existing_character=None, supplied_cell=None):
                       'to_do_list', 'contracts', 'pronoun')
             help_texts = {
                 'name': _('Name'),
-                'private': _("If checked, Character will not be publicly viewable."),
+                'private': _("If checked, this Contractor will only be viewable by their World's leaders and any GMs "
+                             "running Games for them."),
                 'pronoun': _(""),
                 'tagline': _('A subtitle that introduces your Contractor in a flavorful way'),
-                'appearance': _('A brief description of your Character\'s outward appearance.'),
+                'appearance': _('A brief description of your Contractor\'s outward appearance.'),
                 'concept_summary': _('Archetype Summary (ex: "skater punk werewolf", "cannibal chef", or "golden-age comic book hero")'),
-                'ambition': _('Ambition. Why does this character risk their life in the games? Good ambitions can shape '
-                              'the Character\'s interactions (ex: "drive non-humans out of the USA" is better than "become'
-                              ' the ultimate fighter")'),
+                'ambition': _('Ambition. Why does this Contractor risk their life in the Games? Focus outward: how do they want to '
+                              'change the world?'),
                 'age': _("Age"),
                 'paradigm': _('How do the character\'s powers work?'),
                 'residence': _('Where the character lives'),
