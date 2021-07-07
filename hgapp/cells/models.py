@@ -231,6 +231,8 @@ class Cell(models.Model):
     def save(self, *args, **kwargs):
         if self.setting_sheet_blurb and self.setting_sheet_blurb[-1] == '.':
             self.setting_sheet_blurb = self.setting_sheet_blurb[:-1 or None]
+        if not hasattr(self, "find_world_date") or not self.find_world_date:
+            self.find_world_date = self.created_date
         if self.pk is None:
             super(Cell, self).save(*args, **kwargs)
             for role in ROLE:
@@ -243,9 +245,6 @@ class Cell(models.Model):
                 settings.save()
             self.addPlayer(player=self.creator, role=ROLE[0])
         else:
-            super(Cell, self).save(*args, **kwargs)
-        if not hasattr(self, "find_world_date") or not self.find_world_date:
-            self.find_world_date = self.created_date
             super(Cell, self).save(*args, **kwargs)
 
     def open_invitations(self):

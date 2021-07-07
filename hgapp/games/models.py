@@ -241,6 +241,14 @@ class Game(models.Model):
         self.give_rewards()
         self.update_profile_stats()
 
+    def is_introductory_game(self):
+        # Returns True if this Game had at least one new Player in it.
+        attending_invites = self.get_attended_players()
+        for invite in attending_invites:
+            if invite.profile.completed_game_invites().count() == 1:
+                return True
+        return False
+
     def give_rewards(self):
         if not self.is_finished() and not self.is_recorded():
             print("Game is not finished: " + str(self.id))
@@ -252,6 +260,12 @@ class Game(models.Model):
                                rewarded_player=self.gm,
                                is_improvement=True)
             gm_reward.save()
+        elif self.is_introductory_game():
+            gm_reward = Reward(relevant_game=self,
+                               rewarded_player=self.gm,
+                               is_improvement=True,
+                               is_new_player_gm_reward=True)
+            gm_reward.save()
         self._grant_gm_exp_reward()
 
     def _grant_gm_exp_reward(self):
@@ -261,6 +275,20 @@ class Game(models.Model):
         exp_reward.save()
         self.gm_experience_reward = exp_reward
         self.save()
+
+    def recalculate_gm_reward(self, originally_achieves_golden_ratio):
+        current_reward = self.get_gm_reward()
+        now_achieves_ratio = self.recalculate_golden_ratio(originally_achieves_golden_ratio)
+        if now_achieves_ratio and current_reward and current_reward.is_new_player_gm_reward:
+                current_reward.mark_void()
+        if not now_achieves_ratio:
+            if self.is_introductory_game():
+                if not current_reward or not current_reward.is_new_player_gm_reward:
+                    gm_reward = Reward(relevant_game=self,
+                                       rewarded_player=self.gm,
+                                       is_improvement=True,
+                                       is_new_player_gm_reward=True)
+                    gm_reward.save()
 
     # Determines if the game's golden ratio status has changed and handles GM rewards accordingly.
     def recalculate_golden_ratio(self, original_value):
@@ -276,6 +304,7 @@ class Game(models.Model):
                 self._grant_gm_exp_reward()
             else:
                 self.get_gm_reward().mark_void()
+        return current_value
 
     def achieves_golden_ratio(self):
         death = False
@@ -442,7 +471,7 @@ class Game_Attendance(models.Model):
             return self.game_invite.invited_player
 
     # Changes the outcome of the GameAttendance. Handles Gifts, Experience Rewards, attending Character, Character death
-    # status, and confirmation status. This method does NOT update the Game's golden ratio rewards.
+    # status, and confirmation status. This method does NOT update the Game's GM rewards (golden ratio or new player).
     def change_outcome(self, new_outcome, is_confirmed, attending_character=None):
         current_outcome = self.outcome
         if current_outcome == new_outcome and attending_character == self.attending_character and self.is_confirmed == is_confirmed:
@@ -472,7 +501,7 @@ class Game_Attendance(models.Model):
         # If we're changing attending character, do so
         changed_character = False
         if attending_character:
-            if self.attending_character.id != attending_character.id:
+            if not self.attending_character or (self.attending_character.id != attending_character.id):
                 changed_character = True
                 for journal in self.journal_set.all():
                     journal.void_reward()
@@ -532,6 +561,8 @@ class Game_Attendance(models.Model):
     # character
     def save(self, *args, **kwargs):
         game = self.relevant_game
+        if self.get_player() == game.gm:
+            raise ValueError("GM cannot attend their own game.")
         if hasattr(self, "attending_character") and self.attending_character and hasattr(self, "game_invite") and self.game_invite:
             if self.attending_character.player != self.game_invite.invited_player:
                 raise ValueError("Attendance's invited player and attending_character's player differ!")
@@ -778,6 +809,7 @@ class Reward(models.Model):
     is_charon_coin = models.BooleanField(default=False)
     is_void = models.BooleanField(default=False)
     is_journal = models.BooleanField(default=False)
+    is_new_player_gm_reward = models.BooleanField(default=False)
 
     awarded_on = models.DateTimeField('awarded on')
     assigned_on = models.DateTimeField('assigned on',
@@ -819,28 +851,22 @@ class Reward(models.Model):
         super(Reward, self).save(*args, **kwargs)
 
     def refund_keeping_character_assignment(self):
-        self.is_void = True
+        self.mark_void()
+        # create new reward by setting pk to none and saving
+        self.pk = None
+        self.is_void = False
+        self.relevant_power = None
         self.save()
-        new_reward = Reward(relevant_game = self.relevant_game,
-                            relevant_power = None,
-                            rewarded_character = self.rewarded_character,
-                            rewarded_player = self.rewarded_player,
-                            awarded_on = self.awarded_on,
-                            is_improvement = self.is_improvement,
-                            is_charon_coin = self.is_charon_coin)
-        new_reward.save()
 
     def refund_and_unassign_from_character(self):
-        character = None if self.is_charon_coin or self.is_improvement else self.rewarded_character
+        character = None if self.is_charon_coin or self.is_new_player_gm_reward or self.is_improvement else self.rewarded_character
         self.mark_void()
-        new_reward = Reward(relevant_game = self.relevant_game,
-                            relevant_power = None,
-                            rewarded_character = character,
-                            rewarded_player = self.rewarded_player,
-                            awarded_on = self.awarded_on,
-                            is_improvement = self.is_improvement,
-                            is_charon_coin = self.is_charon_coin)
-        new_reward.save()
+        # create new reward by setting pk to none and saving
+        self.pk = None
+        self.is_void = False
+        self.relevant_power = None
+        self.rewarded_character = character
+        self.save()
 
     def mark_void(self):
         self.is_void = True
@@ -869,7 +895,10 @@ class Reward(models.Model):
     def reason_text(self):
         if self.relevant_game:
             if self.relevant_game.gm.id == self.rewarded_player.id:
-                reason = "running "
+                if self.is_new_player_gm_reward:
+                    reason = "running for a new Player: "
+                else:
+                    reason = "achieving the Golden Ratio running "
             elif self.is_charon_coin:
                 reason = "dying in "
             elif self.is_journal:

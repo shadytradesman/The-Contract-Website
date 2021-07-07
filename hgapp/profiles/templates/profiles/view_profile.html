@@ -175,7 +175,7 @@
                             {% if character.number_of_victories %}
                                 {{ character.number_of_victories }}-Victory
                             {% endif %}
-                            <b>{{ character.get_status_display }}</b>
+                            <b>{{ character.get_status_display }}</b> Contractor
                             {% if character.cell %}
                                 from
                                 <a href="{% url 'cells:cells_view_cell' character.cell.id %}">{{ character.cell.name }}</a>
