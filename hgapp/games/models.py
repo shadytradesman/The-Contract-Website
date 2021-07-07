@@ -851,28 +851,22 @@ class Reward(models.Model):
         super(Reward, self).save(*args, **kwargs)
 
     def refund_keeping_character_assignment(self):
-        self.is_void = True
+        self.mark_void()
+        # create new reward by setting pk to none and saving
+        self.pk = None
+        self.is_void = False
+        self.relevant_power = None
         self.save()
-        new_reward = Reward(relevant_game = self.relevant_game,
-                            relevant_power = None,
-                            rewarded_character = self.rewarded_character,
-                            rewarded_player = self.rewarded_player,
-                            awarded_on = self.awarded_on,
-                            is_improvement = self.is_improvement,
-                            is_charon_coin = self.is_charon_coin)
-        new_reward.save()
 
     def refund_and_unassign_from_character(self):
-        character = None if self.is_charon_coin or self.is_improvement else self.rewarded_character
+        character = None if self.is_charon_coin or self.is_new_player_gm_reward or self.is_improvement else self.rewarded_character
         self.mark_void()
-        new_reward = Reward(relevant_game = self.relevant_game,
-                            relevant_power = None,
-                            rewarded_character = character,
-                            rewarded_player = self.rewarded_player,
-                            awarded_on = self.awarded_on,
-                            is_improvement = self.is_improvement,
-                            is_charon_coin = self.is_charon_coin)
-        new_reward.save()
+        # create new reward by setting pk to none and saving
+        self.pk = None
+        self.is_void = False
+        self.relevant_power = None
+        self.rewarded_character = character
+        self.save()
 
     def mark_void(self):
         self.is_void = True

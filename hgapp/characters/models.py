@@ -409,9 +409,11 @@ class Character(models.Model):
             return False
         return not self.private or player.has_perm("view_private_character", self) or self.player_has_cell_edit_perms(player)
 
+    # Latest game last
     def completed_games(self):
         return self.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).order_by("relevant_game__end_time").all()
 
+    # Latest game first
     def completed_games_rev_sort(self):
         return self.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).order_by("-relevant_game__end_time").all()
 
@@ -871,7 +873,14 @@ class ExperienceReward(models.Model):
         if hasattr(self, 'custom_reason') and self.custom_reason:
             return mark_safe(self.custom_reason)
         if hasattr(self, 'game_attendance'):
-            return "from attending " + self.game_attendance.relevant_game.scenario.title
+            attendance = self.game_attendance
+            if attendance.is_victory():
+                outcome = "winning"
+            elif attendance.is_ringer_victory():
+                outcome = "winning as a ringer in"
+            else:
+                outcome = "losing"
+            return "from {} {}".format(outcome, self.game_attendance.relevant_game.scenario.title)
         elif hasattr(self, 'game'):
             return "from GMing " + self.game.scenario.title
         elif hasattr(self, 'journal'):

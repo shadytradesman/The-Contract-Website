@@ -186,14 +186,19 @@ def view_character(request, character_id, secret_key = None):
                  "user_can_edit": user_can_edit}
         return render(request, 'characters/legacy_character.html', context)
 
-    completed_games = [(x.relevant_game.end_time, "game", x) for x in character.completed_games_rev_sort()] # completed_games() does ordering
+    completed_games = [(x.relevant_game.end_time, "game", x) for x in character.completed_games()] # completed_games() does ordering
     character_edit_history = [(x.created_time, "edit", x) for x in
                               character.contractstats_set.filter(is_snapshot=False).order_by("created_time").all()[1:]]
     exp_rewards = [(x.created_time, "exp_reward", x) for x in character.experiencereward_set.filter(is_void=False).order_by("created_time").all()]
     events_by_date = list(merge(completed_games, character_edit_history, exp_rewards))
     timeline = defaultdict(list)
     for event in events_by_date:
-        timeline[event[0].strftime("%d %b %Y")].append((event[1], event[2]))
+        if event[1] == "edit":
+            phrases = event[2].get_change_phrases()
+            if len(phrases):
+                timeline[event[0].strftime("%d %b %Y")].append((event[1], phrases))
+        else:
+            timeline[event[0].strftime("%d %b %Y")].append((event[1], event[2]))
 
     char_ability_values = character.stats_snapshot.abilityvalue_set.order_by("relevant_ability__name").all()
     char_value_ids = [x.relevant_ability.id for x in char_ability_values]

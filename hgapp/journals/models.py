@@ -85,12 +85,12 @@ class Journal(models.Model):
         else:
             return
         journals_until_improvement = Journal.get_num_journals_until_improvement(character)
-        if journals_until_improvement <= 0:
+        if not self.is_downtime and journals_until_improvement <= 0:
             reward = Reward(relevant_game=self.game_attendance.relevant_game,
                                    rewarded_character=character,
                                    rewarded_player=character.player,
                                    is_improvement=True,
-                                    is_journal=True)
+                                   is_journal=True)
             reward.save()
         else:
             exp_reward = ExperienceReward(

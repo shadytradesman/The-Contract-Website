@@ -96,20 +96,20 @@
 <ul>
     {% for event in event_list %}
     {% if event.0 == "game"%}
-    {% with event.1 as attendance %}
-    {% include "games/game_attendance_badge_snippet.html" %}
-    {% endwith %}
+        {% with event.1 as attendance %}
+            {% include "games/game_attendance_badge_snippet.html" %}
+        {% endwith %}
     {% elif event.0 == "exp_reward" %}
-    <li class="css-timeline-item css-timeline-exp">
-        <b>{{event.1.get_history_blurb.0}}</b>
-        {{event.1.get_history_blurb.1}}
-    </li>
+        <li class="css-timeline-item css-timeline-exp">
+            <b>{{event.1.get_history_blurb.0}}</b>
+            {{event.1.get_history_blurb.1}}
+        </li>
     {% else %}
-    {% for phrase in event.1.get_change_phrases %} {# This is expensive. TODO: make ajax? #}
-    <li class="css-timeline-item css-timeline-exp">
-        <b>{{phrase.0}} Exp:</b> {{phrase.1}}
-    </li>
-    {% endfor %}
+        {% for phrase in event.1 %}
+            <li class="css-timeline-item css-timeline-exp">
+                <b>{{phrase.0}} Exp:</b> {{phrase.1}}
+            </li>
+        {% endfor %}
     {% endif %}
     {% endfor %}
 </ul>
