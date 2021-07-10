@@ -467,8 +467,11 @@ class Game_Attendance(models.Model):
     def get_player(self):
         if self.attending_character:
             return self.attending_character.player
-        else:
+        elif hasattr(self, "game_invite"):
             return self.game_invite.invited_player
+        else:
+            # this should only occur when initially saving an attendance (before invite is associated with it)
+            return None
 
     # Changes the outcome of the GameAttendance. Handles Gifts, Experience Rewards, attending Character, Character death
     # status, and confirmation status. This method does NOT update the Game's GM rewards (golden ratio or new player).

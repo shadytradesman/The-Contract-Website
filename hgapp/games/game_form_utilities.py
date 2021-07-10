@@ -76,6 +76,7 @@ def handle_edit_completed_game(request, game, new_player_list):
     if general_form.is_valid():
         if outcome_formset.is_valid():
             with transaction.atomic():
+                Game.objects.select_for_update().get(pk=game.pk)
                 original_game_ratio = game.achieves_golden_ratio()
                 if "timezone" in general_form.changed_data or "occurred_time" in general_form.changed_data:
                     occurred_time = general_form.cleaned_data['occurred_time']
