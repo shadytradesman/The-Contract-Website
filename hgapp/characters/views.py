@@ -61,7 +61,7 @@ def edit_character(request, character_id, secret_key = None):
     __check_edit_perms(request, character, secret_key)
     if request.method == 'POST':
         with transaction.atomic():
-            Character.objects.select_for_update().get(pk=character.pk)
+            character = Character.objects.select_for_update().get(pk=character.pk)
             update_character_from_post(request.user, existing_character=character, POST=request.POST)
         url_args = (character.id,) if request.user.is_authenticated else (character.id, character.edit_secret_key,)
         return HttpResponseRedirect(reverse('characters:characters_view', args=url_args))
@@ -466,7 +466,7 @@ def post_trauma(request, character_id, secret_key = None):
         __check_edit_perms(request, character, secret_key)
         if form.is_valid():
             with transaction.atomic():
-                Character.objects.select_for_update().get(pk=character.pk)
+                character = Character.objects.select_for_update().get(pk=character.pk)
                 trauma_rev = grant_trauma_to_character(form, character)
             return JsonResponse({"id": trauma_rev.id, "description": trauma_rev.relevant_trauma.description}, status=200)
         else:
@@ -479,7 +479,7 @@ def delete_trauma(request, trauma_rev_id, used_xp, secret_key = None):
         character = trauma_rev.relevant_stats.assigned_character
         __check_edit_perms(request, character, secret_key)
         with transaction.atomic():
-            Character.objects.select_for_update().get(pk=character.pk)
+            character = Character.objects.select_for_update().get(pk=character.pk)
             delete_trauma_rev(character, trauma_rev, True if used_xp == "T" else False)
         return JsonResponse({}, status=200)
     return JsonResponse({"error": ""}, status=400)
