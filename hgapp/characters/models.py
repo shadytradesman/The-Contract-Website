@@ -867,6 +867,7 @@ class ExperienceReward(models.Model):
             return self.journal
         if hasattr(self, 'custom_reason') and self.custom_reason:
             return self.custom_reason
+        self.log_bad_source()
         raise ValueError("Experience reward has no source")
 
     def source_blurb(self):
@@ -886,9 +887,12 @@ class ExperienceReward(models.Model):
         elif hasattr(self, 'journal'):
             return "from writing a journal"
         else:
+            self.log_bad_source()
             raise ValueError("Experience reward has no source")
 
     def get_value(self):
+        if self.is_void:
+            return 0
         if hasattr(self, 'custom_value') and self.custom_value:
             return self.custom_value
         if hasattr(self, 'game_attendance'):
@@ -907,7 +911,11 @@ class ExperienceReward(models.Model):
             return EXP_GM
         if hasattr(self, 'journal'):
             return EXP_JOURNAL
+        self.log_bad_source()
         raise ValueError("Experience reward has no source")
+
+    def log_bad_source(self):
+        logger.error('Experience reward %s for character %s has no source.', str(self.pk), str(self.rewarded_character))
 
     def get_history_blurb(self):
         value = self.get_value()
