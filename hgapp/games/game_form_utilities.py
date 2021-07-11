@@ -76,6 +76,7 @@ def handle_edit_completed_game(request, game, new_player_list):
     if general_form.is_valid():
         if outcome_formset.is_valid():
             with transaction.atomic():
+                Game.objects.select_for_update().get(pk=game.pk)
                 original_game_ratio = game.achieves_golden_ratio()
                 if "timezone" in general_form.changed_data or "occurred_time" in general_form.changed_data:
                     occurred_time = general_form.cleaned_data['occurred_time']
@@ -93,7 +94,7 @@ def handle_edit_completed_game(request, game, new_player_list):
                 for form in outcome_formset:
                     _update_or_add_attendance(request, form, game)
                 game.refresh_from_db()
-                game.recalculate_golden_ratio(original_game_ratio)
+                game.recalculate_gm_reward(original_game_ratio)
                 game.update_profile_stats()
         else:
             raise ValueError("Invalid outcome formset in completed edit")

@@ -61,6 +61,7 @@ def edit_character(request, character_id, secret_key = None):
     __check_edit_perms(request, character, secret_key)
     if request.method == 'POST':
         with transaction.atomic():
+            character = Character.objects.select_for_update().get(pk=character.pk)
             update_character_from_post(request.user, existing_character=character, POST=request.POST)
         url_args = (character.id,) if request.user.is_authenticated else (character.id, character.edit_secret_key,)
         return HttpResponseRedirect(reverse('characters:characters_view', args=url_args))
@@ -193,7 +194,12 @@ def view_character(request, character_id, secret_key = None):
     events_by_date = list(merge(completed_games, character_edit_history, exp_rewards))
     timeline = defaultdict(list)
     for event in events_by_date:
-        timeline[event[0].strftime("%d %b %Y")].append((event[1], event[2]))
+        if event[1] == "edit":
+            phrases = event[2].get_change_phrases()
+            if len(phrases):
+                timeline[event[0].strftime("%d %b %Y")].append((event[1], phrases))
+        else:
+            timeline[event[0].strftime("%d %b %Y")].append((event[1], event[2]))
 
     char_ability_values = character.stats_snapshot.abilityvalue_set.order_by("relevant_ability__name").all()
     char_value_ids = [x.relevant_ability.id for x in char_ability_values]
@@ -460,6 +466,7 @@ def post_trauma(request, character_id, secret_key = None):
         __check_edit_perms(request, character, secret_key)
         if form.is_valid():
             with transaction.atomic():
+                character = Character.objects.select_for_update().get(pk=character.pk)
                 trauma_rev = grant_trauma_to_character(form, character)
             return JsonResponse({"id": trauma_rev.id, "description": trauma_rev.relevant_trauma.description}, status=200)
         else:
@@ -472,6 +479,7 @@ def delete_trauma(request, trauma_rev_id, used_xp, secret_key = None):
         character = trauma_rev.relevant_stats.assigned_character
         __check_edit_perms(request, character, secret_key)
         with transaction.atomic():
+            character = Character.objects.select_for_update().get(pk=character.pk)
             delete_trauma_rev(character, trauma_rev, True if used_xp == "T" else False)
         return JsonResponse({}, status=200)
     return JsonResponse({"error": ""}, status=400)

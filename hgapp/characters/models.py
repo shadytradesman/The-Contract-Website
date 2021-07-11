@@ -9,6 +9,7 @@ from django.db.models import Q
 from django.utils.datetime_safe import datetime
 from django.utils import timezone
 from guardian.shortcuts import assign_perm, remove_perm
+from django.utils.safestring import mark_safe
 
 from hgapp.utilities import get_queryset_size, get_object_or_none
 from cells.models import Cell
@@ -366,9 +367,9 @@ class Character(models.Model):
             return HIGH_ROLLER_STATUS[4][0]
 
     def save(self, *args, **kwargs):
-        if self.ambition[-1] == '.':
+        if self.ambition and self.ambition[-1] == '.':
             self.ambition = self.ambition[:-1 or None]
-        if self.appearance[-1] == '.':
+        if self.appearance and self.appearance[-1] == '.':
             self.appearance = self.appearance[:-1 or None]
         self.status = self.calculate_status()
         if self.pk is None:
@@ -408,9 +409,11 @@ class Character(models.Model):
             return False
         return not self.private or player.has_perm("view_private_character", self) or self.player_has_cell_edit_perms(player)
 
+    # Latest game last
     def completed_games(self):
-        return self.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).order_by("-relevant_game__end_time").all()
+        return self.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).order_by("relevant_game__end_time").all()
 
+    # Latest game first
     def completed_games_rev_sort(self):
         return self.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).order_by("-relevant_game__end_time").all()
 
@@ -845,6 +848,9 @@ class ExperienceReward(models.Model):
     rewarded_player = models.ForeignKey(settings.AUTH_USER_MODEL,
                                         on_delete=models.CASCADE)
     is_void = models.BooleanField(default=False)
+    custom_reason = models.CharField(max_length=150, blank=True, null=True)
+    custom_value = models.PositiveIntegerField(blank=True, null=True)
+
 
 
     def mark_void(self):
@@ -859,11 +865,22 @@ class ExperienceReward(models.Model):
             return self.game
         elif hasattr(self, 'journal'):
             return self.journal
+        if hasattr(self, 'custom_reason') and self.custom_reason:
+            return self.custom_reason
         raise ValueError("Experience reward has no source")
 
     def source_blurb(self):
+        if hasattr(self, 'custom_reason') and self.custom_reason:
+            return mark_safe(self.custom_reason)
         if hasattr(self, 'game_attendance'):
-            return "from attending " + self.game_attendance.relevant_game.scenario.title
+            attendance = self.game_attendance
+            if attendance.is_victory():
+                outcome = "winning"
+            elif attendance.is_ringer_victory():
+                outcome = "winning as a ringer in"
+            else:
+                outcome = "losing"
+            return "from {} {}".format(outcome, self.game_attendance.relevant_game.scenario.title)
         elif hasattr(self, 'game'):
             return "from GMing " + self.game.scenario.title
         elif hasattr(self, 'journal'):
@@ -872,6 +889,8 @@ class ExperienceReward(models.Model):
             raise ValueError("Experience reward has no source")
 
     def get_value(self):
+        if hasattr(self, 'custom_value') and self.custom_value:
+            return self.custom_value
         if hasattr(self, 'game_attendance'):
             attendance = self.game_attendance
             value = 0

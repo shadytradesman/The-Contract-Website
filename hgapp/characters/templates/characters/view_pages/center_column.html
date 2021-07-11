@@ -73,28 +73,6 @@
         <br>
         <ul class="nav nav-pills nav-justified">
             <li>
-                <form id="exert-body-form"
-                  class="injury-form"
-                  data-new-injury-url="{% url 'characters:post_injury' character.id secret_key %}"
-                  data-delete-injury-url="{% url 'characters:delete_injury' 'injuryIdJs' secret_key %}"
-                  data-toggle="tooltip" title='{{tutorial.exert_body}}'>
-                {% csrf_token %}
-                <input type="number" name="injury-severity" value="1" required="" style="display:none;">
-                <input type="text" name="injury-description" value="Exertion" required="" style="display:none;">
-                <input type="submit" class="btn btn-default btn-xs" value="Exert Body" />
-                </form>
-            </li>
-            <li>
-                <form id="recover-mind-form"
-                  data-url="{% url 'characters:set_mind_damage' character.id secret_key %}"
-                  data-toggle="tooltip" title='{{tutorial.recover_mind}}'>
-                    {% csrf_token %}
-                    <input id="recover-mind-val" type="number" name="mental-exertion-severity" value="1" required="" style="display:none;">
-                    <input type="text" name="mental-exertion-description" value="Exertion" required="" style="display:none;">
-                    <input type="submit" class="btn btn-default btn-xs" value="Recover Mind" />
-                </form>
-            </li>
-            <li>
                 <form id="exert-mind-form"
                   data-url="{% url 'characters:set_mind_damage' character.id secret_key %}"
                   data-toggle="tooltip" title='{{tutorial.exert_mind}}'>
@@ -102,6 +80,16 @@
                     <input id="exert-mind-val" type="number" name="mental-exertion-severity" value="1" required="" style="display:none;">
                     <input type="text" name="mental-exertion-description" value="Exertion" required="" style="display:none;">
                     <input type="submit" class="btn btn-default btn-xs" value="Exert Mind" />
+                </form>
+            </li>
+            <li>
+                <form id="recover-mind-form"
+                      data-url="{% url 'characters:set_mind_damage' character.id secret_key %}"
+                      data-toggle="tooltip" title='{{tutorial.recover_mind}}'>
+                    {% csrf_token %}
+                    <input id="recover-mind-val" type="number" name="mental-exertion-severity" value="1" required="" style="display:none;">
+                    <input type="text" name="mental-exertion-description" value="Exertion" required="" style="display:none;">
+                    <input type="submit" class="btn btn-default btn-xs" value="Recover Mind" />
                 </form>
             </li>
         </ul>

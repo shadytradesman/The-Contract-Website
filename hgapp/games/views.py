@@ -586,6 +586,7 @@ def end_game(request, game_id):
         if declare_outcome_formset.is_valid() and game_feedback_form.is_valid() \
                 and (not world_event_form or world_event_form.is_valid()):
             with transaction.atomic():
+                game = Game.objects.select_for_update().get(pk=game.pk)
                 for form in declare_outcome_formset:
                     attendance = get_object_or_404(Game_Attendance, id=form.cleaned_data['hidden_attendance'].id)
                     attendance.outcome = form.cleaned_data['outcome']

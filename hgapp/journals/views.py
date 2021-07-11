@@ -104,6 +104,7 @@ class EditJournal(WriteJournal):
             title = form.cleaned_data['title']
             content = form.cleaned_data['content']
             with transaction.atomic():
+                self.journal = Journal.objects.select_for_update().get(pk=self.journal.pk)
                 self.journal.title = title
                 self.journal.edit_date = timezone.now()
                 self.journal.writer = request.user
