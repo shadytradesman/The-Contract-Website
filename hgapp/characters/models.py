@@ -1471,6 +1471,7 @@ class CharacterTutorial(models.Model):
     penalty = models.TextField(max_length=3000)
     mind = models.TextField(max_length=3000)
     body = models.TextField(max_length=3000)
+    wound = models.TextField(max_length=3000, default="placeholder")
     source_edit = models.TextField(max_length=3000)
     source_view = models.TextField(max_length=3000)
     experience_edit = models.TextField(max_length=3000)
