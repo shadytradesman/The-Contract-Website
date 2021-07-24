@@ -19,7 +19,7 @@
         </div>
         <div class="stat-value col-md-11">
             __description__
-            {% if user_can_edit %}
+            {% if user_can_edit and not character.is_dead %}
                 <form class="js-delete-injury-form pull-right" data-del-injury-url=__delUrl__>
                     {% csrf_token %}
                     <input type="submit" class="btn btn-xs btn-danger" value="X"/>
@@ -40,7 +40,7 @@
                     </div>
                     <div class="stat-value col-xs-11">
                         {{injury.description}}
-                        {% if user_can_edit %}
+                        {% if user_can_edit and not character.is_dead %}
                             <form class="js-delete-injury-form pull-right" data-del-injury-url="{% url 'characters:delete_injury' injury.id secret_key %}">
                                 {% csrf_token %}
                                 <input type="submit" class="btn btn-xs btn-danger" value="X"/>
@@ -53,7 +53,7 @@
                 <h4 class="text-center" id="js-no-injuries"><small>({{character.name}} is unharmed)</small></h4>
             {% endfor%}
         </div>
-        {% if user_can_edit %}
+        {% if user_can_edit and not character.is_dead %}
             <br>
             <div class="col-xs-12">
             <div class="row form-inline">
