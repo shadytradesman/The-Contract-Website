@@ -2,6 +2,7 @@
 
 
 {% load i18n %}
+{% load staticfiles %}
 {% load bootstrap %}
 
 {% block extra_head %}
@@ -13,9 +14,10 @@
 {% block body_class %}home{% endblock %}
 
 {% block body_base %}
+<div class="container">
     <form action="{% url 'characters:characters_obituary' character.id %}" method="post">
         <section>
-            <div class="container text-center">
+            <div class="text-center">
                 {{ obit_form.about.errors }}
                 <h1>Rest in Peace {{character.name}}</h1>
                 <h4>
@@ -28,24 +30,43 @@
                 {{ obit_form.cause_of_death | bootstrap}}
                 {{obit_form.obituary | bootstrap}}
                 {% if obit_form.is_void %}
-                    {{obit_form.is_void |bootstrap }}
+                {{obit_form.is_void |bootstrap }}
                 {% endif %}
             </div>
         </section>
-        <div class="container">
+        <div class="text-center">
             {% if not character.is_dead %}
-                {% if character.active_game_attendances %}
-                    <h4>You cannot kill a character that is currently in an active game. The GM will declare death on game end.</h4>
-                    <input class="btn btn-primary" type="submit" value="Kill {{character.name}}" disabled />
-                {% else %}
-                    <h4>
-                        Warning: If you submit this form, your character will be declared dead and you will be unable to play them.
-                    </h4>
-                    <input class="btn btn-primary" type="submit" value="Kill {{character.name}}" />
-                {% endif %}
+            <div class="alert alert-danger text-center css-char-alert" role="alert">
+                <h4>
+                    Are you sure you're dead?
+                </h4>
+                <h5>
+                    If your Contractor succumbed to their Injuries,
+                    remember: <b><u>damage does not stack linearly.</u></b>
+                    <br>
+                    <br>
+                    Your wound level is equal to the Severity of your worst Injury + the number of other Injuries
+                    you've suffered.
+                    <br>
+                    <br>
+                    Enter all your Injuries on the Character sheet and ensure your wound level equal reaches the
+                    <img class="css-dead-img" src="{% static 'characters/skull.svg' %}" data-toggle="tooltip" title='You are Dead.'/>
+                </h5>
+            </div>
+
+            {% if character.active_game_attendances %}
+                <h4>You cannot kill a Contractor that is currently in an active Game. The GM will declare death on Game end.</h4>
+                <input class="btn btn-primary" type="submit" value="Kill {{character.name}}" disabled />
+            {% else %}
+                <input class="btn btn-primary" type="submit" value="Kill {{character.name}}" />
+                <br>
+                If you submit this form, your Contractor will be declared dead, and you will be unable to play them.
+            {% endif %}
             {% else %}
                 <input class="btn btn-primary" type="submit" value="Done!" />
             {% endif %}
         </div>
     </form>
+
+</div>
 {% endblock %}

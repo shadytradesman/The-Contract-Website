@@ -519,7 +519,7 @@ class GameModelTests(TestCase):
             self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
             self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
             self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR)
-            self.assertEquals(self.user1.profile.get_avail_improvements().count(), 1)
+            self.assertEquals(self.user1.profile.get_avail_improvements().count(), 0)
             self.assertEquals(self.user1.profile.get_avail_charon_coins().count(), 0)
             self.assertEquals(self.user1.profile.get_avail_exp_rewards().count(), 1)
 
@@ -645,7 +645,7 @@ class GameModelTests(TestCase):
             self.assertEquals(self.char_user1_cell2.stats_snapshot.sources.count(), 0)
             self.assertEquals(self.char_user1_cell2.exp_earned(), EXP_NEW_CHAR)
 
-            self.assertEquals(self.user1.profile.get_avail_improvements().count(), 1)
+            self.assertEquals(self.user1.profile.get_avail_improvements().count(), 0)
             self.assertEquals(self.user1.profile.get_avail_charon_coins().count(), 0)
             self.assertEquals(self.user1.profile.get_avail_exp_rewards().count(), 1)
 
@@ -840,7 +840,7 @@ class GameModelTests(TestCase):
 
             attendance.refresh_from_db()
             attendance.change_outcome(new_outcome=RINGER_VICTORY, is_confirmed=True)
-            self.assertEquals(self.user1.profile.get_avail_improvements().count(), 1)
+            self.assertEquals(self.user1.profile.get_avail_improvements().count(), 0)
             self.assertEquals(self.user1.profile.get_avail_charon_coins().count(), 0)
             self.assertEquals(self.user1.profile.get_avail_exp_rewards().count(), 1)
 

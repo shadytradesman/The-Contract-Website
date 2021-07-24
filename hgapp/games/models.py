@@ -549,10 +549,6 @@ class Game_Attendance(models.Model):
                                    is_charon_coin=True,)
             charon_coin_reward.save()
         if self.is_ringer_victory():
-            ringer_reward = Reward(relevant_game=self.relevant_game,
-                                   rewarded_player=self.game_invite.invited_player,
-                                   is_improvement=True)
-            ringer_reward.save()
             exp_reward = ExperienceReward(
                 rewarded_player=self.game_invite.invited_player,
             )

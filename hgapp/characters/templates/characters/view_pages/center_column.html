@@ -56,6 +56,43 @@
         </div>
     </div>
 {% endfor %}
+    <br>
+    <div class="row css-status-text">
+        <div class="col-xs-6 text-center">
+            <div id="js-wound-container" style="display:none;" data-toggle="tooltip" title='{{tutorial.wound}}'>
+                Wound level =
+                <span id="js-worst-injury"></span>
+                +
+                <span id="js-num-other-injuries"></span>
+            </div>
+        </div>
+        <div class="col-xs-6 text-right css-status-text">
+            {% if user_can_edit %}
+                <ul id="mind-buttons" class="nav nav-pills nav-justified">
+                    <li>
+                        <form id="exert-mind-form"
+                              data-url="{% url 'characters:set_mind_damage' character.id secret_key %}"
+                              data-container='#mind-buttons' data-toggle="tooltip" title='{{tutorial.exert_mind}}'>
+                            {% csrf_token %}
+                            <input id="exert-mind-val" type="number" name="mental-exertion-severity" value="1" required="" style="display:none;">
+                            <input type="text" name="mental-exertion-description" value="Exertion" required="" style="display:none;">
+                            <input type="submit" class="btn btn-default btn-xs" value="Exert Mind" />
+                        </form>
+                    </li>
+                    <li>
+                        <form id="recover-mind-form"
+                              data-url="{% url 'characters:set_mind_damage' character.id secret_key %}"
+                              data-container='#mind-buttons' data-toggle="tooltip" title='{{tutorial.recover_mind}}'>
+                            {% csrf_token %}
+                            <input id="recover-mind-val" type="number" name="mental-exertion-severity" value="1" required="" style="display:none;">
+                            <input type="text" name="mental-exertion-description" value="Exertion" required="" style="display:none;">
+                            <input type="submit" class="btn btn-default btn-xs" value="Recover Mind" />
+                        </form>
+                    </li>
+                </ul>
+            {% endif %}
+        </div>
+    </div>
 {% if user_can_edit %}
     {% if character.player %}
         <div id="js-dead-box" class="text-center" style="display:none;">
@@ -69,30 +106,5 @@
             </div>
         </div>
     {% endif %}
-    <div class="row text-center">
-        <br>
-        <ul class="nav nav-pills nav-justified">
-            <li>
-                <form id="exert-mind-form"
-                  data-url="{% url 'characters:set_mind_damage' character.id secret_key %}"
-                  data-toggle="tooltip" title='{{tutorial.exert_mind}}'>
-                    {% csrf_token %}
-                    <input id="exert-mind-val" type="number" name="mental-exertion-severity" value="1" required="" style="display:none;">
-                    <input type="text" name="mental-exertion-description" value="Exertion" required="" style="display:none;">
-                    <input type="submit" class="btn btn-default btn-xs" value="Exert Mind" />
-                </form>
-            </li>
-            <li>
-                <form id="recover-mind-form"
-                      data-url="{% url 'characters:set_mind_damage' character.id secret_key %}"
-                      data-toggle="tooltip" title='{{tutorial.recover_mind}}'>
-                    {% csrf_token %}
-                    <input id="recover-mind-val" type="number" name="mental-exertion-severity" value="1" required="" style="display:none;">
-                    <input type="text" name="mental-exertion-description" value="Exertion" required="" style="display:none;">
-                    <input type="submit" class="btn btn-default btn-xs" value="Recover Mind" />
-                </form>
-            </li>
-        </ul>
-    </div>
 {% endif %}
 </div>

@@ -87,7 +87,7 @@
             </div>
         {% endif %}
         {% if power_full.example_description %}
-            <small style="font-style: italic; color: #808080;">Stock Power Tip: {{power_full.example_description|linebreaks}}</small>
+            <small style="font-style: italic; color: #808080;">Stock Power Tip: {{power_full.example_description|safe}}</small>
         {% endif %}
     </div>
     {% if power_full.tags.all %}

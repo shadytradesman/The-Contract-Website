@@ -278,7 +278,14 @@ function updateHealthDisplay() {
         }
         numInjuries ++;
     });
-    var damageValue = highestSeverity + numInjuries -1;
+    var damageValue = highestSeverity + numInjuries - 1;
+    if (damageValue > 0) {
+        $("#js-wound-container").show();
+        $("#js-worst-injury").html(highestSeverity);
+        $("#js-num-other-injuries").html(numInjuries - 1);
+    } else {
+        $("#js-wound-container").hide();
+    }
     var damageValue = damageValue < 0 ? 0 : damageValue;
     var i;
     var bodyPenalty = 0;
