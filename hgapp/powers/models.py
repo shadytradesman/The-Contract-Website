@@ -347,7 +347,7 @@ class Power_Full(models.Model):
         if hasattr(self, "latest_rev") and self.latest_rev:
             return self.latest_rev
         else:
-            self.latest_rev = self.power_set.order_by('-pub_date').all()[0]
+            self.latest_rev = self.power_set.order_by('-pub_date').first()
             self.save()
             return self.latest_rev
 

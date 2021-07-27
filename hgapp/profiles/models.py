@@ -143,7 +143,7 @@ class Profile(models.Model):
         return self.user.game_invite_set \
             .exclude(get_completed_game_invite_excludes_query()) \
             .exclude(is_declined=True) \
-            .order_by("relevant_game__end_time") \
+            .order_by("-relevant_game__end_time") \
             .all()
 
     def get_avail_improvements(self):
@@ -158,7 +158,7 @@ class Profile(models.Model):
 
     def get_games_where_player_gmed(self):
         return Game.objects.filter(gm=self.user).exclude(get_completed_game_excludes_query()) \
-                .order_by("end_time") \
+                .order_by("-end_time") \
                 .all()
 
     def get_gm_title_tooltip(self):

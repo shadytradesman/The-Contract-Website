@@ -35,10 +35,10 @@ class ProfileView(generic.DetailView):
         self.deceased_characters = [character for character in characters if character.is_dead()]
 
         self.completed_game_invites = self.profile.completed_game_invites()
-        self.completed_games = self.profile.get_games_where_player_gmed()
+        self.gmed_games = self.profile.get_games_where_player_gmed()
 
         played_games_by_date = [(x.relevant_game.end_time, "play", x) for x in self.completed_game_invites]
-        gmed_games_by_date = [(x.end_time, "gm", x) for x in self.completed_games]
+        gmed_games_by_date = [(x.end_time, "gm", x) for x in self.gmed_games]
 
         events_by_date = list(merge(played_games_by_date, gmed_games_by_date))
         timeline = defaultdict(list)
@@ -46,7 +46,6 @@ class ProfileView(generic.DetailView):
             timeline[event[0].strftime("%d %b %Y")].append((event[1], event[2]))
 
         self.game_timeline = dict(timeline)
-        self.games_gmed = Game.objects.filter(gm=self.profile.user).exclude(get_completed_game_excludes_query()).all()
         self.attended_games = self.profile.user.game_set.exclude(get_completed_game_excludes_query()).all()
 
         return Profile.objects
@@ -62,7 +61,6 @@ class ProfileView(generic.DetailView):
         context['living_characters'] = self.living_characters
         context['deceased_characters'] = self.deceased_characters
         context['scenarios'] = self.scenarios
-        context['gmed_games'] = self.games_gmed
         context['attended_games'] = self.attended_games
         context['game_timeline'] = self.game_timeline
         context['profile_view'] = True
@@ -98,7 +96,7 @@ class ProfileView(generic.DetailView):
         cells_gmed = set()
         contractors_gmed = set()
         players_gmed = set()
-        for game in self.games_gmed:
+        for game in self.gmed_games:
             if game.cell:
                 cells_gmed.add(game.cell.id)
             for attendance in game.game_attendance_set.all():
