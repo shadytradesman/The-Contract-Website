@@ -144,6 +144,9 @@ INSTALLED_APPS = [
     'wiki.plugins.macros.apps.MacrosConfig',
 ]
 
+if DEBUG:
+    INSTALLED_APPS.append('debug_toolbar')
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -154,6 +157,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'hgapp.middleware.TimezoneMiddleware'
 ]
+if DEBUG:
+    MIDDLEWARE.insert(2, 'debug_toolbar.middleware.DebugToolbarMiddleware')
 
 ROOT_URLCONF = 'hgapp.urls'
 CSRF_USE_SESSIONS = True

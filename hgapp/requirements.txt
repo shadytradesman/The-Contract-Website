@@ -81,3 +81,4 @@ setuptools>=36
 roman==3.3
 beautifulsoup4==4.9.3
 soupsieve==2.2.1
+django-debug-toolbar==3.2.1
