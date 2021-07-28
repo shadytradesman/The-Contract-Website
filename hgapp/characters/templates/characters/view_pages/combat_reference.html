@@ -1,0 +1,157 @@
+<div class="css-combat-reference row">
+
+<a class="wiki-entry-collapsible text-center" role="button">
+        <div class="col-xs-12">
+            <small>
+                <i>
+                    (Click to toggle Combat quick reference)
+                </i>
+            </small>
+        </div>
+</a>
+    <div class="collapse-content clearfix" style="display:none;">
+        <div class="col-xs-12">
+            <div class="row">
+                <div class="col-xs-12 text-center">
+                    <div data-toggle="tooltip" title="
+                        Initiative determines turn order. Ties are broken using Dexterity, then Wits, then GM discretion.
+                        ">
+                    <i>At the start of Combat, roll <b>Initiative</b>:</i>
+                    Dexterity + Wits
+                    (5<span class="js-roll-penalty" style="color:#fb7e48;">-2</span> dice),
+                    Difficulty 6.
+                    </div>
+                </div>
+            </div>
+            <small>
+                <div class="row">
+                    <div class="col-xs-12 text-center">
+                        Each round of Combat represents 3 seconds of near-simultaneous action.
+                    </div>
+                </div>
+            </small>
+            <div class="row">
+                <div class="col-xs-12 col-md-6">
+                    <div class="text-center">
+                        <b>It's my Turn</b>
+                    </div>
+                    <ul>
+                        <li>
+                            <span data-toggle="tooltip" title="
+                                Movement may be taken immediately before OR After your Action and cannot be split.
+                                Your Action may be anything; the most common are listed below.
+                                ">
+                                You get one <b>Movement</b> and one <b>Action</b> every round of Combat.
+                            </span>
+                        </li>
+                        <li>
+                            <span data-toggle="tooltip" title="
+                                Minimum free movement is 5 feet unless you are incapacitated.
+                                ">
+                                <b>You may Move</b> (Dexterity-Penalty)*5 <b>(35<span class="js-roll-penalty" style="color:#fb7e48;">-10</span>) feet</b> for free.
+                            </span>
+                        </li>
+                        <li>
+                            <b>You may Dash</b> up to an additional
+                            (Brawn*5) <b>(20) feet</b>, but it penalizes your Action -1 die per 5 feet.
+                        </li>
+                        <li>
+                            <b>Action: Attack</b> with your <a>weapon or hands.</a>
+                        </li>
+                        <li>
+                            <b>Action: Sprint</b> by rolling Brawn + Athletics
+                            (3<span class="js-roll-penalty" style="color:#fb7e48;">-2</span> dice).
+                            Add the Outcome*5 feet to your Movement.
+                        </li>
+                        <li>
+                            <span data-toggle="tooltip" title="
+                                Example: if your Evade Outcome is 4 and you are attacked twice with an Outcome of 3 each time,
+                                you would avoid the first attack and suffer the second as though its Outcome was 2.
+                                ">
+                                <b>Action: Evade</b> by rolling to defend or dodge. Your Outcome is "spent" to reduce the
+                                Outcome of any incoming attacks until your next Action.
+                            </span>
+                        </li>
+                        <li>
+                            <span data-toggle="tooltip" title="
+                                Most Powers require an Action to activate.
+                                ">
+                                <b>Action: Activate a Power</b>.
+                            </span>
+                        </li>
+                        <li>
+                            <span data-toggle="tooltip" title="
+                                The Action and event cannot be changed once declared.
+                                If the event never occurs, you lose your Action.
+                                You may still React to incoming attacks if your Action is held, but it still uses that round's Action.
+                                You cannot hold Movement.
+                                ">
+                            <b>Hold your Action</b> by declaring an Action and a triggering event.
+                            If the event occurs before your next turn, you perform the Action.
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-xs-12 col-md-6">
+                    <div class="text-center">
+                        <b>I'm being attacked</b>
+                    </div>
+                    <ul>
+                        <li>
+                            <span data-toggle="tooltip" title="
+                                You cannot react to ranged firearms attacks without a Power.
+                                ">
+                            If you have not yet spent your Action this round, you may use it as a Reaction to defend yourself.
+                                Otherwise you take the full attack.
+                            </span>
+                        </li>
+                        <li>
+                            <span data-toggle="tooltip" title="
+                                You cannot dodge ranged firearms attacks as a Reaction without a Power.
+                                ">
+                                <b>Reaction: Dodge</b> by rolling Dexterity + Athletics
+                                (7<span class="js-roll-penalty" style="color:#fb7e48;">-2</span> dice), Difficulty 7.
+                                Your Outcome is subtracted from the attacker's.
+                            </span>
+                        </li>
+                        <li>
+                            <span data-toggle="tooltip" title="
+                                Unarmed people can Defend against other unarmed attacks.
+                                Melee weapons can Defend against unarmed, melee, or thrown attacks.
+                                Firearms cannot Defend but may be Defended against if the attacker is within reach.
+                                ">
+                                <b>Reaction: Defend</b> with your weapon by rolling its attack roll, if allowed.
+                                Your Outcome is subtracted from the attacker's.
+                            </span>
+                        </li>
+                        <li>
+                            <span data-toggle="tooltip" title="
+                                    The requirements for Clashing are the same as for Defending.
+                                    On a tie, both attacks succeed with their full Outcome.
+                                    The loser gets nothing.
+                                ">
+                                <b>Reaction: Clash</b> with the attacker using the same roll you would use to Defend.
+                                The higher Outcome is treated as the result of a successful, undefended attack roll against the other.
+                            </span>
+                        </li>
+                        <li>
+                            <span data-toggle="tooltip" title="
+                                    This penalty can reduce your next Action's roll to 0 dice. You cannot use a Desperate
+                                    Defense if you have already Exerted your Mind this round.
+                                ">
+                                <b>Desperate Defense:</b>
+                                If you have already used your Action, you may Exert your Mind to perform a Reaction.
+                                Your next round's Action receives a -2 dice penalty.
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 text-center">
+                    If an attack's Outcome is positive after defense, it results a new Injury with Severity = <b>Outcome + Weapon damage - Armor</b>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
