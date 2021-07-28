@@ -5,6 +5,8 @@ from django.urls import reverse
 from django.core.exceptions import PermissionDenied
 from django.views import generic
 from django.db import transaction
+from django.db.models import Prefetch
+
 
 from characters.models import Character
 from .createPowerFormUtilities import get_create_power_context_from_base, \
@@ -15,7 +17,9 @@ from .models import Power, Base_Power_Category, Base_Power, Base_Power_System, D
 from .forms import DeletePowerForm
 
 def create(request, character_id=None):
-    category_list = Base_Power_Category.objects.order_by('name')
+    category_list = Base_Power_Category.objects\
+        .prefetch_related(Prefetch('base_power_set',queryset=Base_Power.objects.order_by('name')))\
+        .order_by('name')
     character=None
     if character_id:
         character = get_object_or_404(Character, pk=character_id)
