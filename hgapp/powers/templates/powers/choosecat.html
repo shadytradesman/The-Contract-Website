@@ -69,6 +69,7 @@
                 <div class="panel-body" style="padding-top: 10px; padding-bottom: 10px;">
                 <div class="row">
                 {% for power in category.base_power_set.all %}
+                    {% if power.is_public %}
                     <div class="col-xs-12" style="padding-left:40px;">
                         {% if character %}
                             <a href="{% url 'powers:powers_create_power_for_char' power.slug character.id %}">
@@ -90,6 +91,7 @@
                             </h4>
                         </a>
                     </div>
+                    {% endif %}
                 {% endfor %}
                     </div>
                 </div>
