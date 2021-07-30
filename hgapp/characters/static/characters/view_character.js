@@ -327,10 +327,18 @@ function updateHealthDisplay() {
     var penaltyContent;
     if (isNaN(mindPenalty)) {
         penaltyContent = mindPenalty;
+        $(".js-roll-penalty").hide();
     } else if (isNaN(bodyPenalty)) {
         penaltyContent = bodyPenalty;
+        $(".js-roll-penalty").hide();
     } else {
         penaltyContent = mindPenalty + bodyPenalty;
+        if (penaltyContent < 0) {
+            $(".js-roll-penalty").html(penaltyContent);
+            $(".js-roll-penalty").show();
+        } else {
+            $(".js-roll-penalty").hide();
+        }
     }
     $("#js-penalty-box").html(penaltyContent);
 
@@ -631,3 +639,30 @@ $(".js-world-element-container").on("submit",".js-delete-world-element-form", fu
         }
     })
 })
+
+// populate dice rolls
+const abilityValueById = JSON.parse(document.getElementById('abilityValueById').textContent);
+const attributeValueById = JSON.parse(document.getElementById('attributeValueById').textContent);
+window.onload = function () {
+    $(".js-roll-value").show();
+    $(".js-roll-num-dice").each(function(){
+        const attrId = parseInt($(this).attr('data-attr-id'));
+        const attrId2 = parseInt($(this).attr('data-attr2-id'));
+        const abilityId = parseInt($(this).attr('data-ability-id'));
+        var abilityValue = abilityValueById[abilityId];
+        var attrValue = attributeValueById[attrId];
+        var attr2Value = attributeValueById[attrId2];
+        abilityValue = abilityValue ? abilityValue : 0;
+        attrValue = attrValue ? attrValue : 0;
+        attr2Value = attr2Value ? attr2Value : 0;
+        $(this).html(abilityValue + attrValue + attr2Value);
+        var difficultyElement = $(this).parent().parent().children(".js-roll-difficulty");
+        if (difficultyElement.length == 1) {
+            var difficultyValue = parseInt(difficultyElement.attr('data-difficulty'));
+            if (abilityValue === 0 && attr2Value === 0) {
+                difficultyValue = difficultyValue + 1;
+                difficultyElement.html(difficultyValue + "+1 (untrained)");
+            }
+        }
+    });
+};

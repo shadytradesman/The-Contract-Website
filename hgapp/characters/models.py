@@ -727,15 +727,17 @@ class Character(models.Model):
             return mind_val
 
     def get_attributes(self, is_physical):
-        return self.stats_snapshot.attributevalue_set\
-            .filter(relevant_attribute__is_physical=is_physical)\
+        return self.stats_snapshot.attributevalue_set \
+            .prefetch_related('relevant_attribute')\
+            .filter(relevant_attribute__is_physical=is_physical) \
             .order_by('relevant_attribute__name')\
             .all()
 
     def get_abilities(self, is_physical):
-        return self.stats_snapshot.abilityvalue_set\
-            .filter(relevant_ability__is_physical=is_physical)\
-             .order_by('relevant_ability__name')\
+        return self.stats_snapshot.abilityvalue_set \
+            .prefetch_related('relevant_ability') \
+            .filter(relevant_ability__is_physical=is_physical) \
+            .order_by('relevant_ability__name')\
             .all()
 
     def get_health_display(self):
@@ -1491,6 +1493,10 @@ class CharacterTutorial(models.Model):
     world_modal_1 = models.TextField(max_length=3000, default="placeholder")
     world_modal_2 = models.TextField(max_length=3000, default="placeholder")
     world_modal_3 = models.TextField(max_length=3000, default="placeholder")
+    dodge_roll = models.ForeignKey(Roll, on_delete=models.CASCADE, blank=True, null=True,
+                                   related_name="char_dodge")
+    sprint_roll = models.ForeignKey(Roll, on_delete=models.CASCADE, blank=True, null=True,
+                                    related_name="char_sprint")
 
 class AttributeBonus(models.Model):
     character = models.ForeignKey('Character', on_delete=models.CASCADE)
