@@ -53,7 +53,7 @@
                             <span data-toggle="tooltip" title="
                                 Minimum free movement is 5 feet unless you are incapacitated.
                                 ">
-                                <b>You may Move</b> (Dexterity-Penalty)*5 <b>(35<span class="js-roll-penalty" style="color:#fb7e48;">-10</span>) feet</b> for free.
+                                <b>You may Move</b> (Dexterity-Penalty)*5 <b>(35<span class="js-roll-penalty" style="color:#fb7e48;" data-penalty-multiplier="5"></span>) feet</b> for free.
                             </span>
                         </li>
                         <li>
@@ -64,8 +64,8 @@
                             <b>Action: Attack</b> with your <a>weapon or hands.</a>
                         </li>
                         <li>
-                            <b>Action: Sprint</b> by rolling Brawn + Athletics
-                            (3<span class="js-roll-penalty" style="color:#fb7e48;">-2</span> dice).
+                            <b>Action: Sprint</b> by rolling
+                            {{tutorial.sprint_roll.render_html_for_current_contractor}}.
                             Add the Outcome*5 feet to your Movement.
                         </li>
                         <li>
@@ -114,8 +114,8 @@
                             <span data-toggle="tooltip" title="
                                 You cannot dodge ranged firearms attacks as a Reaction without a Power.
                                 ">
-                                <b>Reaction: Dodge</b> by rolling Dexterity + Athletics
-                                (7<span class="js-roll-penalty" style="color:#fb7e48;">-2</span> dice), Difficulty 7.
+                                <b>Reaction: Dodge</b> by rolling
+                                {{tutorial.dodge_roll.render_html_for_current_contractor}}.
                                 Your Outcome is subtracted from the attacker's.
                             </span>
                         </li>

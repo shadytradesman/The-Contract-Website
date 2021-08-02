@@ -630,6 +630,7 @@ class SystemFieldRoll(SystemField):
                                            null=True,
                                            blank=True)
     difficulty = models.PositiveIntegerField(null=True, blank=True)
+    caster_rolls = models.BooleanField(default=True)
 
     def render_speed(self):
         if self.speed == NO_SPEED_INFO:
@@ -672,23 +673,10 @@ class SystemFieldRollInstance(SystemFieldInstance):
         unique_together = (("relevant_field", "relevant_power"))
 
     def render_value(self):
-        if self.roll.parry_type != NO_PARRY_INFO:
-            if self.roll.parry_type == DODGE_ONLY:
-                roll_text = "to dodge"
-            else:
-                roll_text = "to dodge or parry (as for {})".format(self.roll.get_parry_type_display())
-            if self.roll.speed != NO_SPEED_INFO:
-                roll_text = "{} as {}".format(roll_text, self.roll.get_speed_display())
-            return roll_text
-        first_word = "Mind" if self.roll.is_mind else "Body" if self.roll.is_body else self.roll.attribute.name
-        if self.roll.ability:
-            roll_text = "{} + {}".format(first_word, self.roll.ability.name)
+        if self.relevant_field.caster_rolls:
+            return self.roll.render_html_for_current_contractor()
         else:
-            roll_text = first_word
-        roll_text = "{}, Difficulty {}".format(roll_text, self.roll.difficulty)
-        if self.roll.speed != NO_SPEED_INFO:
-            roll_text = "{} as {}".format(roll_text, self.roll.get_speed_display())
-        return roll_text
+            return self.roll.render_value_for_power()
 
 class Enhancement_Instance(models.Model):
     relevant_enhancement = models.ForeignKey(Enhancement,

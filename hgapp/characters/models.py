@@ -974,6 +974,74 @@ class Roll(models.Model):
             models.Index(fields=['attribute', 'ability', 'difficulty',]),
         ]
 
+    def __str__(self):
+        supp_info = None
+        if self.parry_type != NO_PARRY_INFO:
+            supp_info = "(defended against as {})".format(self.get_parry_type_display())
+        if self.speed != NO_SPEED_INFO:
+            speed = "as {}".format(self.get_speed_display())
+            supp_info = "{} {}".format(speed, supp_info) if supp_info else speed
+        return "{}, Diff {}{}".format(self.get_main_roll_component(), self.difficulty, " " + supp_info if supp_info else "")
+
+    def get_main_roll_component(self):
+        if hasattr(self, "attribute") and self.attribute:
+            main_component = self.attribute.name
+        else:
+            main_component = "Mind" if self.is_mind else "Body"
+        if hasattr(self, "ability") and self.ability:
+            ability_name = self.ability.name
+            roll = "{} + {}".format(main_component, ability_name)
+        else:
+            roll = main_component
+        return roll
+
+    def render_html_for_current_contractor(self):
+        if self.parry_type != NO_PARRY_INFO:
+            return self.get_defense_text()
+        html_output = "{}" \
+        "<span>" \
+            "<span class=\"js-roll-value\" style=\"display:none;\">" \
+                " (<span class=\"js-roll-num-dice\" " \
+                "data-attr-id=\"{}\" " \
+                "data-ability-id=\"{}\" " \
+                "data-is-mind=\"{}\" " \
+                "data-is-body=\"{}\">" \
+                "</span>" \
+                "<span class=\"js-roll-penalty\" style=\"color:#fb7e48;\"></span>" \
+            " dice)</span>" \
+            " Difficulty <span class=\"js-roll-difficulty\" data-difficulty=\"{}\">{}</span>" \
+        "</span>" \
+        .format(self.get_main_roll_component(),
+                self.attribute.id if hasattr(self, "attribute") and self.attribute else " ",
+                self.ability.id if hasattr(self, "ability") and self.ability else " ",
+                self.is_mind,
+                self.is_body,
+                self.difficulty,
+                self.difficulty)
+        return mark_safe(html_output)
+
+    def render_value_for_power(self):
+        if self.parry_type != NO_PARRY_INFO:
+            return self.get_defense_text()
+        first_word = "Mind" if self.is_mind else "Body" if self.is_body else self.attribute.name
+        if self.ability:
+            roll_text = "{} + {}".format(first_word, self.ability.name)
+        else:
+            roll_text = first_word
+        roll_text = "{}, Difficulty {}".format(roll_text, self.difficulty)
+        if self.speed != NO_SPEED_INFO:
+            roll_text = "{} as {}".format(roll_text, self.get_speed_display())
+        return roll_text
+
+    def get_defense_text(self):
+        if self.parry_type == DODGE_ONLY:
+            roll_text = "to dodge"
+        else:
+            roll_text = "to dodge or parry (as for {})".format(self.get_parry_type_display())
+        if self.speed != NO_SPEED_INFO:
+            roll_text = "{} as {}".format(roll_text, self.get_speed_display())
+        return roll_text
+
     # To obtain the singleton rolls, use this static getter methods instead of directly creating the roll objects.
     @staticmethod
     def get_mind_roll(difficulty=6, parry_type=NO_PARRY_INFO, speed=FREE_ACTION):
