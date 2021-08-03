@@ -38,6 +38,10 @@ else:
     ]
     SESSION_COOKIE_DOMAIN = ".thecontractrpg.com"
 
+INTERNAL_IPS = (
+    '127.0.0.1',
+    '192.168.1.23',
+)
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"

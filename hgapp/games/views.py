@@ -325,7 +325,6 @@ def edit_game(request, game_id):
 
 def view_game(request, game_id):
     game = get_object_or_404(Game, id=game_id)
-    game.gm.profile.update_gm_stats_if_necessary()  # remove after world patch
     can_view_scenario = False
     my_invitation = None
     if request.user.is_authenticated:
@@ -813,8 +812,6 @@ class LookingForGame(View):
         if self.request.user.is_anonymous or not self.request.user.profile.view_adult_content:
             games_query = games_query.exclude(is_nsfw=True)
         games = games_query.order_by('scheduled_start_time').all()
-        for game in games:
-            game.gm.profile.update_gm_stats_if_necessary() # remove after world patch
         context = {
             'games': games,
         }

@@ -1,5 +1,7 @@
 from django import template
 
+from powers.models import Power
+
 register = template.Library()
 
 @register.simple_tag
