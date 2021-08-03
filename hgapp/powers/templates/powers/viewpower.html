@@ -12,6 +12,15 @@
 
 {% load account_tags %}
 {% load power_tags %}
+{% load staticfiles %}
+
+{% block extra_scripts %}
+    {% if power.parent_power.character %}
+        {{attribute_value_by_id|json_script:"attributeValueById"}}
+        {{ability_value_by_id|json_script:"abilityValueById"}}
+        <script src="{% static 'characters/roll_values.js' %}"></script>
+    {% endif %}
+{% endblock %}
 
 <div class="container">
     <br>

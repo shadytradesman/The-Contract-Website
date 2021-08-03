@@ -726,12 +726,12 @@ class Character(models.Model):
         else:
             return mind_val
 
-    def get_attributes(self, is_physical):
-        return self.stats_snapshot.attributevalue_set \
-            .prefetch_related('relevant_attribute')\
-            .filter(relevant_attribute__is_physical=is_physical) \
-            .order_by('relevant_attribute__name')\
-            .all()
+    def get_attributes(self, is_physical=None):
+        query = self.stats_snapshot.attributevalue_set \
+            .prefetch_related('relevant_attribute')
+        if is_physical is not None:
+            query = query.filter(relevant_attribute__is_physical=is_physical)
+        return query.order_by('relevant_attribute__name').all()
 
     def get_abilities(self, is_physical):
         return self.stats_snapshot.abilityvalue_set \
@@ -1018,7 +1018,10 @@ class Roll(models.Model):
                 self.is_body,
                 self.difficulty,
                 self.difficulty)
-        return mark_safe(html_output)
+        roll_text = mark_safe(html_output)
+        if self.speed != NO_SPEED_INFO:
+            roll_text = "{} as {}".format(roll_text, self.get_speed_display())
+        return roll_text
 
     def render_value_for_power(self):
         if self.parry_type != NO_PARRY_INFO:
