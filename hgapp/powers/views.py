@@ -172,14 +172,8 @@ def power_view(request, power_id):
         if power_list[0] == power and "history" not in request.path:
             return HttpResponseRedirect(reverse('powers:powers_view_power_full', args=(power_full.id,)))
         if power_full.character:
-            attributes = power_full.character.get_attributes()
-            attribute_val_by_id = {}
-            for attr in attributes:
-                attribute_val_by_id[attr.relevant_attribute.id] = attr.value
-            ability_val_by_id = {}
-            char_ability_values = power_full.character.stats_snapshot.abilityvalue_set.all()
-            for x in char_ability_values:
-                ability_val_by_id[x.relevant_ability.id] = x.value
+            attribute_val_by_id = power_full.character.get_attribute_values_by_id()
+            ability_val_by_id  = power_full.character.get_ability_values_by_id()
     else:
         power_full = None
         power_list = None

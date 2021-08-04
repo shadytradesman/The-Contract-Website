@@ -10,83 +10,54 @@
             <div class="row">
                 <div class="col-xs-12 text-center">
                     <div class="css-quickstart-action">
-                <span class="css-quickstart-left-btn btn btn-default">
-                    <-
+                <button  id="js-qs-prev-action" class="css-quickstart-left-btn btn btn-default" >
+                    <span class="glyphicon glyphicon-backward"></span>
+                </button>
+                <span id="js-qs-action-text" class="css-quickstart-action-text">
                 </span>
-                        <span class="css-quickstart-action-text">
-                    Pick the lock
-                </span>
-                        <span class="css-quickstart-right-btn btn btn-default">
-                    ->
-                </span>
+                <button id="js-qs-next-action" class="css-quickstart-right-btn btn btn-default">
+                    <span class="glyphicon glyphicon-forward"></span>
+                </button>
                     </div>
                 </div>
             </div>
             <div class="row text-center css-quickstart-gm-text">
                 <div class="col-xs-12">
                     <p>
-                        "Roll <b>Dexterity</b> + <b>Ledgerdemain</b>, Difficulty <b>6</b>"
+                        "Roll <b class="js-qs-attribute">Dexterity</b>
+                        + <b class="js-qs-ability">Ledgerdemain</b>,
+                        Difficulty <b id="js-qs-difficulty">-</b>"
                     </p>
                     <p>
-                        <b>4</b> Dexterity + <b>2</b> Ledgerdemain =
-                        <span class="btn btn-primary">
-                    Roll <b>6</b> Dice
-                </span>
+                        <b class="js-qs-attribute-val"></b>
+                        <span class="js-qs-attribute"></span>
+                        + <b class="js-qs-ability-val"></b>
+                        <span class="js-qs-ability"></span>  =
+                        <span id="js-qs-roll-button" class="btn btn-primary">
+                            Roll <b id="js-qs-num-dice" class="js-roll-num-dice">-</b> Dice
+                        </span>
                     </p>
                 </div>
             </div>
             <div class="row">
                 <div class="col-xs-12">
-                    <div class="css-qs-roll-results">
-                        <div class="css-quickstart-die" style="background-image: url({% static 'info/die-background.png' %})">
-                    <span class="css-quickstart-die-val">
-                        0
-                    </span>
-                        </div>
-                        <div class="css-quickstart-die" style="background-image: url({% static 'info/die-background.png' %})">
-                    <span class="css-quickstart-die-val">
-                        2
-                    </span>
-                        </div>
-                        <div class="css-quickstart-die" style="background-image: url({% static 'info/die-background.png' %})">
-                    <span class="css-quickstart-die-val">
-                        8
-                    </span>
-                        </div>
-                        <div class="css-quickstart-die" style="background-image: url({% static 'info/die-background.png' %})">
-                    <span class="css-quickstart-die-val">
-                        1
-                    </span>
-                        </div>
+                    <div id="js-qs-roll-dice" class="css-qs-roll-results">
                     </div>
                 </div>
             </div>
             <div class="row">
                 <div class="col-xs-12">
-                    <div class="css-qs-roll-results">
-                        <div class="css-quickstart-die-outcome">
-                            +2
-                        </div>
-                        <div class="css-quickstart-die-outcome">
-                            +0
-                        </div>
-                        <div class="css-quickstart-die-outcome">
-                            +1
-                        </div>
-                        <div class="css-quickstart-die-outcome">
-                            -1
-                        </div>
+                    <div id="js-qs-roll-results" class="css-qs-roll-results">
                     </div>
                 </div>
             </div>
             <div class="row text-center">
                 <div class="col-xs-12">
-                    <h4 >Outcome <b>2</b>
+                    <h4 >Outcome: <b id="js-qs-outcome-num">-</b>
                         <br>
-                        <small>An Outcome of 1, 2, or 3 indicates a partial success or a success with a complication</small>
+                        <small id="js-qs-outcome-explanation"></small>
                     </h4>
-                    <p>
-                        "You successfully pick the lock, but you break it in the process."
+                    <p id="js-qs-action-outcome">
                     </p>
                 </div>
             </div>

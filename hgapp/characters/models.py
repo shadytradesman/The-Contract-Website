@@ -726,6 +726,20 @@ class Character(models.Model):
         else:
             return mind_val
 
+    def get_attribute_values_by_id(self):
+        attributes = self.get_attributes()
+        attribute_val_by_id = {}
+        for attr in attributes:
+            attribute_val_by_id[attr.relevant_attribute.id] = attr.value
+        return attribute_val_by_id
+
+    def get_ability_values_by_id(self):
+        ability_val_by_id = {}
+        char_ability_values = self.stats_snapshot.abilityvalue_set.all()
+        for x in char_ability_values:
+            ability_val_by_id[x.relevant_ability.id] = x.value
+        return ability_val_by_id
+
     def get_attributes(self, is_physical=None):
         query = self.stats_snapshot.attributevalue_set \
             .prefetch_related('relevant_attribute')

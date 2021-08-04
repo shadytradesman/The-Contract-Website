@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from .terms import EULA, TERMS, PRIVACY
-from info.models import FrontPageInfo
+from django.shortcuts import get_object_or_404
+from info.models import FrontPageInfo, QuickStartInfo, ExampleAction
+from characters.models import CharacterTutorial
 
 def getting_started(request):
     return render(request, 'info/getting_started.html')
@@ -24,8 +26,21 @@ def fiction(request):
     return render(request, 'info/fiction.html', context)
 
 def quickstart(request):
-    info = FrontPageInfo.objects.first()
+    quickstart_info = QuickStartInfo.objects.first()
+    char = quickstart_info.main_char
+    attribute_val_by_id = char.get_attribute_values_by_id()
+    ability_val_by_id = char.get_ability_values_by_id()
+    actions = ExampleAction.objects.all()
+    character_tutorial = get_object_or_404(CharacterTutorial)
+    action_list = []
+    for action in actions:
+        action_list.append(action.json_serialize())
     context= {
-        "info": info,
+        "quickstart_info": quickstart_info,
+        "character": char,
+        "attribute_value_by_id": attribute_val_by_id,
+        "ability_value_by_id": ability_val_by_id,
+        "action_list": action_list,
+        "tutorial": character_tutorial,
     }
     return render(request, 'info/quickstart.html', context)
