@@ -27,17 +27,23 @@ def fiction(request):
 
 def quickstart(request):
     quickstart_info = QuickStartInfo.objects.first()
-    char = quickstart_info.main_char
-    attribute_val_by_id = char.get_attribute_values_by_id()
-    ability_val_by_id = char.get_ability_values_by_id()
+    character = quickstart_info.main_char
+    attribute_val_by_id = character.get_attribute_values_by_id()
+    ability_val_by_id = character.get_ability_values_by_id()
     actions = ExampleAction.objects.all()
     character_tutorial = get_object_or_404(CharacterTutorial)
     action_list = []
+    physical_attributes = character.get_attributes(is_physical=True)
+    mental_attributes = character.get_attributes(is_physical=False)
     for action in actions:
         action_list.append(action.json_serialize())
+    abilities = character.stats_snapshot.abilityvalue_set.all()
     context= {
         "quickstart_info": quickstart_info,
-        "character": char,
+        "character": character,
+        "physical_attributes": physical_attributes,
+        "mental_attributes": mental_attributes,
+        "abilities": abilities,
         "attribute_value_by_id": attribute_val_by_id,
         "ability_value_by_id": ability_val_by_id,
         "action_list": action_list,

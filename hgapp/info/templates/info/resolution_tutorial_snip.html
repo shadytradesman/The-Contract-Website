@@ -69,30 +69,38 @@
             <h4>My Attributes</h4>
         </div>
         <div class="row css-qs-attributes">
-            <div class="col-md-4">
-                <b>Brawn</b> 3
-            </div>
-            <div class="col-md-4">
-                <b>Dexterity</b> 3
-            </div>
-            <div class="col-md-4">
-                <b>Perception</b> 3
-            </div>
+            {% for attr in physical_attributes %}
+                <div class="col-md-4" data-toggle="tooltip" title='{{attr.relevant_attribute.tutorial_text}}'>
+                    <b>
+                        {{attr.relevant_attribute.name}}
+                    </b>
+                    {{attr.val_with_bonuses}}
+                </div>
+            {% endfor %}
         </div>
         <div class="row css-qs-attributes">
-            <div class="col-md-4">
-                <b>Charisma</b> 3
+            {% for attr in mental_attributes %}
+            <div class="col-md-4" data-toggle="tooltip" title='{{attr.relevant_attribute.tutorial_text}}'>
+                <b>
+                    {{attr.relevant_attribute.name}}
+                </b>
+                {{attr.val_with_bonuses}}
             </div>
-            <div class="col-md-4">
-                <b>Wits</b> 3
-            </div>
-            <div class="col-md-4">
-                <b>Intelligence</b> 3
-            </div>
+            {% endfor %}
         </div>
         <div class="text-center">
             <br>
             <h4>My Abilities</h4>
+        </div>
+        <div class="row css-qs-attributes">
+            {% for ability in abilities %}
+                <div class="col-md-4" data-toggle="tooltip" title='{{ability.relevant_ability.tutorial_text}}'>
+                    <b>
+                        {{ability.relevant_ability.name}}
+                    </b>
+                    {{ability.value}}
+                </div>
+            {% endfor %}
         </div>
     </div>
 </div>
