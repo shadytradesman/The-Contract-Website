@@ -1,0 +1,207 @@
+{% load staticfiles %}
+<h2 class="text-center">
+    2. Contractors and Dice
+</h2>
+<div class="thumbnail css-rules text-center">
+    The Contract uses online Character Sheets. 
+    <br>
+    These sheets make it easy to track your Contractor’s status, powers, equipment, and history. 
+    <br>
+    Mouseover tooltips with system info save you trips to the rule book
+    <br>
+    You can view an example sheet here: (sheet)
+    <br>
+    If you would like to try creating a Contractor before you learn the rules, click here.
+</div>
+
+<div class="row">
+    <div class="col-sm-6">
+        <div class="css-narrative">
+            <p>
+                The Starlight Motel struck me as the kinda place bad things happened. Not even that gorgeous twilight sky--no sun or moon in sight, casting everything above and below in shades of violet-- not even it could turn this parking-lot motel into a place that felt safe. 
+            </p>
+            <p>
+                I climbed the steps to the second floor and knocked on the door of room 231. No answer. The windows were black.
+            </p>
+            <p>
+                “You’re looking for Bradley.” The voice came from behind: a pale teen wearing a pleather duster and watches on both wrists.
+            </p>
+            <p>
+                “Are you here on Contract?”
+            </p>
+            <p>
+                “You could say that.” 
+            </p>
+            <p>
+                “Then we are working together. I am Five.” 
+            </p>
+            <p>
+                “You look a little older than that.” 
+            </p>
+            <p>
+                “That is my name. I am seventeen years old. I think.”
+            </p>
+            <p>
+                “Uh huh. Look, kid, I don’t really need a sidekick.”
+            </p>
+            <p>
+                Five stared at me. “You must be new. We will need all the help we can get.”
+            </p>
+            <p>
+                “You’ve done this before?” 
+            </p>
+            <p>
+                Five nodded.
+            </p>
+            <p>
+                “So you have. . . powers.”
+            </p>
+            <p>
+                Another nod. 
+            </p>
+            <p>
+                “Okay. I’ll work with you. But you better not get in my way.”
+            </p>
+            <p>
+                “Same to you.”
+            </p>
+        </div>
+        <div class="thumbnail css-rules text-center">
+            Contractors without a single Victory are called Newbies.
+            <br>
+            Novice Contractors (1-9 Victories) can participate in Contracts with Newbies and other Novices.
+            <br>
+            Seasoned Contractors (10+ Victories) can only play with other Seasoned and Veteran (25+ Victories) Contractors.
+            <br>
+            Only Veteran Contractors can participate in solo Contracts.
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="css-narrative">
+            <p>
+                Then came the click-clacking of cowboy boots traveling up the stairwell. The man attached had one arm, a revolver on each hip, and a mustache that would put Yosemite Sam to shame. His sheriff’s star winked at me. 
+            </p>
+            <p>
+                “Great. A cop,” I said to myself. 
+            </p>
+            <p>
+                Five nodded. “Bo.” 
+            </p>
+            <p>
+                The man approached, face cracking into a smile. “Five! Here to pick up a new timepiece?” 
+            </p>
+            <p>
+                “No. We are on a Contract.”
+            </p>
+            <p>
+                “We’ve gotta work on your sense of humor, Five.” He turned to me and held out his hand. “Looks like this is the team. The name’s Bo Perkins. Pleased to meet you.” 
+            </p>
+            <p>
+                “Fuck off, pig.”
+            </p>
+            <p>
+                Bo’s smile disappeared. “I don’t like that attitude. Not one bit.” 
+            </p>
+            <p>
+                Five stiffened. “She is new.”
+            </p>
+            <p>
+                “Ah. Well, little miss sunshine, as long as we’re bein’ candid with each other, I don’t think I like you either. You look like a punk, and I’m sure I could find enough dirt to put you away for a long time. But unless you signed a very different contract than I did, I think we ought to put aside our differences and work together.”
+            </p>
+        </div>
+        <div class="thumbnail css-rules text-center">
+            Contractors may have opposing ambitions.
+            <br>
+            (left) destroy the police state
+            <br>
+            (right) create a crime-free big-brother society
+            <br>
+            In many playgroups, realpolitik and player-vs-player action are not uncommon.
+        </div>
+        <div class="css-narrative">
+            <p>
+                “Fine. All we gotta do is give some dude a ride on an airplane.”
+            </p>
+            <p>
+                “Yeah,” he scoffed, “I’m sure it’ll be an absolute cakewalk. Now listen, I’ve been a detective for twenty years. I know Five’s got their own set of tricks. What are you good at?”
+            </p>
+        </div>
+    </div>
+
+</div>
+<div class="row">
+    <div class="col-xs-12 text-center">
+    <h4>
+        Your capabilities are described by your <b>Attributes</b> and <b>Abilities.</b>
+    </h4>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-5">
+        <div class="text-center">
+            <h4>My Attributes</h4>
+        </div>
+        <div class="row css-qs-attributes">
+            {% for attr in physical_attributes %}
+            <div class="col-md-4" data-toggle="tooltip" title='{{attr.relevant_attribute.tutorial_text}}'>
+                <b>
+                    {{attr.relevant_attribute.name}}
+                </b>
+                {{attr.val_with_bonuses}}
+            </div>
+            {% endfor %}
+        </div>
+        <div class="row css-qs-attributes">
+            {% for attr in mental_attributes %}
+            <div class="col-md-4" data-toggle="tooltip" title='{{attr.relevant_attribute.tutorial_text}}'>
+                <b>
+                    {{attr.relevant_attribute.name}}
+                </b>
+                {{attr.val_with_bonuses}}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="col-xs-7">
+        <div class="thumbnail css-rules text-center">
+            The six Attributes represent your intrinsic strengths and weaknesses.
+            <br>
+            Attributes are rated 1-5. A rating of 2 is the human average. A rating of 5 is world-class.
+            <br>
+            Your Attribute values determine many of your other stats, such as movement speed and mental fortitude.
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <div class="thumbnail css-rules text-center">
+            Abilities represent your learned skills and knowledge.
+            <br>
+            Even a single rank in an Ability indicates some training or experience in that field. 
+            <br>
+            Abilities are only used in skill checks.
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="text-center">
+            <h4>My Abilities</h4>
+        </div>
+        <div class="row css-qs-attributes">
+            {% for ability in abilities %}
+            <div class="col-md-4" data-toggle="tooltip" title='{{ability.relevant_ability.tutorial_text}}'>
+                <b>
+                    {{ability.relevant_ability.name}}
+                </b>
+                {{ability.value}}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<div class="thumbnail css-rules text-center">
+     You may invent your own Abilities.
+    <br>
+    These Secondary Abilities must be more specific than the Primary Abilities listed above, but you receive a bonus when you use them. 
+    <br>
+    Secondary Abilities can not grant any supernatural capabilities
+</div>

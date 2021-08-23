@@ -62,3 +62,56 @@
     margin-left: 15px;
     margin-right: 15px;
 }
+
+.css-narrative {
+    padding: 10px;
+    font-size: 16px;
+    color: skyblue;
+}
+
+.css-rules {
+    padding: 10px;
+    font-size: 14px;
+    width: 80%;
+    text-align: center;
+    margin: auto;
+}
+
+
+.css-art-front-punk {
+    position: relative;
+    background-position: top right;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.css-two-thirds-col {
+    width: 66%;
+    background-color: rgba(17, 20, 24, 0.5);
+}
+
+.css-two-thirds-col-right {
+    width: 66%;
+    position: relative;
+    left: 33%;
+    background-color: rgba(17, 20, 24, 0.5);
+}
+
+.css-art-front-music {
+    position: relative;
+    background-position: top left;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.css-art-front-doors {
+    position: relative;
+    background-position: center;
+    background-size: fill;
+    background-repeat: no-repeat;
+}
+
+.css-backdropped-text {
+    padding: 15px;
+    background-color: rgba(17, 20, 24, 0.7);
+}

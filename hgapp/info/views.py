@@ -49,4 +49,4 @@ def quickstart(request):
         "action_list": action_list,
         "tutorial": character_tutorial,
     }
-    return render(request, 'info/quickstart.html', context)
+    return render(request, 'info/new_player_guide/quickstart.html', context)
