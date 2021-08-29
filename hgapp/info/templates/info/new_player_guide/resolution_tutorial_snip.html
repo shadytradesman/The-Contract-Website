@@ -1,5 +1,5 @@
 {% load staticfiles %}
-<div class="css-quickstart-container">
+<div id="js-other-resolution" class="css-quickstart-container js-resolution-container">
     <div class="row">
         <div class="col-xs-12 text-center">
             <h3 style="margin-top: 5px;">I will</h3>
@@ -8,12 +8,12 @@
     <div class="row">
         <div class="col-xs-12 text-center">
             <div class="css-quickstart-action">
-        <button  id="js-qs-prev-action" class="css-quickstart-left-btn btn btn-default" >
+        <button  class="js-qs-prev-action css-quickstart-left-btn btn btn-default" >
             <span class="glyphicon glyphicon-backward"></span>
         </button>
-        <span id="js-qs-action-text" class="css-quickstart-action-text">
+        <span class="js-qs-action-text css-quickstart-action-text">
         </span>
-        <button id="js-qs-next-action" class="css-quickstart-right-btn btn btn-default">
+        <button class="js-qs-next-action css-quickstart-right-btn btn btn-default">
             <span class="glyphicon glyphicon-forward"></span>
         </button>
             </div>
@@ -27,7 +27,7 @@
             <p>
                 "Roll <b class="js-qs-attribute">Dexterity</b>
                 + <b class="js-qs-ability">Ledgerdemain</b>,
-                Difficulty <b id="js-qs-difficulty">-</b>"
+                Difficulty <b class="js-qs-difficulty">-</b>"
             </p>
             <p>
                 <b class="js-qs-attribute-val"></b>
@@ -35,30 +35,30 @@
                 + <b class="js-qs-ability-val"></b>
                 <span class="js-qs-ability"></span>  =
                 <span id="js-qs-roll-button" class="btn btn-primary">
-                    Roll <b id="js-qs-num-dice" class="js-roll-num-dice">-</b> Dice
+                    Roll <b class="js-qs-num-dice js-roll-num-dice">-</b> Dice
                 </span>
             </p>
         </div>
     </div>
     <div class="row">
         <div class="col-xs-12">
-            <div id="js-qs-roll-dice" class="css-qs-roll-results">
+            <div class="js-qs-roll-dice css-qs-roll-results">
             </div>
         </div>
     </div>
     <div class="row">
         <div class="col-xs-12">
-            <div id="js-qs-roll-results" class="css-qs-roll-results">
+            <div class="js-qs-roll-results css-qs-roll-results">
             </div>
         </div>
     </div>
     <div class="row text-center">
         <div class="col-xs-12">
-            <h4 >Outcome: <b id="js-qs-outcome-num">-</b>
+            <h4 >Outcome: <b class="js-qs-outcome-num">-</b>
                 <br>
-                <small id="js-qs-outcome-explanation"></small>
+                <small class="js-qs-outcome-explanation"></small>
             </h4>
-            <p id="js-qs-action-outcome">
+            <p class="js-qs-action-outcome">
             </p>
         </div>
     </div>

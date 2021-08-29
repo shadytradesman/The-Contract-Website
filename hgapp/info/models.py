@@ -14,6 +14,8 @@ class ExampleAction(models.Model):
     roll = models.ForeignKey(Roll, on_delete=models.CASCADE)
     is_contested = models.BooleanField(default=False)
     is_secondary = models.BooleanField(default=False)
+    is_first_roll = models.BooleanField(default=False)
+    additional_rules_info = models.CharField(max_length=3000, default="")
     outcome_botch = models.CharField(max_length=3000)
     outcome_failure = models.CharField(max_length=3000)
     outcome_partial_success = models.CharField(max_length=3000)

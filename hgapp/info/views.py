@@ -30,7 +30,8 @@ def quickstart(request):
     character = quickstart_info.main_char
     attribute_val_by_id = character.get_attribute_values_by_id()
     ability_val_by_id = character.get_ability_values_by_id()
-    actions = ExampleAction.objects.all()
+    actions = ExampleAction.objects.filter(is_first_roll=False).all()
+    first_action = ExampleAction.objects.filter(is_first_roll=True).get()
     character_tutorial = get_object_or_404(CharacterTutorial)
     action_list = []
     physical_attributes = character.get_attributes(is_physical=True)
@@ -47,6 +48,7 @@ def quickstart(request):
         "attribute_value_by_id": attribute_val_by_id,
         "ability_value_by_id": ability_val_by_id,
         "action_list": action_list,
+        "first_action": first_action.json_serialize(),
         "tutorial": character_tutorial,
     }
     return render(request, 'info/new_player_guide/quickstart.html', context)

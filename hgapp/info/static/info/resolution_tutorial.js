@@ -1,41 +1,42 @@
 const exampleActions = JSON.parse(document.getElementById('exampleActions').textContent);
+const firstAction = JSON.parse(document.getElementById('firstAction').textContent);
 
 var currentAction = 0;
 
-function displayAction() {
+function displayAction(rollElement, action) {
+    const roller = $(rollElement);
     const actionNum = currentAction;
     if (actionNum === 0) {
-        $("#js-qs-prev-action").prop('disabled', true);
+        roller.find(".js-qs-prev-action").prop('disabled', true);
     } else {
-        $("#js-qs-prev-action").prop('disabled', false);
+        roller.find(".js-qs-prev-action").prop('disabled', false);
     }
     if (actionNum === exampleActions.length - 1) {
-        $("#js-qs-next-action").prop('disabled', true);
+        roller.find(".js-qs-next-action").prop('disabled', true);
     } else {
-        $("#js-qs-next-action").prop('disabled', false);
+        roller.find(".js-qs-next-action").prop('disabled', false);
     }
-    const action = exampleActions[actionNum];
-    $("#js-qs-action-text").html(action.actionText);
-    $(".js-qs-attribute").html(action.roll.attributeName);
-    $(".js-qs-ability").html(action.roll.abilityName);
-    $(".js-roll-num-dice").attr("data-attr-id", action.roll.attributeId);
-    $(".js-roll-num-dice").attr("data-ability-id", action.roll.abilityId);
+    roller.find(".js-qs-action-text").html(action.actionText);
+    roller.find(".js-qs-attribute").html(action.roll.attributeName);
+    roller.find(".js-qs-ability").html(action.roll.abilityName);
+    roller.find(".js-roll-num-dice").attr("data-attr-id", action.roll.attributeId);
+    roller.find(".js-roll-num-dice").attr("data-ability-id", action.roll.abilityId);
     var abilityValue = abilityValueById[action.roll.abilityId] != null ? abilityValueById[action.roll.abilityId] : 0;
     var attrValue = attributeValueById[action.roll.attributeId];
-    $(".js-qs-attribute-val").html(attrValue);
+    roller.find(".js-qs-attribute-val").html(attrValue);
     console.log(abilityValue);
-    $(".js-qs-ability-val").html(abilityValue);
-    $("#js-qs-difficulty").html(action.roll.difficulty);
+    roller.find(".js-qs-ability-val").html(abilityValue);
+    roller.find(".js-qs-difficulty").html(action.roll.difficulty);
     updateRollValues();
-    rollDice();
+    rollDice(roller, action);
 }
 
 function getRandomInt(max) {
     return Math.ceil(Math.random() * max);
 }
 
-function rollDice() {
-    const numDice = parseInt($("#js-qs-num-dice").html());
+function rollDice(roller, action) {
+    const numDice = parseInt(roller.find(".js-qs-num-dice").html());
     var results = [];
     for (let i = 0; i < numDice; i++) {
         results[i] = getRandomInt(10);
@@ -43,9 +44,8 @@ function rollDice() {
     results.sort(function(a, b) {
         return b - a;
     });
-    $("#js-qs-roll-results").html("");
-    $("#js-qs-roll-dice").html("");
-    const action = exampleActions[currentAction];
+    roller.find(".js-qs-roll-results").html("");
+    roller.find(".js-qs-roll-dice").html("");
     const diff = action.roll.difficulty;
     var outcome = 0;
     for (let i = 0; i < numDice; i++) {
@@ -61,50 +61,63 @@ function rollDice() {
         if (successes > -1) {
             successes = "+" + successes;
         }
-        $("#js-qs-roll-results").append("<div class=\"css-quickstart-die-outcome\">" + successes + "</div>" );
+        roller.find(".js-qs-roll-results").append("<div class=\"css-quickstart-die-outcome\">" + successes + "</div>" );
         var dieFace = results[i];
         if (results[i] === 10) {
             dieFace = 0;
         }
-        $("#js-qs-roll-dice").append("<div class=\"css-quickstart-die\" style=\"background-image: url("
+        roller.find(".js-qs-roll-dice").append("<div class=\"css-quickstart-die\" style=\"background-image: url("
             + dieImageUrl + ")\"> <span class=\"css-quickstart-die-val\">" + dieFace + "</span></div>");
     }
     var outcomeText;
     if (outcome > 5) {
         outcomeText = "An Outcome of 6 or more indicates an exceptional success with an additional positive effect.";
-        $("#js-qs-action-outcome").html(action.outcomeExceptionalSuccess);
+        roller.find(".js-qs-action-outcome").html(action.outcomeExceptionalSuccess);
     } else if (outcome > 3) {
         outcomeText = "An Outcome of 4 or 5 indicates a complete success.";
-        $("#js-qs-action-outcome").html(action.outcomeCompleteSuccess);
+        roller.find(".js-qs-action-outcome").html(action.outcomeCompleteSuccess);
     } else if (outcome > 0) {
         outcomeText = "An Outcome of 1, 2, or 3 indicates a partial success or a success with a complication";
-        $("#js-qs-action-outcome").html(action.outcomePartialSuccess);
+        roller.find(".js-qs-action-outcome").html(action.outcomePartialSuccess);
     } else if (outcome === 0) {
         outcomeText = "An Outcome of 0 is a failure.";
-        $("#js-qs-action-outcome").html(action.outcomeFailure);
+        roller.find(".js-qs-action-outcome").html(action.outcomeFailure);
     } else if (outcome < 0) {
-        outcome = outcome + " (botch)"
-        outcomeText = "An Outcome of less than 0 is called a botch and indicates that something went horribly wrong.";
-        $("#js-qs-action-outcome").html(action.outcomeBotch);
+        outcome = outcome + " (Botch)"
+        outcomeText = "An Outcome of less than 0 is called a Botch and indicates that something went horribly wrong.";
+        roller.find(".js-qs-action-outcome").html(action.outcomeBotch);
     }
-    $("#js-qs-outcome-num").html(outcome);
-    $("#js-qs-outcome-explanation").html(outcomeText);
+    roller.find(".js-qs-outcome-num").html(outcome);
+    roller.find(".js-qs-outcome-explanation").html(outcomeText);
 }
 
 $("#js-qs-roll-button").click(function () {
-    rollDice();
+    var parent = $($(this).closest(".js-resolution-container")[0]);
+    const action = exampleActions[currentAction];
+    rollDice(parent,action);
 })
 
-$("#js-qs-next-action").click(function () {
+$("#js-qs-roll-first-button").click(function () {
+    var parent = $($(this).closest(".js-resolution-container")[0]);
+    rollDice(parent,firstAction);
+})
+
+$(".js-qs-next-action").click(function () {
+    var parent = $(this).closest(".js-resolution-container")[0];
     currentAction++;
-    displayAction(currentAction);
+    const action = exampleActions[currentAction];
+    displayAction(parent, action);
 })
 
-$("#js-qs-prev-action").click(function () {
+$(".js-qs-prev-action").click(function () {
+    var parent = $(this).closest(".js-resolution-container")[0];
     currentAction--;
-    displayAction(currentAction);
+    const action = exampleActions[currentAction];
+    displayAction(parent, action);
 })
 
 window.onload = function () {
-    displayAction(currentAction);
+    const action = exampleActions[currentAction];
+    displayAction($("#js-other-resolution"), action);
+    displayAction($("#js-first-resolution"), firstAction);
 }
