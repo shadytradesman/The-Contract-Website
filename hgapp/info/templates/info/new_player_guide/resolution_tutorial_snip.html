@@ -1,106 +1,65 @@
 {% load staticfiles %}
-<div class="row">
-    <div class="col-md-6">
-        <div class="css-quickstart-container">
-            <div class="row">
-                <div class="col-xs-12 text-center">
-                    <h3 style="margin-top: 5px;">I want to</h3>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-xs-12 text-center">
-                    <div class="css-quickstart-action">
-                <button  id="js-qs-prev-action" class="css-quickstart-left-btn btn btn-default" >
-                    <span class="glyphicon glyphicon-backward"></span>
-                </button>
-                <span id="js-qs-action-text" class="css-quickstart-action-text">
-                </span>
-                <button id="js-qs-next-action" class="css-quickstart-right-btn btn btn-default">
-                    <span class="glyphicon glyphicon-forward"></span>
-                </button>
-                    </div>
-                </div>
-            </div>
-            <div class="row text-center css-quickstart-gm-text">
-                <div class="col-xs-12">
-                    <p>
-                        "Roll <b class="js-qs-attribute">Dexterity</b>
-                        + <b class="js-qs-ability">Ledgerdemain</b>,
-                        Difficulty <b id="js-qs-difficulty">-</b>"
-                    </p>
-                    <p>
-                        <b class="js-qs-attribute-val"></b>
-                        <span class="js-qs-attribute"></span>
-                        + <b class="js-qs-ability-val"></b>
-                        <span class="js-qs-ability"></span>  =
-                        <span id="js-qs-roll-button" class="btn btn-primary">
-                            Roll <b id="js-qs-num-dice" class="js-roll-num-dice">-</b> Dice
-                        </span>
-                    </p>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-xs-12">
-                    <div id="js-qs-roll-dice" class="css-qs-roll-results">
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-xs-12">
-                    <div id="js-qs-roll-results" class="css-qs-roll-results">
-                    </div>
-                </div>
-            </div>
-            <div class="row text-center">
-                <div class="col-xs-12">
-                    <h4 >Outcome: <b id="js-qs-outcome-num">-</b>
-                        <br>
-                        <small id="js-qs-outcome-explanation"></small>
-                    </h4>
-                    <p id="js-qs-action-outcome">
-                    </p>
-                </div>
+<div class="css-quickstart-container">
+    <div class="row">
+        <div class="col-xs-12 text-center">
+            <h3 style="margin-top: 5px;">I will</h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 text-center">
+            <div class="css-quickstart-action">
+        <button  id="js-qs-prev-action" class="css-quickstart-left-btn btn btn-default" >
+            <span class="glyphicon glyphicon-backward"></span>
+        </button>
+        <span id="js-qs-action-text" class="css-quickstart-action-text">
+        </span>
+        <button id="js-qs-next-action" class="css-quickstart-right-btn btn btn-default">
+            <span class="glyphicon glyphicon-forward"></span>
+        </button>
             </div>
         </div>
     </div>
-    <div class="col-md-6 hidden-xs hidden-sm">
-        <br>
-        <div class="text-center">
-            <h4>My Attributes</h4>
-        </div>
-        <div class="row css-qs-attributes">
-            {% for attr in physical_attributes %}
-                <div class="col-md-4" data-toggle="tooltip" title='{{attr.relevant_attribute.tutorial_text}}'>
-                    <b>
-                        {{attr.relevant_attribute.name}}
-                    </b>
-                    {{attr.val_with_bonuses}}
-                </div>
-            {% endfor %}
-        </div>
-        <div class="row css-qs-attributes">
-            {% for attr in mental_attributes %}
-            <div class="col-md-4" data-toggle="tooltip" title='{{attr.relevant_attribute.tutorial_text}}'>
-                <b>
-                    {{attr.relevant_attribute.name}}
-                </b>
-                {{attr.val_with_bonuses}}
+    <div class="row text-center css-quickstart-gm-text">
+        <div class="col-xs-12">
+            <div class="thumbnail css-rules text-left">
+                Contested Rolls
             </div>
-            {% endfor %}
+            <p>
+                "Roll <b class="js-qs-attribute">Dexterity</b>
+                + <b class="js-qs-ability">Ledgerdemain</b>,
+                Difficulty <b id="js-qs-difficulty">-</b>"
+            </p>
+            <p>
+                <b class="js-qs-attribute-val"></b>
+                <span class="js-qs-attribute"></span>
+                + <b class="js-qs-ability-val"></b>
+                <span class="js-qs-ability"></span>  =
+                <span id="js-qs-roll-button" class="btn btn-primary">
+                    Roll <b id="js-qs-num-dice" class="js-roll-num-dice">-</b> Dice
+                </span>
+            </p>
         </div>
-        <div class="text-center">
-            <br>
-            <h4>My Abilities</h4>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div id="js-qs-roll-dice" class="css-qs-roll-results">
+            </div>
         </div>
-        <div class="row css-qs-attributes">
-            {% for ability in abilities %}
-                <div class="col-md-4" data-toggle="tooltip" title='{{ability.relevant_ability.tutorial_text}}'>
-                    <b>
-                        {{ability.relevant_ability.name}}
-                    </b>
-                    {{ability.value}}
-                </div>
-            {% endfor %}
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div id="js-qs-roll-results" class="css-qs-roll-results">
+            </div>
+        </div>
+    </div>
+    <div class="row text-center">
+        <div class="col-xs-12">
+            <h4 >Outcome: <b id="js-qs-outcome-num">-</b>
+                <br>
+                <small id="js-qs-outcome-explanation"></small>
+            </h4>
+            <p id="js-qs-action-outcome">
+            </p>
         </div>
     </div>
 </div>

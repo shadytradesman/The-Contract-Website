@@ -25,19 +25,37 @@
 
 {% block body_base %}
 {% cache 50000 quickstart %}
+
+{% comment %}
+    The New Players guide has two main features:
+    Learning about the game IS learning to play the game.
+    Offload tables / reference to the website interface, and use the saved space to SHOW the game via a narrative.
+{% endcomment %}
+
+
 <div class="container">
     <h1 class="text-center">
-        Quick Start Guide
+        New Player Guide
     </h1>
     <div class="panel panel-default">
         <div class="panel-body">
+            <div class="css-rules css-rules-centered">
+                <p>
+                    This New Player Guide will teach you what The Contract is and how to play it.
+                </p>
+                <p>
+                    Experienced Players should use the full Player’s Guide to reference rules and read about more advanced topics.
+                </p>
+                <p>
+                    We recommend reading this guide online to take advantage of its interactive components. However, it is also available as a PDF download.
+                </p>
+                <p>
+                    The best way to learn The Contract is to <b>read this guide front to back without skipping anything.</b> The narrative covers the events of one play session and contains critical information.
+                </p>
+            </div>
             {% include "info/new_player_guide/1-intro-and-format.html" %}
             {% include "info/new_player_guide/2-contractors-and-dice.html" %}
-            <br>
-            <br>
-            <hr>
-            <br>
-            {% include "info/new_player_guide/resolution_tutorial_snip.html" %}
+            {% include "info/new_player_guide/3-downtimes-setting-worlds.html" %}
         </div>
     </div>
 </div>

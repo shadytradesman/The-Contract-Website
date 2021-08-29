@@ -20,6 +20,11 @@ function displayAction() {
     $(".js-qs-ability").html(action.roll.abilityName);
     $(".js-roll-num-dice").attr("data-attr-id", action.roll.attributeId);
     $(".js-roll-num-dice").attr("data-ability-id", action.roll.abilityId);
+    var abilityValue = abilityValueById[action.roll.abilityId] != null ? abilityValueById[action.roll.abilityId] : 0;
+    var attrValue = attributeValueById[action.roll.attributeId];
+    $(".js-qs-attribute-val").html(attrValue);
+    console.log(abilityValue);
+    $(".js-qs-ability-val").html(abilityValue);
     $("#js-qs-difficulty").html(action.roll.difficulty);
     updateRollValues();
     rollDice();

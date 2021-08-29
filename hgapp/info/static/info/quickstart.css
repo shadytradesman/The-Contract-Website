@@ -72,8 +72,13 @@
 .css-rules {
     padding: 10px;
     font-size: 14px;
-    width: 80%;
-    text-align: center;
+    background-color: #353e4b;
+    border: 1px solid #000;
+    border-radius: 4px;
+}
+
+.css-rules-centered {
+    width: 70%;
     margin: auto;
 }
 
@@ -114,4 +119,8 @@
 .css-backdropped-text {
     padding: 15px;
     background-color: rgba(17, 20, 24, 0.7);
+}
+
+.css-qs-big {
+    font-size: 16px;
 }
