@@ -243,7 +243,7 @@ $(".injury-form").submit(function (e) {
     })
 })
 
-// delete battle injury
+// delete injury
 $("#js-injury-container").on("submit",".js-delete-injury-form", function (e) {
     e.preventDefault();
     var serializedData = $(this).serialize();

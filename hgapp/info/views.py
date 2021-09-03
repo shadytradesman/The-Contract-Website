@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from .terms import EULA, TERMS, PRIVACY
 from django.shortcuts import get_object_or_404
+from heapq import merge
 from info.models import FrontPageInfo, QuickStartInfo, ExampleAction
-from characters.models import CharacterTutorial
+from characters.models import CharacterTutorial, Ability
 from characters.forms import InjuryForm
 
 def getting_started(request):
@@ -30,16 +31,24 @@ def quickstart(request):
     quickstart_info = QuickStartInfo.objects.first()
     character = quickstart_info.main_char
     attribute_val_by_id = character.get_attribute_values_by_id()
-    ability_val_by_id = character.get_ability_values_by_id()
     actions = ExampleAction.objects.filter(is_first_roll=False).all()
     first_action = ExampleAction.objects.filter(is_first_roll=True).get()
     character_tutorial = get_object_or_404(CharacterTutorial)
     action_list = []
     physical_attributes = character.get_attributes(is_physical=True)
     mental_attributes = character.get_attributes(is_physical=False)
+    char_ability_values = character.stats_snapshot.abilityvalue_set.order_by("relevant_ability__name").all()
+    ability_value_by_id = {}
+    char_value_ids = [x.relevant_ability.id for x in char_ability_values]
+    primary_zero_values = [(x.name, x, 0) for x in Ability.objects.filter(is_primary=True).order_by("name").all()
+                           if x.id not in char_value_ids]
+    all_ability_values = []
+    for x in char_ability_values:
+        all_ability_values.append((x.relevant_ability.name, x.relevant_ability, x.value))
+        ability_value_by_id[x.relevant_ability.id] = x.value
+    ability_value_by_name = list(merge(primary_zero_values, all_ability_values))
     for action in actions:
         action_list.append(action.json_serialize())
-    abilities = character.stats_snapshot.abilityvalue_set.all()
     context= {
         "quickstart_info": quickstart_info,
         "character": character,
@@ -47,9 +56,9 @@ def quickstart(request):
         'injury_form': InjuryForm(request.POST, prefix="injury"),
         "physical_attributes": physical_attributes,
         "mental_attributes": mental_attributes,
-        "abilities": abilities,
         "attribute_value_by_id": attribute_val_by_id,
-        "ability_value_by_id": ability_val_by_id,
+        "ability_value_by_id": ability_value_by_id,
+        "ability_value_by_name": ability_value_by_name,
         "action_list": action_list,
         "first_action": first_action.json_serialize(),
         "tutorial": character_tutorial,

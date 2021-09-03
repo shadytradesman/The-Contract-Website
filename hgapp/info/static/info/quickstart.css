@@ -177,6 +177,17 @@
     font-size: 16px;
 }
 
+.css-attribute-color {
+    color: blue;
+}
+
+.css-ability-color {
+    color: purple;
+}
+
+.css-sec-ability-color {
+    color: violet;
+}
 
 // HEALTH WIDGET
 .css-injury-val {
