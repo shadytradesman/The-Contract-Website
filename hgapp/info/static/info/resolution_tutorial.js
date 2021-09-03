@@ -46,7 +46,14 @@ function rollDice(roller, action) {
     });
     roller.find(".js-qs-roll-results").html("");
     roller.find(".js-qs-roll-dice").html("");
-    const diff = action.roll.difficulty;
+    var diff = action.roll.difficulty;
+    if (action.isSecondary) {
+        diff = diff - 1;
+        roller.find(".js-qs-difficulty-extra")
+            .html("-1 Difficulty from using Secondary Ability means the Difficulty is actually " + diff);
+    } else {
+        roller.find(".js-qs-difficulty-extra").html("");
+    }
     var outcome = 0;
     for (let i = 0; i < numDice; i++) {
         var successes = 0;
@@ -70,25 +77,47 @@ function rollDice(roller, action) {
             + dieImageUrl + ")\"> <span class=\"css-quickstart-die-val\">" + dieFace + "</span></div>");
     }
     var outcomeText;
-    if (outcome > 5) {
-        outcomeText = "An Outcome of 6 or more indicates an exceptional success with an additional positive effect.";
-        roller.find(".js-qs-action-outcome").html(action.outcomeExceptionalSuccess);
-    } else if (outcome > 3) {
-        outcomeText = "An Outcome of 4 or 5 indicates a complete success.";
-        roller.find(".js-qs-action-outcome").html(action.outcomeCompleteSuccess);
-    } else if (outcome > 0) {
-        outcomeText = "An Outcome of 1, 2, or 3 indicates a partial success or a success with a complication";
-        roller.find(".js-qs-action-outcome").html(action.outcomePartialSuccess);
-    } else if (outcome === 0) {
-        outcomeText = "An Outcome of 0 is a failure.";
-        roller.find(".js-qs-action-outcome").html(action.outcomeFailure);
-    } else if (outcome < 0) {
-        outcome = outcome + " (Botch)"
-        outcomeText = "An Outcome of less than 0 is called a Botch and indicates that something went horribly wrong.";
-        roller.find(".js-qs-action-outcome").html(action.outcomeBotch);
+    if (action.isContested) {
+        const combinedOutcome = outcome - 3;
+        roller.find(".js-qs-contested-outcome").html(" - 3 (defender's Outcome) = " + combinedOutcome);
+        if (combinedOutcome > 0) {
+            outcomeText = "A positive contested Outcome means that the attempted action is successful.";
+            roller.find(".js-qs-action-outcome").html(action.outcomeCompleteSuccess);
+        } else if (combinedOutcome == 0) {
+            outcomeText = "A contested Outcome of zero means that the attempted action fails. Ties go to the defender.";
+            roller.find(".js-qs-action-outcome").html(action.outcomeFailure);
+        } else if (combinedOutcome < 0) {
+            outcomeText = "A negative contested Outcome means that the attempted action fails.";
+            roller.find(".js-qs-action-outcome").html(action.outcomeFailure);
+        }
+    } else {
+        roller.find(".js-qs-contested-outcome").html("");
+        if (outcome > 5) {
+            outcomeText = "An Outcome of 6 or more indicates an exceptional success with an additional positive effect.";
+            roller.find(".js-qs-action-outcome").html(action.outcomeExceptionalSuccess);
+        } else if (outcome > 3) {
+            outcomeText = "An Outcome of 4 or 5 indicates a complete success.";
+            roller.find(".js-qs-action-outcome").html(action.outcomeCompleteSuccess);
+        } else if (outcome > 0) {
+            outcomeText = "An Outcome of 1, 2, or 3 indicates a partial success or a success with a complication";
+            roller.find(".js-qs-action-outcome").html(action.outcomePartialSuccess);
+        } else if (outcome === 0) {
+            outcomeText = "An Outcome of 0 is a failure.";
+            roller.find(".js-qs-action-outcome").html(action.outcomeFailure);
+        } else if (outcome < 0) {
+            outcome = outcome + " (Botch)"
+            outcomeText = "An Outcome of less than 0 is called a Botch and indicates that something went horribly wrong.";
+            roller.find(".js-qs-action-outcome").html(action.outcomeBotch);
+        }
     }
     roller.find(".js-qs-outcome-num").html(outcome);
     roller.find(".js-qs-outcome-explanation").html(outcomeText);
+    if (action.additionalRules){
+        roller.find(".js-additional-rules").html(action.additionalRules);
+        roller.find(".js-additional-rules").show();
+    } else {
+        roller.find(".js-additional-rules").hide();
+    }
 }
 
 $("#js-qs-roll-button").click(function () {
@@ -121,3 +150,7 @@ window.onload = function () {
     displayAction($("#js-other-resolution"), action);
     displayAction($("#js-first-resolution"), firstAction);
 }
+
+
+
+

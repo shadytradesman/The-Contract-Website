@@ -136,81 +136,124 @@
     </div>
 
 </div>
-<div class=" css-rules">
+<div class="">
     <div class="row">
         <div class="col-xs-12 text-center">
             <h4>
-                Your capabilities are described by your <b>Attributes</b> and <b>Abilities.</b>
+                <b>Attributes describe your intrinsic strengths and weaknesses</b>
             </h4>
         </div>
     </div>
-    <div class="row">
-        <div class="col-xs-5">
-            <div class="text-center">
-                <h4>My Attributes</h4>
-            </div>
-            <div class="row css-qs-attributes">
-                {% for attr in physical_attributes %}
-                <div class="col-md-4" data-toggle="tooltip" title='{{attr.relevant_attribute.tutorial_text}}'>
-                    <b>
-                        {{attr.relevant_attribute.name}}
-                    </b>
-                    {{attr.val_with_bonuses}}
+    <div class="css-rules">
+        <div class="row ">
+            <div class="col-xs-5 ">
+                <div class="text-center">
+                    <b>Punk's Attributes</b>
                 </div>
-                {% endfor %}
-            </div>
-            <div class="row css-qs-attributes">
-                {% for attr in mental_attributes %}
-                <div class="col-md-4" data-toggle="tooltip" title='{{attr.relevant_attribute.tutorial_text}}'>
-                    <b>
-                        {{attr.relevant_attribute.name}}
-                    </b>
-                    {{attr.val_with_bonuses}}
+                <div class="css-quickstart-container">
+                    <div class="row">
+                        {% for attr in physical_attributes %}
+                        <div class="col-md-4" data-toggle="tooltip" title='{{attr.relevant_attribute.tutorial_text}}'>
+                            <b>
+                                {{attr.relevant_attribute.name}}
+                            </b>
+                            {{attr.val_with_bonuses}}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="row">
+                        {% for attr in mental_attributes %}
+                        <div class="col-md-4" data-toggle="tooltip" title='{{attr.relevant_attribute.tutorial_text}}'>
+                            <b>
+                                {{attr.relevant_attribute.name}}
+                            </b>
+                            {{attr.val_with_bonuses}}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="text-center">
+                        <small>Mouse-over or tap any Attribute for more details</small>
+                    </div>
                 </div>
-                {% endfor %}
             </div>
-        </div>
-        <div class="col-xs-7">
-            <div class="">
-                The six Attributes represent your intrinsic strengths and weaknesses.
-                <br>
-                Attributes are rated 1-5. A rating of 2 is the human average. A rating of 5 is world-class.
-                <br>
-                Your Attribute values determine many of your other stats, such as movement speed and mental fortitude.
+            <div class="col-xs-7">
+                <ul>
+                    <li>
+                        Attributes are rated between 1-5.
+                    </li>
+                    <li>
+                        A rating of 2 is the human average. A rating of 1 is below average, and 5 is world-class.
+                    </li>
+                    <li>
+                        Your Attributes' values determine many of your other stats, such as movement speed, Mind (mental fortitude), and Body (physical fortitude).
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
+    <br>
     <div class="row">
-        <div class="col-md-6">
-            <div class=" css-rules text-center">
-                Abilities represent your learned skills and knowledge.
-                <br>
-                Even a single rank in an Ability indicates some training or experience in that field. 
-                <br>
-                Abilities are only used in skill checks.
-            </div>
+        <div class="col-xs-12 text-center">
+            <h4>
+                <b>
+                    Abilities define your learned skills and knowledge
+                </b>
+            </h4>
         </div>
-        <div class="col-md-6">
-            <div class="text-center">
-                <h4>My Abilities</h4>
-            </div>
-            <div class="row css-qs-attributes">
-                {% for ability in abilities %}
-                <div class="col-md-4" data-toggle="tooltip" title='{{ability.relevant_ability.tutorial_text}}'>
-                    <b>
-                        {{ability.relevant_ability.name}}
-                    </b>
-                    {{ability.value}}
+    </div>
+    <div class="css-rules">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="">
+                    <ul>
+                        <li>
+                            Abilities are rated between 0 and 5.
+                        </li>
+                        <li>
+                            Even a single rank in an Ability indicates training or experience in that field. 
+                        </li>
+                        <li>
+                            Abilities are only used in skill checks. They do not grant stats.
+                        </li>
+                        <li>
+                            You may also invent your own Abilities.
+                            <ul>
+                                <li>
+                                    These <b>Secondary Abilities</b> must be more specific than the Primary Abilities that appear on all character sheets.
+                                </li>
+                                <li>
+                                    In return, you receive a bonus when you use them.
+                                </li>
+                                <li>
+                                    Punk's "Smuggling" Ability is a Secondary Ability; it is unique to her.
+                                </li>
+                                <li>
+                                    Secondary Abilities can not grant any supernatural effects.
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
                 </div>
-                {% endfor %}
+            </div>
+            <div class="col-xs-6">
+                <div class="">
+                    <b>Punk's Abilities </b><small>(Mouse-over or tap any Ability for more details)</small>
+                </div>
+                <div class="css-quickstart-container">
+                    <div class="row">
+                        {% for ability in abilities %}
+                        <div class="col-md-4" data-toggle="tooltip" title='{{ability.relevant_ability.tutorial_text}}'>
+                            <b>
+                                {{ability.relevant_ability.name}}
+                            </b>
+                            {{ability.value}}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    You may invent your own Abilities.
-    <br>
-    These Secondary Abilities must be more specific than the Primary Abilities listed above, but you receive a bonus when you use them. 
-    <br>
-    Secondary Abilities can not grant any supernatural capabilities
 </div>
 <br>
 <div id="js-first-resolution" class="js-resolution-container">
@@ -255,6 +298,7 @@
                     </li>
                     <li>
                         The GM declares an Attribute, an Ability, and a Difficulty rating.
+                        <ul><li>(If the Difficulty is not specified, it is 6)</li></ul>
                     </li>
                 </ul>
                 <div class="css-quickstart-container text-center" style="margin-bottom: 5px;">
@@ -515,7 +559,7 @@
 </div>
 <div class="row">
     <h4 class="text-center">
-        Getting Hurt
+        Taking Inventory
     </h4>
     <div class="col-md-6">
         <div class="css-narrative">
@@ -537,6 +581,10 @@
             <p>
                 “I’m listenin’ for bright ideas, sugarplum, but I ain’t hearin’ any.”
             </p>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="css-narrative">
             <p>
                 I wracked my brain. “We’re so stupid. We could have gotten donor blood on our way to the airport, or at least some syringes. Instead we’ve got jack shit.” 
             </p>
@@ -550,17 +598,39 @@
                 “I’m type-1 diabetic.”
             </p>
         </div>
-        <div class=" css-rules text-center">
-            <b>Pro tip:</b> Always keep a complete Equipment list. You never know what you'll need.
+        <div class=" css-rules">
+            <b>Equipment</b>
+            <ul>
+                <li>
+                    You specify your equipment on the "Stock" tab of your character sheet.
+                </li>
+                <li>
+                    You can list any equipment you would reasonably be able to acquire.
+                </li>
+                <li>
+                    You can carry up to Brawn x 25 pounds without it affecting your movement.
+                </li>
+                <li>
+                    Your equipment list can be as detailed or vague as you like. However. . .
+                    <ul>
+                        <li>
+                            <b>If it isn't listed on your sheet, you don't have it.</b>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
         </div>
+    </div>
+</div>
+<div class="row">
+    <h4 class="text-center">
+        Getting Hurt
+    </h4>
+    <div class="col-md-6">
         <div class="css-narrative">
             <p>
                 “Five, I could kiss you.” 
             </p>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="css-narrative">
             <p>
                 “Please do not.” 
             </p>
@@ -584,6 +654,10 @@
                     All humans have between 6 and 8 Body. 
                 </li>
             </ul>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="css-rules ">
             <b>Injuries</b>
             <ul>
                 <li>
@@ -672,10 +746,13 @@
                     A successful combat relies more on setting up the right fight than being the best fighter.
                 </li>
                 <li>
+                    The best way to win a fight is with an ambush and/or a numbers advantage.
+                </li>
+                <li>
                     The system for Combat is easy to learn, but it relies on some mechanics that we have not covered yet.
                 </li>
                 <li>
-                    For that reason, the specifics of Combat are covered later in this guide.
+                    We'll learn the details of Combat later in this guide.
                 </li>
             </ul>
         </div>
@@ -722,8 +799,8 @@
             </ul>
         </div>
     </div>
-    <div class="col-md-6">
-        Put an image here about body and Injuries on the Interactive Character Sheets.
+    <div class="col-md-6 css-rules">
+        {% include "info/new_player_guide/healthwidget.html" %}
     </div>
 </div>
 
@@ -774,13 +851,11 @@
         <div class="css-rules ">
             <b>Exerting</b>
             <ul>
-                <li>When the chips are down and the stakes have never been higher, you may Exert your Mind to get a bonus on a roll.</li>
-                <li>You must declare that you are Exerting before you make the roll. </li>
+                <li>When the chips are down and the stakes have never been higher, you may Exert yourself to get a bonus on a roll.</li>
+                <li>You must declare that you are Exerting before you roll. </li>
                 <li>Exerting allows you to ignore your Penalty for a single roll AND increases its Outcome by 1.</li>
-                <li>You may Exert a maximum of once per round.</li>
+                <li>You may Exert a maximum of once per Round of Combat.</li>
             </ul>
-
-            <li>(maybe) Roll with / without exerting. Show the difference. (maybe too much) </li>
         </div>
     </div>
 </div>

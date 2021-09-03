@@ -1,0 +1,123 @@
+{% load staticfiles %}
+    <div class="row no-gutters">
+        <div class="col-xs-6">
+            <div class="row">
+                <script type="text/html" id="injury-template">
+                    <span>
+        <div class="stat-value col-md-1 text-center css-injury-val">
+            <b class="injury-severity">__severity__</b>
+        </div>
+        <div class="stat-value col-md-11">
+            __description__
+            <form class="js-delete-injury-form pull-right" data-del-injury-url=__delUrl__>
+                <input type="submit" class="btn btn-xs btn-danger" value="X"/>
+            </form>
+        </div>
+        <div class="clearfix"></div>
+    </span>
+                </script>
+                <div class="text-center">
+                    <div class="col-xs-12">
+                        <h3 data-toggle="tooltip" title='{{tutorial.injuries}}'>Injuries</h3>
+                        <div class="text-left" id="js-injury-container">
+                            {% for injury in character.injury_set.all %}
+                            <span>
+                    <div class="stat-value col-xs-1 text-center css-injury-val">
+                        <b class="injury-severity">{{injury.severity}}</b>
+                    </div>
+                    <div class="stat-value col-xs-11">
+                        {{injury.description}}
+                            <form class="js-delete-injury-form pull-right" data-del-injury-url="">
+                                {% csrf_token %}
+                                <input type="submit" class="btn btn-xs btn-danger" value="X"/>
+                            </form>
+                    </div>
+                    <div class="clearfix"></div>
+                </span>
+                            {% endfor%}
+                        </div>
+                        <br>
+                        <b>Add an Injury</b>
+                            <div class="form-inline">
+                                <div id="injury-form"
+                                      class="injury-form"
+                                      data-new-injury-url=""
+                                      data-delete-injury-url="">
+                                    {{ injury_form.about.errors }}
+                                    {{ injury_form.non_field_errors }}
+                                    {% csrf_token %}
+                                        <span class="js-injury-form">
+                        {{ injury_form.severity }}
+                    </span>
+                                    {{injury_form.description}}
+                                    <input type="submit" class="btn btn-default" value="Ouch!" />
+                                </div>
+                            </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="col-xs-6">
+            <div class="css-health-area">
+                <div class="row text-center">
+                    <div class="col-xs-8 text-right" data-toggle="tooltip" title='{{tutorial.body}}'>
+                        <h3 class="css-body-h">
+                            Body <span class="stat-value css-fort-stat">{{character.num_body_levels}}</span>
+                        </h3>
+                    </div>
+                    <div class="col-xs-4" data-toggle="tooltip" title='{{tutorial.penalty}}'>
+                        <span style="position:relative;right:7px">Penalty</span><br>
+                        <div id="js-penalty-box" class="stat-value css-penalty-box text-center"  style="color:#fb7e48;">
+                        </div>
+                    </div>
+                </div>
+                {% for row in health_display %}
+                <div class="row">
+                    <div class="col-xs-6 text-right css-status-text">
+                        {{row.0}}
+                    </div>
+                    <div class="col-xs-2 text-center health-box">
+                        {% if row.1 == 'none' %}
+                        {% else %}
+                        <span id ="js-body-{{row.1}}">
+                    <i class="fa fa-square-o fa-2x" ></i>
+                </span>
+                        {% endif %}
+                    </div>
+                    <div class="col-xs-4 text-center ">
+            <span class="js-penalty-body-{{row.1}} js-penalty-mind-{{row.3}}">
+                {% if row.2 == 'Incap' %}
+                    <span data-toggle="tooltip" title='You are Incapacitated. You may take no actions.'>
+                        X_X
+                    </span>
+                {% elif row.2 == 'Dead' %}
+                    <img class="css-dead-img" src="{% static 'characters/skull.svg' %}" data-toggle="tooltip" title='You are Dead.'/>
+                {% else %}
+                        {{ row.2 }}
+                {% endif %}
+            </span>
+                    </div>
+                </div>
+                {% endfor %}
+                <br>
+                <div class="row css-status-text">
+                    <div class="col-xs-12 text-center">
+                        <div id="js-wound-container" style="display:none;" data-toggle="tooltip" title='{{tutorial.wound}}'>
+                            Wound level =
+                            <span id="js-worst-injury"></span>
+                            +
+                            <span id="js-num-other-injuries"></span>
+                        </div>
+                    </div>
+                </div>
+                <div id="js-dead-box" class="text-center" style="display:none;">
+                    <br>
+                    <div class="alert alert-warning" role="alert">
+                        You're dead.
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>

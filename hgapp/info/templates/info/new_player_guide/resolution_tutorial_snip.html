@@ -21,13 +21,15 @@
     </div>
     <div class="row text-center css-quickstart-gm-text">
         <div class="col-xs-12">
-            <div class="thumbnail css-rules text-left">
-                Contested Rolls
+            <div class="thumbnail css-rules text-left js-additional-rules" style="display:none;">
             </div>
             <p>
                 "Roll <b class="js-qs-attribute">Dexterity</b>
                 + <b class="js-qs-ability">Ledgerdemain</b>,
                 Difficulty <b class="js-qs-difficulty">-</b>"
+                <div>
+                    <small class="js-qs-difficulty-extra"></small>
+                </div>
             </p>
             <p>
                 <b class="js-qs-attribute-val"></b>
@@ -54,11 +56,15 @@
     </div>
     <div class="row text-center">
         <div class="col-xs-12">
-            <h4 >Outcome: <b class="js-qs-outcome-num">-</b>
+            <h4 >Outcome:
+                <b>
+                    <span class="js-qs-outcome-num"></span>
+                    <span class="js-qs-contested-outcome"></span>
+                </b>
                 <br>
                 <small class="js-qs-outcome-explanation"></small>
             </h4>
-            <p class="js-qs-action-outcome">
+            <p class="js-qs-action-outcome css-narrative">
             </p>
         </div>
     </div>

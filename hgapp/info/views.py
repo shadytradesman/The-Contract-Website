@@ -3,6 +3,7 @@ from .terms import EULA, TERMS, PRIVACY
 from django.shortcuts import get_object_or_404
 from info.models import FrontPageInfo, QuickStartInfo, ExampleAction
 from characters.models import CharacterTutorial
+from characters.forms import InjuryForm
 
 def getting_started(request):
     return render(request, 'info/getting_started.html')
@@ -42,6 +43,8 @@ def quickstart(request):
     context= {
         "quickstart_info": quickstart_info,
         "character": character,
+        'health_display': character.get_health_display(),
+        'injury_form': InjuryForm(request.POST, prefix="injury"),
         "physical_attributes": physical_attributes,
         "mental_attributes": mental_attributes,
         "abilities": abilities,
