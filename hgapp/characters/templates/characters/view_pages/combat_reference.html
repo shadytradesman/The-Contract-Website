@@ -20,7 +20,7 @@
                     Dexterity + Wits
                     <span>
                         <span class="js-roll-value" style="display:none;">
-                            (<span class="js-roll-num-dice" data-attr-id="3" data-ability-id="4" data-attr2-id="4">0</span><span class="js-roll-penalty" style="color:#fb7e48;"></span>
+                            (<span class="js-roll-num-dice" data-attr-id="2" data-attr2-id="5">0</span><span class="js-roll-penalty" style="color:#fb7e48;"></span>
                             dice),
                         </span>
                         Difficulty <span class="js-roll-difficulty" data-difficulty="6">6</span>.
@@ -38,33 +38,48 @@
             <div class="row">
                 <div class="col-xs-12 col-md-6">
                     <div class="text-center">
-                        <b>It's my Turn</b>
+                        <h4>It's my Turn</h4>
                     </div>
+                    <div class="text-center">
+                        <small>
+                        <span data-toggle="tooltip" title="
+                            Movement may be taken immediately before OR After your Action and cannot be split.
+                            Your Action may be anything; the most common are listed below.
+                            ">
+                                You get one <b>Movement</b> and one <b>Action</b> on your turn every Round of Combat.
+                            </span>
+
+                        </small>
+                    </div>
+                    <b>Movement</b>
                     <ul>
                         <li>
-                            <span data-toggle="tooltip" title="
-                                Movement may be taken immediately before OR After your Action and cannot be split.
-                                Your Action may be anything; the most common are listed below.
-                                ">
-                                You get one <b>Movement</b> and one <b>Action</b> every round of Combat.
-                            </span>
+                            Movement is taken immediately before OR after your Action. It cannot be split.
                         </li>
                         <li>
                             <span data-toggle="tooltip" title="
                                 Minimum free movement is 5 feet unless you are incapacitated.
                                 ">
-                                <b>You may Move</b> (Dexterity-Penalty)*5 <b>(35<span class="js-roll-penalty" style="color:#fb7e48;" data-penalty-multiplier="5"></span>) feet</b> for free.
+                                <b>You may Move</b> (Dexterity + 1 - Penalty)*5 <b>(<span class="js-roll-num-dice" data-attr-id="2" data-multiplier="5" data-additional="5">0</span><span class="js-roll-penalty" style="color:#fb7e48;" data-penalty-multiplier="5"></span>) feet</b> for free.
                             </span>
                         </li>
                         <li>
-                            <b>You may Dash</b> up to an additional
-                            (Brawn*5) <b>(20) feet</b>, but it penalizes your Action -1 die per 5 feet.
+                            <b>You may Dash</b> up to an additional (Brawn*5)
+                            <b>(<span class="js-roll-num-dice" data-attr-id="1" data-multiplier="5">0</span> feet</b>).
+                            <ul>
+                                <li>
+                                    Dashing penalizes your Action -1 die per 5 feet.
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <b>Actions</b>
+                    <ul>
+                        <li>
+                            <b>Attack</b> with your <a href="/wiki/Rules/3-combat/c-weapons/">weapon or hands.</a>
                         </li>
                         <li>
-                            <b>Action: Attack</b> with your <a>weapon or hands.</a>
-                        </li>
-                        <li>
-                            <b>Action: Sprint</b> by rolling
+                            <b>Sprint</b> by rolling
                             {{tutorial.sprint_roll.render_html_for_current_contractor}}.
                             Add the Outcome*5 feet to your Movement.
                         </li>
@@ -73,7 +88,7 @@
                                 Example: if your Evade Outcome is 4 and you are attacked twice with an Outcome of 3 each time,
                                 you would avoid the first attack and suffer the second as though its Outcome was 2.
                                 ">
-                                <b>Action: Evade</b> by rolling to defend or dodge. Your Outcome is "spent" to reduce the
+                                <b>Evade</b> by rolling to Defend or Dodge. Your Outcome is "spent" to reduce the
                                 Outcome of any incoming attacks until your next Action.
                             </span>
                         </li>
@@ -81,7 +96,7 @@
                             <span data-toggle="tooltip" title="
                                 Most Powers require an Action to activate.
                                 ">
-                                <b>Action: Activate a Power</b>.
+                                <b>Activate a Power</b>.
                             </span>
                         </li>
                         <li>
@@ -99,22 +114,24 @@
                 </div>
                 <div class="col-xs-12 col-md-6">
                     <div class="text-center">
-                        <b>I'm being attacked</b>
+                        <h4>I'm being attacked</h4>
                     </div>
-                    <ul>
-                        <li>
+                    <div class="text-center">
+                        <small>
                             <span data-toggle="tooltip" title="
                                 You cannot react to ranged firearms attacks without a Power.
                                 ">
-                                If you have not yet spent your Action this round, you may use it as a Reaction to defend yourself.
-
+                                If you have not yet spent your Action this Round, you may use it as a Reaction.
                             </span>
-                        </li>
+                        </small>
+                    </div>
+                    <b>Reactions</b>
+                    <ul>
                         <li>
                             <span data-toggle="tooltip" title="
                                 You cannot dodge ranged firearms attacks as a Reaction without a Power.
                                 ">
-                                <b>Reaction: Dodge</b> by rolling
+                                <b>Dodge</b> by rolling
                                 {{tutorial.dodge_roll.render_html_for_current_contractor}}.
                                 Your Outcome is subtracted from the attacker's.
                             </span>
@@ -125,7 +142,7 @@
                                 Melee weapons can Defend against unarmed, melee, or thrown attacks.
                                 Firearms cannot Defend but may be Defended against if the attacker is within reach.
                                 ">
-                                <b>Reaction: Defend</b> with your weapon by rolling its attack roll.
+                                <b>Defend</b> with your weapon by rolling its attack roll.
                                 Your Outcome is subtracted from the attacker's. Not always possible (tap/hover for more info).
                             </span>
                         </li>
@@ -135,18 +152,20 @@
                                     On a tie, both attacks succeed with their full Outcome.
                                     The loser gets nothing.
                                 ">
-                                <b>Reaction: Clash</b> with the attacker using the same roll you would use to Defend.
-                                The higher Outcome is treated as the result of a successful, undefended attack roll against the other.
+                                <b>Clash</b> with the attacker using the same roll you would use to Defend.
+                                The higher Outcome (not contested) is treated as the result of a successful, undefended attack roll against the other.
                             </span>
                         </li>
+                    </ul>
+                    <b>Desperate Defense</b>
+                    <ul>
                         <li>
                             <span data-toggle="tooltip" title="
                                     This penalty can reduce your next Action's roll to 0 dice. You cannot use a Desperate
                                     Defense if you have already Exerted your Mind this round.
                                 ">
-                                <b>Desperate Defense:</b>
                                 If you have already used your Action, you may Exert your Mind to perform a Reaction.
-                                Your next round's Action receives a -2 dice penalty.
+                                Your next Round's Action receives a -2 dice penalty.
                             </span>
                         </li>
                     </ul>

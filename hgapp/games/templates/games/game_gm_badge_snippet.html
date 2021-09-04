@@ -3,19 +3,9 @@
 <div class="css-timeline-item css-gm-badge">
     <h4>
         GMed
-        {% if "view_scenario" in scenario_perms %}
-            <a href="{% url 'games:games_view_scenario' game.scenario.id %}">
-                {{ game.scenario.title }}
-            </a>
-        {% else %}
+        <a href="{% url 'games:games_view_game' game.id %}">
             {{ game.scenario.title }}
-        {% endif %}
-        <small>
-            -
-            <a href="{% url 'games:games_view_game' game.id %}">
-                (<i>View Game</i>)
-            </a>
-        </small>
+        </a>
     </h4>
     {% if game.achieves_golden_ratio %}
         Achieved the Golden Ratio

@@ -17,7 +17,12 @@ function updateRollValues() {
         attrValue = attrValue ? attrValue : 0;
         attr2Value = attr2Value ? attr2Value : 0;
         if (attrId || attrId2 || abilityId || mindValue || bodyValue) {
-            $(this).html(abilityValue + attrValue + attr2Value + mindValue + bodyValue);
+            var value = abilityValue + attrValue + attr2Value + mindValue + bodyValue;
+            var multiplier = parseInt($(this).attr('data-multiplier'));
+            multiplier = multiplier ? multiplier : 1;
+            var additional = parseInt($(this).attr('data-additional'));
+            additional = additional ? additional : 0;
+            $(this).html((value * multiplier) + additional);
             $(this).parent().show();
         }
         var difficultyElement = $(this).parent().parent().children(".js-roll-difficulty");

@@ -10,10 +10,11 @@ from heapq import merge
 
 from profiles.forms import EditProfileForm, AcceptTermsForm
 from profiles.models import Profile
-from characters.models import Character
-from games.models import Game, DISCOVERY_REASON
 from info.terms import EULA, TERMS, PRIVACY
 from games.games_constants import get_completed_game_invite_excludes_query, get_completed_game_excludes_query, GAME_STATUS
+
+def key_funct(x):
+    return x[0]
 
 class ProfileView(generic.DetailView):
     template_name = 'profiles/view_profile.html'
@@ -40,7 +41,7 @@ class ProfileView(generic.DetailView):
         played_games_by_date = [(x.relevant_game.end_time, "play", x) for x in self.completed_game_invites]
         gmed_games_by_date = [(x.end_time, "gm", x) for x in self.gmed_games]
 
-        events_by_date = list(merge(played_games_by_date, gmed_games_by_date))
+        events_by_date = list(merge(played_games_by_date, gmed_games_by_date, reverse=True))
         timeline = defaultdict(list)
         for event in events_by_date:
             timeline[event[0].strftime("%d %b %Y")].append((event[1], event[2]))
