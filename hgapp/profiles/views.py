@@ -13,9 +13,6 @@ from profiles.models import Profile
 from info.terms import EULA, TERMS, PRIVACY
 from games.games_constants import get_completed_game_invite_excludes_query, get_completed_game_excludes_query, GAME_STATUS
 
-def key_funct(x):
-    return x[0]
-
 class ProfileView(generic.DetailView):
     template_name = 'profiles/view_profile.html'
 
