@@ -5,6 +5,20 @@
             <small>
                 <i>
                     (Click to toggle Combat quick reference)
+                    <div class="row">
+                        <div class="col-sm-3 col-xs-6">
+                            Initiative: <span class="js-roll-num-dice" data-attr-id="2" data-attr2-id="5">0</span><span class="js-roll-penalty" style="color:#fb7e48;"></span> dice
+                        </div>
+                        <div class="col-sm-3 col-xs-6">
+                            Free Movement: <span class="js-roll-num-dice" data-attr-id="2" data-multiplier="5" data-additional="5">0</span><span class="js-roll-penalty" style="color:#fb7e48;" data-penalty-multiplier="5"></span> feet
+                        </div>
+                        <div class="col-sm-3 col-xs-6">
+                            Dash: <span class="js-roll-num-dice" data-attr-id="1" data-multiplier="5">0</span> feet
+                        </div>
+                        <div class="col-sm-3 col-xs-6">
+                            Perception + Alertness: <span class="js-roll-num-dice" data-attr-id="4" data-ability-id="1" >0</span> <span class="js-roll-penalty" style="color:#fb7e48;"></span> dice
+                        </div>
+                    </div>
                 </i>
             </small>
         </div>
@@ -58,30 +72,30 @@
                         </li>
                         <li>
                             <span data-toggle="tooltip" title="
-                                Minimum free movement is 5 feet unless you are incapacitated.
+                                (Dexterity + 1 - Penalty)*5 feet. Minimum 5 feet.
                                 ">
-                                <b>You may Move</b> (Dexterity + 1 - Penalty)*5 <b>(<span class="js-roll-num-dice" data-attr-id="2" data-multiplier="5" data-additional="5">0</span><span class="js-roll-penalty" style="color:#fb7e48;" data-penalty-multiplier="5"></span>) feet</b> for free.
+                                <b>You may Move</b> <b>(<span class="js-roll-num-dice" data-attr-id="2" data-multiplier="5" data-additional="5">0</span><span class="js-roll-penalty" style="color:#fb7e48;" data-penalty-multiplier="5"></span>) feet</b> for free. Minimum 5 feet.
                             </span>
                         </li>
-                        <li>
-                            <b>You may Dash</b> up to an additional (Brawn*5)
+                        <li data-toggle="tooltip" title="Dash up to: Brawn x 5 feet.">
+                            <b>You may Dash</b> up to an additional
                             <b>(<span class="js-roll-num-dice" data-attr-id="1" data-multiplier="5">0</span> feet</b>).
                             <ul>
                                 <li>
                                     Dashing penalizes your Action -1 die per 5 feet.
                                 </li>
                             </ul>
+                            <li data-toggle="tooltip" title="Sprint: (Outcome + Brawn + Dexterity) x 5 feet.">
+                                <b>All-out Sprint:</b> instead of using Movement or Dash, you may spend your Action and roll
+                                {{tutorial.sprint_roll.render_html_for_current_contractor}}.
+                                You move (<span class="js-roll-num-dice" data-attr-id="1" data-attr2-id="2" data-multiplier="5">0</span> + Outcome*5 Feet).
+                            </li>
                         </li>
                     </ul>
                     <b>Actions</b>
                     <ul>
                         <li>
                             <b>Attack</b> with your <a href="/wiki/Rules/3-combat/c-weapons/">weapon or hands.</a>
-                        </li>
-                        <li>
-                            <b>Sprint</b> by rolling
-                            {{tutorial.sprint_roll.render_html_for_current_contractor}}.
-                            Add the Outcome*5 feet to your Movement.
                         </li>
                         <li>
                             <span data-toggle="tooltip" title="
@@ -96,18 +110,18 @@
                             <span data-toggle="tooltip" title="
                                 Most Powers require an Action to activate.
                                 ">
-                                <b>Activate a Power</b>.
+                                <b>Activate a Power</b> or <b>use an Ability</b> as normal.
                             </span>
                         </li>
                         <li>
                             <span data-toggle="tooltip" title="
                                 The Action and event cannot be changed once declared.
-                                If the event never occurs, you lose your Action.
-                                You may still React to incoming attacks if your Action is held, but it still uses that round's Action.
+                                This does not allow you to take two Actions in a Round.
+                                You may break the hold to React to incoming attacks.
                                 You cannot hold Movement.
                                 ">
                             <b>Hold your Action</b> by declaring an Action and a triggering event.
-                            If the event occurs before your next turn, you perform the Action.
+                                If the event occurs before your turn on the next Round, you perform the Action.
                             </span>
                         </li>
                     </ul>
@@ -140,20 +154,20 @@
                             <span data-toggle="tooltip" title="
                                 Unarmed people can Defend against other unarmed attacks.
                                 Melee weapons can Defend against unarmed, melee, or thrown attacks.
-                                Firearms cannot Defend but may be Defended against if the attacker is within reach.
+                                Firearms cannot Defend but may be Defended only against if the attacker is within reach.
                                 ">
                                 <b>Defend</b> with your weapon by rolling its attack roll.
-                                Your Outcome is subtracted from the attacker's. Not always possible (tap/hover for more info).
+                                Your Outcome is subtracted from the attacker's. Availability depends on weapon match-up (tap/hover).
                             </span>
                         </li>
                         <li>
                             <span data-toggle="tooltip" title="
                                     The requirements for Clashing are the same as for Defending.
                                     On a tie, both attacks succeed with their full Outcome.
-                                    The loser gets nothing.
                                 ">
                                 <b>Clash</b> with the attacker using the same roll you would use to Defend.
-                                The higher Outcome (not contested) is treated as the result of a successful, undefended attack roll against the other.
+                                The higher Outcome (not contested) is treated as the result of a successful, undefended attack
+                                roll against the loser.
                             </span>
                         </li>
                     </ul>
@@ -162,7 +176,7 @@
                         <li>
                             <span data-toggle="tooltip" title="
                                     This penalty can reduce your next Action's roll to 0 dice. You cannot use a Desperate
-                                    Defense if you have already Exerted your Mind this round.
+                                    Defense if you have already Exerted your Mind this Round.
                                 ">
                                 If you have already used your Action, you may Exert your Mind to perform a Reaction.
                                 Your next Round's Action receives a -2 dice penalty.
@@ -173,7 +187,7 @@
             </div>
             <div class="row">
                 <div class="col-xs-12 text-center">
-                    If an attack's Outcome is positive after defense, it results a new Injury with Severity = <b>Outcome + Weapon damage - Armor</b>
+                    If an attack's Outcome is positive after defense, it results in a new Injury with Severity = <b>Outcome + Weapon damage - Armor</b>
                 </div>
             </div>
         </div>

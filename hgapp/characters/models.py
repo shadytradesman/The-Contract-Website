@@ -1578,6 +1578,7 @@ class CharacterTutorial(models.Model):
     world_modal_1 = models.TextField(max_length=3000, default="placeholder")
     world_modal_2 = models.TextField(max_length=3000, default="placeholder")
     world_modal_3 = models.TextField(max_length=3000, default="placeholder")
+    encumbrance = models.TextField(max_length=3000, default="placeholder")
     dodge_roll = models.ForeignKey(Roll, on_delete=models.CASCADE, blank=True, null=True,
                                    related_name="char_dodge")
     sprint_roll = models.ForeignKey(Roll, on_delete=models.CASCADE, blank=True, null=True,
