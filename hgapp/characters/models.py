@@ -181,6 +181,11 @@ class Character(models.Model):
     pub_date = models.DateTimeField('date published')
     edit_date = models.DateTimeField('date last edited')
 
+    num_games = models.IntegerField(blank=True, null=True)
+    num_victories = models.IntegerField(blank=True, null=True)
+    num_losses = models.IntegerField(blank=True, null=True)
+    num_journals = models.IntegerField(blank=True, null=True)
+
     # Optional fields
     cell = models.ForeignKey(Cell,
                               blank=True,
@@ -258,6 +263,13 @@ class Character(models.Model):
             ('view_private_character', 'View private character'),
             ('edit_character', 'Edit character'),
         )
+        indexes = [
+            models.Index(fields=['num_victories', 'private']),
+            models.Index(fields=['num_losses', 'private']),
+            models.Index(fields=['num_games', 'private']),
+            models.Index(fields=['num_journals']),
+            models.Index(fields=['player']),
+        ]
 
     def is_editable_with_key(self, key):
         if hasattr(self, 'player') and self.player:
@@ -336,14 +348,38 @@ class Character(models.Model):
             return self.cell
         return None
 
+    def update_contractor_journal_stats(self):
+        self.num_journals = self.game_attendance_set \
+            .filter(relevant_game__end_time__isnull=False, journal__isnull=False, journal__is_valid=True)\
+            .count()
+        self.save()
+
+    def update_contractor_game_stats(self):
+        self._update_game_count()
+        self._update_loss_count()
+        self._update_victory_count()
+        self._update_game_count()
+        self.status = self.calculate_status()
+        self.save()
+
     def number_completed_games(self):
-        return self.game_attendance_set.exclude(outcome=None, is_confirmed=False).count()
+        return self.num_games
+
+    def _update_game_count(self):
+        self.num_games = self.game_attendance_set.exclude(outcome=None, is_confirmed=False).count()
 
     def number_of_victories(self):
-        return get_queryset_size(self.game_attendance_set.filter(is_confirmed=True, outcome="WIN"))
+        return self.num_victories
+
+    def _update_victory_count(self):
+        self.num_victories = get_queryset_size(self.game_attendance_set.filter(is_confirmed=True, outcome="WIN"))
 
     def number_of_losses(self):
-        return get_queryset_size(self.game_attendance_set.filter(is_confirmed=True, outcome="LOSS"))
+        return self.num_losses
+
+    def _update_loss_count(self):
+        self.num_losses = get_queryset_size(self.game_attendance_set.filter(is_confirmed=True, outcome="LOSS"))
+
 
     def number_completed_games_in_home_cell(self):
         if not hasattr(self, "cell") or not self.cell:
@@ -371,7 +407,6 @@ class Character(models.Model):
             self.ambition = self.ambition[:-1 or None]
         if self.appearance and self.appearance[-1] == '.':
             self.appearance = self.appearance[:-1 or None]
-        self.status = self.calculate_status()
         if self.pk is None:
             super(Character, self).save(*args, **kwargs)
             self.set_default_permissions()
@@ -726,16 +761,32 @@ class Character(models.Model):
         else:
             return mind_val
 
-    def get_attributes(self, is_physical):
-        return self.stats_snapshot.attributevalue_set\
-            .filter(relevant_attribute__is_physical=is_physical)\
-            .order_by('relevant_attribute__name')\
-            .all()
+    def get_attribute_values_by_id(self):
+        attributes = self.get_attributes()
+        attribute_val_by_id = {}
+        for attr in attributes:
+            attribute_val_by_id[attr.relevant_attribute.id] = attr.value
+        return attribute_val_by_id
+
+    def get_ability_values_by_id(self):
+        ability_val_by_id = {}
+        char_ability_values = self.stats_snapshot.abilityvalue_set.all()
+        for x in char_ability_values:
+            ability_val_by_id[x.relevant_ability.id] = x.value
+        return ability_val_by_id
+
+    def get_attributes(self, is_physical=None):
+        query = self.stats_snapshot.attributevalue_set \
+            .prefetch_related('relevant_attribute')
+        if is_physical is not None:
+            query = query.filter(relevant_attribute__is_physical=is_physical)
+        return query.order_by('relevant_attribute__name').all()
 
     def get_abilities(self, is_physical):
-        return self.stats_snapshot.abilityvalue_set\
-            .filter(relevant_ability__is_physical=is_physical)\
-             .order_by('relevant_ability__name')\
+        return self.stats_snapshot.abilityvalue_set \
+            .prefetch_related('relevant_ability') \
+            .filter(relevant_ability__is_physical=is_physical) \
+            .order_by('relevant_ability__name')\
             .all()
 
     def get_health_display(self):
@@ -971,6 +1022,77 @@ class Roll(models.Model):
             models.Index(fields=['is_body', 'difficulty']),
             models.Index(fields=['attribute', 'ability', 'difficulty',]),
         ]
+
+    def __str__(self):
+        supp_info = None
+        if self.parry_type != NO_PARRY_INFO:
+            supp_info = "(defended against as {})".format(self.get_parry_type_display())
+        if self.speed != NO_SPEED_INFO:
+            speed = "as {}".format(self.get_speed_display())
+            supp_info = "{} {}".format(speed, supp_info) if supp_info else speed
+        return "{}, Diff {}{}".format(self.get_main_roll_component(), self.difficulty, " " + supp_info if supp_info else "")
+
+    def get_main_roll_component(self):
+        if hasattr(self, "attribute") and self.attribute:
+            main_component = self.attribute.name
+        else:
+            main_component = "Mind" if self.is_mind else "Body"
+        if hasattr(self, "ability") and self.ability:
+            ability_name = self.ability.name
+            roll = "{} + {}".format(main_component, ability_name)
+        else:
+            roll = main_component
+        return roll
+
+    def render_html_for_current_contractor(self):
+        if self.parry_type != NO_PARRY_INFO:
+            return self.get_defense_text()
+        html_output = "{}" \
+        "<span>" \
+            "<span class=\"js-roll-value\" style=\"display:none;\">" \
+                " (<span class=\"js-roll-num-dice\" " \
+                "data-attr-id=\"{}\" " \
+                "data-ability-id=\"{}\" " \
+                "data-is-mind=\"{}\" " \
+                "data-is-body=\"{}\">" \
+                "</span>" \
+                "<span class=\"js-roll-penalty\" style=\"color:#fb7e48;\"></span>" \
+            " dice)</span>" \
+            " Difficulty <span class=\"js-roll-difficulty\" data-difficulty=\"{}\">{}</span>" \
+        "</span>" \
+        .format(self.get_main_roll_component(),
+                self.attribute.id if hasattr(self, "attribute") and self.attribute else " ",
+                self.ability.id if hasattr(self, "ability") and self.ability else " ",
+                self.is_mind,
+                self.is_body,
+                self.difficulty,
+                self.difficulty)
+        roll_text = mark_safe(html_output)
+        if self.speed != NO_SPEED_INFO:
+            roll_text = "{} as {}".format(roll_text, self.get_speed_display())
+        return roll_text
+
+    def render_value_for_power(self):
+        if self.parry_type != NO_PARRY_INFO:
+            return self.get_defense_text()
+        first_word = "Mind" if self.is_mind else "Body" if self.is_body else self.attribute.name
+        if self.ability:
+            roll_text = "{} + {}".format(first_word, self.ability.name)
+        else:
+            roll_text = first_word
+        roll_text = "{}, Difficulty {}".format(roll_text, self.difficulty)
+        if self.speed != NO_SPEED_INFO:
+            roll_text = "{} as {}".format(roll_text, self.get_speed_display())
+        return roll_text
+
+    def get_defense_text(self):
+        if self.parry_type == DODGE_ONLY:
+            roll_text = "to dodge"
+        else:
+            roll_text = "to dodge or parry (as for {})".format(self.get_parry_type_display())
+        if self.speed != NO_SPEED_INFO:
+            roll_text = "{} as {}".format(roll_text, self.get_speed_display())
+        return roll_text
 
     # To obtain the singleton rolls, use this static getter methods instead of directly creating the roll objects.
     @staticmethod
@@ -1491,6 +1613,11 @@ class CharacterTutorial(models.Model):
     world_modal_1 = models.TextField(max_length=3000, default="placeholder")
     world_modal_2 = models.TextField(max_length=3000, default="placeholder")
     world_modal_3 = models.TextField(max_length=3000, default="placeholder")
+    encumbrance = models.TextField(max_length=3000, default="placeholder")
+    dodge_roll = models.ForeignKey(Roll, on_delete=models.CASCADE, blank=True, null=True,
+                                   related_name="char_dodge")
+    sprint_roll = models.ForeignKey(Roll, on_delete=models.CASCADE, blank=True, null=True,
+                                    related_name="char_sprint")
 
 class AttributeBonus(models.Model):
     character = models.ForeignKey('Character', on_delete=models.CASCADE)

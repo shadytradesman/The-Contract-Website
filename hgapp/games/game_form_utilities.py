@@ -187,6 +187,7 @@ def create_archival_game(request, general_form, cell, outcome_formset):
         if general_form.cleaned_data['scenario']:
             game.scenario = general_form.cleaned_data['scenario']
         game.save()
+        cell.find_world_date = occurred_time
         for form in outcome_formset:
             player = get_object_or_404(User, id=form.cleaned_data['player_id'])
             attendance = Game_Attendance(

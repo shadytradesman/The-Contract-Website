@@ -235,6 +235,8 @@ class Game(models.Model):
         assert(self.is_active())
         for character in self.attended_by.all():
             character.default_perms_char_and_powers_to_player(self.gm)
+        if hasattr(self, "cell") and self.cell:
+            self.cell.find_world_date = timezone.now()
         self.status = GAME_STATUS[2][0]
         self.end_time = timezone.now()
         self.save()
@@ -375,6 +377,8 @@ class Game(models.Model):
         self.gm.profile.recompute_titles()
         for invite in self.invitations.all():
             invite.profile.recompute_titles()
+        for character in self.attended_by.all():
+            character.update_contractor_game_stats()
 
     def update_profile_stats(self):
         self.update_participant_titles()

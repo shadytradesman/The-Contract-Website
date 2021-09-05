@@ -10,6 +10,7 @@
     </div>
 </div>
 {% include "characters/view_pages/attributes_and_abilities.html" %}
+{% include "characters/view_pages/combat_reference.html" %}
 <div class="row css-health-section">
     <div class="col-md-4">
         {% include "characters/view_pages/left_column.html" %}
@@ -36,7 +37,7 @@
                 <div class="css-quirk-container">
                     <b>
                         <span class="css-quirk-value">
-                            -{{asset_details.relevant_asset.value}}
+                            +{{asset_details.relevant_asset.value}}
                         </span>
                     </b>
                     <span class="css-quirk-content">

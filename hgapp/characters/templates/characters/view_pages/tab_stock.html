@@ -19,6 +19,11 @@
         <h3 class="text-center" data-toggle="tooltip" title='{{tutorial.equipment|safe}}'>
             Equipment
         </h3>
+        <div class="text-center" data-toggle="tooltip" title='{{tutorial.encumbrance|safe}}'>
+            <small>
+                Max Encumbrance: <span class="js-roll-num-dice" data-attr-id="1" data-multiplier="15">0</span> pounds</b>.
+            </small>
+        </div>
         {% if user_can_edit %}
         <form id="equipment-form"
               data-post-url="{% url 'characters:post_equipment' character.id secret_key %}">

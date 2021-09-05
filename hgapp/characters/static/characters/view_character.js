@@ -243,7 +243,7 @@ $(".injury-form").submit(function (e) {
     })
 })
 
-// delete battle injury
+// delete injury
 $("#js-injury-container").on("submit",".js-delete-injury-form", function (e) {
     e.preventDefault();
     var serializedData = $(this).serialize();
@@ -327,10 +327,22 @@ function updateHealthDisplay() {
     var penaltyContent;
     if (isNaN(mindPenalty)) {
         penaltyContent = mindPenalty;
+        $(".js-roll-penalty").hide();
     } else if (isNaN(bodyPenalty)) {
         penaltyContent = bodyPenalty;
+        $(".js-roll-penalty").hide();
     } else {
         penaltyContent = mindPenalty + bodyPenalty;
+        if (penaltyContent < 0) {
+            $(".js-roll-penalty").each(function () {
+                var penaltyMultiplier = parseInt($(this).attr('data-penalty-multiplier'));
+                penaltyMultiplier = penaltyMultiplier ? penaltyMultiplier: 1;
+                $(this).html(penaltyContent * penaltyMultiplier);
+            })
+            $(".js-roll-penalty").show();
+        } else {
+            $(".js-roll-penalty").hide();
+        }
     }
     $("#js-penalty-box").html(penaltyContent);
 

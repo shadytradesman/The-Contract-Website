@@ -156,7 +156,6 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'hgapp.urls'
-CSRF_USE_SESSIONS = True
 CSRF_FAILURE_VIEW = 'hgapp.views.csrf_failure'
 
 TEMPLATES = [
@@ -432,3 +431,6 @@ TINYMCE_DEFAULT_CONFIG = {
     " | help",
     'content_css': "/static/css/site.css",
 }
+
+# Pinax Blog settings
+PINAX_BLOG_SLUG_UNIQUE = True

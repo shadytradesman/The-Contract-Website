@@ -67,21 +67,27 @@
                         </h3>
                     </div>
                     {% if cells %}
-                        <ul class="nav nav-pills nav-stacked">
-                            {% for cell in cells %}
-                                <li>
-                                    <a href="{% url 'cells:cells_view_cell' cell.id %}">
-                                        <b>{{cell.name}}</b>
-                                        <br>
-                                        <small>
-                                            {% player_rank cell profile.user %}
-                                            - {{ cell.number_of_members }} Member{{cell.number_of_members|pluralize}}
-                                            - Game Participation: {% num_games_player_participated cell profile.user %}
-                                        </small>
-                                    </a>
-                                </li>
-                            {% endfor %}
-                        </ul>
+                        <div class="row">
+                                {% for cell in cells %}
+                                <div class="col-xs-6">
+                                    <ul class="nav nav-pills nav-stacked">
+                                        <li>
+                                            <a href="{% url 'cells:cells_view_cell' cell.id %}">
+                                                <b>{{cell.name}}</b>
+                                                <br>
+                                                <small>
+                                                    {% player_rank cell profile.user %}
+                                                    - {{ cell.number_of_members }} Member{{cell.number_of_members|pluralize}}
+                                                    <br>
+                                                    Game Participation: {% num_games_player_participated cell profile.user %}
+                                                </small>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                {% endfor %}
+
+                        </div>
                     {% else %}
                         <h4 class="text-center"><small>{{profile.user.username}} is not a member of any Worlds</small></h4>
                     {% endif %}
@@ -304,7 +310,7 @@
             <div class="row">
                 <div class="text-center">
                     <h2>
-                        Games Played
+                        Game Record
                     </h2>
                 </div>
             </div>

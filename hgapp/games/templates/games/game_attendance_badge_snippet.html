@@ -13,20 +13,13 @@
             {% endif %}
             in
         {% endif %}
-        {% if "view_scenario" in scenario_perms %}
-            <a href="{% url 'games:games_view_scenario' attendance.relevant_game.scenario.id %}">
-                {{ attendance.relevant_game.scenario.title }}
-            </a>
-        {% else %}
+        <a href="{% url 'games:games_view_game' attendance.relevant_game.id %}">
             {{ attendance.relevant_game.scenario.title }}
-        {% endif %}
-        <small>
-            -
-            <a href="{% url 'games:games_view_game' attendance.relevant_game.id %}">
+            <small>
+                -
                 <b>{{attendance.get_outcome_display}}</b>
-                (<i>View Game</i>)
-            </a>
-        </small>
+            </small>
+        </a>
     </h4>
     <p>{{attendance.notes}}</p>
     {% if attendance.associated_character_reward %}

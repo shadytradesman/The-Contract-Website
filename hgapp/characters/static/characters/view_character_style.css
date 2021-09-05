@@ -321,3 +321,17 @@ input[type="number"] {
         text-align: left;
     }
 }
+
+.css-combat-reference {
+    background-color: #353e4b;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    //padding-bottom: 10px;
+    //border-bottom: 1px solid #a6763a;
+    border-top: 1px solid #a6763a;
+    //margin-bottom: 10px;
+}
+
+.js-injury-value-input {
+    display: inline-block;
+}

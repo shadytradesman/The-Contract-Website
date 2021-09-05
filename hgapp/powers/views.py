@@ -164,11 +164,16 @@ def power_view(request, power_id):
     power = get_object_or_404(Power, id=power_id)
     if not power.player_can_view(request.user):
         raise PermissionDenied("This Power has been deleted, or you're not allowed to view it")
+    attribute_val_by_id = None
+    ability_val_by_id = None
     if power.parent_power:
-        power_full = Power_Full.objects.filter(id=power.parent_power.id).all().first()
+        power_full = Power_Full.objects.get(id=power.parent_power.id)
         power_list = power_full.power_set.order_by('-pub_date').all()
         if power_list[0] == power and "history" not in request.path:
             return HttpResponseRedirect(reverse('powers:powers_view_power_full', args=(power_full.id,)))
+        if power_full.character:
+            attribute_val_by_id = power_full.character.get_attribute_values_by_id()
+            ability_val_by_id  = power_full.character.get_ability_values_by_id()
     else:
         power_full = None
         power_list = None
@@ -176,6 +181,8 @@ def power_view(request, power_id):
     context['power'] = power
     context['power_list'] = power_list
     context['power_full'] = power_full
+    context['ability_value_by_id'] = ability_val_by_id
+    context['attribute_value_by_id'] = attribute_val_by_id
     return render(request, 'powers/viewpower.html', context)
 
 

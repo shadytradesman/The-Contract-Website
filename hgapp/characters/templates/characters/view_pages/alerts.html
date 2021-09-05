@@ -155,7 +155,7 @@
             </p>
         </div>
 {% endif %}
-{% if character.unspent_experience > 2 and user_can_edit %}
+{% if character.unspent_experience > 1 and user_can_edit %}
         <a href="{% url 'characters:characters_edit' character.id secret_key %}">
             <div class="alert alert-success btn btn-success css-char-alert" role="alert">
                 Spend {{character.name}}'s <b>{{character.unspent_experience}}</b> unspent Experience
