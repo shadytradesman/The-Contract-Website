@@ -1,8 +1,6 @@
 from django.contrib import admin
 
-from .models import FrontPageInfo, QuickStartInfo, ExampleAction
+from .models import FrontPageInfo
 
 
 admin.site.register(FrontPageInfo)
-admin.site.register(QuickStartInfo)
-admin.site.register(ExampleAction)
