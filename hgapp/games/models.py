@@ -377,6 +377,8 @@ class Game(models.Model):
         self.gm.profile.recompute_titles()
         for invite in self.invitations.all():
             invite.profile.recompute_titles()
+        for character in self.attended_by.all():
+            character.update_contractor_game_stats()
 
     def update_profile_stats(self):
         self.update_participant_titles()

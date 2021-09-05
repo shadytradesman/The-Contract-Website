@@ -1,0 +1,20 @@
+{% extends "info/leaderboard/leaderboard_entry_template.html" %}
+
+{% block entry_content %}
+<a href="{% url 'profiles:profiles_view_profile' player.id %}">
+
+    <b>{{player.user.username}}</b>
+    <span class="main-subtitle">
+        the
+    {% if player.player_prefix %}
+    {{player.get_player_prefix_display}}
+    {% endif %}
+    {{player.get_player_suffix_display}}
+    </span>
+    <span class="subtitle">
+        <div>
+            <b>{{player.num_player_survivals}}</b> Games survived
+        </div>
+    </span>
+</a>
+{% endblock %}

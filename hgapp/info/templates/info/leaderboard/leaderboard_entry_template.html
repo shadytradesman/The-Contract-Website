@@ -1,0 +1,30 @@
+<span {% if forloop.counter0 < 3 %} class="css-top3" {% else %} class="css-runnerup"{% endif %}>
+<li>
+    {% block entry_content %}
+    {% endblock %}
+</li>
+</span>
+{% if forloop.counter == 3 %}
+    <div class=""
+         id="collapse-{{entry_name}}}-heading"
+         role="button" data-toggle="collapse"
+         data-target=".collapse-{{entry_name}}"
+         aria-expanded="false"
+         aria-controls="collapse-{{entry_name}}">
+
+        <div class="collapse collapse-{{entry_name}} in"
+             role="tabpanel"
+             aria-labelledby="collapse-{{entry_name}}-heading">
+            <a>
+                <span class="visible-xs-block visible-sm-block text-center"><i>Tap to see more</i></span>
+                <span class="visible-md-block visible-lg-block text-center"><i>Click to see more</i></span>
+            </a>
+        </div>
+    </div>
+    <div class="panel-collapse collapse collapse-{{entry_name}}"
+         role="tabpanel"
+         aria-labelledby="collapse-{{entry_name}}-heading">
+{% endif %}
+{% if forloop.last and forloop.counter > 4 %}
+    </div>
+{% endif %}

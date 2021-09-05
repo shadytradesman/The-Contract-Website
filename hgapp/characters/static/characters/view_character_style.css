@@ -331,3 +331,7 @@ input[type="number"] {
     border-top: 1px solid #a6763a;
     //margin-bottom: 10px;
 }
+
+.js-injury-value-input {
+    display: inline-block;
+}

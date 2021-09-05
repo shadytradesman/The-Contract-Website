@@ -1,0 +1,192 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+{% load staticfiles %}
+{% load account_tags %}
+
+{% block head_title %}Dice Pool Probability Calculator{% endblock %}
+
+{% block extra_styles %}
+<link rel="stylesheet" type="text/css" href="{% static 'info/leaderboard_style.css' %}" />
+{% endblock %}
+
+{% block extra_scripts %}
+{% endblock %}
+
+{% block body_base %}
+<h1 class="text-center">
+    Leaderboard
+</h1>
+<div class="container">
+    <div class="panel panel-default">
+        <div class="panel-heading css-leaderboard-header">
+            Players
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-4 col-sm-6">
+                    <h3 class="text-center">
+                        Top Players
+                        <br>
+                        <small>
+                            Games Played
+                        </small>
+                    </h3>
+                    <ol>
+                        {% for player in top_players %}
+                            {% with 'top_players' as entry_name %}
+                                {% include "info/leaderboard/top_player_entry.html" %}
+                            {% endwith %}
+                        {% endfor %}
+                    </ol>
+                </div>
+                <div class="col-md-4 col-sm-6">
+                    <h3 class="text-center">
+                        Top Survivors
+                        <br>
+                        <small>
+                            Games survived where another Contractor died
+                        </small>
+                    </h3>
+                    <ol>
+                        {% for player in top_survivors %}
+                            {% with 'top_survivors' as entry_name %}
+                                {% include "info/leaderboard/top_survivor_entry.html" %}
+                            {% endwith %}
+                        {% endfor %}
+                    </ol>
+                </div>
+                <div class="col-md-4 col-sm-6">
+                    <h3 class="text-center">
+                        Top Ringers
+                        <br>
+                        <small>
+                            Number of NPC Ringers played
+                        </small>
+                    </h3>
+                    <ol>
+                        {% for player in top_ringer_players %}
+                        {% with 'ringer_player' as entry_name %}
+                        {% include "info/leaderboard/ringer_player_entry.html" %}
+                        {% endwith %}
+                        {% endfor %}
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-heading css-leaderboard-header">
+            GameMasters
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-4 col-sm-6">
+                    <h3 class="text-center">
+                        Most Prolific GMs
+                        <br>
+                        <small>
+                            Games GMed
+                        </small>
+                    </h3>
+                    <ol>
+                        {% for gm in top_gms %}
+                        {% with 'top_gm' as entry_name %}
+                        {% include "info/leaderboard/top_gm_entry.html" %}
+                        {% endwith %}
+                        {% endfor %}
+                    </ol>
+                </div>
+                <div class="col-md-4 col-sm-6">
+                    <h3 class="text-center">
+                        Deadliest GMs
+                        <br>
+                        <small>
+                            Contractors killed while GM
+                        </small>
+                    </h3>
+                    <ol>
+                        {% for gm in deadliest_gms %}
+                            {% with 'deadly_gm' as entry_name %}
+                                {% include "info/leaderboard/deadly_gm_entry.html" %}
+                            {% endwith %}
+                        {% endfor %}
+                    </ol>
+                </div>
+                <div class="col-md-4 col-sm-6">
+                    <h3 class="text-center">
+                        Most Social GMs
+                        <br>
+                        <small>
+                            Number of distinct Players GMed
+                        </small>
+                    </h3>
+                    <ol>
+                        {% for gm in most_social_gms %}
+                            {% with 'social_gm' as entry_name %}
+                                {% include "info/leaderboard/social_gm_entry.html" %}
+                            {% endwith %}
+                        {% endfor %}
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-heading css-leaderboard-header">
+            Contractors
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-4 col-sm-6">
+                    <h3 class="text-center">
+                        Most Victorious
+                        <br>
+                        <small>
+                            Games won
+                        </small>
+                    </h3>
+                    <ol>
+                        {% for character in top_contractor_wins %}
+                        {% with 'top_con_win' as entry_name %}
+                            {% include "info/leaderboard/top_contractor_entry.html" %}
+                        {% endwith %}
+                        {% endfor %}
+                    </ol>
+                </div>
+                <div class="col-md-4 col-sm-6">
+                    <h3 class="text-center">
+                        Biggest Loser
+                        <br>
+                        <small>
+                            Games lost
+                        </small>
+                    </h3>
+                    <ol>
+                        {% for character in top_contractor_losses %}
+                        {% with 'top_con_loss' as entry_name %}
+                        {% include "info/leaderboard/loss_contractor_entry.html" %}
+                        {% endwith %}
+                        {% endfor %}
+                    </ol>
+                </div>
+                <div class="col-md-4 col-sm-6">
+                    <h3 class="text-center">
+                        Most Chronicled
+                        <br>
+                        <small>
+                            Valid Journals written
+                        </small>
+                    </h3>
+                    <ol>
+                        {% for character in top_contractor_journals %}
+                        {% with 'top_con_journal' as entry_name %}
+                        {% include "info/leaderboard/journal_contractor_entry.html" %}
+                        {% endwith %}
+                        {% endfor %}
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

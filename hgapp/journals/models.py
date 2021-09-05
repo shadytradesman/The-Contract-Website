@@ -51,6 +51,8 @@ class Journal(models.Model):
             self.grant_reward()
         if original_valid and not self.is_valid:
             self.void_reward()
+        if self.game_attendance.attending_character:
+            self.game_attendance.attending_character.update_contractor_journal_stats()
 
     def get_improvement(self):
         return get_object_or_none(Reward,

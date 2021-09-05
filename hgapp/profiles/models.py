@@ -192,14 +192,14 @@ class Profile(models.Model):
             if invite.attendance:
                 if invite.attendance.attending_character:
                     played_character_ids.add(invite.attendance.attending_character.id)
+                else:
+                    num_played_ringers = num_played_ringers + 1
                 if invite.attendance.is_victory():
                     num_victories = num_victories + 1
                 elif invite.attendance.is_loss():
                     num_losses = num_losses + 1
                 elif invite.attendance.is_death():
                     num_deaths = num_deaths + 1
-            else:
-                num_played_ringers = num_played_ringers + 1
         self.num_contractors_played = len(played_character_ids)
         self.num_player_deaths = num_deaths
         self.num_player_victories = num_victories

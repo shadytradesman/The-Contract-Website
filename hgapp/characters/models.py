@@ -181,6 +181,11 @@ class Character(models.Model):
     pub_date = models.DateTimeField('date published')
     edit_date = models.DateTimeField('date last edited')
 
+    num_games = models.IntegerField(blank=True, null=True)
+    num_victories = models.IntegerField(blank=True, null=True)
+    num_losses = models.IntegerField(blank=True, null=True)
+    num_journals = models.IntegerField(blank=True, null=True)
+
     # Optional fields
     cell = models.ForeignKey(Cell,
                               blank=True,
@@ -258,6 +263,13 @@ class Character(models.Model):
             ('view_private_character', 'View private character'),
             ('edit_character', 'Edit character'),
         )
+        indexes = [
+            models.Index(fields=['num_victories', 'private']),
+            models.Index(fields=['num_losses', 'private']),
+            models.Index(fields=['num_games', 'private']),
+            models.Index(fields=['num_journals']),
+            models.Index(fields=['player']),
+        ]
 
     def is_editable_with_key(self, key):
         if hasattr(self, 'player') and self.player:
@@ -336,14 +348,38 @@ class Character(models.Model):
             return self.cell
         return None
 
+    def update_contractor_journal_stats(self):
+        self.num_journals = self.game_attendance_set \
+            .filter(relevant_game__end_time__isnull=False, journal__isnull=False, journal__is_valid=True)\
+            .count()
+        self.save()
+
+    def update_contractor_game_stats(self):
+        self._update_game_count()
+        self._update_loss_count()
+        self._update_victory_count()
+        self._update_game_count()
+        self.status = self.calculate_status()
+        self.save()
+
     def number_completed_games(self):
-        return self.game_attendance_set.exclude(outcome=None, is_confirmed=False).count()
+        return self.num_games
+
+    def _update_game_count(self):
+        self.num_games = self.game_attendance_set.exclude(outcome=None, is_confirmed=False).count()
 
     def number_of_victories(self):
-        return get_queryset_size(self.game_attendance_set.filter(is_confirmed=True, outcome="WIN"))
+        return self.num_victories
+
+    def _update_victory_count(self):
+        self.num_victories = get_queryset_size(self.game_attendance_set.filter(is_confirmed=True, outcome="WIN"))
 
     def number_of_losses(self):
-        return get_queryset_size(self.game_attendance_set.filter(is_confirmed=True, outcome="LOSS"))
+        return self.num_losses
+
+    def _update_loss_count(self):
+        self.num_losses = get_queryset_size(self.game_attendance_set.filter(is_confirmed=True, outcome="LOSS"))
+
 
     def number_completed_games_in_home_cell(self):
         if not hasattr(self, "cell") or not self.cell:
@@ -371,7 +407,6 @@ class Character(models.Model):
             self.ambition = self.ambition[:-1 or None]
         if self.appearance and self.appearance[-1] == '.':
             self.appearance = self.appearance[:-1 or None]
-        self.status = self.calculate_status()
         if self.pk is None:
             super(Character, self).save(*args, **kwargs)
             self.set_default_permissions()

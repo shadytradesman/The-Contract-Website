@@ -173,14 +173,14 @@ def migrate_update_stats(apps, schema_editor):
             if invite.attendance:
                 if invite.attendance.attending_character:
                     played_character_ids.add(invite.attendance.attending_character.id)
+                else:
+                    num_played_ringers = num_played_ringers + 1
                 if invite.attendance.outcome == WIN:
                     num_victories = num_victories + 1
                 elif invite.attendance.outcome == LOSS:
                     num_losses = num_losses + 1
                 elif invite.attendance.outcome == DEATH:
                     num_deaths = num_deaths + 1
-            else:
-                num_played_ringers = num_played_ringers + 1
         profile.num_contractors_played = len(played_character_ids)
         profile.num_player_deaths = num_deaths
         profile.num_player_victories = num_victories
