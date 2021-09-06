@@ -355,7 +355,7 @@ class Character(models.Model):
         self.save()
 
     def update_contractor_game_stats(self):
-        self._update_game_count()
+        self.update_contractor_journal_stats()
         self._update_loss_count()
         self._update_victory_count()
         self._update_game_count()
@@ -410,6 +410,7 @@ class Character(models.Model):
         if self.pk is None:
             super(Character, self).save(*args, **kwargs)
             self.set_default_permissions()
+            self.update_contractor_game_stats()
         else:
             self.set_default_permissions()
             super(Character, self).save(*args, **kwargs)

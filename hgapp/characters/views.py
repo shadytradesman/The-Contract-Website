@@ -218,7 +218,7 @@ def view_character(request, character_id, secret_key = None):
     equipment_form = EquipmentForm()
     bio_form = BioForm()
 
-    num_journal_entries = character.num_journals
+    num_journal_entries = character.num_journals if character.num_journals else 0
     latest_journals = []
     if num_journal_entries > 0:
         journal_query = Journal.objects.filter(game_attendance__attending_character=character.id).order_by('-created_date')
