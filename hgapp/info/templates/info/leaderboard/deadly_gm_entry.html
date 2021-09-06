@@ -6,10 +6,10 @@
     <b>{{gm.user.username}}</b>
     <span class="main-subtitle">
         the
-    {% if gm.player_prefix %}
-    {{gm.get_player_prefix_display}}
+    {% if gm.gm_prefix %}
+    {{gm.get_gm_prefix_display}}
     {% endif %}
-    {{gm.get_player_suffix_display}}
+    {{gm.get_gm_suffix_display}}
     </span>
     <div class="subtitle">
         <b>{{gm.num_gm_kills}}</b> Contractors killed

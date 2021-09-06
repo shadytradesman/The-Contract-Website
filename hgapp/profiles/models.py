@@ -41,7 +41,7 @@ PLAYER_SUFFIX = (
     (ADEPT, 'Adept'),
     (PROFESSIONAL, 'Professional'),
     (VETERAN, 'Veteran'),
-    (SEASONED, 'Seasoned'),
+    (SEASONED, 'Operative'),
     (MASTER, 'Master'),
     (GRANDMASTER, 'Grandmaster'),
 )
