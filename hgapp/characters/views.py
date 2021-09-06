@@ -270,9 +270,9 @@ def view_character(request, character_id, secret_key = None):
     mental_attributes = character.get_attributes(is_physical=False)
     attribute_value_by_id = {}
     for attr in physical_attributes:
-        attribute_value_by_id[attr.relevant_attribute.id] = attr.value
+        attribute_value_by_id[attr.relevant_attribute.id] = attr.val_with_bonuses()
     for attr in mental_attributes:
-        attribute_value_by_id[attr.relevant_attribute.id] = attr.value
+        attribute_value_by_id[attr.relevant_attribute.id] = attr.val_with_bonuses()
     context = {
         'character': character,
         'user_can_edit': user_can_edit,
