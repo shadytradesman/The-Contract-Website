@@ -431,3 +431,6 @@ TINYMCE_DEFAULT_CONFIG = {
     " | help",
     'content_css': "/static/css/site.css",
 }
+
+# Pinax Blog settings
+PINAX_BLOG_SLUG_UNIQUE = True

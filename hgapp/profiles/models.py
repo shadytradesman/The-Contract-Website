@@ -41,7 +41,7 @@ PLAYER_SUFFIX = (
     (ADEPT, 'Adept'),
     (PROFESSIONAL, 'Professional'),
     (VETERAN, 'Veteran'),
-    (SEASONED, 'Seasoned'),
+    (SEASONED, 'Operative'),
     (MASTER, 'Master'),
     (GRANDMASTER, 'Grandmaster'),
 )
@@ -128,7 +128,11 @@ class Profile(models.Model):
         ]
 
     def save(self, *args, **kwargs):
-        super(Profile, self).save(*args, **kwargs)
+        if self.pk is None:
+            super(Profile, self).save(*args, **kwargs)
+            self.recompute_titles()
+        else:
+            super(Profile, self).save(*args, **kwargs)
 
     # This should be the only way you set the user's adult content prefs
     def update_view_adult_content(self, view_adult_content):

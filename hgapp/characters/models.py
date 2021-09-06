@@ -355,7 +355,7 @@ class Character(models.Model):
         self.save()
 
     def update_contractor_game_stats(self):
-        self._update_game_count()
+        self.update_contractor_journal_stats()
         self._update_loss_count()
         self._update_victory_count()
         self._update_game_count()
@@ -363,19 +363,19 @@ class Character(models.Model):
         self.save()
 
     def number_completed_games(self):
-        return self.num_games
+        return self.num_games if self.num_games else 0
 
     def _update_game_count(self):
         self.num_games = self.game_attendance_set.exclude(outcome=None, is_confirmed=False).count()
 
     def number_of_victories(self):
-        return self.num_victories
+        return self.num_victories if self.num_victories else 0
 
     def _update_victory_count(self):
         self.num_victories = get_queryset_size(self.game_attendance_set.filter(is_confirmed=True, outcome="WIN"))
 
     def number_of_losses(self):
-        return self.num_losses
+        return self.num_losses if self.num_losses else 0
 
     def _update_loss_count(self):
         self.num_losses = get_queryset_size(self.game_attendance_set.filter(is_confirmed=True, outcome="LOSS"))
@@ -410,6 +410,7 @@ class Character(models.Model):
         if self.pk is None:
             super(Character, self).save(*args, **kwargs)
             self.set_default_permissions()
+            self.update_contractor_game_stats()
         else:
             self.set_default_permissions()
             super(Character, self).save(*args, **kwargs)

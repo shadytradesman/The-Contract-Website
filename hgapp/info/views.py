@@ -6,6 +6,9 @@ from info.models import FrontPageInfo, QuickStartInfo, ExampleAction
 from profiles.models import Profile
 from characters.models import CharacterTutorial, Ability, Character
 from characters.forms import InjuryForm
+from info.models import FrontPageInfo
+from profiles.models import Profile
+from characters.models import CharacterTutorial, Ability, Character
 
 def getting_started(request):
     return render(request, 'info/getting_started.html')
