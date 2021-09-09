@@ -93,23 +93,23 @@ class Profile(models.Model):
                                  max_length=25,
                                  default=GM_SUFFIX[0][0])
 
-    num_games_gmed = models.IntegerField(blank=True, null=True)
-    num_gm_kills = models.IntegerField(blank=True, null=True)
-    num_gm_victories = models.IntegerField(blank=True, null=True)
-    num_gm_losses = models.IntegerField(blank=True, null=True)
-    num_golden_ratios = models.IntegerField(blank=True, null=True)
-    num_gmed_players = models.IntegerField(blank=True, null=True)
-    num_gmed_cells = models.IntegerField(blank=True, null=True)
-    num_gmed_contractors = models.IntegerField(blank=True, null=True)
+    num_games_gmed = models.IntegerField(default=0)
+    num_gm_kills = models.IntegerField(default=0)
+    num_gm_victories = models.IntegerField(default=0)
+    num_gm_losses = models.IntegerField(default=0)
+    num_golden_ratios = models.IntegerField(default=0)
+    num_gmed_players = models.IntegerField(default=0)
+    num_gmed_cells = models.IntegerField(default=0)
+    num_gmed_contractors = models.IntegerField(default=0)
 
-    num_player_games = models.IntegerField(blank=True, null=True)
-    num_player_victories = models.IntegerField(blank=True, null=True)
-    num_player_losses = models.IntegerField(blank=True, null=True)
-    num_player_deaths = models.IntegerField(blank=True, null=True)
-    num_played_ringers = models.IntegerField(blank=True, null=True)
-    num_contractors_played = models.IntegerField(blank=True, null=True)
-    num_deadly_player_games = models.IntegerField(blank=True, null=True)
-    num_player_survivals = models.IntegerField(blank=True, null=True)
+    num_player_games = models.IntegerField(default=0)
+    num_player_victories = models.IntegerField(default=0)
+    num_player_losses = models.IntegerField(default=0)
+    num_player_deaths = models.IntegerField(default=0)
+    num_played_ringers = models.IntegerField(default=0)
+    num_contractors_played = models.IntegerField(default=0)
+    num_deadly_player_games = models.IntegerField(default=0)
+    num_player_survivals = models.IntegerField(default=0)
 
     view_adult_content = models.BooleanField(default=False)
     date_set_adult_content = models.DateTimeField(blank=True, null=True)
@@ -126,13 +126,6 @@ class Profile(models.Model):
             models.Index(fields=['num_played_ringers']),
             models.Index(fields=['num_player_survivals']),
         ]
-
-    def save(self, *args, **kwargs):
-        if self.pk is None:
-            super(Profile, self).save(*args, **kwargs)
-            self.recompute_titles()
-        else:
-            super(Profile, self).save(*args, **kwargs)
 
     # This should be the only way you set the user's adult content prefs
     def update_view_adult_content(self, view_adult_content):

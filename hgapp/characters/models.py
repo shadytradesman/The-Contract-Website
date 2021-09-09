@@ -181,10 +181,10 @@ class Character(models.Model):
     pub_date = models.DateTimeField('date published')
     edit_date = models.DateTimeField('date last edited')
 
-    num_games = models.IntegerField(blank=True, null=True)
-    num_victories = models.IntegerField(blank=True, null=True)
-    num_losses = models.IntegerField(blank=True, null=True)
-    num_journals = models.IntegerField(blank=True, null=True)
+    num_games = models.IntegerField(default=0)
+    num_victories = models.IntegerField(default=0)
+    num_losses = models.IntegerField(default=0)
+    num_journals = models.IntegerField(default=0)
 
     # Optional fields
     cell = models.ForeignKey(Cell,
