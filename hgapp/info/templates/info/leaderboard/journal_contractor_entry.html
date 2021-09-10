@@ -1,14 +1,14 @@
 {% extends "info/leaderboard/leaderboard_entry_template.html" %}
 
 {% block entry_content %}
-<a href="{% url 'journals:journal_read' character.id %}">
+<a href="{% url 'journals:journal_read' character.id %}"  class="css-contractor-sub">
     <b>{{character.name}}</b>
-    <br>
-    <span class="main-subtitle">
-        The {{character.concept_summary}}
-    </span>
-    <div class="subtitle">
-        <b>{{character.num_journals}}</b> Journals
-    </div>
+    <p class="main-subtitle">
+        the {{character.concept_summary}}
+        <br>
+        <span class="subtitle">
+            <b>{{character.num_journals}}</b> Journals
+        </span>
+    </p>
 </a>
 {% endblock %}
