@@ -1,127 +1,126 @@
-<div class="">
-    <div class="row">
-        <div class="col-xs-12 text-center">
-            <h4>
-                <b><span class="css-attribute-color">Attributes</span> describe your intrinsic strengths and weaknesses</b>
-            </h4>
-        </div>
-    </div>
-    <div class="css-rules">
-        <div class="row ">
-            <div class="col-xs-5 col-md-6">
-                <div class="text-center">
-                    <b>Punk's Attributes</b>
-                </div>
-                <div class="css-quickstart-container">
-                    <div class="row">
-                        {% for attribute_value in physical_attributes %}
-                        <div class="col-md-4" data-toggle="tooltip" title='{{attr.relevant_attribute.tutorial_text}}'>
-                            <h5 data-toggle="tooltip" title='{{attribute_value.relevant_attribute.tutorial_text}}'>
-                                <span class="stat-value">{{attribute_value.val_with_bonuses}}</span>
-                                <span class="css-attribute-color">{{attribute_value.relevant_attribute.name}}</span>
-                            </h5>
-                        </div>
-                        {% endfor %}
-                    </div>
-                    <div class="row">
-                        {% for attribute_value in mental_attributes %}
-                        <div class="col-md-4" data-toggle="tooltip" title='{{attr.relevant_attribute.tutorial_text}}'>
-                            <h5 data-toggle="tooltip" title='{{attribute_value.relevant_attribute.tutorial_text}}'>
-                                <span class="stat-value">{{attribute_value.val_with_bonuses}}</span>
-                                {{attribute_value.relevant_attribute.name}}
-                            </h5>
-                        </div>
-                        {% endfor %}
-                    </div>
-                    <div class="text-center">
-                        <small>Mouse-over or tap any Attribute for more details</small>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xs-7 col-md-6">
-                <ul>
-                    <li>
-                        Attributes are rated between 1-5.
-                    </li>
-                    <li>
-                        A rating of 2 is the human average. A rating of 1 is below average, and 5 is world-class.
-                    </li>
-                    <li>
-                        Your Attributes' values determine many of your other stats, such as movement speed, Mind (mental fortitude), and Body (physical fortitude).
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
-    <br>
-    <div class="row">
-        <div class="col-xs-12 text-center">
-            <h4>
-                <b>
-                    <span class="css-ability-color">Abilities</span> define your learned skills and knowledge
-                </b>
-            </h4>
-        </div>
-    </div>
-    <div class="css-rules">
+<div class="row">
+    <div class="col-md-5">
         <div class="row">
-            <div class="col-md-6">
-                <div class="">
+        </div>
+        <div class="css-rules">
+            <div class="row ">
+                <div class="col-xs-12">
+                    <div class="text-center">
+                        <b>Punk's Attributes</b>
+                    </div>
+                    <div class="css-quickstart-container">
+                        <div class="row">
+                            {% for attribute_value in physical_attributes %}
+                            <div class="col-md-4" data-toggle="tooltip" title='{{attr.relevant_attribute.tutorial_text}}'>
+                                <h5 data-toggle="tooltip" title='{{attribute_value.relevant_attribute.tutorial_text}}'>
+                                    <span class="stat-value">{{attribute_value.val_with_bonuses}}</span>
+                                    <span class="css-attribute-color">{{attribute_value.relevant_attribute.name}}</span>
+                                </h5>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="row">
+                            {% for attribute_value in mental_attributes %}
+                            <div class="col-md-4" data-toggle="tooltip" title='{{attr.relevant_attribute.tutorial_text}}'>
+                                <h5 data-toggle="tooltip" title='{{attribute_value.relevant_attribute.tutorial_text}}'>
+                                    <span class="stat-value">{{attribute_value.val_with_bonuses}}</span>
+                                    {{attribute_value.relevant_attribute.name}}
+                                </h5>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="text-center">
+                            <small>Mouse-over or tap any Attribute for more details</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12">
+                    <b><span class="css-attribute-color">Attributes</span> describe your intrinsic strengths and weaknesses</b>
                     <ul>
                         <li>
-                            Abilities are rated between 0 and 5.
+                            Attributes are rated between 1-5.
+                            <ol>
+                                <li>Very poor</li>
+                                <li>Average or a bit below average</li>
+                                <li>Above average</li>
+                                <li>Superb</li>
+                                <li>World-class</li>
+                            </ol>
                         </li>
                         <li>
-                            Even a single rank in an Ability indicates training or experience in that field. 
-                        </li>
-                        <li>
-                            Abilities are only used in skill checks. They do not grant stats.
-                        </li>
-                        <li>
-                            You may also invent your own Abilities.
-                            <ul>
-                                <li>
-                                    These <span class="css-sec-ability-color"> Secondary Abilities</span> must be more specific than the Primary Abilities that appear on all character sheets.
-                                </li>
-                                <li>
-                                    In return, you receive a bonus when you use them.
-                                </li>
-                                <li>
-                                    Punk's <span class="css-sec-ability-color">Smuggling</span> Ability is a Secondary Ability; it is unique to her.
-                                </li>
-                                <li>
-                                    Secondary Abilities can not grant any supernatural effects.
-                                </li>
-                            </ul>
+                            Your Attributes' values determine many of your other stats, such as movement speed, Mind (mental fortitude), and Body (physical fortitude).
                         </li>
                     </ul>
                 </div>
             </div>
-            <div class="col-xs-12 col-md-6">
-                <div class="">
-                    <b>Punk's Abilities </b><small>(Mouse-over or tap any Ability for more details)</small>
-                </div>
-                <div class="css-quickstart-container">
-                    <div class="row">
-                        {% for ability_value in ability_value_by_name %}
-                        <div class="ability {% if not ability_value.2%} zero-ability {% endif %}">
-                            <p>
-                                <div class="col-md-4 col-sm-3 col-xs-6 css-physical-ability"
-                                     data-toggle="tooltip"
-                                     title='{{ability_value.1.tutorial_text}}'>
-                                    <p>
-                                        <span class="stat-value hidden-xs">{{ability_value.2}}</span>
-                                        <span class="stat-value visible-xs-inline">{{ability_value.2}}</span>
-                                        {% if ability_value.1.is_primary %}
-                                            <span class="css-ability-color"> {{ability_value.1.name}}</span>
-                                        {% else %}
-                                            <span class="css-sec-ability-color"> {{ability_value.1.name}}</span>
-                                        {% endif %}
-                                    </p>
-                                </div>
+        </div>
+    </div>
+    <div class="col-md-7">
+        <div class="row">
+        </div>
+        <div class="css-rules">
+            <div class="row">
+                <div class="col-xs-12 col-md-12">
+                    <div class="text-center">
+                        <b>Punk's Abilities</b>
+                    </div>
+                    <div class="css-quickstart-container">
+                        <div class="row">
+                            {% for ability_value in ability_value_by_name %}
+                            <div class="ability {% if not ability_value.2%} zero-ability {% endif %}">
+                                <p>
+                                    <div class="col-md-4 col-sm-3 col-xs-6 css-physical-ability"
+                                         data-toggle="tooltip"
+                                         title='{{ability_value.1.tutorial_text}}'>
+                                <p>
+                                    <span class="stat-value hidden-xs">{{ability_value.2}}</span>
+                                    <span class="stat-value visible-xs-inline">{{ability_value.2}}</span>
+                                    {% if ability_value.1.is_primary %}
+                                    <span class="css-ability-color"> {{ability_value.1.name}}</span>
+                                    {% else %}
+                                    <span class="css-sec-ability-color"> {{ability_value.1.name}}</span>
+                                    {% endif %}
+                                </p>
+                            </div>
                             </p>
                         </div>
                         {% endfor %}
+                    </div>
+                </div>
+            </div>
+                <div class="col-md-12">
+                    <div class="">
+                        <b>
+                            <span class="css-ability-color">Abilities</span> define your learned skills and knowledge
+                        </b>
+                        <ul>
+                            <li>
+                                Abilities are rated between 0 and 5.
+                            </li>
+                            <li>
+                                Even a single rank in an Ability indicates training or experience in that field. 
+                            </li>
+                            <li>
+                                Abilities are only used in skill checks. They do not grant stats.
+                            </li>
+                            <li>
+                                You may also invent your own Abilities.
+                                <ul>
+                                    <li>
+                                        These <span class="css-sec-ability-color"> Secondary Abilities</span> must be more specific than the Primary Abilities that appear on all character sheets.
+                                    </li>
+                                    <li>
+                                        In return, you receive a bonus when you use them.
+                                    </li>
+                                    <li>
+                                        Punk's <span class="css-sec-ability-color">Smuggling</span> Ability is a Secondary Ability; it is unique to her.
+                                    </li>
+                                    <li>
+                                        Secondary Abilities can not grant any supernatural effects.
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>

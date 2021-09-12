@@ -1,26 +1,40 @@
 {% load staticfiles %}
 <h2 class="text-center">
     Contractors and Dice
+    <hr>
 </h2>
 
 <div class="row">
-    <div class="col-sm-6">
+    <div class="col-sm-7">
         <div class="css-rules">
             <b>Character Sheets</b>
             <ul>
                 <li>Your Contractor's Character Sheet tracks their stats, status, Powers, equipment, history, and more.</li>
-                <li>The Contract uses online Character Sheets that do the tedious work for you.</li>
+                <li>The Contract uses online Character Sheets.</li>
                 <li>
-                    If you ever need to reference rules at game time, you can
-                    <span class="visible-xs-inline">tap on</span><span class="hidden-xs">mouse-over</span>
-                    any element of your Character Sheet to learn more.
+                    Players and GMs access their sheets on mobile devices or print them out before play.
                 </li>
                 <li>
-                    You will create a sheet for your own Contractor at the end of this guide.
+                    If you ever need to reference a rule at game time, you can
+                    <span class="visible-xs-inline">tap on</span><span class="hidden-xs">mouse-over</span>
+                    any element of your Character Sheet to learn.
+                </li>
+                <li>
+                    At the end of this guide, you will create your own Contractor by filling out their Character Sheet.
                 </li>
             </ul>
         </div>
     </div>
+    <div class="col-sm-5">
+        <figure class="css-figure-container">
+            <img src="{% static 'info/graphics/charsheet.png' %}" class="css-inline-image">
+            <figcaption class="text-center">A Character Sheet</figcaption>
+        </figure>
+    </div>
+</div>
+<div class="row">
+    <h4 class="text-center">Teammates</h4>
+    <div class="col-sm-4">
         <div class="css-narrative">
             <p>
                 The Starlight Motel struck me as the kinda place bad things happened. Not even that gorgeous twilight sky--no sun or moon in sight, casting everything above and below in shades of violet-- not even it could turn this parking-lot motel into a place that felt safe. 
@@ -46,6 +60,16 @@
             <p>
                 “That is my name. I am seventeen years old. I think.”
             </p>
+        </div>
+    </div>
+    <div class="col-sm-3">
+        <figure class="" style="height: 450px; padding: 10px;">
+            <img src="{% static 'info/graphics/fiveintro.jpeg' %}" class="css-inline-image">
+            <figcaption class="text-center"></figcaption>
+        </figure>
+    </div>
+    <div class="col-sm-5">
+        <div class="css-narrative">
             <p>
                 “Uh huh. Look, kid, I don’t really need a sidekick.”
             </p>
@@ -71,17 +95,28 @@
                 “Same to you.”
             </p>
         </div>
-        <div class=" css-rules text-center">
-            Contractors without a single Victory are called Newbies.
-            <br>
-            Novice Contractors (1-9 Victories) can participate in Contracts with Newbies and other Novices.
-            <br>
-            Seasoned Contractors (10+ Victories) can only play with other Seasoned and Veteran (25+ Victories) Contractors.
-            <br>
-            Only Veteran Contractors can participate in solo Contracts.
+        <div class=" css-rules">
+            <b>Contractor Status</b>
+            <ul>
+                <li>
+                    Contractors without a single Victory are called Newbies.
+                </li>
+                <li>
+                    Novice Contractors (1-9 Victories) can participate in Contracts with Newbies and other Novices.
+                </li>
+                <li>
+                    Seasoned Contractors (10+ Victories) can only play with other Seasoned and Veteran (25+ Victories) Contractors.
+                </li>
+                <li>
+                    Only Veteran Contractors can participate in solo Contracts.
+                </li>
+            </ul>
         </div>
     </div>
-    <div class="col-md-6">
+</div>
+<div class="row">
+    <h4 class="text-center">Rivals</h4>
+    <div class="col-sm-7">
         <div class="css-narrative">
             <p>
                 Then came the click-clacking of cowboy boots traveling up the stairwell. The man attached had one arm, a revolver on each hip, and a mustache that would put Yosemite Sam to shame. His sheriff’s star winked at me. 
@@ -114,32 +149,45 @@
                 “Ah. Well, little miss sunshine, as long as we’re bein’ candid with each other, I don’t think I like you either. You look like a punk, and I’m sure I could find enough dirt to put you away for a long time. But unless you signed a very different contract than I did, I think we ought to put aside our differences and work together.”
             </p>
         </div>
+    </div>
+    <div class="col-sm-5">
+        <figure class="" style="height: 450px; padding: 10px;">
+            <img src="{% static 'info/graphics/fiveintro.jpeg' %}" class="css-inline-image">
+            <figcaption class="text-center"></figcaption>
+        </figure>
         <div class=" css-rules">
+            <b>Ambitions</b>
             <ul>
                 <li>
                     Contractors may have opposing ambitions.
+                    <ul>
+                        <li>
+                            Punk wants to destroy the police state
+                        </li>
+                        <li>
+                            Bo wants to create a crime-free big-brother society.
+                        </li>
+                    </ul>
                 </li>
                 <li>
-                    (left) destroy the police state
-                </li>
-                <li>
-                    (right) create a crime-free big-brother society
-                </li>
-                <li>
-                    In many playgroups, realpolitik and player-vs-player action are not uncommon.
+                    In many playgroups, realpolitik and player-vs-player is not uncommon.
                 </li>
             </ul>
         </div>
-        <div class="css-narrative">
-            <p>
-                “Fine. All we gotta do is give some dude a ride on an airplane.”
-            </p>
-            <p>
-                “Yeah,” he scoffed, “I’m sure it’ll be an absolute cakewalk. Now listen, I’ve been a detective for twenty years. I know Five’s got their own set of tricks. What are you good at?”
-            </p>
-        </div>
     </div>
-
+</div>
+<div class="row">
+    <h4 class="text-center">
+        Capabilities
+    </h4>
+    <div class="css-narrative css-rules-centered">
+        <p>
+            “Fine. All we gotta do is give some dude a ride on an airplane.”
+        </p>
+        <p>
+            “Yeah,” he scoffed, “I’m sure it’ll be an absolute cakewalk. Now listen, I’ve been a detective for twenty years. I know Five’s got their own set of tricks. What are you good at?”
+        </p>
+    </div>
 </div>
 {% include "info/new_player_guide/attributes-and-abilities.html" %}
 <br>
@@ -160,6 +208,12 @@
                 <p>
                     “It appears that Bradley is a dog.” 
                 </p>
+            </div>
+            <figure class="" style="height: 450px; padding: 10px;">
+                <img src="{% static 'info/graphics/fiveintro.jpeg' %}" class="css-inline-image">
+                <figcaption class="text-center"></figcaption>
+            </figure>
+            <div class="css-narrative">
                 <p>
                     “WOOF! WOOF!” stated Bradley, moments before licking Bo’s face with a steak-sized tongue. 
                 </p>
@@ -176,6 +230,7 @@
         </div>
         <div class="col-md-6">
             <div class="css-rules ">
+                <b>Resolution</b>
                 <ul>
                     <li>
                         Most of the time, taking actions is as simple as telling the GM what you want to do.
@@ -308,7 +363,7 @@
 </div>
 <div class="row">
     <h4 class="text-center">
-        Rolling More Dice
+        Advanced Dice Rolling
     </h4>
     <div class="col-md-6">
         <div class="css-narrative">
@@ -351,7 +406,7 @@
 
 <div class="row">
     <h4 class="text-center">
-        Scenarios
+        The Mission
     </h4>
     <div class="col-md-6">
         <div class="css-narrative">
@@ -409,35 +464,39 @@
             </p>
         </div>
         <div class="css-rules ">
+            <b>Problem Solving</b>
             <ul>
                 <li>
                     Contractors are rarely suited for the Contracts they attend.
                 </li>
                 <li>
-                    Most Contracts demand outside-the-box problem solving in critical situations. 
+                    Most Contracts demand outside-the-box solutions to critical situations. 
                 </li>
                 <li>
                     Violence is a risky tactic, not the assumed solution.
-                </li>
-                <li>
-                    Trying to fight your way through every Contract will earn you a one-way trip to <a>the Graveyard.</a>
-                </li>
-                <li>
-                    The modules GMs use to run Contracts are called <b>Scenarios</b>.
                     <ul>
                         <li>
-                            New GMs are given 5 Scenarios to help them start running The Contract.
-                        </li>
-                        <li>
-                           After you play in a user-created Contract, its Scenario is revealed to you, and you can then run it for other groups.
-                        </li>
-                        <li>
-                            Unlocked Scenarios include Journal entries written by Contractors who have participated in them and comments from GMs who have run the Scenario before.
-                        </li>
-                        <li>
-                            Playing in the occasional online Contract is a great way to discover content for your group.
+                            Trying to fight your way through every Contract will earn you a one-way trip to <a>the Graveyard.</a>
                         </li>
                     </ul>
+                </li>
+            </ul>
+            <b>Scenarios</b>
+            <ul>
+                <li>
+                    The modules GMs run as Contracts are called <b>Scenarios</b>.
+                </li>
+                <li>
+                    New GMs are given 5 Scenarios to help them start running The Contract.
+                </li>
+                <li>
+                    After you play in a user-created Contract, its Scenario write-up is revealed to you, and you can then run it for other groups.
+                </li>
+                <li>
+                    Unlocked Scenarios include notes from GMs who previously ran it, as well as Journal Entries for the Contractors who attended.
+                </li>
+                <li>
+                    Playing in an occasional online Contract is a great way to discover content for your in-person group.
                 </li>
             </ul>
         </div>
@@ -495,7 +554,7 @@
                     You can list any equipment you would reasonably be able to acquire.
                 </li>
                 <li>
-                    You can carry up to Brawn x 25 pounds without it affecting your movement.
+                    You can carry up to Brawn x 15 pounds without it affecting your movement.
                 </li>
                 <li>
                     Your equipment list can be as detailed or vague as you like. However. . .
@@ -542,7 +601,7 @@
                 </li>
                 <li>
                     When your physical fortitude is tested, the GM may ask you to roll your rating in Body in place of
-                    an Attribute + Ability.
+                    the standard Attribute + Ability.
                 </li>
             </ul>
         </div>
@@ -564,7 +623,7 @@
                     [widget to submit injury] (severity and description not editable). Body without penalty.
                 </li>
                 <li>
-                    Typically, there is an in-game month between Contracts. Each Injury you've sustained heals 3 Severity levels in this time.
+                    Typically, there is an in-game month between Contracts. Each Injury you've sustained heals 2 Severity levels in this time.
                     <ul>
                         <li>
                             If you do not want to play an injured Contractor, you can always play a different one while they heal up.
@@ -576,6 +635,12 @@
             <ul>
                 <li>
                     Injuries Severity 4 or higher leave Battle Scars.
+                </li>
+                <li>
+                    Battle Scars are permanent disfigurements that do not heal naturally.
+                </li>
+                <li>
+                    They may only be prevented or removed using Powers.
                 </li>
             </ul>
         </div>
@@ -656,7 +721,7 @@
 
 <div class="row">
     <h4 class="text-center">
-        More on Injuries
+        Multiple Injuries
     </h4>
     <div class="col-md-6">
         <div class="css-narrative">
@@ -665,35 +730,51 @@
             </p>
         </div>
         <div class="css-rules ">
+            <b>Wound Level</b>
             <ul>
+                <li>
+                    Injuries increase your Wound Level, depleting your Body.
+                </li>
+                <li>
+                    Your Wound Level is equal to <b>the Severity of your worst Injury + the number of other Injuries you have.</b>
+                </li>
                 <li>
                     Let’s say Bradley’s bite counts as a Severity 4 Injury. 
                 </li>
                 <li>
-                    If you enter it onto your character sheet, you will see that 
+                    Combined with Punk's existing Severity 2 Injury from drawing blood, her wound level is now 5.
+                    <ul>
+                        <li>
+                            <b>4</b> (Highest Severity) + <b>1</b> (number of other Injuries) = <b>5</b>.
+                        </li>
+                    </ul>
                 </li>
                 <li>
-                    [severity 4 injury, wound level calculations with sev 2 injury from earlier]
-                    Widget allow submitting more Injuries, healing them.
-                    Severity description mouseovers.
-                    Calculates penalty.
+                    Try it out using the widget
+                    <span class="visible-xs-inline">below</span><span class="hidden-xs">to the right</span>.
                 </li>
             </ul>
             <b>Penalty</b>
             <ul>
                 <li>
-                    The more Injuries you suffer, the more your Body is depleted, and the higher your Penalty.
+                    Injuries aren't easily shrugged off. Pain and loss of functionality impacts your effectiveness.
+                </li>
+                <li>
+                    As your Body is depleted, you gain <b>Penalty</b>.
                 </li>
                 <li>
                     Your Penalty subtracts dice from every roll you make.
                 </li>
                 <li>
-                    Penalty cannot reduce your dice pool to fewer than two dice.
+                    Penalty cannot reduce a roll's dice pool to fewer than two dice.
                 </li>
             </ul>
         </div>
     </div>
     <div class="col-md-6 css-rules">
+        <div class="text-center">
+            <b>Try it Out!</b>
+        </div>
         {% include "info/new_player_guide/healthwidget.html" %}
     </div>
 </div>
@@ -791,7 +872,7 @@
 
 <div class="row">
     <h4 class="text-center">
-        Limits
+        Conspiracy
     </h4>
     <div class="col-md-6">
         <div class="css-narrative">
@@ -812,13 +893,31 @@
             <p>He nodded. “I can do what needs to be done, but to make it look like a suicide, I’ll need that blade you snuck past the TSA. Yeah, I noticed. What do you say?”</p>
         </div>
         <div class="css-rules ">
+            <b>Limits</b>
             <ul>
                 <li>
-                    Limits are circumstances that test your ability to cope
+                    Limits are circumstances that test your ability to cope.
                 </li>
-                <li>Normal humans have the following three Limits:</li>
-                <li>Murder, Atrocities, Torture</li>
-                <li>Other Limits are available, and you can write your own</li>
+                <li>
+                    You choose three Limits during character creation.
+                </li>
+                <li>
+                    Most normal humans have these standard Limits:
+                    <ul>
+                        <li>
+                            <b>Murder:</b> killing another person outside of immediate self-defense.
+                        </li>
+                        <li>
+                            <b>Torture:</b> being tortured.
+                        </li>
+                        <li>
+                            <b>Atrocities:</b> witnessing or participating in a humanitarian atrocity.
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    Non-typical Contractors (psychopaths, fairies, etc) can select other Limits or create their own.
+                </li>
             </ul>
         </div>
     </div>
@@ -826,7 +925,7 @@
 
 <div class="row">
     <h4 class="text-center">
-        Trauma
+        Whatever it Takes
     </h4>
     <div class="col-md-6">
         <div class="css-narrative">
@@ -856,6 +955,7 @@
 <div class="row">
     <div class="col-xs-12">
         <div class="css-rules css-rules-centered">
+            <b>Trauma</b>
             <ul>
                 <li>When you cross a Limit (in this case Murder), you make a Trauma roll.</li>
                 <li>Mind, Difficulty 8.</li>

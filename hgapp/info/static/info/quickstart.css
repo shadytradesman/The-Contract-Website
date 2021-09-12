@@ -255,3 +255,13 @@ input[type="number"] {
     padding-top: 5px;
 }
 
+.css-figure-container {
+    background-color: #353e4b;
+    padding: 10px;
+    height: 100%;
+}
+
+.css-inline-image {
+    max-width: 100%;
+    max-height: 100%;
+}
