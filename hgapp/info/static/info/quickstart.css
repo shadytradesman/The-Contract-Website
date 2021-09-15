@@ -265,3 +265,72 @@ input[type="number"] {
     max-width: 100%;
     max-height: 100%;
 }
+
+
+.css-tab-content {
+    background-color: #262d37;
+    padding: 10px;
+    border-style: solid;
+    border-color: #a6763a;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-width: 0px;
+    border-bottom-width: 0px;
+}
+
+.nav-justified-sm > li {
+    display: table-cell;
+    width: 1%;
+}
+
+.nav-tabs.nav-justified>li>a {
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+
+.nav-justified-sm > li > a {
+    margin-bottom: 0 !important;
+    border-bottom-color: #a6763a ;
+    border-bottom-width: 1px ;
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+
+@media (max-width: 767px) {
+  .nav-tabs.nav-justified>.active>a {
+    border-bottom-color: #262d37;
+    border-bottom-width: 0px;
+  }
+  .nav-tabs.nav-justified>.active>a, .nav-tabs.nav-justified>.active>a:focus, .nav-tabs.nav-justified>.active>a:hover {
+    border-bottom-color: #262d37;
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+  }
+}
+
+.css-nav-tabs>li.active>a {
+    background-color: #262d37 !important;
+}
+.css-nav-tabs.nav-justified>.active>a, .css-nav-tabs.nav-justified>.active>a:focus, .css-nav-tabs.nav-justified>.active>a:hover {
+    border-bottom-color: #262d37;
+}
+
+.css-equip-header {
+    font-weight: bold;
+}
+
+.css-equip-row{
+    font-size: 12px;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-bottom: 5px;
+}
+
+.css-equip-container {
+    height: 130px;
+    overflow: auto;
+}
+
+.css-combat-tab-content {
+    font-size: 12px;
+}
