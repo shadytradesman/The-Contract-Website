@@ -3,15 +3,12 @@ from itertools import chain
 from account.models import Account
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect, HttpResponseForbidden
-from django.shortcuts import render, get_object_or_404
-from django.conf import settings
+from django.shortcuts import render
 import account.views
 from django.core.exceptions import PermissionDenied
 
 # Create your views here.
 from django.urls import reverse
-from django.utils import timezone
-from guardian.shortcuts import assign_perm
 
 from characters.models import Character
 from powers.models import Power_Full, Enhancement, Drawback, Parameter, Base_Power

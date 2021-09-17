@@ -37,6 +37,7 @@ urlpatterns = [
     url(r"^worlds/", include("cells.urls"), name="cells"),
     url(r"info/", include("info.urls"), name="info"),
     url(r"journals/", include("journals.urls"), name="journals"),
+    url(r"guide/", include("guide.urls"), name="guide"),
     url(r"^tinymce/", include("tinymce.urls")),
     path('notifications/', include('django_nyt.urls')),
     path('wiki/', include('wiki.urls')),

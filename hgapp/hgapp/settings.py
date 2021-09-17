@@ -106,6 +106,7 @@ INSTALLED_APPS = [
     'cells.apps.CellsConfig',
     'info.apps.InfoConfig',
     'journals.apps.JournalsConfig',
+    'guide.apps.GuideConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
