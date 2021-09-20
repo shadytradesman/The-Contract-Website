@@ -25,6 +25,14 @@
                 <h{{section.header_level}} id="{{section.slug}}">{{section.title}}</h{{section.header_level}}>
                 <div class="css-section-body">
                     {{section.content|safe}}
+                    {% if request.user.is_superuser %}
+                     <div>
+                         <a class="btn btn-default"
+                            href="{% url 'guide:edit_guide_section' guidebook.slug section.slug %}">
+                             Edit Section
+                         </a>
+                     </div>
+                    {% endif %}
                 </div>
             {% endfor %}
         </div>

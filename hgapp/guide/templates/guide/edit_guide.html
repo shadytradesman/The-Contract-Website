@@ -1,0 +1,34 @@
+
+{% extends "site_base.html" %}
+
+{% load staticfiles %}
+{% load bootstrap %}
+
+{% block head_title %}
+{{guidebook.title}}
+{% endblock %}
+
+{% block extra_styles %}
+<link rel="stylesheet" type="text/css" href="{% static 'guide/read_guide_style.css' %}" />
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% static 'guide/read_guide_scripts.js' %}"></script>
+{% endblock %}p
+
+{% block extra_head %}
+{{ form.media }}
+{% endblock %}
+
+{% block body_base %}
+<div class="container">
+    <h1 class="text-center">
+        Editing {{section.title}} in {{guidebook.title}}
+    </h1>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            {{form|bootstrap}}
+        </div>
+    </div>
+</div>
+{% endblock %}
