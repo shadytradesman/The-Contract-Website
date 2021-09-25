@@ -185,7 +185,7 @@ def __get_charon_coin_form(user, existing_character=None, POST=None):
     if not user.is_authenticated:
         return None
     avail_charon_coins = user.profile.get_avail_charon_coins()
-    coin_eligible = not existing_character or existing_character.num_completed_games() == 0
+    coin_eligible = not existing_character or existing_character.number_completed_games() == 0
     if coin_eligible and (avail_charon_coins or (existing_character and existing_character.assigned_coin())):
         CharonCoinForm = make_charon_coin_form(existing_character)
     else:
@@ -196,7 +196,7 @@ def __get_charon_coin_form(user, existing_character=None, POST=None):
 def __get_ported_character_form(user, existing_character, POST):
     if not user.is_authenticated or not user.profile.able_to_port:
         return None
-    declare_phase_active = not existing_character or existing_character.num_completed_games() == 0
+    declare_phase_active = not existing_character or existing_character.number_completed_games() == 0
     if declare_phase_active:
         return make_character_ported_form(existing_character)(POST)
     else:
