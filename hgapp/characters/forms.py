@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.validators import MaxValueValidator, MinValueValidator
 from overrides.widgets import CustomStylePagedown
 
-from characters.models import Character, BasicStats, Character_Death, BattleScar
+from characters.models import Character, BasicStats, Character_Death, BattleScar, PORT_STATUS
 from cells.models import Cell
 
 ATTRIBUTE_VALUES = {
@@ -344,6 +344,14 @@ def make_charon_coin_form(character=None):
         spend_coin = forms.BooleanField(required=False,
                                         initial=initial)
     return CharonCoinForm
+
+def make_character_ported_form(character=None):
+    initial = character.ported if character else PORT_STATUS[0]
+    class CharacterPortedForm(forms.Form):
+        port_status = forms.ChoiceField(choices=PORT_STATUS,
+                                        widget=forms.Select(attrs={'class': 'form-control '}),
+                                        initial=initial)
+    return CharacterPortedForm
 
 class DeleteCharacterForm(forms.Form):
     pass

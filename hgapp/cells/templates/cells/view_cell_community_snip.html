@@ -46,9 +46,9 @@
                             </a>
                             <br>
                             <small>
-                                A {{character.number_of_victories }}-Victory {{ character.get_status_display }} Contractor
+                                A {{character.number_of_victories }}-Victory {{ character.get_contractor_status_display }} Contractor
                             </small>
-                            {% if character.unspent_rewards|length > 0 and can_edit_characters %}
+                            {% if character.num_unspent_rewards > 0 and can_edit_characters %}
                             <br>
                                 <a class="btn btn-success btn-xs"
                                    href="{% url 'characters:characters_spend_reward' character.id %}">

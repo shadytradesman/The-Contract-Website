@@ -121,8 +121,8 @@
 <p>{{character.basic_stats.advancement_history |linebreaks}}</p>
 {% endif %}
 <h2>Gifts and Improvements</h2>
-{% if character.unspent_rewards|length > 0 %}
-<h4>Character has {{character.unspent_rewards|length}} unspent rewards</h4>
+{% if character.num_unspent_rewards > 0 %}
+<h4>Character has {{character.num_unspent_rewards}} unspent rewards</h4>
 <ul >
     {% for reward in character.unspent_rewards %}
     <li>{% render_reward reward %}</li>

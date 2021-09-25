@@ -13,7 +13,7 @@ from django.utils.safestring import mark_safe
 
 from hgapp.utilities import get_queryset_size, get_object_or_none
 from cells.models import Cell
-from characters.signals import GrantAssetGift, VoidAssetGifts
+from characters.signals import GrantAssetGift, VoidAssetGifts, AlterPortedRewards
 
 import random
 import hashlib
@@ -76,6 +76,16 @@ PRONOUN = (
     ('SHE', 'her'),
     ('THEY', 'their'),
 )
+
+NOT_PORTED = "NOT_PORTED"
+SEASONED_PORTED = "SEASONED_PORTED"
+VETERAN_PORTED = "VETERAN_PORTED"
+PORT_STATUS = (
+    (NOT_PORTED, "Not ported"),
+    (SEASONED_PORTED, "Ported as Seasoned"),
+    (VETERAN_PORTED, "Ported as Veteran"),
+)
+
 
 BODY_STATUS = (
     'Scuffed',
@@ -151,6 +161,22 @@ EXP_COST_TRAUMA_THERAPY = 3
 # STAT CONSTANTS
 BASE_BODY_LEVELS = 5
 
+# PORT CONSTANTS
+PORTED_GIFT_ADJUSTMENT = {
+    NOT_PORTED: 0,
+    SEASONED_PORTED: 15,
+    VETERAN_PORTED: 30,
+}
+PORTED_IMPROVEMENT_ADJUSTMENT = {
+    NOT_PORTED: 0,
+    SEASONED_PORTED: 5,
+    VETERAN_PORTED: 10,
+}
+PORTED_EXP_ADJUSTMENT = {
+    NOT_PORTED: 0,
+    SEASONED_PORTED: 90,
+    VETERAN_PORTED: 180,
+}
 
 def random_string():
     return hashlib.sha224(bytes(random.randint(1, 99999999))).hexdigest()
@@ -185,6 +211,10 @@ class Character(models.Model):
     num_victories = models.IntegerField(default=0)
     num_losses = models.IntegerField(default=0)
     num_journals = models.IntegerField(default=0)
+
+    ported = models.CharField(choices=PORT_STATUS,
+                               max_length=50,
+                               default=NOT_PORTED)
 
     # Optional fields
     cell = models.ForeignKey(Cell,
@@ -371,6 +401,9 @@ class Character(models.Model):
     def number_of_victories(self):
         return self.num_victories if self.num_victories else 0
 
+    def get_contractor_status_display(self):
+        return self.get_status_display() if self.ported == NOT_PORTED else self.get_ported_display()
+
     def _update_victory_count(self):
         self.num_victories = get_queryset_size(self.game_attendance_set.filter(is_confirmed=True, outcome="WIN"))
 
@@ -499,11 +532,30 @@ class Character(models.Model):
     def scheduled_game_attendances(self):
         return [game for game in self.game_attendance_set.all() if game.relevant_game.is_scheduled()]
 
-    def active_spent_rewards(self):
-        return self.reward_set.filter(is_void=False).exclude(relevant_power=None).all()
+    def change_ported_status(self, new_ported_status):
+        old_status = self.ported
+        if old_status == new_ported_status:
+            return
+        num_gifts = PORTED_GIFT_ADJUSTMENT[new_ported_status] - PORTED_GIFT_ADJUSTMENT[self.ported]
+        num_improvements = PORTED_IMPROVEMENT_ADJUSTMENT[new_ported_status] - PORTED_IMPROVEMENT_ADJUSTMENT[self.ported]
+        self.ported = new_ported_status
+        self.save()
+        AlterPortedRewards.send_robust(sender=self.__class__,
+                                       character=self,
+                                       num_gifts=num_gifts,
+                                       num_improvements=num_improvements)
+
+    def show_gift_alert(self):
+        return self.get_power_cost_total() != self.num_active_spent_rewards()
+
+    def num_active_spent_rewards(self):
+        return self.reward_set.filter(is_void=False).exclude(relevant_power=None).count()
 
     def active_rewards(self):
         return self.reward_set.filter(is_void=False).all()
+
+    def num_active_rewards(self):
+        return self.reward_set.filter(is_void=False).count()
 
     def spent_rewards(self):
         return self.reward_set.exclude(relevant_power=None).order_by("assigned_on", "awarded_on").all()
@@ -511,24 +563,34 @@ class Character(models.Model):
     def unspent_rewards(self):
         return self.reward_set.filter(is_void=False).filter(relevant_power=None).order_by("is_improvement", "-awarded_on").all()
 
+    def num_unspent_rewards(self):
+        return self.reward_set.filter(is_void=False).filter(relevant_power=None).count()
+
     def unspent_gifts(self):
         return self.reward_set.filter(is_void=False).filter(relevant_power=None).filter(is_improvement=False).order_by("-awarded_on").all()
+
+    def num_unspent_gifts(self):
+        return self.reward_set.filter(is_void=False).filter(relevant_power=None).filter(is_improvement=False).count()
 
     def unspent_improvements(self):
         return self.reward_set.filter(is_void=False).filter(relevant_power=None).filter(is_improvement=True).order_by("-awarded_on").all()
 
+    def num_unspent_improvements(self):
+        return self.reward_set.filter(is_void=False).filter(relevant_power=None).filter(is_improvement=True).count()
+
     def reward_cost_for_power(self, power_full):
         rewards_to_be_spent = []
         unspent_gifts = self.unspent_gifts()
+        num_unspent_gifts = self.num_unspent_gifts()
         unspent_improvements = self.unspent_improvements()
         num_improvements_to_spend = 0
-        if len(unspent_gifts) > 0:
+        if num_unspent_gifts > 0:
             rewards_to_be_spent.append(unspent_gifts[0])
         for a in range(power_full.get_point_value() - 1):
             if len(unspent_improvements) > a:
                 num_improvements_to_spend += 1
                 rewards_to_be_spent.append(unspent_improvements[a])
-            elif (len(unspent_gifts) > 0) and (len(unspent_gifts) > (a - num_improvements_to_spend + 1)):
+            elif (num_unspent_gifts > 0) and (num_unspent_gifts > (a - num_improvements_to_spend + 1)):
                 rewards_to_be_spent.append(unspent_gifts[(a - num_improvements_to_spend + 1)])
             else:
                 break
@@ -596,7 +658,7 @@ class Character(models.Model):
         output = output.format(self.name,
                                self.player.username if hasattr(self, "player") and self.player else "Anonymous User",
                                datetime.today(),
-                               self.get_status_display(),
+                               self.get_contractor_status_display(),
                                self.number_of_victories(),
                                self.number_of_losses())
         output = output + "Age: {}\nSex: {}\nAppearance: {}\nConcept: {}\nAmbition: {}\n"
@@ -617,7 +679,7 @@ class Character(models.Model):
         total_exp = EXP_NEW_CHAR
         for reward in rewards:
             total_exp = total_exp + reward.get_value()
-        return int(total_exp)
+        return int(total_exp) + PORTED_EXP_ADJUSTMENT[self.ported]
 
     def exp_cost(self):
         return self.stats_snapshot.exp_cost

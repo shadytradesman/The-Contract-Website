@@ -9,7 +9,7 @@ from characters.models import Character, BasicStats, Character_Death, Graveyard_
     EXP_ADV_COST_SKILL_MULTIPLIER, EXP_COST_QUIRK_MULTIPLIER, EXP_ADV_COST_SOURCE_MULTIPLIER, Source, SourceRevision, \
     Condition, Circumstance, Artifact
 from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, AbilityForm, \
-    AssetForm, LiabilityForm, LimitForm, PHYS_MENTAL, SourceForm, make_charon_coin_form
+    AssetForm, LiabilityForm, LimitForm, PHYS_MENTAL, SourceForm, make_charon_coin_form, make_character_ported_form
 from collections import defaultdict
 from django.utils import timezone
 from django.core.exceptions import PermissionDenied
@@ -21,6 +21,7 @@ logger = logging.getLogger("app." + __name__)
 # logic for Character creation and editing
 # TRANSACTIONS HAPPEN IN VIEW LAYER
 # See tests.py for hints on how revisioning works.
+
 def get_edit_context(user, existing_character=None, secret_key=None, cell=None):
     char_form = make_character_form(user, existing_character, supplied_cell=cell)(instance=existing_character)
     AttributeFormSet = formset_factory(AttributeForm, extra=0)
@@ -54,8 +55,10 @@ def get_edit_context(user, existing_character=None, secret_key=None, cell=None):
         source_formset = ()
         show_tutorial = False if user.is_authenticated and user.character_set.all() else True
     charon_coin_form = None
+    ported_character_form = None
     if user.is_authenticated:
         charon_coin_form = __get_charon_coin_form(user, existing_character, POST=None)
+        ported_character_form = __get_ported_character_form(user, existing_character, POST=None)
     cell_info = {}
     for cell1 in char_form.fields["cell"].queryset.all():
         sheet_blurb = cell1.setting_create_char_info if cell1.setting_create_char_info \
@@ -72,6 +75,7 @@ def get_edit_context(user, existing_character=None, secret_key=None, cell=None):
         'liability_formsets': liability_formsets,
         'limit_formset': limit_formset,
         'charon_coin_form': charon_coin_form,
+        'ported_character_form': ported_character_form,
         'tutorial': tutorial,
         'character': existing_character,
         'source_formset': source_formset,
@@ -97,6 +101,9 @@ def character_from_post(user, POST, cell):
         new_character.edit_date = timezone.now()
         if user.is_authenticated:
             new_character.player = user
+        ported_character_form = __get_ported_character_form(user, None, POST=POST)
+        if ported_character_form and ported_character_form.is_valid():
+            new_character.change_ported_status(ported_character_form.cleaned_data["port_status"])
         new_character.save()
         __save_stats_diff_from_post(POST=POST, new_character=new_character, user=user)
         new_character.regen_stats_snapshot()
@@ -121,6 +128,9 @@ def update_character_from_post(user, POST, existing_character):
         existing_character.edit_date = timezone.now()
         if user.is_authenticated and 'cell' in char_form.changed_data:
             existing_character.cell = char_form.cleaned_data['cell']
+        ported_character_form = __get_ported_character_form(user, existing_character, POST=POST)
+        if ported_character_form and ported_character_form.is_valid():
+            existing_character.change_ported_status(ported_character_form.cleaned_data["port_status"])
         existing_character.save()
         if existing_character.private != char_form.cleaned_data['private']:
             for power_full in existing_character.power_full_set.all():
@@ -181,6 +191,18 @@ def __get_charon_coin_form(user, existing_character=None, POST=None):
     else:
         return None
     return CharonCoinForm(POST)
+
+
+def __get_ported_character_form(user, existing_character, POST):
+    if not user.is_authenticated or not user.profile.able_to_port:
+        return None
+    declare_phase_active = not existing_character or not existing_character.completed_games()
+    if declare_phase_active:
+        return make_character_ported_form(existing_character)(POST)
+    else:
+        return None
+
+
 
 def __limits_from_formset(limit_formset, stats):
     if limit_formset.is_valid():
