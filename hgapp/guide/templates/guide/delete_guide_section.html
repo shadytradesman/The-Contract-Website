@@ -1,0 +1,31 @@
+
+{% extends "site_base.html" %}
+
+{% load staticfiles %}
+{% load bootstrap %}
+
+{% block head_title %}
+{{guidebook.title}}
+{% endblock %}
+
+
+
+{% block body_base %}
+<div class="container">
+    <h1 class="text-center">
+        Deleting {{current_section.title}}
+    </h1>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <form action="{% url 'guide:delete_guide_section' guidebook.slug current_section.slug %}" method="post">
+                {% csrf_token %}
+                {{form|bootstrap}}
+                <h3 class="text-danger">
+                    If you delete this section. . . it will be deleted. Are you sure?
+                </h3>
+                <input class="btn btn-primary" type="submit" value="Submit" />
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
