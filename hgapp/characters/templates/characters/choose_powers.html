@@ -20,7 +20,7 @@
     </div>
     <div class="panel panel-default">
         <div class="panel-body">
-            {% if character.unspent_gifts|length <= 0 %}
+            {% if character.num_unspent_gifts <= 0 %}
                 <div class="row">
                     <div class="col-md-8 col-md-offset-2 alert alert-warning text-center" role="alert">
                         <p>
@@ -38,7 +38,7 @@
                  <div class="row">
                     <div class="col-md-8 col-md-offset-2 alert alert-success text-center" role="alert">
                        <h4>
-                           {{ character.name}} has <b>{{character.unspent_gifts|length}}</b> Gift{{character.unspent_gifts|length|pluralize}}
+                           {{ character.name}} has <b>{{character.num_unspent_gifts}}</b> Gift{{character.num_unspent_gifts|pluralize}}
                            {% if character.unspent_improvements|length > 0 %}
                                 and <b>{{character.unspent_improvements|length}}</b> Improvements
                            {% endif %}
@@ -47,14 +47,14 @@
                     </div>
                 </div>
             {% endif %}
-            {% if character.get_power_cost_total != character.active_spent_rewards|length %}
+            {% if character.show_gift_alert %}
                 <div class="row">
                     <div class="col-md-8 col-md-offset-2 alert alert-danger text-center" role="alert">
                         <p>
                             Character's total Power cost does not match their number of spent Gifts and Improvements!
                             <br>
                             <b>Power Value: </b>{{character.get_power_cost_total}}
-                            <b>Spent Gifts and Improvements: </b> {{character.active_spent_rewards|length}}
+                            <b>Spent Gifts and Improvements: </b> {{character.num_active_spent_rewards }}
                         </p>
                     </div>
                 </div>

@@ -78,6 +78,7 @@ class Profile(models.Model):
         on_delete=models.CASCADE)
     about = models.TextField(max_length=10000)
     confirmed_agreements = models.BooleanField(default=False)
+    able_to_port = models.BooleanField(default=False)
     date_confirmed_agreements = models.DateTimeField(blank=True, null=True)
     player_prefix = models.CharField(choices=PLAYER_PREFIX,
                                      max_length=25,

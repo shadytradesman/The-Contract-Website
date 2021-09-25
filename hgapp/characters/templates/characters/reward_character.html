@@ -15,16 +15,16 @@
 {% block body_base %}
 <div class="container">
     <div class="backdropped">
-    {% if character.unspent_rewards|length > 0 %}
+    {% if character.num_unspent_rewrads > 0 %}
         <div class="text-center">
-            {% if character.unspent_gifts|length > 0 %}
+            {% if character.num_unspent_gifts > 0 %}
                 <h1>
                     You've done well, <a href="{% url 'characters:characters_view' character.id %}">{{ character.name }}</a>
                 </h1>
                 <h3>
-                    {% if character.unspent_gifts|length == 1 and character.unspent_improvements|length == 0 %}
+                    {% if character.num_unspent_gifts == 1 and character.num_unspent_improvements == 0 %}
                         Please accept this Gift
-                    {% elif character.unspent_gifts|length > 1 %}
+                    {% elif character.num_unspent_gifts > 1 %}
                         Please accept these Gifts
                     {% endif %}
                 </h3>
@@ -34,7 +34,7 @@
                 </h1>
             {% endif %}
         </div>
-        {% if character.unspent_gifts|length > 0 %}
+        {% if character.num_unspent_rewards > 0 %}
             <ul class="list-unstyled text-center">
                 {% for reward in character.unspent_rewards %}
                     <li>{% render_reward reward %}</li>
@@ -43,7 +43,7 @@
         {% endif %}
         <div class="panel panel-default">
             <div class="panel-body">
-                {% if character.unspent_gifts|length > 0 %}
+                {% if character.num_unspent_gifts > 0 %}
                     <a href="{% url 'powers:powers_create_for_char' character.id %}">
                         <h2>Create a New Power</h2>
                     </a>
@@ -53,7 +53,7 @@
                     <h2>Improve an Existing Power</h2>
                     {% for power_full in character.power_full_set.all %}
                         <div class="row">
-                            {% if request.user.is_authenticated and request.user.id == character.player.id and character.unspent_rewards|length > 0 %}
+                            {% if request.user.is_authenticated and request.user.id == character.player.id and character.num_unspent_rewrads > 0 %}
                                 <div class= "col-sm-1 container">
                                     <a href="{% url 'powers:powers_edit_power' power_full.id %}" class="btn btn-success"><i class="fa fa-plus-square fa-4x"></i></a>
                                 </div>

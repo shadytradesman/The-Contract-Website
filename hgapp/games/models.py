@@ -817,6 +817,7 @@ class Reward(models.Model):
         related_name='rewarded_player',
         on_delete=models.CASCADE)
     is_improvement = models.BooleanField(default=True)
+    is_ported_reward = models.BooleanField(default=False)
     is_charon_coin = models.BooleanField(default=False)
     is_void = models.BooleanField(default=False)
     is_journal = models.BooleanField(default=False)

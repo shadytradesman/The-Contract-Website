@@ -13,7 +13,7 @@
         {% if character.number_of_victories %}
         {{ character.number_of_victories }}-Victory
         {% endif %}
-        <b>{{ character.get_status_display }}</b>
+        <b>{{ character.get_contractor_status_display }}</b>
         Contractor played by
         {% if character.player %}
         <a href="{% url 'profiles:profiles_view_profile' character.player.id %}">{% user_display character.player %}</a>
