@@ -15,7 +15,7 @@
 {% block body_base %}
 <div class="container">
     <div class="backdropped">
-    {% if character.num_unspent_rewrads > 0 %}
+    {% if character.num_unspent_rewards > 0 %}
         <div class="text-center">
             {% if character.num_unspent_gifts > 0 %}
                 <h1>
@@ -53,7 +53,7 @@
                     <h2>Improve an Existing Power</h2>
                     {% for power_full in character.power_full_set.all %}
                         <div class="row">
-                            {% if request.user.is_authenticated and request.user.id == character.player.id and character.num_unspent_rewrads > 0 %}
+                            {% if request.user.is_authenticated and request.user.id == character.player.id and character.num_unspent_rewards > 0 %}
                                 <div class= "col-sm-1 container">
                                     <a href="{% url 'powers:powers_edit_power' power_full.id %}" class="btn btn-success"><i class="fa fa-plus-square fa-4x"></i></a>
                                 </div>

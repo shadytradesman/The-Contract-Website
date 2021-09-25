@@ -236,7 +236,7 @@ def view_character(request, character_id, secret_key = None):
 
     show_more_home_games_warning = character.number_completed_games() > 3 \
                                    and (character.number_completed_games_in_home_cell() < character.number_completed_games_out_of_home_cell())
-    available_gift = character.num_unspent_rewrads() > 0
+    available_gift = character.num_unspent_rewards() > 0
     circumstance_form = None
     condition_form = None
     artifact_form = None

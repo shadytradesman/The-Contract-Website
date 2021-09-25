@@ -63,7 +63,7 @@ function updateGiftCost() {
     }
     $('#gift_cost_delta').text(delta_text);
     {% if character %}
-        if (delta > {{character.num_unspent_rewrads}}) {
+        if (delta > {{character.num_unspent_rewards}}) {
             $('#gift_cost_delta').css("color", "red");
         } else if (delta < 0) {
             $('#gift_cost_delta').css("color", "white");

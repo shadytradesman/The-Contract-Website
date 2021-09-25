@@ -923,6 +923,8 @@ class Reward(models.Model):
             return "the Asset " + self.source_asset.relevant_asset.name
         if self.is_charon_coin:
             return "losing a Contractor in a Side Game"
+        if self.is_ported_reward:
+            return "House Games of yore"
 
 
 class ScenarioTag(models.Model):
