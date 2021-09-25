@@ -1,6 +1,8 @@
 from django.db import models
 from django.db.models import Q
 from django.conf import settings
+from django.template import loader
+import re
 
 
 class GuideBook(models.Model):
@@ -38,7 +40,32 @@ class GuideSection(models.Model):
             models.Index(fields=['position']),
         ]
 
+    def save(self, *args, **kwargs):
+        self.rendered_content = self.__render_content()
+        super(GuideSection, self).save(*args, **kwargs)
+
+    # Support for "STML" or Spencer Text Markup Language
+    # This is a super-janky markup language that is intended only for admin use.
+    # DO NOT GIVE USERS ACCESS TO THESE METHODS. THEY ARE NOT SECURE OR EVEN REALLY STABLE.
+    def __render_content(self):
+        rendered_content = self.__render_section_links(str(self.content))
+        rendered_content = self.__render_columns(rendered_content)
+        return rendered_content
+
+
+    # {{article-slug|link-text}} to link to that article
+    def __render_section_links(self, content):
+        return re.sub(r"\{\{([\w-]+)\|([\w\s-]+)\}\}", r"<a href=#\1>\2</a>", content)
+
+    # {!col1!} {!col2!} {!colend!}
+    def __render_columns(self, content):
+        col1_start = '<div class="row"><div class="col-sm-6 col-xs-12">'
+        col2_start = '</div><div class="col-sm-6 col-xs-12">'
+        col_end = '</div></div>'
+        rendered_content = re.sub(r"\{!col1!\}", col1_start, content)
+        rendered_content = re.sub(r"\{!col2!\}", col2_start, rendered_content)
+        rendered_content = re.sub(r"\{!colend!\}", col_end, rendered_content)
+        return rendered_content
 
     #Render text on save. Replaces
-    # {{article-slug}} with link to that article
     # {{fancy-section}} with entire section

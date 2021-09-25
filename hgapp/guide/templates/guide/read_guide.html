@@ -3,38 +3,77 @@
 {% load staticfiles %}
 
 {% block head_title %}
-{{guidebook.title}}
+    {{guidebook.title}}
 {% endblock %}
 
 {% block extra_styles %}
-<link rel="stylesheet" type="text/css" href="{% static 'guide/read_guide_style.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'guide/read_guide_style.css' %}" />
 {% endblock %}
 
 {% block extra_scripts %}
-<script src="{% static 'guide/read_guide_scripts.js' %}"></script>
+    <script src="{% static 'guide/read_guide_scripts.js' %}"></script>
 {% endblock %}
 
 {% block body_base %}
-<div class="container">
-    <h1 class="text-center">
-        {{guidebook.title}}
-    </h1>
-    <div class="panel panel-default">
-        <div class="panel-body">
-            {% for section in sections %}
-                <h{{section.header_level}} id="{{section.slug}}">{{section.title}}</h{{section.header_level}}>
-                <div class="css-section-body">
-                    {{section.content|safe}}
-                    {% if request.user.is_superuser %}
-                     <div>
-                         <a class="btn btn-default"
-                            href="{% url 'guide:edit_guide_section' guidebook.slug section.slug %}">
-                             Edit Section
-                         </a>
-                     </div>
-                    {% endif %}
+<div class="container-fluid">
+    <div id="article-container" class="row">
+        <div class="col-sm-4 col-md-3 hidden-xs css-toc-sec">
+            <div id="js-guide-index" class="guide-toc">
+                <h3 class="text-center">{{guidebook.title}} Index</h3>
+                <hr>
+                {{nav_list|safe}}
+            </div>
+        </div>
+        <div class="col-sm-8 col-md-9 ">
+            <h1 class="text-center">
+                {{guidebook.title}}
+            </h1>
+            <div class="panel panel-default" style="margin-right: 10px; margin-left: 10px;">
+                <div class="panel-body css-guide-content">
+                    {% for section in sections %}
+                        <div id="{{section.slug}}" class="css-guide-section"></div>
+                        <div class="text-center">
+                            <h{{section.header_level}}>
+                                {{section.title}}
+                            </h{{section.header_level}}>
+                            <a class="btn btn-xs" href="#{{section.slug}}">
+                                <i class="fa fa-link"></i> link to this section
+                            </a>
+                            {% if section.header_level < 2 %}
+                                <hr>
+                            {% endif %}
+                            <div>
+                                {% if can_edit %}
+                                    <a class="btn btn-default btn-xs"
+                                       href="{% url 'guide:edit_guide_section' guidebook.slug section.slug %}">
+                                        Edit Section
+                                    </a>
+                                    <a class="btn btn-default btn-xs"
+                                       href="{% url 'guide:new_guide_section' guidebook.slug section.slug %}">
+                                        Add new Section after this one
+                                    </a>
+                                    <a class="btn btn-danger btn-xs"
+                                       href="{% url 'guide:delete_guide_section' guidebook.slug section.slug %}">
+                                        Delete Section
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="css-section-body">
+                            {{section.rendered_content|safe}}
+                        </div>
+                    {% empty %}
+                        {% if can_edit %}
+                            <div>
+                                <a class="btn btn-default"
+                                   href="{% url 'guide:new_guide_section' guidebook.slug section.slug %}">
+                                    Add first Section
+                                </a>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
                 </div>
-            {% endfor %}
+            </div>
         </div>
     </div>
 </div>

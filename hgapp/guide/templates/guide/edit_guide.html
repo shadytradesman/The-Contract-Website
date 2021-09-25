@@ -8,14 +8,6 @@
 {{guidebook.title}}
 {% endblock %}
 
-{% block extra_styles %}
-<link rel="stylesheet" type="text/css" href="{% static 'guide/read_guide_style.css' %}" />
-{% endblock %}
-
-{% block extra_scripts %}
-<script src="{% static 'guide/read_guide_scripts.js' %}"></script>
-{% endblock %}p
-
 {% block extra_head %}
 {{ form.media }}
 {% endblock %}
@@ -23,11 +15,55 @@
 {% block body_base %}
 <div class="container">
     <h1 class="text-center">
-        Editing {{section.title}} in {{guidebook.title}}
+        {% if current_section %}
+            Editing {{current_section.title}}
+        {% else %}
+            Writing new Section
+        {% endif %}
+        in {{guidebook.title}}
     </h1>
     <div class="panel panel-default">
         <div class="panel-body">
-            {{form|bootstrap}}
+            <form
+                {% if current_section %}
+                    action="{% url 'guide:edit_guide_section' guidebook.slug current_section.slug %}"
+                {% elif previous_section %}
+                    action="{% url 'guide:new_guide_section' guidebook.slug previous_section.slug %}"
+                {% else %}
+                    action="{% url 'guide:new_guide_section' guidebook.slug %}"
+                {% endif %}
+                    method="post">
+                {% csrf_token %}
+                {{form|bootstrap}}
+                <p>
+                    <h3>STML cheat sheet</h3>
+                <ul>
+                    {% verbatim %}
+                    <li>
+                        <b>Link to another section:</b> {{section-slug|link-text}} e.g. "Click {{attributes|here}} to see info on Attributes"
+                    </li>
+                    <li>
+                        <b>Columns</b>
+                        <ul>
+                            <li>
+                                {!col1!} - start column one
+                            </li>
+                            <li>
+                                {!col2!} - start column two
+                            </li>
+                            <li>
+                                {!colend!} - end columns
+                            </li>
+                            <li>
+                                If you use one, you must have ALL THREE in your section IN ORDER or the world will explode.
+                            </li>
+                        </ul>
+                    </li>
+                    {% endverbatim %}
+                </ul>
+                </p>
+                <input class="btn btn-primary" type="submit" value="Submit" />
+            </form>
         </div>
     </div>
 </div>
