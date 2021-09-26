@@ -271,6 +271,8 @@ class Game(models.Model):
         self._grant_gm_exp_reward()
 
     def _grant_gm_exp_reward(self):
+        if self.gm_experience_reward and not self.gm_experience_reward.is_void:
+            raise ValueError("Game is granting exp reward to gm when it already has one.", str(self.id))
         exp_reward = ExperienceReward(
             rewarded_player=self.gm,
         )
@@ -527,10 +529,16 @@ class Game_Attendance(models.Model):
                 journal.grant_reward()
 
     def give_reward(self):
-        if not self.is_confirmed or self.get_reward():
+        if not self.is_confirmed:
             return None
+        if self.get_reward():
+            raise ValueError("attendance is granting reward when it already has one. Attendance: " +
+                             str(self.id))
+        if self.experience_reward:
+            raise ValueError("attendance is granting exp reward when it already has one. Attendance: " +
+                             str(self.id))
         if self.outcome is None:
-            raise ValueError("Error, game attendance has no outcome when game is being transitioned to finished.",
+            raise ValueError("Error, game attendance has no outcome when game is being transitioned to finished." +
                              str(self.id))
         if self.is_victory():
             player_reward = Reward(relevant_game=self.relevant_game,
@@ -538,6 +546,12 @@ class Game_Attendance(models.Model):
                                    rewarded_player=self.attending_character.player,
                                    is_improvement=False)
             player_reward.save()
+        elif self.attending_character and self.is_death():
+            charon_coin_reward = Reward(relevant_game=self.relevant_game,
+                                        rewarded_player=self.attending_character.player,
+                                        is_improvement=False,
+                                        is_charon_coin=True,)
+            charon_coin_reward.save()
         if self.attending_character and not self.is_death() and not self.is_declined_invite():
             exp_reward = ExperienceReward(
                 rewarded_character=self.attending_character,
@@ -546,13 +560,7 @@ class Game_Attendance(models.Model):
             exp_reward.save()
             self.experience_reward = exp_reward
             self.save()
-        if self.attending_character and self.is_death():
-            charon_coin_reward = Reward(relevant_game=self.relevant_game,
-                                   rewarded_player=self.attending_character.player,
-                                   is_improvement=False,
-                                   is_charon_coin=True,)
-            charon_coin_reward.save()
-        if self.is_ringer_victory():
+        elif self.is_ringer_victory():
             exp_reward = ExperienceReward(
                 rewarded_player=self.game_invite.invited_player,
             )
@@ -809,6 +817,7 @@ class Reward(models.Model):
         related_name='rewarded_player',
         on_delete=models.CASCADE)
     is_improvement = models.BooleanField(default=True)
+    is_ported_reward = models.BooleanField(default=False)
     is_charon_coin = models.BooleanField(default=False)
     is_void = models.BooleanField(default=False)
     is_journal = models.BooleanField(default=False)
@@ -914,6 +923,8 @@ class Reward(models.Model):
             return "the Asset " + self.source_asset.relevant_asset.name
         if self.is_charon_coin:
             return "losing a Contractor in a Side Game"
+        if self.is_ported_reward:
+            return "House Games of yore"
 
 
 class ScenarioTag(models.Model):

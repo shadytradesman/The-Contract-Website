@@ -20,7 +20,7 @@
                     </a>
                     {% endif %}
                     {% else %}
-                    {% if character.unspent_rewards|length > 0 %}
+                    {% if character.num_unspent_rewards > 0 %}
                     <a class="btn btn-success btn-xs" href="{% url 'characters:characters_spend_reward' character.id %}">
                         Spend Rewards
                     </a>

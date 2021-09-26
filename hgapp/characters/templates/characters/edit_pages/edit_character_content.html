@@ -133,6 +133,15 @@
                         </div>
                     </div>
                 {% endif %}
+                {% if ported_character_form %}
+                    <div class="col-md-4 col-xs-12 text-center" style="margin-top: 15px;">
+                        <div class="alert alert-info ">
+                            <label data-toggle="tooltip" data-placement="bottom" title='Is this Contractor ported from House Games?'>
+                                {{ ported_character_form|bootstrap }}
+                            </label>
+                        </div>
+                    </div>
+                {% endif %}
         </div>
     </div>
 </div>

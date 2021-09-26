@@ -222,14 +222,14 @@ class JournalModelTests(TestCase):
                                           is_downtime=False)
             journal.set_content(VALID_JOURNAL_CONTENT)
             journals.append(journal)
-        self.assertEquals(self.char1.unspent_improvements().count(), 1)
+        self.assertEquals(self.char1.num_unspent_improvements(), 1)
         self.assertEquals(self.char1.exp_earned(), EXP_NEW_CHAR + (12 * EXP_WIN) + (5 * EXP_JOURNAL))
         exp_journal = journals[0]
         self.assertIsNone(exp_journal.get_improvement())
         self.assertIsNotNone(exp_journal.get_exp_reward())
         exp_journal.set_content(INVALID_JOURNAL_CONTENT)
         exp_journal.refresh_from_db()
-        self.assertEquals(self.char1.unspent_improvements().count(), 1)
+        self.assertEquals(self.char1.num_unspent_improvements(), 1)
         self.assertEquals(self.char1.exp_earned(), EXP_NEW_CHAR + (12 * EXP_WIN) + (4 * EXP_JOURNAL))
         self.assertIsNone(exp_journal.get_improvement())
         self.assertIsNone(exp_journal.get_exp_reward())
@@ -237,7 +237,7 @@ class JournalModelTests(TestCase):
         exp_journal.refresh_from_db()
         self.assertIsNone(exp_journal.get_improvement())
         self.assertIsNotNone(exp_journal.get_exp_reward())
-        self.assertEquals(self.char1.unspent_improvements().count(), 1)
+        self.assertEquals(self.char1.num_unspent_improvements(), 1)
         self.assertEquals(self.char1.exp_earned(), EXP_NEW_CHAR + (12 * EXP_WIN) + (5 * EXP_JOURNAL))
 
         improvement_journal = journals[3]
@@ -247,13 +247,13 @@ class JournalModelTests(TestCase):
         improvement_journal.refresh_from_db()
         self.assertIsNone(improvement_journal.get_improvement())
         self.assertIsNone(improvement_journal.get_exp_reward())
-        self.assertEquals(self.char1.unspent_improvements().count(), 0)
+        self.assertEquals(self.char1.num_unspent_improvements(), 0)
         self.assertEquals(self.char1.exp_earned(), EXP_NEW_CHAR + (12 * EXP_WIN) + (5 * EXP_JOURNAL))
         improvement_journal.set_content(VALID_JOURNAL_CONTENT)
         improvement_journal.refresh_from_db()
         self.assertIsNotNone(improvement_journal.get_improvement())
         self.assertIsNone(improvement_journal.get_exp_reward())
-        self.assertEquals(self.char1.unspent_improvements().count(), 1)
+        self.assertEquals(self.char1.num_unspent_improvements(), 1)
         self.assertEquals(self.char1.exp_earned(), EXP_NEW_CHAR + (12 * EXP_WIN) + (5 * EXP_JOURNAL))
 
     def test_journal_change_attendance(self):
@@ -268,7 +268,7 @@ class JournalModelTests(TestCase):
         self.assertIsNone(exp_journal.get_improvement())
         self.assertIsNotNone(exp_journal.get_exp_reward())
         self.assertEquals(exp_journal.get_exp_reward().rewarded_character, self.char1)
-        self.assertEquals(self.char1.unspent_improvements().count(), 1)
+        self.assertEquals(self.char1.num_unspent_improvements(), 1)
 
         self.assertEquals(self.char1.exp_earned(), EXP_NEW_CHAR + (12 * EXP_WIN) + (5 * EXP_JOURNAL))
         self.assertEquals(self.char2.exp_earned(), EXP_NEW_CHAR + (0 * EXP_WIN))
@@ -279,7 +279,7 @@ class JournalModelTests(TestCase):
         self.assertEquals(exp_journal.get_exp_reward().rewarded_character, self.char1)
         exp_journal.game_attendance.change_outcome(new_outcome='WIN', is_confirmed=True, attending_character=self.char2)
         exp_journal.refresh_from_db()
-        self.assertEquals(self.char1.unspent_improvements().count(), 1)
+        self.assertEquals(self.char1.num_unspent_improvements(), 1)
         self.assertEquals(self.char1.exp_earned(), EXP_NEW_CHAR + (11 * EXP_WIN) + (4 * EXP_JOURNAL))
         self.assertEquals(self.char2.exp_earned(), EXP_NEW_CHAR + (1 * EXP_WIN) + EXP_JOURNAL)
         self.assertIsNone(exp_journal.get_improvement())
@@ -293,7 +293,7 @@ class JournalModelTests(TestCase):
 
         improvement_journal.game_attendance.change_outcome(new_outcome='WIN', is_confirmed=True, attending_character=self.char1)
         improvement_journal.refresh_from_db()
-        self.assertEquals(self.char1.unspent_improvements().count(), 1)
+        self.assertEquals(self.char1.num_unspent_improvements(), 1)
         self.assertEquals(self.char1.exp_earned(), EXP_NEW_CHAR + (11 * EXP_WIN) + (4 * EXP_JOURNAL))
         self.assertEquals(self.char2.exp_earned(), EXP_NEW_CHAR + (1 * EXP_WIN) + EXP_JOURNAL)
         self.assertIsNotNone(improvement_journal.get_improvement())
@@ -305,7 +305,7 @@ class JournalModelTests(TestCase):
         self.assertIsNone(improvement_journal.get_improvement()) # it is char2s second journal. still no improvement rewarded
         self.assertIsNotNone(improvement_journal.get_exp_reward())
         self.assertEquals(improvement_journal.get_exp_reward().rewarded_character, self.char2)
-        self.assertEquals(self.char1.unspent_improvements().count(), 0)
+        self.assertEquals(self.char1.num_unspent_improvements(), 0)
         self.assertEquals(self.char1.exp_earned(), EXP_NEW_CHAR + (10 * EXP_WIN) + (4 * EXP_JOURNAL))
         self.assertEquals(self.char2.exp_earned(), EXP_NEW_CHAR + (2 * EXP_WIN) + (2 * EXP_JOURNAL))
 

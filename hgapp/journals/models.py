@@ -95,6 +95,9 @@ class Journal(models.Model):
                                    is_journal=True)
             reward.save()
         else:
+            if self.experience_reward and not self.experience_reward.is_void:
+                raise ValueError("journal is granting exp reward when it already has one.",
+                                 str(self.id))
             exp_reward = ExperienceReward(
                 rewarded_character=character,
                 rewarded_player=character.player,

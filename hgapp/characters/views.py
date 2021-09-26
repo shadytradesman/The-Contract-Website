@@ -153,7 +153,7 @@ def graveyard(request):
             "death": death,
             "num_journals": num_journals,
         }
-        tombstones[death.relevant_character.get_status_display()].append(tombstone)
+        tombstones[death.relevant_character.get_contractor_status_display()].append(tombstone)
     num_headers = Graveyard_Header.objects.all().count()
     if num_headers > 0:
         header = Graveyard_Header.objects.all()[randint(0,num_headers-1)].header
@@ -236,7 +236,7 @@ def view_character(request, character_id, secret_key = None):
 
     show_more_home_games_warning = character.number_completed_games() > 3 \
                                    and (character.number_completed_games_in_home_cell() < character.number_completed_games_out_of_home_cell())
-    available_gift = character.unspent_rewards().count() > 0
+    available_gift = character.num_unspent_rewards() > 0
     circumstance_form = None
     condition_form = None
     artifact_form = None
@@ -369,7 +369,7 @@ def toggle_power(request, character_id, power_full_id):
         rewards_to_be_spent = character.reward_cost_for_power(power_full)
         reward_deficit = power_full.get_point_value() - len(rewards_to_be_spent)
         insufficient_gifts = False
-        if len(character.unspent_gifts()) == 0:
+        if character.num_unspent_gifts() == 0:
             insufficient_gifts = True
         context = {
             'character': character,

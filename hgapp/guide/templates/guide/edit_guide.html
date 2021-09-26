@@ -1,0 +1,75 @@
+
+{% extends "site_base.html" %}
+
+{% load staticfiles %}
+{% load bootstrap %}
+
+{% block head_title %}
+{{guidebook.title}}
+{% endblock %}
+
+{% block extra_head %}
+{{ form.media }}
+{% endblock %}
+
+{% block body_base %}
+<div class="container">
+    <h1 class="text-center">
+        {% if current_section %}
+            Editing {{current_section.title}}
+        {% else %}
+            Writing new Section
+        {% endif %}
+        in {{guidebook.title}}
+    </h1>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <form
+                {% if current_section %}
+                    action="{% url 'guide:edit_guide_section' guidebook.slug current_section.slug %}"
+                {% elif previous_section %}
+                    action="{% url 'guide:new_guide_section' guidebook.slug previous_section.slug %}"
+                {% else %}
+                    action="{% url 'guide:new_guide_section' guidebook.slug %}"
+                {% endif %}
+                    method="post">
+                {% csrf_token %}
+                {{form|bootstrap}}
+                {% verbatim %}
+                <p>
+                    <h3>STML cheat sheet</h3>
+                <ul>
+                    <li>
+                        <b>Link to another section:</b> {{section-slug|link-text}} e.g. "Click {{attributes|here}} to see info on Attributes"
+                    </li>
+                    <li>
+                        <b>Columns</b>
+                        <ul>
+                            <li>
+                                {!col1!} - start column one
+                            </li>
+                            <li>
+                                {!col2!} - start column two
+                            </li>
+                            <li>
+                                {!colend!} - end columns
+                            </li>
+                            <li>
+                                If you use one, you must have ALL THREE in your section IN ORDER or the world will explode.
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <b>Gm tip panel:</b> {!start-gm-tip!} and {!end-gm-tip!}
+                    </li>
+                </ul>
+                Note that all STML tags cannot have any styling changes in the middle of them. For example:
+                {{secti<b><i>on-slug|li</i></b>nk-text}} will NOT work. Use "paste matching style" to prevent issues.
+                </p>
+                {% endverbatim %}
+                <input class="btn btn-primary" type="submit" value="Submit" />
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

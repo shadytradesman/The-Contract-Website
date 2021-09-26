@@ -111,10 +111,16 @@ class GameModelTests(TestCase):
         )
         char.regen_stats_snapshot()
 
+    def update_char_stats(self):
+        self.char_user1_cell.update_contractor_game_stats()
+        self.char_user1_cell2.update_contractor_game_stats()
+        self.char_user2_cell.update_contractor_game_stats()
+        self.char_user2_nocell.update_contractor_game_stats()
+        self.char_cellowner_cell.update_contractor_game_stats()
 
     def test_archive_game_victory(self):
-        self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 0)
-        self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 0)
+        self.assertEquals(self.char_user1_cell.num_unspent_rewards(), 0)
+        self.assertEquals(self.char_user1_cell.num_unspent_gifts(), 0)
         self.assertEquals(self.char_user1_cell.completed_games().count(), 0)
         self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
         self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
@@ -146,8 +152,9 @@ class GameModelTests(TestCase):
         game_invite.attendance = attendance
         game_invite.save()
         game.give_rewards()
-        self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 1)
-        self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 1)
+        self.update_char_stats()
+        self.assertEquals(self.char_user1_cell.num_unspent_rewards(), 1)
+        self.assertEquals(self.char_user1_cell.num_unspent_gifts(), 1)
         self.assertEquals(self.char_user1_cell.completed_games().count(), 1)
         self.assertEquals(self.char_user1_cell.number_of_victories(), 1)
         self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
@@ -155,8 +162,8 @@ class GameModelTests(TestCase):
         self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR + EXP_WIN)
 
     def test_archive_game_loss(self):
-        self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 0)
-        self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 0)
+        self.assertEquals(self.char_user1_cell.num_unspent_rewards(), 0)
+        self.assertEquals(self.char_user1_cell.num_unspent_gifts(), 0)
         self.assertEquals(self.char_user1_cell.completed_games().count(), 0)
         self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
         self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
@@ -188,8 +195,9 @@ class GameModelTests(TestCase):
         game_invite.attendance = attendance
         game_invite.save()
         game.give_rewards()
-        self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 0)
-        self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 0)
+        self.update_char_stats()
+        self.assertEquals(self.char_user1_cell.num_unspent_rewards(), 0)
+        self.assertEquals(self.char_user1_cell.num_unspent_gifts(), 0)
         self.assertEquals(self.char_user1_cell.completed_games().count(), 1)
         self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
         self.assertEquals(self.char_user1_cell.number_of_losses(), 1)
@@ -197,8 +205,8 @@ class GameModelTests(TestCase):
         self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR + EXP_LOSS)
 
     def test_archive_game_death(self):
-        self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 0)
-        self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 0)
+        self.assertEquals(self.char_user1_cell.num_unspent_rewards(), 0)
+        self.assertEquals(self.char_user1_cell.num_unspent_gifts(), 0)
         self.assertEquals(self.char_user1_cell.completed_games().count(), 0)
         self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
         self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
@@ -235,8 +243,8 @@ class GameModelTests(TestCase):
         game_invite.attendance = attendance
         game_invite.save()
         game.give_rewards()
-        self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 0)
-        self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 0)
+        self.assertEquals(self.char_user1_cell.num_unspent_rewards(), 0)
+        self.assertEquals(self.char_user1_cell.num_unspent_gifts(), 0)
         self.assertEquals(self.char_user1_cell.completed_games().count(), 1)
         self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
         self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
@@ -339,8 +347,8 @@ class GameModelTests(TestCase):
         self.assertEquals(self.user2.rewarded_player.filter(rewarded_character=None, is_charon_coin=False).filter(is_void=False).all().count(), 1)
 
     def test_archive_game_victory_not_in_cell(self):
-        self.assertEquals(self.char_user2_nocell.unspent_rewards().count(), 0)
-        self.assertEquals(self.char_user2_nocell.unspent_gifts().count(), 0)
+        self.assertEquals(self.char_user2_nocell.num_unspent_rewards(), 0)
+        self.assertEquals(self.char_user2_nocell.num_unspent_gifts(), 0)
         self.assertEquals(self.char_user2_nocell.completed_games().count(), 0)
         self.assertEquals(self.char_user2_nocell.number_of_victories(), 0)
         self.assertEquals(self.char_user2_nocell.number_of_losses(), 0)
@@ -374,8 +382,8 @@ class GameModelTests(TestCase):
         game_invite.attendance = attendance
         game_invite.save()
         game.give_rewards()
-        self.assertEquals(self.char_user2_nocell.unspent_rewards().count(), 0)
-        self.assertEquals(self.char_user2_nocell.unspent_gifts().count(), 0)
+        self.assertEquals(self.char_user2_nocell.num_unspent_rewards(), 0)
+        self.assertEquals(self.char_user2_nocell.num_unspent_gifts(), 0)
         self.assertEquals(self.char_user2_nocell.completed_games().count(), 0)
         self.assertEquals(self.char_user2_nocell.number_of_victories(), 0)
         self.assertEquals(self.char_user2_nocell.number_of_losses(), 0)
@@ -436,8 +444,9 @@ class GameModelTests(TestCase):
             game_invite.attendance = attendance
             game_invite.save()
             game.give_rewards()
-            self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 1)
-            self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 1)
+            self.update_char_stats()
+            self.assertEquals(self.char_user1_cell.num_unspent_rewards(), 1)
+            self.assertEquals(self.char_user1_cell.num_unspent_gifts(), 1)
             self.assertEquals(self.char_user1_cell.completed_games().count(), 1)
             self.assertEquals(self.char_user1_cell.number_of_victories(), 1)
             self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
@@ -450,10 +459,11 @@ class GameModelTests(TestCase):
             attendance.refresh_from_db()
             attendance.change_outcome(new_outcome = LOSS, is_confirmed = True)
             self.char_user1_cell.refresh_from_db()
+            self.update_char_stats()
 
             self.assertEquals(self.char_user1_cell.is_dead(), False)
-            self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 0)
-            self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 0)
+            self.assertEquals(self.char_user1_cell.num_unspent_rewards(), 0)
+            self.assertEquals(self.char_user1_cell.num_unspent_gifts(), 0)
             self.assertEquals(self.char_user1_cell.completed_games().count(), 1)
             self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
             self.assertEquals(self.char_user1_cell.number_of_losses(), 1)
@@ -465,10 +475,11 @@ class GameModelTests(TestCase):
 
             attendance.refresh_from_db()
             attendance.change_outcome(new_outcome = WIN, is_confirmed = True)
+            self.update_char_stats()
 
             self.assertEquals(self.char_user1_cell.is_dead(), False)
-            self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 1)
-            self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 1)
+            self.assertEquals(self.char_user1_cell.num_unspent_rewards(), 1)
+            self.assertEquals(self.char_user1_cell.num_unspent_gifts(), 1)
             self.assertEquals(self.char_user1_cell.completed_games().count(), 1)
             self.assertEquals(self.char_user1_cell.number_of_victories(), 1)
             self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
@@ -480,10 +491,11 @@ class GameModelTests(TestCase):
 
             attendance.refresh_from_db()
             attendance.change_outcome(new_outcome = DEATH, is_confirmed = True)
+            self.update_char_stats()
 
             self.assertEquals(self.char_user1_cell.is_dead(), True)
-            self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 0)
-            self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 0)
+            self.assertEquals(self.char_user1_cell.num_unspent_rewards(), 0)
+            self.assertEquals(self.char_user1_cell.num_unspent_gifts(), 0)
             self.assertEquals(self.char_user1_cell.completed_games().count(), 1)
             self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
             self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
@@ -495,10 +507,11 @@ class GameModelTests(TestCase):
 
             attendance.refresh_from_db()
             attendance.change_outcome(new_outcome=DECLINED, is_confirmed=True)
+            self.update_char_stats()
 
             self.assertEquals(self.char_user1_cell.is_dead(), False)
-            self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 0)
-            self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 0)
+            self.assertEquals(self.char_user1_cell.num_unspent_rewards(), 0)
+            self.assertEquals(self.char_user1_cell.num_unspent_gifts(), 0)
             self.assertEquals(self.char_user1_cell.completed_games().count(), 1) #Maybe this should be different?
             self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
             self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
@@ -510,10 +523,11 @@ class GameModelTests(TestCase):
 
             attendance.refresh_from_db()
             attendance.change_outcome(new_outcome=RINGER_VICTORY, is_confirmed=True)
+            self.update_char_stats()
 
             self.assertEquals(self.char_user1_cell.is_dead(), False)
-            self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 0)
-            self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 0)
+            self.assertEquals(self.char_user1_cell.num_unspent_rewards(), 0)
+            self.assertEquals(self.char_user1_cell.num_unspent_gifts(), 0)
             self.assertEquals(self.char_user1_cell.completed_games().count(), 0)
             self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
             self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
@@ -525,10 +539,11 @@ class GameModelTests(TestCase):
 
             attendance.refresh_from_db()
             attendance.change_outcome(new_outcome=RINGER_FAILURE, is_confirmed=True)
+            self.update_char_stats()
 
             self.assertEquals(self.char_user1_cell.is_dead(), False)
-            self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 0)
-            self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 0)
+            self.assertEquals(self.char_user1_cell.num_unspent_rewards(), 0)
+            self.assertEquals(self.char_user1_cell.num_unspent_gifts(), 0)
             self.assertEquals(self.char_user1_cell.completed_games().count(), 0)
             self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
             self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
@@ -540,10 +555,11 @@ class GameModelTests(TestCase):
 
             attendance.refresh_from_db()
             attendance.change_outcome(new_outcome=WIN, is_confirmed=True, attending_character=self.char_user1_cell)
+            self.update_char_stats()
 
             self.assertEquals(self.char_user1_cell.is_dead(), False)
-            self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 1)
-            self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 1)
+            self.assertEquals(self.char_user1_cell.num_unspent_rewards(), 1)
+            self.assertEquals(self.char_user1_cell.num_unspent_gifts(), 1)
             self.assertEquals(self.char_user1_cell.completed_games().count(), 1)
             self.assertEquals(self.char_user1_cell.number_of_victories(), 1)
             self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
@@ -582,8 +598,10 @@ class GameModelTests(TestCase):
             game_invite.attendance = attendance
             game_invite.save()
             game.give_rewards()
-            self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 1)
-            self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 1)
+            self.update_char_stats()
+
+            self.assertEquals(self.char_user1_cell.num_unspent_rewards(), 1)
+            self.assertEquals(self.char_user1_cell.num_unspent_gifts(), 1)
             self.assertEquals(self.char_user1_cell.completed_games().count(), 1)
             self.assertEquals(self.char_user1_cell.number_of_victories(), 1)
             self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
@@ -596,10 +614,11 @@ class GameModelTests(TestCase):
             attendance.refresh_from_db()
             attendance.change_outcome(new_outcome = WIN, is_confirmed = True, attending_character = self.char_user1_cell2)
             self.char_user1_cell.refresh_from_db()
+            self.update_char_stats()
 
             self.assertEquals(self.char_user1_cell.is_dead(), False)
-            self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 0)
-            self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 0)
+            self.assertEquals(self.char_user1_cell.num_unspent_rewards(), 0)
+            self.assertEquals(self.char_user1_cell.num_unspent_gifts(), 0)
             self.assertEquals(self.char_user1_cell.completed_games().count(), 0)
             self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
             self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
@@ -607,8 +626,8 @@ class GameModelTests(TestCase):
             self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR)
 
             self.assertEquals(self.char_user1_cell2.is_dead(), False)
-            self.assertEquals(self.char_user1_cell2.unspent_rewards().count(), 1)
-            self.assertEquals(self.char_user1_cell2.unspent_gifts().count(), 1)
+            self.assertEquals(self.char_user1_cell2.num_unspent_rewards(), 1)
+            self.assertEquals(self.char_user1_cell2.num_unspent_gifts(), 1)
             self.assertEquals(self.char_user1_cell2.completed_games().count(), 1)
             self.assertEquals(self.char_user1_cell2.number_of_victories(), 1)
             self.assertEquals(self.char_user1_cell2.number_of_losses(), 0)
@@ -626,10 +645,11 @@ class GameModelTests(TestCase):
             attendance.refresh_from_db()
             attendance.change_outcome(new_outcome = RINGER_VICTORY, is_confirmed = True)
             # We switched the character to one owned by user2, so now user2 gets the rewards
+            self.update_char_stats()
 
             self.assertEquals(self.char_user1_cell.is_dead(), False)
-            self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 0)
-            self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 0)
+            self.assertEquals(self.char_user1_cell.num_unspent_rewards(), 0)
+            self.assertEquals(self.char_user1_cell.num_unspent_gifts(), 0)
             self.assertEquals(self.char_user1_cell.completed_games().count(), 0)
             self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
             self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
@@ -637,8 +657,8 @@ class GameModelTests(TestCase):
             self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR)
 
             self.assertEquals(self.char_user1_cell2.is_dead(), False)
-            self.assertEquals(self.char_user1_cell2.unspent_rewards().count(), 0)
-            self.assertEquals(self.char_user1_cell2.unspent_gifts().count(), 0)
+            self.assertEquals(self.char_user1_cell2.num_unspent_rewards(), 0)
+            self.assertEquals(self.char_user1_cell2.num_unspent_gifts(), 0)
             self.assertEquals(self.char_user1_cell2.completed_games().count(), 0)
             self.assertEquals(self.char_user1_cell2.number_of_victories(), 0)
             self.assertEquals(self.char_user1_cell2.number_of_losses(), 0)
@@ -655,10 +675,11 @@ class GameModelTests(TestCase):
 
             attendance.refresh_from_db()
             attendance.change_outcome(new_outcome=DEATH, is_confirmed=True, attending_character=self.char_user1_cell)
+            self.update_char_stats()
 
             self.assertEquals(self.char_user1_cell.is_dead(), True)
-            self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 0)
-            self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 0)
+            self.assertEquals(self.char_user1_cell.num_unspent_rewards(), 0)
+            self.assertEquals(self.char_user1_cell.num_unspent_gifts(), 0)
             self.assertEquals(self.char_user1_cell.completed_games().count(), 1)
             self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
             self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
@@ -666,8 +687,8 @@ class GameModelTests(TestCase):
             self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR)
 
             self.assertEquals(self.char_user1_cell2.is_dead(), False)
-            self.assertEquals(self.char_user1_cell2.unspent_rewards().count(), 0)
-            self.assertEquals(self.char_user1_cell2.unspent_gifts().count(), 0)
+            self.assertEquals(self.char_user1_cell2.num_unspent_rewards(), 0)
+            self.assertEquals(self.char_user1_cell2.num_unspent_gifts(), 0)
             self.assertEquals(self.char_user1_cell2.completed_games().count(), 0)
             self.assertEquals(self.char_user1_cell2.number_of_victories(), 0)
             self.assertEquals(self.char_user1_cell2.number_of_losses(), 0)
@@ -684,10 +705,11 @@ class GameModelTests(TestCase):
 
             attendance.refresh_from_db()
             attendance.change_outcome(new_outcome=DEATH, is_confirmed=True, attending_character=self.char_user1_cell2)
+            self.update_char_stats()
 
             self.assertEquals(self.char_user1_cell.is_dead(), False)
-            self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 0)
-            self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 0)
+            self.assertEquals(self.char_user1_cell.num_unspent_rewards(), 0)
+            self.assertEquals(self.char_user1_cell.num_unspent_gifts(), 0)
             self.assertEquals(self.char_user1_cell.completed_games().count(), 0)
             self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
             self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
@@ -695,8 +717,8 @@ class GameModelTests(TestCase):
             self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR)
 
             self.assertEquals(self.char_user1_cell2.is_dead(), True)
-            self.assertEquals(self.char_user1_cell2.unspent_rewards().count(), 0)
-            self.assertEquals(self.char_user1_cell2.unspent_gifts().count(), 0)
+            self.assertEquals(self.char_user1_cell2.num_unspent_rewards(), 0)
+            self.assertEquals(self.char_user1_cell2.num_unspent_gifts(), 0)
             self.assertEquals(self.char_user1_cell2.completed_games().count(), 1)
             self.assertEquals(self.char_user1_cell2.number_of_victories(), 0)
             self.assertEquals(self.char_user1_cell2.number_of_losses(), 0)
@@ -739,8 +761,9 @@ class GameModelTests(TestCase):
             game_invite.attendance = attendance
             game_invite.save()
             game.give_rewards()
-            self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 1)
-            self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 1)
+            self.update_char_stats()
+            self.assertEquals(self.char_user1_cell.num_unspent_rewards(), 1)
+            self.assertEquals(self.char_user1_cell.num_unspent_gifts(), 1)
             self.assertEquals(self.char_user1_cell.completed_games().count(), 1)
             self.assertEquals(self.char_user1_cell.number_of_victories(), 1)
             self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
@@ -752,10 +775,11 @@ class GameModelTests(TestCase):
 
             attendance.refresh_from_db()
             attendance.change_outcome(new_outcome = WIN, is_confirmed = False, attending_character = self.char_user1_cell2)
+            self.update_char_stats()
 
             self.assertEquals(self.char_user1_cell.is_dead(), False)
-            self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 0)
-            self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 0)
+            self.assertEquals(self.char_user1_cell.num_unspent_rewards(), 0)
+            self.assertEquals(self.char_user1_cell.num_unspent_gifts(), 0)
             self.assertEquals(self.char_user1_cell.completed_games().count(), 0)
             self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
             self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
@@ -763,8 +787,8 @@ class GameModelTests(TestCase):
             self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR)
 
             self.assertEquals(self.char_user1_cell2.is_dead(), False)
-            self.assertEquals(self.char_user1_cell2.unspent_rewards().count(), 0)
-            self.assertEquals(self.char_user1_cell2.unspent_gifts().count(), 0)
+            self.assertEquals(self.char_user1_cell2.num_unspent_rewards(), 0)
+            self.assertEquals(self.char_user1_cell2.num_unspent_gifts(), 0)
             self.assertEquals(self.char_user1_cell2.completed_games().count(), 0)
             self.assertEquals(self.char_user1_cell2.number_of_victories(), 0)
             self.assertEquals(self.char_user1_cell2.number_of_losses(), 0)
@@ -781,10 +805,11 @@ class GameModelTests(TestCase):
 
             attendance.refresh_from_db()
             attendance.change_outcome(new_outcome=WIN, is_confirmed=True, attending_character=self.char_user1_cell2)
+            self.update_char_stats()
 
             self.assertEquals(self.char_user1_cell.is_dead(), False)
-            self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 0)
-            self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 0)
+            self.assertEquals(self.char_user1_cell.num_unspent_rewards(), 0)
+            self.assertEquals(self.char_user1_cell.num_unspent_gifts(), 0)
             self.assertEquals(self.char_user1_cell.completed_games().count(), 0)
             self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
             self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
@@ -792,8 +817,8 @@ class GameModelTests(TestCase):
             self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR)
 
             self.assertEquals(self.char_user1_cell2.is_dead(), False)
-            self.assertEquals(self.char_user1_cell2.unspent_rewards().count(), 1)
-            self.assertEquals(self.char_user1_cell2.unspent_gifts().count(), 1)
+            self.assertEquals(self.char_user1_cell2.num_unspent_rewards(), 1)
+            self.assertEquals(self.char_user1_cell2.num_unspent_gifts(), 1)
             self.assertEquals(self.char_user1_cell2.completed_games().count(), 1)
             self.assertEquals(self.char_user1_cell2.number_of_victories(), 1)
             self.assertEquals(self.char_user1_cell2.number_of_losses(), 0)
@@ -811,10 +836,11 @@ class GameModelTests(TestCase):
             attendance.refresh_from_db()
             attendance.change_outcome(new_outcome = RINGER_VICTORY, is_confirmed = False)
             # We switched the character to one owned by user2, so now user2 gets the rewards
+            self.update_char_stats()
 
             self.assertEquals(self.char_user1_cell.is_dead(), False)
-            self.assertEquals(self.char_user1_cell.unspent_rewards().count(), 0)
-            self.assertEquals(self.char_user1_cell.unspent_gifts().count(), 0)
+            self.assertEquals(self.char_user1_cell.num_unspent_rewards(), 0)
+            self.assertEquals(self.char_user1_cell.num_unspent_gifts(), 0)
             self.assertEquals(self.char_user1_cell.completed_games().count(), 0)
             self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
             self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
@@ -822,8 +848,8 @@ class GameModelTests(TestCase):
             self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR)
 
             self.assertEquals(self.char_user1_cell2.is_dead(), False)
-            self.assertEquals(self.char_user1_cell2.unspent_rewards().count(), 0)
-            self.assertEquals(self.char_user1_cell2.unspent_gifts().count(), 0)
+            self.assertEquals(self.char_user1_cell2.num_unspent_rewards(), 0)
+            self.assertEquals(self.char_user1_cell2.num_unspent_gifts(), 0)
             self.assertEquals(self.char_user1_cell2.completed_games().count(), 0)
             self.assertEquals(self.char_user1_cell2.number_of_victories(), 0)
             self.assertEquals(self.char_user1_cell2.number_of_losses(), 0)
@@ -840,6 +866,7 @@ class GameModelTests(TestCase):
 
             attendance.refresh_from_db()
             attendance.change_outcome(new_outcome=RINGER_VICTORY, is_confirmed=True)
+            self.update_char_stats()
             self.assertEquals(self.user1.profile.get_avail_improvements().count(), 0)
             self.assertEquals(self.user1.profile.get_avail_charon_coins().count(), 0)
             self.assertEquals(self.user1.profile.get_avail_exp_rewards().count(), 1)
@@ -876,6 +903,7 @@ class GameModelTests(TestCase):
             game_invite.attendance = attendance
             game_invite.save()
             game.give_rewards()
+            self.update_char_stats()
             self.assertFalse(game.achieves_golden_ratio())
             self.assertEquals(self.user1.profile.get_avail_improvements().count(), 0)
             self.assertEquals(self.user1.profile.get_avail_charon_coins().count(), 0)
@@ -903,6 +931,7 @@ class GameModelTests(TestCase):
             attendance2.give_reward()
             game.refresh_from_db()
             game.recalculate_gm_reward(False)
+            self.update_char_stats()
 
             self.assertTrue(game.achieves_golden_ratio())
             self.assertEquals(self.user1.profile.get_avail_improvements().count(), 0)
@@ -922,6 +951,7 @@ class GameModelTests(TestCase):
             attendance2.change_outcome(new_outcome=WIN, is_confirmed=True)
             game.refresh_from_db()
             game.recalculate_gm_reward(True)
+            self.update_char_stats()
 
             self.assertFalse(game.achieves_golden_ratio())
             self.assertEquals(self.user1.profile.get_avail_improvements().count(), 0)
@@ -965,6 +995,7 @@ class GameModelTests(TestCase):
             game_invite.attendance = attendance
             game_invite.save()
             game.give_rewards()
+            self.update_char_stats()
             self.assertFalse(game.achieves_golden_ratio())
             self.assertEquals(self.user1.profile.get_avail_improvements().count(), 0)
             self.assertEquals(self.user1.profile.get_avail_charon_coins().count(), 0)
@@ -1037,3 +1068,4 @@ class GameModelTests(TestCase):
             self.assertEquals(self.cell_owner.profile.get_avail_improvements().count(), 2) # user2's first game
             self.assertEquals(self.cell_owner.profile.get_avail_charon_coins().count(), 0)
             self.assertEquals(self.cell_owner.profile.get_avail_exp_rewards().count(), 3) # cell_owner gmed the game
+

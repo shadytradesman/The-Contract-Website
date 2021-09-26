@@ -137,12 +137,12 @@
         </p>
     </div>
 {% endif %}
-{% if character.get_power_cost_total != character.active_spent_rewards|length %}
+{% if character.show_gift_alert %}
     <div class="alert alert-danger text-center css-char-alert" role="alert">
         <p>
             {{character.name}}'s Power value does not match their spent Gifts! </br>
             <b>Power Value: </b>{{character.get_power_cost_total}}
-            <b>Spent Rewards: </b>{{character.active_spent_rewards|length}}
+            <b>Spent Rewards: </b>{{character.num_active_spent_rewards }}
         </p>
     </div>
 {% endif %}

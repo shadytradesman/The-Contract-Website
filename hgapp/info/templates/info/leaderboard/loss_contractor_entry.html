@@ -1,14 +1,14 @@
 {% extends "info/leaderboard/leaderboard_entry_template.html" %}
 
 {% block entry_content %}
-<a href="{% url 'characters:characters_view' character.id %}">
+<a href="{% url 'characters:characters_view' character.id %}"  class="css-contractor-sub">
     <b>{{character.name}}</b>
-    <br>
-    <span class="main-subtitle">
-        The {{character.concept_summary}}
-    </span>
-    <div class="subtitle">
-        <b>{{character.num_losses}}</b> Losses
-    </div>
+    <p class="main-subtitle">
+        the {{character.concept_summary}}
+        <br>
+        <span class="subtitle">
+            <b>{{character.num_losses}}</b> Losses in {{character.num_games}} Games
+        </span>
+    </p>
 </a>
 {% endblock %}

@@ -2,7 +2,8 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from characters.models import Character, ContractStats, Asset, Liability, AssetDetails, LiabilityDetails, Attribute, \
     AttributeValue, Ability, AbilityValue, Roll, NO_PARRY_INFO, NO_SPEED_INFO, UNAVOIDABLE, FREE_ACTION, TraumaRevision, \
-    Trauma
+    Trauma, NOT_PORTED, SEASONED_PORTED, VETERAN_PORTED, PORTED_GIFT_ADJUSTMENT, PORTED_IMPROVEMENT_ADJUSTMENT, \
+    PORTED_EXP_ADJUSTMENT, EXP_NEW_CHAR
 from games.models import Reward
 from cells.models import Cell
 from django.utils import timezone
@@ -91,6 +92,14 @@ class CharacterModelTests(TestCase):
             tutorial_text="tut"
         )
 
+    def grant_empty_stats_to_char_full(self):
+        stats_snapshot = ContractStats(assigned_character=self.char_full,
+                                       is_snapshot=True,
+                                       exp_cost=0)
+        stats_snapshot.save()
+        self.char_full.stats_snapshot = stats_snapshot
+        self.char_full.save()
+
     def grant_basic_stats_to_char_full(self):
         stats_snapshot = ContractStats(assigned_character=self.char_full,
                                        is_snapshot=True)
@@ -152,11 +161,64 @@ class CharacterModelTests(TestCase):
         )
         coin_reward.save()
 
+    def validate_ported_rewards(self, character, ported_status):
+        self.assertEquals(character.ported, ported_status)
+        self.assertEquals(character.num_unspent_rewards(), PORTED_IMPROVEMENT_ADJUSTMENT[ported_status] \
+                          + PORTED_GIFT_ADJUSTMENT[ported_status])
+        self.assertEquals(character.num_unspent_gifts(), PORTED_GIFT_ADJUSTMENT[ported_status])
+        self.assertEquals(character.num_unspent_improvements(), PORTED_IMPROVEMENT_ADJUSTMENT[ported_status])
+        self.assertEquals(character.unspent_experience(), EXP_NEW_CHAR + PORTED_EXP_ADJUSTMENT[ported_status])
+        self.assertEquals(character.ported, ported_status)
+
     def test_basic_privacy(self):
         self.assertTrue(self.char_full.player_can_view(self.user1))
         self.assertTrue(self.char_full.player_can_view(self.user2))
         self.assertFalse(self.char_reqs.player_can_view(self.user1))
         self.assertTrue(self.char_reqs.player_can_view(self.user2))
+
+    def test_ported_status_change(self):
+        self.grant_empty_stats_to_char_full()
+        self.assertEquals(self.char_full.num_unspent_rewards(), 0)
+        self.assertEquals(self.char_full.num_unspent_gifts(), 0)
+        self.assertEquals(self.char_full.num_unspent_improvements(), 0)
+        self.assertEquals(self.char_full.unspent_experience(), EXP_NEW_CHAR)
+        self.assertEquals(self.char_full.ported, NOT_PORTED)
+
+        new_ported_status = NOT_PORTED
+        self.char_full.change_ported_status(new_ported_status)
+        self.validate_ported_rewards(self.char_full, new_ported_status)
+
+        new_ported_status = SEASONED_PORTED
+        self.char_full.change_ported_status(new_ported_status)
+        self.validate_ported_rewards(self.char_full, new_ported_status)
+
+        new_ported_status = VETERAN_PORTED
+        self.char_full.change_ported_status(new_ported_status)
+        self.validate_ported_rewards(self.char_full, new_ported_status)
+
+        new_ported_status = SEASONED_PORTED
+        self.char_full.change_ported_status(new_ported_status)
+        self.validate_ported_rewards(self.char_full, new_ported_status)
+
+        new_ported_status = VETERAN_PORTED
+        self.char_full.change_ported_status(new_ported_status)
+        self.validate_ported_rewards(self.char_full, new_ported_status)
+
+        new_ported_status = NOT_PORTED
+        self.char_full.change_ported_status(new_ported_status)
+        self.validate_ported_rewards(self.char_full, new_ported_status)
+
+        new_ported_status = VETERAN_PORTED
+        self.char_full.change_ported_status(new_ported_status)
+        self.validate_ported_rewards(self.char_full, new_ported_status)
+
+        new_ported_status = SEASONED_PORTED
+        self.char_full.change_ported_status(new_ported_status)
+        self.validate_ported_rewards(self.char_full, new_ported_status)
+
+        new_ported_status = NOT_PORTED
+        self.char_full.change_ported_status(new_ported_status)
+        self.validate_ported_rewards(self.char_full, new_ported_status)
 
     def test_basic_death_and_void(self):
         self.char_full.kill()
@@ -629,3 +691,4 @@ class RollModelTests(TestCase):
         roll6 = Roll.get_body_roll(difficulty=7, speed=NO_SPEED_INFO)
         self.assertEquals(roll5, roll6)
         self.assertEquals(Roll.objects.count(), 3)
+
