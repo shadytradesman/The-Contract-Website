@@ -32,14 +32,14 @@
                 <div class="panel-body css-guide-content">
                     {% for section in sections %}
                         <div id="{{section.slug}}" class="css-guide-section"></div>
-                        <div class="text-center">
+                        <div {% if section.heder_level < 4 %} class="text-center" {% endif %} >
                             <h{{section.header_level}}>
                                 {{section.title}}
                             </h{{section.header_level}}>
                             <a class="btn btn-xs" href="#{{section.slug}}">
                                 <i class="fa fa-link"></i> link to this section
                             </a>
-                            {% if section.header_level < 2 %}
+                            {% if section.header_level < 3 %}
                                 <hr>
                             {% endif %}
                             <div>

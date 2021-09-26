@@ -50,6 +50,7 @@ class GuideSection(models.Model):
     def __render_content(self):
         rendered_content = self.__render_section_links(str(self.content))
         rendered_content = self.__render_columns(rendered_content)
+        rendered_content = self.__render_gm_tip(rendered_content)
         return rendered_content
 
 
@@ -66,6 +67,14 @@ class GuideSection(models.Model):
         rendered_content = re.sub(r"\{!col2!\}", col2_start, rendered_content)
         rendered_content = re.sub(r"\{!colend!\}", col_end, rendered_content)
         return rendered_content
+
+    def __render_gm_tip(self, content):
+        start = '<div class="css-gm-tip"><div class="css-gm-tip-header"><span class="glyphicon glyphicon-star" aria-hidden="true"></span> GM Tip</div><div class="css-gm-tip-content">'
+        end = '</div></div>'
+        rendered_content = re.sub(r"\{!start-gm-tip!\}", start, content)
+        rendered_content = re.sub(r"\{!end-gm-tip!\}", end, rendered_content)
+        return rendered_content
+
 
     #Render text on save. Replaces
     # {{fancy-section}} with entire section
