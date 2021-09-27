@@ -5,6 +5,14 @@
     visibility: hidden;
 }
 
+#main-container {
+    max-width: 1650px;
+    margin: auto;
+}
+
+.css-guidebook-col {
+}
+
 /* required for scrollspy */
 body {position:relative;}
 
@@ -14,17 +22,46 @@ body {position:relative;}
 #js-guide-index {
     position: fixed;
     max-height: calc(100vh - 60px);
+    max-width: 400px;
     overflow: auto;
     top: 60px;
 }
 
+@media(max-width: 1540px) {
+    #js-guide-index {
+        max-width: 330px;
+    }
+}
+
+@media(max-width: 740px) {
+    #js-guide-index {
+        max-width: 280px;
+    }
+}
 
 .css-inner-nav-list {
     padding-left: 20px;
 }
 
-.css-guide-content {
+.css-section-body {
     background-color: #353e4b !important;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.css-guide-content {
+
+}
+
+.css-section-anchor-link {
+    margin-top: -15px;
+    text-align: left;
+}
+@media(max-width: 768px) {
+    .css-section-anchor-link {
+        margin-top: -8px;
+        text-align: center;
+    }
 }
 
 
@@ -33,9 +70,9 @@ body {position:relative;}
     padding-left: 15px;
     padding-right: 15px;
     padding-top: 5px;
-    padding-bottom: 5px;
+    padding-bottom: 10px;
     font-style: italic;
-    background-color: #454e5b !important;
+    background-color: #455864 !important;
     border-radius: 4px;
     border: 1px solid #252e3b;
 }
@@ -49,6 +86,15 @@ body {position:relative;}
     padding-left: 20px;
 }
 
+.css-subsection {
+    background-color: #454e5b !important;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 5px;
+    padding-bottom: 10px;
+    border-radius: 4px;
+    border: 1px solid #252e3b;
+}
 
 /* navbar style */
 

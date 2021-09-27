@@ -16,7 +16,7 @@
 
 {% block body_base %}
 <div class="container-fluid">
-    <div id="article-container" class="row">
+    <div id="main-container" class="row">
         <div class="col-sm-4 col-md-3 hidden-xs css-toc-sec">
             <div id="js-guide-index" class="guide-toc">
                 <h3 class="text-center">{{guidebook.title}} Index</h3>
@@ -24,7 +24,7 @@
                 {{nav_list|safe}}
             </div>
         </div>
-        <div class="col-sm-8 col-md-9 ">
+        <div class="col-sm-8 col-md-9 css-guidebook-col">
             <h1 class="text-center">
                 {{guidebook.title}}
             </h1>
@@ -32,13 +32,10 @@
                 <div class="panel-body css-guide-content">
                     {% for section in sections %}
                         <div id="{{section.slug}}" class="css-guide-section"></div>
-                        <div {% if section.heder_level < 4 %} class="text-center" {% endif %} >
+                        <div class="text-center">
                             <h{{section.header_level}}>
                                 {{section.title}}
                             </h{{section.header_level}}>
-                            <a class="btn btn-xs" href="#{{section.slug}}">
-                                <i class="fa fa-link"></i> link to this section
-                            </a>
                             {% if section.header_level < 3 %}
                                 <hr>
                             {% endif %}
@@ -58,6 +55,11 @@
                                     </a>
                                 {% endif %}
                             </div>
+                        </div>
+                        <div class="css-section-anchor-link">
+                            <a class="btn-xs" href="#{{section.slug}}">
+                                <i class="fa fa-link"></i> link to this section
+                            </a>
                         </div>
                         <div class="css-section-body">
                             {{section.rendered_content|safe}}

@@ -60,8 +60,8 @@ class GuideSection(models.Model):
 
     # {!col1!} {!col2!} {!colend!}
     def __render_columns(self, content):
-        col1_start = '<div class="row"><div class="col-sm-6 col-xs-12">'
-        col2_start = '</div><div class="col-sm-6 col-xs-12">'
+        col1_start = '<div class="row"><div class="col-md-6 col-xs-12">'
+        col2_start = '</div><div class="col-md-6 col-xs-12">'
         col_end = '</div></div>'
         rendered_content = re.sub(r"\{!col1!\}", col1_start, content)
         rendered_content = re.sub(r"\{!col2!\}", col2_start, rendered_content)
