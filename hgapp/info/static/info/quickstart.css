@@ -1,6 +1,8 @@
 .css-quickstart-container {
     background-color: #262d37;
     padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 .css-quickstart-action {
@@ -16,6 +18,10 @@
 
 .css-quickstart-gm-text {
     margin-top: 10px;
+}
+
+h4 {
+    font-size: 20px;
 }
 
 .css-qs-roll-results {
@@ -57,9 +63,19 @@
 }
 
 .css-narrative {
-    padding: 10px;
-    font-size: 16px;
-    color: skyblue;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-bottom: 10px !important;
+    margin-top: 10px !important;
+    font-size: 15px;
+    color: #A4C0D1;
+    font-family: Georgia;
+    border-color: #a6763a;
+    border-left-width: 1px;
+    border-right-width: 0px;
+    border-top-width: 0px;
+    border-bottom-width: 0px;
+    border-style: solid;
 }
 
 .css-rules {
@@ -130,8 +146,24 @@
 }
 
 .css-two-thirds-col {
+    padding-top: 10px;
+    padding-bottom: 10px;
     width: 66%;
     background-color: rgba(17, 20, 24, 0.5);
+    border-color: #a6763a;
+    border-left-width: 1px;
+    border-right-width: 0px;
+    border-top-width: 0px;
+    border-bottom-width: 0px;
+    border-style: solid;
+}
+
+.css-two-thirds-col .css-narrative {
+    border-width: 0px;
+}
+
+.css-two-thirds-col-right .css-narrative {
+    border-width: 0px;
 }
 
 .css-two-thirds-col-right {
@@ -139,6 +171,14 @@
     position: relative;
     left: 33%;
     background-color: rgba(17, 20, 24, 0.5);
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-color: #a6763a;
+    border-left-width: 1px;
+    border-right-width: 0px;
+    border-top-width: 0px;
+    border-bottom-width: 0px;
+    border-style: solid;
 }
 
 @media(max-width: 768px) {
@@ -178,15 +218,13 @@
 }
 
 .css-attribute-color {
-    color: blue;
 }
 
 .css-ability-color {
-    color: purple;
 }
 
 .css-sec-ability-color {
-    color: violet;
+    color: #A4C0D1;
 }
 
 // HEALTH WIDGET
@@ -264,6 +302,10 @@ input[type="number"] {
 .css-inline-image {
     max-width: 100%;
     max-height: 100%;
+    border-style: solid;
+    border-color: black; //#a6763a;
+    border-width: 1px;
+    border-radius: 4px;
 }
 
 

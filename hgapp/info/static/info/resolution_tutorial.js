@@ -48,9 +48,8 @@ function rollDice(roller, action) {
     roller.find(".js-qs-roll-dice").html("");
     var diff = action.roll.difficulty;
     if (action.isSecondary) {
-        diff = diff - 1;
         roller.find(".js-qs-difficulty-extra")
-            .html("-1 Difficulty from using Secondary Ability means the Difficulty is actually " + diff);
+            .html("(-1 Difficulty from using a Secondary Ability)");
     } else {
         roller.find(".js-qs-difficulty-extra").html("");
     }

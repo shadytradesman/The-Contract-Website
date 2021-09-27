@@ -12,10 +12,10 @@
                 <li>Your Contractor's Character Sheet tracks their stats, status, Powers, equipment, history, and more.</li>
                 <li>The Contract uses online Character Sheets.</li>
                 <li>
-                    Players and GMs access their sheets on mobile devices or print them out before play.
+                    At game-time, Players access their sheets on phones, tablets, laptops, or print them out.
                 </li>
-                <li>
-                    If you ever need to reference a rule at game time, you can
+                <li data-toggle="tooltip" title='Mouse-over tooltips provide useful information throughout the site.'>
+                    If you ever need to reference a rule, you can
                     <span class="visible-xs-inline">tap on</span><span class="hidden-xs">mouse-over</span>
                     any element of your Character Sheet to learn.
                 </li>
@@ -64,7 +64,7 @@
     </div>
     <div class="col-sm-3">
         <figure class="" style="height: 450px; padding: 10px;">
-            <img src="{% static 'info/graphics/fiveintro.jpeg' %}" class="css-inline-image">
+            <img src="{% static 'info/graphics/five_web.jpg' %}" class="css-inline-image">
             <figcaption class="text-center"></figcaption>
         </figure>
     </div>
@@ -110,6 +110,9 @@
                 <li>
                     Only Veteran Contractors can participate in solo Contracts.
                 </li>
+                <li>
+                    The GM states the Contract's required Status in the invitation.
+                </li>
             </ul>
         </div>
     </div>
@@ -152,7 +155,7 @@
     </div>
     <div class="col-sm-5">
         <figure class="" style="height: 450px; padding: 10px;">
-            <img src="{% static 'info/graphics/fiveintro.jpeg' %}" class="css-inline-image">
+            <img src="{% static 'info/graphics/five_web.jpg' %}" class="css-inline-image">
             <figcaption class="text-center"></figcaption>
         </figure>
         <div class=" css-rules">
@@ -180,14 +183,6 @@
     <h4 class="text-center">
         Capabilities
     </h4>
-    <div class="css-narrative css-rules-centered">
-        <p>
-            “Fine. All we gotta do is give some dude a ride on an airplane.”
-        </p>
-        <p>
-            “Yeah,” he scoffed, “I’m sure it’ll be an absolute cakewalk. Now listen, I’ve been a detective for twenty years. I know Five’s got their own set of tricks. What are you good at?”
-        </p>
-    </div>
 </div>
 {% include "info/new_player_guide/attributes-and-abilities.html" %}
 <br>
@@ -210,7 +205,7 @@
                 </p>
             </div>
             <figure class="" style="height: 300px; padding: 10px;">
-                <img src="{% static 'info/graphics/fiveintro.jpeg' %}" class="css-inline-image" >
+                <img src="{% static 'info/graphics/five_web.jpg' %}" class="css-inline-image" >
                 <figcaption class="text-center"></figcaption>
             </figure>
             <div class="css-narrative">
@@ -233,7 +228,7 @@
                 <b>Resolution</b>
                 <ul>
                     <li>
-                        Most of the time, taking actions is as simple as telling the GM what you want to do.
+                        Most of the time, controlling your Contractor is as simple as telling the GM what you'd like to do.
                     </li>
                     <li>
                         When you attempt an action that is dangerous or might not succeed, the GM may call for a roll to determine the outcome. 
@@ -258,16 +253,16 @@
                         Add up your rating in the Attribute and Ability and roll that many 10-sided dice.
                     </li>
                     <li>
-                        Each die contributes to the <b>Outcome</b> based on its result.
+                        Each die's result contributes to the <b>Outcome</b>.
                         <ul>
                             <li>
-                                <b class="css-qs-big">+2</b> for each 10 (or 0)
-                            </li>
-                            <li>
-                                <b class="css-qs-big">-1</b> for each 1
+                                <b class="css-qs-big">+2</b> for each 10 (some dice use 0)
                             </li>
                             <li>
                                 <b class="css-qs-big">+1</b> for each 6 (Difficulty) or higher
+                            </li>
+                            <li>
+                                <b class="css-qs-big">-1</b> for each 1
                             </li>
                         </ul>
                     </li>
@@ -716,12 +711,19 @@
     </div>
 </div>
 
-<div class="row">
+<div class="">
     <h4 class="text-center">
         Powers
     </h4>
-    <div class="col-md-6">
-        <div class="css-narrative">
+    <div id="format-five-time">
+        <span id="css-art-front-time-sm" class="css-art-sm" style='background-image:url("{% static 'overrides/art/front-time.jpg' %}")'></span>
+        <div class="css-content">
+            <div id="css-art-front-music-lg" class="css-art-lg" style='background-image:url("{% static 'overrides/art/front-time.jpg' %}")'>
+            <div class="css-affix-spacer"></div>
+            <div class="css-affix-spacer"></div>
+            <div class="css-affix-spacer"></div>
+            <div class="css-two-thirds-col-right">
+                <div class="css-narrative">
             <p>
                 Bo Perkins snapped his body like he was throwing a punch with his missing arm. There was a blue shimmer, and Bradley flew backwards, slamming into the wall beneath the window. Undeterred, he opened his jaws and prepared to lunge again. 
             </p>
@@ -736,9 +738,7 @@
             <p>I struggled to my feet. More passengers were craning their necks and covering their mouths in shock. I shot Bo a frantic glance.  </p>
             <p>“I’ll deal with it. You go!”</p>
         </div>
-    </div>
-    <div class="col-md-6">
-        <div class="css-rules ">
+        <div class="css-rules css-rules-centered">
             <b>Powers</b>
             <ul>
                 <li>Something about Powers?</li>
@@ -873,25 +873,21 @@
             <p>My heart pounded in my throat. “What did Five say?” </p>
             <p>“They’re on board.” </p>
             <p>“Fuck.” </p>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="css-narrative">
             <p>Bo held out his hand. “Give me the blade, Punk. We’ll all get home safe, and we’ll all get paid.”</p>
             <p>I pulled the pocket knife and turned it over in my hand. The blade caught my reflection. </p>
             <p>“I feel sick,” I said. I handed it over.  </p>
             <p>Bo relaxed. “Trust me kid, you don’t wanna think too much about it.” </p>
             <p>He opened the door and paused. “You made the right choice.”</p>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="css-narrative">
             <p>I probably shouldn’t have, but I watched him walk away. He slipped into a bathroom up the aisle and kept the door open. A few minutes later, a woman walked in. Don’t know how she didn’t see him. </p>
             <p>She closed the door.</p>
             <p>There was one loud bang, something hitting the door.</p>
             <p>People went back to reading their books.</p>
         </div>
-    </div>
-</div>
-<div class="row">
-    <div class="col-xs-12">
-        <div class="css-rules css-rules-centered">
+        <div class="css-rules">
             <b>Trauma</b>
             <ul>
                 <li>
@@ -930,6 +926,10 @@
                 </li>
             </ul>
         </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
     </div>
 </div>
 
