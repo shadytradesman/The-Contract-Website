@@ -4,6 +4,11 @@
     top: -60px;
     visibility: hidden;
 }
+@media (max-width: 768px) {
+    .css-guide-section {
+        top: -100px;
+    }
+}
 
 #main-container {
     max-width: 1650px;
@@ -18,39 +23,14 @@
     .css-guidebook-col {
         padding-left: 0px;
         padding-right: 0px;
+        position: relative;
+        top: 40px;
     }
 }
 
 
 /* required for scrollspy */
 body {position:relative;}
-
-.css-toc-sec {
-}
-
-#js-guide-index {
-    position: fixed;
-    max-height: calc(100vh - 60px);
-    max-width: 400px;
-    overflow: auto;
-    top: 60px;
-}
-
-@media(max-width: 1540px) {
-    #js-guide-index {
-        max-width: 330px;
-    }
-}
-
-@media(max-width: 740px) {
-    #js-guide-index {
-        max-width: 280px;
-    }
-}
-
-.css-inner-nav-list {
-    padding-left: 20px;
-}
 
 .css-section-body {
     background-color: #353e4b !important;
@@ -78,7 +58,7 @@ body {position:relative;}
 }
 
 .css-admin-buttons {
-margin-bottom: 10px;
+    margin-bottom: 10px;
 }
 
 
@@ -122,6 +102,26 @@ margin-bottom: 10px;
     padding-left: 25px;
     width: inherit;
 }
+
+#js-guide-index {
+    position: fixed;
+    max-height: calc(100vh - 60px);
+    max-width: 400px;
+    overflow: auto;
+    top: 60px;
+}
+
+
+@media(max-width: 1540px) {
+    #js-guide-index {
+        max-width: 330px;
+    }
+}
+
+.css-inner-nav-list {
+    padding-left: 20px;
+}
+
 
 .guide-toc h3 {
     padding-right: 25px;
@@ -175,3 +175,66 @@ margin-bottom: 10px;
 .guide-toc .active {
     color: #a6763a;
 }
+
+@media(max-width: 768px) {
+
+    #js-guide-index {
+       position: fixed;
+       max-width: none;
+       overflow-x: scroll;
+       overflow-y: visible;
+       width: 100vw;
+       white-space: nowrap;
+       height: 35px;
+       z-index: 50;
+       top: 51px;
+    }
+
+    .css-toc-sec {
+        margin-left: 0px;
+        padding-left: 0px;
+    }
+
+    #js-guide-index li {
+        display: inline-block;
+        padding-right: 5px;
+        padding-left: 5px;
+        width: auto;
+        height: 100%;
+    }
+
+    .guide-toc {
+        padding-left: 5px;
+    }
+
+    .guide-toc li>a {
+        display: inline-block;
+        width: auto;
+        height: 100%;
+        padding-top: 5px;
+    }
+
+    .guide-toc li {
+        display: inline-block;
+        width: auto;
+        height: 100%;
+    }
+
+    .guide-toc ol {
+        display: inline-block;
+        height: 100%;
+    }
+
+    .css-inner-nav-list {
+        padding-left: 5px;
+    }
+    .guide-toc .active>a {
+        border-right-width: 0px;
+        border-bottom: 1px solid #a6763a;
+        width: auto;
+    }
+    .nav-stacked>li+li {
+        margin-top: 0px;
+    }
+}
+

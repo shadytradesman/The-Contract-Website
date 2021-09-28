@@ -15,13 +15,19 @@ $(document).ready(function(){
 
 $('body').on('activate.bs.scrollspy', function () {
     target = $("#js-guide-index .active").get(0);
+    /* vertical scroll fix */
     if (target.getBoundingClientRect().bottom > window.innerHeight - 50) {
         target.scrollIntoView(false);
-        console.log("scroll bottom");
     }
-
     if (target.getBoundingClientRect().top < 50) {
         target.scrollIntoView();
-        console.log("scroll top");
     }
+    if (target.getBoundingClientRect().left <0 ) {
+        target.scrollIntoView(false);
+    }
+    if (target.getBoundingClientRect().right > window.innerWidth) {
+        target.scrollIntoView();
+    }
+    /* horizontal scroll fix */
+    // TODO: horizontal scroll fix
 })
