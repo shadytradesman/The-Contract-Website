@@ -24,8 +24,4 @@ $('body').on('activate.bs.scrollspy', function () {
         target.scrollIntoView();
         console.log("scroll top");
     }
-//    active.scrollIntoView();
-
-//    var scrollHeight = Math.max(container.scrollHeight, container.clientHeight);
-//    container.scrollTop = scrollHeight - active.position().top;
 })

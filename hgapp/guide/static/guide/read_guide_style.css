@@ -1,4 +1,4 @@
-.css-guide-section{
+.css-guide-section {
     display: block;
     position: relative;
     top: -60px;
@@ -10,8 +10,17 @@
     margin: auto;
 }
 
-.css-guidebook-col {
+@media (max-width: 768px) {
+    .container-fluid {
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+    .css-guidebook-col {
+        padding-left: 0px;
+        padding-right: 0px;
+    }
 }
+
 
 /* required for scrollspy */
 body {position:relative;}
@@ -49,19 +58,27 @@ body {position:relative;}
     border-radius: 4px;
 }
 
-.css-guide-content {
+.css-section-backdrop {
+    background-color: #353e4b !important;
+}
+
+.css-guide-content h3 {
+    margin-top: 0px;
 
 }
 
 .css-section-anchor-link {
-    margin-top: -15px;
-    text-align: left;
+    margin-top: -10px;
 }
+
 @media(max-width: 768px) {
     .css-section-anchor-link {
         margin-top: -8px;
-        text-align: center;
     }
+}
+
+.css-admin-buttons {
+margin-bottom: 10px;
 }
 
 
@@ -103,8 +120,11 @@ body {position:relative;}
     color: #9fb1bc;
     background-color: #20252d;
     padding-left: 25px;
-    padding-right: 25px;
     width: inherit;
+}
+
+.guide-toc h3 {
+    padding-right: 25px;
 }
 
 .guide-toc ol {

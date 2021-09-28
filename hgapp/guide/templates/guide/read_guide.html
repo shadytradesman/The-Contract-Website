@@ -18,9 +18,11 @@
 <div class="container-fluid">
     <div id="main-container" class="row">
         <div class="col-sm-4 col-md-3 hidden-xs css-toc-sec">
-            <div id="js-guide-index" class="guide-toc">
-                <h3 class="text-center">{{guidebook.title}} Index</h3>
-                <hr>
+             <div id="js-guide-index" class="guide-toc">
+                <h3 class="text-center">
+                    {{guidebook.title}} Index
+                    <hr>
+                </h3>
                 {{nav_list|safe}}
             </div>
         </div>
@@ -31,16 +33,16 @@
             <div class="panel panel-default" style="margin-right: 10px; margin-left: 10px;">
                 <div class="panel-body css-guide-content">
                     {% for section in sections %}
+                        {% if section.header_level > 2 %}
+                            <div class="css-section-backdrop">
+                        {% endif %}
                         <div id="{{section.slug}}" class="css-guide-section"></div>
                         <div class="text-center">
                             <h{{section.header_level}}>
                                 {{section.title}}
                             </h{{section.header_level}}>
-                            {% if section.header_level < 3 %}
-                                <hr>
-                            {% endif %}
-                            <div>
-                                {% if can_edit %}
+                            {% if can_edit %}
+                                <div class="css-admin-buttons">
                                     <a class="btn btn-default btn-xs"
                                        href="{% url 'guide:edit_guide_section' guidebook.slug section.slug %}">
                                         Edit Section
@@ -53,17 +55,23 @@
                                        href="{% url 'guide:delete_guide_section' guidebook.slug section.slug %}">
                                         Delete Section
                                     </a>
-                                {% endif %}
+                                </div>
+                            {% endif %}
+                            <div class="css-section-anchor-link">
+                                <a class="btn-xs" href="#{{section.slug}}">
+                                    <i class="fa fa-link"></i> link to this section
+                                </a>
                             </div>
-                        </div>
-                        <div class="css-section-anchor-link">
-                            <a class="btn-xs" href="#{{section.slug}}">
-                                <i class="fa fa-link"></i> link to this section
-                            </a>
+                            {% if section.header_level < 2 %}
+                                <hr>
+                            {% endif %}
                         </div>
                         <div class="css-section-body">
                             {{section.rendered_content|safe}}
                         </div>
+                        {% if section.header_level > 2 %}
+                            </div>
+                        {% endif %}
                     {% empty %}
                         {% if can_edit %}
                             <div>
