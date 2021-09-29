@@ -83,7 +83,7 @@ body {position:relative;}
     padding-left: 20px;
 }
 
-.css-subsection {
+.css-subsection { /* TODO: implement or delete*/
     background-color: #454e5b !important;
     padding-left: 15px;
     padding-right: 15px;
@@ -119,9 +119,12 @@ body {position:relative;}
 }
 
 .css-inner-nav-list {
-    padding-left: 20px;
+    padding-left: 35px;
 }
 
+.guide-toc li>a {
+    padding-left: 5px !important;
+}
 
 .guide-toc h3 {
     padding-right: 25px;
@@ -131,15 +134,28 @@ body {position:relative;}
     list-style: square !important;
     list-style-type:decimal !important;
     color: #9fb1bc;
+    font-weight: bold;
 }
 
 .guide-toc ol ol {
     list-style-type:lower-alpha !important;
+    font-weight: normal;
 }
 
 .guide-toc ol ol ol {
     list-style-type:upper-roman !important;
+    color: #9fb1bc;
 }
+
+.guide-toc ol ol ol li a {
+    list-style-type:upper-roman !important;
+    color: #9fb1bc;
+}
+
+.guide-toc ol ol ol>li+li {
+    margin-top: 0px;
+}
+
 
 .guide-toc ol ol ol ol {
     list-style-type:lower-roman !important;
@@ -160,6 +176,14 @@ body {position:relative;}
     padding: 2px;
 }
 
+.guide-toc ol li>a {
+    padding: 1px;
+}
+
+.guide-toc ol ol li>a {
+    padding: 1px;
+}
+
 .guide-toc li>a:hover {
     background-color: #353e4b !important;
     border-radius: 2px;
@@ -167,9 +191,10 @@ body {position:relative;}
 
 .guide-toc .active>a {
     background-color: #252e3b !important;
-    border-right: 1px solid #a6763a;
+    border-right: 2px solid #a6763a;
     border-radius: 2px;
     width: 100%;
+    font-weight: bold;
 }
 
 .guide-toc .active {
@@ -186,7 +211,7 @@ body {position:relative;}
        width: 100vw;
        white-space: nowrap;
        height: 35px;
-       z-index: 50;
+       z-index: 5;
        top: 51px;
     }
 
@@ -211,7 +236,7 @@ body {position:relative;}
         display: inline-block;
         width: auto;
         height: 100%;
-        padding-top: 5px;
+        padding-top: 5px !important;
     }
 
     .guide-toc li {
