@@ -26,7 +26,8 @@ class ReadGuideBook(View):
         nav_list = '<ol class="nav nav-pills nav-stacked">'
         prev_section = None
         depth = 1
-        for section in sections:
+        num_sections = sections.count()
+        for i, section in enumerate(sections):
             entry = ""
             if prev_section and prev_section.header_level < section.header_level:
                 for x in range(section.header_level - prev_section.header_level):
@@ -36,7 +37,10 @@ class ReadGuideBook(View):
                 for x in range(prev_section.header_level - section.header_level):
                     entry = entry + "</ol>"
                     depth = depth - 1
-            entry = entry + '<li role="presentation"><a href="#{}">{}</a></li>'.format(section.slug, section.title)
+            entry = entry + '<li role="presentation" class="{}"><a href="#{}">{}</a></li>'.format(
+                'js-last-section' if i == num_sections - 1 else "js-first-section" if i == 0 else "",
+                section.slug,
+                section.title)
             nav_list = nav_list + entry
             prev_section = section
         for x in range(depth):

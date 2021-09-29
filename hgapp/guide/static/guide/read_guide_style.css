@@ -100,15 +100,23 @@ body {position:relative;}
     color: #9fb1bc;
     background-color: #20252d;
     padding-left: 25px;
-    width: inherit;
+    height: 100%;
 }
 
 #js-guide-index {
     position: fixed;
-    max-height: calc(100vh - 60px);
+    max-height: calc(100vh - 50px);
     max-width: 400px;
     overflow: auto;
-    top: 60px;
+    padding-top: 10px;
+    padding-bottom: 81px;
+    width: inherit;
+    height: inherit;
+}
+
+#js-guide-index h3 {
+    margin-top: 0px;
+    padding-top: 20px;
 }
 
 
@@ -213,6 +221,8 @@ body {position:relative;}
        height: 35px;
        z-index: 5;
        top: 51px;
+       padding-top: 0px;
+       padding-bottom: 0px;
     }
 
     .css-toc-sec {
@@ -230,6 +240,7 @@ body {position:relative;}
 
     .guide-toc {
         padding-left: 5px;
+        z-index: 15;
     }
 
     .guide-toc li>a {
@@ -248,6 +259,7 @@ body {position:relative;}
     .guide-toc ol {
         display: inline-block;
         height: 100%;
+        background-color: #20252d;
     }
 
     .css-inner-nav-list {

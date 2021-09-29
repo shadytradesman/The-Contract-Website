@@ -17,10 +17,18 @@ $('body').on('activate.bs.scrollspy', function () {
     target = $("#js-guide-index .active").get(0);
     /* vertical scroll fix */
     if (target.getBoundingClientRect().bottom > window.innerHeight - 50) {
+        // scroll at bottom
         target.scrollIntoView(false);
+        if ($(target).hasClass("js-last-section")) {
+            $("#js-guide-index").scrollTop($("#js-guide-index")[0].scrollHeight);
+        }
     }
     if (target.getBoundingClientRect().top < 50) {
+        // scroll at top
         target.scrollIntoView();
+        if ($(target).hasClass("js-first-section")) {
+            $("#js-guide-index").scrollTop(0);
+        }
     }
     if (target.getBoundingClientRect().left <0 ) {
         target.scrollIntoView(false);
