@@ -181,13 +181,13 @@ class EditGuideSection(WriteGuideSection):
                                                  slug=self.kwargs['section_slug'],
                                                  is_deleted=False)
         previous_sections = GuideSection.objects\
-            .filter(book=self.kwargs['guidebook_slug'], position__lt=self.current_section.position, is_deleted=False)\
+            .filter(book=self.kwargs['guidebook_slug'], is_deleted=False, position__lt=self.current_section.position)\
             .order_by('position')
         if previous_sections.count() > 0:
             self.previous_section = previous_sections.all().last()
         next_sections = GuideSection.objects \
-            .filter(book=self.kwargs['guidebook_slug'], position__gt=self.current_section.position, is_deleted=False) \
-            .order_by('position')
+            .filter(book=self.kwargs['guidebook_slug'], is_deleted=False, position__gt=self.current_section.position) \
+            .order_by('-position')
         if next_sections.count() > 0:
             self.next_section = next_sections.all().last()
         self.initial = {
