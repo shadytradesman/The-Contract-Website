@@ -63,8 +63,10 @@ class DeleteGuideSection(View):
         if not self.request.user.is_superuser:
             raise PermissionDenied("Only admins can edit the players guide")
         self.guidebook = get_object_or_404(GuideBook, pk=self.kwargs['guidebook_slug'])
-        self.current_section = get_object_or_404(GuideSection, book=self.kwargs['guidebook_slug'],
-                                                 slug=self.kwargs['section_slug'])
+        self.current_section = get_object_or_404(GuideSection,
+                                                 book=self.kwargs['guidebook_slug'],
+                                                 slug=self.kwargs['section_slug'],
+                                                 is_deleted=False)
         return super().dispatch(*args, **kwargs)
 
     def get(self, request, *args, **kwargs):
@@ -123,7 +125,10 @@ class WriteNewGuideSection(WriteGuideSection):
     def dispatch(self, *args, **kwargs):
         if 'section_slug' in self.kwargs:
             # write new section after provided section
-            self.previous_section = get_object_or_404(GuideSection, book=self.kwargs['guidebook_slug'], slug=self.kwargs['section_slug'])
+            self.previous_section = get_object_or_404(GuideSection,
+                                                      book=self.kwargs['guidebook_slug'],
+                                                      slug=self.kwargs['section_slug'],
+                                                      is_deleted=False)
             guidebook = get_object_or_404(GuideBook, pk=self.kwargs['guidebook_slug'])
             sections = GuideSection.objects.filter(book=guidebook, is_deleted=False).order_by('position').all()
             num_sections = GuideSection.objects.filter(book=guidebook, is_deleted=False).order_by('position').count()
@@ -171,7 +176,10 @@ class WriteNewGuideSection(WriteGuideSection):
 
 class EditGuideSection(WriteGuideSection):
     def dispatch(self, *args, **kwargs):
-        self.current_section = get_object_or_404(GuideSection, book=self.kwargs['guidebook_slug'], slug=self.kwargs['section_slug'])
+        self.current_section = get_object_or_404(GuideSection,
+                                                 book=self.kwargs['guidebook_slug'],
+                                                 slug=self.kwargs['section_slug'],
+                                                 is_deleted=False)
         previous_sections = GuideSection.objects\
             .filter(book=self.kwargs['guidebook_slug'], position__lt=self.current_section.position)\
             .order_by('position')
