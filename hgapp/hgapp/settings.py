@@ -130,6 +130,7 @@ INSTALLED_APPS = [
     'tinymce',
     "blog",
     "pinax.images",
+    'social_django',
 
     #Wiki
     #'django.contrib.sites.apps.SitesConfig',
@@ -356,6 +357,7 @@ ACCOUNT_TIMEZONES = list(zip(pytz.common_timezones, pytz.common_timezones))
 
 
 AUTHENTICATION_BACKENDS = [
+    "social_core.backends.facebook.FacebookOAuth2",
     "account.auth_backends.UsernameAuthenticationBackend",
     'guardian.backends.ObjectPermissionBackend',
 ]
@@ -435,3 +437,22 @@ TINYMCE_DEFAULT_CONFIG = {
 
 # Pinax Blog settings
 PINAX_BLOG_SLUG_UNIQUE = True
+
+# Social auth settings
+SOCIAL_AUTH_URL_NAMESPACE = 'social'
+SOCIAL_AUTH_PIPELINE = (
+    'social_core.pipeline.social_auth.social_details',
+    'social_core.pipeline.social_auth.social_uid',
+    'social_core.pipeline.social_auth.social_user',
+    #'social_core.pipeline.user.get_username',
+    'social_core.pipeline.user.create_user',
+    'social_core.pipeline.social_auth.associate_user',
+    'social_core.pipeline.user.user_details',
+    'social_core.pipeline.user.user_details',
+)
+if DEBUG:
+    SOCIAL_AUTH_FACEBOOK_KEY = "1148039019057921"
+    SOCIAL_AUTH_FACEBOOK_SECRET = ""
+else:
+    SOCIAL_AUTH_FACEBOOK_KEY = os.environ["FACEBOOK_APP_KEY"]
+    SOCIAL_AUTH_FACEBOOK_SECRET = os.environ["FACEBOOK_APP_SECRET"]

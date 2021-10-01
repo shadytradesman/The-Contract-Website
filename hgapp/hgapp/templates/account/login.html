@@ -22,6 +22,9 @@
                         <button type="submit" class="btn btn-primary">{% trans "Log in" %}</button>
                         <a href="{% url "account_password_reset" %}" class="btn btn-link">{% trans "Forgot your password?" %}</a>
                     </form>
+                    <button class="btn btn-primary mb-2">
+                        <a href="{% url 'social:begin' 'facebook' %}">Login with Facebook</a>
+                    </button>
                     {% if ACCOUNT_OPEN_SIGNUP %}
                         <p class="login-signup">
                             <small>

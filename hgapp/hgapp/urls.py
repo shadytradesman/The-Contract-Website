@@ -43,6 +43,7 @@ urlpatterns = [
     path('wiki/', include('wiki.urls')),
     url(r"^news/", include("blog.urls", namespace="pinax_blog")),
     url(r"^ajax/images/", include("pinax.images.urls", namespace="pinax_images")),
+    url(r"^social/", include('social_django.urls', namespace='social')),
 ]
 
 import os
