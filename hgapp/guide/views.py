@@ -28,7 +28,7 @@ class ReadGuideBook(View):
             if book == guidebook:
                 sections_by_book.append((guidebook, sections,))
             else:
-                sections_by_book.append((book, book.get_sections_in_order,))
+                sections_by_book.append((book, book.get_sections_in_order(),))
         nav_list = self.__get_nav_list(sections_by_book, active_book=guidebook)
         can_edit = self.request.user.is_superuser
         context = {
@@ -42,14 +42,16 @@ class ReadGuideBook(View):
     def __get_nav_list(self, sections_by_book, active_book=None):
         nav_list = '<ul class="nav nav-pills nav-stacked">'
         for guidebook, sections in sections_by_book:
+            guidebook_active = guidebook == active_book if active_book else False
             url = guidebook.redirect_url if hasattr(guidebook, "redirect_url") and guidebook.redirect_url \
-                else reverse('guide:read_guidebook', args=(guidebook.slug,))
-            guidebook_expanded = guidebook == active_book if active_book else guidebook.expanded
-            active_book_class = "css-active-book" if guidebook_expanded else ""
-            nav_list = nav_list + '<li class="css-guide-index-book {}"><a href="{}">{}</a></li>'\
+                else "#" if guidebook_active else reverse('guide:read_guidebook', args=(guidebook.slug,))
+            guidebook_expanded = guidebook.expanded if not active_book else guidebook_active
+            active_book_class = "css-active-book" if guidebook_active else ""
+            nav_list = nav_list + '<li class="{}"><a href="{}" class="css-guide-index-book">{}</a>'\
                 .format(active_book_class, url, guidebook.title)
             if guidebook_expanded:
                 nav_list = nav_list + self.__get_nav_list_for_sections(sections)
+            nav_list = nav_list + '</li>' # end guidebook list item
         nav_list = nav_list + "</ul>"
         return nav_list
 

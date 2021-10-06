@@ -99,21 +99,27 @@ body {position:relative;}
     font-size: 18px;
     text-align: center;
     font-weight: bold;
-    margin-left: -12px !important;
 }
 
+.css-active-book-sections {
+    border-left: 1px solid #a6763a;
+}
 
 .css-active-book {
-    background-color: #252e3b !important;
     border-left: 1px solid #a6763a;
-    border-right: 1px solid #a6763a;
+}
+
+.css-active-book>a {
+    background-color: #252e3b !important;
+    color: white;
+    border-right: 2px solid #a6763a;
+    border-radius: 0px !important;
 }
 
 .guide-toc {
     font-size: 15px;
     color: #9fb1bc;
     background-color: #20252d;
-    padding-left: 25px;
     height: 100%;
 }
 
@@ -148,12 +154,8 @@ body {position:relative;}
     padding-left: 5px !important;
 }
 
-.guide-toc h3 {
-    padding-right: 25px;
-}
-
 .guide-toc ol {
-    list-style: square !important;
+    padding-left: 25px;
     list-style-type:decimal !important;
     color: #9fb1bc;
     font-weight: bold;
@@ -188,13 +190,12 @@ body {position:relative;}
 }
 
 .guide-toc li {
-    width: 100%;
     display: list-item;
 }
 
 .guide-toc li>a {
+    display: inline-block;
     width: 100%;
-    display: block;
     padding: 2px;
 }
 
@@ -215,7 +216,6 @@ body {position:relative;}
     background-color: #252e3b !important;
     border-right: 2px solid #a6763a;
     border-radius: 2px;
-    width: 100%;
     font-weight: bold;
 }
 
@@ -255,6 +255,11 @@ body {position:relative;}
     .guide-toc {
         padding-left: 5px;
         z-index: 15;
+        width: inherit;
+    }
+
+    .guide-toc ul {
+        height: 100%;
     }
 
     .guide-toc li>a {
@@ -262,6 +267,7 @@ body {position:relative;}
         width: auto;
         height: 100%;
         padding-top: 5px !important;
+        padding-right: 5px !important;
     }
 
     .guide-toc li {
@@ -274,11 +280,13 @@ body {position:relative;}
         display: inline-block;
         height: 100%;
         background-color: #20252d;
+        padding-left: 0px;
     }
 
     .css-inner-nav-list {
         padding-left: 5px;
     }
+
     .guide-toc .active>a {
         border-right-width: 0px;
         border-bottom: 1px solid #a6763a;
@@ -286,6 +294,24 @@ body {position:relative;}
     }
     .nav-stacked>li+li {
         margin-top: 0px;
+    }
+
+    .css-guide-index-book {
+        font-size: 14px;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .css-active-book-sections {
+        border-left: 0px solid #a6763a;
+    }
+
+    .css-active-book {
+        border-left: 0px solid #a6763a;
+    }
+
+    .css-active-book>a {
+        border-width: 0px;
     }
 }
 
