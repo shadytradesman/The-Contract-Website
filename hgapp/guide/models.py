@@ -9,6 +9,13 @@ class GuideBook(models.Model):
     # A container for Guide Sections.
     title = models.CharField(max_length=400)
     slug = models.SlugField("Unique URL-Safe Title", max_length=80, primary_key=True)
+    position = models.PositiveIntegerField(default=1) # determines position in dropdown menu and index
+    expanded = models.BooleanField(default=False) # should this book be expanded in quick-access from navbar
+    redirect_url = models.CharField(max_length=400, blank=True, null=True) # redirect to here instead of being viewable as a guidebook
+
+    def get_sections_in_order(self):
+        return GuideSection.objects.filter(book=self, is_deleted=False).order_by('position').all()
+
 
 
 class GuideSection(models.Model):

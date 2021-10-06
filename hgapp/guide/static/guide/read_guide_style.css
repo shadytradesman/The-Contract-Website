@@ -95,6 +95,20 @@ body {position:relative;}
 
 /* navbar style */
 
+.css-guide-index-book {
+    font-size: 18px;
+    text-align: center;
+    font-weight: bold;
+    margin-left: -12px !important;
+}
+
+
+.css-active-book {
+    background-color: #252e3b !important;
+    border-left: 1px solid #a6763a;
+    border-right: 1px solid #a6763a;
+}
+
 .guide-toc {
     font-size: 15px;
     color: #9fb1bc;

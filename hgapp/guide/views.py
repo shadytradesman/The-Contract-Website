@@ -21,8 +21,39 @@ class ReadGuideBook(View):
 
     def __get_context_data(self):
         guidebook = get_object_or_404(GuideBook, pk=self.kwargs['guidebook_slug'])
-        sections = GuideSection.objects.filter(book=guidebook, is_deleted=False).order_by('position').all()
+        sections = guidebook.get_sections_in_order()
+        guidebooks = GuideBook.objects.order_by('position').all()
+        sections_by_book = []
+        for book in guidebooks:
+            if book == guidebook:
+                sections_by_book.append((guidebook, sections,))
+            else:
+                sections_by_book.append((book, book.get_sections_in_order,))
+        nav_list = self.__get_nav_list(sections_by_book, active_book=guidebook)
         can_edit = self.request.user.is_superuser
+        context = {
+            "guidebook": guidebook,
+            "sections": sections,
+            "can_edit": can_edit,
+            "nav_list": nav_list,
+        }
+        return context
+
+    def __get_nav_list(self, sections_by_book, active_book=None):
+        nav_list = '<ul class="nav nav-pills nav-stacked">'
+        for guidebook, sections in sections_by_book:
+            url = guidebook.redirect_url if hasattr(guidebook, "redirect_url") and guidebook.redirect_url \
+                else reverse('guide:read_guidebook', args=(guidebook.slug,))
+            guidebook_expanded = guidebook == active_book if active_book else guidebook.expanded
+            active_book_class = "css-active-book" if guidebook_expanded else ""
+            nav_list = nav_list + '<li class="css-guide-index-book {}"><a href="{}">{}</a></li>'\
+                .format(active_book_class, url, guidebook.title)
+            if guidebook_expanded:
+                nav_list = nav_list + self.__get_nav_list_for_sections(sections)
+        nav_list = nav_list + "</ul>"
+        return nav_list
+
+    def __get_nav_list_for_sections(self, sections):
         nav_list = '<ol class="nav nav-pills nav-stacked">'
         prev_section = None
         depth = 1
@@ -45,13 +76,8 @@ class ReadGuideBook(View):
             prev_section = section
         for x in range(depth):
             nav_list = nav_list + "</ol>"
-        context = {
-            "guidebook": guidebook,
-            "sections": sections,
-            "can_edit": can_edit,
-            "nav_list": nav_list,
-        }
-        return context
+        return nav_list
+
 
 @method_decorator(login_required(login_url='account_login'), name='dispatch')
 class DeleteGuideSection(View):
