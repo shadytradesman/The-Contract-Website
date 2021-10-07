@@ -1,9 +1,10 @@
 from django import forms
 
-from characters.models import HIGH_ROLLER_STATUS
+from characters.models import HIGH_ROLLER_STATUS, SEASONED_PORTED, VETERAN_PORTED
 from django.forms import ModelChoiceField
 from account.conf import settings
 from django.utils import timezone
+from django.db.models import Q
 
 from games.models import OUTCOME, ScenarioTag, REQUIRED_HIGH_ROLLER_STATUS, INVITE_MODE, GameMedium
 from characters.models import Character
@@ -167,9 +168,9 @@ def make_accept_invite_form(invitation):
         elif required_status == REQUIRED_HIGH_ROLLER_STATUS[3][0]:  # novice only
             queryset = Character.objects.filter(id__in=users_living_character_ids).filter(status=HIGH_ROLLER_STATUS[2][0])
         elif required_status == REQUIRED_HIGH_ROLLER_STATUS[4][0]:  # seasoned only
-            queryset = Character.objects.filter(id__in=users_living_character_ids).filter(status=HIGH_ROLLER_STATUS[3][0])
+            queryset = Character.objects.filter(id__in=users_living_character_ids).filter(Q(status=HIGH_ROLLER_STATUS[3][0]) | Q(ported=SEASONED_PORTED))
         elif required_status == REQUIRED_HIGH_ROLLER_STATUS[5][0]:  # veteran only
-            queryset = Character.objects.filter(id__in=users_living_character_ids).filter(status=HIGH_ROLLER_STATUS[4][0])
+            queryset = Character.objects.filter(id__in=users_living_character_ids).filter(Q(status=HIGH_ROLLER_STATUS[4][0]) | Q(ported=VETERAN_PORTED))
         else:
             raise ValueError("unanticipated required roller status")
         if invitation.as_ringer or invitation.relevant_game.allow_ringers:
