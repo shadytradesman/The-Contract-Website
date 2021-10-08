@@ -18,12 +18,18 @@
 <div class="container-fluid">
     <div id="main-container" class="row">
         <div class="col-sm-4 col-md-3 css-toc-sec">
-            <div id="js-guide-index">
+            <div id="js-guide-index" class="horizontal-toc">
                 <div class="guide-toc">
                     <h3 class="text-center hidden-xs">
                         Player's Guide Index
                         <hr>
                     </h3>
+
+                    <div class="visible-xs css-expand-button">
+                        <button class="btn btn-default" data-toggle="collapse" onclick="toggleToc();">
+                            <span class="fa fa-bars"></span>
+                        </button>
+                    </div>
                     {{nav_list|safe}}
                 </div>
             </div>

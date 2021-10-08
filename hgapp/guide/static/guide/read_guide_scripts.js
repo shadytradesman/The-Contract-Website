@@ -20,6 +20,10 @@ $('body').on('activate.bs.scrollspy', function () {
     if (oddSpy) {
         return;
     }
+    scrollToc();
+})
+
+function scrollToc() {
     target = $("#js-guide-index .active").get(1);
     /* vertical scroll fix */
     if (target.getBoundingClientRect().bottom > window.innerHeight) {
@@ -42,6 +46,22 @@ $('body').on('activate.bs.scrollspy', function () {
     if (target.getBoundingClientRect().right > window.innerWidth) {
         target.scrollIntoView();
     }
-    /* horizontal scroll fix */
-    // TODO: horizontal scroll fix
+}
+
+function toggleToc() {
+    const index = $("#js-guide-index");
+    const horizontalTocClass = "horizontal-toc";
+    if (index.hasClass(horizontalTocClass)) {
+        index.removeClass(horizontalTocClass);
+    } else {
+        index.addClass(horizontalTocClass);
+    }
+    scrollToc();
+}
+
+$(".guide-toc a").on("click", function() {
+    const index = $("#js-guide-index");
+    const horizontalTocClass = "horizontal-toc";
+    index.addClass(horizontalTocClass);
+    scrollToc();
 })
