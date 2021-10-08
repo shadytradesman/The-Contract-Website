@@ -53,8 +53,10 @@ function toggleToc() {
     const horizontalTocClass = "horizontal-toc";
     if (index.hasClass(horizontalTocClass)) {
         index.removeClass(horizontalTocClass);
+        $(document.body).addClass("noscroll");
     } else {
         index.addClass(horizontalTocClass);
+        $(document.body).removeClass("noscroll");
     }
     scrollToc();
 }
@@ -63,5 +65,6 @@ $(".guide-toc a").on("click", function() {
     const index = $("#js-guide-index");
     const horizontalTocClass = "horizontal-toc";
     index.addClass(horizontalTocClass);
+    $(document.body).removeClass("noscroll");
     scrollToc();
 })

@@ -15,6 +15,11 @@
 {% endblock %}
 
 {% block body_base %}
+<div class="visible-xs css-expand-button">
+    <button class="btn btn-default" onclick="toggleToc();">
+        <span class="fa fa-bars"></span>
+    </button>
+</div>
 <div class="container-fluid">
     <div id="main-container" class="row">
         <div class="col-sm-4 col-md-3 css-toc-sec">
@@ -24,12 +29,6 @@
                         Player's Guide Index
                         <hr>
                     </h3>
-
-                    <div class="visible-xs css-expand-button">
-                        <button class="btn btn-default" data-toggle="collapse" onclick="toggleToc();">
-                            <span class="fa fa-bars"></span>
-                        </button>
-                    </div>
                     {{nav_list|safe}}
                 </div>
             </div>
@@ -38,7 +37,7 @@
             <h1 class="text-center">
                 {{guidebook.title}}
             </h1>
-            <div class="panel panel-default" style="margin-right: 10px; margin-left: 10px;">
+            <div class="panel panel-default" style="margin-right: 10px; margin-left: 10px; z-index: 4;">
                 <div class="panel-body css-guide-content">
                     {% for section in sections %}
                         {% if section.header_level > 2 %}

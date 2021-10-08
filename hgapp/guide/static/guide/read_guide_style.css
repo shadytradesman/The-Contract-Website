@@ -25,6 +25,7 @@
         padding-right: 0px;
         position: relative;
         top: 40px;
+        z-index: 4;
     }
 }
 
@@ -52,7 +53,11 @@ body {position:relative;}
 
 .css-guide-content h3 {
     margin-top: 0px;
+}
 
+.css-guide-content {
+    z-index: 4;
+    position: relative;
 }
 
 .css-section-anchor-link {
@@ -235,7 +240,12 @@ body {position:relative;}
     color: #a6763a;
 }
 
+
 @media(max-width: 768px) {
+    .noscroll {
+        overflow: hidden;
+    }
+
     .css-expand-button {
         position: fixed;
         width: 38px;
@@ -243,10 +253,12 @@ body {position:relative;}
         top: 51px;
         height: 35px;
         background-color: #20252d;
+        z-index: 10;
     }
 
     .css-expand-button button {
         background-color: #20252d;
+        z-index: 10;
     }
 
     #js-guide-index.horizontal-toc {
@@ -270,7 +282,7 @@ body {position:relative;}
        width: 100vw;
        max-width: 100vw;
        height: 100vh;
-       z-index: 10;
+       z-index: 5;
        top: 51px;
        left: 0px;
        padding-top: 0px;
@@ -282,6 +294,7 @@ body {position:relative;}
     .horizontal-toc .css-toc-sec {
         margin-left: 0px;
         padding-left: 0px;
+        position: relative;
     }
 
     #js-guide-index.horizontal-toc li {
@@ -294,7 +307,7 @@ body {position:relative;}
 
     .horizontal-toc .guide-toc {
         padding-left: 5px;
-        z-index: 15;
+        z-index: 5;
         width: inherit;
     }
 
