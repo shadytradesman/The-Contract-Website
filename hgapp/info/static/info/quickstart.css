@@ -16,6 +16,10 @@
     min-width: 75%;
 }
 
+.css-tattoo {
+    font-family: 'Courier', 'Courier New', monospace;
+}
+
 .css-quickstart-gm-text {
     margin-top: 10px;
 }
@@ -106,6 +110,14 @@ h4 {
 }
 
 #css-art-front-punk-lg {
+    position: relative;
+    margin: auto;
+    background-position: top right;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+#css-art-front-doors-lg {
     position: relative;
     margin: auto;
     background-position: top right;
