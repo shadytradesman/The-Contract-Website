@@ -11,6 +11,9 @@ from django.utils.safestring import mark_safe
 from django.views import View
 
 import datetime
+import logging
+
+logger = logging.getLogger("app." + __name__)
 
 from games.forms import CreateScenarioForm, CellMemberAttendedForm, make_game_form, make_allocate_improvement_form, \
     CustomInviteForm, make_accept_invite_form, ValidateAttendanceForm, DeclareOutcomeForm, GameFeedbackForm, \
@@ -102,8 +105,8 @@ def edit_scenario(request, scenario_id):
                     scenario.tags.set(form.cleaned_data["tags"])
             return HttpResponseRedirect(reverse('games:games_view_scenario', args=(scenario.id,)))
         else:
-            print(form.errors)
-            return None
+            logger.error("Invalid scenario form. Errors: %s", str(form.errors))
+            raise ValueError("Invalid scenario form")
     else:
         # Build a scenario form.
         form = CreateScenarioForm(initial={'title': scenario.title,
@@ -239,8 +242,8 @@ def create_game(request, cell_id=None):
             messages.add_message(request, messages.SUCCESS, mark_safe("Your Game has been created Successfully."))
             return HttpResponseRedirect(reverse('games:games_invite_players', args=(game.id,)))
         else:
-            print(form.errors)
-            return None
+            logger.error('Error: invalid GameForm. Errors: %s', str(form.errors))
+            raise ValueError("Invalid game form")
     else:
         # Build a game form.
         form = GameForm(initial={"cell": cell})
@@ -310,8 +313,8 @@ def edit_game(request, game_id):
                         game_invite.notify_invitee(request, game)
             return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
         else:
-            print(form.errors)
-            return None
+            logger.error('Error: invalid GameForm. Errors: %s', str(form.errors))
+            raise ValueError("Invalid game form")
     else:
         # Build a game form.
         form = GameForm(initial=initial_data)
@@ -396,8 +399,8 @@ def invite_players(request, game_id):
                 game_invite.notify_invitee(request, game)
             return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
         else:
-            print(form.errors)
-            return None
+            logger.error('Error: invalid CustomInviteForm. Errors: %s', str(form.errors))
+            raise ValueError("Invalid CustomInviteForm form")
     else:
         return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
 
@@ -435,8 +438,8 @@ def accept_invite(request, game_id):
                         game.scenario.played_discovery(request.user)
             return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
         else:
-            print(form.errors)
-            return None
+            logger.error('Error: invalid accept_invite_form. Errors: %s', str(form.errors))
+            raise ValueError("Invalid accept_invite_form form")
     else:
         can_view_scenario = False
         if request.user.has_perm("view_scenario", game.scenario):
@@ -535,8 +538,8 @@ def start_game(request, game_id, char_error=" ", player_error=" "):
                 game.transition_to_active(lock_characters=False)
             return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
         else:
-            print(formset.errors)
-            return None
+            logger.error('Error: invalid ValidateAttendanceFormSet. Errors: %s', str(formset.errors))
+            raise ValueError("Invalid ValidateAttendanceFormSet form")
     else:
         formset = ValidateAttendanceFormSet(form_kwargs={'game': game},
                                               initial=initial_data)
@@ -605,8 +608,10 @@ def end_game(request, game_id):
                 game.transition_to_finished()
             return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
         else:
-            print(declare_outcome_formset.errors + game_feedback_form.errors)
-            return None
+            logger.error('Error: invalid declare_outcome_formset or game_feedback_form. declare_outcome_formset errors: %s\n\n game_feedback_form errors: %s',
+                         str(declare_outcome_formset.errors),
+                         str(game_feedback_form.errors))
+            raise ValueError("Invalid form")
     else:
         formset = DeclareOutcomeFormset(initial=initial_data)
         game_feedback = GameFeedbackForm()
@@ -671,8 +676,11 @@ def create_ex_game_for_cell(request, cell_id):
             return HttpResponseRedirect(
                 reverse('games:games_edit_ex_game_add_players', args=(cell.id, gm.id, '+'.join(players),)))
         else:
-            #TODO: better error handling.
-            raise ValueError("Player filled out the form wrong")
+            logger.error('Error: invalid forms. GM Errors: %s\n\noutsider errors %s\n\n member errors: %s',
+                         str(gm_form.errors),
+                         str(outsider_formset.errors),
+                         str(member_formset.errors))
+            raise ValueError("Invalid form")
     else:
         context = get_context_for_choose_attending(cell)
         return render(request, 'games/create_ex_game_choose_attendance.html', context)
@@ -696,9 +704,10 @@ def finalize_create_ex_game_for_cell(request, cell_id, gm_user_id, players):
             create_archival_game(request, general_form, cell, outcome_formset)
             return HttpResponseRedirect(reverse('cells:cells_view_cell', args=(cell.id,)))
         else:
-            print(general_form.errors)
-            print(outcome_formset.errors)
-            raise ValueError("Invalid game form")
+            logger.error('Error: invalid forms. general_form Errors: %s\n\noutcome_formset errors: %s',
+                         str(general_form.errors),
+                         str(outcome_formset.errors))
+            raise ValueError("Invalid form")
     else:
         context = get_context_for_create_finished_game(player_list, players, gm, cell, GenInfoForm, ArchivalOutcomeFormSet)
         return render(request, 'games/edit_archive_game.html', context)
@@ -717,7 +726,10 @@ def add_attendance(request, game_id):
             return HttpResponseRedirect(
                 reverse('games:games_edit_completed', args=(game_id, '+'.join(players),)))
         else:
-            raise ValueError("Player filled out the form wrong")
+            logger.error('Error: invalid forms. outsider_formset Errors: %s\n\nmember_formset errors: %s',
+                         str(outsider_formset.errors),
+                         str(member_formset.errors))
+            raise ValueError("Invalid add attendance form")
     else:
         context = get_context_for_choose_attending(cell, game)
         return render(request, 'games/create_ex_game_choose_attendance.html', context)
@@ -766,7 +778,9 @@ def confirm_attendance(request, attendance_id, confirmed=None):
                     invite.is_declined = True
                     invite.save()
         else:
-            print(form.errors)
+            logger.error('Error: invalid confirm attendance form. Errors: %s',
+                         str(form.errors))
+            raise ValueError("Invalid confirm attendance form")
         return HttpResponseRedirect(reverse('games:games_view_game', args=(attendance.relevant_game.id,)))
     else:
         return render_confirm_attendance_page(request, attendance)

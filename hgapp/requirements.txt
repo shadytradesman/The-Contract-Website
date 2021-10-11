@@ -25,7 +25,6 @@ django-mptt==0.9.1
 django-nyt==1.1.5
 django-pagedown==2.1.1
 django-postman==3.6.2
-django-sekizai==1.1.0
 django-storages==1.9.1
 django-tinymce==3.1.0
 django-user-accounts==3.0.2
@@ -75,7 +74,6 @@ urllib3==1.24.3
 wcwidth==0.1.9
 webencodings==0.5.1
 websocket-client==0.37.0
-wiki==0.5
 zipp==3.1.0
 setuptools>=36
 roman==3.3

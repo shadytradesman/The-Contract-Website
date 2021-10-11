@@ -13,15 +13,58 @@ $(document).ready(function(){
     $(window).scroll();
 });
 
+var oddSpy = false;
 $('body').on('activate.bs.scrollspy', function () {
-    target = $("#js-guide-index .active").get(0);
-    if (target.getBoundingClientRect().bottom > window.innerHeight - 50) {
-        target.scrollIntoView(false);
-        console.log("scroll bottom");
+    // this triggers twice because the guidebook is a nested nav list. We only want the first one.
+    oddSpy = !oddSpy;
+    if (oddSpy) {
+        return;
     }
+    scrollToc();
+})
 
-    if (target.getBoundingClientRect().top < 50) {
-        target.scrollIntoView();
-        console.log("scroll top");
+function scrollToc() {
+    target = $("#js-guide-index .active").get(1);
+    /* vertical scroll fix */
+    if (target.getBoundingClientRect().bottom > window.innerHeight) {
+        // scroll at bottom
+        target.scrollIntoView(false);
     }
+    if (target.getBoundingClientRect().top < 50) {
+        // scroll at top
+        target.scrollIntoView();
+    }
+    if ($(target).hasClass("js-first-section")) {
+        $("#js-guide-index").scrollTop(0);
+    }
+    if ($(target).hasClass("js-last-section")) {
+        $("#js-guide-index").scrollTop($("#js-guide-index")[0].scrollHeight);
+    }
+    if (target.getBoundingClientRect().left <0 ) {
+        target.scrollIntoView(false);
+    }
+    if (target.getBoundingClientRect().right > window.innerWidth) {
+        target.scrollIntoView();
+    }
+}
+
+function toggleToc() {
+    const index = $("#js-guide-index");
+    const horizontalTocClass = "horizontal-toc";
+    if (index.hasClass(horizontalTocClass)) {
+        index.removeClass(horizontalTocClass);
+        $(document.body).addClass("noscroll");
+    } else {
+        index.addClass(horizontalTocClass);
+        $(document.body).removeClass("noscroll");
+    }
+    scrollToc();
+}
+
+$(".guide-toc a").on("click", function() {
+    const index = $("#js-guide-index");
+    const horizontalTocClass = "horizontal-toc";
+    index.addClass(horizontalTocClass);
+    $(document.body).removeClass("noscroll");
+    scrollToc();
 })

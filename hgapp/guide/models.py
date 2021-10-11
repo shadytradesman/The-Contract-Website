@@ -9,6 +9,16 @@ class GuideBook(models.Model):
     # A container for Guide Sections.
     title = models.CharField(max_length=400)
     slug = models.SlugField("Unique URL-Safe Title", max_length=80, primary_key=True)
+    position = models.PositiveIntegerField(default=1) # determines position in dropdown menu and index
+    expanded = models.BooleanField(default=False) # should this book be expanded in quick-access from navbar
+    redirect_url = models.CharField(max_length=400, blank=True, null=True) # redirect to here instead of being viewable as a guidebook
+
+    def get_sections_in_order(self, is_admin=False):
+        sections = GuideSection.objects.filter(book=self, is_deleted=False)
+        if not is_admin:
+            sections = sections.filter(is_hidden=False)
+        return sections.order_by('position').all()
+
 
 
 class GuideSection(models.Model):
@@ -19,6 +29,7 @@ class GuideSection(models.Model):
     slug = models.SlugField("URL-Safe Title", max_length=80) # must be unique per GuideBook
     position = models.PositiveIntegerField(default=1) # Guide sections are ordered by their position.
     is_deleted = models.BooleanField(default=False)
+    is_hidden = models.BooleanField(default=False)
     content = models.TextField(max_length=74000) # tinymce html content for editing
     rendered_content = models.TextField(max_length=78000) # content that is rendered for display
     last_editor = models.ForeignKey(
@@ -60,8 +71,8 @@ class GuideSection(models.Model):
 
     # {!col1!} {!col2!} {!colend!}
     def __render_columns(self, content):
-        col1_start = '<div class="row"><div class="col-sm-6 col-xs-12">'
-        col2_start = '</div><div class="col-sm-6 col-xs-12">'
+        col1_start = '<div class="row"><div class="col-md-6 col-xs-12">'
+        col2_start = '</div><div class="col-md-6 col-xs-12">'
         col_end = '</div></div>'
         rendered_content = re.sub(r"\{!col1!\}", col1_start, content)
         rendered_content = re.sub(r"\{!col2!\}", col2_start, rendered_content)

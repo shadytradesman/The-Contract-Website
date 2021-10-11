@@ -1,13 +1,10 @@
-{# THIS TEMPLATE IS OVERRIDDEN TO ALLOW SEKIZAI_TAGS #}
-
 {% load staticfiles %}
-{% load sekizai_tags i18n wiki_tags static %}
+{% load i18n static %}
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}">
     <head>
         <meta charset="utf-8" />
         <title>{% block head_title_base %}{% block head_title %}{% endblock %} | The Contract RPG{% endblock %}</title>
-        {% render_block "css" %}
         {% block viewport %}
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
         {% endblock %}
@@ -81,6 +78,5 @@
         {% block extra_body_base %}
             {% block extra_body %}{% endblock %}
         {% endblock %}
-        {% render_block "js" %}
     </body>
 </html>

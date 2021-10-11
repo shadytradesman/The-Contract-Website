@@ -21,33 +21,16 @@ class ReadGuideBook(View):
 
     def __get_context_data(self):
         guidebook = get_object_or_404(GuideBook, pk=self.kwargs['guidebook_slug'])
-        sections = GuideSection.objects.filter(book=guidebook, is_deleted=False).order_by('position').all()
-        can_edit = self.request.user.is_superuser
-        nav_list = '<ol class="nav nav-pills nav-stacked">'
-        prev_section = None
-        depth = 1
-        for section in sections:
-            entry = ""
-            if prev_section and prev_section.header_level < section.header_level:
-                for x in range(section.header_level - prev_section.header_level):
-                    entry = entry + '<ol class="nav nav-pills nav-stacked css-inner-nav-list">'
-                    depth = depth + 1
-            if prev_section and prev_section.header_level > section.header_level:
-                for x in range(prev_section.header_level - section.header_level):
-                    entry = entry + "</ol>"
-                    depth = depth - 1
-            entry = entry + '<li role="presentation"><a href="#{}">{}</a></li>'.format(section.slug, section.title)
-            nav_list = nav_list + entry
-            prev_section = section
-        for x in range(depth):
-            nav_list = nav_list + "</ol>"
+        can_edit = self.request.user.is_superuser if self.request.user else False
+        sections = guidebook.get_sections_in_order(is_admin=can_edit)
         context = {
             "guidebook": guidebook,
             "sections": sections,
             "can_edit": can_edit,
-            "nav_list": nav_list,
         }
         return context
+
+
 
 @method_decorator(login_required(login_url='account_login'), name='dispatch')
 class DeleteGuideSection(View):
@@ -59,8 +42,10 @@ class DeleteGuideSection(View):
         if not self.request.user.is_superuser:
             raise PermissionDenied("Only admins can edit the players guide")
         self.guidebook = get_object_or_404(GuideBook, pk=self.kwargs['guidebook_slug'])
-        self.current_section = get_object_or_404(GuideSection, book=self.kwargs['guidebook_slug'],
-                                                 slug=self.kwargs['section_slug'])
+        self.current_section = get_object_or_404(GuideSection,
+                                                 book=self.kwargs['guidebook_slug'],
+                                                 slug=self.kwargs['section_slug'],
+                                                 is_deleted=False)
         return super().dispatch(*args, **kwargs)
 
     def get(self, request, *args, **kwargs):
@@ -119,7 +104,10 @@ class WriteNewGuideSection(WriteGuideSection):
     def dispatch(self, *args, **kwargs):
         if 'section_slug' in self.kwargs:
             # write new section after provided section
-            self.previous_section = get_object_or_404(GuideSection, book=self.kwargs['guidebook_slug'], slug=self.kwargs['section_slug'])
+            self.previous_section = get_object_or_404(GuideSection,
+                                                      book=self.kwargs['guidebook_slug'],
+                                                      slug=self.kwargs['section_slug'],
+                                                      is_deleted=False)
             guidebook = get_object_or_404(GuideBook, pk=self.kwargs['guidebook_slug'])
             sections = GuideSection.objects.filter(book=guidebook, is_deleted=False).order_by('position').all()
             num_sections = GuideSection.objects.filter(book=guidebook, is_deleted=False).order_by('position').count()
@@ -155,6 +143,7 @@ class WriteNewGuideSection(WriteGuideSection):
                     position=form.cleaned_data['position'],
                     content=form.cleaned_data['content'],
                     rendered_content=form.cleaned_data['content'], # initially just unrendered content
+                    is_hidden=form.cleaned_data['is_hidden'],
                     last_editor=request.user,
                     edit_date=timezone.now(),
                 )
@@ -167,15 +156,18 @@ class WriteNewGuideSection(WriteGuideSection):
 
 class EditGuideSection(WriteGuideSection):
     def dispatch(self, *args, **kwargs):
-        self.current_section = get_object_or_404(GuideSection, book=self.kwargs['guidebook_slug'], slug=self.kwargs['section_slug'])
-        previous_sections = GuideSection.objects\
-            .filter(book=self.kwargs['guidebook_slug'], position__lt=self.current_section.position)\
+        self.current_section = get_object_or_404(GuideSection,
+                                                 book=self.kwargs['guidebook_slug'],
+                                                 slug=self.kwargs['section_slug'],
+                                                 is_deleted=False)
+        previous_sections = GuideSection.objects \
+            .filter(book=self.kwargs['guidebook_slug'], is_deleted=False, position__lt=self.current_section.position) \
             .order_by('position')
         if previous_sections.count() > 0:
             self.previous_section = previous_sections.all().last()
         next_sections = GuideSection.objects \
-            .filter(book=self.kwargs['guidebook_slug'], position__gt=self.current_section.position) \
-            .order_by('position')
+            .filter(book=self.kwargs['guidebook_slug'], is_deleted=False, position__gt=self.current_section.position) \
+            .order_by('-position')
         if next_sections.count() > 0:
             self.next_section = next_sections.all().last()
         self.initial = {
@@ -184,6 +176,7 @@ class EditGuideSection(WriteGuideSection):
             "slug": self.current_section.slug,
             "position": self.current_section.position,
             "header_level": self.current_section.header_level,
+            "is_hidden": self.current_section.is_hidden,
         }
         return super().dispatch(*args, **kwargs)
 
@@ -198,6 +191,7 @@ class EditGuideSection(WriteGuideSection):
                 self.section.header_level = form.cleaned_data["header_level"]
                 self.section.slug = form.cleaned_data["slug"]
                 self.section.content = form.cleaned_data['content']
+                self.section.is_hidden = form.cleaned_data["is_hidden"]
                 self.section.last_editor = request.user
                 self.section.edit_date = timezone.now()
                 self.section.save()

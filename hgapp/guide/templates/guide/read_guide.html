@@ -1,6 +1,7 @@
 {% extends "site_base.html" %}
 
 {% load staticfiles %}
+{% load hgapp_tags %}
 
 {% block head_title %}
     {{guidebook.title}}
@@ -15,52 +16,76 @@
 {% endblock %}
 
 {% block body_base %}
+<div class="visible-xs css-expand-button">
+    <button class="btn btn-default" onclick="toggleToc();">
+        <span class="fa fa-bars"></span>
+    </button>
+</div>
 <div class="container-fluid">
-    <div id="article-container" class="row">
-        <div class="col-sm-4 col-md-3 hidden-xs css-toc-sec">
-            <div id="js-guide-index" class="guide-toc">
-                <h3 class="text-center">{{guidebook.title}} Index</h3>
-                <hr>
-                {{nav_list|safe}}
+    <div id="main-container" class="row">
+        <div class="col-sm-4 col-md-3 css-toc-sec">
+            <div id="js-guide-index" class="horizontal-toc">
+                <div class="guide-toc">
+                    <h3 class="text-center hidden-xs">
+                        Player's Guide Index
+                        <hr>
+                    </h3>
+                    {% guide_toc guidebook %}
+                </div>
             </div>
         </div>
-        <div class="col-sm-8 col-md-9 ">
+        <div class="col-sm-8 col-md-9 css-guidebook-col">
             <h1 class="text-center">
                 {{guidebook.title}}
             </h1>
-            <div class="panel panel-default" style="margin-right: 10px; margin-left: 10px;">
+            <div class="panel panel-default" style="margin-right: 10px; margin-left: 10px; z-index: 4;">
                 <div class="panel-body css-guide-content">
                     {% for section in sections %}
-                        <div id="{{section.slug}}" class="css-guide-section"></div>
-                        <div {% if section.heder_level < 4 %} class="text-center" {% endif %} >
-                            <h{{section.header_level}}>
-                                {{section.title}}
-                            </h{{section.header_level}}>
-                            <a class="btn btn-xs" href="#{{section.slug}}">
-                                <i class="fa fa-link"></i> link to this section
-                            </a>
-                            {% if section.header_level < 3 %}
-                                <hr>
+                        <div class="{% if section.is_hidden %} css-hidden-section {% endif %}">
+                            {% if section.header_level > 2 %}
+                                <div class="css-section-backdrop">
                             {% endif %}
-                            <div>
+                            <div id="{{section.slug}}" class="css-guide-section"></div>
+                            <div class="text-center">
+                                <h{{section.header_level}}>
+                                    {{section.title}}
+                                </h{{section.header_level}}>
                                 {% if can_edit %}
-                                    <a class="btn btn-default btn-xs"
-                                       href="{% url 'guide:edit_guide_section' guidebook.slug section.slug %}">
-                                        Edit Section
+                                    {% if section.is_hidden %}
+                                        <div class="css-hidden-section-warning">
+                                            This Section is only viewable by admins
+                                        </div>
+                                    {% endif %}
+                                    <div class="css-admin-buttons">
+                                        <a class="btn btn-default btn-xs"
+                                           href="{% url 'guide:edit_guide_section' guidebook.slug section.slug %}">
+                                            Edit Section
+                                        </a>
+                                        <a class="btn btn-default btn-xs"
+                                           href="{% url 'guide:new_guide_section' guidebook.slug section.slug %}">
+                                            Add new Section after this one
+                                        </a>
+                                        <a class="btn btn-danger btn-xs"
+                                           href="{% url 'guide:delete_guide_section' guidebook.slug section.slug %}">
+                                            Delete Section
+                                        </a>
+                                    </div>
+                                {% endif %}
+                                <div class="css-section-anchor-link">
+                                    <a class="btn-xs" href="#{{section.slug}}">
+                                        <i class="fa fa-link"></i> link to this section
                                     </a>
-                                    <a class="btn btn-default btn-xs"
-                                       href="{% url 'guide:new_guide_section' guidebook.slug section.slug %}">
-                                        Add new Section after this one
-                                    </a>
-                                    <a class="btn btn-danger btn-xs"
-                                       href="{% url 'guide:delete_guide_section' guidebook.slug section.slug %}">
-                                        Delete Section
-                                    </a>
+                                </div>
+                                {% if section.header_level < 2 %}
+                                    <hr>
                                 {% endif %}
                             </div>
-                        </div>
-                        <div class="css-section-body">
-                            {{section.rendered_content|safe}}
+                            <div class="css-section-body">
+                                {{section.rendered_content|safe}}
+                            </div>
+                            {% if section.header_level > 2 %}
+                                </div>
+                            {% endif %}
                         </div>
                     {% empty %}
                         {% if can_edit %}

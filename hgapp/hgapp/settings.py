@@ -130,19 +130,6 @@ INSTALLED_APPS = [
     'tinymce',
     "blog",
     "pinax.images",
-
-    #Wiki
-    #'django.contrib.sites.apps.SitesConfig',
-    'django.contrib.humanize.apps.HumanizeConfig',
-    'django_nyt.apps.DjangoNytConfig',
-    'mptt',
-    'sekizai',
-    'sorl.thumbnail',
-    'wiki.apps.WikiConfig',
-    'wiki.plugins.attachments.apps.AttachmentsConfig',
-    'wiki.plugins.notifications.apps.NotificationsConfig',
-    'wiki.plugins.images.apps.ImagesConfig',
-    'wiki.plugins.macros.apps.MacrosConfig',
 ]
 
 MIDDLEWARE = [
@@ -180,7 +167,6 @@ TEMPLATES = [
                 "account.context_processors.account",
                 "pinax_theme_bootstrap.context_processors.theme",
                 "postman.context_processors.inbox",
-                "sekizai.context_processors.sekizai", # required by Wiki
             ],
         },
     },
@@ -367,51 +353,6 @@ POSTMAN_AUTO_MODERATE_AS = True
 #Pagedown settings
 PAGEDOWN_WIDGET_CSS = ("overrides/pagedown_widget.css",)
 
-#Wiki settings
-def is_admin(request=None, user=None):
-    if user is None:
-        return request.user.is_superuser
-    else:
-        return user.is_superuser
-
-WIKI_ACCOUNT_HANDLING = False
-WIKI_ACCOUNT_SIGNUP_ALLOWED = False
-WIKI_ANONYMOUS_WRITE = False
-WIKI_CAN_WRITE = is_admin
-WIKI_CAN_MODERATE = is_admin
-WIKI_CAN_DELETE = is_admin
-WIKI_CAN_CHANGE_PERMISSIONS = is_admin
-WIKI_CAN_ASSIGN_OWNER = is_admin
-WIKI_CAN_ASSIGN = is_admin
-WIKI_CAN_ADMIN = is_admin
-WIKI_REVISIONS_PER_HOUR = 120
-if not DEBUG:
-    WIKI_USE_LOCAL_PATH = False
-
-WIKI_MARKDOWN_HTML_ATTRIBUTES = {'a': ['aria-controls', 'aria-expanded', 'href', 'title', 'class', 'data-toggle', 'id', 'target', 'rel'],
-                                 'abbr': ['title', 'class', 'id', 'target', 'rel'],
-                                 'acronym': ['title', 'class', 'id', 'target', 'rel'],
-                                 'b': ['class', 'id', 'target', 'rel'], 'blockquote': ['class', 'id', 'target', 'rel'],
-                                 'br': ['class', 'id', 'target', 'rel'],
-                                 'code': ['class', 'id', 'target', 'rel'],
-                                 'dd': ['class', 'id', 'target', 'rel'], 'div': ['class', 'id', 'target', 'rel', 'style'],
-                                 'dl': ['class', 'id', 'target', 'rel'], 'dt': ['class', 'id', 'target', 'rel'],
-                                 'em': ['class', 'id', 'target', 'rel'], 'figcaption': ['class', 'id', 'target', 'rel'],
-                                 'figure': ['class', 'id', 'target', 'rel'], 'h1': ['class', 'id', 'target', 'rel'],
-                                 'h2': ['class', 'id', 'target', 'rel'], 'h3': ['class', 'id', 'target', 'rel'],
-                                 'h4': ['class', 'id', 'target', 'rel'], 'h5': ['class', 'id', 'target', 'rel'],
-                                 'h6': ['class', 'id', 'target', 'rel'], 'hr': ['class', 'id', 'target', 'rel'],
-                                 'i': ['class', 'id', 'target', 'rel'],
-                                 'img': ['class', 'id', 'target', 'rel', 'src', 'alt'],
-                                 'li': ['class', 'id', 'target', 'rel'], 'ol': ['class', 'id', 'target', 'rel'],
-                                 'p': ['class', 'id', 'target', 'rel'], 'pre': ['class', 'id', 'target', 'rel'],
-                                 'span': ['class', 'id', 'target', 'rel'], 'strong': ['class', 'id', 'target', 'rel'],
-                                 'sup': ['class', 'id', 'target', 'rel'], 'table': ['class', 'id', 'target', 'rel'],
-                                 'tbody': ['class', 'id', 'target', 'rel'], 'td': ['class', 'id', 'target', 'rel'],
-                                 'th': ['class', 'id', 'target', 'rel'], 'thead': ['class', 'id', 'target', 'rel'],
-                                 'tr': ['class', 'id', 'target', 'rel'], 'ul': ['class', 'id', 'target', 'rel']}
-
-WIKI_METHODS = ('article_list', 'toc', 'wikilinks')
 
 # Theme settings
 THEME_CONTACT_EMAIL = "TheContractGame@gmail.com"

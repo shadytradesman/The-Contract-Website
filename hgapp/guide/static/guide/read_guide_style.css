@@ -1,30 +1,86 @@
-.css-guide-section{
+.css-guide-section {
     display: block;
     position: relative;
     top: -60px;
     visibility: hidden;
 }
 
+.css-hidden-section {
+    border: 2px dotted violet;
+}
+
+.css-hidden-section-warning {
+    color: violet;
+}
+
+@media (max-width: 768px) {
+    .css-guide-section {
+        top: -100px;
+    }
+}
+
+#main-container {
+    max-width: 1650px;
+    margin: auto;
+}
+
+@media (max-width: 768px) {
+    .container-fluid {
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+    .css-guidebook-col {
+        padding-left: 0px;
+        padding-right: 0px;
+        position: relative;
+        top: 40px;
+        z-index: 4;
+    }
+}
+
+
 /* required for scrollspy */
 body {position:relative;}
 
-.css-toc-sec {
+.css-section-body {
+    background-color: #353e4b !important;
+    padding: 10px;
+    border-radius: 4px;
 }
 
-#js-guide-index {
-    position: fixed;
-    max-height: calc(100vh - 60px);
-    overflow: auto;
-    top: 60px;
+.css-section-body p, .css-section-body li, .css-section-body td, .css-section-body .col-md-6, .css-section-body .col-sm-6 {
+    /*font-family: "Georgia", Times, serif;*/
 }
 
+.css-section-body td {
+    padding: 3px;
+}
 
-.css-inner-nav-list {
-    padding-left: 20px;
+.css-section-backdrop {
+    background-color: #353e4b !important;
+}
+
+.css-guide-content h3 {
+    margin-top: 0px;
 }
 
 .css-guide-content {
-    background-color: #353e4b !important;
+    z-index: 4;
+    position: relative;
+}
+
+.css-section-anchor-link {
+    margin-top: -10px;
+}
+
+@media(max-width: 768px) {
+    .css-section-anchor-link {
+        margin-top: -8px;
+    }
+}
+
+.css-admin-buttons {
+    margin-bottom: 10px;
 }
 
 
@@ -33,9 +89,9 @@ body {position:relative;}
     padding-left: 15px;
     padding-right: 15px;
     padding-top: 5px;
-    padding-bottom: 5px;
+    padding-bottom: 10px;
     font-style: italic;
-    background-color: #454e5b !important;
+    background-color: #455864 !important;
     border-radius: 4px;
     border: 1px solid #252e3b;
 }
@@ -49,63 +105,13 @@ body {position:relative;}
     padding-left: 20px;
 }
 
-
-/* navbar style */
-
-.guide-toc {
-    font-size: 15px;
-    color: #9fb1bc;
-    background-color: #20252d;
-    padding-left: 25px;
-    padding-right: 25px;
-    width: inherit;
+.css-subsection { /* TODO: implement or delete*/
+    background-color: #454e5b !important;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 5px;
+    padding-bottom: 10px;
+    border-radius: 4px;
+    border: 1px solid #252e3b;
 }
 
-.guide-toc ol {
-    list-style: square !important;
-    list-style-type:decimal !important;
-    color: #9fb1bc;
-}
-
-.guide-toc ol ol {
-    list-style-type:lower-alpha !important;
-}
-
-.guide-toc ol ol ol {
-    list-style-type:upper-roman !important;
-}
-
-.guide-toc ol ol ol ol {
-    list-style-type:lower-roman !important;
-}
-
-.css-article-content {
-    margin: auto;
-}
-
-.guide-toc li {
-    width: 100%;
-    display: list-item;
-}
-
-.guide-toc li>a {
-    width: 100%;
-    display: block;
-    padding: 2px;
-}
-
-.guide-toc li>a:hover {
-    background-color: #353e4b !important;
-    border-radius: 2px;
-}
-
-.guide-toc .active>a {
-    background-color: #252e3b !important;
-    border-right: 1px solid #a6763a;
-    border-radius: 2px;
-    width: 100%;
-}
-
-.guide-toc .active {
-    color: #a6763a;
-}

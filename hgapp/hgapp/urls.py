@@ -17,7 +17,6 @@ from django.conf import settings
 from django.conf.urls import include, url
 from django.urls import path
 from django.conf.urls.static import static
-from django.views.generic import TemplateView
 from hgapp import views
 
 from django.contrib import admin
@@ -39,8 +38,6 @@ urlpatterns = [
     url(r"journals/", include("journals.urls"), name="journals"),
     url(r"guide/", include("guide.urls"), name="guide"),
     url(r"^tinymce/", include("tinymce.urls")),
-    path('notifications/', include('django_nyt.urls')),
-    path('wiki/', include('wiki.urls')),
     url(r"^news/", include("blog.urls", namespace="pinax_blog")),
     url(r"^ajax/images/", include("pinax.images.urls", namespace="pinax_images")),
 ]
