@@ -5,7 +5,7 @@ from powers.models import Base_Power, Base_Power_Category, ACTIVATION_STYLE, Pow
 import hgapp.settings
 
 PACKAGE_ROOT = os.path.abspath(os.path.dirname(__file__))
-#Required to render our templates using sekizai
+#Required to render our templates using sekizai, tho we don't do that any more so we should revisit.
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -26,7 +26,6 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "account.context_processors.account",
                 "postman.context_processors.inbox",
-                "sekizai.context_processors.sekizai", # required by Wiki
             ],
         },
     },

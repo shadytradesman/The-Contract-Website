@@ -23,62 +23,13 @@ class ReadGuideBook(View):
         guidebook = get_object_or_404(GuideBook, pk=self.kwargs['guidebook_slug'])
         can_edit = self.request.user.is_superuser if self.request.user else False
         sections = guidebook.get_sections_in_order(is_admin=can_edit)
-        guidebooks = GuideBook.objects.order_by('position').all()
-        sections_by_book = []
-        for book in guidebooks:
-            if book == guidebook:
-                sections_by_book.append((guidebook, sections,))
-            else:
-                sections_by_book.append((book, book.get_sections_in_order(is_admin=can_edit),))
-        nav_list = self.__get_nav_list(sections_by_book, active_book=guidebook)
         context = {
             "guidebook": guidebook,
             "sections": sections,
             "can_edit": can_edit,
-            "nav_list": nav_list,
         }
         return context
 
-    def __get_nav_list(self, sections_by_book, active_book=None):
-        nav_list = '<ul class="nav nav-pills nav-stacked">'
-        for guidebook, sections in sections_by_book:
-            guidebook_active = guidebook == active_book if active_book else False
-            url = guidebook.redirect_url if hasattr(guidebook, "redirect_url") and guidebook.redirect_url \
-                else "#" if guidebook_active else reverse('guide:read_guidebook', args=(guidebook.slug,))
-            guidebook_expanded = guidebook.expanded if not active_book else guidebook_active
-            active_book_class = "css-active-book" if guidebook_active else ""
-            nav_list = nav_list + '<li class="{}"><a href="{}" class="css-guide-index-book">{}</a>'\
-                .format(active_book_class, url, guidebook.title)
-            if guidebook_expanded:
-                nav_list = nav_list + self.__get_nav_list_for_sections(sections)
-            nav_list = nav_list + '</li>' # end guidebook list item
-        nav_list = nav_list + "</ul>"
-        return nav_list
-
-    def __get_nav_list_for_sections(self, sections):
-        nav_list = '<ol class="nav nav-pills nav-stacked">'
-        prev_section = None
-        depth = 1
-        num_sections = sections.count()
-        for i, section in enumerate(sections):
-            entry = ""
-            if prev_section and prev_section.header_level < section.header_level:
-                for x in range(section.header_level - prev_section.header_level):
-                    entry = entry + '<ol class="nav nav-pills nav-stacked css-inner-nav-list">'
-                    depth = depth + 1
-            if prev_section and prev_section.header_level > section.header_level:
-                for x in range(prev_section.header_level - section.header_level):
-                    entry = entry + "</ol>"
-                    depth = depth - 1
-            entry = entry + '<li role="presentation" class="{}"><a href="#{}">{}</a></li>'.format(
-                'js-last-section' if i == num_sections - 1 else "js-first-section" if i == 0 else "",
-                section.slug,
-                section.title)
-            nav_list = nav_list + entry
-            prev_section = section
-        for x in range(depth):
-            nav_list = nav_list + "</ol>"
-        return nav_list
 
 
 @method_decorator(login_required(login_url='account_login'), name='dispatch')

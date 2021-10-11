@@ -1,6 +1,7 @@
 {% extends "site_base.html" %}
 
 {% load staticfiles %}
+{% load hgapp_tags %}
 
 {% block head_title %}
     {{guidebook.title}}
@@ -29,7 +30,7 @@
                         Player's Guide Index
                         <hr>
                     </h3>
-                    {{nav_list|safe}}
+                    {% guide_toc guidebook %}
                 </div>
             </div>
         </div>

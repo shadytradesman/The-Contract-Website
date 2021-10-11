@@ -1,6 +1,7 @@
 from django import template
-from django.shortcuts import get_object_or_404
-from wiki.models import Article, URLPath
+from django.urls import reverse
+
+from guide.models import GuideBook, GuideSection
 
 register = template.Library()
 
@@ -20,49 +21,65 @@ def gwynn_png(filename, hide_caption=None):
         'hide_caption': hide_caption,
     }
 
+
+@register.inclusion_tag('tags/guidebook_toc.html', takes_context=True)
+def guide_toc(context, guidebook=None):
+    guidebooks = GuideBook.objects.order_by('position').all()
+    can_edit = context["request"].user.is_superuser if context["request"].user else False
+    sections_by_book = []
+    for book in guidebooks:
+        sections_by_book.append((book, book.get_sections_in_order(is_admin=can_edit),))
+    nav_list = __get_nav_list(sections_by_book, active_book=guidebook)
+    context["nav_list"] = nav_list
+    return context
+
+def __get_nav_list(sections_by_book, active_book=None):
+    nav_list = '<ul class="nav nav-pills nav-stacked {}">'.format("dropdown-menu" if not active_book else "")
+    for guidebook, sections in sections_by_book:
+        guidebook_active = guidebook == active_book if active_book else False
+        url = guidebook.redirect_url if hasattr(guidebook, "redirect_url") and guidebook.redirect_url \
+            else "#" if guidebook_active else reverse('guide:read_guidebook', args=(guidebook.slug,))
+        guidebook_expanded = guidebook.expanded if not active_book else guidebook_active
+        active_book_class = "css-active-book" if guidebook_active else ""
+        nav_list = nav_list + '<li class="{}"><a href="{}" class="css-guide-index-book">{}</a>' \
+            .format(active_book_class, url, guidebook.title)
+        if guidebook_expanded:
+            nav_list = nav_list + __get_nav_list_for_sections(sections, guidebook_active, url)
+        nav_list = nav_list + '</li>'  # end guidebook list item
+    nav_list = nav_list + "</ul>"
+    return nav_list
+
+
+def __get_nav_list_for_sections(sections, is_viewing_guidebook, guidebook_url):
+    nav_list = '<ol class="nav nav-pills nav-stacked">'
+    prev_section = None
+    depth = 1
+    num_sections = sections.count()
+    for i, section in enumerate(sections):
+        entry = ""
+        if prev_section and prev_section.header_level < section.header_level:
+            for x in range(section.header_level - prev_section.header_level):
+                entry = entry + '<ol class="nav nav-pills nav-stacked css-inner-nav-list">'
+                depth = depth + 1
+        if prev_section and prev_section.header_level > section.header_level:
+            for x in range(prev_section.header_level - section.header_level):
+                entry = entry + "</ol>"
+                depth = depth - 1
+        section_url = "#{}".format(section.slug) if is_viewing_guidebook else "{}#{}".format(guidebook_url, section.slug)
+        entry = entry + '<li role="presentation" class="{}"><a href="{}">{}</a></li>'.format(
+            'js-last-section' if i == num_sections - 1 else "js-first-section" if i == 0 else "",
+            section_url,
+            section.title)
+        nav_list = nav_list + entry
+        prev_section = section
+    for x in range(depth):
+        nav_list = nav_list + "</ol>"
+    return nav_list
+
+
 @register.inclusion_tag('tags/article_list.html', takes_context=True)
 def article_list(context, urlpath, depth):
     context['parent'] = urlpath
     context['children'] = get_article_children(article=urlpath.article, article__current_revision__deleted=False)
     context['depth'] = depth
     return context
-
-
-@register.inclusion_tag('tags/article_toc.html')
-def article_toc(article_slug=None, dropdown=True, current_article=None):
-    return inner_article_toc(article_slug, dropdown=dropdown, current_article=current_article)
-
-def inner_article_toc(article_slug=None, dropdown=True, current_article=None):
-    article = None
-    if not article_slug:
-        root = URLPath.root()
-        article = root.article
-    else:
-        urlpath = URLPath.get_by_path(article_slug, select_related=True)
-        article = urlpath.article
-    toc_tree = get_article_children(article,
-                                    article__current_revision__deleted=False)
-    return {
-        'article_children': toc_tree,
-        'article_parent': article,
-        'article_path': article_slug + "/",
-        'is_dropdown': dropdown,
-        'current_article': current_article,
-    }
-
-def get_article_children(article, max_num=None, user_can_read=None, **kwargs):
-    """NB! This generator is expensive, so use it with care!!"""
-    cnt = 0
-    for obj in article.articleforobject_set.filter(is_mptt=True):
-        if user_can_read:
-            objects = obj.content_object.get_children().filter(
-                **kwargs).can_read(user_can_read)
-        else:
-            objects = obj.content_object.get_children().filter(**kwargs)
-        ordered_objects = sorted(objects,
-                key=lambda x: x.get_absolute_url())
-        for child in ordered_objects:
-            cnt += 1
-            if max_num and cnt > max_num:
-                return
-            yield child
