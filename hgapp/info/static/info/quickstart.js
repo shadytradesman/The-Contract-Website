@@ -49,15 +49,6 @@ function updateAffix() {
     setTimeout(() => {$('#format-music').affix('checkPosition'); }, 700);
 }
 
-$("a").click(function() {
-    updateAffix();
-});
-
-$(".power-badge").click(function() {
-    updateAffix();
-});
-
-
 /*
 * HEALTH TUTORIAL CODE
 *

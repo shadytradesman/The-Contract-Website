@@ -77,18 +77,18 @@ function rollDice(roller, action) {
     }
     var outcomeText;
     if (action.isContested) {
-        const combinedOutcome = outcome - 3;
-        roller.find(".js-qs-contested-outcome").html(" - 3 (defender's Outcome) = " + combinedOutcome);
+        const combinedOutcome = 3 - outcome;
+        roller.find(".js-qs-contested-outcome").html("3 (Bradley's Outcome) - " + outcome + " = " + combinedOutcome);
         if (combinedOutcome > 0) {
-            outcomeText = "A positive contested Outcome means that the attempted action is successful.";
+            outcomeText = "A positive contested Outcome means that Bradley's attempted Action is successful.";
             roller.find(".js-qs-action-outcome").html(action.outcomeCompleteSuccess);
             roller.find(".js-qs-additional-narrative").html(action.outcomeCompleteSuccessExtra);
         } else if (combinedOutcome == 0) {
-            outcomeText = "A contested Outcome of zero means that the attempted action fails. Ties go to the defender.";
+            outcomeText = "A contested Outcome of zero means that Bradley's attempted action fails. Ties go to the defender.";
             roller.find(".js-qs-action-outcome").html(action.outcomeFailure);
             roller.find(".js-qs-additional-narrative").html(action.outcomeFailureExtra);
         } else if (combinedOutcome < 0) {
-            outcomeText = "A negative contested Outcome means that the attempted action fails.";
+            outcomeText = "A negative contested Outcome means that Bradley's attempted action fails.";
             roller.find(".js-qs-action-outcome").html(action.outcomeFailure);
             roller.find(".js-qs-additional-narrative").html(action.outcomeFailureExtra);
         }
@@ -137,7 +137,11 @@ function rollDice(roller, action) {
             }
         }
     }
-    roller.find(".js-qs-outcome-num").html(outcome);
+    if (action.isContested) {
+        roller.find(".js-qs-outcome-num").html("");
+    } else {
+        roller.find(".js-qs-outcome-num").html(outcome);
+    }
     roller.find(".js-qs-outcome-explanation").html(outcomeText);
     if (action.additionalRules){
         roller.find(".js-additional-rules").html(action.additionalRules);
