@@ -62,6 +62,17 @@ $( window ).resize(function() {
   $(window).scroll();
 });
 
+$(document).ready(function() {
+    var first = true;
+    $(".css-start-play-section").each(function(){
+        if($(this).children('[class*="in"]').length==1 && first){
+            $(this).addClass("css-start-play-active");
+            first = false;
+            return;
+        }
+    })
+})
+
 function updateAffix() {
     setTimeout(() => {  $(window).scroll(); }, 700);
     setTimeout(() => {$('#css-art-front-time').affix('checkPosition'); }, 700);

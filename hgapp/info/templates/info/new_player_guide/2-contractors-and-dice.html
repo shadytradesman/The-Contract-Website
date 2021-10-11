@@ -64,7 +64,7 @@
         </div>
     </div>
     <div class="col-sm-3">
-        <figure class="" style="height: 550px; padding: 10px;">
+        <figure class="" style="height: 500px; padding: 10px;">
             <img src="{% static 'info/graphics/five_web.jpg' %}" class="css-inline-image">
             <figcaption class="text-center"></figcaption>
         </figure>
@@ -176,10 +176,12 @@
         </div>
     </div>
     <div class="col-sm-5">
+        {% comment %}
         <figure class="" style="height: 580px; padding: 10px;">
             <img src="{% static 'info/graphics/five_web.jpg' %}" class="css-inline-image">
             <figcaption class="text-center"></figcaption>
         </figure>
+        {% endcomment %}
     </div>
 </div>
 <div class="row">
@@ -1026,7 +1028,6 @@
                 <b>You won't need to create a Power until after your first Victory, but here's a primer.</b>
             </div>
             <ul>
-                <li>All Powers are created using the Custom Power System. </li>
                 <li>
                     Creating a custom Power is easy:
                     <ol>
@@ -1037,15 +1038,15 @@
                             </ul>
                         </li>
                         <li>
-                            Select an Effect that matches your power’s concept.
+                            Select an <b>Effect</b> that matches your power’s concept.
                             <ul>
                                 <li>Effects are starting templates for Powers with defined systems. </li>
                                 <li>Examples include: Investigate Individual, Alternate Form, Disguise, and Injure. </li>
-                                <li>There are currency 93 Effects to choose from.</li>
+                                <li>There are currently 93 Effects to choose from.</li>
                             </ul>
                         </li>
                         <li>
-                            Customize the Effect with Drawbacks, Enhancements, and Parameters.
+                            Customize the Effect with <b>Drawbacks</b>, <b>Enhancements</b>, and <b>Parameters</b>.
                             <ul>
                                 <li>All Powers have a Gift cost. </li>
                                 <li>Taking an Enhancement or upgrading a Parameter expands the Power’s functionality but costs a Gift.</li>

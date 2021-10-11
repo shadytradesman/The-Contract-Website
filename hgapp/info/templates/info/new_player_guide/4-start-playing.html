@@ -1,53 +1,255 @@
 <br>
-<div class="css-start-playing-container alert alert-info">
+<div class="css-start-playing-container">
     <h2 class="text-center">
-        Start Playing!
+        You're Ready to Play!
     </h2>
-    <div>
-        <ul class="nav nav-tabs nav-justified nav-justified-sm css-nav-tabs" role="tablist">
-            <li role="presentation" class="active" >
-                <a href="#play-game" aria-controls="play-game" role="tab" data-toggle="tab">
-                    <h3 style="margin: 0px;">
-                        Play Online
-                    </h3>
-                </a>
-            </li>
-            <li role="presentation">
-                <a href="#start-gming" aria-controls="start-gming" role="tab" data-toggle="tab">
-                    <h3 style="margin: 0px;">
-                        Start GMing
-                    </h3>
-                </a>
-            </li>
-        </ul>
-    </div>
-    <div class="tab-content css-tab-content">
-        <div role="tabpanel" class="tab-pane active " id="play-game">
+    <div class="panel-group">
+        <div class="panel panel-default css-start-play-section">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapse-play-1">
+                <div class="panel-heading css-start-play-header">
+                    Step 1 - Create an Account
+                </div>
+            </a>
+            <div id="collapse-play-1" class="panel-collapse collapse {% if expand_step.1 %} in {% endif %}">
+                <div class="panel-body css-start-play-body">
+                    <p>
+                        While The Contract does not require an account to create a Contractor, read the guide, or view one of the stock Scenarios,
+                        we <b>strongly</b> recommend making an account before continuing.
+                    </p>
+                    <p>
+                        Accounts are free, require only an email address, and unlock 100% of the website's features.
+                    </p>
+                    <div class="text-center">
+                        <h3>
+                            <a href="{% url 'account_signup' %}" class="btn btn-lg btn-success">Click Here to Create an Account</a>
+                        </h3>
+                    </div>
+                    <div class="text-center">
+                        Already have an account?
+                        <a href="{% url 'account_login' %}" class="btn btn-primary">Click Here to Log in</a>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div role="tabpanel" class="tab-pane" id="start-gming">
+
+
+        <div class="panel panel-default css-start-play-section ">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapse-play-2">
+                <div class="panel-heading css-start-play-header">
+                    Step 2 - Create a Contractor
+                </div>
+            </a>
+            <div id="collapse-play-2" class="panel-collapse collapse {% if expand_step.2 %} in {% endif %}">
+                <div class="panel-body css-start-play-body">
+                    <div class="text-center">
+                        Whether you're planning on playing or GMing, you should
+                        <a href="{% url 'characters:characters_create' %}" class="btn btn-success">
+                            Create a Contractor
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="css-start-play-section">
-        Log in / create account
-    </div>
-    <div class="css-start-play-section">
-        Create a Contractor
-    </div>
-    <div class="css-start-play-section">
-        Find a Game
-    </div>
-    <div class="css-start-play-section">
-    </div>
-    <div class="css-start-play-section">
-        Read the GM Guide
-    </div>
-    <div class="css-start-play-section">
-        Unlock Scenarios
-    </div>
-    <div class="css-start-play-section">
-        Create a World, invite your friends.
-    </div>
-    <div class="css-start-play-section">
-        Schedule a Contract
+
+        <div class="text-center">
+            <h3>I want to. . .</h3>
+        </div>
+        <div>
+            <ul class="nav nav-tabs nav-justified nav-justified-sm css-nav-tabs" role="tablist">
+                <li role="presentation" class="active" >
+                    <a href="#play-game" aria-controls="play-game" role="tab" data-toggle="tab">
+                        <h3 style="margin: 0px;">
+                            Play Online
+                        </h3>
+                    </a>
+                </li>
+                <li role="presentation">
+                    <a href="#start-gming" aria-controls="start-gming" role="tab" data-toggle="tab">
+                        <h3 style="margin: 0px;">
+                            Start GMing
+                        </h3>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="tab-content css-tab-content">
+            <div role="tabpanel" class="tab-pane active " id="play-game">
+                <div class="panel panel-default css-start-play-section ">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse-play-online-3">
+                        <div class="panel-heading css-start-play-header">
+                            Step 3 - Find a Contract to play in
+                        </div>
+                    </a>
+                    <div id="collapse-play-online-3" class="panel-collapse collapse in">
+                        <div class="panel-body css-start-play-body">
+                            <div class="text-center">
+                                <h4>
+                                    All that's left to do is find an upcoming Contract to play in!
+                                </h4>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p>
+                                        Visit the
+                                        <a href="{% url 'games:games_looking_for_game' %}" class="btn btn-success">
+                                            Looking for Game
+                                        </a>
+                                        page for a list of upcoming Contracts.
+                                    </p>
+                                    <p>
+                                        Note that while many newbie-friendly Contracts occur each week, they are usually scheduled as-needed or right before they occur.
+                                    </p>
+                                    <p>
+                                        The surest way to schedule a Contract is to
+                                        <a class="btn btn-default btn-lg" href="https://discord.gg/xUZZegYNNy">
+                                            <img class="float-left" src="/static/overrides/other_graphics/Discord-Logo-Color.svg" style="width: 30px; height: 30px; position: absolute;">
+                                            <span style="padding-left: 35px;"> Join Our Discord Server</span>
+                                        </a>
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <iframe src="https://discord.com/widget?id=730495287206084638&theme=dark" width="350" height="500" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="start-gming">
+
+                <div class="panel panel-default css-start-play-section ">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse-play-gm-3">
+                        <div class="panel-heading css-start-play-header">
+                            Step 3 - Create a World
+                        </div>
+                    </a>
+                    <div id="collapse-play-gm-3" class="panel-collapse collapse {% if expand_step.3 %} in {% endif %}">
+                        <div class="panel-body css-start-play-body">
+                            <div class="text-center">
+                                <a href="{% url 'cells:cells_create' %}" class="btn btn-success">
+                                    Create a World
+                                </a>
+                                to give your playgroup a home and unlock an additional Stock Scenario.
+                            </div>
+                            <div class="text-center">
+                                Once you've created your world, invite your friends to join and create their own Contractors.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel panel-default css-start-play-section ">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse-play-gm-4">
+                        <div class="panel-heading css-start-play-header">
+                            Step 4 - Select a Scenario and read the GameMaster's Manual
+                        </div>
+                    </a>
+                    <div id="collapse-play-gm-4" class="panel-collapse collapse in">
+                        <div class="panel-body css-start-play-body">
+                            <div class="text-center">
+                                The Contract comes with several Stock Scenarios to help you start running. They are trivial to unlock:
+                            </div>
+                            <p>
+                                <ul>
+                                    <li>
+                                        <a href="/games/view/s/41/" class="btn btn-primary btn-sm">
+                                            <b>
+                                                Mushroom Hunt
+                                            </b>
+                                        </a>
+                                        - is avilable to all Players for free, registered or not. Note: because Players may view Mushroom Hunt when logged-out, GMs can't rely on the website to determine if a Player is spoiled on it.
+                                    </li>
+                                    <li>
+                                        <b>Sanctuary</b> - Create a World
+                                    </li>
+                                    <li>
+                                        <b>Passing the Hours</b> - Play a Contractor in a Contract
+                                    </li>
+                                    <li>
+                                        <b>Beware the Assassin</b> - GM a Contract
+                                    </li>
+                                    <li>
+                                        <b>Monster Hunter Island</b> - Lose a Contractor on a Contract
+                                    </li>
+                                    <li>
+                                        Finally, the Scenario from this guide's narrative
+                                        <a href="games/view/s/39/" class="btn btn-default btn-xs">
+                                            See no Evil, Hear no Evil, Smell no Evil
+                                        </a>
+                                         is available to all users but should not be run because it is spoiled in the tutorial.
+                                    </li>
+
+                                </ul>
+                            </p>
+                            <div class="text-center">
+                                Once unlocked, Scenarios will appear in your
+                                <a class="btn btn-default" href="{% url 'games:games_view_scenario_gallery' %}">
+                                    Scenario Gallery
+                                </a>
+                            </div>
+                            <div class="text-center">
+                                Always remember,
+                                <a href="/guide/gm-manual/" class="btn btn-primary">
+                                    The GameMaster's Manual
+                                </a>
+                                is chock full of useful advice for GMs.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel panel-default css-start-play-section ">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse-play-gm-5">
+                        <div class="panel-heading css-start-play-header">
+                            Step 5 (optional) - Hold a "Session Zero"
+                        </div>
+                    </a>
+                    <div id="collapse-play-gm-5" class="panel-collapse collapse in">
+                        <div class="panel-body css-start-play-body">
+                            <p>
+                                When you're GMing for a group of Players that is brand new to The Contract, it can be helpful
+                                to split your first session into two halves.
+                            </p>
+                            <p>
+                                Instead of running a Contract during the first half (or "session zero"), simply help
+                                your Players create their Contractors and run their initial introductory meetings with the Harbinger.
+                            </p>
+                            <p>
+                                At the second session, you can jump right into the meat of the Contract with time to spare.
+                            </p>
+                            <p>
+                                This provides extra "wiggle room" time for teaching rules, answering questions, and learning
+                                the system.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel panel-default css-start-play-section ">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse-play-gm-6">
+                        <div class="panel-heading css-start-play-header">
+                            Step 6 - Schedule a Contract
+                        </div>
+                    </a>
+                    <div id="collapse-play-gm-6" class="panel-collapse collapse in">
+                        <div class="panel-body css-start-play-body">
+                            <div class="text-center">
+                                Now all you need to do is
+                                <a href="{% url 'games:games_enter_game' %}" class="btn btn-primary">
+                                    Schedule a Contract
+                                </a>
+                                and invite your Players.
+                            </div>
+                            <div class="text-center">
+                                When you complete the Contract, you can declare each Contractor's outcome.
+                                You and your Players will receive the Experience, Gifts, and Improvements you've earned,
+                                the Scenario will be revealed to them, and the Contract will be entered into the record books.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
     </div>
 </div>
