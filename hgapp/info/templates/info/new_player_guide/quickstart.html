@@ -17,6 +17,17 @@
     <script>
         const dieImageUrl = "{% static 'info/die-background.png' %}";
     </script>
+
+    <script id="sourceValues">
+        []
+    </script>
+    <script id="equipment">
+        ""
+    </script>
+    <script id="bio">
+        ""
+    </script>
+
     {{attribute_value_by_id|json_script:"attributeValueById"}}
     {{ability_value_by_id|json_script:"abilityValueById"}}
     {{character.num_body_levels|json_script:"numBodyLevels"}}
@@ -42,7 +53,7 @@
 
 <div class="container">
     <h1 class="text-center">
-        How to Play
+        How to Play The Contract
     </h1>
     <div class="panel panel-default">
         <div class="panel-body">

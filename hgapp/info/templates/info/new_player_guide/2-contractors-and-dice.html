@@ -5,7 +5,7 @@
 </h2>
 
 <div class="row">
-    <div class="col-sm-7">
+        <div class="col-sm-7">
         <div class="css-rules">
             <b>Character Sheets</b>
             <ul>
@@ -25,9 +25,9 @@
             </ul>
         </div>
     </div>
-    <div class="col-sm-5">
-        <figure class="css-figure-container">
-            <img src="{% static 'info/graphics/charsheet.png' %}" class="css-inline-image">
+    <div class="col-sm-5" style="height: 350px;">
+        <figure class="css-figure-container" style="width: 100%;" >
+            <img src="{% static 'info/graphics/qs_char_sheet.gif' %}" class="css-inline-image">
             <figcaption class="text-center">A Character Sheet</figcaption>
         </figure>
     </div>
@@ -37,7 +37,7 @@
     <div class="col-sm-4">
         <div class="css-narrative">
             <p>
-                The Starlight Motel struck me as the sort of place a night of bad decisions led to.
+                The Starlight Motel struck me as the sort of place you ended up after a night of bad decisions.
                 Not even that twilight sky--no sun or moon in sight, casting everything in shades of violet-- not even it could turn this parking-lot motel into somewhere that felt safe.
             </p>
             <p>
@@ -90,7 +90,7 @@
                 Another nod. 
             </p>
             <p>
-                “Okay. I’ll work with you. But you better not get in my way.”
+                “Okay. I’ll work with you," I said. "My name's Lucy. Don't get in my way.”
             </p>
             <p>
                 “Same to you.”
@@ -100,13 +100,13 @@
             <b>Contractor Status</b>
             <ul>
                 <li>
-                    Contractors without a single Victory are called Newbies.
+                    Contractors with fewer than four Victories are <b>Newbies</b>.
                 </li>
                 <li>
-                    Novice Contractors (1-9 Victories) can participate in Contracts with Newbies and other Novices.
+                    <b>Novice</b> Contractors (4-9 Victories) can participate in Contracts with Newbies and other Novices.
                 </li>
                 <li>
-                    Seasoned Contractors (10+ Victories) can only play with other Seasoned and Veteran (25+ Victories) Contractors.
+                    <b>Seasoned</b> Contractors (10+ Victories) can only play with other Seasoned and <b>Veteran</b> (25+ Victories) Contractors.
                 </li>
                 <li>
                     Only Veteran Contractors can participate in solo Contracts.
@@ -120,20 +120,20 @@
 </div>
 <div class="row">
     <h4 class="text-center">Rivals</h4>
-    <div class="col-sm-7">
+    <div class="col-sm-6">
         <div class="css-narrative">
             <p>
                 The click-clacking of cowboy boots echoed up the stairwell. The man attached had one arm, a revolver on each hip, and a mustache that would put Yosemite Sam to shame.
                 His sheriff’s star winked at me. 
             </p>
             <p>
-                “Great. Another cop,” I muttered.
+                “Great," I muttered. "Another cop.”
             </p>
             <p>
                 Five nodded. “Bo.” 
             </p>
             <p>
-                The man approached, face cracking into a smile. “Five! Here to pick up a new timepiece?” 
+                As the man approached, his face cracked into a smile. “Five! Here to pick up a new timepiece?” 
             </p>
             <p>
                 “No. We are on Contract.”
@@ -144,6 +144,10 @@
             <p>
                 “Fuck off, pig.”
             </p>
+        </div>
+    </div>
+    <div class="col-sm-6">
+        <div class="css-narrative">
             <p>
                 Bo’s smile disappeared. “I don’t like that attitude. Not one bit.” 
             </p>
@@ -170,13 +174,12 @@
                     </ul>
                 </li>
                 <li>
-                    In many playgroups, realpolitik and player-vs-player is not uncommon.
+                    In many playgroups, realpolitik and player-vs-player are not uncommon.
                 </li>
             </ul>
         </div>
-    </div>
-    <div class="col-sm-5">
         {% comment %}
+        and set this to col-sm-5, remove narrative and rules.
         <figure class="" style="height: 580px; padding: 10px;">
             <img src="{% static 'info/graphics/five_web.jpg' %}" class="css-inline-image">
             <figcaption class="text-center"></figcaption>
@@ -196,8 +199,16 @@
         <h4 class="text-center">Rolling Dice</h4>
         <div class="col-md-6">
             <div class="css-narrative">
+                <p>I chewed on Bo's question. “What am I good at? Causing trouble.”</p>
+                <p>“Big surprise. Well, the plane leaves in two hours. Let’s give ‘er a knock and get this show on the road.”</p>
+                <p>Five shook their head. “Already knocked. No answer. And the door is locked.”</p>
+                <p>“Well shit,” sighed Bo. “Suppose I could go talk to the manager--”</p>
+                <p>I set down my backpack and pulled out my crowbar.</p>
+                <p>“What in the hell do you think you’re doing, miss?”</p>
+                <p>“Causing trouble.”</p>
+
                 <p>
-                    I slid the crowbar between the door and frame on the hinged side and gave a tug. A snap of cheap wood cracking echoed down the hall, and the door fell off its hinges.
+                    I slid the crowbar between the door and its frame and gave a tug. The crackling of wood echoed down the hall, and the door fell off its hinges.
                 </p>
                 <p>
                     “So much for subtlety,” Bo grumbled, pushing past me into the room. “Bradley? You here, Bradley? Bra-- AGH!” 
@@ -209,16 +220,16 @@
                     “It appears that Bradley is a dog.” 
                 </p>
                 <p>
-                    “WOOF! WOOF!” stated Bradley, moments before licking Bo’s face with a steak-sized tongue. 
+                    <b>“WOOF! WOOF!”</b> stated Bradley before licking Bo’s face with a steak-sized tongue. 
                 </p>
                 <p>
-                    Bo struggled to fend off the licks under its weight. “A dog? Thing’s a gat-dammed bear!” 
+                    Bo struggled under Bradley's weight, trying to find off his kisses. “A dog? Thing’s a gat-dammed bear!” 
                 </p>
                 <p>
                     “Caucasian mountain dog,” said Five, guiding the beast off of Bo. “It smells like he has been eating roadkill.”
                 </p>
                 <p>
-                    "Looks like you've got your hands full, Five. Bo and I will search the apartment."
+                    I tried not to laugh. "Looks like you've got your hands full, Five. Come on, Bo. Let's search the apartment."
                 </p>
             </div>
         </div>
@@ -252,13 +263,13 @@
                         Add up your rating in the Attribute and Ability and roll that many 10-sided dice.
                     </li>
                     <li>
-                        Each die's result contributes to the <b>Outcome</b>.
+                        The number each die lands on contributes to the <b>Outcome</b>.
                         <ul>
                             <li>
                                 <b class="css-qs-big">+2</b> for each 10 (some dice use 0)
                             </li>
                             <li>
-                                <b class="css-qs-big">+1</b> for each 6 (Difficulty) or higher
+                                <b class="css-qs-big">+1</b> for each 6 (Difficulty rating) or higher
                             </li>
                             <li>
                                 <b class="css-qs-big">-1</b> for each 1
@@ -319,7 +330,7 @@
                         </ul>
                     </li>
                 </ul>
-                <div class=" css-quickstart-container text-center" style="margin-bottom: 5px; ">
+                <div class=" css-quickstart-container" style="margin-bottom: 5px; ">
                     <div class="css-narrative">
                         <p class="js-qs-action-outcome">
                         </p>
@@ -331,7 +342,8 @@
     <div class="row">
         <div class="col-xs-12">
             <div class="css-narrative css-rules-centered">
-                <div class="js-qs-additional-narrative">
+                <div id="js-qs-additional-narrative">
+
                 </div>
                 <p>
                     “Convenient,” said Five. “Too convenient.”
@@ -340,7 +352,7 @@
                     “You can rest easy, Five,” said Bo, “I found our wrinkle. That food bowl in the bathroom’s got traces of human blood on it. This room’s windows are painted black. That combined with the dog’s stench and those fangs. . .” 
                 </p>
                 <p>
-                    “Real fucking funny. You tryna say Bradley’s, what, a vampire?”
+                    I crossed my arms. “Real fucking funny. You tryna say Bradley’s what, a vampire?”
                 </p>
                 <p>
                     “You feel a pulse under all that fur, Five?” 

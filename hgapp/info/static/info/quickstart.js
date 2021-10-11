@@ -1,14 +1,5 @@
 function setAffix() {
     const $window = $(window);
-//    const $home = $('#format-punk');
-//    const homeEnd =  document.body.scrollHeight - $home.position().top - $home.outerHeight(true);
-//
-//    $('#css-art-front-punk').affix({
-//      offset: {
-//        top: -50,
-//        bottom:  homeEnd + 50,
-//      }
-//    })
 
     const $contractors = $('#format-punk');
     console.log("outer height: " + $contractors.outerHeight(true));
@@ -28,28 +19,6 @@ function setAffix() {
         bottom:  gamesEnd +50,
       }
     })
-//
-//    const $dice = $("#dice");
-//    var topBamboo;
-//    var bottomBamboo;
-//    const diceEnd =  document.body.scrollHeight - $dice.position().top - $dice.outerHeight(true);
-//    topBamboo = $dice.position().top -50;
-//    bottomBamboo = diceEnd +50,
-//    $('#css-art-front-bamboo').affix({
-//      offset: {
-//        top: topBamboo,
-//        bottom: bottomBamboo,
-//      }
-//    })
-//
-//
-//    const $website = $("#website");
-//    const websiteEnd =  document.body.scrollHeight - $website.position().top - $website.outerHeight(true);
-//    $('#css-art-front-music').affix({
-//      offset: {
-//        top: $website.position().top -50,
-//      }
-//    })
 }
 
 $(document).ready(function(){
@@ -62,6 +31,7 @@ $( window ).resize(function() {
   $(window).scroll();
 });
 
+/* Start playing highlight current step */
 $(document).ready(function() {
     var first = true;
     $(".css-start-play-section").each(function(){
@@ -75,10 +45,8 @@ $(document).ready(function() {
 
 function updateAffix() {
     setTimeout(() => {  $(window).scroll(); }, 700);
-    setTimeout(() => {$('#css-art-front-time').affix('checkPosition'); }, 700);
-    setTimeout(() => {$('#css-art-front-doors').affix('checkPosition'); }, 700);
-    setTimeout(() => {$('#css-art-front-bamboo').affix('checkPosition'); }, 700);
-    setTimeout(() => {$('#css-art-front-music').affix('checkPosition'); }, 700);
+    setTimeout(() => {$('#format-punk').affix('checkPosition'); }, 700);
+    setTimeout(() => {$('#format-music').affix('checkPosition'); }, 700);
 }
 
 $("a").click(function() {
@@ -106,7 +74,6 @@ $(".injury-form-tutorial").submit(function (e) {
     $("#injury-form-tutorial").trigger('reset');
     $("#id_description").focus();
 
-//    delUrl = delUrl.replace(/injuryIdJs/g, JSON.parse(response["id"]));
     var tmplMarkup = $('#injury-template').html();
     var compiledTmpl = tmplMarkup.replace(/__description__/g, serializedData[2].value);
     var compiledTmpl = compiledTmpl.replace(/__delUrl__/g, delUrl);
