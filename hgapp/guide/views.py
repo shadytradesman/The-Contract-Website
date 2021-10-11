@@ -21,16 +21,16 @@ class ReadGuideBook(View):
 
     def __get_context_data(self):
         guidebook = get_object_or_404(GuideBook, pk=self.kwargs['guidebook_slug'])
-        sections = guidebook.get_sections_in_order()
+        can_edit = self.request.user.is_superuser if self.request.user else False
+        sections = guidebook.get_sections_in_order(is_admin=can_edit)
         guidebooks = GuideBook.objects.order_by('position').all()
         sections_by_book = []
         for book in guidebooks:
             if book == guidebook:
                 sections_by_book.append((guidebook, sections,))
             else:
-                sections_by_book.append((book, book.get_sections_in_order(),))
+                sections_by_book.append((book, book.get_sections_in_order(is_admin=can_edit),))
         nav_list = self.__get_nav_list(sections_by_book, active_book=guidebook)
-        can_edit = self.request.user.is_superuser
         context = {
             "guidebook": guidebook,
             "sections": sections,
@@ -192,6 +192,7 @@ class WriteNewGuideSection(WriteGuideSection):
                     position=form.cleaned_data['position'],
                     content=form.cleaned_data['content'],
                     rendered_content=form.cleaned_data['content'], # initially just unrendered content
+                    is_hidden=form.cleaned_data['is_hidden'],
                     last_editor=request.user,
                     edit_date=timezone.now(),
                 )
@@ -224,6 +225,7 @@ class EditGuideSection(WriteGuideSection):
             "slug": self.current_section.slug,
             "position": self.current_section.position,
             "header_level": self.current_section.header_level,
+            "is_hidden": self.current_section.is_hidden,
         }
         return super().dispatch(*args, **kwargs)
 
@@ -238,6 +240,7 @@ class EditGuideSection(WriteGuideSection):
                 self.section.header_level = form.cleaned_data["header_level"]
                 self.section.slug = form.cleaned_data["slug"]
                 self.section.content = form.cleaned_data['content']
+                self.section.is_hidden = form.cleaned_data["is_hidden"]
                 self.section.last_editor = request.user
                 self.section.edit_date = timezone.now()
                 self.section.save()

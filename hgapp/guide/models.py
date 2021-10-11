@@ -13,8 +13,11 @@ class GuideBook(models.Model):
     expanded = models.BooleanField(default=False) # should this book be expanded in quick-access from navbar
     redirect_url = models.CharField(max_length=400, blank=True, null=True) # redirect to here instead of being viewable as a guidebook
 
-    def get_sections_in_order(self):
-        return GuideSection.objects.filter(book=self, is_deleted=False).order_by('position').all()
+    def get_sections_in_order(self, is_admin=False):
+        sections = GuideSection.objects.filter(book=self, is_deleted=False)
+        if not is_admin:
+            sections = sections.filter(is_hidden=False)
+        return sections.order_by('position').all()
 
 
 
@@ -26,6 +29,7 @@ class GuideSection(models.Model):
     slug = models.SlugField("URL-Safe Title", max_length=80) # must be unique per GuideBook
     position = models.PositiveIntegerField(default=1) # Guide sections are ordered by their position.
     is_deleted = models.BooleanField(default=False)
+    is_hidden = models.BooleanField(default=False)
     content = models.TextField(max_length=74000) # tinymce html content for editing
     rendered_content = models.TextField(max_length=78000) # content that is rendered for display
     last_editor = models.ForeignKey(

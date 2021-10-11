@@ -4,6 +4,15 @@
     top: -60px;
     visibility: hidden;
 }
+
+.css-hidden-section {
+    border: 2px dotted violet;
+}
+
+.css-hidden-section-warning {
+    color: violet;
+}
+
 @media (max-width: 768px) {
     .css-guide-section {
         top: -100px;
