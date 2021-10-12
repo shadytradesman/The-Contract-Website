@@ -74,7 +74,7 @@ body {
 #css-front-text {
     width: 66%;
     position: relative;
-    margin-top: 300px;
+    margin-top: 250px;
     left: 40px;
     background-color: rgba(17, 20, 24, 0.3);
 }
@@ -94,18 +94,25 @@ body {
 }
 
 #css-front-bullets-section {
-    margin-top: 50px;
+    margin-top: 00px;
     position: relative;
     margin-left: 60px;
     width: 60%;
-    padding: 20px;
+    padding: 10px;
     background-color: rgba(17, 20, 24, 0.5);
 }
 
+.css-front-text-bullets>h4 {
+    margin-top: 15px;
+}
+
+.css-subtitle {
+    font-size: 18px;
+}
 
 @media (max-width: 768px) {
     #css-front-bullets-section {
-        margin-top: 50px;
+        margin-top: 10px;
         position: relative;
         margin-left: 0px;
         width: 100%;
