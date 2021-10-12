@@ -1,0 +1,88 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+{% load staticfiles %}
+{% load account_tags %}
+{% load hgapp_tags %}
+{% load cache %}
+
+{% block head_title %}How to Play{% endblock %}
+
+{% block extra_styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'info/quickstart.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'info/start_playing_style.css' %}" />
+{% endblock %}
+
+{% block extra_scripts %}
+    <script>
+        const dieImageUrl = "{% static 'info/die-background.png' %}";
+    </script>
+
+    <script id="sourceValues">
+        []
+    </script>
+    <script id="equipment">
+        ""
+    </script>
+    <script id="bio">
+        ""
+    </script>
+
+    {{attribute_value_by_id|json_script:"attributeValueById"}}
+    {{ability_value_by_id|json_script:"abilityValueById"}}
+    {{character.num_body_levels|json_script:"numBodyLevels"}}
+    {{character.num_mind_levels|json_script:"numMindLevels"}}
+    {{character.mental_damage|json_script:"mindDamage"}}
+    <script src="{% static 'characters/roll_values.js' %}"></script>
+    <script src="{% static 'characters/view_character.js' %}"></script>
+    {{action_list|json_script:"exampleActions"}}
+    {{first_action|json_script:"firstAction"}}
+    <script src="{% static 'info/resolution_tutorial.js' %}"></script>
+    <script src="{% static 'info/quickstart.js' %}"></script>
+{% endblock %}
+
+{% block body_base %}
+{% cache 50000 quickstart %}
+
+{% comment %}
+    The New Players guide has two main features:
+    Learning about the game IS learning to play the game.
+    Offload tables / reference to the website interface, and use the saved space to SHOW the game via a narrative.
+{% endcomment %}
+
+
+<div class="container">
+    <h1 class="text-center">
+        How to Play The Contract
+    </h1>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="css-rules css-rules-centered">
+                <b>By the time you finish this Guide:</b>
+                <ul>
+                    <li>
+                        You will know what The Contract is and how to play it.
+                    </li>
+                    <li>
+                        You will have made your own Contractor.
+                    </li>
+                    <li>
+                        You will either be scheduled to participate in an upcoming online Contract
+                        OR you will be prepared to start running The Contract for your own group.
+                    </li>
+                </ul>
+                <p class="text-center">
+                <b>Note:</b>
+                     Read this guide front to back without skipping.
+                    The narrative covers the events of one play session and contains critical information.
+                </p>
+            </div>
+            {% include "info/new_player_guide/1-intro-and-format.html" %}
+            {% include "info/new_player_guide/2-contractors-and-dice.html" %}
+            {% include "info/new_player_guide/3-downtimes-setting-worlds.html" %}
+            {% include "info/new_player_guide/4-start-playing.html" %}
+        </div>
+    </div>
+</div>
+{% endcache %}
+{% endblock %}

@@ -1,0 +1,103 @@
+<div class="css-rules ">
+    <b>Combat Basics</b>
+    <ul>
+        <li>
+            Combat in The Contract is quick, unpredictable, and deadly.
+        </li>
+        <li>
+            A successful combat relies more on setting up the right fight than being the best fighter.
+        </li>
+        <li>
+            The best way to win a fight is with an ambush or a numbers advantage.
+        </li>
+    </ul>
+    <b>Going turn-based</b>
+    <ul>
+        <li>
+            When the action comes to a head and many characters want to do something at once, the game enters a turn-based mode called Combat. 
+        </li>
+        <li>
+            At the start of Combat each character rolls Initiative (Dexterity + Wits) to determine their place in the turn order.
+        </li>
+        <li>
+            Each Round of turns represents three seconds of in-game action.
+        </li>
+    </ul>
+    <div class="text-center">
+        <b>What can I do?</b>
+    </div>
+    <ul class="nav nav-tabs nav-justified nav-justified-sm css-nav-tabs" role="tablist">
+        <li role="presentation" class="active" >
+            <a href="#myturn" aria-controls="myturn" role="tab" data-toggle="tab">It's my turn</a>
+        </li>
+        <li role="presentation"><a href="#react" aria-controls="react" role="tab" data-toggle="tab">I'm being attacked!</a></li>
+    </ul>
+    <div class="tab-content css-tab-content">
+        <div role="tabpanel" class="tab-pane active " id="myturn">
+            <div class="css-combat-tab-content">
+                <div class="text-center">You get one <b>Movement</b> and one <b>Action</b> on your turn each Round.</div>
+                <b>Movement</b>
+                <ul>
+                    <li>You may move up to 5 + (5 x Dexterity) feet immediately before OR After your Action.</li>
+                </ul>
+                <b>Actions</b>
+                <ul>
+                    <li>
+                        <b>Attack</b> with your weapon or hands.
+                        <ul>
+                            <li>
+                                If an attack's Outcome is positive after defense, it results in a new Injury with Severity =
+                                <b>Outcome + Weapon damage - Armor</b>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><b>Evade</b> by rolling to Defend or Dodge. Your Outcome is "spent" to reduce the Outcome of any incoming attacks until your next Action.</li>
+                    <li><b>Activate a Power</b> or <b>use an Ability</b> as normal.</li>
+                    <li><b>Hold your Action</b> by declaring an Action and a triggering event. If the event occurs before your turn on the next Round, you perform the Action.</li>
+                </ul>
+            </div>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="react">
+            <div class="css-combat-tab-content">
+                <div class="text-center">
+                    If you have not yet spent your Action this Round, you may use it as a Reaction.
+                </div>
+                <b>Reactions</b>
+                <ul>
+                    <li>
+                            <span data-toggle="tooltip" title="
+                                You cannot dodge ranged firearms attacks as a Reaction without a Power.
+                                ">
+                                <b>Dodge</b> by rolling Dexterity + Athletics.
+                                Your Outcome is subtracted from the attacker's.
+                            </span>
+                    </li>
+                    <li>
+                            <span data-toggle="tooltip" title="
+                                Unarmed people can Defend against other unarmed attacks.
+                                Melee weapons can Defend against unarmed, melee, or thrown attacks.
+                                Firearms cannot Defend but may be Defended only against if the attacker is within reach.
+                                ">
+                                <b>Defend</b> with your weapon by rolling its attack roll.
+                                Your Outcome is subtracted from the attacker's. Availability depends on weapon match-up
+                                (<span class="visible-xs-inline">tap</span><span class="hidden-xs">hover</span>).
+                            </span>
+                    </li>
+                    <li>
+                            <span data-toggle="tooltip" title="
+                                    The requirements for Clashing are the same as for Defending.
+                                    On a tie, both attacks succeed with their full Outcome.
+                                ">
+                                <b>Clash</b> with the attacker using the same roll you would use to Defend.
+                                The higher Outcome (not contested) is treated as the result of a successful, undefended attack
+                                roll against the loser.
+                            </span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="text-center" style="margin-top: 5px;">
+        Each Character Sheet features an expandable Combat reference.
+    </div>
+</div>

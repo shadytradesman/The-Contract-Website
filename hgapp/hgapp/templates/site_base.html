@@ -65,7 +65,7 @@
     </li>
         {% if request.user.is_authenticated and not request.user.game_set.all %}
             <li>
-                <a class="css-nav-butt btn-primary" href="{% url 'info:getting_started' %}">Start Playing</a>
+                <a class="css-nav-butt btn-primary" href="{% url 'info:how-to-play' %}">Start Playing</a>
             </li>
         {% elif request.user.is_authenticated %}
             <li class="dropdown hidden-sm">
@@ -119,7 +119,7 @@
             </li>
         {% else %}
             <li>
-                <a class="css-nav-butt btn-warning" href="{% url 'info:getting_started' %}">Start Playing</a>
+                <a class="css-nav-butt btn-warning" href="{% url 'info:how-to-play' %}">Start Playing</a>
             </li>
         {% endif %}
 {% endblock %}

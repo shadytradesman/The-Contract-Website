@@ -1,0 +1,26 @@
+.css-start-playing-container h2 {
+    margin-top: 0px;
+}
+
+.css-start-play-active .css-start-play-header {
+    background-color: #455864;
+}
+
+.css-start-play-header {
+    font-size: 24px;
+}
+
+.css-start-play-section {
+    background-color: #353e4b;
+    border-color: #36494f;
+    color: #ccd6dc;
+
+}
+
+.css-start-play-body {
+}
+
+.css-start-play-section p {
+    width: 80%;
+    margin: auto;
+}

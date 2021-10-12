@@ -1,0 +1,1100 @@
+{% load staticfiles %}
+<h2 class="text-center">
+    Contractors and Dice
+    <hr>
+</h2>
+
+<div class="row">
+        <div class="col-sm-7">
+        <div class="css-rules">
+            <b>Character Sheets</b>
+            <ul>
+                <li>Your Contractor's Character Sheet tracks their stats, status, Powers, equipment, history, and more.</li>
+                <li>The Contract uses online Character Sheets.</li>
+                <li>
+                    At game-time, Players access their sheets on phones, tablets, laptops, or print them out.
+                </li>
+                <li data-toggle="tooltip" title='Mouse-over tooltips provide useful information throughout the site.'>
+                    If you ever need to reference a rule, you can
+                    <span class="visible-xs-inline">tap on</span><span class="hidden-xs">mouse-over</span>
+                    any element of your Character Sheet to learn.
+                </li>
+                <li>
+                    At the end of this guide, you will create your own Contractor by filling out their Character Sheet.
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-sm-5" style="height: 350px;">
+        <figure class="css-figure-container" style="width: 100%;" >
+            <img src="{% static 'info/graphics/qs_char_sheet.gif' %}" class="css-inline-image">
+            <figcaption class="text-center">A Character Sheet</figcaption>
+        </figure>
+    </div>
+</div>
+<div class="row">
+    <h4 class="text-center">Teammates</h4>
+    <div class="col-sm-4">
+        <div class="css-narrative">
+            <p>
+                The Starlight Motel struck me as the sort of place you ended up after a night of bad decisions.
+                Not even that twilight sky--no sun or moon in sight, casting everything in shades of violet-- not even it could turn this parking-lot motel into somewhere that felt safe.
+            </p>
+            <p>
+                I climbed the steps to the second floor and knocked on the door labled <span class="css-typeface">231</span>. No answer. The windows were black.
+            </p>
+            <p>
+                “You’re looking for Bradley,” came a voice from behind. It belonged to a pale teenager wearing a pleather duster and watches on both wrists.
+            </p>
+            <p>
+                “Are you here on Contract?” they asked.
+            </p>
+            <p>
+                “You could say that.” 
+            </p>
+            <p>
+                “Then we are working together. I am Five.” 
+            </p>
+            <p>
+                “You look a little older than that.” 
+            </p>
+            <p>
+                “That is my name. I am seventeen years old. I think.”
+            </p>
+        </div>
+    </div>
+    <div class="col-sm-3">
+        <figure class="" style="height: 500px; padding: 10px;">
+            <img src="{% static 'info/graphics/five_web.jpg' %}" class="css-inline-image">
+            <figcaption class="text-center"></figcaption>
+        </figure>
+    </div>
+    <div class="col-sm-5">
+        <div class="css-narrative">
+            <p>
+                “Uh huh. Look, kid, I don’t really need a sidekick.”
+            </p>
+            <p>
+                Five stared at me. “You must be new. We will need all the help we can get.”
+            </p>
+            <p>
+                “You’ve done this before?” 
+            </p>
+            <p>
+                Five nodded.
+            </p>
+            <p>
+                “So you have. . . powers.”
+            </p>
+            <p>
+                Another nod. 
+            </p>
+            <p>
+                “Okay. I’ll work with you," I said. "My name's Lucy. Don't get in my way.”
+            </p>
+            <p>
+                “Same to you.”
+            </p>
+        </div>
+        <div class=" css-rules">
+            <b>Contractor Status</b>
+            <ul>
+                <li>
+                    Contractors with fewer than four Victories are <b>Newbies</b>.
+                </li>
+                <li>
+                    <b>Novice</b> Contractors (4-9 Victories) can participate in Contracts with Newbies and other Novices.
+                </li>
+                <li>
+                    <b>Seasoned</b> Contractors (10+ Victories) can only play with other Seasoned and <b>Veteran</b> (25+ Victories) Contractors.
+                </li>
+                <li>
+                    Only Veteran Contractors can participate in solo Contracts.
+                </li>
+                <li>
+                    The GM states the Contract's required Status in the invitation.
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <h4 class="text-center">Rivals</h4>
+    <div class="col-sm-6">
+        <div class="css-narrative">
+            <p>
+                The click-clacking of cowboy boots echoed up the stairwell. The man attached had one arm, a revolver on each hip, and a mustache that would put Yosemite Sam to shame.
+                His sheriff’s star winked at me. 
+            </p>
+            <p>
+                “Great," I muttered. "Another cop.”
+            </p>
+            <p>
+                Five nodded. “Bo.” 
+            </p>
+            <p>
+                As the man approached, his face cracked into a smile. “Five! Here to pick up a new timepiece?” 
+            </p>
+            <p>
+                “No. We are on Contract.”
+            </p>
+            <p>
+                “We’ve gotta work on your sense of humor, Five.” He turned to me and held out his hand. “Looks like we've got ourselves a team. The name’s Bo Perkins. Pleasure to meet you.” 
+            </p>
+            <p>
+                “Fuck off, pig.”
+            </p>
+        </div>
+    </div>
+    <div class="col-sm-6">
+        <div class="css-narrative">
+            <p>
+                Bo’s smile disappeared. “I don’t like that attitude. Not one bit.” 
+            </p>
+            <p>
+                Five stiffened. “She is new.”
+            </p>
+            <p>
+                “Ah. Well, little miss sunshine, as long as we’re bein’ candid with each other, I don’t think I like you either.
+                You look like a good-fer-nothin' punk. Now I’m sure I could uncover enough dirt to put you away for a long time, but, unless you signed a very different contract than I did, I think we ought to put aside our differences and work together.”
+            </p>
+        </div>
+        <div class=" css-rules">
+            <b>Ambitions</b>
+            <ul>
+                <li>
+                    Contractors may have opposing ambitions.
+                    <ul>
+                        <li>
+                            Lucy wants to destroy the government.
+                        </li>
+                        <li>
+                            Bo wants to create a police state utopia.
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    In many playgroups, realpolitik and player-vs-player are not uncommon.
+                </li>
+            </ul>
+        </div>
+        {% comment %}
+        and set this to col-sm-5, remove narrative and rules.
+        <figure class="" style="height: 580px; padding: 10px;">
+            <img src="{% static 'info/graphics/five_web.jpg' %}" class="css-inline-image">
+            <figcaption class="text-center"></figcaption>
+        </figure>
+        {% endcomment %}
+    </div>
+</div>
+<div class="row">
+    <h4 class="text-center">
+        Capabilities
+    </h4>
+</div>
+{% include "info/new_player_guide/attributes-and-abilities.html" %}
+<br>
+<div id="js-first-resolution" class="js-resolution-container">
+    <div class="row">
+        <h4 class="text-center">Rolling Dice</h4>
+        <div class="col-md-6">
+            <div class="css-narrative">
+                <p>I chewed on Bo's question. “What am I good at? Causing trouble.”</p>
+                <p>“Big surprise. Well, the plane leaves in two hours. Let’s give ‘er a knock and get this show on the road.”</p>
+                <p>Five shook their head. “Already knocked. No answer. And the door is locked.”</p>
+                <p>“Well shit,” sighed Bo. “Suppose I could go talk to the manager--”</p>
+                <p>I set down my backpack and pulled out my crowbar.</p>
+                <p>“What in the hell do you think you’re doing, miss?”</p>
+                <p>“Causing trouble.”</p>
+
+                <p>
+                    I slid the crowbar between the door and its frame and gave a tug. The crackling of wood echoed down the hall, and the door fell off its hinges.
+                </p>
+                <p>
+                    “So much for subtlety,” Bo grumbled, pushing past me into the room. “Bradley? You here, Bradley? Bra-- AGH!” 
+                </p>
+                <p>
+                    A massive creature crashed into the cop, pinning him to the ground. A maw of slavering, razor-sharp fangs opened above him, ready to go for the kill. I raised my crowbar to brain the thing, but Five caught my wrist and flipped on the lights. 
+                </p>
+                <p>
+                    “It appears that Bradley is a dog.” 
+                </p>
+                <p>
+                    <b>“WOOF! WOOF!”</b> stated Bradley before licking Bo’s face with a steak-sized tongue. 
+                </p>
+                <p>
+                    Bo struggled under Bradley's weight, fending off his kisses. “A dog? Thing’s a gat-dammed bear!” 
+                </p>
+                <p>
+                    “Caucasian mountain dog,” said Five, guiding the beast off of Bo. “It smells like he has been eating roadkill.”
+                </p>
+                <p>
+                    I tried not to laugh. "Looks like you've got your hands full, Five. Come on, Bo. Let's search the apartment."
+                </p>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="css-rules ">
+                <b>Resolution</b>
+                <ul>
+                    <li>
+                        Most of the time, controlling your Contractor is as simple as telling the GM what you'd like to do.
+                    </li>
+                    <li>
+                        When you attempt an action that is dangerous or might not succeed, the GM may call for a roll to determine the outcome. 
+                    </li>
+                    <li>
+                        The GM declares an Attribute, an Ability, and a Difficulty rating.
+                        <ul><li>(If the Difficulty is not specified, it is 6)</li></ul>
+                    </li>
+                </ul>
+                <div class="css-quickstart-container text-center" style="margin-bottom: 5px;">
+                    <p>
+                        <b>Player:</b> "I want to investigate the apartment"
+                    </p>
+                    <p>
+                        <b>GM:</b>"Roll <b class="js-qs-attribute"></b>
+                        + <b class="js-qs-ability"></b>,
+                        Difficulty <b class="js-qs-difficulty">-</b>"
+                    </p>
+                </div>
+                <ul>
+                    <li>
+                        Add up your rating in the Attribute and Ability and roll that many 10-sided dice.
+                    </li>
+                    <li>
+                        The number each die lands on contributes to the <b>Outcome</b>.
+                        <ul>
+                            <li>
+                                <b class="css-qs-big">+2</b> for each 10 (some dice use 0)
+                            </li>
+                            <li>
+                                <b class="css-qs-big">+1</b> for each 6 (Difficulty rating) or higher
+                            </li>
+                            <li>
+                                <b class="css-qs-big">-1</b> for each 1
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                <div class=" css-quickstart-container text-center" style="margin-bottom: 5px;">
+                    <p>
+                        <b class="js-qs-attribute-val"></b>
+                        <span class="js-qs-attribute"></span>
+                        + <b class="js-qs-ability-val"></b>
+                        <span class="js-qs-ability"></span>  =
+                        <span id="js-qs-roll-first-button" class="btn btn-primary">
+                        Roll <b class="js-roll-num-dice js-qs-num-dice">-</b> Dice
+                    </span>
+                    </p>
+                    <div class="text-left">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="js-qs-roll-dice css-qs-roll-results">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="js-qs-roll-results css-qs-roll-results">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row text-center">
+                        <div class="col-xs-12">
+                            <h4 >Outcome: <b class="js-qs-outcome-num">-</b>
+                            </h4>
+                        </div>
+                    </div>
+                </div>
+                <ul>
+                    <li>
+                        The Outcome determines the result of your Action
+                        <ul>
+                            <li>
+                                6+ Exceptional Success
+                            </li>
+                            <li>
+                                4-5 Complete Success
+                            </li>
+                            <li>
+                                1-3 Partial success, or a Success with a complication
+                            </li>
+                            <li>
+                                0 Failure
+                            </li>
+                            <li>
+                                -1 Botch, something goes horribly wrong.
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                <div class=" css-quickstart-container" style="margin-bottom: 5px; ">
+                    <div class="css-narrative">
+                        <p class="js-qs-action-outcome">
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="css-narrative css-rules-centered">
+                <div id="js-qs-additional-narrative">
+
+                </div>
+                <p>
+                    “You feel a pulse under all that fur, Five?” 
+                </p>
+                <p>
+                    Five pushed their hand into Bradley's fur.
+                </p>
+                <p>
+                    “No.”
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <h4 class="text-center">
+        Advanced Dice Rolling
+    </h4>
+    <div class="col-md-6">
+        <div class="css-narrative">
+            <p>
+                There was a moment of silence. Bradley’s tongue slid over his razor fangs in a breathless mimicry of panting.  
+            </p>
+            <p>
+                I shook my head. “Wild. I mean, I’ve seen the videos of werewolves and ghosts and shit on YouTube, but none of the vampire ones are confirmed.” 
+            </p>
+            <p>
+                “Look at this,” said Five, pointing their phone’s camera at Bradley. “He doesn’t appear on film. Even so, I am sure if we live-streamed in public--” 
+            </p>
+            <p>
+                Bo held up his hand. “Absolutely not. Goin’ viral is the last thing we need. We’ve got a flight to catch, and as far as the US Government is concerned, this thing’s a WMD. Lucy, grab the leash; you’re our handler.” 
+            </p>
+            <p>
+                “Me? Five seems better with dogs.” 
+            </p>
+            <p>
+                “Yeah, but Five couldn’t talk their way into a timeshare presentation. No offense, Five.” 
+            </p>
+            <p>
+                Five shrugged. “They are often scams.”
+            </p>
+            <p>
+                “But sneaking contraband should be second nature to a punk like you,” he said, offering me the leash. “Unless you’re yellow.” 
+            </p>
+            <p>
+                I snatched the leash from his hand. “I took this job for a chance to change the world. I’ll do whatever it takes.”
+            </p>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="css-rules">
+            {% include "info/new_player_guide/resolution_tutorial_snip.html" %}
+        </div>
+    </div>
+
+</div>
+
+<div class="row">
+    <h4 class="text-center">
+        The Mission
+    </h4>
+    <div class="col-md-6">
+        <div class="css-narrative">
+            <p>
+                Bradley and I boarded first with the elderly and uniformed military personnel. I gave him the window seat, took the aisle for myself, and saved the middle seat for Five.
+            </p>
+            <p>
+                Bo slumped into the aisle seat across from mine. “Well color me impressed, Lucy. We made it on board without getting arrested. Now we just have to survive the flight. And the other passengers.”
+            </p>
+            <p>
+                “What about ‘em?”
+            </p>
+            <p>
+                “You didn’t notice?” he whispered ”Looks like we’re heading to Hawaii with a band of monster hunters.” 
+            </p>
+            <p>
+                “You’re fucking kidding.”  
+            </p>
+            <p>
+                “Keep your cool. Chances are they’re nothing but charlatans and scam artists. ‘Course I can’t say the same for the pair of air marshals in row 35.”  
+            </p>
+            <p>
+                “Shit.”
+            </p>
+            <p>
+                Five squeezed past me to their seat and started petting Bradley. “The dog looks different. Longer fangs. Pointed ears. Red eyes.” 
+            </p>
+            <p>
+                “He’s getting hungry,” I said. “When he snapped at that dog, he looked like a full-on demon.”
+            </p>
+            <p>
+                The Flight attendants finished their presentation. The plane lurched into motion. 
+            </p>
+            <p>
+                “Maybe he will eat my roast beef sandwich,” Five said, rummaging through their bag. Bradley sniffed the sandwich once, coughed, and started licking at the arteries in Five’s wrists. 
+            </p>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="css-narrative">
+            <p>
+                The plane shot down the runway with a mighty rumble, and we were away. It was about now I started to panic. 
+            </p>
+            <p>
+                “Fuck this. We’re not dog trainers. We aren’t priests. Why the fuck did she choose us for this job?”
+            </p>
+            <p>
+                Bo scoffed. “This aint Ocean’s 11, sweety.”
+            </p>
+            <p>
+                “The fuck does that mean?”
+            </p>
+            <p>
+                “He means they did not pick us for our specific talents. These jobs are more like,” Five paused, “like an escape room. Except all the puzzles are impossible. If you want to win, you have to cheat.”
+            </p>
+        </div>
+        <div class="css-rules ">
+            <b>Problem Solving</b>
+            <ul>
+                <li>
+                    Contractors are rarely suited for the Contracts they attend.
+                </li>
+                <li>
+                    Most Contracts demand outside-the-box solutions to critical situations. 
+                </li>
+                <li>
+                    Violence is a risky tactic, not the assumed solution.
+                    <ul>
+                        <li>
+                            Trying to fight your way through every Contract will earn you a one-way trip to the graveyard.
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <b>Scenarios</b>
+            <ul>
+                <li>
+                    The modules GMs run as Contracts are called <b>Scenarios</b>.
+                </li>
+                <li>
+                    New GMs are given 5 Scenarios to help them start running The Contract.
+                </li>
+                <li>
+                    After you play in a user-created Contract, its Scenario write-up is revealed to you, and you can then run it for other groups.
+                </li>
+                <li>
+                    Unlocked Scenarios include notes from GMs who previously ran it, as well as Journal Entries for the Contractors who attended.
+                </li>
+                <li>
+                    Playing in an occasional online Contract is a great way to discover content for your in-person group.
+                </li>
+            </ul>
+        </div>
+
+    </div>
+</div>
+<div class="row">
+    <h4 class="text-center">
+        Taking Inventory
+    </h4>
+    <div class="col-md-6">
+        <div class="css-narrative">
+            <p>
+                “He wants blood,” I said, pulling Five’s wrists away from Bradley. “Human blood.” 
+            </p>
+            <p>
+                “Water, water everywhere, and not a drop to drink,” muttered Bo. “Unless, of course, we do something drastic.”
+            </p>
+            <p>
+                I leaned close to Bo. “What are you saying? We feed him a person?” 
+            </p>
+            <p>
+                “Seems like things are heading that way, one way or another,” he said, nodding towards the demonic dog currently trying to lick its way through the skin on Five’s neck. 
+            </p>
+            <p>
+                “I’m gunna be fucking sick. There has to be another way.”  
+            </p>
+            <p>
+                “I’m listenin’ for bright ideas, sugarplum, but I ain’t hearin’ any.”
+            </p>
+            <p>
+                I wracked my brain. “We’re so stupid. We could have gotten donor blood on our way to the airport, or at least some syringes. Instead we’ve got jack shit.” 
+            </p>
+            <p>
+                “I have syringes,” said Five.
+            </p>
+            <p>
+                “Excuse me?”
+            </p>
+            <p>
+                “I’m type-1 diabetic.”
+            </p>
+        </div>
+    </div>
+    <div class="col-md-6">
+        {% include "info/new_player_guide/equipment.html" %}
+    </div>
+</div>
+<div class="row">
+    <h4 class="text-center">
+        Getting Hurt
+    </h4>
+    <div class="col-md-6">
+        <div class="css-narrative">
+            <p>
+                “Five, I could kiss you.” 
+            </p>
+            <p>
+                “Please do not.” 
+            </p>
+            <p>
+                “Give me one of those syringes. Bo, hand me that water bottle. I’m going to the bathroom.”
+            </p>
+            <p>
+                You ever try to draw blood from yourself? It isn’t easy, especially with turbulence. . .
+            </p>
+        </div>
+        <div class="css-rules ">
+            <b>Body</b>
+            <ul>
+                <li>
+                    Body represents your physical fortitude.
+                </li>
+                <li>
+                    Its value is calculated based on your Brawn Attribute. 
+                </li>
+                <li>
+                    All humans have between 6 and 8 Body.
+                </li>
+                <li>
+                    When your physical fortitude is tested, the GM may ask you to roll your rating in Body in place of
+                    the standard Attribute + Ability.
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="css-rules ">
+            <b>Injuries</b>
+            <ul>
+                <li>
+                    Injuries are tracked individually on your Character Sheet.
+                </li>
+                <li>
+                    An Injury’s Severity determines how deadly it is, how difficult it is to treat, and how long it takes to heal.
+                </li>
+                <li>
+                    Typically, there is an in-game month between Contracts. Each Injury you've sustained heals 2 Severity levels in this time.
+                    <ul>
+                        <li>
+                            If you do not want to play an injured Contractor, you can always play a different one while they heal up.
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <b>Battle Scars</b>
+            <ul>
+                <li>
+                    Injuries Severity 4 or higher leave Battle Scars.
+                </li>
+                <li>
+                    Battle Scars are permanent disfigurements that do not heal naturally.
+                </li>
+                <li>
+                    They may only be prevented or removed using Powers.
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <h4 class="text-center">
+        Combat
+    </h4>
+    <div class="col-md-6">
+        <div class="css-narrative">
+            <p>
+                I emerged from the bathroom with new blood stains on my jeans carrying a 12 oz water bottle full of what I hoped looked like wine. The line of people waiting in the aisle gave odd looks as I squeezed by. 
+            </p>
+            <p>
+                “One bloody mary for our buddy,” I said, handing the plastic bottle to Five. “Why’s Bradley under that blanket?” 
+            </p>
+            <p>
+                Bradley lifted his head to greet me, and I nearly had a heart attack.  A pair of glowing red eyes peered over an upturned, batlike nose. Strands of saliva swung from the tips of needle-sharp fangs that no longer fit behind his lips. 
+            </p>
+            <p>
+                “He’s getting worse,” said Five.
+            </p>
+            <p>
+                "Jesus," I said, and Bradley growled. "Good thinking keeping him out of sight of those wannabe Van-Helsings."
+            </p>
+            <p>
+                Five uncapped the bottle for Bradley, who proceeded to swallow the meal, bottle and all, with a single chomp. Five was lucky to keep their hand. 
+            </p>
+            <p>
+                As the dog set to work lapping up any excess splatter, his demonic features receded. Soon, he was back to the big, clumsy teddy bear we’d met in the motel. We breathed a sigh of relief.
+            </p>
+            <p>
+                “Gotta hand it to you, kid,” whispered Bo. “That was some good thinking.” 
+            </p>
+            <p>
+                “Thanks,” I said, reaching out to pet our still giant, but otherwise normal, dog. 
+            </p>
+            <p>
+                Bradley gave my leg a sniff, recognized the scent of a good meal, bared his fangs, and lunged.
+            </p>
+        </div>
+    </div>
+    <div class="col-md-6">
+        {% include "info/new_player_guide/combat.html" %}
+    </div>
+</div>
+
+
+<div class="row">
+    <h4 class="text-center">
+        Multiple Injuries
+    </h4>
+    <div class="col-md-6">
+        <div class="css-narrative">
+            <p>
+                In an instant, Bradley the monster was back. His fangs sank into my calf like a dozen steak knives. I remember making a noise, not a scream, something more primal. I twisted and kicked. My heel connected with Bradley’s eye, but he didn’t let go. 
+            </p>
+        </div>
+        <div class="css-rules ">
+            <b>Wound Level</b>
+            <ul>
+                <li>
+                    Injuries increase your Wound Level, depleting your Body.
+                </li>
+                <li>
+                    Your Wound Level is equal to <b>the Severity of your worst Injury + the number of other Injuries you have.</b>
+                </li>
+                <li>
+                    Let’s say Bradley’s bite counts as a Severity 4 Injury. 
+                </li>
+                <li>
+                    Combined with Lucy's existing Severity 2 Injury from drawing blood, her Wound Level is now 5.
+                    <ul>
+                        <li>
+                            <b>4</b> (Highest Severity) + <b>1</b> (number of other Injuries) = <b>5</b>.
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    Try it out using the widget
+                    <span class="visible-xs-inline">below</span><span class="hidden-xs">to the right</span>.
+                </li>
+            </ul>
+            <b>Penalty</b>
+            <ul>
+                <li>
+                    Injuries aren't easily shrugged off. Pain and loss of functionality impacts your effectiveness.
+                </li>
+                <li>
+                    As your Body is depleted, you gain <b>Penalty</b>.
+                </li>
+                <li>
+                    Your Penalty subtracts dice from every roll you make.
+                </li>
+                <li>
+                    Penalty cannot reduce a roll's dice pool to fewer than two dice.
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-md-6 css-rules">
+        <div class="text-center">
+            <b>Try it Out!</b>
+        </div>
+        {% include "info/new_player_guide/healthwidget.html" %}
+    </div>
+</div>
+
+<div class="">
+    <h4 class="text-center">
+        Gifted
+    </h4>
+    <div id="format-five-time">
+        <span id="css-art-front-time-sm" class="css-art-sm" style='background-image:url("{% static 'overrides/art/front-time.jpg' %}")'></span>
+        <div class="css-content">
+            <div id="css-art-front-music-lg" class="css-art-lg" style='background-image:url("{% static 'overrides/art/front-time.jpg' %}")'>
+            <div class="css-affix-spacer"></div>
+            <div class="css-affix-spacer"></div>
+            <div class="css-affix-spacer"></div>
+            <div class="css-two-thirds-col-right">
+                <div class="css-narrative">
+                    <p>
+                        Bo Perkins snapped his body like he was throwing a punch with his missing arm. There was a blue shimmer, and Bradley flew backwards, slamming into the wall beneath the window. Undeterred, he opened his jaws and prepared to lunge again. 
+                    </p>
+                    <p>
+                        Five leaped onto his back, and they both disappeared. A lone wrist watch clattered to the ground, the only sign they’d ever been there. 
+                    </p>
+                    <p>
+                        “What the hell!?” cried a passenger in the row behind us. He was standing, looking over the seat at me with a look of utter shock. 
+                    </p>
+                    <p>Bo scrambled over, threw the blanket over my injured leg, and started tying a tourniquet, his single hand working in tandem with an invisible one. </p>
+                    <p>“They went 25 seconds into the future,” he whispered urgently. “It’s one of Five’s Gifts. You best not be around when we catch up to them. Go!” </p>
+                    <p>I struggled to my feet. More passengers were craning their necks and covering their mouths in shock. I shot Bo a frantic glance.  </p>
+                    <p>“I’ll deal with it. You go!”</p>
+                </div>
+                <div class="css-rules css-rules-centered">
+                    <b>Powers</b>
+                    <ul>
+                        <li>Most Powers do not grant dice bonuses or make you more effective in a fight.</li>
+                        <ul>
+                            <li>Instead they provide tools, information, and options.</li>
+                        </ul>
+                        <li>While you can create almost any Power imaginable, they must fit your Contractor’s concept.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <h4 class="text-center">
+        Exertion
+    </h4>
+    <div class="col-md-6">
+        <div class="css-narrative">
+            <p>I used the seat backs like crutches, jostling another dozen passengers from their sleep, grimacing at each agonizing step. Hot blood pooled in my shoe.</p>
+            <p>A dozen rows back, an arm reached out and caught my wrist. It was one of the air marshals. </p>
+            <p>“What happened up there, miss? Are you okay?” </p>
+            <p>“I-- it--” I stammered.</p>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="css-rules ">
+            <b>Exerting</b>
+            <ul>
+                <li>When the chips are down and the stakes have never been higher, you may Exert yourself to get a bonus on a roll.</li>
+                <li>You must declare that you are Exerting before you roll. </li>
+                <li>Exerting allows you to ignore your Penalty for the roll AND increases its Outcome by 1.</li>
+                <li>You may Exert a maximum of once per Round of Combat.</li>
+                <li>
+                    Exerting is stressful and takes a toll on your mental health.
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <h4 class="text-center">
+        Mind
+    </h4>
+    <div class="col-md-6">
+        <div class="css-narrative">
+            <p>“I stepped on the dog’s tail, and he bit me. Just surprised him. All’s good now.”  </p>
+            <p>The air marshal and I looked back up the aisle. There was no commotion. The man who’d seen everything was seated, maybe sleeping. </p>
+            <p>“Okay,” he said, letting go. “You should let the flight attendants know if you need first aid.”</p>
+            <p>“Thanks. I’ll do that.” </p>
+            <p>I didn’t talk to anyone. Hell, I don't know if I drew a single breath until the bathroom door was locked behind me. My body was shaking uncontrollably. I didn’t know what to do. I just sat there, waiting. My leg didn’t hurt anymore, but it had gone numb, and that was even worse.</p>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="css-rules ">
+            <b>Mind</b>
+            <ul>
+                <li>Mind represents your mental and emotional fortitude.</li>
+                <li>Mind damage represents short-term stress, and is accrued linearly (not tracked per-injury like Body)</li>
+                <li>Click the “Exert Mind” button on your Character Sheet to incur one Mind damage.</li>
+                <li>Mind damage recovers one level per night of restful sleep.</li>
+                <li>Mental stress also contributes to your Penalty. </li>
+                <li>
+                    When your mental fortitude is tested, the GM may ask you to roll your rating in Mind in place of
+                    an Attribute + Ability.
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <h4 class="text-center">
+        Conspiracy
+    </h4>
+    <div class="col-md-6">
+        <div class="css-narrative">
+            <p>Thirty minutes later, there was a knock at the door.</p>
+            <p>“Occupied!”</p>
+            <p>“It’s Bo. Open up.” </p>
+            <p>I cracked open the door. Bo pressed his way in and closed it behind him. There was hardly enough room for one person inside, let alone two.</p>
+            <p>“How’s the leg, champ?” </p>
+            <p>“I’ll live. What’s going on out there?”</p>
+            <p>He sighed. “Situation’s under control. For now. Bradley’s getting hungry again, startin’ to get the whole,” he gestured at his face. “We need your help.” </p>
+            <p>“I can’t. He’s tasted me. He’ll attack on sight.” </p>
+            <p>“I know, I know. That’s how come Five and I can’t give our own blood. Listen, the syringe idea was a good one, I’ll give ya that, but it’s time for plan B.” </p>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="css-narrative">
+            <p>“Murder.”</p>
+            <p>He winced. “Listen, I can do, well, what needs to be done. But to make it look like a suicide, I’ll need that blade you snuck past the TSA. Yeah, I noticed. What do you say?”</p>
+        </div>
+        <div class="css-rules ">
+            <b>Limits</b>
+            <ul>
+                <li>
+                    Limits are circumstances that test your ability to cope.
+                </li>
+                <li>
+                    You choose three Limits during character creation.
+                </li>
+                <li>
+                    Most normal humans have these standard Limits:
+                    <ul>
+                        <li>
+                            <b>Murder:</b> killing another person outside of immediate self-defense.
+                        </li>
+                        <li>
+                            <b>Torture:</b> being tortured or enduring extended physical or emotional stress.
+                        </li>
+                        <li>
+                            <b>Atrocities:</b> witnessing or participating in a humanitarian atrocity.
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    Non-typical Contractors (psychopaths, fairies, etc) can select other Limits or create their own.
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <h4 class="text-center">
+        Whatever it Takes
+    </h4>
+    <div class="col-md-6">
+        <div class="css-narrative">
+            <p>“No fuckin’ way,” I said, resisting the urge to spit in his face. </p>
+            <p>“Don’t let your idealism blind you. Way I see it, we got two options. One: we wait, let this monster lose control, kill a few people, and get taken out by the air marshals, if we’re lucky. Two: we take one life, relax until we land in Hawaii, and get paid.” </p>
+            <p>“You forgot option three: kill the monster.” </p>
+            <p>Bo’s face turned red. “Kill it!? We don’t even know if we can!” he snorted. “We brought this creature on board. It’s our responsibility to see it through. Are you gunna throw this opportunity away? You gunna rip up The Contract?” </p>
+            <p>My heart pounded in my throat. “What did Five say?” </p>
+            <p>“They’re on board.” </p>
+            <p>“Fuck.” </p>
+            <p>Bo held out his hand. “Give me the blade, Lucy. We’ll all get home safe, and we’ll all get paid.”</p>
+            <p>I pulled the pocket knife and turned it over in my hand. The blade caught my reflection. </p>
+            <p>“I feel sick.”</p>
+            <p>I handed it over.  </p>
+            <p>Bo relaxed. “Trust me kid, you don’t wanna think too much about it.” </p>
+            <p>He opened the door and paused. “You made the right choice.”</p>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="css-narrative">
+            <p>I probably shouldn’t have, but I watched him walk away. He slipped into a bathroom up the aisle and kept the door open. A few minutes later, a woman walked in. Don’t know how she didn’t see him. </p>
+            <p>She closed the door.</p>
+            <p>There was one loud bang, something hitting the door.</p>
+            <p>People looked up, then went back to reading their books.</p>
+        </div>
+        <div class="css-rules">
+            <b>Trauma</b>
+            <ul>
+                <li>
+                    When you cross a Limit (in this case Murder), you make a Trauma Roll.
+                    <ul>
+                        <li>
+                            Roll your Mind, Difficulty 8.
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    If you fail, you take one point of Mind damage and acquire a new Trauma.
+                    <ul>
+                        <li>
+                            Traumas are long-lasting mental health issues such as phobias, delusions, and compulsions.
+                        </li>
+                        <li>
+                            The specific Trauma you develop is based on the circumstances that led to its formation.
+                        </li>
+                        <li>
+                            When a Trauma is triggered, you must roll Mind, Difficulty 8 to maintain control.
+                            <ul>
+                                <li>
+                                    For example, someone with a phobia of the open ocean would need to succeed a Mind roll to board a ferry.
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    The Imbuing process makes Contractors more resilient to trauma than normal humans.
+                    <ul>
+                        <li>Traumas may be “bought off” by spending 3 Exp and a Downtime in therapy.</li>
+                        <li>Certain Powers allow Contractors to heal Traumas without an Exp cost.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+    </div>
+</div>
+
+<div class="row">
+    <h4 class="text-center">
+        The End of the Line
+    </h4>
+    <div class="col-md-6">
+        <div class="css-narrative">
+            <p>I threw up. </p>
+            <p>Later, I heard the other passengers discover the body. An anguished scream, a hushed murmuring. I didn’t open the bathroom door until we touched down in Hawaii, and by the time I did, Five, Bo, and Bradley were gone. </p>
+            <p>It’s only now, looking back on it, that I realize Bo lied to me. If I hadn’t given him that knife, he would have fed Bradley a different in-flight meal. </p>
+            <p>Me.</p>
+            <p>I can’t blame him. There’s no sense keeping a dead-weight Contractor around. liabilities end up in the graveyard. </p>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="css-rules">
+            <b>Death</b>
+            <ul>
+                <li>
+                    The Contract is dangerous, and survival is not guaranteed.
+                </li>
+                <li>
+                    If your Wound Level <i>exceeds</i> your Body rating, you die.
+                </li>
+                <li>
+                    Dead Contractors are interred in
+                    <a href="{% url 'characters:characters_graveyard' %}">the Graveyard</a>
+                    and can never be played again.
+                </li>
+            </ul>
+            <b>Underworld Upsides</b>
+            <ul>
+                <li>
+                    When one of your Contractors dies, you are given a <b>Charon Coin</b> which you can use to start a
+                    new Contractor with a Power.
+                </li>
+                <li>
+                    GMs are rewarded a Power Improvement for running a Contract that achieves <b>The Golden Ratio</b>:
+                    at least one Contractor died while another achieved Victory.
+                    <ul>
+                        <li>
+                            Note: GMs are impartial referees that pit the Contractors against the Scenarios. It is not their goal to kill a Contractor every session.
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <b>But I don't want to die!</b>
+            <ul>
+                <li>
+                    Good. Contractors are not throwaway characters.
+                </li>
+                <li>
+                    The Golden ratio and Charon Coins exist only because most GMs are hesitant to kill Player Characters even when they deserve it.
+                </li>
+                <li>
+                    While Contractor death is a vital ingredient to The Contract's challenge and storytelling, each
+                    Player has a different appetite for danger.
+                    <ul>
+                        <li>
+                            To help you find a group that suits your tastes, the website surfaces deadliness stats for
+                            GMs and survival stats for Players.
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    Contractors gain access to Powers that make them resistant to death once they reach Seasoned Status.
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<br>
+<div class="row">
+    <div class="col-xs-12">
+        <div class="css-narrative">
+            <h4 class="text-center">
+                But, in the end, some of the sheriff’s words were true. It is better not to think about it. 
+                <br>
+                <br>
+                And I did get paid. 
+            </h4>
+        </div>
+    </div>
+</div>
+<br>
+<div class="row">
+    <h3 class="text-center">
+        Powers
+    </h3>
+    <div class="col-md-8">
+        <div class="css-rules">
+            <div class="text-center">
+                <b>You won't need to create a Power until after your first Victory, but here's a primer.</b>
+            </div>
+            <ul>
+                <li>
+                    Creating a custom Power is easy:
+                    <ol>
+                        <li>
+                            Envision what you’d like your Contractor to do.
+                            <ul>
+                                <li>Get creative (or steal ideas).</li>
+                            </ul>
+                        </li>
+                        <li>
+                            Select an <b>Effect</b> that matches your power’s concept.
+                            <ul>
+                                <li>Effects are starting templates for Powers with defined systems. </li>
+                                <li>Examples include: Investigate Individual, Alternate Form, Disguise, and Injure. </li>
+                                <li>There are currently 93 Effects to choose from.</li>
+                            </ul>
+                        </li>
+                        <li>
+                            Customize the Effect with <b>Drawbacks</b>, <b>Enhancements</b>, and <b>Parameters</b>.
+                            <ul>
+                                <li>All Powers have a Gift cost. </li>
+                                <li>Taking an Enhancement or upgrading a Parameter expands the Power’s functionality but costs a Gift.</li>
+                                <li>Taking Drawbacks or downgrading a Parameter reduces the Gift cost but makes the Power more situational or risky. </li>
+                            </ul>
+                        </li>
+                        <li>
+                            Flavor your Power and describe its appearance.
+                            <ul>
+                                <li>At this point the Power has a system but no identity. </li>
+                                <li>Does your Alternate Form Power turn you into a werewolf or a magical girl?</li>
+                                <li>Does your Restrict Power fire spiderwebs or summon ghostly chains?</li>
+                                <li>Your Power’s Description can have a big impact in-game, but it cannot change the Power’s System.</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </li>
+                <li>Certain Effects, Enhancements, and Parameter levels are restricted to Seasoned or Veteran Contractors. </li>
+            </ul>
+            <div class="text-center">
+                Still Curious? Try
+                <a href="{% url 'powers:powers_create' %}">
+                    creating a Power
+                </a>
+                or check out the
+                <a href="{% url 'powers:powers_stock' %}">
+                    premade Stock Powers.
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <figure class="" style="height: 450px; padding: 10px;">
+            <img src="{% static 'overrides/art/front-bamboo.jpg' %}" class="css-inline-image">
+            <figcaption class="text-center"></figcaption>
+        </figure>
+    </div>
+</div>
