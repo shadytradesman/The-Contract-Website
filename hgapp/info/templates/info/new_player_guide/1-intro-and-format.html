@@ -89,11 +89,22 @@
 </div>
 <div id="format-punk">
     <div class="css-content">
-        <span id="css-art-front-punk-sm" class="css-art-sm" style='background-image:url("{% static 'overrides/art/front-punk.jpg' %}")'></span>
-        <div class="css-affix-spacer-sm"></div>
-        <h2 id="css-format-header" class="text-center">
-            Format
-        </h2>
+        <div class="hidden-xs">
+            <h2 id="css-format-header" class="text-center">
+                Format
+            </h2>
+        </div>
+        <div class="visible-xs">
+            <h2 class="text-center ">
+                Format
+            </h2>
+        </div>
+        <div class="visible-xs">
+            <figure class="visible-xs-block" style="width: 100%; padding: 10px;">
+                <img src="{% static 'overrides/art/front-punk.jpg' %}" class="css-inline-image">
+                <figcaption class="text-center"></figcaption>
+            </figure>
+        </div>
         <div id="css-art-front-punk-lg" class="css-art-lg" style='background-image:url("{% static 'overrides/art/front-punk.jpg' %}")'>
             <div class="css-two-thirds-col">
                 <div class="css-narrative">
@@ -180,10 +191,14 @@
 
 </div>
 <div id="format-music">
-    <span id="css-art-front-music-sm" class="css-art-sm" style='background-image:url("{% static 'overrides/art/front-music.jpg' %}")'></span>
+    <div class="visible-xs">
+        <figure class="visible-xs-block" style="width: 100%; padding: 10px;">
+            <img src="{% static 'overrides/art/front-music.jpg' %}" class="css-inline-image">
+            <figcaption class="text-center"></figcaption>
+        </figure>
+    </div>
     <div class="css-content">
         <div id="css-art-front-music-lg" class="css-art-lg" style='background-image:url("{% static 'overrides/art/front-music.jpg' %}")'>
-        <div class="css-affix-spacer"></div>
             <div class="css-two-thirds-col-right">
                 <div class="css-narrative">
                     <p>“Thanks for driving,” she said to the cops, “but Lucy and I have a gig to discuss.” </p>
@@ -284,10 +299,14 @@
             </p>
         </div>
     </div>
-    <span id="css-art-front-doors-sm" class="css-art-sm" style='background-image:url("{% static 'overrides/art/front-doors.jpg' %}")'></span>
+    <div class="visible-xs">
+        <figure class="visible-xs-block" style="width: 100%; padding: 10px;">
+            <img src="{% static 'overrides/art/front-doors.jpg' %}" class="css-inline-image">
+            <figcaption class="text-center"></figcaption>
+        </figure>
+    </div>
     <div class="css-content">
         <div id="css-art-front-doors-lg" class="css-art-lg" style='background-image:url("{% static 'overrides/art/front-doors.jpg' %}")'>
-        <div class="css-affix-spacer"></div>
         <div class="css-two-thirds-col">
             <div class="css-narrative">
                 <p class="hidden-xs">
