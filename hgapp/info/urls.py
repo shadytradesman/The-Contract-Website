@@ -3,8 +3,6 @@ from . import views
 
 app_name = 'info'
 urlpatterns = [
-    # ex: .com/info/getting-started/
-    url(r"^getting-started/$", views.getting_started, name="getting_started"),
 
     # ex: .com/info/terms/
     url(r"^terms/$", views.terms, name="terms"),
@@ -19,5 +17,5 @@ urlpatterns = [
     url(r"^fiction/$", views.fiction, name="fiction"),
 
     # ex: .com/info/quickstart/
-    url(r"^quickstart/$", views.quickstart, name="quickstart"),
+    url(r"^how-to-play/$", views.how_to_play, name="how-to-play"),
 ]

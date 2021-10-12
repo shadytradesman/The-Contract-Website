@@ -10,9 +10,6 @@ from info.models import FrontPageInfo
 from profiles.models import Profile
 from characters.models import CharacterTutorial, Ability, Character
 
-def getting_started(request):
-    return render(request, 'info/getting_started.html')
-
 def terms(request):
     context= {
         "terms": TERMS,
@@ -62,7 +59,7 @@ def leaderboard(request):
     return render(request, 'info/leaderboard/leaderboard.html', context)
 
 
-def quickstart(request):
+def how_to_play(request):
     quickstart_info = QuickStartInfo.objects.first()
     character = quickstart_info.main_char
     attribute_val_by_id = character.get_attribute_values_by_id()
