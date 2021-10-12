@@ -25,8 +25,9 @@ def gwynn_png(filename, hide_caption=None):
 @register.inclusion_tag('tags/guidebook_toc.html', takes_context=True)
 def guide_toc(context, guidebook=None):
     guidebooks = GuideBook.objects.order_by('position').all()
-    logged_in = context["request"].user.is_authenticated
-    can_edit = context["request"].user.is_superuser if context["request"].user else False
+
+    logged_in = context["request"].user.is_authenticated if "request" in context else False
+    can_edit = context["request"].user.is_superuser if "request" in context and context["request"].user else False
     sections_by_book = []
     for book in guidebooks:
         sections_by_book.append((book, book.get_sections_in_order(is_admin=can_edit),))
