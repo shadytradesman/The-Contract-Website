@@ -1,35 +1,3 @@
-function setAffix() {
-    const $window = $(window);
-
-    const $contractors = $('#format-punk');
-    console.log("outer height: " + $contractors.outerHeight(true));
-    const contractorsEnd =  document.body.scrollHeight - $contractors.position().top - $contractors.outerHeight(true);
-    $('#css-art-front-punk-sm').affix({
-      offset: {
-        top: $contractors.position().top -50,
-        bottom:  contractorsEnd +50 ,
-      }
-    })
-
-    const $games = $("#format-music");
-    const gamesEnd =  document.body.scrollHeight - $games.position().top - $games.outerHeight(true);
-    $('#css-art-front-music-sm').affix({
-      offset: {
-        top: $games.position().top -50,
-        bottom:  gamesEnd +50,
-      }
-    })
-}
-
-$(document).ready(function(){
-    setAffix();
-    $(window).scroll();
-});
-
-$( window ).resize(function() {
-  setAffix();
-  $(window).scroll();
-});
 
 /* Start playing highlight current step */
 $(document).ready(function() {

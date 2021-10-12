@@ -1,64 +1,63 @@
 {% load staticfiles %}
     <div class="row no-gutters">
-        <div class="col-xs-6">
+        <div class="col-sm-6">
             <div class="row">
                 <script type="text/html" id="injury-template">
                     <span>
-        <div class="stat-value col-md-1 text-center css-injury-val">
-            <b class="injury-severity">__severity__</b>
-        </div>
-        <div class="stat-value col-md-11">
-            __description__
-            <form class="js-delete-injury-form-tutorial pull-right" data-del-injury-url=__delUrl__>
-                <input type="submit" class="btn btn-xs btn-danger" value="X"/>
-            </form>
-        </div>
-        <div class="clearfix"></div>
-    </span>
+                        <div class="stat-value col-md-1 text-center css-injury-val">
+                            <b class="injury-severity">__severity__</b>
+                        </div>
+                        <div class="stat-value col-md-11">
+                            __description__
+                            <form class="js-delete-injury-form-tutorial pull-right" data-del-injury-url=__delUrl__>
+                                <input type="submit" class="btn btn-xs btn-danger" value="X"/>
+                            </form>
+                        </div>
+                        <div class="clearfix"></div>
+                    </span>
                 </script>
                 <div class="text-center">
                     <div class="col-xs-12">
                         <h3 data-toggle="tooltip" title='{{tutorial.injuries}}'>Injuries</h3>
                         <div class="text-left" id="js-injury-container-tutorial">
                             {% for injury in character.injury_set.all %}
-                            <span>
-                    <div class="stat-value col-xs-1 text-center css-injury-val">
-                        <b class="injury-severity">{{injury.severity}}</b>
-                    </div>
-                    <div class="stat-value col-xs-11">
-                        {{injury.description}}
-                            <form class="js-delete-injury-form-tutorial pull-right" data-del-injury-url="">
-                                {% csrf_token %}
-                                <input type="submit" class="btn btn-xs btn-danger" value="X"/>
-                            </form>
-                    </div>
-                    <div class="clearfix"></div>
-                </span>
+                                <span>
+                                    <div class="stat-value col-xs-1 text-center css-injury-val">
+                                        <b class="injury-severity">{{injury.severity}}</b>
+                                    </div>
+                                    <div class="stat-value col-xs-11">
+                                        {{injury.description}}
+                                        <form class="js-delete-injury-form-tutorial pull-right" data-del-injury-url="">
+                                            {% csrf_token %}
+                                            <input type="submit" class="btn btn-xs btn-danger" value="X"/>
+                                        </form>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </span>
                             {% endfor%}
                         </div>
                         <br>
                         <b>Add an Injury</b>
-                            <div class="form-inline">
-                                <form id="injury-form-tutorial"
-                                      class="injury-form-tutorial"
-                                      data-new-injury-url=""
-                                      data-delete-injury-url="">
-                                    {{ injury_form.about.errors }}
-                                    {{ injury_form.non_field_errors }}
-                                    {% csrf_token %}
-                                        <span class="js-injury-form">
-                        {{ injury_form.severity }}
-                    </span>
-                                    {{injury_form.description}}
-                                    <input type="submit" class="btn btn-default" value="Ouch!" />
-                                </form>
-                            </div>
+                        <div class="form-inline">
+                            <form id="injury-form-tutorial"
+                                  class="injury-form-tutorial"
+                                  data-new-injury-url=""
+                                  data-delete-injury-url="">
+                                {{ injury_form.about.errors }}
+                                {{ injury_form.non_field_errors }}
+                                {% csrf_token %}
+                                <span class="js-injury-form">
+                                    {{ injury_form.severity }}
+                                </span>
+                                {{injury_form.description}}
+                                <input type="submit" class="btn btn-default" value="Ouch!" />
+                            </form>
+                        </div>
                     </div>
                 </div>
-
             </div>
         </div>
-        <div class="col-xs-6">
+        <div class="col-sm-6">
             <div class="css-health-area">
                 <div class="row text-center">
                     <div class="col-xs-9 text-right" data-toggle="tooltip" title='{{tutorial.body}}'>
