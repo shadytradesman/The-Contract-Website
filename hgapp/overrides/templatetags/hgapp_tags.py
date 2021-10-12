@@ -25,24 +25,25 @@ def gwynn_png(filename, hide_caption=None):
 @register.inclusion_tag('tags/guidebook_toc.html', takes_context=True)
 def guide_toc(context, guidebook=None):
     guidebooks = GuideBook.objects.order_by('position').all()
+    logged_in = context["request"].user.is_authenticated
     can_edit = context["request"].user.is_superuser if context["request"].user else False
     sections_by_book = []
     for book in guidebooks:
         sections_by_book.append((book, book.get_sections_in_order(is_admin=can_edit),))
-    nav_list = __get_nav_list(sections_by_book, active_book=guidebook)
+    nav_list = __get_nav_list(sections_by_book, active_book=guidebook, logged_in=logged_in)
     context["nav_list"] = nav_list
     return context
 
-def __get_nav_list(sections_by_book, active_book=None):
+def __get_nav_list(sections_by_book, active_book=None, logged_in=False):
     nav_list = '<ul class="nav nav-pills nav-stacked {}">'.format("dropdown-menu" if not active_book else "")
     for guidebook, sections in sections_by_book:
         guidebook_active = guidebook == active_book if active_book else False
         url = guidebook.redirect_url if hasattr(guidebook, "redirect_url") and guidebook.redirect_url \
             else "#" if guidebook_active else reverse('guide:read_guidebook', args=(guidebook.slug,))
         guidebook_expanded = guidebook.expanded if not active_book else guidebook_active
-        active_book_class = "css-active-book" if guidebook_active else ""
+        book_class = "css-how-to-play-link" if not logged_in and guidebook.redirect_url else "css-active-book" if guidebook_active else ""
         nav_list = nav_list + '<li class="{}"><a href="{}" class="css-guide-index-book">{}</a>' \
-            .format(active_book_class, url, guidebook.title)
+            .format(book_class, url, guidebook.title)
         if guidebook_expanded:
             nav_list = nav_list + __get_nav_list_for_sections(sections, guidebook_active, url)
         nav_list = nav_list + '</li>'  # end guidebook list item
