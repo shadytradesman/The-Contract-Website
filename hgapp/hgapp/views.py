@@ -34,27 +34,9 @@ class PasswordResetTokenView(account.views.PasswordResetTokenView):
 
 def home(request):
     if request.user.is_anonymous:
-        power_1 = Power_Full.objects.filter(tags__in=["splash1"]).all()[0]
-        power_2 = Power_Full.objects.filter(tags__in=["splash2"]).all()[0]
-        power_3 = Power_Full.objects.filter(tags__in=["splash3"]).all()[0]
-        num_enhancements = Enhancement.objects.all().count()
-        num_drawbacks = Drawback.objects.all().count()
-        num_params = Parameter.objects.all().count()
-        num_bases = Base_Power.objects.filter(is_public=True).all().count()
-        num_stock = Power_Full.objects.filter(tags__slug="example").all().count()
         info = FrontPageInfo.objects.first()
-        num_stock_scenarios = Scenario.objects.filter(tags__isnull=False).count()
-        num_community_scenarios = Scenario.objects.filter(tags__isnull=True).count()
         context = {
-            'power_1': power_1,
-            'power_2': power_2,
-            'power_3': power_3,
-            'num_bases': num_bases,
-            'num_modifiers': num_enhancements + num_drawbacks + num_params,
-            'num_stock': num_stock,
             'info': info,
-            'num_stock_scenarios': num_stock_scenarios,
-            'num_community_scenarios': num_community_scenarios,
         }
         return render(request, 'logged_out_homepage.html', context)
     else:
