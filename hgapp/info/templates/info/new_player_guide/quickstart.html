@@ -42,7 +42,6 @@
 {% endblock %}
 
 {% block body_base %}
-{% cache 50000 quickstart %}
 
 {% comment %}
     The New Players guide has two main features:
@@ -57,32 +56,33 @@
     </h1>
     <div class="panel panel-default">
         <div class="panel-body">
-            <div class="css-rules css-rules-centered">
-                <b>By the time you finish this Guide:</b>
-                <ul>
-                    <li>
-                        You will know what The Contract is and how to play it.
-                    </li>
-                    <li>
-                        You will have made your own Contractor.
-                    </li>
-                    <li>
-                        You will either be scheduled to participate in an upcoming online Contract
-                        OR you will be prepared to start running The Contract for your own group.
-                    </li>
-                </ul>
-                <p class="text-center">
-                <b>Note:</b>
-                     Read this guide front to back without skipping.
-                    The narrative covers the events of one play session and contains critical information.
-                </p>
-            </div>
-            {% include "info/new_player_guide/1-intro-and-format.html" %}
-            {% include "info/new_player_guide/2-contractors-and-dice.html" %}
-            {% include "info/new_player_guide/3-downtimes-setting-worlds.html" %}
+            {% cache 50000 quickstart %}
+                <div class="css-rules css-rules-centered">
+                    <b>By the time you finish this Guide:</b>
+                    <ul>
+                        <li>
+                            You will know what The Contract is and how to play it.
+                        </li>
+                        <li>
+                            You will have made your own Contractor.
+                        </li>
+                        <li>
+                            You will either be scheduled to participate in an upcoming online Contract
+                            OR you will be prepared to start running The Contract for your own group.
+                        </li>
+                    </ul>
+                    <p class="text-center">
+                    <b>Note:</b>
+                         Read this guide front to back without skipping.
+                        The narrative covers the events of one play session and contains critical information.
+                    </p>
+                </div>
+                {% include "info/new_player_guide/1-intro-and-format.html" %}
+                {% include "info/new_player_guide/2-contractors-and-dice.html" %}
+                {% include "info/new_player_guide/3-downtimes-setting-worlds.html" %}
+            {% endcache %}
             {% include "info/new_player_guide/4-start-playing.html" %}
         </div>
     </div>
 </div>
-{% endcache %}
 {% endblock %}
