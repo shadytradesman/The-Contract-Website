@@ -21,7 +21,7 @@
 
 {% block body_class %}home{% endblock %}
 {% block body_base %}
-{% cache 50000 loggedouthome1 %}
+{% cache 50000 loggedouthome2 %}
 <div class="css-main-container">
     <span class="css-art-credit"><small>Art by <a href="https://www.artstation.com/tavaresart">Gwynn Tavares</a></small></span>
 
@@ -65,8 +65,15 @@
                 <ul>
                     <li>Each session is a self-contained mission with great risks and rewards.</li>
                     <li>Play your favorite Contractors no matter who shows up to game night.</li>
-                    <li>Anyone present may act as the GameMaster (GM), earning rewards for their own Contractors.</li>
-                    <li>No in-person group? Join our active online community and play as often as you’d like. </li>
+                    <li>A different player may act as GameMaster (GM) each session.</li>
+                    <li>The GM earns experience and power improvements for their own Contractors.</li>
+                    <li>
+                        No in-person group? Join an active online community like
+                        <a href="https://discord.gg/xUZZegYNNy">
+                            our Discord
+                        </a>
+                        and play as often as you’d like.
+                    </li>
                 </ul>
 
                 <h4>Play Characters you care about.</h4>
@@ -82,14 +89,17 @@
                     <li>Online character sheets and integrated rules mean less memorization and fewer trips to the rulebook.</li>
                     <li>An active online community runs drop-in-friendly sessions almost every day for new and seasoned Players alike. </li>
                 </ul>
-            <div id="get-started-wrapper" class="text-center">
-                <div id="get-started" class="text-center">
-                    <div class="css-subtitle">
-                        You don’t need to enter a credit card number, spend a day reading a textbook-sized rulebook,
-                        or even assemble your own group of Players. You can play The Contract <b>today</b>.
+                <div id="get-started-wrapper" class="text-center">
+                    <div id="get-started" class="text-center">
+                        <div class="css-subtitle">
+                            You don’t need to enter a credit card, read a hefty rulebook,
+                            or even assemble your own group.
+                            <br>
+                            You can play The Contract <b>today</b>.
+                        </div>
+                        <br>
+                        <a class="btn btn-lg btn-warning" href="{% url 'info:how-to-play' %}">Start Playing</a>
                     </div>
-                    <br>
-                    <a class="btn btn-lg btn-warning" href="{% url 'info:how-to-play' %}">Start Playing</a>
                 </div>
             </div>
         </div>
