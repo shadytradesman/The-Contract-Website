@@ -818,15 +818,24 @@ class LookingForGame(View):
 
     def __get_context_data(self):
         now = datetime.datetime.now()
-        an_hour_ago = now - datetime.timedelta(hours=1)
+        two_hours_ago = now - datetime.timedelta(hours=2)
+        two_weeks_ago = now - datetime.timedelta(weeks=2)
         games_query = Game.objects.filter(
             list_in_lfg=True,
             status=GAME_STATUS[0][0],
-            scheduled_start_time__gte=an_hour_ago)
+            scheduled_start_time__gte=two_hours_ago)
         if self.request.user.is_anonymous or not self.request.user.profile.view_adult_content:
             games_query = games_query.exclude(is_nsfw=True)
         games = games_query.order_by('scheduled_start_time').all()
+        completed_games_query = Game.objects.filter(
+            list_in_lfg=True,
+            status=GAME_STATUS[2][0],
+            end_time__gte=two_weeks_ago)
+        if self.request.user.is_anonymous or not self.request.user.profile.view_adult_content:
+            completed_games_query = completed_games_query.exclude(is_nsfw=True)
+        completed_games = completed_games_query.order_by('-end_time').all()
         context = {
             'games': games,
+            'completed_games': completed_games,
         }
         return context

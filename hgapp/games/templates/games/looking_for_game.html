@@ -27,27 +27,35 @@
     <div class="panel panel-default">
         <div class="panel-body">
             <div class="row">
-                <div class="col-md-10 col-md-offset-1 text-center">
+                <div class="col-md-10 col-md-offset-1">
                     <div role="alert" class="alert alert-info">
-                        <p>
-                            This page lists upcoming Games that welcome drop-in Contractors from other Worlds.
+                        <p class="text-center">
+                            This page lists upcoming Contracts that welcome drop-ins.
+                            <br>
                             It's a great place for brand new Players who want to try out The Contract
-                            and Players with consistent groups who want to take their Contractors on some online Games.
+                            and Players with consistent groups who want to take their Contractors online.
                         </p>
-                        <p>
-                            If you'd like to schedule your own Game
-                            <a href="{% url 'games:games_create_game' %}" class="btn btn-default btn-xs">
-                                click here
-                            </a>
-                            <br>
-                            If you are looking for a regular playgroup, visit
-                            <a href="{% url 'cells:cells_find_world' %}" class="btn btn-default btn-xs">
-                                Find a World
-                            </a>
-                            <br>
-                            NOTE: Many Games are scheduled only hours before they occur. If can't find a Game on this page,
-                            please visit our Discord server, and our community will work with your schedule.
-
+                        <ul>
+                            <li>
+                                If you'd like to schedule your own Contract
+                                <a href="{% url 'games:games_create_game' %}" class="btn btn-default btn-xs">
+                                    Click Here
+                                </a>
+                            </li>
+                            <li>
+                                If you are looking for a regular playgroup, visit
+                                <a href="{% url 'cells:cells_find_world' %}" class="btn btn-default btn-xs">
+                                    Find a World
+                                </a>
+                            </li>
+                            <li>
+                                <b>
+                                    NOTE: Many Contracts are scheduled only hours before they occur. If can't find a Contract on this page,
+                                    please visit our Discord server, and our community will work with your schedule.
+                                </b>
+                            </li>
+                        </ul>
+                        <p class="text-center">
                             <a class="btn btn-default btn" href="https://discord.gg/xUZZegYNNy">
                                     <img class="float-left" src="/static/overrides/other_graphics/Discord-Logo-Color.svg" style="width: 25px; height: 25px; position: absolute;">
                                     <span style="padding-left: 25px;"> Join Our Discord Server</span>
@@ -56,71 +64,108 @@
                     </div>
                 </div>
             </div>
+            <h3>Upcoming Public Contracts</h3>
             <div class="row">
                 {% for game in games %}
-                {% if forloop.counter|divisibleby:2 == 0 %}
+                    {% if forloop.counter|divisibleby:2 == 0 %}
+                        </div>
+                        <div class="row">
+                    {% endif %}
+                    <div class="col-md-6">
+                        <div class="thumbnail">
+                            <h3 class="text-center" style="margin-top:10px;">
+                                <a href="{% url 'games:games_view_game' game.id %}">
+                                    {{game.scenario.title}}
+                                </a>
+                            </h3>
+                            <p class="text-center">
+                                <b>Start time:</b>
+                                {{game.scheduled_start_time|timeuntil}}
+                                ({{game.scheduled_start_time}}
+                                {% if request.user.account %}
+                                {{request.user.account.timezone}}
+                                {% endif %}
+                                )
+                            </p>
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <b>Game Master: </b>
+                                    <a href="{% url 'profiles:profiles_view_profile' game.gm.id %}">
+                                        {% user_display game.gm %}
+                                    </a>
+                                    <br>
+                                    <b>In World: </b>
+                                    <a href="{% url 'cells:cells_view_cell' game.cell.id %}">
+                                        {{game.cell.name}}
+                                    </a>
+                                </div>
+                                <div class="col-xs-6">
+                                    <b>GM Title:</b>
+                                    {% render_gm_title game.gm %}
+                                    <br>
+                                    <b>Status:</b>
+                                    {{game.get_required_character_status_display}}
+                                </div>
+                            </div>
+                            {% if game.mediums.all|length %}
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <b>Medium:</b>
+                                    {% render_game_mediums game %}
+                                </div>
+                            </div>
+                            {% endif %}
+                            <hr>
+                            <div class="expandable-outer js-expandable-collapsed">
+                                {{game.hook|linebreaks}}
+                                <div class="text-center">
+                                    <i><small>
+                                        <a href="{% url 'games:games_view_game' game.id %}">
+                                            (click to RSVP or learn more)
+                                        </a>
+                                    </small></i>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="row">
-                {% endif %}
-                <div class="col-md-6">
+                {% empty %}
+                    <div class="col-md-10 col-md-offset-1 col-xs-12">
+                        <div role="alert" class="alert alert-danger">
+                            <h4>There are currently no scheduled upcoming Contracts.</h4>
+                            <b>
+                                NOTE: Many Contracts are scheduled only hours before they occur.
+                                Please visit our Discord server for more advanced notice.
+                            </b>
+                            <p class="text-center">
+                                <a class="btn btn-default btn" href="https://discord.gg/xUZZegYNNy">
+                                    <img class="float-left" src="/static/overrides/other_graphics/Discord-Logo-Color.svg" style="width: 25px; height: 25px; position: absolute;">
+                                    <span style="padding-left: 25px;"> Join Our Discord Server</span>
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            {% if completed_games %}
+                <h3>Recently Completed Public Contracts</h3>
+                {% for game in completed_games %}
                     <div class="thumbnail">
-                        <h3 class="text-center" style="margin-top:10px;">
+                        <h5>
+                            <a href="{% url 'profiles:profiles_view_profile' game.gm.id %}">
+                                {% user_display game.gm %}
+                            </a>
+                            the
+                            {% render_gm_title game.gm %}
+                            ran
                             <a href="{% url 'games:games_view_game' game.id %}">
                                 {{game.scenario.title}}
                             </a>
-                        </h3>
-                        <p class="text-center">
-                            <b>Start time:</b>
-                            {{game.scheduled_start_time|timeuntil}}
-                            ({{game.scheduled_start_time}}
-                            {% if request.user.account %}
-                            {{request.user.account.timezone}}
-                            {% endif %}
-                            )
-                        </p>
-                        <div class="row">
-                            <div class="col-xs-6">
-                                <b>Game Master: </b>
-                                <a href="{% url 'profiles:profiles_view_profile' game.gm.id %}">
-                                    {% user_display game.gm %}
-                                </a>
-                                <br>
-                                <b>In World: </b>
-                                <a href="{% url 'cells:cells_view_cell' game.cell.id %}">
-                                    {{game.cell.name}}
-                                </a>
-                            </div>
-                            <div class="col-xs-6">
-                                <b>GM Title:</b>
-                                {% render_gm_title game.gm %}
-                                <br>
-                                <b>Status:</b>
-                                {{game.get_required_character_status_display}}
-                            </div>
-                        </div>
-                        {% if game.mediums.all|length %}
-                        <div class="row">
-                            <div class="col-xs-12">
-                                <b>Medium:</b>
-                                {% render_game_mediums game %}
-                            </div>
-                        </div>
-                        {% endif %}
-                        <hr>
-                        <div class="expandable-outer js-expandable-collapsed">
-                            {{game.hook|linebreaks}}
-                            <div class="text-center">
-                                <i><small>
-                                    <a href="{% url 'games:games_view_game' game.id %}">
-                                        (click to RSVP or learn more)
-                                    </a>
-                                </small></i>
-                            </div>
-                        </div>
+                            {{game.end_time|timesince}} ago
+                        </h5>
                     </div>
-                </div>
+
                 {% endfor %}
-            </div>
+            {% endif %}
         </div>
     </div>
 </div>
