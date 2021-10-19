@@ -466,7 +466,7 @@
             <b>Problem Solving</b>
             <ul>
                 <li>
-                    Contractors are rarely suited for the Contracts they attend.
+                    Contractors may not be suited for the Contracts they attend.
                 </li>
                 <li>
                     Most Contracts demand outside-the-box solutions to critical situations. 
@@ -751,9 +751,10 @@
                     <ul>
                         <li>Most Powers do not grant dice bonuses or make you more effective in a fight.</li>
                         <ul>
-                            <li>Instead they provide tools, information, and options.</li>
+                            <li>Instead, they provide tools, information, and options.</li>
                         </ul>
                         <li>While you can create almost any Power imaginable, they must fit your Contractor’s concept.</li>
+                        <li>Powers work. If a Power allows you to side-step the primary challenge of a Scenario, you win.</li>
                     </ul>
                 </div>
             </div>
@@ -957,10 +958,8 @@
             <p>Later, I heard the other passengers discover the body. An anguished scream, a hushed murmuring. I didn’t open the bathroom door until we touched down in Hawaii, and by the time I did, Five, Bo, and Bradley were gone. </p>
             <p>It’s only now, looking back on it, that I realize Bo lied to me. If I hadn’t given him that knife, he would have fed Bradley a different in-flight meal. </p>
             <p>Me.</p>
-            <p>I can’t blame him. There’s no sense keeping a dead-weight Contractor around. liabilities end up in the graveyard. </p>
+            <p>I can’t blame him. There’s no sense keeping a dead-weight Contractor around. Liabilities end up in the graveyard. </p>
         </div>
-    </div>
-    <div class="col-md-6">
         <div class="css-rules">
             <b>Death</b>
             <ul>
@@ -975,7 +974,14 @@
                     <a href="{% url 'characters:characters_graveyard' %}">the Graveyard</a>
                     and can never be played again.
                 </li>
+                <li>
+                    Contractors gain access to Powers that make them resistant to death once they reach Seasoned Status.
+                </li>
             </ul>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="css-rules">
             <b>Underworld Upsides</b>
             <ul>
                 <li>
@@ -983,11 +989,12 @@
                     new Contractor with a Power.
                 </li>
                 <li>
-                    GMs are rewarded a Power Improvement for running a Contract that achieves <b>The Golden Ratio</b>:
-                    at least one Contractor died while another achieved Victory.
+                    GMs are rewarded with a Power Improvement when they run a Contract that achieves <b>The Golden Ratio</b>:
+                    at least one Contractor dies while another achieves Victory.
                     <ul>
                         <li>
-                            Note: GMs are impartial referees that pit the Contractors against the Scenarios. It is not their goal to kill a Contractor every session.
+                            Note: GMs are impartial referees that pit the Contractors against the Scenarios.
+                            GMs who fudge rules to kill Contractors have a hard time finding Players.
                         </li>
                     </ul>
                 </li>
@@ -998,22 +1005,42 @@
                     Good. Contractors are not throwaway characters.
                 </li>
                 <li>
-                    The Golden ratio and Charon Coins exist only because most GMs are hesitant to kill Player Characters even when they deserve it.
+                    The Golden ratio and Charon Coins exist only because GMs are hesitant to kill Player Characters even when they deserve it.
                 </li>
                 <li>
-                    While Contractor death is a vital ingredient to The Contract's challenge and storytelling, each
+                    While Contractor death is a vital ingredient to The Contract's challenge and story, each
                     Player has a different appetite for danger.
                     <ul>
                         <li>
-                            To help you find a group that suits your tastes, the website surfaces deadliness stats for
-                            GMs and survival stats for Players.
+                            To help you find a group that suits your tastes, the website assigns <b>GM Titles</b>
+                            based on the GM's deadliness and experience.
                         </li>
                     </ul>
                 </li>
-                <li>
-                    Contractors gain access to Powers that make them resistant to death once they reach Seasoned Status.
-                </li>
             </ul>
+            <div class="text-center">
+                <small>
+                    <span class="visible-xs-inline">Tap on</span><span class="hidden-xs">Mouse-over</span>
+                    a GM's title for precise stats
+                </small>
+            </div>
+            <div class="text-center">
+                <span data-html="true" data-toggle="tooltip" title="" style="margin-top: 0px; display: inline-block; margin-bottom: 5px;" data-original-title="Games GMed: 3<br>Contractors killed: 0<br>Victories awarded: 7 <br>Losses awarded: 0">
+                    <span class="css-gm-danger-rating css-gm-danger-Pillow">
+                        Pillow Referee
+                    </span>
+                </span>
+                    <span data-html="true" data-toggle="tooltip" title="" style="margin-top: 0px; display: inline-block; margin-bottom: 5px;" data-original-title="Games GMed: 26<br>Contractors killed: 5<br>Victories awarded: 75 <br>Losses awarded: 10">
+                     <span class="css-gm-danger-rating css-gm-danger-Just">
+                        Just Boss
+                    </span>
+                </span>
+                    <span data-html="true" data-toggle="tooltip" title="" style="margin-top: 0px; display: inline-block; margin-bottom: 5px;" data-original-title="Games GMed: 10<br>Contractors killed: 8<br>Victories awarded: 31 <br>Losses awarded: 4">
+                    <span class="css-gm-danger-rating css-gm-danger-Cruel">
+                        Cruel Middle Management
+                    </span>
+                </span>
+            </div>
         </div>
     </div>
 </div>
