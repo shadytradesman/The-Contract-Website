@@ -28,7 +28,7 @@
             <h2>
                 Unlocked Scenarios
                 <br>
-                <small>These Scenarios are unlocked but not spoiled. You may play in them or click on them to view them.</small>
+                <small>These Scenarios are unlocked but not spoiled. You may play in them or click on them to view and spoil them so that you may run them.</small>
             </h2>
         </div>
         <div class="panel-body">
@@ -78,10 +78,31 @@
             <h2>Discovered Scenarios</h2>
         </div>
         <div class="panel-body">
-            <div class="alert alert-info text-center">
-                <h5>
-                    You can discover new Scenarios by playing them in Games.
-                </h5>
+            <div class="alert alert-info">
+                <h4>
+                    How to unlock Scenarios
+                </h4>
+                <div class="">
+                    <ul>
+                        {% for scenario in scenarios_to_unlock %}
+                        <li>
+                            {% if scenario.is_public %}
+                                <a href="{% url 'games:games_view_scenario' scenario.id %}">
+                                    {{ scenario.title }}
+                                </a>
+                            {% else %}
+                                <b>{{scenario.title}}: </b>
+                            {% endif %}
+                            {% for scenario_tag in scenario.tags.all %}
+                                {{ scenario_tag.unlock_instructions | safe }}
+                            {% endfor %}
+                        </li>
+                        {% endfor %}
+                        <li>
+                            Playing any Scenario in a Contract unlocks it.
+                        </li>
+                    </ul>
+                </div>
             </div>
             {% if not_cell_leader %}
                 <div class="alert alert-success text-center">
@@ -89,7 +110,7 @@
                         <a href="{% url 'cells:cells_create'%}">
                             Create a World
                         </a>
-                        to unlock <b>{{num_new_cell_scenarios}}</b> stock Scenarios to get you started!
+                        to unlock a stock Scenario!
                     </h4>
                 </div>
             {% endif %}

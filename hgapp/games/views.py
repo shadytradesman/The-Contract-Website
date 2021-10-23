@@ -128,7 +128,7 @@ def edit_scenario(request, scenario_id):
 
 def view_scenario(request, scenario_id, game_id=None):
     scenario = get_object_or_404(Scenario, id=scenario_id)
-    if not scenario.player_can_view(request.user) and not scenario.player_discovered(request.user):
+    if not scenario.player_is_spoiled(request.user) and not scenario.player_discovered(request.user):
         raise PermissionDenied("You don't have permission to view this scenario")
     show_spoiler_warning = scenario.is_public() \
                            and not (request.user.is_authenticated and scenario.player_discovered(request.user)) \
@@ -148,6 +148,8 @@ def view_scenario(request, scenario_id, game_id=None):
                 raise ValueError("Invalid Game for feedback")
         return HttpResponseRedirect(reverse('games:games_view_scenario', args=(scenario.id,)))
     else:
+        viewer_can_edit = request.user.is_superuser \
+                          or (request.user.is_authenticated and request.user.id == scenario.creator.id)
         game_feedback = None
         games_run = Game.objects.filter(gm_id=request.user.id, scenario_id=scenario.id).order_by("end_time").all()
         games_run = [x for x in games_run if not x.is_scheduled() and not x.is_active()]
@@ -155,9 +157,12 @@ def view_scenario(request, scenario_id, game_id=None):
         games_run_no_feedback = [x for x in games_run_no_feedback if not x.is_scheduled() and not x.is_active()]
         if games_run_no_feedback:
             game_feedback = GameFeedbackForm()
+        is_public = scenario.is_public()
         context = {
             'show_spoiler_warning': show_spoiler_warning,
             'scenario': scenario,
+            'is_public': is_public,
+            'viewer_can_edit': viewer_can_edit,
             'games_run': games_run,
             'games_run_no_feedback': games_run_no_feedback,
             'game_feedback_form': game_feedback,
@@ -171,13 +176,13 @@ def view_scenario_gallery(request):
     owned_scenarios = request.user.scenario_creator.all()
     discovered_scenarios = request.user.scenario_discovery_set.exclude(reason=DISCOVERY_REASON[1][0]).exclude(is_spoiled=False).all()
     unlocked_scenarios = request.user.scenario_discovery_set.exclude(is_spoiled=True).all()
-    num_new_cell_scenarios = len(Scenario.objects.filter(tags__slug="newcell").all())
     not_cell_leader = len(request.user.cell_set.filter(creator=request.user).all()) == 0
+    scenarios_to_unlock = [scenario for scenario in Scenario.objects.filter(tags__isnull=False).all() if not scenario.player_discovered(request.user)]
     context = {
         'owned_scenarios': owned_scenarios,
         'scenario_discoveries': discovered_scenarios,
         'unlocked_discoveries': unlocked_scenarios,
-        'num_new_cell_scenarios': num_new_cell_scenarios,
+        'scenarios_to_unlock': scenarios_to_unlock,
         'not_cell_leader': not_cell_leader,
     }
     return render(request, 'games/view_scenario_gallery.html', context)
@@ -328,12 +333,11 @@ def edit_game(request, game_id):
 
 def view_game(request, game_id):
     game = get_object_or_404(Game, id=game_id)
-    can_view_scenario = False
     my_invitation = None
     if request.user.is_authenticated:
         my_invitation = get_object_or_none(request.user.game_invite_set.filter(relevant_game=game_id))
-    if request.user.has_perm("view_scenario", game.scenario):
-        can_view_scenario = True
+    can_view_scenario = game.scenario.player_discovered(request.user)
+    scenario_spoiled = game.scenario.player_is_spoiled(request.user)
     invite_form = None
     can_edit = game.player_can_edit(request.user)
     if can_edit and game.is_scheduled():
@@ -347,6 +351,7 @@ def view_game(request, game_id):
     context = {
         'game': game,
         'can_view_scenario': can_view_scenario,
+        'scenario_spoiled': scenario_spoiled,
         'my_invitation': my_invitation,
         'invite_form': invite_form,
         'can_edit': can_edit,
@@ -800,10 +805,12 @@ def spoil_scenario(request, scenario_id):
         if request.is_ajax and request.method == "POST":
             scenario = get_object_or_404(Scenario, id=scenario_id)
             with transaction.atomic():
+                discovery = None
                 if not scenario.player_discovered(request.user):
-                    scenario.unlocked_discovery(request.user)
+                    discovery = scenario.unlocked_discovery(request.user)
                 elif scenario.is_spoilable_for_player(request.user):
-                    scenario.discovery_for_player(request.user).spoil()
+                    discovery = scenario.discovery_for_player(request.user)
+                discovery.spoil()
             return JsonResponse({}, status=200)
         return JsonResponse({"error": ""}, status=400)
 

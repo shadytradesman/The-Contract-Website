@@ -81,7 +81,7 @@ class EditWorld(View):
         new_cell_scenarios = Scenario.objects.filter(tags__slug="newcell").all()
         for scenario in new_cell_scenarios:
             scenario.unlocked_discovery(self.request.user)
-        if len(self.request.user.cell_set.filter(creator=self.request.user).all()) == 1:
+        if self.request.user.cell_set.filter(creator=self.request.user).count() == 1:
             gallery_url = reverse('games:games_view_scenario_gallery')
             num_unlocked = len(new_cell_scenarios)
             messages.add_message(self.request, messages.SUCCESS, mark_safe("<h4 class=\"text-center\">By creating this Cell "

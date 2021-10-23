@@ -48,7 +48,7 @@
                             {% endif %}
                         </b>
                         {{ form.player}} {{ form.character }}
-                        {% if form.attendance.game_invite.invitee_can_view_scenario %}
+                        {% if form.attendance.game_invite.invitee_is_spoiled_on_scenario %}
                             <span class="text-danger">
                                 This Player has already discovered this Scenario and should only play an NPC Ringer.
                             </span>

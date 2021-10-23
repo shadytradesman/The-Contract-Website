@@ -96,6 +96,7 @@ def handle_edit_completed_game(request, game, new_player_list):
                 game.refresh_from_db()
                 game.recalculate_gm_reward(original_game_ratio)
                 game.update_profile_stats()
+                game.unlock_stock_scenarios()
         else:
             raise ValueError("Invalid outcome formset in completed edit")
     else:
@@ -218,6 +219,7 @@ def create_archival_game(request, general_form, cell, outcome_formset):
             game_invite.save()
         game.give_rewards()
         game.update_profile_stats()
+        game.unlock_stock_scenarios()
 
 
 def get_context_for_choose_attending(cell, game=None):

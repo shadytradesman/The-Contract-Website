@@ -1,13 +1,17 @@
 $(document).ready(function(){
-    if (scenarioPublic) {
+    if (showSpoilers) {
         $('#spoilerModal').modal({});
     }
 });
 
 function spoilersAccepted() {
-    $("#scenario-content").show();
-    $("#spoil-confirm-buttons").hide();
-    $('#spoilerModal').modal('hide');
+    if (scenarioIsPublic) {
+        $("#scenario-content").show();
+        $("#spoil-confirm-buttons").hide();
+        $('#spoilerModal').modal('hide');
+    } else {
+        window.location.reload(true);
+    }
 }
 
 // delete battle injury
@@ -20,7 +24,6 @@ $(".container").on("submit",".js-accept-spoilers", function (e) {
         data: serializedData,
         success: function (response) {
             spoilersAccepted();
-
         },
         error: function (response) {
             console.log(response);

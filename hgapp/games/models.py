@@ -242,6 +242,7 @@ class Game(models.Model):
         self.save()
         self.give_rewards()
         self.update_profile_stats()
+        self.unlock_stock_scenarios()
 
     def is_introductory_game(self):
         # Returns True if this Game had at least one new Player in it.
@@ -387,6 +388,28 @@ class Game(models.Model):
         if hasattr(self, "cell") and self.cell:
             self.cell.update_safety_stats()
 
+    def unlock_stock_scenarios(self):
+        if not self.is_finished() and not self.is_recorded():
+            print("Game is not finished: " + str(self.id))
+            return
+        run_contract_scenarios = Scenario.objects.filter(tags__slug="gm-contract").all()
+        for scenario in run_contract_scenarios:
+            scenario.unlocked_discovery(self.gm)
+        die_in_contract_scenarios = Scenario.objects.filter(tags__slug="die").all()
+        play_in_contract_scenarios = Scenario.objects.filter(tags__slug="play-contractor").all()
+        for game_attendance in self.game_attendance_set.all():
+            if game_attendance.is_confirmed:
+                player = game_attendance.get_player()
+                if player:
+                    for scenario in play_in_contract_scenarios:
+                        scenario.unlocked_discovery(player)
+                if game_attendance.is_death():
+                    for scenario in die_in_contract_scenarios:
+                        scenario.unlocked_discovery(player)
+
+
+
+
     def save(self, *args, **kwargs):
         if not hasattr(self, 'gm'):
             self.gm = self.creator
@@ -406,8 +429,6 @@ class Game(models.Model):
             assign_perm('edit_game', self.creator, self)
         else:
             super(Game, self).save(*args, **kwargs)
-        if self.is_recorded() or self.is_archived() or self.is_finished():
-            self.update_profile_stats()
 
     def __str__(self):
         return "[" + self.status + "] " + self.scenario.title + " run by: " + self.gm.username
@@ -646,7 +667,7 @@ class Game_Invite(models.Model):
         else:
             super(Game_Invite, self).save(*args, **kwargs)
 
-    def invitee_can_view_scenario(self):
+    def invitee_is_spoiled_on_scenario(self):
         return self.invited_player.has_perm("view_scenario", self.relevant_game.scenario)
 
 class Scenario(models.Model):
@@ -687,7 +708,7 @@ class Scenario(models.Model):
         public = self.tags.filter(slug="public").exists()
         return public
 
-    def player_can_view(self, player):
+    def player_is_spoiled(self, player):
         return self.is_public() or player.has_perm("view_scenario", self)
 
     def is_spoilable_for_player(self, player):
@@ -731,9 +752,11 @@ class Scenario(models.Model):
                 is_spoiled=False,
             )
             discovery.save()
+            return discovery
+        return None
 
     def is_stock(self):
-        return len(self.tags.all()) > 0
+        return self.tags.count() > 0
 
     def save(self, *args, **kwargs):
         if self.pk is None:
@@ -741,7 +764,8 @@ class Scenario(models.Model):
             discovery = Scenario_Discovery (
                 discovering_player = self.creator,
                 relevant_scenario = self,
-                reason = DISCOVERY_REASON[1][0]
+                reason = DISCOVERY_REASON[1][0],
+                is_spoiled=True
             )
             discovery.save()
         else:
@@ -932,6 +956,7 @@ class ScenarioTag(models.Model):
     slug = models.SlugField("Unique URL-Safe Name",
                             max_length=40,
                             primary_key=True)
+    unlock_instructions = models.CharField(max_length=400, default=".")
 
     def __str__(self):
         return self.tag
