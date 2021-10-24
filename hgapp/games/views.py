@@ -211,7 +211,8 @@ def create_game(request, cell_id=None):
             if not (form_cell.player_can_manage_games(request.user) or form_cell.player_can_run_games(request.user)):
                 raise PermissionDenied("You do not have permission to run Games in this World")
             game = Game(
-            title = title,
+			scenario=self.scenario,
+			title = title,
                 creator = request.user,
                 gm = request.user,
                 required_character_status = form.cleaned_data['required_character_status'],

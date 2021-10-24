@@ -58,7 +58,8 @@ class JournalModelTests(TestCase):
             edit_date=timezone.now(),
             cell=self.cell)
         self.game1 = Game(
-            title="title",
+scenario=self.scenario,
+title="title",
             creator=self.user2,
             gm=self.user2,
             created_date=timezone.now(),
@@ -83,7 +84,8 @@ class JournalModelTests(TestCase):
         game_invite.save()
         self.game1.give_rewards()
         self.game2 = Game(
-            title="title",
+	scenario=self.scenario,
+title="title",
             creator=self.user2,
             gm=self.user2,
             created_date=timezone.now(),
@@ -112,7 +114,8 @@ class JournalModelTests(TestCase):
         self.char1_attendances = []
         for x in range(10):
             new_game = Game(
-                title="title",
+		scenario=self.scenario,
+		title="title",
                 creator=self.user2,
                 gm=self.user2,
                 created_date=timezone.now(),

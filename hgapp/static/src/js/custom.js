@@ -57,7 +57,7 @@ $(document).ready(function(){
 function updateHoverText() {
     $('.js-render-power-keywords').each(function(){
         for(var key in powerKeywordDict) {
-            $(this).html($(this).html().replaceAll(' ' + key + ' ', replaceSubstring));
+            $(this).html($(this).html().replaceAll(' ' + key, replaceSubstring));
         }
     });
     $('[data-toggle="tooltip"]').tooltip();
@@ -65,7 +65,7 @@ function updateHoverText() {
 
 function replaceSubstring(match) {
 	const trimmed = match.trim();
-	return ' <span class="css-keyword-with-tooltip" data-toggle="tooltip" title="' + powerKeywordDict[trimmed] + '">' + trimmed + '</span> ';
+	return ' <span class="css-keyword-with-tooltip" data-toggle="tooltip" title="' + powerKeywordDict[trimmed] + '">' + trimmed + '</span>';
 }
 
 

@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Count
 from django.conf import settings
 from characters.models import Character, HIGH_ROLLER_STATUS, Character_Death, ExperienceReward, AssetDetails
 from powers.models import Power
@@ -9,7 +10,7 @@ from guardian.shortcuts import assign_perm
 from postman.api import pm_write
 from django.urls import reverse
 from django.utils.safestring import SafeText
-from games.games_constants import GAME_STATUS
+from games.games_constants import GAME_STATUS, get_completed_game_excludes_query
 
 from hgapp.utilities import get_object_or_none
 
@@ -387,6 +388,7 @@ class Game(models.Model):
         self.update_participant_titles()
         if hasattr(self, "cell") and self.cell:
             self.cell.update_safety_stats()
+        self.scenario.update_stats()
 
     def unlock_stock_scenarios(self):
         if not self.is_finished() and not self.is_recorded():
@@ -698,8 +700,42 @@ class Scenario(models.Model):
     tags = models.ManyToManyField("ScenarioTag",
                                    blank=True)
 
+    num_words = models.IntegerField("Number of Words", default=0)
+    times_run = models.IntegerField("Number of times Scenario has been run", default=0)
+    num_gms_run = models.IntegerField("Number of GMs who have run Scenario", default=0)
+    num_victories = models.IntegerField("Number of victories awarded in this Scenario", default=0)
+    num_deaths = models.IntegerField("Number of deaths caused by this Scenario", default=0)
+    deadliness_ratio = models.FloatField("A denormalization of deaths over victories", default=0)
+
+    class Meta:
+        permissions = (
+            ('edit_scenario', 'Edit scenario'),
+        )
+        indexes = [
+            models.Index(fields=['times_run']),
+            models.Index(fields=['num_gms_run']),
+            models.Index(fields=['num_victories']),
+            models.Index(fields=['num_deaths']),
+            models.Index(fields=['deadliness_ratio']),
+            models.Index(fields=['creator']),
+        ]
+
     def __str__(self):
         return self.title
+
+    def is_valid(self):
+        return self.num_words > 1000
+
+    def update_stats(self):
+        self.times_run = self.game_set.exclude(get_completed_game_excludes_query()).count()
+        self.num_gms_run = Game.objects \
+            .filter(scenario=self) \
+            .exclude(get_completed_game_excludes_query()) \
+            .aggregate(Count('gm_id', distinct=True))['gm_id__count']
+        self.num_victories = Game_Attendance.objects.filter(relevant_game__scenario=self, outcome=WIN, is_confirmed=True).count()
+        self.num_deaths = Game_Attendance.objects.filter(relevant_game__scenario=self, outcome=DEATH, is_confirmed=True).count()
+        self.deadliness_ratio = self.num_deaths / max(self.num_victories, 1)
+        self.save()
 
     def is_public(self):
         public = self.tags.filter(slug="public").exists()
@@ -767,11 +803,6 @@ class Scenario(models.Model):
             discovery.save()
         else:
             super(Scenario, self).save(*args, **kwargs)
-
-    class Meta:
-        permissions = (
-            ('edit_scenario', 'Edit scenario'),
-        )
 
 
 class Scenario_Discovery(models.Model):
