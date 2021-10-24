@@ -407,9 +407,6 @@ class Game(models.Model):
                     for scenario in die_in_contract_scenarios:
                         scenario.unlocked_discovery(player)
 
-
-
-
     def save(self, *args, **kwargs):
         if not hasattr(self, 'gm'):
             self.gm = self.creator

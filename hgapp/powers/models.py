@@ -225,6 +225,7 @@ class Base_Power(models.Model):
     def get_system(self):
         return Base_Power_System.objects.filter(dice_system=DICE_SYSTEM[1][0]).get(base_power=self)
 
+
 class Base_Power_System(models.Model):
     base_power = models.ForeignKey(Base_Power,
                                    on_delete=models.PROTECT)
@@ -242,6 +243,7 @@ class Base_Power_System(models.Model):
 
     def __str__(self):
         return ":".join([self.base_power.name,str(self.dice_system)])
+
 
 class Power_Param(models.Model):
     relevant_parameter = models.ForeignKey(Parameter,

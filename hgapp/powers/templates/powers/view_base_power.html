@@ -57,7 +57,9 @@
                 <div class="col-sm-6">
                     <div>
                         <h2>System</h2>
-                        {{ system_text.system_text|linebreaks }}
+                        <span class="js-render-power-keywords">
+                            {{ system_text.system_text|linebreaks }}
+                        </span>
                         {% if system_text.eratta %}
                             <h3><small>Eratta</small></h3>
                             <p>{{ system_text.eratta }}</p>
@@ -73,7 +75,11 @@
                             {% for enhancement in base_power.enhancements.all %}
                                 <div class="base_enhancement">
                                     <p>
-                                    <dt><b>{{ enhancement.name }}</b> ({{ enhancement.description}})</dt>
+                                    <dt><b>{{ enhancement.name }}</b>
+                                        <span class="js-render-power-keywords">
+                                            ({{ enhancement.description}})
+                                        </span>
+                                    </dt>
                                     <dd><small>{{ enhancement.eratta }}</small> </dd>
                                     </p>
                                 </div>
@@ -87,7 +93,11 @@
                         <dl>
                             {% for drawback in base_power.drawbacks.all %}
                             <div class="base_drawback">
-                                <dt><b>{{ drawback.name }}</b> ({{ drawback.description}})</dt>
+                                <dt><b>{{ drawback.name }}</b>
+                                    <span class="js-render-power-keywords">
+                                        ({{ drawback.description}})
+                                    </span>
+                                </dt>
                                 <dd><small>{{ drawback.eratta }}</small></dd>
                             </div>
                             {% endfor %}

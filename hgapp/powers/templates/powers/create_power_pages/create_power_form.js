@@ -221,8 +221,6 @@ $(document).ready(function(){
             defaultSpeed.show();
             parrySpeed.hide();
         }
-        console.log("Default speed: ");
-        console.log(defaultSpeed);
     }
 
     function updateSelectableRoll(attr_roll) {
@@ -261,5 +259,6 @@ $(document).ready(function(){
     });
 
   });
+
 
 </script>

@@ -28,3 +28,44 @@ $(function(){
     });
 });
 
+/* Power Keywords */
+
+const powerKeywordDict = {
+    // targeting
+	"Sapient": "An intelligent being that thinks and is self-aware.",
+	"Non-Sapient": "Any target that does not think or is not self-aware.",
+	"Living": "Only targets that are alive.",
+	"Non-Living": "Only targets that are not alive.",
+	"Dead": "Only targets that were once alive.",
+	"Animate": "Only targets that can move or think on their own.",
+	"Inanimate": "Only targets that cannot move or think on their own.",
+	"Creature": "Only targets that are living, animate, and non-sapient.",
+	"Object": "Only non-living targets that are also free-standing, loose, or otherwise not currently a part of another structure or device.",
+    "Device": "An Object that was designed or created for some purpose.",
+    "Plant": "Any non-sapient living thing that cannot act.",
+    "Computer": "A non-living device that takes input, processes data, and produces output. Generally electric.",
+    "Vehicle": "A device designed to move from one place to another while carrying cargo or passengers.",
+
+    // Other
+    "Concentration": "While concentrating you can only take Free Actions and a single Quick Action per Round. Disrupting events (like taking damage) cause the effect to end."
+};
+
+$(document).ready(function(){
+    updateHoverText();
+});
+
+function updateHoverText() {
+    $('.js-render-power-keywords').each(function(){
+        for(var key in powerKeywordDict) {
+            $(this).html($(this).html().replaceAll(' ' + key + ' ', replaceSubstring));
+        }
+    });
+    $('[data-toggle="tooltip"]').tooltip();
+}
+
+function replaceSubstring(match) {
+	const trimmed = match.trim();
+	return ' <span class="css-keyword-with-tooltip" data-toggle="tooltip" title="' + powerKeywordDict[trimmed] + '">' + trimmed + '</span> ';
+}
+
+

@@ -79,9 +79,11 @@
                         System
                         <small>{{ power.get_activation_style_display }}</small>
                     </h4>
-                    <p><i>
-                    {{ power.render_system }}
-                    </i></p>
+                    <span class="js-render-power-keywords">
+                        <p><i>
+                            {{ power.render_system }}
+                        </i></p>
+                    </span>
                 </div>
             </div>
             <hr>
@@ -99,7 +101,11 @@
                                     {% endif %}
                                 >
 
-                                    <b>{{ enhancement_inst.relevant_enhancement.name }} </b> ({{ enhancement_inst.relevant_enhancement.description }})
+                                    <b>{{ enhancement_inst.relevant_enhancement.name }} </b>
+                                    <span class="js-render-power-keywords">
+                                        ({{ enhancement_inst.relevant_enhancement.description }})
+                                    </span>
+
                                     {% if enhancement_inst.detail %}
                                         <ul ><li class="list-unstyled">
                                             <p><b>{{ enhancement_inst.relevant_enhancement.detail_field_label }} - </b> {{ enhancement_inst.detail }}</p>
@@ -122,7 +128,11 @@
                                         title='{{drawback_inst.relevant_drawback.eratta|linebreaks}}'
                                     {% endif %}
                                 >
-                                    <b>{{ drawback_inst.relevant_drawback.name }} </b> ({{ drawback_inst.relevant_drawback.description }})
+                                    <b>{{ drawback_inst.relevant_drawback.name }} </b>
+                                    <span class="js-render-power-keywords">
+                                        ({{ drawback_inst.relevant_drawback.description }})
+                                    </span>
+
                                     {% if drawback_inst.detail %}
                                         <ul ><li class="list-unstyled">
                                             <b>{{ drawback_inst.relevant_drawback.detail_field_label }} - </b> {{ drawback_inst.detail }}
