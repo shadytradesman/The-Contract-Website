@@ -2,6 +2,7 @@
 
 {% load i18n %}
 {% load staticfiles %}
+{% load games_tags %}
 
 {% block head_title %}
 Community Journals
@@ -35,7 +36,11 @@ Community Journals
                     <li>
                         <div class="thumbnail">
                             <a href="{% url 'profiles:profiles_view_profile' journal.game_attendance.attending_character.player.profile.id %}">
-                                {{journal.game_attendance.attending_character.player.username}}
+                                {{journal.game_attendance.attending_character.player.username}}'s
+                            </a>
+                            Contractor
+                            <a href="{% url 'characters:characters_view' journal.game_attendance.attending_character.id %}">
+                                {{journal.game_attendance.attending_character.name}}
                             </a>
                             wrote a
                             <a href="{% url 'journals:journal_read_id' journal.id %}">
@@ -46,12 +51,11 @@ Community Journals
                                 {% endif %}
                                 Journal
                             </a>
-                            for
-                            <a href="{% url 'characters:characters_view' journal.game_attendance.attending_character.id %}">
-                                {{journal.game_attendance.attending_character.name}}
-                            </a>
+                            {% if not journal.is_downtime %}
+                                for
+                                {% render_scenario_title_check_for_link journal.game_attendance.relevant_game.scenario %}
+                            {% endif %}
                             on
-
                             {{ journal.created_date }}
 
                             <a href="{% url 'journals:journal_read_id' journal.id %}">

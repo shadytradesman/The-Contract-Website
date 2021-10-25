@@ -29,7 +29,7 @@
                         Top Players
                         <br>
                         <small>
-                            Games Played
+                            Contracts Played
                         </small>
                     </h3>
                     <ol>
@@ -85,7 +85,7 @@
                         Most Prolific GMs
                         <br>
                         <small>
-                            Games GMed
+                            Contracts GMed
                         </small>
                     </h3>
                     <ol>
@@ -141,7 +141,7 @@
                         Most Victorious
                         <br>
                         <small>
-                            Games won
+                            Contracts won
                         </small>
                     </h3>
                     <ol>
@@ -157,7 +157,7 @@
                         Biggest Loser
                         <br>
                         <small>
-                            Games lost
+                            Contracts lost
                         </small>
                     </h3>
                     <ol>
@@ -180,6 +180,67 @@
                         {% for character in top_contractor_journals %}
                         {% with 'top_con_journal' as entry_name %}
                         {% include "info/leaderboard/journal_contractor_entry.html" %}
+                        {% endwith %}
+                        {% endfor %}
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="panel-heading css-leaderboard-header">
+            Scenarios
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-4 col-sm-6">
+                    <h3 class="text-center">
+                        Most Run
+                        <br>
+                        <small>
+                            Most times run as a Contract
+                        </small>
+                    </h3>
+                    <ol>
+                        {% for scenario in top_scenario_runs %}
+                            {% with 'most_run_scenario' as entry_name %}
+                                {% include "info/leaderboard/top_scenario_entry.html" %}
+                            {% endwith %}
+                        {% endfor %}
+                    </ol>
+                </div>
+                <div class="col-md-4 col-sm-6">
+                    <h3 class="text-center">
+                        Most Widely Run
+                        <br>
+                        <small>
+                            Number of unique GMs
+                        </small>
+                    </h3>
+                    <ol>
+                        {% for scenario in top_scenario_gms %}
+                        {% with 'most_gm_scenario' as entry_name %}
+                        {% include "info/leaderboard/top_gm_scenario_entry.html" %}
+                        {% endwith %}
+                        {% endfor %}
+                    </ol>
+                </div>
+                <div class="col-md-4 col-sm-6">
+                    <h3 class="text-center">
+                        Most Feared
+                        <br>
+                        <small>
+                            Highest average deadliness
+                            <br>
+                            <i>
+                                (Run by at least 3 GMs)
+                            </i>
+                        </small>
+                    </h3>
+                    <ol>
+                        {% for scenario in top_scenario_deadliness %}
+                        {% with 'top_scenario_deadliness' as entry_name %}
+                        {% include "info/leaderboard/top_feared_scenario_entry.html" %}
                         {% endwith %}
                         {% endfor %}
                     </ol>

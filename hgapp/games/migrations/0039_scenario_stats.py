@@ -3,6 +3,7 @@
 from django.db import migrations, models
 from django.db.models import Q, Count
 from django.db import transaction
+from bs4 import BeautifulSoup
 
 GAME_STATUS = (
     # Invites go out, players may accept invites w/ characters and change whether they are coming and with which character
@@ -61,6 +62,8 @@ def migrate_update_stats(apps, schema_editor):
             scenario.num_victories = Game_Attendance.objects.filter(relevant_game__scenario=scenario, outcome=WIN, is_confirmed=True).count()
             scenario.num_deaths = Game_Attendance.objects.filter(relevant_game__scenario=scenario, outcome=DEATH, is_confirmed=True).count()
             scenario.deadliness_ratio = scenario.num_deaths / max(scenario.num_victories, 1)
+            soup = BeautifulSoup(scenario.description, features="html5lib")
+            scenario.num_words = len(soup.text.split())
             scenario.save()
 
 class Migration(migrations.Migration):

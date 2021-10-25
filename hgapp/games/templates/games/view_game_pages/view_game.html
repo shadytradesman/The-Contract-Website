@@ -42,11 +42,7 @@
                 {% else %}
                     ran
                 {% endif %}
-                {% if can_view_scenario %}
-                    <a href="{% url 'games:games_view_scenario' game.scenario.id %}">{{game.scenario.title}}</a>
-                {% else %}
-                    {{ game.scenario.title }}
-                {% endif %}
+                {% render_scenario_title_check_for_link game.scenario %}
                 {% if scenario_spoiled %}
                     {% if game.scenario.summary %}
                         <br>

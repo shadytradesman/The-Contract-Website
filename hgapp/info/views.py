@@ -9,6 +9,7 @@ from characters.forms import InjuryForm
 from info.models import FrontPageInfo
 from profiles.models import Profile
 from characters.models import CharacterTutorial, Ability, Character
+from games.models import Scenario
 
 def terms(request):
     context= {
@@ -42,7 +43,11 @@ def leaderboard(request):
     top_contractor_losses = Character.objects.order_by('-num_losses')[:num_to_fetch]
     top_contractor_journals = Character.objects.order_by('-num_journals')[:num_to_fetch]
 
-    context= {
+    top_scenario_runs = Scenario.objects.order_by('-times_run')[:num_to_fetch]
+    top_scenario_gms = Scenario.objects.order_by('-num_gms_run')[:num_to_fetch]
+    top_scenario_deadliness = Scenario.objects.filter(num_gms_run__gt=3).order_by('-deadliness_ratio')[:num_to_fetch]
+
+    context = {
         "top_players": top_players,
         "top_ringer_players": top_ringer_players,
         "top_survivors": top_survivors,
@@ -55,6 +60,9 @@ def leaderboard(request):
         "top_contractor_losses": top_contractor_losses,
         "top_contractor_journals": top_contractor_journals,
 
+        "top_scenario_runs": top_scenario_runs,
+        "top_scenario_gms": top_scenario_gms,
+        "top_scenario_deadliness": top_scenario_deadliness,
     }
     return render(request, 'info/leaderboard/leaderboard.html', context)
 

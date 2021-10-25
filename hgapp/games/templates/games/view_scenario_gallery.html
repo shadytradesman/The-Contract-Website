@@ -14,14 +14,17 @@
     <h1 class="text-center">Scenario Gallery</h1>
     <div class="panel panel-default">
         <div class="panel-body">
-            <div class="lead">
-                This gallery contains all the
-                <a href="/guide/rules/#scenarios">Scenarios</a>
-                you've written or discovered.
+            <div class="text-center">
+                <h4>
+                    This gallery contains all the
+                    <a href="/guide/rules/#scenarios">Scenarios</a>
+                    you've written or discovered.
+                </h4>
+                <p>
+                    You may view the full write-up of any Scenarios that appear below including spoilers,
+                    Journals, and feedback from the GMs who have run them.
+                </p>
             </div>
-            <p>
-                You may view the full write-up of any Scenarios that appear below including spoilers, their Game history, and feedback from the GMs who have run them.
-            </p>
         </div>
         {% if unlocked_discoveries %}
         <div class="panel-heading">
@@ -52,12 +55,12 @@
         <div class="panel-heading">
             <h2>
                 My Scenarios
+                <small> (count: {{owned_scenarios.count}})</small>
+                <a class="btn btn-primary btn-sm pull-right hidden-xs" href="{% url 'games:games_create_scenario' %}">Write a new Scenario</a>
             </h2>
+            <a class="btn btn-primary btn-sm visible-xs-block" href="{% url 'games:games_create_scenario' %}">Write a new Scenario</a>
         </div>
         <div class="panel-body">
-            <a class="btn btn-primary" href="{% url 'games:games_create_scenario' %}">Write a new Scenario</a>
-            <br>
-            <br>
             <div class="row">
                 {% for scenario in owned_scenarios %}
                     <div class="col-md-6">
@@ -75,7 +78,10 @@
             </div>
         </div>
         <div class="panel-heading">
-            <h2>Discovered Scenarios</h2>
+            <h2>
+                Discovered Scenarios
+                <small> (count: {{scenario_discoveries.count}})</small>
+            </h2>
         </div>
         <div class="panel-body">
             <div class="alert alert-info">

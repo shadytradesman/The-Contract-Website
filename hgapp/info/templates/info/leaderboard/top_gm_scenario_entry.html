@@ -1,0 +1,11 @@
+{% extends "info/leaderboard/leaderboard_entry_template.html" %}
+
+{% load games_tags %}
+
+{% block entry_content %}
+    {% render_scenario_title_check_for_link scenario %}
+    <br>
+    <span class="subtitle">
+            Run by <b>{{scenario.num_gms_run}}</b> GM{{scenario.num_gms_run|pluralize}}
+        </span>
+{% endblock %}

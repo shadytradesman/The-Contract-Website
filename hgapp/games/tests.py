@@ -1122,3 +1122,45 @@ class GameModelTests(TestCase):
             self.assertEquals(self.cell_owner.profile.get_avail_charon_coins().count(), 0)
             self.assertEquals(self.cell_owner.profile.get_avail_exp_rewards().count(), 3) # cell_owner gmed the game
 
+    def test_give_scenario_rewards(self):
+        with transaction.atomic():
+            self.scenario.description = " ".join([str(x) for x in range(10000)])
+            self.scenario.save()
+            game = Game(
+                scenario=self.scenario,
+                title="title",
+                creator=self.user2,
+                gm=self.cell_owner,
+                created_date=timezone.now(),
+                scheduled_start_time=timezone.now(),
+                actual_start_time=timezone.now(),
+                end_time=timezone.now(),
+                status=GAME_STATUS[6][0],
+                cell=self.cell,
+            )
+            game.save()
+            attendance = Game_Attendance(
+                relevant_game=game,
+                notes="notes",
+                outcome=WIN,
+                attending_character=self.char_user1_cell,
+            )
+            game_invite = Game_Invite(invited_player=self.user1,
+                                      relevant_game=game,
+                                      as_ringer=False,
+                                      )
+            attendance.save()
+            game_invite.attendance = attendance
+            game_invite.save()
+            game.give_rewards()
+
+            self.update_char_stats()
+            self.assertFalse(game.achieves_golden_ratio())
+            self.assertEquals(self.user1.profile.get_avail_improvements().count(), 1) #valid scenario writeup
+            self.assertIsNotNone(self.scenario.get_active_improvement()) #valid scenario writeup
+
+            self.scenario.description = "blah blah"
+            self.scenario.save()
+            self.assertEquals(self.user1.profile.get_avail_improvements().count(), 0) # invalid scenario writeup
+            self.assertIsNone(self.scenario.get_active_improvement()) # invalid scenario writeup
+

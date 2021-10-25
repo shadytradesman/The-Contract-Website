@@ -173,10 +173,10 @@ def view_scenario(request, scenario_id, game_id=None):
 def view_scenario_gallery(request):
     if not request.user.is_authenticated:
         raise PermissionDenied("You must be logged in to view your Scenario Gallery")
-    owned_scenarios = request.user.scenario_creator.all()
-    discovered_scenarios = request.user.scenario_discovery_set.exclude(reason=DISCOVERY_REASON[1][0]).exclude(is_spoiled=False).all()
+    owned_scenarios = request.user.scenario_creator.order_by("-times_run", "-num_words").all()
+    discovered_scenarios = request.user.scenario_discovery_set.exclude(reason=DISCOVERY_REASON[1][0]).exclude(is_spoiled=False).order_by("-relevant_scenario__times_run", "-relevant_scenario__num_words").all()
     unlocked_scenarios = request.user.scenario_discovery_set.exclude(is_spoiled=True).all()
-    not_cell_leader = len(request.user.cell_set.filter(creator=request.user).all()) == 0
+    not_cell_leader = request.user.cell_set.filter(creator=request.user).count() == 0
     scenarios_to_unlock = [scenario for scenario in Scenario.objects.filter(tags__isnull=False).all() if not scenario.player_discovered(request.user)]
     context = {
         'owned_scenarios': owned_scenarios,
@@ -211,8 +211,7 @@ def create_game(request, cell_id=None):
             if not (form_cell.player_can_manage_games(request.user) or form_cell.player_can_run_games(request.user)):
                 raise PermissionDenied("You do not have permission to run Games in this World")
             game = Game(
-			scenario=self.scenario,
-			title = title,
+                title = title,
                 creator = request.user,
                 gm = request.user,
                 required_character_status = form.cleaned_data['required_character_status'],
@@ -337,7 +336,6 @@ def view_game(request, game_id):
     my_invitation = None
     if request.user.is_authenticated:
         my_invitation = get_object_or_none(request.user.game_invite_set.filter(relevant_game=game_id))
-    can_view_scenario = game.scenario.player_discovered(request.user)
     scenario_spoiled = game.scenario.player_is_spoiled(request.user)
     invite_form = None
     can_edit = game.player_can_edit(request.user)
@@ -351,7 +349,6 @@ def view_game(request, game_id):
     gametime_url = None if not my_invitation or not game.gametime_url else game.gametime_url
     context = {
         'game': game,
-        'can_view_scenario': can_view_scenario,
         'scenario_spoiled': scenario_spoiled,
         'my_invitation': my_invitation,
         'invite_form': invite_form,
@@ -447,9 +444,7 @@ def accept_invite(request, game_id):
             logger.error('Error: invalid accept_invite_form. Errors: %s', str(form.errors))
             raise ValueError("Invalid accept_invite_form form")
     else:
-        can_view_scenario = False
-        if request.user.has_perm("view_scenario", game.scenario):
-            can_view_scenario = True
+        scenario_spoiled = game.scenario.player_is_spoiled(request.user)
         # Build a accept form.
         if not invite:
             # if game is open for self-invites, make a temp invite that we don't save so we can make a form
@@ -462,7 +457,7 @@ def accept_invite(request, game_id):
             'form': form,
             'game': game,
             'invite': invite,
-            'can_view_scenario': can_view_scenario,
+            'scenario_spoiled': scenario_spoiled,
         }
         return render(request, 'games/accept_invite.html', context)
 

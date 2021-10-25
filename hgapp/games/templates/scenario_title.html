@@ -1,0 +1,40 @@
+{% load staticfiles %}
+
+{% if render_link %}
+    <a href="{% url 'games:games_view_scenario' scenario.id %}">
+{% endif %}
+
+<span
+        {% if scenario.is_valid %}
+            class="css-scenario-with-writeup-title"
+        {% else %}
+            class="css-scenario-title-no-writeup"
+        {% endif %}
+>
+    <span
+            data-toggle="tooltip"
+            title='This Scenario has been run {{ scenario.times_run }} time{{scenario.times_run|pluralize}}
+                    by a total of {{ scenario.num_gms_run }} GM{{scenario.num_gms_run|pluralize}}.
+                    Victories: {{scenario.num_victories}}
+                    Deaths: {{scenario.num_deaths}}'
+    >
+        {{scenario.title}}
+    </span>
+    {% if scenario.is_valid %}
+        <img class ="css-valid-quill-img"
+             src="{% static 'journals/quill.svg' %}"
+             data-toggle="tooltip"
+             title='This Scenario has a full writeup. Word count: {{scenario.num_words}}'
+        />
+    {% else %}
+        <img class ="css-quill-img"
+             src="{% static 'journals/quill.svg' %}"
+             data-toggle="tooltip"
+             title="This Scenario's writeup is too short for credit. Word count: {{scenario.num_words}}"
+        />
+    {% endif %}
+</span>
+
+{% if render_link %}
+    </a>
+{% endif %}

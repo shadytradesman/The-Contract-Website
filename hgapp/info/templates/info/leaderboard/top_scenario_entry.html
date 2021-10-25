@@ -1,0 +1,11 @@
+{% extends "info/leaderboard/leaderboard_entry_template.html" %}
+
+{% load games_tags %}
+
+{% block entry_content %}
+    {% render_scenario_title_check_for_link scenario %}
+    <br>
+    <span class="subtitle">
+            <b>{{scenario.times_run}}</b> Contracts
+        </span>
+{% endblock %}

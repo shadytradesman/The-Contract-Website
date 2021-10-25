@@ -19,3 +19,28 @@ def render_game_mediums(game):
     return {
         'game': game,
     }
+
+@register.inclusion_tag('scenario_title.html')
+def render_scenario_title_without_link(scenario):
+    return {
+        "scenario": scenario,
+        "render_link": False,
+    }
+
+@register.inclusion_tag('scenario_title.html', takes_context=True)
+def render_scenario_title_check_for_link(context, scenario):
+    request = context["request"] if "request" in context else None
+    if not request:
+        raise ValueError("Scenario tag had no context")
+    return {
+        "scenario": scenario,
+        "render_link": scenario.player_discovered(request.user),
+    }
+
+
+@register.inclusion_tag('scenario_title.html')
+def render_scenario_title_with_link(scenario):
+    return {
+        "scenario": scenario,
+        "render_link": True,
+    }

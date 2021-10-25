@@ -95,13 +95,13 @@
                         Click here to RSVP
                     </a>
                 </h4>
-                {% if can_view_scenario %}
+                {% if scenario_spoiled %}
                     <div class="alert alert-warning text-center">
-                        <h4>You have already discovered this Scenario</h4>
+                        <h4>You have already spoiled this Scenario</h4>
                         <p>
-                            You have already discovered the Scenario
+                            You have already spoiled the Scenario
                             <a href="{% url 'games:games_view_scenario' game.scenario.id %}">{{game.scenario.title}}</a>
-                            and have access to the full writeup, including spoilers.
+                            and have access to the full writeup.
                             <br>
                             You should only play in this Game as an NPC Ringer.
                         </p>

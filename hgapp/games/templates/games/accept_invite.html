@@ -46,7 +46,7 @@
                 {% else %}
                     {{ form.attending_character | bootstrap }}
                 {% endif %}
-                {% if can_view_scenario %}
+                {% if scenario_spoiled %}
                     <div class="alert alert-warning text-center">
                         <h3>You have already discovered this Scenario</h3>
                         <p>

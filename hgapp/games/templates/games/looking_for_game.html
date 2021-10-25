@@ -75,7 +75,7 @@
                         <div class="thumbnail">
                             <h3 class="text-center" style="margin-top:10px;">
                                 <a href="{% url 'games:games_view_game' game.id %}">
-                                    {{game.scenario.title}}
+                                    {% render_scenario_title_without_link scenario %}
                                 </a>
                             </h3>
                             <p class="text-center">
@@ -158,7 +158,7 @@
                             {% render_gm_title game.gm %}
                             ran
                             <a href="{% url 'games:games_view_game' game.id %}">
-                                {{game.scenario.title}}
+                                {% render_scenario_title_without_link game.scenario %}
                             </a>
                             {{game.end_time|timesince}} ago
                         </h5>

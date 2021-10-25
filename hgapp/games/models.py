@@ -5,6 +5,7 @@ from characters.models import Character, HIGH_ROLLER_STATUS, Character_Death, Ex
 from powers.models import Power
 from cells.models import Cell
 from django.utils import timezone
+from bs4 import BeautifulSoup
 import datetime
 from guardian.shortcuts import assign_perm
 from postman.api import pm_write
@@ -271,6 +272,8 @@ class Game(models.Model):
                                is_new_player_gm_reward=True)
             gm_reward.save()
         self._grant_gm_exp_reward()
+        self.scenario.grant_or_void_reward_as_necessary()
+
 
     def _grant_gm_exp_reward(self):
         if self.gm_experience_reward and not self.gm_experience_reward.is_void:
@@ -726,6 +729,38 @@ class Scenario(models.Model):
     def is_valid(self):
         return self.num_words > 1000
 
+    def get_steps_to_receive_improvement(self):
+        reasons = []
+        if not self.is_valid():
+            reasons.append("Minimum 1000 words. ")
+        if self.num_finished_games() == 0:
+            reasons.append("Must be run as a Contract. ")
+        return reasons
+
+    def get_active_improvement(self):
+        return get_object_or_none(Reward,
+                                  rewarded_player=self.creator,
+                                  relevant_scenario=self,
+                                  is_void=False)
+
+    def _grant_reward(self):
+        reward = Reward(relevant_scenario=self,
+                        rewarded_player=self.creator,
+                        is_improvement=True)
+        reward.save()
+
+    def grant_or_void_reward_as_necessary(self):
+        improvement_steps = self.get_steps_to_receive_improvement()
+        active_improvement = self.get_active_improvement()
+        if len(improvement_steps) == 0:
+            # should have improvement
+            if not active_improvement:
+                self._grant_reward()
+        else:
+            # shouldn't have improvement
+            if active_improvement:
+                active_improvement.mark_void()
+
     def update_stats(self):
         self.times_run = self.game_set.exclude(get_completed_game_excludes_query()).count()
         self.num_gms_run = Game.objects \
@@ -764,7 +799,7 @@ class Scenario(models.Model):
         return self.game_set.filter(status__in=[GAME_STATUS[2][0], GAME_STATUS[3][0], GAME_STATUS[6][0]]).all()
 
     def num_finished_games(self):
-        return len(self.finished_games())
+        return self.finished_games().count()
 
     def played_discovery(self, player):
         if not player.scenario_set.filter(id=self.id).exists():
@@ -791,7 +826,12 @@ class Scenario(models.Model):
     def is_stock(self):
         return self.tags.count() > 0
 
+    def __update_word_count(self):
+        soup = BeautifulSoup(self.description, features="html5lib")
+        self.num_words = len(soup.text.split())
+
     def save(self, *args, **kwargs):
+        self.__update_word_count()
         if self.pk is None:
             super(Scenario, self).save(*args, **kwargs)
             discovery = Scenario_Discovery (
@@ -803,6 +843,7 @@ class Scenario(models.Model):
             discovery.save()
         else:
             super(Scenario, self).save(*args, **kwargs)
+        self.grant_or_void_reward_as_necessary()
 
 
 class Scenario_Discovery(models.Model):
@@ -845,6 +886,11 @@ class Cycle(models.Model):
 class Reward(models.Model):
     relevant_game = models.ForeignKey(
         Game,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE)
+    relevant_scenario = models.ForeignKey(
+        Scenario,
         null=True,
         blank=True,
         on_delete=models.CASCADE)
@@ -971,6 +1017,8 @@ class Reward(models.Model):
                 reason = "playing in "
             reason = reason + self.relevant_game.scenario.title
             return reason
+        if self.relevant_scenario:
+            reason = "writing up " + self.relevant_scenario.title
         if self.source_asset:
             return "the Asset " + self.source_asset.relevant_asset.name
         if self.is_charon_coin:

@@ -261,12 +261,50 @@
                 </div>
             </div>
         </div>
-        <br>
         <div class="panel panel-default">
             <div class="panel-heading text-center">
                 <a role="button" data-toggle="collapse" href="#collapseWriteup" aria-expanded="true" aria-controls="collapseWriteup">
                     <div class="panel-heading text-center" role="tab" id="writeupHeading">
-                        <h3>Writeup for {{scenario.title}}</h3>
+                        <h3
+                                {% if scenario.is_valid %}
+                                class="css-scenario-with-writeup-title"
+                                {% endif %}
+                        >
+                            Writeup for {{scenario.title}}
+                            <br>
+                            <small>
+                                {% if scenario.get_active_improvement %}
+                                <span class="glyphicon glyphicon-star css-scenario-rewarded-star" aria-hidden="true"
+                                      data-toggle="tooltip"
+                                      {% if request.user and scenario.creator == request.user %}
+                                      title='This Scenario has a valid writeup and was run as a Contract, granting you an Improvement.'
+                                      {% else %}
+                                      title='This Scenario has a valid writeup and was run as a Contract, granting its creator an Improvement.'
+                                      {% endif %}
+                                >
+                                    </span>
+                                {% else %}
+                                <span class="glyphicon glyphicon-star" aria-hidden="true"
+                                      data-toggle="tooltip"
+                                      title='This Scenario does not meet the requirements to grant an Improvement: {% for reason in scenario.get_steps_to_receive_improvement %} {{reason}} {% endfor %}'
+                                >
+                                    </span>
+                                {% endif %}
+                                {% if scenario.is_valid %}
+                                    <img class ="css-valid-quill-img"
+                                         src="{% static 'journals/quill.svg' %}"
+                                         data-toggle="tooltip"
+                                         title='This Scenario has a full writeup. Word count: {{scenario.num_words}}'
+                                    />
+                                {% else %}
+                                    <i class="fa fa-exclamation-circle fa-1x"
+                                       data-toggle="tooltip"
+                                       title="This Scenario's writeup is too short for credit"
+                                    ></i>
+                                {% endif %}
+                                Word count: {{scenario.num_words}}
+                            </small>
+                        </h3>
                     </div>
                 </a>
             </div>
