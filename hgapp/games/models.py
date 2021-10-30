@@ -1018,7 +1018,7 @@ class Reward(models.Model):
             reason = reason + self.relevant_game.scenario.title
             return reason
         if self.relevant_scenario:
-            reason = "writing up " + self.relevant_scenario.title
+            return "writing up " + self.relevant_scenario.title
         if self.source_asset:
             return "the Asset " + self.source_asset.relevant_asset.name
         if self.is_charon_coin:

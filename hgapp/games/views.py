@@ -225,7 +225,7 @@ def create_game(request, cell_id=None):
                 allow_ringers=form.cleaned_data['allow_ringers'],
                 max_rsvp=form.cleaned_data['max_rsvp'],
                 gametime_url=form.cleaned_data['gametime_url'],
-        )
+                )
             if 'only_over_18' in form.cleaned_data:
                 game.is_nsfw = form.cleaned_data['only_over_18']
             if form.cleaned_data['scenario']:
