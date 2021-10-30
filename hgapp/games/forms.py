@@ -79,7 +79,7 @@ def make_game_form(user):
         all_cells = user.cell_set.all()
         cell_ids = {cell.id for cell in all_cells if cell.player_can_run_games(user)}
         queryset = user.cell_set.filter(id__in=cell_ids).all()
-        scenario = ScenarioModelChoiceField(queryset=user.scenario_set.filter(scenario_discovery__is_spoiled=True).all(),
+        scenario = ScenarioModelChoiceField(queryset=user.scenario_set.filter(scenario_discovery__is_spoiled=True).order_by("-num_words").all(),
                                           empty_label="Create New Scenario",
                                           required=False,
                                           help_text='Select the Scenario that the Game will follow.')

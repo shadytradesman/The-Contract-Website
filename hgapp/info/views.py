@@ -45,7 +45,7 @@ def leaderboard(request):
 
     top_scenario_runs = Scenario.objects.order_by('-times_run')[:num_to_fetch]
     top_scenario_gms = Scenario.objects.order_by('-num_gms_run')[:num_to_fetch]
-    top_scenario_deadliness = Scenario.objects.filter(num_gms_run__gt=3).order_by('-deadliness_ratio')[:num_to_fetch]
+    top_scenario_deadliness = Scenario.objects.filter(num_gms_run__gt=2).order_by('-deadliness_ratio')[:num_to_fetch]
 
     context = {
         "top_players": top_players,

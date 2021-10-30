@@ -1,7 +1,11 @@
 {% load staticfiles %}
-
-{% if render_link %}
-    <a href="{% url 'games:games_view_scenario' scenario.id %}">
+<span>
+{% if render_link or custom_link%}
+    {% if custom_link %}
+        <a href="{{custom_link}}">
+    {% else %}
+        <a href="{% url 'games:games_view_scenario' scenario.id %}">
+    {% endif %}
 {% endif %}
 
 <span
@@ -20,21 +24,31 @@
     >
         {{scenario.title}}
     </span>
-    {% if scenario.is_valid %}
-        <img class ="css-valid-quill-img"
-             src="{% static 'journals/quill.svg' %}"
-             data-toggle="tooltip"
-             title='This Scenario has a full writeup. Word count: {{scenario.num_words}}'
-        />
-    {% else %}
-        <img class ="css-quill-img"
-             src="{% static 'journals/quill.svg' %}"
-             data-toggle="tooltip"
-             title="This Scenario's writeup is too short for credit. Word count: {{scenario.num_words}}"
-        />
-    {% endif %}
 </span>
-
-{% if render_link %}
-    </a>
+{% if render_link or custom_link %}
+        </a>
 {% endif %}
+{% if scenario.is_valid %}
+    <img class ="css-valid-quill-img"
+         src="{% static 'journals/quill.svg' %}"
+         data-toggle="tooltip"
+         title='This Scenario has a full writeup. Word count: {{scenario.num_words}}'
+    />
+{% else %}
+    <img class ="css-quill-img"
+         src="{% static 'journals/quill.svg' %}"
+         data-toggle="tooltip"
+         title="This Scenario's writeup is too short for credit. Word count: {{scenario.num_words}}"
+    />
+{% endif %}
+<span
+        class="visible-xs-inline-block"
+        data-toggle="tooltip"
+        title='This Scenario has been run {{ scenario.times_run }} time{{scenario.times_run|pluralize}}
+        by a total of {{ scenario.num_gms_run }} GM{{scenario.num_gms_run|pluralize}}.
+        Victories: {{scenario.num_victories}}
+        Deaths: {{scenario.num_deaths}}'
+>
+<i class="fa fa-question-circle fa-1x" style="margin-left: -5px;"></i>
+</span>
+</span>

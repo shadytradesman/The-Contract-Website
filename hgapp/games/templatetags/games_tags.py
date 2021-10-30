@@ -21,10 +21,11 @@ def render_game_mediums(game):
     }
 
 @register.inclusion_tag('scenario_title.html')
-def render_scenario_title_without_link(scenario):
+def render_scenario_title_without_link(scenario, custom_link=None):
     return {
         "scenario": scenario,
         "render_link": False,
+        "custom_link": custom_link,
     }
 
 @register.inclusion_tag('scenario_title.html', takes_context=True)

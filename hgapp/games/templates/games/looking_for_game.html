@@ -74,9 +74,8 @@
                     <div class="col-md-6">
                         <div class="thumbnail">
                             <h3 class="text-center" style="margin-top:10px;">
-                                <a href="{% url 'games:games_view_game' game.id %}">
-                                    {% render_scenario_title_without_link scenario %}
-                                </a>
+                                {% url 'games:games_view_game' game.id as custom_link %}
+                                {% render_scenario_title_without_link game.scenario custom_link %}
                             </h3>
                             <p class="text-center">
                                 <b>Start time:</b>
@@ -154,13 +153,20 @@
                             <a href="{% url 'profiles:profiles_view_profile' game.gm.id %}">
                                 {% user_display game.gm %}
                             </a>
-                            the
-                            {% render_gm_title game.gm %}
+                            <span class="hidden-xs">
+                                the
+                                {% render_gm_title game.gm %}
+                            </span>
                             ran
-                            <a href="{% url 'games:games_view_game' game.id %}">
-                                {% render_scenario_title_without_link game.scenario %}
-                            </a>
+                            {% url 'games:games_view_game' game.id as custom_link %}
+                            {% render_scenario_title_without_link game.scenario custom_link %}
+                            <br class="visible-xs">
                             {{game.end_time|timesince}} ago
+                                <span class="visible-xs-block">
+                                <br class="visible-xs">
+                                GM Title:
+                                {% render_gm_title game.gm %}
+                            </span>
                         </h5>
                     </div>
 
