@@ -646,6 +646,11 @@ class Game_Invite(models.Model):
     class Meta:
         unique_together = (("invited_player", "relevant_game"))
 
+    def __str__(self):
+        status = "DECLINED" if self.is_declined else "ACCEPTED" if hasattr(self, "attendance") and self.attendance \
+            else "OPEN" if self.relevant_game.is_scheduled() else "EXPIRED"
+        return "[{}] {} invitation to {}".format(status, self.invited_player.username, self.relevant_game.scenario.title)
+
     def notify_invitee(self, request, game):
         # This string is considered "safe" only because the markdown renderer will escape malicious HTML and scripts.
         message_body = SafeText('###{0} has invited you to an upcoming Game in {1}\n\n{2}\n\n [Click Here]({3}) to respond.'

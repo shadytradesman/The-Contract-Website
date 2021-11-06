@@ -419,7 +419,7 @@ def accept_invite(request, game_id):
                                  relevant_game=game)
             if game.scenario in request.user.scenario_set.all():
                 invite.as_ringer = True
-        form =  make_accept_invite_form(invite)(request.POST)
+        form = make_accept_invite_form(invite)(request.POST)
         if form.is_valid():
             game_attendance = invite.attendance
             with transaction.atomic():
