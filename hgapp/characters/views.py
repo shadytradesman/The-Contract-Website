@@ -29,6 +29,8 @@ from cells.models import Cell
 
 from hgapp.utilities import get_object_or_none
 
+from games.game_utilities import get_character_contacts
+
 def __check_edit_perms(request, character, secret_key):
     if request.user.is_superuser:
         return True
@@ -334,6 +336,15 @@ def choose_powers(request, character_id):
         'unassigned_powers': unassigned_powers,
     }
     return render(request, 'characters/choose_powers.html', context)
+
+def view_character_contacts(request, character_id):
+    character = get_object_or_404(Character, id=character_id)
+    contacts = get_character_contacts(character)
+    context = {
+        'character': character,
+        'contacts': dict(contacts),
+    }
+    return render(request, 'characters/view_character_contacts.html', context)
 
 
 def toggle_power(request, character_id, power_full_id):

@@ -842,3 +842,4 @@ class LookingForGame(View):
             'completed_games': completed_games,
         }
         return context
+

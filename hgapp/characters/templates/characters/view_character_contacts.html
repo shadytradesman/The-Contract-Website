@@ -1,0 +1,83 @@
+
+{% extends "site_base.html" %}
+
+{% load i18n %}
+
+{% block head_title %}Viewing Character{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% load account_tags %}
+{% load staticfiles %}
+
+{% block body_base %}
+<div class="container text-center">
+    <h1>
+        <a href="{% url 'characters:characters_view' character.id %}">{{character.name}}'s</a>
+        Encountered Contractors
+    </h1>
+</div>
+<div class="container">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <ul class="list-unstyled">
+                {% for character_seen, game_list in contacts.items %}
+                    <li>
+                        <h3>
+                            <a href="{% url 'characters:characters_view' character_seen.id %}">
+                                {{character_seen.name}}
+                            </a>
+                        </h3>
+                        <ul style="list-style: none;">
+                            <b>Encountered on</b>
+                            {% for num, game in game_list %}
+                                <li>
+                                    Contract {{num}}:
+                                    <a href="{% url 'games:games_view_game' game.id %}">
+                                        {{game.scenario.title}}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+
+                {% empty %}
+                {{character.name}} has not met anyone yet.
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+    <div class="panel-group" id="accordion">
+        {% if tombstones.Veteran %}
+        <h2>Veterans</h2>
+        {% endif %}
+        {% for tombstone in tombstones.Veteran %}
+        {% include 'characters/tombstone_snippet.html' %}
+        {% endfor %}
+
+        {% if tombstones.Seasoned %}
+        <h2>Seasoned</h2>
+        {% endif %}
+        {% for tombstone in tombstones.Seasoned %}
+        {% include 'characters/tombstone_snippet.html' %}
+        {% endfor %}
+
+        {% if tombstones.Novice %}
+        <h3>Novices</h3>
+        {% endif %}
+        {% for tombstone in tombstones.Novice %}
+        {% include 'characters/tombstone_snippet.html' %}
+        {% endfor %}
+
+
+        {% if tombstones.Newbie %}
+        <h4>Newbies</h4>
+        {% endif %}
+        {% for tombstone in tombstones.Newbie %}
+        {% include 'characters/tombstone_snippet.html' %}
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

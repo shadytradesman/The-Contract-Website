@@ -1,7 +1,16 @@
 {% load games_tags %}
 {% load markdown_deux_tags %}
 
-{% if chracter.background or user_can_edit %}
+{% if character.number_of_victories %}
+<div class="text-center">
+    <h4>
+        <a href="{% url 'characters:characters_view_contacts' character.id %}">
+            View {{character.name}}'s Encountered Contractors
+        </a>
+    </h4>
+</div>
+{% endif %}
+{% if character.background or user_can_edit %}
     <h3>Biography</h3>
     <div class="thumbnail">
         {% if character.background or user_can_edit %}
@@ -129,7 +138,7 @@
     {% endfor %}
 </ul>
 {% endif %}
-{% if character.spent_rewards|length > 0 %}
+{% if character.spent_rewards %}
 <h4>Gift / Reward History</h4>
 <ul >
     {% for reward in character.spent_rewards %}

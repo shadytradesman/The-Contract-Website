@@ -9,6 +9,9 @@ urlpatterns = [
     # ex: .com/characters/view/c/110/6db20aef104038d363eca31985142c08daa82be57e29e53ad3c8171b9d46083f
     url(r'^view/c/(?P<character_id>[\d]+)/(?P<secret_key>[\da-z]*)$', views.view_character, name='characters_view'),
 
+    # ex: .com/characters/view-contacts/c/110
+    url(r'^view-contacts/c/(?P<character_id>[\d]+)/$', views.view_character_contacts, name='characters_view_contacts'),
+
     # ex: .com/characters/reward/c/110
     url(r'^reward/c/(?P<character_id>[\d]+)/$', views.spend_reward, name='characters_spend_reward'),
 

@@ -72,9 +72,9 @@
                     <li>
                         <a href="{% url 'games:games_view_game' game_invite.relevant_game.id %}">
                             {% if game_invite.attendance %}
-                            <b>Attending - </b>
+                                <b>Attending - </b>
                             {% else %}
-                            <b>Invited - </b>
+                                <b>Invited - </b>
                             {% endif %}
                             <b>
                                 {{game_invite.relevant_game.title}}
