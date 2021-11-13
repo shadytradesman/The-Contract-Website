@@ -8,7 +8,7 @@ from django.urls import reverse
 
 from games.models import Game_Attendance, Reward
 
-from characters.models import Character, ExperienceReward
+from characters.models import Character, ExperienceReward, EXP_JOURNAL
 
 from hgapp.utilities import get_object_or_none
 
@@ -101,6 +101,7 @@ class Journal(models.Model):
             exp_reward = ExperienceReward(
                 rewarded_character=character,
                 rewarded_player=character.player,
+                type=EXP_JOURNAL,
             )
             exp_reward.save()
             self.experience_reward = exp_reward

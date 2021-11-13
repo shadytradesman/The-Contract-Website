@@ -3,13 +3,16 @@ from django.contrib.auth.models import AnonymousUser, User
 from django.db.utils import IntegrityError
 from django.db import transaction
 from characters.models import Character, ContractStats, Asset, Liability, AssetDetails, LiabilityDetails, Attribute, \
-    AttributeValue, Ability, AbilityValue, ExperienceReward, EXP_NEW_CHAR, EXP_LOSS, EXP_WIN
+    AttributeValue, Ability, AbilityValue, ExperienceReward, EXP_NEW_CHAR
 from games.models import Game, Game_Attendance, Reward, Game_Invite, GAME_STATUS, OUTCOME, WIN, LOSS, DEATH, DECLINED, \
     RINGER_VICTORY, RINGER_FAILURE, Scenario
 
 from cells.models import Cell
 from profiles.signals import make_profile_for_new_user
 from django.utils import timezone
+
+EXP_LOSS = 2
+EXP_WIN = 4
 
 def make_test_char(player, cell=None):
     return Character.objects.create(

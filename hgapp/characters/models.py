@@ -142,14 +142,53 @@ Track your current equipment here. You may start with anything your Contractor w
 * Metal water bottle
 * Toiletries kit
 """
-
 # EXPERIENCE CONSTANTS
 # These can be changed at will as the historical values are all dynamically calculated.
-EXP_MVP = 2
-EXP_LOSS = 2
-EXP_WIN = 4
-EXP_GM = 4
-EXP_JOURNAL = 1
+
+EXP_MVP = "MVP"
+EXP_LOSS_V1 = "LOSS_V1"
+EXP_LOSS_RINGER_V1 = "LOSS_RINGER_V1"
+EXP_WIN_V1 = "WIN_V1"
+EXP_WIN_RINGER_V1 = "WIN_RINGER_V1"
+EXP_LOSS_V2 = "LOSS_V2"
+EXP_LOSS_RINGER_V2 = "LOSS_RINGER_V2"
+EXP_WIN_V2 = "WIN_V2"
+EXP_WIN_RINGER_V2 = "WIN_RINGER_V2"
+EXP_IN_WORLD_GAME = "IN_WORLD"
+EXP_GM = "GM"
+EXP_JOURNAL = "JOURNAL"
+EXP_CUSTOM = "CUSTOM"
+EXP_REWARD_TYPE = (
+    (EXP_MVP, "earning MVP"),
+    (EXP_LOSS_V1, "losing"),
+    (EXP_LOSS_RINGER_V1, "losing as a ringer"),
+    (EXP_WIN_V1, "winning"),
+    (EXP_WIN_RINGER_V1, "winning as a ringer"),
+    (EXP_LOSS_V2, "losing"),
+    (EXP_LOSS_RINGER_V2, "losing as a ringer"),
+    (EXP_WIN_V2, "winning"),
+    (EXP_WIN_RINGER_V2, "winning as a ringer"),
+    (EXP_IN_WORLD_GAME, "playing in-World"),
+    (EXP_GM, "GMing"),
+    (EXP_JOURNAL, "writing a journal"),
+    (EXP_CUSTOM, "custom reason"),
+)
+
+EXP_REWARD_VALUES = {
+    EXP_MVP: 2,
+    EXP_LOSS_V1: 2,
+    EXP_LOSS_RINGER_V1: 2,
+    EXP_WIN_V1: 4,
+    EXP_WIN_RINGER_V1: 4,
+    EXP_LOSS_V2: 1,
+    EXP_LOSS_RINGER_V2: 1,
+    EXP_WIN_V2: 3,
+    EXP_WIN_RINGER_V2: 3,
+    EXP_IN_WORLD_GAME: 2,
+    EXP_GM: 4,
+    EXP_JOURNAL: 1,
+}
+
 EXP_NEW_CHAR = 150
 EXP_COST_QUIRK_MULTIPLIER = 3
 EXP_ADV_COST_ATTR_MULTIPLIER = 4
@@ -961,70 +1000,45 @@ class ExperienceReward(models.Model):
                                            on_delete=models.CASCADE)
     rewarded_player = models.ForeignKey(settings.AUTH_USER_MODEL,
                                         on_delete=models.CASCADE)
+    type = models.CharField(choices=EXP_REWARD_TYPE,
+                            max_length=45,
+                            default=EXP_MVP)
     is_void = models.BooleanField(default=False)
     custom_reason = models.CharField(max_length=150, blank=True, null=True)
     custom_value = models.PositiveIntegerField(blank=True, null=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['rewarded_character', 'created_time']),
+            models.Index(fields=['rewarded_character', 'is_void', 'type']),
+            models.Index(fields=['rewarded_player', 'rewarded_character']),
+        ]
 
     def mark_void(self):
         self.is_void = True
         self.save()
 
-    # returns one of several potential classes. Intended to be used with visitor pattern
-    def get_source(self):
-        if hasattr(self, 'game_attendance'):
-            return self.game_attendance
-        if hasattr(self, 'game'):
-            return self.game
-        elif hasattr(self, 'journal'):
-            return self.journal
-        if hasattr(self, 'custom_reason') and self.custom_reason:
-            return self.custom_reason
-        self.log_bad_source()
-        raise ValueError("Experience reward has no source: " + str(self.pk))
-
     def source_blurb(self):
         if hasattr(self, 'custom_reason') and self.custom_reason:
             return mark_safe(self.custom_reason)
+        reason = "from {}".format(self.get_type_display())
+        if self.type == EXP_GM:
+            return "{} {}".format(reason, self.game.scenario.title)
+        if self.type == EXP_JOURNAL:
+            return mark_safe(reason)
         if hasattr(self, 'game_attendance'):
             attendance = self.game_attendance
-            if attendance.is_victory():
-                outcome = "winning"
-            elif attendance.is_ringer_victory():
-                outcome = "winning as a ringer in"
-            else:
-                outcome = "losing"
-            return "from {} {}".format(outcome, self.game_attendance.relevant_game.scenario.title)
-        elif hasattr(self, 'game'):
-            return "from GMing " + self.game.scenario.title
-        elif hasattr(self, 'journal'):
-            return "from writing a journal"
+            return "{} in {}".format(reason, attendance.relevant_game.scenario.title)
         else:
             self.log_bad_source()
-            raise ValueError("Experience reward has no source: " + str(self.pk))
+            raise ValueError("Experience reward has bad source: " + str(self.pk))
 
     def get_value(self):
         if self.is_void:
             return 0
         if hasattr(self, 'custom_value') and self.custom_value:
             return self.custom_value
-        if hasattr(self, 'game_attendance'):
-            attendance = self.game_attendance
-            value = 0
-            # if attendance.is_mvp():
-            #     value = value + EXP_MVP
-            if attendance.is_victory():
-                value = value + EXP_WIN
-            elif attendance.is_ringer_victory():
-                value = value + EXP_WIN
-            else:
-                value = value + EXP_LOSS
-            return value
-        if hasattr(self, 'game'):
-            return EXP_GM
-        if hasattr(self, 'journal'):
-            return EXP_JOURNAL
-        self.log_bad_source()
-        raise ValueError("Experience reward has no source: " + str(self.pk))
+        return EXP_REWARD_VALUES[self.type]
 
     def log_bad_source(self):
         logger.error('Experience reward %s for character %s has no source.', str(self.pk), str(self.rewarded_character))
