@@ -3,7 +3,8 @@ from django.contrib.auth.models import AnonymousUser, User
 from django.db.utils import IntegrityError
 from django.db import transaction
 from characters.models import Character, ContractStats, Asset, Liability, AssetDetails, LiabilityDetails, Attribute, \
-    AttributeValue, Ability, AbilityValue, ExperienceReward, EXP_NEW_CHAR
+    AttributeValue, Ability, AbilityValue, ExperienceReward, EXP_NEW_CHAR, EXP_REWARD_VALUES, EXP_WIN_V2, EXP_LOSS_V2, \
+    EXP_LOSS_IN_WORLD_V2, EXP_WIN_IN_WORLD_V2
 from games.models import Game, Game_Attendance, Reward, Game_Invite, GAME_STATUS, OUTCOME, WIN, LOSS, DEATH, DECLINED, \
     RINGER_VICTORY, RINGER_FAILURE, Scenario
 
@@ -11,8 +12,10 @@ from cells.models import Cell
 from profiles.signals import make_profile_for_new_user
 from django.utils import timezone
 
-EXP_LOSS = 2
-EXP_WIN = 4
+EXP_LOSS = EXP_REWARD_VALUES[EXP_LOSS_V2]
+EXP_LOSS_IN_WORLD = EXP_REWARD_VALUES[EXP_LOSS_IN_WORLD_V2]
+EXP_WIN = EXP_REWARD_VALUES[EXP_WIN_V2]
+EXP_WIN_IN_WORLD = EXP_REWARD_VALUES[EXP_WIN_IN_WORLD_V2]
 
 def make_test_char(player, cell=None):
     return Character.objects.create(
@@ -170,7 +173,7 @@ class GameModelTests(TestCase):
         self.assertEquals(self.char_user1_cell.number_of_victories(), 1)
         self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
         self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
-        self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR + EXP_WIN)
+        self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR + EXP_WIN_IN_WORLD)
         self.scenario.update_stats()
         self.assertEquals(self.scenario.num_victories, 1)
         self.assertEquals(self.scenario.num_gms_run, 1)
@@ -219,7 +222,7 @@ class GameModelTests(TestCase):
         self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
         self.assertEquals(self.char_user1_cell.number_of_losses(), 1)
         self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
-        self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR + EXP_LOSS)
+        self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR + EXP_LOSS_IN_WORLD)
         self.scenario.update_stats()
         self.assertEquals(self.scenario.num_victories, 0)
         self.assertEquals(self.scenario.num_gms_run, 1)
@@ -426,6 +429,14 @@ class GameModelTests(TestCase):
         self.assertEquals(self.char_user2_nocell.stats_snapshot.sources.count(), 0)
         self.assertEquals(self.char_user2_nocell.exp_earned(), EXP_NEW_CHAR)
         self.assertEquals(self.user2.game_invite_set.filter(attendance__is_confirmed=False).exclude(is_declined=True).all().count(), 1)
+        attendance.confirm_and_reward()
+        self.assertEquals(self.char_user2_nocell.num_unspent_rewards(), 1)
+        self.assertEquals(self.char_user2_nocell.num_unspent_gifts(), 1)
+        self.assertEquals(self.char_user2_nocell.completed_games().count(), 1)
+        self.assertEquals(self.char_user2_nocell.number_of_victories(), 1)
+        self.assertEquals(self.char_user2_nocell.number_of_losses(), 0)
+        self.assertEquals(self.char_user2_nocell.exp_earned(), EXP_NEW_CHAR + EXP_WIN)
+        self.assertEquals(self.user2.game_invite_set.filter(attendance__is_confirmed=False).exclude(is_declined=True).all().count(), 0)
 
     def test_cannot_double_invite(self):
         game = Game(
@@ -495,7 +506,7 @@ class GameModelTests(TestCase):
             self.assertEquals(self.char_user1_cell.number_of_victories(), 1)
             self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
             self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
-            self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR + EXP_WIN)
+            self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR + EXP_WIN_IN_WORLD)
             self.assertEquals(self.user1.profile.get_avail_improvements().count(), 0)
             self.assertEquals(self.user1.profile.get_avail_charon_coins().count(), 0)
             self.assertEquals(self.user1.profile.get_avail_exp_rewards().count(), 0)
@@ -512,7 +523,7 @@ class GameModelTests(TestCase):
             self.assertEquals(self.char_user1_cell.number_of_victories(), 0)
             self.assertEquals(self.char_user1_cell.number_of_losses(), 1)
             self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
-            self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR + EXP_LOSS)
+            self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR + EXP_LOSS_IN_WORLD)
             self.assertEquals(self.user1.profile.get_avail_improvements().count(), 0)
             self.assertEquals(self.user1.profile.get_avail_charon_coins().count(), 0)
             self.assertEquals(self.user1.profile.get_avail_exp_rewards().count(), 0)
@@ -528,7 +539,7 @@ class GameModelTests(TestCase):
             self.assertEquals(self.char_user1_cell.number_of_victories(), 1)
             self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
             self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
-            self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR + EXP_WIN)
+            self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR + EXP_WIN_IN_WORLD)
             self.assertEquals(self.user1.profile.get_avail_improvements().count(), 0)
             self.assertEquals(self.user1.profile.get_avail_charon_coins().count(), 0)
             self.assertEquals(self.user1.profile.get_avail_exp_rewards().count(), 0)
@@ -595,7 +606,7 @@ class GameModelTests(TestCase):
             self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR)
             self.assertEquals(self.user1.profile.get_avail_improvements().count(), 0)
             self.assertEquals(self.user1.profile.get_avail_charon_coins().count(), 0)
-            self.assertEquals(self.user1.profile.get_avail_exp_rewards().count(), 0)
+            self.assertEquals(self.user1.profile.get_avail_exp_rewards().count(), 1)
 
             attendance.refresh_from_db()
             attendance.change_outcome(new_outcome=WIN, is_confirmed=True, attending_character=self.char_user1_cell)
@@ -608,7 +619,7 @@ class GameModelTests(TestCase):
             self.assertEquals(self.char_user1_cell.number_of_victories(), 1)
             self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
             self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
-            self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR + EXP_WIN)
+            self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR + EXP_WIN_IN_WORLD)
             self.assertEquals(self.user1.profile.get_avail_improvements().count(), 0)
             self.assertEquals(self.user1.profile.get_avail_charon_coins().count(), 0)
             self.assertEquals(self.user1.profile.get_avail_exp_rewards().count(), 0)
@@ -657,7 +668,7 @@ class GameModelTests(TestCase):
             self.assertEquals(self.char_user1_cell.number_of_victories(), 1)
             self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
             self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
-            self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR + EXP_WIN)
+            self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR + EXP_WIN_IN_WORLD)
             self.assertEquals(self.user1.profile.get_avail_improvements().count(), 0)
             self.assertEquals(self.user1.profile.get_avail_charon_coins().count(), 0)
             self.assertEquals(self.user1.profile.get_avail_exp_rewards().count(), 0)
@@ -683,7 +694,7 @@ class GameModelTests(TestCase):
             self.assertEquals(self.char_user1_cell2.number_of_victories(), 1)
             self.assertEquals(self.char_user1_cell2.number_of_losses(), 0)
             self.assertEquals(self.char_user1_cell2.stats_snapshot.sources.count(), 0)
-            self.assertEquals(self.char_user1_cell2.exp_earned(), EXP_NEW_CHAR + EXP_WIN)
+            self.assertEquals(self.char_user1_cell2.exp_earned(), EXP_NEW_CHAR + EXP_WIN_IN_WORLD)
 
             self.assertEquals(self.user1.profile.get_avail_improvements().count(), 0)
             self.assertEquals(self.user1.profile.get_avail_charon_coins().count(), 0)
@@ -820,7 +831,7 @@ class GameModelTests(TestCase):
             self.assertEquals(self.char_user1_cell.number_of_victories(), 1)
             self.assertEquals(self.char_user1_cell.number_of_losses(), 0)
             self.assertEquals(self.char_user1_cell.stats_snapshot.sources.count(), 0)
-            self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR + EXP_WIN)
+            self.assertEquals(self.char_user1_cell.exp_earned(), EXP_NEW_CHAR + EXP_WIN_IN_WORLD)
             self.assertEquals(self.user1.profile.get_avail_improvements().count(), 0)
             self.assertEquals(self.user1.profile.get_avail_charon_coins().count(), 0)
             self.assertEquals(self.user1.profile.get_avail_exp_rewards().count(), 0)
@@ -875,7 +886,7 @@ class GameModelTests(TestCase):
             self.assertEquals(self.char_user1_cell2.number_of_victories(), 1)
             self.assertEquals(self.char_user1_cell2.number_of_losses(), 0)
             self.assertEquals(self.char_user1_cell2.stats_snapshot.sources.count(), 0)
-            self.assertEquals(self.char_user1_cell2.exp_earned(), EXP_NEW_CHAR + EXP_WIN)
+            self.assertEquals(self.char_user1_cell2.exp_earned(), EXP_NEW_CHAR + EXP_WIN_IN_WORLD)
 
             self.assertEquals(self.user1.profile.get_avail_improvements().count(), 0)
             self.assertEquals(self.user1.profile.get_avail_charon_coins().count(), 0)

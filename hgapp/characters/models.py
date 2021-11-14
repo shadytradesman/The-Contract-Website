@@ -151,10 +151,11 @@ EXP_LOSS_RINGER_V1 = "LOSS_RINGER_V1"
 EXP_WIN_V1 = "WIN_V1"
 EXP_WIN_RINGER_V1 = "WIN_RINGER_V1"
 EXP_LOSS_V2 = "LOSS_V2"
+EXP_LOSS_IN_WORLD_V2 = "LOSS_IN_WORLD_V2"
 EXP_LOSS_RINGER_V2 = "LOSS_RINGER_V2"
 EXP_WIN_V2 = "WIN_V2"
+EXP_WIN_IN_WORLD_V2 = "WIN_IN_WORLD_V2"
 EXP_WIN_RINGER_V2 = "WIN_RINGER_V2"
-EXP_IN_WORLD_GAME = "IN_WORLD"
 EXP_GM = "GM"
 EXP_JOURNAL = "JOURNAL"
 EXP_CUSTOM = "CUSTOM"
@@ -165,10 +166,11 @@ EXP_REWARD_TYPE = (
     (EXP_WIN_V1, "winning"),
     (EXP_WIN_RINGER_V1, "winning as a ringer"),
     (EXP_LOSS_V2, "losing"),
+    (EXP_LOSS_IN_WORLD_V2, "losing in-World Contract"),
     (EXP_LOSS_RINGER_V2, "losing as a ringer"),
     (EXP_WIN_V2, "winning"),
+    (EXP_WIN_IN_WORLD_V2, "winning in-World Contract"),
     (EXP_WIN_RINGER_V2, "winning as a ringer"),
-    (EXP_IN_WORLD_GAME, "playing in-World"),
     (EXP_GM, "GMing"),
     (EXP_JOURNAL, "writing a journal"),
     (EXP_CUSTOM, "custom reason"),
@@ -181,10 +183,11 @@ EXP_REWARD_VALUES = {
     EXP_WIN_V1: 4,
     EXP_WIN_RINGER_V1: 4,
     EXP_LOSS_V2: 1,
+    EXP_LOSS_IN_WORLD_V2: 3,
     EXP_LOSS_RINGER_V2: 1,
     EXP_WIN_V2: 3,
+    EXP_WIN_IN_WORLD_V2: 5,
     EXP_WIN_RINGER_V2: 3,
-    EXP_IN_WORLD_GAME: 2,
     EXP_GM: 4,
     EXP_JOURNAL: 1,
 }
