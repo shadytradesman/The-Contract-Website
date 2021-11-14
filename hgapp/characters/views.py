@@ -205,7 +205,7 @@ def view_character(request, character_id, secret_key = None):
         else:
             timeline[event[0].strftime("%d %b %Y")].append((event[1], event[2]))
 
-    char_ability_values = character.stats_snapshot.abilityvalue_set.order_by("relevant_ability__name").all()
+    char_ability_values = character.get_abilities()
     ability_value_by_id = {}
     char_value_ids = [x.relevant_ability.id for x in char_ability_values]
     primary_zero_values = [(x.name, x, 0) for x in Ability.objects.filter(is_primary=True).order_by("name").all()
@@ -270,12 +270,9 @@ def view_character(request, character_id, secret_key = None):
 
     assets = character.stats_snapshot.assetdetails_set.all()
     liabilities = character.stats_snapshot.liabilitydetails_set.all()
-    physical_attributes = character.get_attributes(is_physical=True)
-    mental_attributes = character.get_attributes(is_physical=False)
+    attributes = character.get_attributes()
     attribute_value_by_id = {}
-    for attr in physical_attributes:
-        attribute_value_by_id[attr.relevant_attribute.id] = attr.val_with_bonuses()
-    for attr in mental_attributes:
+    for attr in attributes:
         attribute_value_by_id[attr.relevant_attribute.id] = attr.val_with_bonuses()
     context = {
         'character': character,
@@ -283,8 +280,7 @@ def view_character(request, character_id, secret_key = None):
         'health_display': character.get_health_display(),
         'ability_value_by_name': ability_value_by_name,
         'ability_value_by_id': ability_value_by_id,
-        'physical_attributes': physical_attributes,
-        'mental_attributes': mental_attributes,
+        'attributes': attributes,
         'attribute_value_by_id': attribute_value_by_id,
         'timeline': dict(timeline),
         'tutorial': get_object_or_404(CharacterTutorial),

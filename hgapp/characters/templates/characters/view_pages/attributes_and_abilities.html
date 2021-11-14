@@ -1,75 +1,66 @@
-<div class ="row css-attributes">
-    <h2 class="text-center" data-toggle="tooltip" title='{{tutorial.attributes_view}}'>
-        Attributes
-    </h2>
-    {% for attribute_value in physical_attributes %}
-        <div class="col-md-2 col-xs-6">
-            <h4 data-toggle="tooltip" title='{{attribute_value.relevant_attribute.tutorial_text}}'>
-                <span class="stat-value visible-xs-inline">{{attribute_value.val_with_bonuses}}</span>
-                {{attribute_value.relevant_attribute.name}}
-                <span class="stat-value hidden-xs">{{attribute_value.val_with_bonuses}}</span>
-            </h4>
-        </div>
-    {% endfor %}
-    {% for attribute_value in mental_attributes %}
-        <div class="col-md-2 col-xs-6">
-            <h4 data-toggle="tooltip" title='{{attribute_value.relevant_attribute.tutorial_text}}'>
-                <span class="stat-value">{{attribute_value.val_with_bonuses}}</span>
-                {{attribute_value.relevant_attribute.name}}
-            </h4>
-        </div>
-    {% endfor %}
-</div>
-
-<hr>
 <div class ="row">
-    <div id="abilities-toggle" class="css-section-button text-center">
-        <h2 data-toggle="tooltip" title='{{tutorial.abilities_view}}' style="margin-top: 0px;">
-            Abilities
-        </h2>
+    <div class="col-lg-2 col-sm-3 col-xs-12 css-attributes">
+            <h2 class="text-center" data-toggle="tooltip" title='{{tutorial.attributes_view}}'>
+                Attributes
+            </h2>
+        <div class="row">
+            {% for attribute_value in attributes %}
+                    <div class="col-lg-8 col-md-8 col-sm-9 col-xs-4 text-right">
+                    <h4 data-toggle="tooltip" title='{{attribute_value.relevant_attribute.tutorial_text}}'>
+                            {{attribute_value.relevant_attribute.name}}
+                    </h4>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-3 col-xs-2 text-left">
+                        <h4 data-toggle="tooltip" title='{{attribute_value.relevant_attribute.tutorial_text}}'>
+                            <span class="stat-value">{{attribute_value.val_with_bonuses}}</span>
+                    </h4>
+                    </div>
+            {% endfor %}
+        </div>
     </div>
-    <div >
-        <div class="col-md-6">
-            <div class="row">
+    <div class="col-lg-10 col-sm-9 col-xs-12 css-abilities">
+        <div id="abilities-toggle" class="css-section-button text-center">
+            <h2 data-toggle="tooltip" title='{{tutorial.abilities_view}}'>
+                Abilities
+            </h2>
+        </div>
+        <div class ="row">
             {% for ability_value in ability_value_by_name %}
-                {% if ability_value.1.is_physical %}
+                {% if ability_value.1.is_primary %}
                 <div class="ability {% if not ability_value.2%} zero-ability {% endif %}">
                     <p>
-                        <div class="col-md-4 col-sm-3 col-xs-6 css-physical-ability"
-                             data-toggle="tooltip"
-                             title='{{ability_value.1.tutorial_text}}'>
+                        <div class="col-lg-2 col-md-3 col-sm-4 col-xs-6"
+                         data-toggle="tooltip"
+                         title='{{ability_value.1.tutorial_text}}'>
                             <p>
-                                <span class="stat-value visible-xs-inline">{{ability_value.2}}</span>
+                                <span class="stat-value">{{ability_value.2}}</span>
                                 <b>{{ability_value.1.name}}</b>
-                                <span class="stat-value hidden-xs">{{ability_value.2}}</span>
                             </p>
                         </div>
                     </p>
                 </div>
                 {% endif %}
             {% endfor %}
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="row">
-            {% for ability_value in ability_value_by_name %}
-                {% if not ability_value.1.is_physical %}
-                    <div class="ability {% if not ability_value.2%} zero-ability {% endif %}">
+            <div class="col-xs-12">
+                <div class="row">
+                    {% for ability_value in ability_value_by_name %}
+                    {% if not ability_value.1.is_primary %}
+                    <div class="ability {% if not ability_value.2%} zero-ability {% endif %} css-secondary-ability">
                         <p>
-                            <div class="col-md-4 col-sm-3 col-xs-6 css-mental-ability"
+                            <div class="col-lg-2 col-md-3 col-sm-4 col-xs-6"
                                  data-toggle="tooltip"
                                  title='{{ability_value.1.tutorial_text}}'>
-                                <p>
-                                    <span class="stat-value">{{ability_value.2}}</span>
-                                    <b>{{ability_value.1.name}}</b>
-                                </p>
-                            </div>
+                        <p>
+                            <span class="stat-value">{{ability_value.2}}</span>
+                            <b>{{ability_value.1.name}}</b>
                         </p>
                     </div>
+                    </p>
+                </div>
                 {% endif %}
-            {% endfor %}
+                {% endfor %}
+            </div>
             </div>
         </div>
     </div>
 </div>
-<br>

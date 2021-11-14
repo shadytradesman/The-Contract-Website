@@ -52,17 +52,19 @@ h3 {
 }
 
 .css-fort-stat {
-    font-size: 18px;
+    font-size: 20px;
 }
 
 .css-body-h {
     position:relative;
     left: 9px;
+    font-size: 25px;
 }
 
 .css-mind-h {
     position:relative;
     right: 12px;
+    font-size: 25px;
 }
 
 .css-del-trauma-form {
@@ -110,6 +112,8 @@ input[type="number"] {
 }
 
 .css-status-text {
+    padding-left: 5px;
+    padding-right: 5px;
 }
 
 .css-source-button {
@@ -302,15 +306,29 @@ input[type="number"] {
     border-radius: 0px;
 }
 
-.css-attributes {
-    text-align: center;
+.css-secondary-ability {
+    color: #d3d2e6;
 }
 
-@media (max-width: 767px) {
+.css-attributes {
+    text-align: left;
+    padding-bottom: 10px;
+}
+
+@media (min-width: 767px) {
+    .css-abilities {
+        border-left-style: solid;
+        border-left-width: 1px;
+        border-left-color: #a6763a !important;
+    }
     .css-attributes {
-        text-align: left;
+        margin-right: -1px;
+        border-right-style: solid;
+        border-right-width: 1px;
+        border-right-color: #a6763a !important;
     }
 }
+
 
 .css-physical-ability {
     text-align: right;

@@ -26,7 +26,6 @@ def get_edit_context(user, existing_character=None, secret_key=None, cell=None):
     char_form = make_character_form(user, existing_character, supplied_cell=cell)(instance=existing_character)
     AttributeFormSet = formset_factory(AttributeForm, extra=0)
     AbilityFormSet = formset_factory(AbilityForm, extra=1)
-    attributes = Attribute.objects.order_by('name')
     tutorial = get_object_or_404(CharacterTutorial)
     if existing_character and existing_character.stats_snapshot:
         asset_formsets = __get_asset_formsets(existing_character)
@@ -37,6 +36,7 @@ def get_edit_context(user, existing_character=None, secret_key=None, cell=None):
         source_formset = __get_source_formset_for_edit(existing_character)
         show_tutorial = False
     else:
+        attributes = Attribute.objects.filter(is_deprecated=False).order_by('name')
         asset_formsets = __get_asset_formsets()
         liability_formsets = __get_liability_formsets()
         attribute_formset = AttributeFormSet(
@@ -281,7 +281,7 @@ def __save_stats_diff_from_post(POST, existing_character=None, new_character=Non
         new_character.save()
     AttributeFormSet = formset_factory(AttributeForm, extra=0)
     AbilityFormSet = formset_factory(AbilityForm, extra=1)
-    attributes = Attribute.objects.order_by('name')
+    attributes = Attribute.objects.filter(is_deprecated=False).order_by('name')
     asset_formsets = __get_asset_formsets(existing_character, POST=POST)
     liability_formsets = __get_liability_formsets(existing_character, POST=POST)
     if existing_character:
@@ -322,7 +322,7 @@ def __save_stats_diff_from_post(POST, existing_character=None, new_character=Non
 def __save_edit_attributes_from_formset(attribute_formset, new_stats_rev):
     for form in attribute_formset:
         if form.is_valid():
-            attribute = get_object_or_404(Attribute, id=form.cleaned_data['attribute_id'])
+            attribute = get_object_or_404(Attribute, id=form.cleaned_data['attribute_id'], is_deprecated=False)
             if "previous_value_id" in form.cleaned_data and form.cleaned_data["previous_value_id"]:
                 value_id = form.cleaned_data['previous_value_id']
                 prev_val = get_object_or_404(AttributeValue, id=value_id)
@@ -384,7 +384,7 @@ def __attributes_from_form(attribute_formset, stats):
         attribute_values = []
         for form in attribute_formset:
             attr_value = AttributeValue(
-                relevant_attribute=get_object_or_404(Attribute, id=form.cleaned_data['attribute_id']),
+                relevant_attribute=get_object_or_404(Attribute, id=form.cleaned_data['attribute_id'], is_deprecated=False),
                 value=form.cleaned_data['value'],
                 relevant_stats=stats,
             )
@@ -413,7 +413,7 @@ def __new_ability_from_form(form, stats):
         ability = Ability(
             name=form.cleaned_data['name'],
             tutorial_text=form.cleaned_data['description'] if 'description' in form.cleaned_data else "",
-            is_physical = True if form.cleaned_data['phys_mental'] == PHYS_MENTAL[0][0] else False
+            is_physical = True
         )
         ability.save()
     if 'value' in form.cleaned_data and form.cleaned_data['value'] > 0 and ability:
@@ -432,7 +432,9 @@ def __get_attribute_formset_for_edit(existing_character, AttributeFormSet, POST=
                   'value': x.value,
                   'attribute': x.relevant_attribute,
                   'previous_value_id': x.previous_revision.id if x.previous_revision else None}
-                 for x in existing_character.stats_snapshot.attributevalue_set.order_by('relevant_attribute__name').all()],
+                 for x in existing_character.stats_snapshot.attributevalue_set
+                     .filter(relevant_attribute__is_deprecated=False)
+                     .order_by('relevant_attribute__name').all()],
         prefix="attributes")
 
 def __get_limit_formset_for_edit(character, POST=None):

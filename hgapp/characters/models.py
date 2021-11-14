@@ -10,6 +10,7 @@ from django.utils.datetime_safe import datetime
 from django.utils import timezone
 from guardian.shortcuts import assign_perm, remove_perm
 from django.utils.safestring import mark_safe
+from django.db import transaction
 
 from hgapp.utilities import get_queryset_size, get_object_or_none
 from cells.models import Cell
@@ -753,6 +754,8 @@ class Character(models.Model):
                     if not detail.is_deleted:
                         liability_details.append(detail)
                 for value in diff.attributevalue_set.all():
+                    if value.relevant_attribute.is_deprecated:
+                        continue
                     if value.previous_revision:
                         cost = cost + diff.calc_attr_change_ex_cost(value.previous_revision.value, value.value)
                         attribute_values.remove(value.previous_revision)
@@ -887,10 +890,9 @@ class Character(models.Model):
             query = query.filter(relevant_attribute__is_physical=is_physical)
         return query.order_by('relevant_attribute__name').all()
 
-    def get_abilities(self, is_physical):
+    def get_abilities(self):
         return self.stats_snapshot.abilityvalue_set \
             .prefetch_related('relevant_ability') \
-            .filter(relevant_ability__is_physical=is_physical) \
             .order_by('relevant_ability__name')\
             .all()
 
@@ -1065,9 +1067,30 @@ class Trait(models.Model):
     class Meta:
         abstract = True
 
+    def __lt__(self, other):
+        return self.name < other.name
+
 class Attribute(Trait):
     scales_body = models.BooleanField(default=False)
     scales_mind = models.BooleanField(default=False)
+    is_deprecated = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        existing = get_object_or_none(Attribute, pk=self.pk)
+        super().save(*args, **kwargs)
+        if existing and (existing.is_deprecated != self.is_deprecated):
+            characters = Character.objects.all()
+            for character in characters:
+                try:
+                    with transaction.atomic():
+                        character.regen_stats_snapshot()
+                except Exception as inst:
+                    logger.error('Error regenerating stats snapshot for character %s id %s',
+                                 str(character.name),
+                                 str(character.id))
+                    logger.exception(inst)
+
+
 
 class Ability(Trait):
     is_primary = models.BooleanField(default=False)
@@ -1365,6 +1388,8 @@ class ContractStats(models.Model):
     def get_change_phrases(self):
         change_phrases = []
         for attribute in self.attributevalue_set.all():
+            if attribute.relevant_attribute.is_deprecated:
+                continue
             exp_cost = self.calc_attr_change_ex_cost(attribute.previous_revision.value, attribute.value)
             exp_phrase = self.get_exp_phrase(exp_cost)
             phrase = self.get_trait_value_change_phrase(attribute.relevant_attribute.name,

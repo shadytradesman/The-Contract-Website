@@ -1,7 +1,7 @@
 {% load staticfiles %}
 <div class="css-health-area">
 <div class="row text-center">
-    <div class="col-xs-5 text-right" data-toggle="tooltip" title='{{tutorial.body}}'>
+    <div class="col-xs-5 text-right" data-toggle="tooltip" title='{{tutorial.body}}' style="padding-left: 5px; padding-right: 5px;">
         <h2 class="css-body-h">
             Body <span class="stat-value css-fort-stat">{{character.num_body_levels}}</span>
         </h2>
@@ -11,7 +11,7 @@
         <div id="js-penalty-box" class="stat-value css-penalty-box text-center"  style="color:#fb7e48;">
         </div>
     </div>
-    <div class="col-xs-5 text-left" data-toggle="tooltip" title='{{tutorial.mind}}'>
+    <div class="col-xs-5 text-left" data-toggle="tooltip" title='{{tutorial.mind}}' style="padding-left: 5px; padding-right: 5px;">
         <h2 class="css-mind-h">
             <span class="stat-value css-fort-stat">{{character.num_mind_levels}}</span> Mind
         </h2>
@@ -19,7 +19,7 @@
 </div>
 {% for row in health_display %}
     <div class="row">
-        <div class="col-xs-4 text-right css-status-text">
+        <div class="col-sm-4 col-xs-3 col-xs-offset-1 col-sm-offset-0 text-right css-status-text">
             {{row.0}}
         </div>
         <div class="col-xs-1 text-center health-box">
@@ -30,7 +30,8 @@
                 </span>
             {% endif %}
         </div>
-        <div class="col-xs-2 text-center ">
+        <div class="col-xs-2 col-sm-2 text-center" style="padding-left: 5px; padding-right: 5px; margin-left: -5px; margin-right: -5px;">
+
             <span class="js-penalty-body-{{row.1}} js-penalty-mind-{{row.3}}">
                 {% if row.2 == 'Incap' %}
                     <span data-toggle="tooltip" title='You are Incapacitated. You cannot move on your own, automatically fail any Actions that requires a roll, cannot activate any Powers, and can only speak at a whisper. '>
@@ -43,7 +44,7 @@
                 {% endif %}
             </span>
         </div>
-        <div class="col-xs-1 text-center health-box" >
+        <div class="col-xs-1 text-center health-box">
             {% if row.3 == 'none' %}
             {% else %}
                 <span id ="js-mind-{{row.3}}">
@@ -56,7 +57,6 @@
         </div>
     </div>
 {% endfor %}
-    <br>
     <div class="row css-status-text">
         <div class="col-xs-6 text-center">
             <div id="js-wound-container" style="display:none;" data-toggle="tooltip" title='{{tutorial.wound}}'>
@@ -68,28 +68,26 @@
         </div>
         <div class="col-xs-6 text-right css-status-text">
             {% if user_can_edit %}
-                <ul id="mind-buttons" class="nav nav-pills nav-justified">
-                    <li>
+                <div id="mind-buttons" class="text-center">
                         <form id="exert-mind-form"
                               data-url="{% url 'characters:set_mind_damage' character.id secret_key %}"
-                              data-container='#mind-buttons' data-toggle="tooltip" title='{{tutorial.exert_mind}}'>
+                              data-container='#mind-buttons' data-toggle="tooltip" title='{{tutorial.exert_mind}}'
+                                style="display:inline-block;">
                             {% csrf_token %}
                             <input id="exert-mind-val" type="number" name="mental-exertion-severity" value="1" required="" style="display:none;">
                             <input type="text" name="mental-exertion-description" value="Exertion" required="" style="display:none;">
-                            <input type="submit" class="btn btn-default btn-xs" value="Exert Mind" />
+                            <input type="submit" class="btn btn-default btn-xs" value="Exert" style="display:inline-block" />
                         </form>
-                    </li>
-                    <li>
                         <form id="recover-mind-form"
                               data-url="{% url 'characters:set_mind_damage' character.id secret_key %}"
-                              data-container='#mind-buttons' data-toggle="tooltip" title='{{tutorial.recover_mind}}'>
+                              data-container='#mind-buttons' data-toggle="tooltip" title='{{tutorial.recover_mind}}'
+                                style="display:inline-block;">
                             {% csrf_token %}
                             <input id="recover-mind-val" type="number" name="mental-exertion-severity" value="1" required="" style="display:none;">
                             <input type="text" name="mental-exertion-description" value="Exertion" required="" style="display:none;">
-                            <input type="submit" class="btn btn-default btn-xs" value="Recover Mind" />
+                            <input type="submit" class="btn btn-default btn-xs" value="Recover" style="display:inline-block"/>
                         </form>
-                    </li>
-                </ul>
+                </div>
             {% endif %}
         </div>
     </div>
