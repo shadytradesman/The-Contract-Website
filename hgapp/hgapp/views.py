@@ -81,7 +81,7 @@ def home(request):
             'avail_charon_coins': avail_charon_coins,
             'cells': cells,
             'cell_invites': cell_invites,
-            'world_events': world_events,
+            'world_events': world_events[:3],
             'attendance_invites_to_confirm': attendance_invites_to_confirm,
             'avail_exp_rewards': avail_exp_rewards,
             'latest_blog_post': latest_blog_post,
