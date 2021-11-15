@@ -45,6 +45,13 @@
                     <h3 class="text-danger">You do not have any valid characters.</h3>
                 {% else %}
                     {{ form.attending_character | bootstrap }}
+                    {% if form.fields.attending_character.choices %}
+                        <div style="max-width: 80%; margin: auto;">
+                            <div class="alert alert-info text-center">
+                                <p>Attending with an in-World Contractor grants an additional 2 Exp, win or lose.</p>
+                            </div>
+                        </div>
+                    {% endif %}
                 {% endif %}
                 {% if scenario_spoiled %}
                     <div class="alert alert-warning text-center">

@@ -238,8 +238,6 @@ def view_character(request, character_id, secret_key = None):
     journal_cover = get_object_or_none(JournalCover, character=character.id)
     next_entry = get_characters_next_journal_credit(character) if user_can_edit else None
 
-    show_more_home_games_warning = character.number_completed_games() > 3 \
-                                   and (character.number_completed_games_in_home_cell() < character.number_completed_games_out_of_home_cell())
     available_gift = character.num_unspent_rewards() > 0
     circumstance_form = None
     condition_form = None
@@ -298,7 +296,6 @@ def view_character(request, character_id, secret_key = None):
         'journal_cover': journal_cover,
         'next_entry': next_entry,
         'latest_journals': latest_journals,
-        'show_more_home_games_warning': show_more_home_games_warning,
         'available_gift': available_gift,
         'circumstance_form': circumstance_form,
         'condition_form': condition_form,

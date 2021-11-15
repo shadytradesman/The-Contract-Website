@@ -12,6 +12,7 @@ from django.views import View
 
 import datetime
 import logging
+from collections import defaultdict
 
 logger = logging.getLogger("app." + __name__)
 
@@ -252,10 +253,22 @@ def create_game(request, cell_id=None):
     else:
         # Build a game form.
         form = GameForm(initial={"cell": cell})
+        scenarios_by_cells = get_scenarios_by_cells(request)
         context = {
-            'form' : form,
+            'form': form,
+            'scenarios_by_cells': scenarios_by_cells,
         }
         return render(request, 'games/edit_game.html', context)
+
+
+def get_scenarios_by_cells(request):
+    user_cells = request.user.cell_set.all()
+    scenarios_by_cells = defaultdict(set)
+    for cell in user_cells:
+        scenarios_by_cells[cell.id] = list(set(
+            Game.objects.filter(cell=cell, scenario__isnull=False).select_related('scenario').values(
+                'scenario__id').distinct().values_list('id', flat=True)))
+    return scenarios_by_cells
 
 
 def edit_game(request, game_id):
@@ -323,8 +336,10 @@ def edit_game(request, game_id):
     else:
         # Build a game form.
         form = GameForm(initial=initial_data)
+        scenarios_by_cells = get_scenarios_by_cells(request)
         context = {
             'game': game,
+            'scenarios_by_cells': scenarios_by_cells,
             'form' : form,
         }
         return render(request, 'games/edit_game.html', context)

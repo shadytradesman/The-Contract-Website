@@ -126,17 +126,6 @@
         </div>
     {% endif %}
 {% endif %}
-{% if show_more_home_games_warning %}
-    <div class="alert alert-warning text-center css-char-alert" role="alert">
-        <p>
-            {{character.name}} has played more Games out of their home World than in it.</br>
-            <b>Games in home World: </b>{{character.number_completed_games_in_home_cell}}
-            <b>Games in other Worlds: </b>{{character.number_completed_games_out_of_home_cell}}
-            <br>
-            They can only play in Games in their home World until that's where the majority of their Games have taken place.
-        </p>
-    </div>
-{% endif %}
 {% if character.show_gift_alert %}
     <div class="alert alert-danger text-center css-char-alert" role="alert">
         <p>

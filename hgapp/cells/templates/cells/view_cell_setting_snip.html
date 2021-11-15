@@ -33,6 +33,8 @@
         </div>
     {% endif %}
     {% for event in world_events %}
-        {% include "cells/world_event_snip.html" %}
+        <div id="event-{{event.id}}">
+            {% include "cells/world_event_snip.html" %}
+        </div>
     {% endfor %}
 </div>

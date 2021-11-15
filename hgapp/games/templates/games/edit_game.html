@@ -11,6 +11,7 @@
 
 {% block extra_scripts %}
     {% include "games/datepicker.js" %}
+    {{scenarios_by_cells|json_script:"scenariosByCells"}}
     <script src="{% static 'overrides/wiki-macro-scripts.js' %}"></script>
     <script src="{% static 'games/edit_game.js' %}"></script>
 {% endblock %}
@@ -127,6 +128,14 @@
                     <div class="col-md-6">
                         <div id="js-scenario-title">
                             {{ form.title | bootstrap}}
+                        </div>
+                        <div id="js-scenario-already-play">
+                            <div class="alert alert-info text-center">
+                                <b>This Scenario has already been run in this World</b>
+                                <p>
+                                    Re-running some Scenarios can introduce story consistency issues.
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>

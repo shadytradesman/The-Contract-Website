@@ -1,4 +1,7 @@
 from django import forms
+from itertools import groupby
+from django.forms.models import ModelChoiceField, ModelChoiceIterator
+from itertools import chain
 
 from characters.models import HIGH_ROLLER_STATUS, SEASONED_PORTED, VETERAN_PORTED
 from django.forms import ModelChoiceField
@@ -151,9 +154,40 @@ def make_game_form(user):
 
     return CreateGameForm
 
+def buildContractorChoiceIterator(game_cell=None):
+    class ContractorChoiceIterator(ModelChoiceIterator):
+        def __len__(self):
+            return self.queryset.count() + (1 if self.field.empty_label is not None else 0)
+
+        def __iter__(self):
+            if game_cell:
+                in_cell_contractors = self.queryset.filter(cell=game_cell).select_related('cell').order_by('cell__name', 'name')
+                out_cell_contractors = self.queryset.exclude(cell=game_cell).select_related('cell').order_by('cell__name', 'name')
+                queryset = chain(in_cell_contractors, out_cell_contractors)
+                groups = groupby(queryset, key=lambda x: x.cell == game_cell)
+            else:
+                queryset = self.queryset.select_related('cell').order_by('cell__name', 'name')
+                groups = groupby(queryset, key=lambda x: x.cell)
+            if self.field.empty_label is not None:
+                yield ("", self.field.empty_label)
+            for world, contractors in groups:
+                yield [
+                    "In-World" if game_cell and world else "Out-of-World" if game_cell else world.name,
+                    [
+                        (contractor.id, contractor.name)
+                        for contractor in contractors
+                    ]
+                ]
+    return ContractorChoiceIterator
+
 class CharDisplayModelChoiceField(ModelChoiceField):
+    def __init__(self, world=None, *args, **kwargs):
+        self.iterator = buildContractorChoiceIterator(world)
+        super().__init__(*args, **kwargs)
+
     def label_from_instance(self, character):
         return "{} ({} Victories)".format(character.name, character.number_of_victories())
+
 
 def make_accept_invite_form(invitation):
     class AcceptInviteForm(forms.Form):
@@ -175,16 +209,20 @@ def make_accept_invite_form(invitation):
             raise ValueError("unanticipated required roller status")
         if invitation.as_ringer or invitation.relevant_game.allow_ringers:
             attending_character = CharDisplayModelChoiceField(
+                world=invitation.relevant_game.cell,
                 queryset=queryset,
-                 empty_label="Play an NPC Ringer",
-                 required=False)
+                empty_label="Play an NPC Ringer",
+                required=False)
+
         else:
-            attending_character = CharDisplayModelChoiceField(queryset=queryset,
-                                                     empty_label=None,
-                                                     help_text="Declare which character you're attending with. Private "
-                                                               "Characters and their powers will be revealed to the "
-                                                               "Game creator if selected.",
-                                                     required=True)
+            attending_character = CharDisplayModelChoiceField(
+                world=invitation.relevant_game.cell,
+                queryset=queryset,
+                empty_label=None,
+                help_text="Declare which character you're attending with. Private "
+                           "Characters and their powers will be revealed to the "
+                           "Game creator if selected.",
+                required=True,)
     return AcceptInviteForm
 
 
