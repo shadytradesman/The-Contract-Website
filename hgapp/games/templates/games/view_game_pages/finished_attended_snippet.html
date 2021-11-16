@@ -18,6 +18,12 @@
                     </strong>
                     -
                     {{ invitation.attendance.get_outcome_display }}
+                    {% if invitation.attendance.is_mvp %}
+                        <span class="glyphicon glyphicon-star css-scenario-rewarded-star" aria-hidden="true"
+                              data-toggle="tooltip"
+                              title='This Contractor was MVP. +2 Exp.'>
+                        </span>
+                    {% endif %}
                 </span>
                 <div  style="text-indent: 20px;">
                     Played by

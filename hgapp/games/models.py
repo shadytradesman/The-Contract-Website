@@ -2,7 +2,7 @@ from django.db import models
 from django.db.models import Count
 from django.conf import settings
 from characters.models import Character, HIGH_ROLLER_STATUS, Character_Death, ExperienceReward, AssetDetails, EXP_GM, \
-    EXP_LOSS_V2, EXP_WIN_V2, EXP_LOSS_RINGER_V2, EXP_WIN_RINGER_V2, EXP_LOSS_IN_WORLD_V2, EXP_WIN_IN_WORLD_V2
+    EXP_LOSS_V2, EXP_WIN_V2, EXP_LOSS_RINGER_V2, EXP_WIN_RINGER_V2, EXP_LOSS_IN_WORLD_V2, EXP_WIN_IN_WORLD_V2, EXP_MVP
 from powers.models import Power
 from cells.models import Cell
 from django.utils import timezone
@@ -462,6 +462,12 @@ class Game_Attendance(models.Model):
                                           null=True,
                                           blank=True,
                                           on_delete=models.SET_NULL)
+    is_mvp = models.BooleanField(default=False)
+    mvp_reward = models.OneToOneField(ExperienceReward,
+                                      related_name='mvp_exp_attendance',
+                                      null=True,
+                                      blank=True,
+                                      on_delete=models.SET_NULL)
 
     def is_victory(self):
         return self.outcome == WIN
@@ -507,9 +513,9 @@ class Game_Attendance(models.Model):
 
     # Changes the outcome of the GameAttendance. Handles Gifts, Experience Rewards, attending Character, Character death
     # status, and confirmation status. This method does NOT update the Game's GM rewards (golden ratio or new player).
-    def change_outcome(self, new_outcome, is_confirmed, attending_character=None):
+    def change_outcome(self, new_outcome, is_confirmed, attending_character=None, is_mvp=False):
         current_outcome = self.outcome
-        if current_outcome == new_outcome and attending_character == self.attending_character and self.is_confirmed == is_confirmed:
+        if current_outcome == new_outcome and attending_character == self.attending_character and self.is_confirmed == is_confirmed and self.is_mvp == is_mvp:
             return
         current_reward = self.get_reward()
         # Void rewards
@@ -519,6 +525,9 @@ class Game_Attendance(models.Model):
         if hasattr(self, "experience_reward") and self.experience_reward:
             self.experience_reward.mark_void()
             self.experience_reward = None
+        if hasattr(self, "mvp_reward") and self.mvp_reward:
+            self.mvp_reward.mark_void()
+            self.mvp_reward = None
         # Void deaths
         if hasattr(self, "character_death") and self.character_death:
             self.character_death.mark_void()
@@ -548,6 +557,7 @@ class Game_Attendance(models.Model):
                     self.game_invite.save()
         self.outcome = new_outcome
         self.is_confirmed = is_confirmed
+        self.is_mvp = is_mvp
         self.save()
         self.give_reward()
         if changed_character:
@@ -562,6 +572,9 @@ class Game_Attendance(models.Model):
                              str(self.id))
         if self.experience_reward:
             raise ValueError("attendance is granting exp reward when it already has one. Attendance: " +
+                             str(self.id))
+        if self.mvp_reward:
+            raise ValueError("attendance is granting MVP exp reward when it already has one. Attendance: " +
                              str(self.id))
         if self.outcome is None:
             raise ValueError("Error, game attendance has no outcome when game is being transitioned to finished." +
@@ -599,6 +612,16 @@ class Game_Attendance(models.Model):
             exp_reward.save()
             self.experience_reward = exp_reward
             self.save()
+        if self.is_mvp:
+            exp_reward = ExperienceReward(
+                rewarded_character=self.attending_character,
+                rewarded_player=self.attending_character.player,
+                type=EXP_MVP,
+            )
+            exp_reward.save()
+            self.mvp_reward = exp_reward
+            self.save()
+
 
     # Save attendance, creating scenario discoveries as needed, killing characters if needed, and setting GM perms on the
     # character

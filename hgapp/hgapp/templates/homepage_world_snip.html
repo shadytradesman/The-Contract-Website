@@ -45,25 +45,25 @@
         </div>
     </div>
     {% if world_events %}
-    {% for event in world_events%}
-    <div class="row css-home-row">
-        <div class="col-md-10 col-md-offset-1">
-            <small>
-                From
-                <a href="{% url 'cells:cells_view_cell' event.parent_cell.id %}">
-                    {{event.parent_cell.name}}
+        {% for event in world_events%}
+        <div class="row css-home-row">
+            <div class="col-md-10 col-md-offset-1">
+                <small>
+                    From
+                    <a href="{% url 'cells:cells_view_cell' event.parent_cell.id %}">
+                        {{event.parent_cell.name}}
+                    </a>
+                </small>
+                <a href="{% url 'cells:cells_view_cell' event.parent_cell.id %}#event-{{event.id}}">
+                <div class="alert-info alert css-home-alert" style="margin-bottom: 5px;">
+                    <h4 style="margin-bottom: 0px;">
+                        {{event.headline}}
+                    </h4>
+                </div>
                 </a>
-            </small>
-            <a href="{% url 'cells:cells_view_cell' event.parent_cell.id %}#event-{{event.id}}">
-            <div class="alert-info alert css-home-alert" style="margin-bottom: 5px;">
-                <h4 style="margin-bottom: 0px;">
-                    {{event.headline}}
-                </h4>
             </div>
-            </a>
         </div>
-    </div>
-    {% endfor %}
+        {% endfor %}
     <br>
     {% endif %}
     {% if cells %}

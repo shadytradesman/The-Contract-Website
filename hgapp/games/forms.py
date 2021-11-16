@@ -172,7 +172,7 @@ def buildContractorChoiceIterator(game_cell=None):
                 yield ("", self.field.empty_label)
             for world, contractors in groups:
                 yield [
-                    "In-World" if game_cell and world else "Out-of-World" if game_cell else world.name,
+                    "In-World" if game_cell and world else "Out-of-World" if game_cell else world.name if world else None,
                     [
                         (contractor.id, contractor.name)
                         for contractor in contractors
@@ -250,10 +250,15 @@ class DeclareOutcomeForm(forms.Form):
         # self.initial is set in super
         super(DeclareOutcomeForm, self).__init__(*args, **kwargs)
         attendance = self.initial['game_attendance']
+        mvp_disabled = False
         if attendance.attending_character:
             self.fields['outcome'] = forms.ChoiceField(choices=OUTCOME[:4])
         else:
             self.fields['outcome'] = forms.ChoiceField(choices=OUTCOME[4:6])
+            mvp_disabled = True
+        self.fields['MVP'] = forms.BooleanField(required=False,
+                                                 help_text='The MVP earns +2 Exp. Select whoever you\'d like.',
+                                                disabled=mvp_disabled)
         self.fields['hidden_attendance'] = forms.ModelChoiceField(self.initial['game_attendance'].relevant_game.game_attendance_set.all(),
                                                    required=False)
         self.fields['hidden_attendance'].widget.attrs['hidden'] = True
@@ -290,7 +295,7 @@ def make_who_was_gm_form(cell):
     class WhoWasGMForm(forms.Form):
         queryset = cell.cellmembership_set.all()
         gm = forms.ModelChoiceField(queryset=queryset,
-                                      label="Which Cell member ran the Game?",
+                                      label="Who ran the Contract?",
                                       empty_label="Select a GM",
                                       required=True)
     return WhoWasGMForm
@@ -354,6 +359,8 @@ class ArchivalOutcomeForm(forms.Form):
                                                     help_text="Declare which character this player brought.",
                                                     required=False)
     outcome = forms.ChoiceField(choices=OUTCOME)
+    MVP = forms.BooleanField(required=False,
+                             help_text='The MVP earns +2 Exp. Select whoever you\'d like.')
     notes = forms.CharField(label='Notes',
                             max_length=500,
                             required=False,

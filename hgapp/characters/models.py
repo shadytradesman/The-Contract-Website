@@ -193,7 +193,7 @@ EXP_REWARD_VALUES = {
     EXP_JOURNAL: 1,
 }
 
-EXP_NEW_CHAR = 150
+EXP_NEW_CHAR = 145
 EXP_COST_QUIRK_MULTIPLIER = 3
 EXP_ADV_COST_ATTR_MULTIPLIER = 4
 EXP_ADV_COST_SKILL_MULTIPLIER = 2
@@ -1033,6 +1033,9 @@ class ExperienceReward(models.Model):
             return mark_safe(reason)
         if hasattr(self, 'game_attendance'):
             attendance = self.game_attendance
+            return "{} {}".format(reason, attendance.relevant_game.scenario.title)
+        if hasattr(self, 'mvp_exp_attendance'):
+            attendance = self.mvp_exp_attendance
             return "{} in {}".format(reason, attendance.relevant_game.scenario.title)
         else:
             self.log_bad_source()

@@ -12,6 +12,7 @@
 
 {% block extra_scripts %}
     <script src="{% static 'overrides/wiki-macro-scripts.js' %}"></script>
+    <script src="{% static 'games/end_game.js' %}"></script>
 {% endblock %}
 {% block head_title %}
     Ending Game
@@ -50,6 +51,9 @@
                         </h4>
                         <div >
                             {{ form.outcome | bootstrap }}
+                        </div>
+                        <div>
+                            {{ form.MVP |bootstrap}}
                         </div>
                         <div >
                             {{ form.notes | bootstrap }}

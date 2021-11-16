@@ -595,19 +595,21 @@ def end_game(request, game_id):
         }
         initial_data.append(initial)
     if request.method == 'POST':
-        declare_outcome_formset = DeclareOutcomeFormset(request.POST,
-                                            initial=initial_data)
+        declare_outcome_formset = DeclareOutcomeFormset(request.POST, initial=initial_data)
         game_feedback_form = GameFeedbackForm(request.POST)
         world_event_form = None
         if game.cell.player_can_post_world_events(request.user):
             world_event_form = EditWorldEventForm(request.POST)
         if declare_outcome_formset.is_valid() and game_feedback_form.is_valid() \
                 and (not world_event_form or world_event_form.is_valid()):
+            if len([x for x in declare_outcome_formset if x.cleaned_data["MVP"]]) > 1:
+                raise ValueError("More than one MVP in completed edit")
             with transaction.atomic():
                 game = Game.objects.select_for_update().get(pk=game.pk)
                 for form in declare_outcome_formset:
                     attendance = get_object_or_404(Game_Attendance, id=form.cleaned_data['hidden_attendance'].id)
                     attendance.outcome = form.cleaned_data['outcome']
+                    attendance.is_mvp = form.cleaned_data['MVP']
                     if form.cleaned_data['notes']:
                         attendance.notes = form.cleaned_data['notes']
                     attendance.save()
