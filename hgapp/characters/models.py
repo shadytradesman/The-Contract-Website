@@ -640,7 +640,8 @@ class Character(models.Model):
         return rewards_to_be_spent
 
     def improvement_ok(self):
-        return self.number_of_victories() * 2 > len(self.active_rewards())
+        ported_adjustment = PORTED_IMPROVEMENT_ADJUSTMENT[self.ported] + PORTED_GIFT_ADJUSTMENT[self.ported]
+        return self.number_of_victories() * 2 > (len(self.active_rewards()) - ported_adjustment)
 
     def get_powers_for_render(self):
         return self.power_full_set.all()

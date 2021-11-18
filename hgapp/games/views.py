@@ -680,10 +680,10 @@ def allocate_improvement(request, improvement_id):
 # Select which players attended and who was GM
 def create_ex_game_for_cell(request, cell_id):
     if not request.user.is_authenticated:
-        raise PermissionDenied("You must log in to create archival Game events")
+        raise PermissionDenied("You must log in to create archival Contract events")
     cell = get_object_or_404(Cell, id = cell_id)
     if not cell.player_can_manage_games(request.user):
-        raise PermissionDenied("You do not have permission to manage Game Events for this Cell")
+        raise PermissionDenied("You do not have permission to manage Contract Events for this Cell")
     if request.method == 'POST':
         gm_form = get_gm_form(cell, request.POST)
         outsider_formset = get_outsider_formset(request.POST)
