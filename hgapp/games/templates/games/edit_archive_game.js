@@ -37,6 +37,7 @@
          })
          this.checked = true;
     })
+    $("input[id$=-MVP]")[0].checked = true;
 
     $("select[id$=attending_character]").change(function () {
         var regex = ".*([\\d]).*";

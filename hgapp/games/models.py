@@ -2,11 +2,13 @@ from django.db import models
 from django.db.models import Count
 from django.conf import settings
 from characters.models import Character, HIGH_ROLLER_STATUS, Character_Death, ExperienceReward, AssetDetails, EXP_GM, \
-    EXP_LOSS_V2, EXP_WIN_V2, EXP_LOSS_RINGER_V2, EXP_WIN_RINGER_V2, EXP_LOSS_IN_WORLD_V2, EXP_WIN_IN_WORLD_V2, EXP_MVP
+    EXP_LOSS_V2, EXP_WIN_V2, EXP_LOSS_RINGER_V2, EXP_WIN_RINGER_V2, EXP_LOSS_IN_WORLD_V2, EXP_WIN_IN_WORLD_V2, EXP_MVP,\
+    EXP_WIN_V1, EXP_LOSS_V1
 from powers.models import Power
 from cells.models import Cell
 from django.utils import timezone
 from bs4 import BeautifulSoup
+from .games_constants import EXP_V1_V2_GAME_ID
 import datetime
 from guardian.shortcuts import assign_perm
 from postman.api import pm_write
@@ -592,14 +594,16 @@ class Game_Attendance(models.Model):
                                         is_charon_coin=True,)
             charon_coin_reward.save()
         if self.attending_character and not self.is_death() and not self.is_declined_invite():
-            if self.attending_character.cell and self.attending_character.cell == self.relevant_game.cell:
-                type = EXP_WIN_IN_WORLD_V2 if self.is_victory() else EXP_LOSS_IN_WORLD_V2
+            if self.relevant_game.id < EXP_V1_V2_GAME_ID:
+                reward_type = EXP_WIN_V1 if self.is_victory() else EXP_LOSS_V1
+            elif self.attending_character.cell and self.attending_character.cell == self.relevant_game.cell:
+                reward_type = EXP_WIN_IN_WORLD_V2 if self.is_victory() else EXP_LOSS_IN_WORLD_V2
             else:
-                type = EXP_WIN_V2 if self.is_victory() else EXP_LOSS_V2
+                reward_type = EXP_WIN_V2 if self.is_victory() else EXP_LOSS_V2
             exp_reward = ExperienceReward(
                 rewarded_character=self.attending_character,
                 rewarded_player=self.attending_character.player,
-                type=type,
+                type=reward_type,
             )
             exp_reward.save()
             self.experience_reward = exp_reward
@@ -612,7 +616,7 @@ class Game_Attendance(models.Model):
             exp_reward.save()
             self.experience_reward = exp_reward
             self.save()
-        if self.is_mvp:
+        if self.is_mvp and self.relevant_game.id > EXP_V1_V2_GAME_ID:
             exp_reward = ExperienceReward(
                 rewarded_character=self.attending_character,
                 rewarded_player=self.attending_character.player,

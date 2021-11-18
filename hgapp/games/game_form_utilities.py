@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404
 from django.db import transaction
 from django.contrib.auth.models import User
 
-from .forms import make_archive_game_general_info_form, ArchivalOutcomeForm, CellMemberAttendedForm, OutsiderAttendedForm, \
+from .forms import make_archive_game_general_info_form, get_archival_outcome_form, CellMemberAttendedForm, OutsiderAttendedForm, \
     make_who_was_gm_form
 from .models import Game, Game_Invite, Game_Attendance
 from .games_constants import GAME_STATUS
@@ -42,7 +42,7 @@ def get_context_for_create_finished_game(player_list, players, gm, cell, GenInfo
 
 
 def _get_outcome_formset_for_edit(game, new_player_list, POST=None):
-    ArchivalOutcomeFormset = formset_factory(ArchivalOutcomeForm, extra=0)
+    ArchivalOutcomeFormset = formset_factory(get_archival_outcome_form(game.id), extra=0)
     initial_existing = [{'player_id': attendance.get_player().id,
                          'attendance_id': attendance.id,
                          'invited_player': attendance.get_player(),

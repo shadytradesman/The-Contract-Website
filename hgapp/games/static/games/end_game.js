@@ -4,5 +4,6 @@ $(document).ready(function(){
              this.checked = false;
          })
          this.checked = true;
-    })
+    });
+    $("input[id$=-MVP]")[0].checked = true;
 })

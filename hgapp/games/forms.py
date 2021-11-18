@@ -10,6 +10,7 @@ from django.utils import timezone
 from django.db.models import Q
 
 from games.models import OUTCOME, ScenarioTag, REQUIRED_HIGH_ROLLER_STATUS, INVITE_MODE, GameMedium
+from .games_constants import EXP_V1_V2_GAME_ID
 from characters.models import Character
 
 from bootstrap3_datetime.widgets import DateTimePicker
@@ -256,8 +257,10 @@ class DeclareOutcomeForm(forms.Form):
         else:
             self.fields['outcome'] = forms.ChoiceField(choices=OUTCOME[4:6])
             mvp_disabled = True
-        self.fields['MVP'] = forms.BooleanField(required=False,
-                                                 help_text='The MVP earns +2 Exp. Select whoever you\'d like.',
+        self.fields['MVP'] = forms.BooleanField(label="Award Commission",
+                                                required=False,
+                                                help_text='The Contractor awarded Commission gets +2 Exp. '
+                                                          'Select whoever you\'d like (MVP, funniest line, achieved secondary objective, etc).',
                                                 disabled=mvp_disabled)
         self.fields['hidden_attendance'] = forms.ModelChoiceField(self.initial['game_attendance'].relevant_game.game_attendance_set.all(),
                                                    required=False)
@@ -344,41 +347,46 @@ def make_archive_game_general_info_form(gm):
 
     return ArchiveGeneralInfoForm
 
-class ArchivalOutcomeForm(forms.Form):
-    player_id = forms.CharField(label=None,
-                            max_length=200,
-                            widget=forms.HiddenInput(),
-                            required=True,)
-    attendance_id = forms.CharField(label=None,
-                            max_length=200,
-                            widget=forms.HiddenInput(),
-                            required=False,)
 
-    attending_character = CharDisplayModelChoiceField(queryset=Character.objects.all(),
-                                                    empty_label="Played a Ringer",
-                                                    help_text="Declare which character this player brought.",
-                                                    required=False)
-    outcome = forms.ChoiceField(choices=OUTCOME)
-    MVP = forms.BooleanField(required=False,
-                             help_text='The MVP earns +2 Exp. Select whoever you\'d like.')
-    notes = forms.CharField(label='Notes',
-                            max_length=500,
-                            required=False,
-                            help_text='Spoiler-free notes about the character\'s experience in the game (eg. They lost '
-                                      'their hand, went insane, found a million bucks, etc)')
+def get_archival_outcome_form(game_id):
+    class ArchivalOutcomeForm(forms.Form):
+        player_id = forms.CharField(label=None,
+                                max_length=200,
+                                widget=forms.HiddenInput(),
+                                required=True,)
+        attendance_id = forms.CharField(label=None,
+                                max_length=200,
+                                widget=forms.HiddenInput(),
+                                required=False,)
 
-    def __init__(self, *args, **kwargs):
-        super(ArchivalOutcomeForm, self).__init__(*args, **kwargs)
-        # user may have declared character dead after the game ended, so allow selecting dead characters
-        if "attendance_id" in self.initial and self.initial["attendance_id"]:
-            queryset = self.initial["invited_player"].character_set.filter(is_deleted=False) \
-                .distinct()
-        else:
-            queryset = self.initial["invited_player"].character_set.filter(is_deleted=False)\
-                .exclude(character_death__is_void = False, character_death__game_attendance__isnull = False)\
-                .distinct()
-        self.fields['attending_character'].queryset = queryset
+        attending_character = CharDisplayModelChoiceField(queryset=Character.objects.all(),
+                                                        empty_label="Played a Ringer",
+                                                        help_text="Declare which character this player brought.",
+                                                        required=False)
+        outcome = forms.ChoiceField(choices=OUTCOME)
+        MVP = forms.BooleanField(label="Award Commission",
+                                required=False,
+                                help_text='The Contractor awarded Commission gets +2 Exp. '
+                                          'Select whoever you\'d like (MVP, funniest line, achieved secondary objective, etc).',
+                                 disabled=game_id < EXP_V1_V2_GAME_ID)
+        notes = forms.CharField(label='Notes',
+                                max_length=500,
+                                required=False,
+                                help_text='Spoiler-free notes about the character\'s experience in the game (eg. They lost '
+                                          'their hand, went insane, found a million bucks, etc)')
 
+        def __init__(self, *args, **kwargs):
+            super(ArchivalOutcomeForm, self).__init__(*args, **kwargs)
+            # user may have declared character dead or deleted after the game ended, so allow selecting dead characters
+            if "attendance_id" in self.initial and self.initial["attendance_id"]:
+                queryset = self.initial["invited_player"].character_set.distinct()
+            else:
+                queryset = self.initial["invited_player"].character_set\
+                    .exclude(character_death__is_void = False, character_death__game_attendance__isnull = False)\
+                    .distinct()
+            self.fields['attending_character'].queryset = queryset
+
+    return ArchivalOutcomeForm
 
 class RsvpAttendanceForm(forms.Form):
     pass

@@ -161,7 +161,7 @@ EXP_GM = "GM"
 EXP_JOURNAL = "JOURNAL"
 EXP_CUSTOM = "CUSTOM"
 EXP_REWARD_TYPE = (
-    (EXP_MVP, "earning MVP"),
+    (EXP_MVP, "earning Commission"),
     (EXP_LOSS_V1, "losing"),
     (EXP_LOSS_RINGER_V1, "losing as a ringer"),
     (EXP_WIN_V1, "winning"),

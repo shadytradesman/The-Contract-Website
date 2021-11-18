@@ -18,12 +18,12 @@ logger = logging.getLogger("app." + __name__)
 
 from games.forms import CreateScenarioForm, CellMemberAttendedForm, make_game_form, make_allocate_improvement_form, \
     CustomInviteForm, make_accept_invite_form, ValidateAttendanceForm, DeclareOutcomeForm, GameFeedbackForm, \
-    OutsiderAttendedForm, make_who_was_gm_form,make_archive_game_general_info_form, ArchivalOutcomeForm, \
+    OutsiderAttendedForm, make_who_was_gm_form,make_archive_game_general_info_form, get_archival_outcome_form, \
     RsvpAttendanceForm
 from .game_form_utilities import get_context_for_create_finished_game, change_time_to_current_timezone, convert_to_localtime, \
     create_archival_game, get_context_for_completed_edit, handle_edit_completed_game, get_context_for_choose_attending, \
     get_gm_form, get_outsider_formset, get_member_formset, get_players_for_new_attendances
-from .games_constants import GAME_STATUS
+from .games_constants import GAME_STATUS, EXP_V1_V2_GAME_ID
 
 from cells.forms import EditWorldEventForm
 from cells.models import WorldEvent
@@ -712,7 +712,7 @@ def finalize_create_ex_game_for_cell(request, cell_id, gm_user_id, players):
     gm = get_object_or_404(User, id=gm_user_id)
     player_list = [get_object_or_404(User, id=player_id) for player_id in players.split('+') if not player_id == str(gm.id)]
     GenInfoForm = make_archive_game_general_info_form(gm)
-    ArchivalOutcomeFormSet = formset_factory(ArchivalOutcomeForm, extra=0)
+    ArchivalOutcomeFormSet = formset_factory(get_archival_outcome_form(EXP_V1_V2_GAME_ID+1), extra=0)
     if request.method == 'POST':
         general_form = GenInfoForm(request.POST, prefix="general")
         outcome_formset = ArchivalOutcomeFormSet(request.POST, prefix="outcome", initial=[{'player_id': x.id,
