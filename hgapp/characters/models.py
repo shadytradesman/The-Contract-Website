@@ -469,7 +469,7 @@ class Character(models.Model):
 
     def calculate_status(self):
         num_victories = self.number_of_victories()
-        if num_victories == 0 and self.number_of_losses() == 0:
+        if num_victories < 4:
             return HIGH_ROLLER_STATUS[1][0]
         elif num_victories < 10:
             return HIGH_ROLLER_STATUS[2][0]
@@ -726,6 +726,12 @@ class Character(models.Model):
 
     def exp_cost(self):
         return self.stats_snapshot.exp_cost
+
+    def ability_maximum(self):
+        if self.status == HIGH_ROLLER_STATUS[3][0] or self.status == HIGH_ROLLER_STATUS[4][0] or self.ported != NOT_PORTED:
+            return 6
+        else:
+            return 5
 
     # WARNING: this is an expensive call
     def regen_stats_snapshot(self):

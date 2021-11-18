@@ -8,7 +8,7 @@ from characters.models import Character, BasicStats, Character_Death, Graveyard_
     Limit, LimitRevision, Trauma, TraumaRevision, EXP_NEW_CHAR, EXP_ADV_COST_ATTR_MULTIPLIER, \
     EXP_ADV_COST_SKILL_MULTIPLIER, EXP_COST_QUIRK_MULTIPLIER, EXP_ADV_COST_SOURCE_MULTIPLIER, Source, SourceRevision, \
     Condition, Circumstance, Artifact
-from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, AbilityForm, \
+from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, get_ability_form, \
     AssetForm, LiabilityForm, LimitForm, PHYS_MENTAL, SourceForm, make_charon_coin_form, make_character_ported_form
 from collections import defaultdict
 from django.utils import timezone
@@ -25,8 +25,9 @@ logger = logging.getLogger("app." + __name__)
 def get_edit_context(user, existing_character=None, secret_key=None, cell=None):
     char_form = make_character_form(user, existing_character, supplied_cell=cell)(instance=existing_character)
     AttributeFormSet = formset_factory(AttributeForm, extra=0)
-    AbilityFormSet = formset_factory(AbilityForm, extra=1)
     tutorial = get_object_or_404(CharacterTutorial)
+    max_ability_score = existing_character.ability_maximum() if existing_character and existing_character.stats_snapshot else 5
+    AbilityFormSet = formset_factory(get_ability_form(max_ability_score), extra=1)
     if existing_character and existing_character.stats_snapshot:
         asset_formsets = __get_asset_formsets(existing_character)
         liability_formsets = __get_liability_formsets(existing_character)
@@ -71,6 +72,7 @@ def get_edit_context(user, existing_character=None, secret_key=None, cell=None):
         'char_form': char_form,
         'attribute_formset': attribute_formset,
         'ability_formset': ability_formset,
+        'max_ability_score': max_ability_score,
         'asset_formsets': asset_formsets,
         'liability_formsets': liability_formsets,
         'limit_formset': limit_formset,
@@ -280,7 +282,8 @@ def __save_stats_diff_from_post(POST, existing_character=None, new_character=Non
         new_character.stats_snapshot = stats_snapshot
         new_character.save()
     AttributeFormSet = formset_factory(AttributeForm, extra=0)
-    AbilityFormSet = formset_factory(AbilityForm, extra=1)
+    ability_max = existing_character.ability_maximum() if existing_character else new_character.ability_maximum() if new_character else 5
+    AbilityFormSet = formset_factory(get_ability_form(ability_max), extra=1)
     attributes = Attribute.objects.filter(is_deprecated=False).order_by('name')
     asset_formsets = __get_asset_formsets(existing_character, POST=POST)
     liability_formsets = __get_liability_formsets(existing_character, POST=POST)
