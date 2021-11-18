@@ -10,7 +10,7 @@
                     Enter Contract
                 </a>
                 <a href="{% url 'games:games_looking_for_game' %}" class="btn btn-default">
-                    Find Game
+                    Find Contract
                 </a>
                 <a class="btn btn-default" href="{% url 'games:games_view_scenario_gallery' %}">
                     Scenario Gallery
@@ -25,7 +25,7 @@
         <div class="col-md-10 col-md-offset-1">
             {% if active_games %}
             <div class="alert alert-warning text-center css-home-alert">
-                <h4>Ongoing Game!</h4>
+                <h4>Ongoing Contract!</h4>
                 <ul class="nav nav-pills nav-stacked">
                     {% for game in active_games %}
                     <li>
@@ -37,7 +37,7 @@
             {% endif %}
             {% if attendance_invites_to_confirm %}
             <div class="alert alert-warning text-center css-home-alert">
-                <b>A GM has declared that you attended a Game</b>
+                <b>A GM has declared that you attended a Contract</b>
                 <p>
                     Confirm or deny your attendance
                 </p>

@@ -43,11 +43,11 @@
                                     </div>
                                 {% else %}
                                     {% if reward.is_improvement %}
-                                        {% user_display invitation.invited_player %} has not yet used their Improvement from this Game.
+                                        {% user_display invitation.invited_player %} has not yet used their Improvement from this Contract.
                                     {% elif reward.is_charon_coin %}
-                                        {% user_display invitation.invited_player %} has not yet used their Charon Coin from this Game.
+                                        {% user_display invitation.invited_player %} has not yet used their Charon Coin from this Contract.
                                     {% else %}
-                                        {{invitation.attendance.attending_character.name}} has not yet spent their Gift for this Game.
+                                        {{invitation.attendance.attending_character.name}} has not yet spent their Gift for this Contract.
                                         {% if "edit_character" in char_perms %}
                                             <a href="{% url 'characters:characters_spend_reward' invitation.attendance.attending_character.id %}"
                                                class="btn btn-success btn-xs"
@@ -73,7 +73,7 @@
                             <a href="{% url 'journals:journal_read_game' invitation.attendance.attending_character.id game.id %}"
                                 class="btn btn-default btn-xs"
                                style="text-indent: 0px;">
-                                Read {{invitation.attendance.attending_character.name}}'s Journal entry for this Game
+                                Read {{invitation.attendance.attending_character.name}}'s Journal entry for this Contract
                             </a>
                         </p>
                     {% endif %}
@@ -81,7 +81,7 @@
                         {% if invitation.is_declined %}
                         <div class="alert alert-danger" role="alert">
                             <p>
-                                This player denied their attendance in this game.
+                                This Player denied their attendance in this Contract.
                             </p>
                         </div>
                         {% else %}
@@ -92,11 +92,11 @@
                                 <a href="{% url 'games:games_confirm_attendance' invitation.attendance.id %}">
                                     Click Here
                                 </a>
-                                to confirm or deny your attendance in this game.
+                                to confirm or deny your attendance in this Contract.
                             </p>
                             {% else %}
                             <p>
-                                This player has not yet confirmed their attendance.
+                                This Player has not yet confirmed their attendance.
                             </p>
                             {% endif %}
                         </div>
@@ -107,7 +107,7 @@
             </div>
         {% empty %}
             <p>
-                No players attended this game. <br>
+                No Players attended this Contract. <br>
             </p>
         {% endfor %}
 </div>

@@ -3,7 +3,7 @@
 {% load i18n %}
 
 {% load bootstrap %}
-{% block head_title %}Declaring Game{% endblock %}
+{% block head_title %}Declaring Contract{% endblock %}
 
 {% block body_class %}home{% endblock %}
 
@@ -18,15 +18,15 @@
             <div class="panel-heading">
                 <h1>
                     {% if game %}
-                        Adding attendances to Game where {{game.gm}} ran {{game.scenario.title}} in {{game.cell.name}}
+                        Adding attendances to Contract where {{game.gm}} ran {{game.scenario.title}} in {{game.cell.name}}
                     {% else %}
-                        Declaring a completed game in
+                        Declaring a completed Contract in
                         <a href="{% url 'cells:cells_view_cell' cell.id %}">{{cell.name}}</a>
                     {% endif %}
                 </h1>
                 {% if not game %}
                     <h3><small>
-                        If you would like schedule an upcoming game, <a href="{% url 'games:games_create_game' %}">Click Here</a>
+                        If you would like schedule an upcoming Contract, <a href="{% url 'games:games_create_game' %}">Click Here</a>
                     </small></h3>
                 {% endif %}
             </div>
@@ -64,7 +64,7 @@
                         {% endif %}
                     </h2>
                     {% if not game %}
-                        <small>Even though you can select it here, the GM cannot attend their own game.</small>
+                        <small>Even though you can select it here, the GM cannot attend their own Contract.</small>
                     {% endif %}
                     <ul>
                         {% for form in member_formset %}

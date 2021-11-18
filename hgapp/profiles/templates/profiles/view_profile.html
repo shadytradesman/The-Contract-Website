@@ -79,7 +79,7 @@
                                                     {% player_rank cell profile.user %}
                                                     - {{ cell.number_of_members }} Member{{cell.number_of_members|pluralize}}
                                                     <br>
-                                                    Game Participation: {% num_games_player_participated cell profile.user %}
+                                                    Contract Participation: {% num_games_player_participated cell profile.user %}
                                                 </small>
                                             </a>
                                         </li>
@@ -100,13 +100,13 @@
                         <p>
                             <b>{{profile.user.username}}</b> has played
                             <b>{{num_contractors_played}}</b> Contractor{{num_contractors_played|pluralize}}
-                            in a total of <b>{{num_games_played}}</b> Game{{num_games_played|pluralize}},
+                            in a total of <b>{{num_games_played}}</b> Contracts{{num_games_played|pluralize}},
                             earning <b>{{num_contractor_victories}}</b> Win{{num_contractor_victories|pluralize}},
                             <b>{{num_contractor_losses}}</b> Failure{{num_contractor_losses|pluralize}},
                             and <b>{{num_contractor_deaths}}</b> Contractor Death{{num_contractor_deaths|pluralize}}.
                         </p>
                         <p>
-                            They have survived <b>{{num_deadly_games_survived}}</b> Game{{num_deadly_games_survived|pluralize}} where another Contractor died.
+                            They have survived <b>{{num_deadly_games_survived}}</b> Contract{{num_deadly_games_survived|pluralize}} where another Contractor died.
                             <br>
                             <a href="#contractors-sec">View Contractors</a>
                         </p>
@@ -118,12 +118,12 @@
                             {{profile.get_gm_suffix_display}}
                         </h3>
                         <p>
-                            <b>{{profile.user.username}}</b> has run <b>{{num_gm_games}}</b> Game{{num_gm_games|pluralize}}
+                            <b>{{profile.user.username}}</b> has run <b>{{num_gm_games}}</b> Contract{{num_gm_games|pluralize}}
                             in <b>{{num_cells_gmed}}</b> World{{num_cells_gmed|pluralize}}
                             for <b>{{num_contractors_gmed}}</b> Contractor{{num_contractors_gmed|pluralize}} and
                             <b>{{num_players_gmed}}</b> Player{{num_players_gmed|pluralize}}.
 
-                            Contractors in their Games received <b>{{num_gm_victories}}</b> Gift{{num_gm_victories|pluralize}},
+                            Contractors in their Contracts received <b>{{num_gm_victories}}</b> Gift{{num_gm_victories|pluralize}},
                             failed but survived <b>{{num_gm_losses}}</b> time{{num_gm_losses|pluralize}},
                             and met with <b>{{num_gm_kills}}</b> unfortunate end{{num_gm_kills|pluralize}}.
                         </p>
@@ -131,7 +131,7 @@
                             They have achieved the Golden Ratio <b>{{num_golden_ratio_games}}</b> time{{num_golden_ratio_games|pluralize}}.
                             <br>
                             <a href="#games-sec">
-                                View Games and Scenarios
+                                View Contracts and Scenarios
                             </a>
                         </p>
                     </div>
@@ -310,7 +310,7 @@
             <div class="row">
                 <div class="text-center">
                     <h2>
-                        Game Record
+                        Contract Record
                     </h2>
                 </div>
             </div>
@@ -332,7 +332,7 @@
                 {% endfor %}
                 </ul>
             {% empty %}
-            <h4 class="text-center"><small>{{profile.user.username}} has never GMed or attended a Game</small></h4>
+            <h4 class="text-center"><small>{{profile.user.username}} has never GMed or attended a Contract</small></h4>
             {% endfor %}
         </div>
         {% endcache %}

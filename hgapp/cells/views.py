@@ -132,7 +132,7 @@ class EditFindWorld(View):
             self.cell.is_listed_publicly = form.cleaned_data['list_publicly']
             self.cell.allow_self_invites = form.cleaned_data['allow_self_invites']
             self.cell.cell_sell = form.cleaned_data['cell_sell']
-            self.cell.community_link = form.cleaned_data['community_link']
+            self.cell.community_link = form.cleaned_data['community_link'] if form.cleaned_data['community_link'] else None
             self.cell.is_community_link_public = form.cleaned_data["is_community_link_public"]
             with transaction.atomic():
                 self.cell.save()
@@ -487,7 +487,7 @@ class FindWorld(View):
         return render(request, self.template_name, self.__get_context_data())
 
     def __get_context_data(self):
-        public_cells = Cell.objects.filter(is_listed_publicly=True).order_by('-find_world_date').all()
+        public_cells = Cell.objects.filter(is_listed_publicly=True, community_link__isnull=False).order_by('-find_world_date').all()
         context = {
             'public_cells': public_cells,
             'tutorial': get_object_or_404(CharacterTutorial),

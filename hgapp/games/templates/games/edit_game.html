@@ -22,9 +22,9 @@
 
 {% block head_title %}
 {% if game %}
-    Editing Game for {{game.scenario.title}}
+    Editing Contract for {{game.scenario.title}}
 {% else %}
-    Scheduling a Game
+    Scheduling a Contract
 {% endif %}
 {% endblock %}
 
@@ -36,9 +36,9 @@
     <div class="text-center">
         <h1>
             {% if game %}
-                Editing Game for {{game.scenario.title}}
+                Editing Contract for {{game.scenario.title}}
             {% else %}
-                Schedule a Game
+                Schedule a Contract
             {% endif %}
         </h1>
     </div>
@@ -58,34 +58,34 @@
                             <br>
                             <div class="col-md-8 col-md-offset-2 thumbnail text-left">
                                 <p>
-                                   This form creates a Game event that helps coordinate running a Game. If you would like
-                                    to record a completed Game,
+                                   This form schedules an upcoming session that helps coordinate running a Contract. If you would like
+                                    to record a completed Contract,
                                     <a href="{% url 'games:games_enter_game' %}">
                                         click here.
                                     </a>
                                     <br><br>
-                                    Players who you invite or who find your Game on the LFG page may RSVP and declare
+                                    Players who you invite or who find your Contract on the LFG page may RSVP and declare
                                     which Contractors they intend to bring. These Contractors will be revealed to you if they
                                     are Private.
                                     <br><br>
-                                   When you are ready to start playing, visit your Game's page, click the "Start Game" button,
-                                    and confirm which Players and Contractors are attending. While the Game is Active,
-                                    Players will not be able bring their Contractor on other Games.
+                                   When you are ready to start playing, visit your Contract's page, click the "Start Contract" button,
+                                    and confirm which Players and Contractors are attending. While the Contract is Active,
+                                    Players will not be able bring their Contractor on other Contracts.
                                    <br><br>
-                                   When the Game is over, transition its status to Finished and declare the outcome for
+                                   When the Contract is over, transition its status to Finished and declare the outcome for
                                     each Contractor.
                                    Surviving Contractors will receive Experience and, if they won, Gifts. Those less
                                     fortunate are interned in
                                     <a href="{%url 'characters:characters_graveyard' %}">
                                         the Graveyard.
                                     </a>
-                                    Regardless of the outcome, the Game's Scenario is revealed to the Players in their
+                                    Regardless of the outcome, the Contract's Scenario is revealed to the Players in their
                                     Scenario Gallery, and they will be able to view any in-character Journals written
                                     about it. As the GM, you can leave feedback about your experience running it.
                                     <br><br>
-                                    You are awarded 4 Experience for GMing. If at least one Contractor died and at least
-                                    one achieves Victory, you are given an Improvement to use on one of your Contractors'
-                                    Powers.
+                                    You are awarded 4 Experience for GMing. If any of the Players are brand-new OR at
+                                    least one Contractor dies and at least one achieves Victory, you are given an
+                                    Improvement to use on one of your Contractors' Powers.
                                </p>
                             </div>
                         </div>
@@ -107,7 +107,7 @@
                         <div class="alert-danger col-xs-7 col-xs-offset-2">
                             <h4>You are not a member of any <a href="/guide/rules/#worlds">Worlds</a></h4>
                             <p>
-                                All Games must take place inside a World. Ask your friends for an invite,
+                                All Contracts must take place inside a World. Ask your friends for an invite,
                                 <a href="{% url 'cells:find_world' ">
                                     find a World to join,
                                 </a>
@@ -145,8 +145,8 @@
                             <div class="alert-warning col-xs-7 col-xs-offset-2">
                                 <h4>You do not have access to any scenarios</h4>
                                 <p>
-                                    You discover Scenarios by playing in games or <a href="{% url 'games:games_create_scenario' %}">writing them yourself</a>!
-                                    Scheduling this game will create a placeholder Scenario that you can edit later.
+                                    You discover Scenarios by playing in Contracts or <a href="{% url 'games:games_create_scenario' %}">writing them yourself</a>!
+                                    Scheduling this Contract will create a placeholder Scenario that you can edit later.
                                 </p>
                             </div>
                         </div>
@@ -216,7 +216,7 @@
                             {% if game %}
                                 Done
                             {% else %}
-                                Schedule Game
+                                Schedule Contract
                             {% endif %}
                             "/>
                 </div>

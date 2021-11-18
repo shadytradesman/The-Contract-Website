@@ -21,12 +21,12 @@
         <br>
         <div class="text-center alert alert-info" role="alert">
             <b>
-                The next Game journal you write will grant you
+                The next Contract journal you write will grant you
                 {% if next_reward_is_improvement %}
                     an Improvement.
                 {% else %}
                     1 Exp. You must write {{num_journals_until_improvement}} more
-                    Game journal{{num_journals_until_improvement|pluralize}} to get an Improvement.
+                    Contract journal{{num_journals_until_improvement|pluralize}} to get an Improvement.
                 {% endif %}
 
             </b>
@@ -137,7 +137,7 @@
         {% else %}
             {% if viewer_can_write %}
                 <div class="alert alert-success text-center">
-                    You have not written a journal for this game yet.
+                    You have not written a journal for this Contract yet.
                     You will earn
                     {% if next_reward_improvement %}
                         <b>an Improvement</b>
@@ -145,7 +145,7 @@
                         1 Exp
                     {% endif %}
                     for {{character.name}} if you write an in-character journal about
-                    the events of the Game.
+                    the events of the Contract.
                     <br>
                     <a class="btn btn-primary"
                        href="{% url 'journals:journal_write_game' journal_page.game.id character.id %}">
@@ -220,10 +220,10 @@
             {% if journal_page.downtime_journals %}
                 You may write additional Downtime journals, but you will not gain Experience from them.
             {% else %}
-                You have not written a Downtime Journal for this Game yet.
+                You have not written a Downtime Journal for this Contract yet.
                 You will earn 1 Exp
                 for {{character.name}} if you write an in-character Journal at least
-                250 words in length explaining what occurred between this Game and the next.
+                250 words in length explaining what occurred between this Contract and the next.
             {% endif %}
             <br>
             <a class="btn btn-primary"

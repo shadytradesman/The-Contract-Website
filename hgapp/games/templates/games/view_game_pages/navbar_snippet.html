@@ -2,7 +2,7 @@
 <br>
 <ul class="nav nav-pills nav-justified navbar-default">
     {% if game.is_scheduled %}
-    <li><a href="{% url 'games:games_game_edit' game.id %}">Edit Game</a></li>
+    <li><a href="{% url 'games:games_game_edit' game.id %}">Edit Contract</a></li>
     {% endif %}
     {% if game.is_finished or game.is_recorded %}
     <li class="active">
@@ -13,13 +13,13 @@
     </li>
     {% endif %}
     {% if game.is_active or game.is_scheduled %}
-    <li><a href="{% url 'games:games_cancel_game' game.id %}">Cancel Game</a></li>
+    <li><a href="{% url 'games:games_cancel_game' game.id %}">Cancel Contract</a></li>
     {% endif %}
     {% if game.is_scheduled %}
-    <li class="active"><a href="{% url 'games:games_start_game' game.id %}">Start Game</a></li>
+    <li class="active"><a href="{% url 'games:games_start_game' game.id %}">Start Contract</a></li>
     {% endif %}
     {% if game.is_active %}
-    <li class="active"><a href="{% url 'games:games_end_game' game.id %}">Finish Game</a></li>
+    <li class="active"><a href="{% url 'games:games_end_game' game.id %}">Finish Contract</a></li>
     {% endif %}
 
 </ul>

@@ -24,17 +24,17 @@
                     <div class="row">
                         <div class="col-md-8 col-md-offset-2 alert alert-danger" role="alert">
                             <h4>{{character.name}} does not have any unspent Gifts.</h4>
-                            <p>All powers cost at least one Gift. Gifts are only obtained by playing a Character in a Game and winning.</p>
-                            <p>You can still assign this power, but it will put your character in bad standing.</p>
+                            <p>All powers cost at least one Gift. Gifts are only obtained by playing a Contractor in a Contract and winning.</p>
+                            <p>You can still assign this Power, but it will put your Contractor in bad standing.</p>
                         </div>
                     </div>
                 {% elif reward_deficit > 0 %}
                     <div class="row">
                         <div class="col-md-8 col-md-offset-2 alert alert-danger" role="alert">
-                            <h4>{{character.name}} does not have a sufficient number of Gifts and Improvements to grant this power.</h4>
+                            <h4>{{character.name}} does not have a sufficient number of Gifts and Improvements to grant this Power.</h4>
                             <p>{{power_full.name}} has a cost of {{power_full.get_point_value}}, and {{character.name}} can only afford {{rewards_to_spend|length}}.</p>
                             <p>You require <b>{{reward_deficit}}</b> more Gift{{reward_deficit|pluralize}} or Improvement{{reward_deficit|pluralize}}.</br>
-                            <b>You can still assign this power, but it will put your character in bad standing.</b></p>
+                            <b>You can still assign this Power, but it will put your Contractor in bad standing.</b></p>
                         </div>
                     </div>
                 {% endif %}

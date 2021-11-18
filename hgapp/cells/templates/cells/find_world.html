@@ -37,7 +37,8 @@
                             </p>
                         </div>
                         <p>
-                            These Worlds are looking for new Players! They are ordered by recent Game activity.
+                            The Worlds on this list are looking for new Players and have off-site communities.
+                            They are ordered by recent activity.
                         </p>
                         <p>
                             If you want to start your own World
@@ -45,7 +46,7 @@
                                 click here
                             </a>
                             <br>
-                            If you are looking for a Game to play in, visit
+                            If you are looking for a Contract to play in, visit
                             <a href="{% url 'games:games_looking_for_game' %}" class="btn btn-default btn-xs">
                                 Looking For Game
                             </a>
@@ -74,7 +75,7 @@
                             |
                             {{cell.character_set.count}} Contractor{{cell.character_set.count|pluralize}}
                             |
-                            {{cell.num_completed_games}} completed Game{{cell.num_completed_games|pluralize}}
+                            {{cell.num_completed_games}} completed Contract{{cell.num_completed_games|pluralize}}
                             {% if cell.cell_sell %}
                                 <div class="expandable-outer js-expandable-collapsed">
                                     {{cell.cell_sell|linebreaks}}

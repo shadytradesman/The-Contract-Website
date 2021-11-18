@@ -1,9 +1,19 @@
+{% if not user_membership and community_link %}
+    <ul class="nav nav-pills nav-justified navbar-default">
+        <li>
+            <a class="btn-primary" href="{{community_link}}">
+                Visit {{cell.name}}'s off-site Community
+            </a>
+        </li>
+    </ul>
+<br>
+{% endif %}
 {% if user_membership %}
 <ul class="nav nav-pills nav-justified navbar-default">
     {% if can_gm %}
         <li>
             <a href="{% url 'games:games_create_game_world' cell.id %}">
-                Schedule Game
+                Schedule Contract
             </a>
         </li>
     {% endif %}
@@ -50,6 +60,13 @@
                 </li>
                 {% endif %}
                 {% if can_manage_memberships %}
+                    {% if not community_link %}
+                        <li>
+                            <a class="btn-primary"  href="{% url 'cells:cells_edit_find_world' cell.id %}">
+                                Add Link to Your off-site Community
+                            </a>
+                        </li>
+                    {% endif %}
                 <li>
                     <a href="{% url 'cells:cells_edit_find_world' cell.id %}">Edit Recruitment Settings</a>
                 </li>
@@ -73,11 +90,18 @@
                 {% if request.user.is_authenticated and can_manage_games %}
                 <li>
                     <a href="{% url 'games:games_create_ex_game_for_cell' cell.id %}">
-                        Declare a Completed Game
+                        Declare a Completed Contract
                     </a>
                 </li>
                 {% endif %}
             </ul>
+        </li>
+    {% endif %}
+    {% if community_link %}
+        <li>
+            <a class="btn-primary" href="{{community_link}}">
+                Visit off-site Community
+            </a>
         </li>
     {% endif %}
     <li>
@@ -86,4 +110,5 @@
         </a>
     </li>
 </ul>
+<br>
 {% endif %}

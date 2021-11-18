@@ -3,7 +3,7 @@
 {% load i18n %}
 
 {% load bootstrap %}
-{% block head_title %}Declaring Game{% endblock %}
+{% block head_title %}Declaring Contract{% endblock %}
 
 {% block body_class %}home{% endblock %}
 
@@ -26,7 +26,7 @@
                     {% if game %}
                         Editing the Game where {{game.gm}} ran {{game.scenario.title}} in {{game.cell.name}}
                     {% else %}
-                        Declaring a completed Game in <a href="{% url 'cells:cells_view_cell' cell.id %}">{{cell.name}}</a>
+                        Declaring a completed Contract in <a href="{% url 'cells:cells_view_cell' cell.id %}">{{cell.name}}</a>
                     {% endif %}
                 </h1>
                 <h3>
@@ -39,7 +39,7 @@
                                 <a href="{% url 'games:games_add_attendance' game.id %}">Click Here.</a> (Leaves page)
                             {% endif %}
                         {% else %}
-                            If you would like schedule an upcoming game,
+                            If you would like schedule an upcoming Contract,
                             <a href="{% url 'games:games_create_game' %}">Click Here.</a>
                         {% endif %}
                     </small>
@@ -62,7 +62,7 @@
                 {{ outcome_formset.management_form }}
                 {{ outcome_formset.non_field_errors }}
                 <div class="container">
-                    <h3>What was {% user_display gm %}'s Game?</h3>
+                    <h3>What was {% user_display gm %}'s Contract?</h3>
                     <div class="col-xs-9">
                         <ul class="list-unstyled">
                         {% for field in general_form %}
@@ -91,7 +91,7 @@
                 <div class = "panel-footer">
                     {% if not game %}
                         <div class="alert alert-warning" role="alert">
-                            Warning: Once you confirm this game, you will be unable to edit the GM or World,
+                            Warning: Once you confirm this Contract, you will be unable to edit the GM or World,
                             and you will be unable to delete it.
                         </div>
                     {% endif %}
@@ -99,7 +99,7 @@
                            {% if game %}
                              value="Submit Edits"
                            {% else %}
-                              value="Submit Completed Game"
+                              value="Submit Completed Contract"
                            {% endif %}
                     />
                 </div>
