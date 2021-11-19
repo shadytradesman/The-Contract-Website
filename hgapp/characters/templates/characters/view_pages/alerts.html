@@ -83,8 +83,8 @@
     {% if character.number_of_victories > 3 %}
         <div class="alert alert-danger text-center css-char-alert" role="alert">
             <p>
-                {{character.name}} does not have a home World despite completing {{character.number_completed_games}} Games.
-                They should not play in any Games until they have a home.
+                {{character.name}} does not have a home World despite completing {{character.number_completed_games}} Contracts.
+                They should not play in any Contracts until they have a home.
                 {% if user_can_edit %}
                     <br>
                     <a href="{% url 'cells:cells_find_world' %}">
@@ -106,7 +106,7 @@
         <div class="alert alert-warning text-center css-char-alert" role="alert">
             <p>
                 {{character.name}} does not have a home World. They cannot interact with Contractors on their Downtimes.
-                They must choose a World before their fourth Game.
+                They must choose a World before their fourth Contract.
                 {% if user_can_edit %}
                     <br>
                     <a href="{% url 'cells:cells_find_world' %}">
@@ -125,17 +125,6 @@
             </p>
         </div>
     {% endif %}
-{% endif %}
-{% if show_more_home_games_warning %}
-    <div class="alert alert-warning text-center css-char-alert" role="alert">
-        <p>
-            {{character.name}} has played more Games out of their home World than in it.</br>
-            <b>Games in home World: </b>{{character.number_completed_games_in_home_cell}}
-            <b>Games in other Worlds: </b>{{character.number_completed_games_out_of_home_cell}}
-            <br>
-            They can only play in Games in their home World until that's where the majority of their Games have taken place.
-        </p>
-    </div>
 {% endif %}
 {% if character.show_gift_alert %}
     <div class="alert alert-danger text-center css-char-alert" role="alert">
@@ -184,7 +173,7 @@
             {% if next_entry.is_downtime %}
             Downtime
             {% else %}
-            Game
+            Contract
             {% endif %}
             journal
         </div>

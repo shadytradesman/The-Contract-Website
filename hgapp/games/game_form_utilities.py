@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404
 from django.db import transaction
 from django.contrib.auth.models import User
 
-from .forms import make_archive_game_general_info_form, ArchivalOutcomeForm, CellMemberAttendedForm, OutsiderAttendedForm, \
+from .forms import make_archive_game_general_info_form, get_archival_outcome_form, CellMemberAttendedForm, OutsiderAttendedForm, \
     make_who_was_gm_form
 from .models import Game, Game_Invite, Game_Attendance
 from .games_constants import GAME_STATUS
@@ -42,12 +42,13 @@ def get_context_for_create_finished_game(player_list, players, gm, cell, GenInfo
 
 
 def _get_outcome_formset_for_edit(game, new_player_list, POST=None):
-    ArchivalOutcomeFormset = formset_factory(ArchivalOutcomeForm, extra=0)
+    ArchivalOutcomeFormset = formset_factory(get_archival_outcome_form(game.id), extra=0)
     initial_existing = [{'player_id': attendance.get_player().id,
                          'attendance_id': attendance.id,
                          'invited_player': attendance.get_player(),
                          'attending_character': attendance.attending_character,
                          'outcome': attendance.outcome,
+                         'MVP': attendance.is_mvp,
                          'notes': attendance.notes, } for attendance in game.game_attendance_set.all()]
     initial_new = [{'player_id': x.id, 'invited_player': x} for x in new_player_list]
     initial_outcomes = initial_existing + initial_new
@@ -75,6 +76,8 @@ def handle_edit_completed_game(request, game, new_player_list):
     outcome_formset = _get_outcome_formset_for_edit(game, new_player_list, request.POST)
     if general_form.is_valid():
         if outcome_formset.is_valid():
+            if len([x for x in outcome_formset if x.cleaned_data["MVP"]]) > 1:
+                raise ValueError("More than one MVP in completed edit")
             with transaction.atomic():
                 Game.objects.select_for_update().get(pk=game.pk)
                 original_game_ratio = game.achieves_golden_ratio()
@@ -129,10 +132,11 @@ def _update_or_add_attendance(request, form, game):
         if notes:
             attendance.notes = notes
         attendance.save() # always resave the attendance because that's how we do scenario discoveries.
-        if 'attending_character' in form.changed_data or 'outcome' in form.changed_data:
+        if 'attending_character' in form.changed_data or 'outcome' in form.changed_data or 'MVP' in form.changed_data:
             attendance.change_outcome(new_outcome=form.cleaned_data['outcome'],
                                       is_confirmed=is_confirmed,
-                                      attending_character=attending_character)
+                                      attending_character=attending_character,
+                                      is_mvp=form.cleaned_data["MVP"])
     else:
         # New Attendance
         attendance = Game_Attendance(
@@ -141,6 +145,7 @@ def _update_or_add_attendance(request, form, game):
             outcome=form.cleaned_data['outcome'],
             is_confirmed=is_confirmed,
             attending_character = attending_character,
+            is_mvp=form.cleaned_data["MVP"],
         )
         game_invite = Game_Invite(invited_player=player,
                                   relevant_game=game,
@@ -175,8 +180,7 @@ def create_archival_game(request, general_form, cell, outcome_formset):
             occurred_time = change_time_to_current_timezone(occurred_time)
         # TODO: check to see if the game has the exact same time as existing game and fail.
         game = Game(
-		scenario=self.scenario,
-		title=general_form.cleaned_data['title'],
+            title=general_form.cleaned_data['title'],
             creator=request.user,
             gm=form_gm,
             created_date=timezone.now(),

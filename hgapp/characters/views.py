@@ -17,7 +17,7 @@ from django.middleware.csrf import rotate_token
 from characters.models import Character, BasicStats, Character_Death, Graveyard_Header, Attribute, Ability, \
     CharacterTutorial, Asset, Liability, BattleScar, Trauma, TraumaRevision, Injury, Source, ExperienceReward
 from powers.models import Power_Full
-from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, AbilityForm, \
+from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, get_ability_form, \
     AssetForm, LiabilityForm, BattleScarForm, TraumaForm, InjuryForm, SourceValForm, make_allocate_gm_exp_form, EquipmentForm,\
     DeleteCharacterForm, BioForm, make_world_element_form
 from characters.form_utilities import get_edit_context, character_from_post, update_character_from_post, \
@@ -205,7 +205,7 @@ def view_character(request, character_id, secret_key = None):
         else:
             timeline[event[0].strftime("%d %b %Y")].append((event[1], event[2]))
 
-    char_ability_values = character.stats_snapshot.abilityvalue_set.order_by("relevant_ability__name").all()
+    char_ability_values = character.get_abilities()
     ability_value_by_id = {}
     char_value_ids = [x.relevant_ability.id for x in char_ability_values]
     primary_zero_values = [(x.name, x, 0) for x in Ability.objects.filter(is_primary=True).order_by("name").all()
@@ -238,8 +238,6 @@ def view_character(request, character_id, secret_key = None):
     journal_cover = get_object_or_none(JournalCover, character=character.id)
     next_entry = get_characters_next_journal_credit(character) if user_can_edit else None
 
-    show_more_home_games_warning = character.number_completed_games() > 3 \
-                                   and (character.number_completed_games_in_home_cell() < character.number_completed_games_out_of_home_cell())
     available_gift = character.num_unspent_rewards() > 0
     circumstance_form = None
     condition_form = None
@@ -270,12 +268,9 @@ def view_character(request, character_id, secret_key = None):
 
     assets = character.stats_snapshot.assetdetails_set.all()
     liabilities = character.stats_snapshot.liabilitydetails_set.all()
-    physical_attributes = character.get_attributes(is_physical=True)
-    mental_attributes = character.get_attributes(is_physical=False)
+    attributes = character.get_attributes()
     attribute_value_by_id = {}
-    for attr in physical_attributes:
-        attribute_value_by_id[attr.relevant_attribute.id] = attr.val_with_bonuses()
-    for attr in mental_attributes:
+    for attr in attributes:
         attribute_value_by_id[attr.relevant_attribute.id] = attr.val_with_bonuses()
     context = {
         'character': character,
@@ -283,8 +278,7 @@ def view_character(request, character_id, secret_key = None):
         'health_display': character.get_health_display(),
         'ability_value_by_name': ability_value_by_name,
         'ability_value_by_id': ability_value_by_id,
-        'physical_attributes': physical_attributes,
-        'mental_attributes': mental_attributes,
+        'attributes': attributes,
         'attribute_value_by_id': attribute_value_by_id,
         'timeline': dict(timeline),
         'tutorial': get_object_or_404(CharacterTutorial),
@@ -302,7 +296,6 @@ def view_character(request, character_id, secret_key = None):
         'journal_cover': journal_cover,
         'next_entry': next_entry,
         'latest_journals': latest_journals,
-        'show_more_home_games_warning': show_more_home_games_warning,
         'available_gift': available_gift,
         'circumstance_form': circumstance_form,
         'condition_form': condition_form,

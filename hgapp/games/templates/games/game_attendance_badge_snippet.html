@@ -2,9 +2,17 @@
 {% get_obj_perms request.user for attendance.relevant_game.scenario as "scenario_perms" %}
 <div class="css-timeline-item css-game-badge">
     <h4>
+        {% if attendance.is_mvp %}
+            <span class="glyphicon glyphicon-star css-scenario-rewarded-star" aria-hidden="true"
+              data-toggle="tooltip"
+              title='This Contractor earned bonus Commission. +2 Exp.'
+                style="top: 2px; left: 2px;">
+            </span>
+        {% endif %}
         {% if profile_view %}
             Played
             {% if attendance.attending_character %}
+
                 <a href="{% url 'characters:characters_view' attendance.attending_character.id %}">
                     {{attendance.attending_character.name}}
                 </a>
@@ -14,7 +22,7 @@
             in
         {% endif %}
         <a href="{% url 'games:games_view_game' attendance.relevant_game.id %}">
-            {{ attendance.relevant_game.scenario.title }}
+             {{ attendance.relevant_game.scenario.title }}
             <small>
                 -
                 <b>{{attendance.get_outcome_display}}</b>

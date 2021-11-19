@@ -10,6 +10,7 @@ from django.utils.datetime_safe import datetime
 from django.utils import timezone
 from guardian.shortcuts import assign_perm, remove_perm
 from django.utils.safestring import mark_safe
+from django.db import transaction
 
 from hgapp.utilities import get_queryset_size, get_object_or_none
 from cells.models import Cell
@@ -142,15 +143,57 @@ Track your current equipment here. You may start with anything your Contractor w
 * Metal water bottle
 * Toiletries kit
 """
-
 # EXPERIENCE CONSTANTS
 # These can be changed at will as the historical values are all dynamically calculated.
-EXP_MVP = 2
-EXP_LOSS = 2
-EXP_WIN = 4
-EXP_GM = 4
-EXP_JOURNAL = 1
-EXP_NEW_CHAR = 150
+
+EXP_MVP = "MVP"
+EXP_LOSS_V1 = "LOSS_V1"
+EXP_LOSS_RINGER_V1 = "LOSS_RINGER_V1"
+EXP_WIN_V1 = "WIN_V1"
+EXP_WIN_RINGER_V1 = "WIN_RINGER_V1"
+EXP_LOSS_V2 = "LOSS_V2"
+EXP_LOSS_IN_WORLD_V2 = "LOSS_IN_WORLD_V2"
+EXP_LOSS_RINGER_V2 = "LOSS_RINGER_V2"
+EXP_WIN_V2 = "WIN_V2"
+EXP_WIN_IN_WORLD_V2 = "WIN_IN_WORLD_V2"
+EXP_WIN_RINGER_V2 = "WIN_RINGER_V2"
+EXP_GM = "GM"
+EXP_JOURNAL = "JOURNAL"
+EXP_CUSTOM = "CUSTOM"
+EXP_REWARD_TYPE = (
+    (EXP_MVP, "earning Commission"),
+    (EXP_LOSS_V1, "losing"),
+    (EXP_LOSS_RINGER_V1, "losing as a ringer"),
+    (EXP_WIN_V1, "winning"),
+    (EXP_WIN_RINGER_V1, "winning as a ringer"),
+    (EXP_LOSS_V2, "losing"),
+    (EXP_LOSS_IN_WORLD_V2, "losing in-World Contract"),
+    (EXP_LOSS_RINGER_V2, "losing as a ringer"),
+    (EXP_WIN_V2, "winning"),
+    (EXP_WIN_IN_WORLD_V2, "winning in-World Contract"),
+    (EXP_WIN_RINGER_V2, "winning as a ringer"),
+    (EXP_GM, "GMing"),
+    (EXP_JOURNAL, "writing a journal"),
+    (EXP_CUSTOM, "custom reason"),
+)
+
+EXP_REWARD_VALUES = {
+    EXP_MVP: 2,
+    EXP_LOSS_V1: 2,
+    EXP_LOSS_RINGER_V1: 2,
+    EXP_WIN_V1: 4,
+    EXP_WIN_RINGER_V1: 4,
+    EXP_LOSS_V2: 1,
+    EXP_LOSS_IN_WORLD_V2: 3,
+    EXP_LOSS_RINGER_V2: 1,
+    EXP_WIN_V2: 3,
+    EXP_WIN_IN_WORLD_V2: 5,
+    EXP_WIN_RINGER_V2: 3,
+    EXP_GM: 4,
+    EXP_JOURNAL: 1,
+}
+
+EXP_NEW_CHAR = 145
 EXP_COST_QUIRK_MULTIPLIER = 3
 EXP_ADV_COST_ATTR_MULTIPLIER = 4
 EXP_ADV_COST_SKILL_MULTIPLIER = 2
@@ -426,7 +469,7 @@ class Character(models.Model):
 
     def calculate_status(self):
         num_victories = self.number_of_victories()
-        if num_victories == 0 and self.number_of_losses() == 0:
+        if num_victories < 4:
             return HIGH_ROLLER_STATUS[1][0]
         elif num_victories < 10:
             return HIGH_ROLLER_STATUS[2][0]
@@ -597,7 +640,8 @@ class Character(models.Model):
         return rewards_to_be_spent
 
     def improvement_ok(self):
-        return self.number_of_victories() * 2 > len(self.active_rewards())
+        ported_adjustment = PORTED_IMPROVEMENT_ADJUSTMENT[self.ported] + PORTED_GIFT_ADJUSTMENT[self.ported]
+        return self.number_of_victories() * 2 > (len(self.active_rewards()) - ported_adjustment)
 
     def get_powers_for_render(self):
         return self.power_full_set.all()
@@ -684,6 +728,12 @@ class Character(models.Model):
     def exp_cost(self):
         return self.stats_snapshot.exp_cost
 
+    def ability_maximum(self):
+        if self.status == HIGH_ROLLER_STATUS[3][0] or self.status == HIGH_ROLLER_STATUS[4][0] or self.ported != NOT_PORTED:
+            return 6
+        else:
+            return 5
+
     # WARNING: this is an expensive call
     def regen_stats_snapshot(self):
         self.refresh_from_db()
@@ -711,6 +761,8 @@ class Character(models.Model):
                     if not detail.is_deleted:
                         liability_details.append(detail)
                 for value in diff.attributevalue_set.all():
+                    if value.relevant_attribute.is_deprecated:
+                        continue
                     if value.previous_revision:
                         cost = cost + diff.calc_attr_change_ex_cost(value.previous_revision.value, value.value)
                         attribute_values.remove(value.previous_revision)
@@ -845,10 +897,9 @@ class Character(models.Model):
             query = query.filter(relevant_attribute__is_physical=is_physical)
         return query.order_by('relevant_attribute__name').all()
 
-    def get_abilities(self, is_physical):
+    def get_abilities(self):
         return self.stats_snapshot.abilityvalue_set \
             .prefetch_related('relevant_ability') \
-            .filter(relevant_ability__is_physical=is_physical) \
             .order_by('relevant_ability__name')\
             .all()
 
@@ -961,70 +1012,48 @@ class ExperienceReward(models.Model):
                                            on_delete=models.CASCADE)
     rewarded_player = models.ForeignKey(settings.AUTH_USER_MODEL,
                                         on_delete=models.CASCADE)
+    type = models.CharField(choices=EXP_REWARD_TYPE,
+                            max_length=45,
+                            default=EXP_MVP)
     is_void = models.BooleanField(default=False)
     custom_reason = models.CharField(max_length=150, blank=True, null=True)
     custom_value = models.PositiveIntegerField(blank=True, null=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['rewarded_character', 'created_time']),
+            models.Index(fields=['rewarded_character', 'is_void', 'type']),
+            models.Index(fields=['rewarded_player', 'rewarded_character']),
+        ]
 
     def mark_void(self):
         self.is_void = True
         self.save()
 
-    # returns one of several potential classes. Intended to be used with visitor pattern
-    def get_source(self):
-        if hasattr(self, 'game_attendance'):
-            return self.game_attendance
-        if hasattr(self, 'game'):
-            return self.game
-        elif hasattr(self, 'journal'):
-            return self.journal
-        if hasattr(self, 'custom_reason') and self.custom_reason:
-            return self.custom_reason
-        self.log_bad_source()
-        raise ValueError("Experience reward has no source: " + str(self.pk))
-
     def source_blurb(self):
         if hasattr(self, 'custom_reason') and self.custom_reason:
             return mark_safe(self.custom_reason)
+        reason = "from {}".format(self.get_type_display())
+        if self.type == EXP_GM:
+            return "{} {}".format(reason, self.game.scenario.title)
+        if self.type == EXP_JOURNAL:
+            return mark_safe(reason)
         if hasattr(self, 'game_attendance'):
             attendance = self.game_attendance
-            if attendance.is_victory():
-                outcome = "winning"
-            elif attendance.is_ringer_victory():
-                outcome = "winning as a ringer in"
-            else:
-                outcome = "losing"
-            return "from {} {}".format(outcome, self.game_attendance.relevant_game.scenario.title)
-        elif hasattr(self, 'game'):
-            return "from GMing " + self.game.scenario.title
-        elif hasattr(self, 'journal'):
-            return "from writing a journal"
+            return "{} {}".format(reason, attendance.relevant_game.scenario.title)
+        if hasattr(self, 'mvp_exp_attendance'):
+            attendance = self.mvp_exp_attendance
+            return "{} in {}".format(reason, attendance.relevant_game.scenario.title)
         else:
             self.log_bad_source()
-            raise ValueError("Experience reward has no source: " + str(self.pk))
+            raise ValueError("Experience reward has bad source: " + str(self.pk))
 
     def get_value(self):
         if self.is_void:
             return 0
         if hasattr(self, 'custom_value') and self.custom_value:
             return self.custom_value
-        if hasattr(self, 'game_attendance'):
-            attendance = self.game_attendance
-            value = 0
-            # if attendance.is_mvp():
-            #     value = value + EXP_MVP
-            if attendance.is_victory():
-                value = value + EXP_WIN
-            elif attendance.is_ringer_victory():
-                value = value + EXP_WIN
-            else:
-                value = value + EXP_LOSS
-            return value
-        if hasattr(self, 'game'):
-            return EXP_GM
-        if hasattr(self, 'journal'):
-            return EXP_JOURNAL
-        self.log_bad_source()
-        raise ValueError("Experience reward has no source: " + str(self.pk))
+        return EXP_REWARD_VALUES[self.type]
 
     def log_bad_source(self):
         logger.error('Experience reward %s for character %s has no source.', str(self.pk), str(self.rewarded_character))
@@ -1048,9 +1077,30 @@ class Trait(models.Model):
     class Meta:
         abstract = True
 
+    def __lt__(self, other):
+        return self.name < other.name
+
 class Attribute(Trait):
     scales_body = models.BooleanField(default=False)
     scales_mind = models.BooleanField(default=False)
+    is_deprecated = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        existing = get_object_or_none(Attribute, pk=self.pk)
+        super().save(*args, **kwargs)
+        if existing and (existing.is_deprecated != self.is_deprecated):
+            characters = Character.objects.all()
+            for character in characters:
+                try:
+                    with transaction.atomic():
+                        character.regen_stats_snapshot()
+                except Exception as inst:
+                    logger.error('Error regenerating stats snapshot for character %s id %s',
+                                 str(character.name),
+                                 str(character.id))
+                    logger.exception(inst)
+
+
 
 class Ability(Trait):
     is_primary = models.BooleanField(default=False)
@@ -1348,6 +1398,8 @@ class ContractStats(models.Model):
     def get_change_phrases(self):
         change_phrases = []
         for attribute in self.attributevalue_set.all():
+            if attribute.relevant_attribute.is_deprecated:
+                continue
             exp_cost = self.calc_attr_change_ex_cost(attribute.previous_revision.value, attribute.value)
             exp_phrase = self.get_exp_phrase(exp_cost)
             phrase = self.get_trait_value_change_phrase(attribute.relevant_attribute.name,

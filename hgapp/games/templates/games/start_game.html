@@ -8,7 +8,7 @@
     {{ form.media }}
 {% endblock %}
 
-{% block head_title %}Accepting game invite{% endblock %}
+{% block head_title %}Accepting Contract invite{% endblock %}
 
 {% load account_tags %}
 {% block body_class %}home{% endblock %}
@@ -57,13 +57,11 @@
 
                 {% empty %}
                     <h4 class="text-danger">
-                        No players are attending! Games must have a minimum of two Player Characters (or one if the attending Character is a Veteran)
+                        No players are attending! Contracts must have a minimum of two Player Characters (or one if the attending Character is a Veteran)
                     </h4>
                 {% endfor %}
                     <p>
-                        Once the game has started, all Players will be unable to edit their Characters for the duration.
-                        If the Game hasn't been finished in 24 hours, each Player will be given the ability to cancel the game, wiping its history
-                        and unlocking their Characters.
+                        If the Contract hasn't been finished in 24 hours, each Player will be given the ability to cancel the Contract, wiping its history.
                     </p>
                 {% if formset.forms %}
                     <input class="btn btn-primary" type="submit" value="Start" />

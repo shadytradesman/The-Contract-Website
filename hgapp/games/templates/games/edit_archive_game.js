@@ -5,10 +5,16 @@
 
     function setRinger(id, isRinger, change_outcome) {
         var select = $("select[id$=" + id + "-outcome]");
+        var mvpBox = $("input[id$=" + id + "-MVP]");
+        if (isRinger) {
+            mvpBox[0].checked = false;
+            mvpBox[0].disabled = true;
+        }
         if (wasRingerLast[id] != isRinger) {
             if (isRinger) {
                 select.val('RINGER_VICTORY');
             } else {
+                mvpBox[0].disabled = false;
                 if (change_outcome) {
                     select.val('WIN');
                 }
@@ -22,7 +28,16 @@
         select.children("option[value=LOSS]").prop('disabled', isRinger);
         select.children("option[value=WIN]").prop('disabled', isRinger);
         wasRingerLast[id] = isRinger;
+
     }
+
+    $("input[id$=-MVP]").change(function () {
+         $("input[id$=-MVP]").each(function () {
+             this.checked = false;
+         })
+         this.checked = true;
+    })
+    $("input[id$=-MVP]")[0].checked = true;
 
     $("select[id$=attending_character]").change(function () {
         var regex = ".*([\\d]).*";

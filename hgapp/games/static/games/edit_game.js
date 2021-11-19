@@ -1,14 +1,23 @@
+const scenariosByCell = JSON.parse(document.getElementById('scenariosByCells').textContent);
+
 $(function(){
     function handleScenarioChange() {
-        var $this = $(this);
-        var scenarioId = $this.val();
+        const scenarioId = $("#id_scenario").val();
         if (scenarioId) {
             $("#js-scenario-title").hide();
+            const worldId = $("#id_cell").val();
+            if (worldId && scenariosByCell[worldId].includes(parseInt(scenarioId))) {
+                $("#js-scenario-already-play").show();
+            } else {
+                $("#js-scenario-already-play").hide();
+            }
         } else {
+            $("#js-scenario-already-play").hide();
             $("#js-scenario-title").show();
         }
     }
     $("#id_scenario").change(handleScenarioChange);
+    $("#id_cell").change(handleScenarioChange);
     $("#id_scenario").change();
 });
 

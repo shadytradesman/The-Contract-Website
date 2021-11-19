@@ -24,10 +24,10 @@
                 {% csrf_token %}
                 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
                 {% if invite.as_ringer %}
-                    <h3>You have been invited to play this game as an NPC ringer.</h3>
+                    <h3>You have been invited to play this Contract as an NPC ringer.</h3>
                     <p>If you accept this invite and play as a Ringer, the Scenario will be revealed to you, and you will be unable to
                         play it as a Contractor in the future. If you succeed in your mission as a Ringer, you
-                        will receive an Improvement for the Contractor of your choice.
+                        will receive 4 Exp for the Contractor of your choice.
                     </p>
                 {% endif %}
                 {% if invite.invite_text %}
@@ -45,6 +45,13 @@
                     <h3 class="text-danger">You do not have any valid characters.</h3>
                 {% else %}
                     {{ form.attending_character | bootstrap }}
+                    {% if form.fields.attending_character.choices %}
+                        <div style="max-width: 80%; margin: auto;">
+                            <div class="alert alert-info text-center">
+                                <p>Attending with an in-World Contractor grants an additional 2 Exp, win or lose.</p>
+                            </div>
+                        </div>
+                    {% endif %}
                 {% endif %}
                 {% if scenario_spoiled %}
                     <div class="alert alert-warning text-center">
@@ -54,7 +61,7 @@
                             <a href="{% url 'games:games_view_scenario' game.scenario.id %}">{{game.scenario.title}}</a>
                             and have access to the full writeup, including spoilers.
                             <br>
-                            You should only play in this Game as an NPC Ringer.
+                            You should only play in this Contract as an NPC Ringer.
                         </p>
                     </div>
                 {% endif %}

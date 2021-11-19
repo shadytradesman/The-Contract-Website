@@ -28,10 +28,8 @@
     </div>
     {% include "_messages.html" %}
     <br>
-    {% if user_membership %}
-        {% include "cells/view_cell_navbar_snip.html" %}
-        <br>
-    {% elif invite %}
+    {% include "cells/view_cell_navbar_snip.html" %}
+    {% if invite %}
         <div class="alert alert-success text-center">
             <h5>You have been invited to join this World</h5>
             <h4><a href="{% url 'cells:cells_rsvp_invite' cell.id %}">Click here to RSVP</a></h4>

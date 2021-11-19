@@ -64,7 +64,7 @@
             {% if next_entry.is_downtime %}
             Downtime
             {% else %}
-            Game
+            Contract
             {% endif %}
             journal
         </a>
@@ -123,7 +123,7 @@
     {% endfor %}
 </ul>
 {% empty %}
-<h4>{{character.name}} Has never edited their stats or attended a Game</h4>
+<h4>{{character.name}} Has never edited their stats or attended a Contract</h4>
 {% endfor %}
 {% if character.basic_stats.advancement_history %}
 <h3>Advancement History</h3>

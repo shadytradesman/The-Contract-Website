@@ -98,7 +98,7 @@
                     <a href="{% url 'games:games_create_scenario' %}">Create New Scenario</a>
                 </li>
                 <li>
-                    <a href="{% url 'games:games_create_game' %}">Enter Game</a>
+                    <a href="{% url 'games:games_create_game' %}">Enter Contract</a>
                 </li>
             </ul>
             <br>
@@ -212,7 +212,7 @@
                                 </ul>
                             </div>
                         {% endif %}
-                        <h4>Games run by other Players:</h4>
+                        <h4>Contracts run by other Players:</h4>
                         <ul>
                             {% for game in scenario.finished_games %}
                                 {% if not game in games_run %}

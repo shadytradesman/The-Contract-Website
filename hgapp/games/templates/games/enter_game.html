@@ -17,7 +17,7 @@
 {% block body_base %}
 <div class="container">
     <div class="text-center">
-        <h1>My Game. . .</h1>
+        <h1>My Contract. . .</h1>
     </div>
     <div class="panel panel-default">
         <div class="panel-body">
@@ -28,7 +28,7 @@
                     </h2>
                     <br>
                     <a class="btn btn-primary btn-lg text-center" href="{% url 'games:games_create_game' %}">
-                        Schedule a Game
+                        Schedule a Contract
                     </a>
                 </div>
                 <div class="col-xs-6 text-center">
@@ -37,7 +37,7 @@
                     </h2>
                     {% if cells %}
                         <div>
-                            Record a completed Game
+                            Record a completed Contract
                         </div>
                     {% endif %}
                     {% for cell in cells %}
@@ -47,7 +47,8 @@
                         </a>
                         <br>
                     {% empty %}
-                        <i class="text-danger">You may declare archival Games only if you have the "Manage Games" permission in their World.</i>
+                        <i class="text-danger">You may declare archival Contracts only if you have the "Manage Games"
+                            permission in the World.</i>
                         <br><br>
                         <a href="{% url 'cells:cells_create' %}" class="btn btn-info">Start a new World</a>
                     {% endfor %}

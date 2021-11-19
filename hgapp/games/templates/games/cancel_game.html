@@ -2,7 +2,7 @@
 
 {% load i18n %}
 
-{% block head_title %}Viewing Scenario{% endblock %}
+{% block head_title %}Cancel Contract{% endblock %}
 
 {% block body_class %}home{% endblock %}
 
@@ -13,11 +13,11 @@
             Are you sure you would like to cancel {{ game.title }}?
         </h1>
         <h4>
-            All invitations, attendences, and records of this game will be erased.
+            All invitations, attendances, and records of this Contract will be erased.
         </h4>
         <form action="{% url 'games:games_cancel_game' game.id %}" method="post">
             {% csrf_token %}
-            <input class="btn btn-primary" type="submit" value="Cancel Game" />
+            <input class="btn btn-primary" type="submit" value="Cancel Contract" />
         </form>
     {% endif %}
     {% if game.is_finished or game.is_archived %}

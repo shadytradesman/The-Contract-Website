@@ -17,15 +17,15 @@
                     </li>
                 {% empty %}
                     <p>
-                        No players attending this game?!??!?! <br>
-                        Maybe <a href="{% url 'games:games_cancel_game' game.id %}">Cancel Game</a> and try re-making?
+                        No players attending this Contract?!??!?! <br>
+                        Maybe <a href="{% url 'games:games_cancel_game' game.id %}">Cancel Contract</a> and try re-making?
                     </p>
                 {% endfor %}
             </ul>
     {% elif request.user.is_authenticated %}
         {% if  my_invitation.attendance %}
             <h4>
-                You are attending this game
+                You are attending this Contract
                 {% if my_invitation.attendance.attending_character %}
                     with
                     <a href="{% url 'characters:characters_view' my_invitation.attendance.attending_character.id %}">
@@ -36,7 +36,7 @@
                 {% endif %}
             </h4>
         {% else %}
-            <h3>You are not attending this game.</h3>
+            <h3>You are not attending this Contract.</h3>
         {% endif %}
     {% else %}
         <h3>Log in to check attendance</h3>

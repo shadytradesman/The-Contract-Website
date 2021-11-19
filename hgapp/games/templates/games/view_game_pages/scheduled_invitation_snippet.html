@@ -39,7 +39,7 @@
             {% endfor %}
         </ul>
         <p>
-            <b>This Game's RSVP mode:</b> {{game.get_invitation_mode_display}}.
+            <b>This Contract's RSVP mode:</b> {{game.get_invitation_mode_display}}.
         </p>
         <p>
             {{game.invite_instructions|safe}}
@@ -69,7 +69,7 @@
             {% if my_invitation %}
                 {% if my_invitation.attendance %}
                     {% if my_invitation.attendance.attending_character %}
-                        <h3>You are set to attend this game with
+                        <h3>You are set to attend this Contract with
                             <a href="{% url 'characters:characters_view' my_invitation.attendance.attending_character.id %}">
                                     {{my_invitation.attendance.attending_character.name}}
                             </a>
@@ -77,16 +77,16 @@
                         <h5> <a href="{% url 'games:games_accept_invite' game.id %}">Click here to change character</a></h5>
                         <h5> <a href="{% url 'games:games_decline_invite' game.id %}">Click here to cancel your attendance</a></h5>
                     {% else %}
-                        <h3>You are set to attend this game as an NPC Ringer.</h3>
+                        <h3>You are set to attend this Contract as an NPC Ringer.</h3>
                         <h5> <a href="{% url 'games:games_decline_invite' game.id %}">Click here to cancel your attendance</a></h5>
                     {% endif %}
                 {% elif my_invitation.is_declined %}
-                    <h3>You have declined your invitation to this Game.</h3>
+                    <h3>You have declined your invitation to this Contract.</h3>
                     {% if can_rsvp %}
                         <h5><a href="{% url 'games:games_accept_invite' game.id %}">You may still RSVP if you change your mind</a></h5>
                     {% endif %}
                 {% else %}
-                    <h3 class="text-center">You have been invited to attend this Game</h3>
+                    <h3 class="text-center">You have been invited to attend this Contract.</h3>
                 {% endif %}
             {% endif %}
             {% if can_rsvp %}
@@ -103,13 +103,13 @@
                             <a href="{% url 'games:games_view_scenario' game.scenario.id %}">{{game.scenario.title}}</a>
                             and have access to the full writeup.
                             <br>
-                            You should only play in this Game as an NPC Ringer.
+                            You should only play in this Contract as an NPC Ringer.
                         </p>
                     </div>
                 {% endif %}
             {% else %}
                 <div class="alert alert-info text-center">
-                    <h3>You cannot RSVP to this Game at this time.</h3>
+                    <h3>You cannot RSVP to this Contract at this time.</h3>
                     <p>
                         {{ reason_cannot_rsvp }}
                         {% if nsfw_blocked %}

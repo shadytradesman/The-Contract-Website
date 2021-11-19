@@ -12,17 +12,18 @@ from django.views import View
 
 import datetime
 import logging
+from collections import defaultdict
 
 logger = logging.getLogger("app." + __name__)
 
 from games.forms import CreateScenarioForm, CellMemberAttendedForm, make_game_form, make_allocate_improvement_form, \
     CustomInviteForm, make_accept_invite_form, ValidateAttendanceForm, DeclareOutcomeForm, GameFeedbackForm, \
-    OutsiderAttendedForm, make_who_was_gm_form,make_archive_game_general_info_form, ArchivalOutcomeForm, \
+    OutsiderAttendedForm, make_who_was_gm_form,make_archive_game_general_info_form, get_archival_outcome_form, \
     RsvpAttendanceForm
 from .game_form_utilities import get_context_for_create_finished_game, change_time_to_current_timezone, convert_to_localtime, \
     create_archival_game, get_context_for_completed_edit, handle_edit_completed_game, get_context_for_choose_attending, \
     get_gm_form, get_outsider_formset, get_member_formset, get_players_for_new_attendances
-from .games_constants import GAME_STATUS
+from .games_constants import GAME_STATUS, EXP_V1_V2_GAME_ID
 
 from cells.forms import EditWorldEventForm
 from cells.models import WorldEvent
@@ -252,10 +253,22 @@ def create_game(request, cell_id=None):
     else:
         # Build a game form.
         form = GameForm(initial={"cell": cell})
+        scenarios_by_cells = get_scenarios_by_cells(request)
         context = {
-            'form' : form,
+            'form': form,
+            'scenarios_by_cells': scenarios_by_cells,
         }
         return render(request, 'games/edit_game.html', context)
+
+
+def get_scenarios_by_cells(request):
+    user_cells = request.user.cell_set.all()
+    scenarios_by_cells = defaultdict(set)
+    for cell in user_cells:
+        scenarios_by_cells[cell.id] = list(set(
+            Game.objects.filter(cell=cell, scenario__isnull=False).select_related('scenario').values(
+                'scenario__id').distinct().values_list('id', flat=True)))
+    return scenarios_by_cells
 
 
 def edit_game(request, game_id):
@@ -323,8 +336,10 @@ def edit_game(request, game_id):
     else:
         # Build a game form.
         form = GameForm(initial=initial_data)
+        scenarios_by_cells = get_scenarios_by_cells(request)
         context = {
             'game': game,
+            'scenarios_by_cells': scenarios_by_cells,
             'form' : form,
         }
         return render(request, 'games/edit_game.html', context)
@@ -580,19 +595,21 @@ def end_game(request, game_id):
         }
         initial_data.append(initial)
     if request.method == 'POST':
-        declare_outcome_formset = DeclareOutcomeFormset(request.POST,
-                                            initial=initial_data)
+        declare_outcome_formset = DeclareOutcomeFormset(request.POST, initial=initial_data)
         game_feedback_form = GameFeedbackForm(request.POST)
         world_event_form = None
         if game.cell.player_can_post_world_events(request.user):
             world_event_form = EditWorldEventForm(request.POST)
         if declare_outcome_formset.is_valid() and game_feedback_form.is_valid() \
                 and (not world_event_form or world_event_form.is_valid()):
+            if len([x for x in declare_outcome_formset if x.cleaned_data["MVP"]]) > 1:
+                raise ValueError("More than one MVP in completed edit")
             with transaction.atomic():
                 game = Game.objects.select_for_update().get(pk=game.pk)
                 for form in declare_outcome_formset:
                     attendance = get_object_or_404(Game_Attendance, id=form.cleaned_data['hidden_attendance'].id)
                     attendance.outcome = form.cleaned_data['outcome']
+                    attendance.is_mvp = form.cleaned_data['MVP']
                     if form.cleaned_data['notes']:
                         attendance.notes = form.cleaned_data['notes']
                     attendance.save()
@@ -663,10 +680,10 @@ def allocate_improvement(request, improvement_id):
 # Select which players attended and who was GM
 def create_ex_game_for_cell(request, cell_id):
     if not request.user.is_authenticated:
-        raise PermissionDenied("You must log in to create archival Game events")
+        raise PermissionDenied("You must log in to create archival Contract events")
     cell = get_object_or_404(Cell, id = cell_id)
     if not cell.player_can_manage_games(request.user):
-        raise PermissionDenied("You do not have permission to manage Game Events for this Cell")
+        raise PermissionDenied("You do not have permission to manage Contract Events for this Cell")
     if request.method == 'POST':
         gm_form = get_gm_form(cell, request.POST)
         outsider_formset = get_outsider_formset(request.POST)
@@ -695,7 +712,7 @@ def finalize_create_ex_game_for_cell(request, cell_id, gm_user_id, players):
     gm = get_object_or_404(User, id=gm_user_id)
     player_list = [get_object_or_404(User, id=player_id) for player_id in players.split('+') if not player_id == str(gm.id)]
     GenInfoForm = make_archive_game_general_info_form(gm)
-    ArchivalOutcomeFormSet = formset_factory(ArchivalOutcomeForm, extra=0)
+    ArchivalOutcomeFormSet = formset_factory(get_archival_outcome_form(EXP_V1_V2_GAME_ID+1), extra=0)
     if request.method == 'POST':
         general_form = GenInfoForm(request.POST, prefix="general")
         outcome_formset = ArchivalOutcomeFormSet(request.POST, prefix="outcome", initial=[{'player_id': x.id,

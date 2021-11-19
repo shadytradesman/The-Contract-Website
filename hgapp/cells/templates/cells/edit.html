@@ -48,12 +48,17 @@
         {% csrf_token %}
         <div class="panel panel-default">
             <div class="panel-body">
-                {% if not cell %}
                 <div class="row">
                     <div class="col-md-10 col-md-offset-1 text-center">
                         <div role="alert" class="alert alert-info text-center">
+                            {% if not cell %}
                             <p>
                                 Most play groups share a single World where all Players take turns acting as GM.
+                            </p>
+                            <p>
+                                <a href="https://www.thecontractrpg.com/guide/gm-manual/#world-leader">
+                                    Learn more about leading a World
+                                </a>
                             </p>
                             <p>
                                 <b>
@@ -63,10 +68,17 @@
                             <p>
                                 Use or replace them as desired.
                             </p>
+                            {% else %}
+                            <p>
+                                <a href="https://www.thecontractrpg.com/guide/gm-manual/#world-leader">
+                                    Learn more about leading a World
+                                </a>
+                            </p>
+
+                            {% endif %}
                         </div>
                     </div>
                 </div>
-                {% endif %}
                 <div class="row">
                     <div class="col-xs-12">
                         <div id="css-name-field" class="css-essential-field">
@@ -93,7 +105,7 @@
                     answer:
                     <ul>
                         <li>How commonplace is the supernatural in this World?</li>
-                        <li>Are the Games (Contractors, Harbingers) known? By who?</li>
+                        <li>Are the Contracts (Contractors, Harbingers) known? By who?</li>
                     </ul>
                 {{ form.setting_description | bootstrap }}
                 </p>

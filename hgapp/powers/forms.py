@@ -168,7 +168,7 @@ class SystemFieldRollForm(forms.Form):
                     required_attr = sys_field.required_attribute
                     attribute_choices.append((required_attr.id, required_attr.name))
                 else:
-                    attribute_choices.extend([(x.id, x.name) for x in Attribute.objects.order_by('name')])
+                    attribute_choices.extend([(x.id, x.name) for x in Attribute.objects.filter(is_deprecated=False).order_by('name')])
                 primary_abilities = Ability.objects.filter(is_primary=True).order_by('name')
                 ability_choices =[('','------'),]
                 ability_choices.extend( [(x.id, x.name) for x in primary_abilities])

@@ -17,6 +17,7 @@ from games.models import GAME_STATUS, Scenario
 from hgapp.forms import SignupForm
 from blog.models import Post
 from info.models import FrontPageInfo
+from cells.models import WorldEvent
 
 
 class SignupView(account.views.SignupView):
@@ -61,6 +62,8 @@ def home(request):
         avail_charon_coins = request.user.profile.get_avail_charon_coins()
         avail_exp_rewards = request.user.profile.get_avail_exp_rewards()
         cells = request.user.cell_set.all()
+        cell_ids = set(request.user.cell_set.values_list('id', flat=True).all())
+        world_events = WorldEvent.objects.filter(parent_cell__id__in=cell_ids).order_by('-created_date').all()
         cell_invites = request.user.cellinvite_set.filter(membership=None).filter(is_declined=False).all()
         attendance_invites_to_confirm = request.user.game_invite_set.filter(attendance__is_confirmed=False).exclude(is_declined=True).all()
         context = {
@@ -78,6 +81,7 @@ def home(request):
             'avail_charon_coins': avail_charon_coins,
             'cells': cells,
             'cell_invites': cell_invites,
+            'world_events': world_events[:3],
             'attendance_invites_to_confirm': attendance_invites_to_confirm,
             'avail_exp_rewards': avail_exp_rewards,
             'latest_blog_post': latest_blog_post,

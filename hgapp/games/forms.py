@@ -1,4 +1,7 @@
 from django import forms
+from itertools import groupby
+from django.forms.models import ModelChoiceField, ModelChoiceIterator
+from itertools import chain
 
 from characters.models import HIGH_ROLLER_STATUS, SEASONED_PORTED, VETERAN_PORTED
 from django.forms import ModelChoiceField
@@ -7,6 +10,7 @@ from django.utils import timezone
 from django.db.models import Q
 
 from games.models import OUTCOME, ScenarioTag, REQUIRED_HIGH_ROLLER_STATUS, INVITE_MODE, GameMedium
+from .games_constants import EXP_V1_V2_GAME_ID
 from characters.models import Character
 
 from bootstrap3_datetime.widgets import DateTimePicker
@@ -82,17 +86,17 @@ def make_game_form(user):
         scenario = ScenarioModelChoiceField(queryset=user.scenario_set.filter(scenario_discovery__is_spoiled=True).order_by("-num_words").all(),
                                           empty_label="Create New Scenario",
                                           required=False,
-                                          help_text='Select the Scenario that the Game will follow.')
+                                          help_text='Select the Scenario that the Contract will follow.')
         scheduled_start_time = forms.DateTimeField(widget=DateTimePicker(options=False),
                                                    input_formats=[date_format],
-                                                   help_text='For planning purposes. Places no actual restrictions on starting the Game.')
+                                                   help_text='For planning purposes. Places no actual restrictions on starting the Contract.')
         cell = forms.ModelChoiceField(label="World",
                                       queryset=queryset,
                                       empty_label="Select a World",
-                                      help_text="Select a World for this Game. This generally defines the setting of "
-                                                "the Game, although some Scenarios may see the Contractors spirited away "
+                                      help_text="Select a World for this Contract. This generally defines the setting of "
+                                                "the Contract, although some Scenarios may see the Contractors spirited away "
                                                 "to other dimensions, pocket realms, or similar. "
-                                                "World leaders have the power to edit or void Games "
+                                                "World leaders have the power to edit or void Contracts "
                                                 "run in their World.",
                                       required=True)
 
@@ -110,37 +114,37 @@ def make_game_form(user):
                                               label='Only allow 18+ Players',
                                               help_text="If selected, only Players over the age of 18 will be able"
                                                         " to attend. This does not imply anything about the content of "
-                                                        " the Game.", )
+                                                        " the Contract.", )
 
         invitation_mode = forms.ChoiceField(label="Who can RSVP?",
                                             choices=INVITE_MODE,
                                             initial=INVITE_MODE[2],
-                                            help_text='Determine who is allowed to RSVP to this Game. Specifically '
-                                                      'invited Players may always RSVP unless the Game is closed.')
+                                            help_text='Determine who is allowed to RSVP to this Contract. Specifically '
+                                                      'invited Players may always RSVP unless the Contract is closed.')
         list_in_lfg = forms.BooleanField(initial=True,
                                          required=False,
                                          label='List on LFG',
-                                         help_text="If checked, this Game will appear on the Looking-For-Game page. Do "
-                                                   "not list in-person Games on the LFG page.")
+                                         help_text="If checked, this Contract will appear on the Looking-For-Game page. Do "
+                                                   "not list in-person Contracts on the LFG page.")
         max_rsvp = forms.IntegerField(label="Capacity",
                                       required=False,
-                                      help_text="Optional. Specify a limit on how many Players can RSVP to this Game.",
+                                      help_text="Optional. Specify a limit on how many Players can RSVP to this Contract.",
                                       widget=forms.NumberInput(attrs={'class': 'ability-value-input form-control'}))
         allow_ringers = forms.BooleanField(initial=True,
                                            required=False,
                                            label='Allow Ringers',
                                            help_text="If checked, Players will be able to RSVP as an NPC Ringer. (Note: "
-                                                     "other Players cannot see who has RSVPed until after the Game.)")
+                                                     "other Players cannot see who has RSVPed until after the Contract.)")
         gametime_url = forms.CharField(label='Communication URL',
                                        max_length=1500,
                                        help_text='Optional. A link to the location (video call, Discord server, Roll20 '
-                                                 'room, etc.) where the Game will take place. It is revealed to Players after '
+                                                 'room, etc.) where the Contract will take place. It is revealed to Players after '
                                                  'they are invited or RSVP.',
                                        required=False)
         mediums = forms.ModelMultipleChoiceField(queryset=GameMedium.objects.order_by("medium").all(),
                                                  required=False,
                                                  widget=forms.CheckboxSelectMultiple(attrs={'class': 'list-unstyled list-inline'}),
-                                                 help_text='How will the Players communicate during the Game? Select all'
+                                                 help_text='How will the Players communicate during the Contract? Select all'
                                                            ' that apply.')
 
         def default_date(self):
@@ -151,9 +155,40 @@ def make_game_form(user):
 
     return CreateGameForm
 
+def buildContractorChoiceIterator(game_cell=None):
+    class ContractorChoiceIterator(ModelChoiceIterator):
+        def __len__(self):
+            return self.queryset.count() + (1 if self.field.empty_label is not None else 0)
+
+        def __iter__(self):
+            if game_cell:
+                in_cell_contractors = self.queryset.filter(cell=game_cell).select_related('cell').order_by('cell__name', 'name')
+                out_cell_contractors = self.queryset.exclude(cell=game_cell).select_related('cell').order_by('cell__name', 'name')
+                queryset = chain(in_cell_contractors, out_cell_contractors)
+                groups = groupby(queryset, key=lambda x: x.cell == game_cell)
+            else:
+                queryset = self.queryset.select_related('cell').order_by('cell__name', 'name')
+                groups = groupby(queryset, key=lambda x: x.cell)
+            if self.field.empty_label is not None:
+                yield ("", self.field.empty_label)
+            for world, contractors in groups:
+                yield [
+                    "In-World" if game_cell and world else "Out-of-World" if game_cell else world.name if world else None,
+                    [
+                        (contractor.id, contractor.name)
+                        for contractor in contractors
+                    ]
+                ]
+    return ContractorChoiceIterator
+
 class CharDisplayModelChoiceField(ModelChoiceField):
+    def __init__(self, world=None, *args, **kwargs):
+        self.iterator = buildContractorChoiceIterator(world)
+        super().__init__(*args, **kwargs)
+
     def label_from_instance(self, character):
         return "{} ({} Victories)".format(character.name, character.number_of_victories())
+
 
 def make_accept_invite_form(invitation):
     class AcceptInviteForm(forms.Form):
@@ -175,16 +210,20 @@ def make_accept_invite_form(invitation):
             raise ValueError("unanticipated required roller status")
         if invitation.as_ringer or invitation.relevant_game.allow_ringers:
             attending_character = CharDisplayModelChoiceField(
+                world=invitation.relevant_game.cell,
                 queryset=queryset,
-                 empty_label="Play an NPC Ringer",
-                 required=False)
+                empty_label="Play an NPC Ringer",
+                required=False)
+
         else:
-            attending_character = CharDisplayModelChoiceField(queryset=queryset,
-                                                     empty_label=None,
-                                                     help_text="Declare which character you're attending with. Private "
-                                                               "Characters and their powers will be revealed to the "
-                                                               "Game creator if selected.",
-                                                     required=True)
+            attending_character = CharDisplayModelChoiceField(
+                world=invitation.relevant_game.cell,
+                queryset=queryset,
+                empty_label=None,
+                help_text="Declare which character you're attending with. Private "
+                           "Characters and their powers will be revealed to the "
+                           "Contract creator if selected.",
+                required=True,)
     return AcceptInviteForm
 
 
@@ -212,10 +251,17 @@ class DeclareOutcomeForm(forms.Form):
         # self.initial is set in super
         super(DeclareOutcomeForm, self).__init__(*args, **kwargs)
         attendance = self.initial['game_attendance']
+        mvp_disabled = False
         if attendance.attending_character:
             self.fields['outcome'] = forms.ChoiceField(choices=OUTCOME[:4])
         else:
             self.fields['outcome'] = forms.ChoiceField(choices=OUTCOME[4:6])
+            mvp_disabled = True
+        self.fields['MVP'] = forms.BooleanField(label="Award Commission",
+                                                required=False,
+                                                help_text='The Contractor awarded Commission gets +2 Exp. '
+                                                          'Select whoever you\'d like (MVP, funniest line, achieved secondary objective, etc).',
+                                                disabled=mvp_disabled)
         self.fields['hidden_attendance'] = forms.ModelChoiceField(self.initial['game_attendance'].relevant_game.game_attendance_set.all(),
                                                    required=False)
         self.fields['hidden_attendance'].widget.attrs['hidden'] = True
@@ -223,7 +269,7 @@ class DeclareOutcomeForm(forms.Form):
     notes = forms.CharField(label='Notes',
                             max_length=500,
                             required=False,
-                            help_text='Spoiler-free notes about the character\'s experience in the game (eg. They lost their hand, went insane, found a million bucks, etc)')
+                            help_text='Spoiler-free notes about the character\'s experience in the Contract (eg. They lost their hand, went insane, found a million bucks, etc)')
     def attendance(self):
         return self.initial['game_attendance']
 
@@ -252,7 +298,7 @@ def make_who_was_gm_form(cell):
     class WhoWasGMForm(forms.Form):
         queryset = cell.cellmembership_set.all()
         gm = forms.ModelChoiceField(queryset=queryset,
-                                      label="Which Cell member ran the Game?",
+                                      label="Who ran the Contract?",
                                       empty_label="Select a GM",
                                       required=True)
     return WhoWasGMForm
@@ -285,13 +331,13 @@ def make_archive_game_general_info_form(gm):
                                             required=False,
                                             help_text='Select the Scenario that the GM used.')
         date_format = '%m/%d/%Y %I:%M %p'
-        title = forms.CharField(label='Game Name',
+        title = forms.CharField(label='Contract Name',
                                 max_length=100,
-                                help_text='The Game\'s name.')
+                                help_text='The Contract\'s name.')
         occurred_time = forms.DateTimeField(label='Date Played',
                                             widget=DateTimePicker(options=False, format=date_format),
                                             input_formats=[date_format],
-                                            help_text='When did this Game occur?')
+                                            help_text='When did this Contract occur?')
         timezone = forms.ChoiceField(
             label= ("My Timezone"),
             choices=settings.ACCOUNT_TIMEZONES,
@@ -301,39 +347,46 @@ def make_archive_game_general_info_form(gm):
 
     return ArchiveGeneralInfoForm
 
-class ArchivalOutcomeForm(forms.Form):
-    player_id = forms.CharField(label=None,
-                            max_length=200,
-                            widget=forms.HiddenInput(),
-                            required=True,)
-    attendance_id = forms.CharField(label=None,
-                            max_length=200,
-                            widget=forms.HiddenInput(),
-                            required=False,)
 
-    attending_character = CharDisplayModelChoiceField(queryset=Character.objects.all(),
-                                                    empty_label="Played a Ringer",
-                                                    help_text="Declare which character this player brought.",
-                                                    required=False)
-    outcome = forms.ChoiceField(choices=OUTCOME)
-    notes = forms.CharField(label='Notes',
-                            max_length=500,
-                            required=False,
-                            help_text='Spoiler-free notes about the character\'s experience in the game (eg. They lost '
-                                      'their hand, went insane, found a million bucks, etc)')
+def get_archival_outcome_form(game_id):
+    class ArchivalOutcomeForm(forms.Form):
+        player_id = forms.CharField(label=None,
+                                max_length=200,
+                                widget=forms.HiddenInput(),
+                                required=True,)
+        attendance_id = forms.CharField(label=None,
+                                max_length=200,
+                                widget=forms.HiddenInput(),
+                                required=False,)
 
-    def __init__(self, *args, **kwargs):
-        super(ArchivalOutcomeForm, self).__init__(*args, **kwargs)
-        # user may have declared character dead after the game ended, so allow selecting dead characters
-        if "attendance_id" in self.initial and self.initial["attendance_id"]:
-            queryset = self.initial["invited_player"].character_set.filter(is_deleted=False) \
-                .distinct()
-        else:
-            queryset = self.initial["invited_player"].character_set.filter(is_deleted=False)\
-                .exclude(character_death__is_void = False, character_death__game_attendance__isnull = False)\
-                .distinct()
-        self.fields['attending_character'].queryset = queryset
+        attending_character = CharDisplayModelChoiceField(queryset=Character.objects.all(),
+                                                        empty_label="Played a Ringer",
+                                                        help_text="Declare which character this player brought.",
+                                                        required=False)
+        outcome = forms.ChoiceField(choices=OUTCOME)
+        MVP = forms.BooleanField(label="Award Commission",
+                                required=False,
+                                help_text='The Contractor awarded Commission gets +2 Exp. '
+                                          'Select whoever you\'d like (MVP, funniest line, achieved secondary objective, etc).',
+                                 disabled=game_id < EXP_V1_V2_GAME_ID)
+        notes = forms.CharField(label='Notes',
+                                max_length=500,
+                                required=False,
+                                help_text='Spoiler-free notes about the character\'s experience in the Contract (eg. They lost '
+                                          'their hand, went insane, found a million bucks, etc)')
 
+        def __init__(self, *args, **kwargs):
+            super(ArchivalOutcomeForm, self).__init__(*args, **kwargs)
+            # user may have declared character dead or deleted after the game ended, so allow selecting dead characters
+            if "attendance_id" in self.initial and self.initial["attendance_id"]:
+                queryset = self.initial["invited_player"].character_set.distinct()
+            else:
+                queryset = self.initial["invited_player"].character_set\
+                    .exclude(character_death__is_void = False, character_death__game_attendance__isnull = False)\
+                    .distinct()
+            self.fields['attending_character'].queryset = queryset
+
+    return ArchivalOutcomeForm
 
 class RsvpAttendanceForm(forms.Form):
     pass

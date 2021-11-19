@@ -10,9 +10,9 @@
         Contractors from {{cell.name}}
         <b>
             {% if cell.are_contractors_portable %}
-            Are portable, and may play in Games in other Worlds.
+            Are portable, and may play in Contracts in other Worlds.
             {% else %}
-            Are NOT portable, and may NOT visit other Worlds to play Games.
+            Are NOT portable, and may NOT visit other Worlds to participate in Contracts.
             {% endif %}
         </b>
     </small>
@@ -33,6 +33,8 @@
         </div>
     {% endif %}
     {% for event in world_events %}
-        {% include "cells/world_event_snip.html" %}
+        <div id="event-{{event.id}}">
+            {% include "cells/world_event_snip.html" %}
+        </div>
     {% endfor %}
 </div>

@@ -177,42 +177,37 @@ class AttributeForm(forms.Form):
         if 'previous_value_id' in self.initial:
             self.fields['previous_value_id'].initial = self.initial['previous_value_id']
 
+def get_ability_form(ability_max):
+    class AbilityForm(forms.Form):
+        ability_id = forms.IntegerField(label=None,
+                                        widget=forms.HiddenInput(),
+                                        required=False) # hidden field to track which abilities we are editing.
+        value = forms.IntegerField(initial=0,
+                                   validators=[MaxValueValidator(ability_max), MinValueValidator(0)],
+                                   widget=forms.NumberInput(attrs={'class': 'ability-value-input form-control'}))
+        value_id = forms.IntegerField(label=None, widget=forms.HiddenInput(),required=False)
+        name = forms.CharField(max_length=50,
+                               required=False,
+                               widget=forms.TextInput(attrs={'class': 'form-control sec-ability-name'}))
+        description = forms.CharField(max_length=250,
+                                      required=False,
+                                      widget=forms.TextInput(attrs={'class': 'form-control sec-ability-desc'}))
 
-class AbilityForm(forms.Form):
-    ability_id = forms.IntegerField(label=None,
-                                    widget=forms.HiddenInput(),
-                                    required=False) # hidden field to track which abilities we are editing.
-    value = forms.IntegerField(initial=0,
-                               validators=[MaxValueValidator(5), MinValueValidator(0)],
-                               widget=forms.NumberInput(attrs={'class': 'ability-value-input form-control'}))
-    value_id = forms.IntegerField(label=None, widget=forms.HiddenInput(),required=False)
-    name = forms.CharField(max_length=50,
-                           required=False,
-                           widget=forms.TextInput(attrs={'class': 'form-control sec-ability-name'}))
-    description = forms.CharField(max_length=250,
-                                  required=False,
-                                  widget=forms.TextInput(attrs={'class': 'form-control sec-ability-desc'}))
-    phys_mental = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control sec-ability-phys'}),
-                                    choices=PHYS_MENTAL,
-                                    required=False,
-                                    help_text="For display purposes only. Most Abilities may be used for physical or "
-                                              "mental actions, depending on the situation.")
+        def __init__(self, *args, **kwargs):
+            super(AbilityForm, self).__init__(*args, **kwargs)
+            if 'ability' in self.initial:
+                ability = self.initial["ability"]
+                self.initial["ability_name"] = ability.name
+                self.initial["ability_is_primary"] = ability.is_primary
+                self.initial["ability_tutorial_text"] = ability.tutorial_text
 
-    def __init__(self, *args, **kwargs):
-        super(AbilityForm, self).__init__(*args, **kwargs)
-        if 'ability' in self.initial:
-            ability = self.initial["ability"]
-            self.initial["ability_name"] = ability.name
-            self.initial["ability_is_primary"] = ability.is_primary
-            self.initial["ability_tutorial_text"] = ability.tutorial_text
-            self.initial["phys_mental"] = PHYS_MENTAL[0] if ability.is_physical else PHYS_MENTAL[1]
-
-            self.fields['name'].initial = ability.name
-            self.fields['ability_id'].initial = ability.id
-            self.fields['description'].widget = forms.HiddenInput()
-            self.fields['name'].widget = forms.HiddenInput()
-        if 'value_id' in self.initial and self.initial['value_id']:
-            self.fields['value_id'].initial = self.initial['value_id']
+                self.fields['name'].initial = ability.name
+                self.fields['ability_id'].initial = ability.id
+                self.fields['description'].widget = forms.HiddenInput()
+                self.fields['name'].widget = forms.HiddenInput()
+            if 'value_id' in self.initial and self.initial['value_id']:
+                self.fields['value_id'].initial = self.initial['value_id']
+    return AbilityForm
 
 class QuirkForm(forms.Form):
     id = forms.IntegerField(label=None, widget=forms.HiddenInput(),) # hidden field to track which quirks we are editing.

@@ -12,9 +12,10 @@
 
 {% block extra_scripts %}
     <script src="{% static 'overrides/wiki-macro-scripts.js' %}"></script>
+    <script src="{% static 'games/end_game.js' %}"></script>
 {% endblock %}
 {% block head_title %}
-    Ending Game
+    Ending Contract
 {% endblock %}
 
 {% load account_tags %}
@@ -23,7 +24,7 @@
 {% block body_base %}
 <div class="container">
     <div class="text-center">
-        <h1>Declare Game End Outcomes for {{game.title}}</h1>
+        <h1>Declare Contract Outcomes for {{game.title}}</h1>
     </div>
     <div class="panel panel-default">
         <div class="panel-body">
@@ -50,6 +51,9 @@
                         </h4>
                         <div >
                             {{ form.outcome | bootstrap }}
+                        </div>
+                        <div>
+                            {{ form.MVP |bootstrap}}
                         </div>
                         <div >
                             {{ form.notes | bootstrap }}
@@ -80,12 +84,12 @@
                 {% endif %}
                 <br>
                 <p class="text-center">
-                    Once the game has ended, it can no longer be canceled.
+                    Once the Contract has ended, it can no longer be canceled.
                     Any private Contractors will again be unviewable,
                     and the Scenario will be revealed to the Players.
                 </p>
                 <div class="text-center">
-                    <input class="btn btn-primary" type="submit" value="End Game" />
+                    <input class="btn btn-primary" type="submit" value="End Contract" />
                 </div>
             <div class="row">
                 <div class="col-xs-6 text-center">
