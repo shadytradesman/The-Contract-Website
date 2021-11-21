@@ -9,7 +9,9 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.views import View
+from django.conf import settings
 
+import requests
 import datetime
 import logging
 from collections import defaultdict
@@ -246,6 +248,7 @@ def create_game(request, cell_id=None):
                         game_invite.save()
                         game_invite.notify_invitee(request, game)
             messages.add_message(request, messages.SUCCESS, mark_safe("Your Game has been created Successfully."))
+            post_game_webhook(game, request)
             return HttpResponseRedirect(reverse('games:games_invite_players', args=(game.id,)))
         else:
             logger.error('Error: invalid GameForm. Errors: %s', str(form.errors))
@@ -259,6 +262,10 @@ def create_game(request, cell_id=None):
             'scenarios_by_cells': scenarios_by_cells,
         }
         return render(request, 'games/edit_game.html', context)
+
+def post_game_webhook(game, request):
+    if game.list_in_lfg:
+        requests.post(settings.LFG_WEBHOOK_URL, json={'content': game.get_webhook_post(request), })
 
 
 def get_scenarios_by_cells(request):
@@ -329,6 +336,7 @@ def edit_game(request, game_id):
                                                   as_ringer=False)
                         game_invite.save()
                         game_invite.notify_invitee(request, game)
+            post_game_webhook(game)
             return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
         else:
             logger.error('Error: invalid GameForm. Errors: %s', str(form.errors))

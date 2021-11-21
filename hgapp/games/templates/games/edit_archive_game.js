@@ -37,7 +37,9 @@
          })
          this.checked = true;
     })
-    $("input[id$=-MVP]")[0].checked = true;
+    if ($("input[id$=-MVP]:checked").length == 0) {
+        $("input[id$=-MVP]")[0].checked = true;
+    }
 
     $("select[id$=attending_character]").change(function () {
         var regex = ".*([\\d]).*";

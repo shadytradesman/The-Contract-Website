@@ -24,6 +24,10 @@
                 {% for character_seen, game_list in contacts.items %}
                     <li>
                         <h3>
+                            {% if character_seen.is_dead %}
+                                <img class="css-dead-img" src="{% static 'characters/skull.svg' %}" data-toggle="tooltip" title='{{character_seen.name}} is deceased.'
+                                style=" width: 30px !important; height: 30px !important; filter: invert(100%) sepia(3%) saturate(6757%) hue-rotate(350deg) brightness(104%) contrast(97%); "/>
+                            {% endif %}
                             <a href="{% url 'characters:characters_view' character_seen.id %}">
                                 {{character_seen.name}}
                             </a>

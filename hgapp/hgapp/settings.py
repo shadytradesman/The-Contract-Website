@@ -95,6 +95,13 @@ if DEBUG:
 else:
     SECRET_KEY = os.environ['SECRET_KEY']
 
+# Official webhooks
+if DEBUG:
+    LFG_WEBHOOK_URL = 'https://discord.com/api/webhooks/911653506384011314/4yUXGA8Q1qhrXaxMNBYI1cIYcfyTyNbKS87NFqVA05VMrw9KOcGnjsaWai9byI8Yj0r_'
+else:
+    LFG_WEBHOOK_URL = os.environ['LFG_WEBHOOK_URL']
+
+
 # Application definition
 
 INSTALLED_APPS = [

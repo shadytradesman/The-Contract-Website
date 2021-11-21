@@ -34,7 +34,7 @@
             {% elif user_can_edit and next_entry %}
                 <a class="btn btn-sm btn-success js-journal-link"
                    href="{% url 'journals:journal_write_next' character.id %}">
-                    Earn Experience and Power Improvements
+                    Earn Experience and Improvements
                     <br class="visible-xs-block">
                     for {{character.name}} by writing in {{character.get_pronoun_display}} journal!
                 </a>

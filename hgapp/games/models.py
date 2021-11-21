@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models import Count
 from django.conf import settings
+import json
 from characters.models import Character, HIGH_ROLLER_STATUS, Character_Death, ExperienceReward, AssetDetails, EXP_GM, \
     EXP_LOSS_V2, EXP_WIN_V2, EXP_LOSS_RINGER_V2, EXP_WIN_RINGER_V2, EXP_LOSS_IN_WORLD_V2, EXP_WIN_IN_WORLD_V2, EXP_MVP,\
     EXP_WIN_V1, EXP_LOSS_V1
@@ -183,6 +184,15 @@ class Game(models.Model):
         # ANYONE case
         return None
 
+    def get_webhook_post(self, request):
+        return "{} will run {} in {}. The Contract starts at <t:{}:f> (<t:{}:R>). RSVP: {}".format(
+            self.gm.username,
+            self.scenario.title,
+            self.cell.name,
+            int(self.scheduled_start_time.timestamp()),
+            int(self.scheduled_start_time.timestamp()),
+            request.build_absolute_uri(reverse('games:games_view_game', args=(self.id,)))
+        )
 
     def get_header_display(self):
         if self.is_scheduled():
