@@ -1,7 +1,8 @@
 from django.db.models import Q
+from django.conf import settings
 
 # This is the ID of the game when experience was changed for the November 2021 update.
-EXP_V1_V2_GAME_ID = 567
+EXP_V1_V2_GAME_ID = 567 if not settings.DEBUG else 0
 
 GAME_STATUS = (
     # Invites go out, players may accept invites w/ characters and change whether they are coming and with which character

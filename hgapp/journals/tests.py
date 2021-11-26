@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from django.db.utils import IntegrityError
 
-from characters.models import Character, EXP_NEW_CHAR, EXP_JOURNAL, EXP_WIN
+from characters.models import Character, EXP_NEW_CHAR, EXP_JOURNAL, EXP_REWARD_VALUES, EXP_WIN_IN_WORLD_V2
 from cells.models import Cell
 from games.models import Game, Scenario, WIN, Game_Attendance, Game_Invite
 from games.games_constants import GAME_STATUS
@@ -11,6 +11,8 @@ from profiles.signals import make_profile_for_new_user
 
 from .models import Journal
 
+EXP_WIN = EXP_REWARD_VALUES[EXP_WIN_IN_WORLD_V2]
+JOURNAL_EXP = EXP_REWARD_VALUES[EXP_JOURNAL]
 LIST_100_WORDS = [str(x) for x in range(100)]
 LIST_270_WORDS = [str(x) for x in range(270)]
 INVALID_JOURNAL_CONTENT = " ".join(LIST_100_WORDS)
@@ -31,6 +33,13 @@ class JournalModelTests(TestCase):
             creator = self.cell_owner,
             setting_name = "world name",
             setting_description = "Test description")
+        self.scenario = Scenario.objects.create(
+            title="test scenario",
+            summary="summary",
+            description="blah",
+            creator=self.user1,
+            max_players=1,
+            min_players=2)
         self.char1 = Character.objects.create(
             name="testchar1",
             tagline="they test so bad!",
@@ -58,8 +67,8 @@ class JournalModelTests(TestCase):
             edit_date=timezone.now(),
             cell=self.cell)
         self.game1 = Game(
-scenario=self.scenario,
-title="title",
+            scenario=self.scenario,
+            title="title",
             creator=self.user2,
             gm=self.user2,
             created_date=timezone.now(),
@@ -84,8 +93,8 @@ title="title",
         game_invite.save()
         self.game1.give_rewards()
         self.game2 = Game(
-	scenario=self.scenario,
-title="title",
+            scenario=self.scenario,
+            title="title",
             creator=self.user2,
             gm=self.user2,
             created_date=timezone.now(),
@@ -114,8 +123,8 @@ title="title",
         self.char1_attendances = []
         for x in range(10):
             new_game = Game(
-		scenario=self.scenario,
-		title="title",
+                scenario=self.scenario,
+                title="title",
                 creator=self.user2,
                 gm=self.user2,
                 created_date=timezone.now(),
@@ -226,14 +235,14 @@ title="title",
             journal.set_content(VALID_JOURNAL_CONTENT)
             journals.append(journal)
         self.assertEquals(self.char1.num_unspent_improvements(), 1)
-        self.assertEquals(self.char1.exp_earned(), EXP_NEW_CHAR + (12 * EXP_WIN) + (5 * EXP_JOURNAL))
+        self.assertEquals(self.char1.exp_earned(), EXP_NEW_CHAR + (12 * EXP_WIN) + (5 * JOURNAL_EXP))
         exp_journal = journals[0]
         self.assertIsNone(exp_journal.get_improvement())
         self.assertIsNotNone(exp_journal.get_exp_reward())
         exp_journal.set_content(INVALID_JOURNAL_CONTENT)
         exp_journal.refresh_from_db()
         self.assertEquals(self.char1.num_unspent_improvements(), 1)
-        self.assertEquals(self.char1.exp_earned(), EXP_NEW_CHAR + (12 * EXP_WIN) + (4 * EXP_JOURNAL))
+        self.assertEquals(self.char1.exp_earned(), EXP_NEW_CHAR + (12 * EXP_WIN) + (4 * JOURNAL_EXP))
         self.assertIsNone(exp_journal.get_improvement())
         self.assertIsNone(exp_journal.get_exp_reward())
         exp_journal.set_content(VALID_JOURNAL_CONTENT)
@@ -241,7 +250,7 @@ title="title",
         self.assertIsNone(exp_journal.get_improvement())
         self.assertIsNotNone(exp_journal.get_exp_reward())
         self.assertEquals(self.char1.num_unspent_improvements(), 1)
-        self.assertEquals(self.char1.exp_earned(), EXP_NEW_CHAR + (12 * EXP_WIN) + (5 * EXP_JOURNAL))
+        self.assertEquals(self.char1.exp_earned(), EXP_NEW_CHAR + (12 * EXP_WIN) + (5 * JOURNAL_EXP))
 
         improvement_journal = journals[3]
         self.assertIsNotNone(improvement_journal.get_improvement())
@@ -251,13 +260,13 @@ title="title",
         self.assertIsNone(improvement_journal.get_improvement())
         self.assertIsNone(improvement_journal.get_exp_reward())
         self.assertEquals(self.char1.num_unspent_improvements(), 0)
-        self.assertEquals(self.char1.exp_earned(), EXP_NEW_CHAR + (12 * EXP_WIN) + (5 * EXP_JOURNAL))
+        self.assertEquals(self.char1.exp_earned(), EXP_NEW_CHAR + (12 * EXP_WIN) + (5 * JOURNAL_EXP))
         improvement_journal.set_content(VALID_JOURNAL_CONTENT)
         improvement_journal.refresh_from_db()
         self.assertIsNotNone(improvement_journal.get_improvement())
         self.assertIsNone(improvement_journal.get_exp_reward())
         self.assertEquals(self.char1.num_unspent_improvements(), 1)
-        self.assertEquals(self.char1.exp_earned(), EXP_NEW_CHAR + (12 * EXP_WIN) + (5 * EXP_JOURNAL))
+        self.assertEquals(self.char1.exp_earned(), EXP_NEW_CHAR + (12 * EXP_WIN) + (5 * JOURNAL_EXP))
 
     def test_journal_change_attendance(self):
         journals = []
@@ -273,7 +282,7 @@ title="title",
         self.assertEquals(exp_journal.get_exp_reward().rewarded_character, self.char1)
         self.assertEquals(self.char1.num_unspent_improvements(), 1)
 
-        self.assertEquals(self.char1.exp_earned(), EXP_NEW_CHAR + (12 * EXP_WIN) + (5 * EXP_JOURNAL))
+        self.assertEquals(self.char1.exp_earned(), EXP_NEW_CHAR + (12 * EXP_WIN) + (5 * JOURNAL_EXP))
         self.assertEquals(self.char2.exp_earned(), EXP_NEW_CHAR + (0 * EXP_WIN))
         exp_journal.game_attendance.change_outcome(new_outcome='WIN', is_confirmed=True, attending_character=self.char1)
         exp_journal.refresh_from_db()
@@ -283,8 +292,8 @@ title="title",
         exp_journal.game_attendance.change_outcome(new_outcome='WIN', is_confirmed=True, attending_character=self.char2)
         exp_journal.refresh_from_db()
         self.assertEquals(self.char1.num_unspent_improvements(), 1)
-        self.assertEquals(self.char1.exp_earned(), EXP_NEW_CHAR + (11 * EXP_WIN) + (4 * EXP_JOURNAL))
-        self.assertEquals(self.char2.exp_earned(), EXP_NEW_CHAR + (1 * EXP_WIN) + EXP_JOURNAL)
+        self.assertEquals(self.char1.exp_earned(), EXP_NEW_CHAR + (11 * EXP_WIN) + (4 * JOURNAL_EXP))
+        self.assertEquals(self.char2.exp_earned(), EXP_NEW_CHAR + (1 * EXP_WIN) + JOURNAL_EXP)
         self.assertIsNone(exp_journal.get_improvement())
         self.assertIsNotNone(exp_journal.get_exp_reward())
         self.assertEquals(exp_journal.get_exp_reward().rewarded_character, self.char2)
@@ -297,8 +306,8 @@ title="title",
         improvement_journal.game_attendance.change_outcome(new_outcome='WIN', is_confirmed=True, attending_character=self.char1)
         improvement_journal.refresh_from_db()
         self.assertEquals(self.char1.num_unspent_improvements(), 1)
-        self.assertEquals(self.char1.exp_earned(), EXP_NEW_CHAR + (11 * EXP_WIN) + (4 * EXP_JOURNAL))
-        self.assertEquals(self.char2.exp_earned(), EXP_NEW_CHAR + (1 * EXP_WIN) + EXP_JOURNAL)
+        self.assertEquals(self.char1.exp_earned(), EXP_NEW_CHAR + (11 * EXP_WIN) + (4 * JOURNAL_EXP))
+        self.assertEquals(self.char2.exp_earned(), EXP_NEW_CHAR + (1 * EXP_WIN) + JOURNAL_EXP)
         self.assertIsNotNone(improvement_journal.get_improvement())
         self.assertIsNone(improvement_journal.get_exp_reward())
         self.assertEquals(improvement_journal.get_improvement().rewarded_character, self.char1)
@@ -309,7 +318,7 @@ title="title",
         self.assertIsNotNone(improvement_journal.get_exp_reward())
         self.assertEquals(improvement_journal.get_exp_reward().rewarded_character, self.char2)
         self.assertEquals(self.char1.num_unspent_improvements(), 0)
-        self.assertEquals(self.char1.exp_earned(), EXP_NEW_CHAR + (10 * EXP_WIN) + (4 * EXP_JOURNAL))
-        self.assertEquals(self.char2.exp_earned(), EXP_NEW_CHAR + (2 * EXP_WIN) + (2 * EXP_JOURNAL))
+        self.assertEquals(self.char1.exp_earned(), EXP_NEW_CHAR + (10 * EXP_WIN) + (4 * JOURNAL_EXP))
+        self.assertEquals(self.char2.exp_earned(), EXP_NEW_CHAR + (2 * EXP_WIN) + (2 * JOURNAL_EXP))
 
 

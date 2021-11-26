@@ -501,7 +501,7 @@ def decline_invite(request, game_id):
 
 #TODO: Pull some of this into helper functions
 #TODO: Enforce or advise on number of players constraints
-def start_game(request, game_id, char_error=" ", player_error=" "):
+def start_game(request, game_id, char_error="", player_error=""):
     game = get_object_or_404(Game, id=game_id)
     if not game.player_can_edit(request.user):
         raise PermissionDenied("You don't have permission to edit this Game event")
