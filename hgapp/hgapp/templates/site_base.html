@@ -1,7 +1,6 @@
 {% extends "theme_bootstrap/base.html" %}
 
-{% load staticfiles %}
-{% load pinax_webanalytics_tags %}
+{% load static %}
 {% load i18n %}
 {% load hgapp_tags %}
 
@@ -52,7 +51,6 @@
 {% endblock %}
 
 {% block extra_body_base %}
-    {% analytics %}
     {% block extra_body %}{% endblock %}
 {% endblock %}
 

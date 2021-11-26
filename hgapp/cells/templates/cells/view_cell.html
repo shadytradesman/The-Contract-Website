@@ -1,7 +1,7 @@
 {% extends "site_base.html" %}
 
 {% load i18n %}
-{% load staticfiles %}
+{% load static %}
 
 {% block head_title %}Viewing World{% endblock %}
 
@@ -34,7 +34,7 @@
             <h5>You have been invited to join this World</h5>
             <h4><a href="{% url 'cells:cells_rsvp_invite' cell.id %}">Click here to RSVP</a></h4>
         </div>
-    {% elif cell.allow_self_invites %}
+    {% elif cell.allow_self_invites and not user_membership %}
         <div class="alert alert-success text-center">
         <b style="margin-top: 5px;">This World has open memberships.</b>
         {% if user.is_anonymous %}
