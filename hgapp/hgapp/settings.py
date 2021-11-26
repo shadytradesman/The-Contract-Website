@@ -129,7 +129,6 @@ INSTALLED_APPS = [
     # external
     "account",
     "pinax.eventlog",
-    "pinax.webanalytics",
     'guardian',
     'pagedown.apps.PagedownConfig',
     'markdown_deux',
@@ -264,11 +263,21 @@ if 'RDS_HOSTNAME' in os.environ:
 else:
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'postgres',
+            'USER': 'shady',
+            'PASSWORD': 'password',
+            'HOST': 'localhost',
+            'PORT': '5432',
         }
     }
-
+    # DATABASES = {
+    #     'default': {
+    #         'ENGINE': 'django.db.backends.sqlite3',
+    #         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    #     }
+    # }
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
 AUTH_PASSWORD_VALIDATORS = [
