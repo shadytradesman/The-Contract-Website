@@ -42,6 +42,8 @@ INTERNAL_IPS = (
     '127.0.0.1',
     '192.168.1.23',
 )
+
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
@@ -376,7 +378,6 @@ THEME_CONTACT_EMAIL = "TheContractGame@gmail.com"
 
 # TinyMCE settings
 TINYMCE_JS_URL = "https://cdn.tiny.cloud/1/12xkz9g5ryiyz78mjzhthvq62r42rsi6tzik4yulk1tol6rn/tinymce/5/tinymce.min.js"
-TINYMCE_INCLUDE_JQUERY = False
 TINYMCE_DEFAULT_CONFIG = {
     "theme": "silver",
     "height": 500,

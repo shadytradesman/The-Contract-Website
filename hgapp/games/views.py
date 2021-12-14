@@ -336,7 +336,6 @@ def edit_game(request, game_id):
                                                   as_ringer=False)
                         game_invite.save()
                         game_invite.notify_invitee(request, game)
-            post_game_webhook(game)
             return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
         else:
             logger.error('Error: invalid GameForm. Errors: %s', str(form.errors))
