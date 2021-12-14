@@ -15,7 +15,7 @@ chardet==3.0.4
 colorama==0.4.3
 cryptography==2.9.2
 defusedxml==0.7.1
-Django==3.2.9
+Django==3.2.10
 django-appconf==1.0.4
 django-bootstrap-form==3.4
 django-bootstrap3-datetimepicker-2==2.8.2
