@@ -83,21 +83,27 @@
                     {% endif %}
                 </h4>
             {% if game.is_scheduled or game.is_active %}
-            {% if gametime_url %}
-            <div class="row">
-                <div class="col-md-10 col-md-offset-1 text-center">
-                    <div role="alert" class="alert alert-info">
-                        <b>
-                            Gametime link:
-                        <a href="{{gametime_url}}">
-                            {{gametime_url}}
-                        </a>
-                        </b>
+                {% if gametime_url or community_link %}
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 text-center">
+                        <div role="alert" class="alert alert-info" style="padding: 5px;">
+                            <b>
+                            {% if gametime_url %}
+                                Gametime link:
+                                <a href="{{gametime_url}}">
+                                    {{gametime_url}}
+                                </a>
+                            {% elif community_link %}
+                                {{game.cell.name}}'s off-site community:
+                                <a href="{{community_link}}">
+                                    {{community_link}}
+                                </a>
+                            {% endif %}
+                            </b>
+                        </div>
                     </div>
-
                 </div>
-            </div>
-            {% endif %}
+                {% endif %}
             {% endif %}
             {% if game.is_scheduled and game.hook %}
                 <div class="panel-heading">

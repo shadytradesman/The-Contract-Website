@@ -431,7 +431,7 @@ def manage_webhooks(request, cell_id):
     if not cell.player_can_admin(request.user):
         raise PermissionDenied("You don't have permission to manage the webhooks of this Cell")
     WebHookFormset = modelformset_factory(WebHook,
-                                          fields=('url', 'send_for_contracts', 'send_for_events', 'send_for_new_members'),
+                                          fields=('url', 'mention_group_id', 'send_for_contracts', 'send_for_events', 'send_for_new_members'),
                                           extra=2,
                                           can_delete=True,
                                           max_num=3)

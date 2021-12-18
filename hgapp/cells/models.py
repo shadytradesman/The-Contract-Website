@@ -285,12 +285,19 @@ class WebHook(models.Model):
         on_delete=models.CASCADE)
     created_date = models.DateTimeField('date created',
                                         auto_now_add=True)
-    url = models.CharField(max_length=2000)
+    url = models.CharField(max_length=2000,
+                           help_text="The Discord webhook's URL")
+    mention_group_id = models.BigIntegerField(blank=True,
+                                           null=True,
+                                           help_text="Optional. The Discord group ID to @mention when this webhook posts. Find by typing "
+                                                     "'\\@GROUPNAME' in your Discord server and copying the number.")
     send_for_contracts = models.BooleanField(default=True)
     send_for_events = models.BooleanField(default=True)
     send_for_new_members = models.BooleanField(default=True)
 
     def post(self, content):
+        if hasattr(self, "mention_group_id") and self.mention_group_id:
+            content = "<@&{}> {}".format(str(self.mention_group_id), content)
         requests.post(self.url, json={'content': content})
 
     def post_new_membership(self, player, cell, request):

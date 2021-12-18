@@ -268,6 +268,7 @@ def post_game_webhook(game, request):
     if game.list_in_lfg or cell_webhooks:
         content = game.get_webhook_post(request)
         if game.list_in_lfg:
+            content = "{} {}".format("<@&921821283551940638>", content)
             requests.post(settings.LFG_WEBHOOK_URL, json={'content': content, })
         for webhook in cell_webhooks:
             webhook.post(content)
@@ -361,8 +362,12 @@ def edit_game(request, game_id):
 def view_game(request, game_id):
     game = get_object_or_404(Game, id=game_id)
     my_invitation = None
+    user_membership = None
     if request.user.is_authenticated:
+        user_membership = game.cell.get_player_membership(request.user)
         my_invitation = get_object_or_none(request.user.game_invite_set.filter(relevant_game=game_id))
+    can_view_community_link = game.cell.is_community_link_public or user_membership
+    community_link = game.cell.community_link if can_view_community_link else None
     scenario_spoiled = game.scenario.player_is_spoiled(request.user)
     invite_form = None
     can_edit = game.player_can_edit(request.user)
@@ -384,6 +389,7 @@ def view_game(request, game_id):
         'reason_cannot_rsvp': reason_cannot_rsvp,
         'nsfw_blocked': nsfw_blocked,
         'gametime_url': gametime_url,
+        'community_link': community_link,
     }
     return render(request, 'games/view_game_pages/view_game.html', context)
 
