@@ -9,6 +9,10 @@
 {% load account_tags %}
 {% load static %}
 
+{% block extra_styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'characters/graveyard_style.css' %}" />
+{% endblock %}
+
 {% block body_base %}
     <div class="container text-center">
         <h1>

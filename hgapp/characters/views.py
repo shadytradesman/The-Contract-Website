@@ -137,7 +137,8 @@ def edit_obituary(request, character_id, secret_key = None):
 def graveyard(request):
     dead_characters = Character_Death.objects.filter(is_void=False)\
         .filter(relevant_character__private=False)\
-        .exclude(relevant_character__status='ANY')\
+        .exclude(relevant_character__status='ANY') \
+        .exclude(relevant_character__num_games=0) \
         .order_by('-date_of_death')\
         .all()
     tombstones = {
@@ -157,7 +158,7 @@ def graveyard(request):
             "death": death,
             "num_journals": num_journals,
         }
-        tombstones[death.relevant_character.get_contractor_status_display()].append(tombstone)
+        tombstones[death.relevant_character.get_calculated_contractor_status_display()].append(tombstone)
     num_headers = Graveyard_Header.objects.all().count()
     if num_headers > 0:
         header = Graveyard_Header.objects.all()[randint(0,num_headers-1)].header

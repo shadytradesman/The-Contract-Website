@@ -447,6 +447,10 @@ class Character(models.Model):
     def get_contractor_status_display(self):
         return self.get_status_display() if self.ported == NOT_PORTED else self.get_ported_display()
 
+    def get_calculated_contractor_status_display(self):
+        self.status = self.calculate_status()
+        return self.get_contractor_status_display()
+
     def _update_victory_count(self):
         self.num_victories = get_queryset_size(self.game_attendance_set.filter(is_confirmed=True, outcome="WIN"))
 
