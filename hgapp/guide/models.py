@@ -37,6 +37,7 @@ class GuideSection(models.Model):
         on_delete=models.PROTECT)
     created_date = models.DateTimeField('date created', auto_now_add=True)
     edit_date = models.DateTimeField('date last edited', null=True, blank=True)
+    tags = models.JSONField(default=list) # Tags for searching through the guide.
 
     class Meta:
         constraints = [

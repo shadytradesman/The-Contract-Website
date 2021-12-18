@@ -48,6 +48,10 @@ def make_guide_section_form(previous_section=None, next_section=None):
                                   max_length=73000,
                                   required=False,
                                   help_text='write the content for the section.')
+
+        tags = forms.JSONField(label='tags',
+                              required=False,
+                              help_text='["tags", "for searching in", "navbar"]')
     return GuideSectionForm
 
 

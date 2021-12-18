@@ -144,6 +144,7 @@ class WriteNewGuideSection(WriteGuideSection):
                     content=form.cleaned_data['content'],
                     rendered_content=form.cleaned_data['content'], # initially just unrendered content
                     is_hidden=form.cleaned_data['is_hidden'],
+                    tags=form.cleaned_data['tags'],
                     last_editor=request.user,
                     edit_date=timezone.now(),
                 )
@@ -177,6 +178,7 @@ class EditGuideSection(WriteGuideSection):
             "position": self.current_section.position,
             "header_level": self.current_section.header_level,
             "is_hidden": self.current_section.is_hidden,
+            "tags": self.current_section.tags,
         }
         return super().dispatch(*args, **kwargs)
 
@@ -192,6 +194,7 @@ class EditGuideSection(WriteGuideSection):
                 self.section.slug = form.cleaned_data["slug"]
                 self.section.content = form.cleaned_data['content']
                 self.section.is_hidden = form.cleaned_data["is_hidden"]
+                self.section.tags = form.cleaned_data["tags"]
                 self.section.last_editor = request.user
                 self.section.edit_date = timezone.now()
                 self.section.save()
