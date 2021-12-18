@@ -269,7 +269,7 @@ def view_cell(request, cell_id):
         if journal.player_can_view(request.user):
             displayed_journals.append(journal)
 
-    show_webhook_tip = can_administer and "discord" in cell.community_link and cell.webhook_cell.count() == 0
+    show_webhook_tip = can_administer and cell.community_link and "discord" in cell.community_link and cell.webhook_cell.size() == 0
 
     context = {
         'cell': cell,
