@@ -4,7 +4,7 @@
 {% load static %}
 {% load account_tags %}
 
-{% block head_title %}Leaderboard{% endblock %}
+{% block head_title %}Statistics{% endblock %}
 
 {% block extra_styles %}
 <link rel="stylesheet" type="text/css" href="{% static 'info/leaderboard_style.css' %}" />
@@ -15,18 +15,18 @@
 
 {% block body_base %}
 <h1 class="text-center">
-    Leaderboard
+    Statistics
 </h1>
 <div class="container">
     <div class="panel panel-default">
         <div class="panel-heading css-leaderboard-header">
-            Players
+            Top Players
         </div>
         <div class="panel-body">
             <div class="row">
                 <div class="col-md-4 col-sm-6">
                     <h3 class="text-center">
-                        Top Players
+                        Most Active
                         <br>
                         <small>
                             Contracts Played
@@ -42,7 +42,7 @@
                 </div>
                 <div class="col-md-4 col-sm-6">
                     <h3 class="text-center">
-                        Top Survivors
+                        Most Survivals
                         <br>
                         <small>
                             Contracts survived where another Contractor died
@@ -76,7 +76,7 @@
         </div>
 
         <div class="panel-heading css-leaderboard-header">
-            GameMasters
+            Top GameMasters
         </div>
         <div class="panel-body">
             <div class="row">
@@ -154,10 +154,10 @@
                 </div>
                 <div class="col-md-4 col-sm-6">
                     <h3 class="text-center">
-                        Biggest Loser
+                        Biggest Losers
                         <br>
                         <small>
-                            Contracts lost
+                            Contracts failed
                         </small>
                     </h3>
                     <ol>

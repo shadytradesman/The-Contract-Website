@@ -10,8 +10,8 @@ urlpatterns = [
     # ex: .com/info/probability/
     url(r"^probability/$", views.probability, name="probability"),
 
-    # ex: .com/info/leaderboard/
-    url(r"^leaderboard/$", views.leaderboard, name="leaderboard"),
+    # ex: .com/info/statistics/
+    url(r"^statistics/$", views.leaderboard, name="leaderboard"),
 
     # ex: .com/info/fiction/
     url(r"^fiction/$", views.fiction, name="fiction"),
