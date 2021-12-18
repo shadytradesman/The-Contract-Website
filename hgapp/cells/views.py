@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.db import transaction
 from cells.forms import CustomInviteForm, RsvpForm, PlayerRoleForm, KickForm, EditWorldForm, EditWorldEventForm, \
     RecruitmentForm, RolePermissionForm
-from cells.models import CELL_PERMISSIONS
+from cells.models import CELL_PERMISSIONS, WebHook
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
@@ -23,7 +23,7 @@ from journals.models import Journal
 from django.core.exceptions import PermissionDenied
 from postman.api import pm_write
 from django.utils.safestring import SafeText
-from django.forms import formset_factory
+from django.forms import formset_factory, modelformset_factory
 
 
 @method_decorator(login_required(login_url='account_login'), name='dispatch')
@@ -188,6 +188,10 @@ class PostWorldEvent(View):
             self.world_event.event_description = form.cleaned_data["event_description"]
             with transaction.atomic():
                 self.world_event.save()
+            if posting_new_event:
+                webhooks = self.cell.webhook_cell.filter(send_for_events=True).all()
+                for webhook in webhooks:
+                    webhook.post_for_event(self.world_event, request)
             return HttpResponseRedirect(reverse('cells:cells_view_cell', args=(self.cell.id,)))
         raise ValueError("Invalid edit setting form")
 
@@ -265,6 +269,8 @@ def view_cell(request, cell_id):
         if journal.player_can_view(request.user):
             displayed_journals.append(journal)
 
+    show_webhook_tip = can_administer and "discord" in cell.community_link and cell.webhook_cell.count() == 0
+
     context = {
         'cell': cell,
         'can_edit_world': can_edit_world,
@@ -283,6 +289,7 @@ def view_cell(request, cell_id):
         'world_events': world_events,
         'community_link': community_link,
         'latest_journals': displayed_journals,
+        'show_webhook_tip': show_webhook_tip,
     }
     return render(request, 'cells/view_cell.html', context)
 
@@ -352,6 +359,10 @@ def rsvp_invite(request, cell_id, secret_key = None, accept = None):
                     cell.addPlayer(request.user, ROLE[2])
                 elif invite:
                     invite.reject()
+            if is_accepted:
+                webhooks = cell.webhook_cell.filter(send_for_new_members=True).all()
+                for webhook in webhooks:
+                    webhook.post_new_membership(request.user, cell, request)
             return HttpResponseRedirect(reverse('cells:cells_view_cell', args=(cell.id,)))
         else:
             print(form.errors)
@@ -411,6 +422,41 @@ def leave_cell(request, cell_id):
             'cell': cell,
         }
         return render(request, 'cells/leave_cell.html', context)
+
+
+def manage_webhooks(request, cell_id):
+    if not request.user.is_authenticated:
+        raise PermissionDenied("You must be logged in to manage webhooks")
+    cell = get_object_or_404(Cell, id=cell_id)
+    if not cell.player_can_admin(request.user):
+        raise PermissionDenied("You don't have permission to manage the webhooks of this Cell")
+    WebHookFormset = modelformset_factory(WebHook,
+                                          fields=('url', 'send_for_contracts', 'send_for_events', 'send_for_new_members'),
+                                          extra=2,
+                                          can_delete=True,
+                                          max_num=3)
+    if request.method == 'POST':
+        formset = WebHookFormset(request.POST)
+        if formset.is_valid():
+            with transaction.atomic():
+                webhooks = formset.save(commit=False)
+                for webhook in formset.deleted_objects:
+                    webhook.delete()
+                for webhook in webhooks:
+                    webhook.parent_cell = cell
+                    webhook.creator = request.user
+                    webhook.save()
+            return HttpResponseRedirect(reverse('cells:cells_view_cell', args=(cell.id,)))
+        else:
+            raise ValueError("Invalid formset")
+    else:
+        webhook_formset = WebHookFormset(queryset=cell.webhook_cell.order_by("created_date").all())
+        context = {
+            'formset': webhook_formset,
+            'cell': cell,
+        }
+        return render(request, 'cells/manage_webhooks.html', context)
+
 
 def manage_members(request, cell_id):
     if not request.user.is_authenticated:

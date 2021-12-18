@@ -1,8 +1,9 @@
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.db import models
-from django.db.models import Q
+from django.urls import reverse
 from guardian.shortcuts import assign_perm, remove_perm
+import requests
 import random
 import hashlib
 
@@ -268,6 +269,43 @@ class WorldEvent(models.Model):
     event_description = models.TextField(max_length=50000,
                                       null=True,
                                       blank=True)
+
+    def get_permalink(self, request):
+        return "{}#event-{}".format(request.build_absolute_uri(reverse('cells:cells_view_cell', args=(self.parent_cell.id,))), self.id)
+
+
+class WebHook(models.Model):
+    creator = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name='hook_creator',
+        on_delete=models.CASCADE)
+    parent_cell = models.ForeignKey(
+        Cell,
+        related_name='webhook_cell',
+        on_delete=models.CASCADE)
+    created_date = models.DateTimeField('date created',
+                                        auto_now_add=True)
+    url = models.CharField(max_length=2000)
+    send_for_contracts = models.BooleanField(default=True)
+    send_for_events = models.BooleanField(default=True)
+    send_for_new_members = models.BooleanField(default=True)
+
+    def post(self, content):
+        requests.post(self.url, json={'content': content})
+
+    def post_new_membership(self, player, cell, request):
+        content = "{} has joined {}! See their profile here: {}".format(
+            player.username,
+            cell.name,
+            request.build_absolute_uri(reverse('profiles:profiles_view_profile', args=(player.id,))))
+        return self.post(content)
+
+    def post_for_event(self, event, request):
+        content = "**{}**\nRead More: {}".format(
+            event.headline,
+            event.get_permalink(request))
+        return self.post(content)
+
 
 class CellMembership(models.Model):
     relevant_cell = models.ForeignKey(Cell,

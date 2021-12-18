@@ -47,6 +47,9 @@ urlpatterns = [
     # ex: .com/cells/members/c/123
     url(r'^members/c/(?P<cell_id>[\d]+)/$', views.manage_members, name='cells_manage_members'),
 
+    # ex: .com/cells/webhooks/c/123
+    url(r'^webhooks/c/(?P<cell_id>[\d]+)/$', views.manage_webhooks, name='cells_manage_webhooks'),
+
     # ex: .com/cells/roles/c/123
     url(r'^roles/c/(?P<cell_id>[\d]+)/$', views.ManageRoles.as_view(), name='cells_manage_roles'),
 

@@ -1,8 +1,9 @@
 from django import forms
+from django.forms import ModelForm
 from tinymce.widgets import TinyMCE
 
-from overrides.widgets import CustomStylePagedown
-from .models import ROLE
+from .models import ROLE, WebHook
+
 
 class EditWorldForm(forms.Form):
     name = forms.CharField(label='Name',

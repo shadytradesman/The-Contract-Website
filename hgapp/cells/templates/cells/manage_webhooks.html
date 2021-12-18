@@ -1,0 +1,60 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+
+{% block head_title %}Managing Webhooks{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% load bootstrap %}
+
+{% block body_base %}
+<div class="container">
+    <div class="text-center">
+        <h1>
+            Manage Webhooks for <a href="{% url 'cells:cells_view_cell' cell.id %}">{{cell.name}}</a>
+        </h1>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-10 col-md-offset-1">
+                    <div role="alert" class="alert alert-info">
+                        <h3 class="text-center" style="margin-top: 5px;">
+                            What are web hooks?
+                        </h3>
+                        <p>
+                            Webhooks are an extremely simple way to integrate your World's Discord Server with The Contract's
+                            website. They direct bots to post helpful announcement messages in your server when Contracts
+                            are scheduled, members join, or World Events occur.
+                        </p>
+                        <p>
+                            To use them, simply obtain a webhook URL from the channel settings of your Discord server.
+                            Paste that URL in one of the forms below, and you're done! The bot will post based on events
+                            you have selected.
+                        </p>
+                        <p>
+                            See
+                            <a href="https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks">
+                                Discord's Tutorial
+                            </a>
+                            for an explanation of how to obtain a webhook URL for your server (it's really easy).
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                {{ formset.management_form }}
+                {% for form in formset %}
+                    {{ form|bootstrap}}
+                    <hr>
+                {% endfor %}
+                <div class="text-center">
+                    <input class="btn btn-primary btn-lg" type="submit" value="Done!" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

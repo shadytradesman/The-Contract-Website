@@ -264,8 +264,13 @@ def create_game(request, cell_id=None):
         return render(request, 'games/edit_game.html', context)
 
 def post_game_webhook(game, request):
-    if game.list_in_lfg:
-        requests.post(settings.LFG_WEBHOOK_URL, json={'content': game.get_webhook_post(request), })
+    cell_webhooks = game.cell.webhook_cell.filter(send_for_contracts=True).all()
+    if game.list_in_lfg or cell_webhooks:
+        content = game.get_webhook_post(request)
+        if game.list_in_lfg:
+            requests.post(settings.LFG_WEBHOOK_URL, json={'content': content, })
+        for webhook in cell_webhooks:
+            webhook.post(content)
 
 
 def get_scenarios_by_cells(request):
@@ -629,6 +634,9 @@ def end_game(request, game_id):
                     world_event.headline = world_event_form.cleaned_data["headline"] if "headline" in world_event_form.cleaned_data else " "
                     world_event.event_description = world_event_form.cleaned_data["event_description"]
                     world_event.save()
+                    webhooks = game.cell.webhook_cell.filter(send_for_events=True).all()
+                    for webhook in webhooks:
+                        webhook.post_for_event(world_event, request)
                 game.save()
                 game.transition_to_finished()
             return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
