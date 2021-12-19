@@ -295,6 +295,9 @@ class WebHook(models.Model):
     send_for_events = models.BooleanField(default=True)
     send_for_new_members = models.BooleanField(default=True)
 
+    def __str__(self):
+        return "{} {}{}{} hook".format(self.parent_cell.name, self.send_for_contracts, self.send_for_events, self.send_for_new_members)
+
     def post(self, content):
         if hasattr(self, "mention_group_id") and self.mention_group_id:
             content = "<@&{}> {}".format(str(self.mention_group_id), content)
