@@ -70,11 +70,7 @@
                 {% if world_event_form %}
                     <div class="row">
                         <div class="col-xs-12">
-                            <a class="wiki-entry-collapsible btn btn-sm btn-default">
-                                Add World Event
-                            </a>
-                            <div class="collapse-content clearfix"
-                                 style="display:none;" >
+                            <div class="clearfix">
                                 <h4>Post new World Event to {{game.cell.name}}</h4>
                                 {{ world_event_form.headline | bootstrap }}
                                 {{ world_event_form.event_description | bootstrap}}
@@ -99,8 +95,4 @@
         </div>
     </div>
 </div>
-
-<div class="container">
-    </div>
-</form>
 {% endblock %}
