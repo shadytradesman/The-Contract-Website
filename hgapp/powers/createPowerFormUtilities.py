@@ -57,7 +57,6 @@ def get_create_power_context_from_power(power, new=True):
     initial = {'system': power.get_system(),
      'description': power.description,
      'flavor': power.flavor_text,
-     'activation_style': power.activation_style,
      'power_name': power.name}
     if power.parent_power:
         initial['tags'] = power.parent_power.tags.all()
@@ -337,7 +336,6 @@ def _get_power_from_form(power_form, base):
                   flavor_text=power_form.cleaned_data['flavor'],
                   description=power_form.cleaned_data['description'],
                   system=power_form.cleaned_data['system'],
-                  activation_style=power_form.cleaned_data['activation_style'],
                   base=base,
                   dice_system=DICE_SYSTEM[1][0],
                   pub_date=timezone.now())

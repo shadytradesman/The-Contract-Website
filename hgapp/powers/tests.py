@@ -1,7 +1,7 @@
 from django.test import TestCase, override_settings
 from django.urls import reverse
 import os
-from powers.models import Base_Power, Base_Power_Category, ACTIVATION_STYLE, PowerTutorial
+from powers.models import Base_Power, Base_Power_Category, PowerTutorial
 import hgapp.settings
 
 PACKAGE_ROOT = os.path.abspath(os.path.dirname(__file__))
@@ -53,7 +53,6 @@ def create_base_power(power_slug, base_power_category, public):
         summary = "summary of base power",
         description = "description of base power",
         eratta = "eratta of base power",
-        default_activation_style = ACTIVATION_STYLE[1],
         is_public = public,
     )
 

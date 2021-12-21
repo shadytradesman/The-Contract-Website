@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import ACTIVATION_STYLE, HIGH_ROLLER_STATUS, Enhancement, Drawback, CREATION_REASON, Power_Full, PowerTag
+from .models import HIGH_ROLLER_STATUS, Enhancement, Drawback, CREATION_REASON, Power_Full, PowerTag
 from characters.models import Attribute, Ability
 
 BODY_ = ("BODY", "Body")
@@ -129,7 +129,6 @@ class CreatePowerForm(forms.Form):
                                        'You can reference the value of a Parameter or field by typing its name in lowercase, '
                                        'surrounded by double brackets, with spaces replaced by hyphens. For example, to display the value '
                                        'of a Power\'s "Cast Time" Parameter, write "[[cast-time]]".')
-    activation_style = forms.ChoiceField(choices=ACTIVATION_STYLE, disabled=True)
     tags = forms.ModelMultipleChoiceField(queryset=PowerTag.objects.order_by("tag").all(),
                                           required=False,
                                           widget=forms.CheckboxSelectMultiple)
@@ -145,9 +144,6 @@ class CreatePowerForm(forms.Form):
         #
         # base_power context sensitive field mutations go here.
         #
-        self.fields['activation_style'].help_text='Choose whether the Power is always on (passive) or activated manually (active). ' \
-                                                  'Default is ' + base_power.default_activation_style + "."
-        self.fields['activation_style'].initial=base_power.default_activation_style
 
 class DeletePowerForm(forms.Form):
     pass

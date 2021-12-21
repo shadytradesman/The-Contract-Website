@@ -13,6 +13,24 @@ ACTIVATION_STYLE = (
     ('ACTIVE', 'Active'),
 )
 
+# EFFECT = "EFFECT"
+# VECTOR = "VECTOR"
+# MODALITY = "MODALITY"
+# BASE_POWER_TYPE = (
+#     (EFFECT, 'Effect'),
+#     (VECTOR, 'Vector'),
+#     (MODALITY, 'Modality'),
+# )
+
+EPHEMERAL = "EPHEMERAL"
+UNIQUE = "UNIQUE"
+ADDITIVE = "ADDITIVE"
+FIELD_SUBSTITUTION_MODE = (
+    (EPHEMERAL, "Ephemeral"),
+    (UNIQUE, "Unique"),
+    (ADDITIVE, "Additive")
+)
+
 CREATION_REASON = (
     ('NEW', 'New'),
     ('IMPROVEMENT', 'Improvement'),
@@ -23,9 +41,37 @@ CREATION_REASON = (
 DICE_SYSTEM = (
     ('ALL', 'All'),
     ('HOUSEGAMES15', 'House Games 1.5'),
+    ('PS2', 'New Powers System'),
 )
 
-class Enhancement(models.Model):
+
+class PowerTag(models.Model):
+    tag = models.CharField(max_length=40)
+    slug = models.SlugField("Unique URL-Safe Name",
+                            max_length=40,
+                            primary_key=True)
+    def __str__(self):
+        return self.tag
+
+class PremadeCategory(models.Model):
+    name = models.CharField(max_length=500)
+    slug = models.SlugField("Unique URL-Safe Name",
+                            max_length=50,
+                            primary_key=True)
+    description = models.CharField(max_length=5000)
+    is_generic = models.BooleanField(default=True)
+    tags = models.ManyToManyField(PowerTag,
+                                  blank=True)
+
+
+class FieldSubstitution(models.Model):
+    marker = models.CharField(max_length=300)
+    replacement = models.CharField(max_length=300, blank=True) # '$' in string to replace value
+    mode = models.CharField(choices=FIELD_SUBSTITUTION_MODE, default=ADDITIVE, max_length=25)
+
+
+# Enhancements and Drawbacks
+class Modifier(models.Model):
     name = models.CharField(max_length = 50)
     slug = models.SlugField("Unique URL-Safe Name",
                             max_length = 50,
@@ -38,7 +84,7 @@ class Enhancement(models.Model):
                                        max_length=25,
                                        default=HIGH_ROLLER_STATUS[0])
     system = models.CharField(choices=DICE_SYSTEM,
-                              max_length=25,
+                              max_length=55,
                               default=DICE_SYSTEM[0])
     description = models.CharField(max_length= 250)
     eratta = models.TextField(blank=True,
@@ -48,55 +94,33 @@ class Enhancement(models.Model):
                                           null=True,
                                           max_length=35)
     is_general = models.BooleanField(default=False)
+    substitutions = models.ManyToManyField(FieldSubstitution)
 
     def __str__(self):
         return self.name + " [" + self.slug + "] (" + self.description + ")"
 
+    def display(self):
+        return self.name + " (" + self.description + ")"
+
+    class Meta:
+        abstract = True
+
+
+class Enhancement(Modifier):
     def form_name(self):
         return self.slug + "-e-is_selected"
 
     def form_detail_name(self):
-        return self.slug+"-e-detail_text"
-
-    def display(self):
-        return self.name + " (" + self.description + ")"
+        return self.slug + "-e-detail_text"
 
 
-class Drawback(models.Model):
-    name = models.CharField(max_length= 50)
-    slug = models.SlugField("Unique URL-Safe Name",
-                            max_length=50,
-                            primary_key = True)
-    required_Enhancements = models.ManyToManyField("Enhancement",
-                                                   blank = True)
-    required_drawbacks = models.ManyToManyField("Drawback",
-                                                blank=True)
-    required_status = models.CharField(choices=HIGH_ROLLER_STATUS,
-                                       max_length=25,
-                                       default=HIGH_ROLLER_STATUS[0])
-    system = models.CharField(choices=DICE_SYSTEM,
-                              max_length=25,
-                              default=DICE_SYSTEM[0])
-    description = models.CharField(max_length = 250)
-    eratta = models.TextField(blank=True,
-                              null=True)
-    multiplicity_allowed = models.BooleanField(default=False)
-    detail_field_label = models.CharField(blank=True,
-                                          null=True,
-                                          max_length=35)
-    is_general = models.BooleanField(default=False)
-
-    def __str__(self):
-        return self.name + " [" + self.slug + "] (" + self.description + ")"
-
+class Drawback(Modifier):
     def form_name(self):
         return self.slug + "-d-is_selected"
 
     def form_detail_name(self):
-        return self.slug+"-d-detail_text"
+        return self.slug + "-d-detail_text"
 
-    def display(self):
-        return self.name + " (" + self.description + ")"
 
 class Parameter(models.Model):
     name = models.CharField(max_length= 50)
@@ -128,6 +152,8 @@ class Parameter(models.Model):
                                   blank=True,
                                   null=True,
                                   on_delete=models.CASCADE)
+    substitutions = models.ManyToManyField(FieldSubstitution)
+
     def display(self):
         return " ".join([self.name])
 
@@ -152,7 +178,6 @@ class Parameter(models.Model):
             levels.append(self.level_six)
         return levels
 
-
     def get_value_for_level(self, level):
         if level is 0:
             return self.level_zero
@@ -176,6 +201,7 @@ class Parameter(models.Model):
                 return n
         return 7
 
+
 class Base_Power_Category(models.Model):
     name = models.CharField(max_length = 25)
     slug = models.SlugField("Unique URL-Safe Name",
@@ -187,30 +213,21 @@ class Base_Power_Category(models.Model):
         return " ".join([self.name])
 
 
-class Base_Power(models.Model):
+# abstract class for Gift Modality, Vector, Effect (Base_Power)
+class GiftComponent(models.Model):
     name = models.CharField(max_length= 50)
     slug = models.SlugField("Unique URL-Safe Name",
                             max_length=50,
                             primary_key = True)
-    category = models.ForeignKey(Base_Power_Category,
-                                 on_delete=models.PROTECT)
     summary = models.CharField(max_length=50)
     description = models.TextField(max_length=5000)
-    eratta = models.TextField(blank = True,
-                              null = True)
-    default_activation_style = models.CharField(choices=ACTIVATION_STYLE,
-                                                max_length=25,
-                                                default=ACTIVATION_STYLE[0])
-    parameters = models.ManyToManyField(Parameter,
-                                        through="Power_Param",
-                                        through_fields=('relevant_base_power', 'relevant_parameter'))
-    enhancements = models.ManyToManyField(Enhancement)
-    drawbacks = models.ManyToManyField(Drawback)
-    required_status = models.CharField(choices=HIGH_ROLLER_STATUS,
-                                       max_length=25,
-                                       default=HIGH_ROLLER_STATUS[0])
+    eratta = models.TextField(blank=True, null=True)
     is_public = models.BooleanField(default=True)
     num_free_enhancements = models.IntegerField(default=0)
+    substitutions = models.ManyToManyField(FieldSubstitution)
+
+    class Meta:
+        abstract = True
 
     def __str__(self):
         return self.name + " (" + self.summary + ")"
@@ -221,16 +238,60 @@ class Base_Power(models.Model):
     def used_power_fulls(self):
         return Power_Full.objects.filter(base=self, character__isnull=False, is_deleted=False)
 
-
     def get_system(self):
         return Base_Power_System.objects.filter(dice_system=DICE_SYSTEM[1][0]).get(base_power=self)
 
 
-class Base_Power_System(models.Model):
-    base_power = models.ForeignKey(Base_Power,
-                                   on_delete=models.PROTECT)
+class GiftModality(GiftComponent):
+    blacklist_parameters = models.ManyToManyField(Parameter, related_name="modality_blacklist_params")
+    avail_enhancements = models.ManyToManyField(Enhancement, related_name="modality_avail_enhancements")
+    avail_drawbacks = models.ManyToManyField(Drawback, related_name="modality_avail_drawbacks")
+    blacklist_enhancements = models.ManyToManyField(Enhancement, related_name="modality_blacklist_enhancements")
+    blacklist_drawbacks = models.ManyToManyField(Drawback, related_name="modality_blacklist_drawbacks")
+    parameters = models.ManyToManyField(Parameter,
+                                        through="ModalityParam",
+                                        through_fields=('relevant_modality', 'relevant_parameter'))
+
+
+class Vector(GiftComponent):
+    blacklist_parameters = models.ManyToManyField(Parameter, related_name="vector_blacklist_params")
+    avail_enhancements = models.ManyToManyField(Enhancement, related_name="vector_avail_enhancements")
+    avail_drawbacks = models.ManyToManyField(Drawback, related_name="vector_avail_drawbacks")
+    blacklist_enhancements = models.ManyToManyField(Enhancement, related_name="vector_blacklist_enhancements")
+    blacklist_drawbacks = models.ManyToManyField(Drawback, related_name="vector_blacklist_drawbacks")
+    parameters = models.ManyToManyField(Parameter,
+                                        through="VectorParam",
+                                        through_fields=('relevant_vector', 'relevant_parameter'))
+
+
+# An Effect, named "Base_Power" for legacy reasons.
+class Base_Power(GiftComponent):
+    enhancements = models.ManyToManyField(Enhancement)
+    drawbacks = models.ManyToManyField(Drawback)
+
+    allowed_vectors = models.ManyToManyField(Vector)
+    allowed_modalities = models.ManyToManyField(GiftModality)
+
+    blacklist_parameters = models.ManyToManyField(Parameter, related_name="base_blacklist_params")
+    avail_enhancements = models.ManyToManyField(Enhancement, related_name="base_avail_enhancements")
+    avail_drawbacks = models.ManyToManyField(Drawback, related_name="base_avail_drawbacks")
+    blacklist_enhancements = models.ManyToManyField(Enhancement, related_name="base_blacklist_enhancements")
+    blacklist_drawbacks = models.ManyToManyField(Drawback, related_name="base_blacklist_drawbacks")
+
+    required_status = models.CharField(choices=HIGH_ROLLER_STATUS,
+                                       max_length=25,
+                                       default=HIGH_ROLLER_STATUS[0][0])
+    category = models.ForeignKey(Base_Power_Category,
+                                 on_delete=models.PROTECT)
+    parameters = models.ManyToManyField(Parameter,
+                                        through="Power_Param",
+                                        through_fields=('relevant_base_power', 'relevant_parameter'))
+
+
+# abstract class for system for components (Modality, Vector, Effect)
+class ComponentSystem(models.Model):
     dice_system = models.CharField(choices=DICE_SYSTEM,
-                                   max_length=25,
+                                   max_length=55,
                                    default=DICE_SYSTEM[1])
     system_text = models.TextField()
     eratta = models.TextField(blank=True,
@@ -239,23 +300,46 @@ class Base_Power_System(models.Model):
                                                   null=True)
 
     class Meta:
+        abstract = True
+
+
+class Base_Power_System(ComponentSystem):
+    base_power = models.ForeignKey(Base_Power,
+                                   on_delete=models.PROTECT)
+    class Meta:
         unique_together = (("base_power", "dice_system"))
 
     def __str__(self):
         return ":".join([self.base_power.name,str(self.dice_system)])
 
 
-class Power_Param(models.Model):
-    relevant_parameter = models.ForeignKey(Parameter,
-                                           on_delete=models.CASCADE)
-    relevant_base_power = models.ForeignKey(Base_Power,
-                                            on_delete=models.CASCADE)
-    seasoned = models.IntegerField("Seasoned Threshold")
-    veteran = models.IntegerField("Veteran Threshold")
-    default = models.IntegerField("Default Level")
+class VectorSystem(ComponentSystem):
+    vector = models.ForeignKey(Vector, on_delete=models.PROTECT)
 
     class Meta:
-        unique_together = ("relevant_parameter", "relevant_base_power")
+        unique_together = (("vector", "dice_system"))
+
+    def __str__(self):
+        return ":".join([self.vector.name, str(self.dice_system)])
+
+
+class GiftModalitySystem(ComponentSystem):
+    gift_modality = models.ForeignKey(GiftModality, on_delete=models.PROTECT)
+
+    class Meta:
+        unique_together = (("gift_modality", "dice_system"))
+
+    def __str__(self):
+        return ":".join([self.vector.name, str(self.dice_system)])
+
+
+# Joining between a parameter and a power component (modality, effect, vector)
+class ParamComponent(models.Model):
+    relevant_parameter = models.ForeignKey(Parameter, on_delete=models.CASCADE)
+    dice_system = models.CharField(choices=DICE_SYSTEM, max_length=55, default=DICE_SYSTEM[1][0])
+
+    class Meta:
+        abstract = True
 
     def get_status_tag(self, level):
         switcher = {
@@ -268,20 +352,51 @@ class Power_Param(models.Model):
         else:
             return ""
 
+
+# Joining between Parameter and Effect
+class Power_Param(ParamComponent):
+    seasoned = models.IntegerField("Seasoned Threshold")
+    veteran = models.IntegerField("Veteran Threshold")
+    default = models.IntegerField("Default Level")
+    relevant_base_power = models.ForeignKey(Base_Power, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ("relevant_parameter", "relevant_base_power", "dice_system")
+
     def __str__(self):
         return ":".join([str(self.relevant_parameter), self.relevant_base_power.name])
 
+
+# Joining between Parameter and Vector
+class VectorParam(ParamComponent):
+    relevant_vector = models.ForeignKey(Vector, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ("relevant_parameter", "relevant_vector", "dice_system")
+
+    def __str__(self):
+        return ":".join([str(self.relevant_parameter), self.relevant_base_power.name])
+
+
+# Joining between Parameter and Gift Modality
+class ModalityParam(ParamComponent):
+    relevant_modality = models.ForeignKey(GiftModality, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ("relevant_parameter", "relevant_modality", "dice_system")
+
+    def __str__(self):
+        return ":".join([str(self.relevant_parameter), self.relevant_base_power.name])
+
+# Power full is essentially a "Gift" object
+# Each Power_Full has at least one PowerHistory for an Effect/Vector and exactly one PowerHistory for a gift modality
+    # Modality cost/credit is applied against all Effects on the gift
 class Power_Full(models.Model):
     name = models.CharField(max_length = 500)
-    dice_system = models.CharField(choices=DICE_SYSTEM, max_length=25)
-    base = models.ForeignKey(Base_Power,
-                             on_delete=models.PROTECT)
+    dice_system = models.CharField(choices=DICE_SYSTEM, max_length=55)
+    base = models.ForeignKey(Base_Power, on_delete=models.PROTECT)
     private = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
-    linked_powers = models.ManyToManyField("Power_Full",
-                                           blank=True, 
-                                           through="Power_Link",
-                                           through_fields=('parent_power', 'child_power'))
     pub_date = models.DateTimeField('date published')
     owner = models.ForeignKey(settings.AUTH_USER_MODEL,
                               on_delete=models.CASCADE,
@@ -291,11 +406,12 @@ class Power_Full(models.Model):
                                   blank=True,
                                   null=True,
                                   on_delete=models.CASCADE)
-    tags = models.ManyToManyField("PowerTag",
-                                   blank=True)
+    tags = models.ManyToManyField(PowerTag, blank=True) # This is for stock Gifts
     example_description = models.CharField(max_length = 9000,
                                            blank=True,
                                            null=True)
+
+    # TODO: Delete and replace with method that gives set of power histories
     latest_rev = models.ForeignKey("Power",
                               on_delete=models.CASCADE,
                               blank=True,
@@ -415,37 +531,49 @@ class Power_Full(models.Model):
         else:
             return self.name + " [NO ASSOCIATED USER]"
 
-class PowerTag(models.Model):
-    tag = models.CharField(max_length=40)
-    slug = models.SlugField("Unique URL-Safe Name",
-                            max_length=40,
-                            primary_key=True)
-    def __str__(self):
-        return self.tag
 
-class PremadeCategory(models.Model):
-    name = models.CharField(max_length=500)
-    slug = models.SlugField("Unique URL-Safe Name",
-                            max_length=50,
-                            primary_key=True)
-    description = models.CharField(max_length=5000)
-    is_generic = models.BooleanField(default=True)
-    tags = models.ManyToManyField("PowerTag",
-                                   blank=True)
-
-class Power(models.Model):
-    name = models.CharField(max_length = 100)
-    flavor_text = models.TextField(max_length = 2000)
-    description = models.TextField(max_length = 2000)
+# A given "revision track" of a Power.
+# Multiple Powers may have the same PowerHistory, and the most recent one is the "canonical" one.
+# A given Power_full may have multiple PowerHistorys
+    # always has at least two in the new system (an Effect+Vector and a Gift Modality)
+class PowerHistory(models.Model):
     parent_power = models.ForeignKey(Power_Full,
                                      blank=True,
                                      null=True,
                                      on_delete=models.CASCADE)
-    dice_system = models.CharField(choices=DICE_SYSTEM, max_length=25)
-    base = models.ForeignKey(Base_Power, on_delete=models.CASCADE)
+    latest_rev = models.ForeignKey("Power",
+                                   on_delete=models.CASCADE,
+                                   blank=True,
+                                   null=True)
+
+
+# TODO: remove permissioning from this and use Power_Full permissioning.
+class Power(models.Model):
+    name = models.CharField(max_length = 150)
+    flavor_text = models.TextField(max_length = 2000)
+    description = models.TextField(max_length = 2500)
+    # TODO: ensure power_history parent and parent_power are same.
+    # TODO: remove blank=True null=True after migration
+    parent_power = models.ForeignKey(Power_Full,
+                                     blank=True,
+                                     null=True,
+                                     on_delete=models.CASCADE)
+    power_history = models.ForeignKey(PowerHistory,
+                                     blank=True,
+                                     null=True,
+                                     on_delete=models.CASCADE) #TODO: remove blank=True and null=True after migration
+    dice_system = models.CharField(choices=DICE_SYSTEM, max_length=55)
+
+    # TODO: ensure if base or vector is set, both are set.
+    base = models.ForeignKey(Base_Power, on_delete=models.CASCADE, blank=True, null=True)
+    vector = models.ForeignKey(Vector, on_delete=models.CASCADE, blank=True, null=True)
+
+    # TODO: ensure if modality is set, base and vector are not.
+    modality = models.ForeignKey(GiftModality, on_delete=models.CASCADE, blank=True, null=True)
+
     private = models.BooleanField(default=False)
-    linked_powers = models.ManyToManyField("Power", blank=True)
-    activation_style = models.CharField(choices=ACTIVATION_STYLE, max_length = 25)
+
+    activation_style = models.CharField(choices=ACTIVATION_STYLE, max_length = 25, default=ACTIVATION_STYLE[0][0])
     creation_reason = models.CharField(choices=CREATION_REASON, max_length = 25)
     creation_reason_expanded_text = models.TextField(max_length = 1500,
                                                      blank=True,
@@ -454,7 +582,7 @@ class Power(models.Model):
                               on_delete=models.CASCADE,
                                    blank=True,
                                    null=True)
-    system = models.TextField(max_length = 9000,
+    system = models.TextField(max_length = 14000,
                               blank=True,
                               null=True)
     selected_enhancements = models.ManyToManyField(Enhancement,
@@ -592,20 +720,10 @@ class Power(models.Model):
             parent.save()
 
 
-class Power_Link(models.Model):
-    parent_power = models.ForeignKey(Power_Full,
-                                     related_name='parent_power',
-                                     on_delete=models.CASCADE)
-    child_power = models.ForeignKey(Power_Full,
-                                    related_name='child_power',
-                                    on_delete=models.CASCADE)
-
-
 class SystemField(models.Model):
-    base_power_system = models.ForeignKey(Base_Power_System,
-                                   on_delete=models.CASCADE)
-    name = models.CharField(max_length = 250)
-    eratta = models.CharField(max_length = 1000, blank=True, null=True)
+    base_power_system = models.ForeignKey(Base_Power_System, on_delete=models.CASCADE)
+    name = models.CharField(max_length=250)
+    eratta = models.CharField(max_length=1000, blank=True, null=True)
 
     def __str__(self):
         base_name = self.base_power_system.base_power.name
@@ -653,8 +771,7 @@ class SystemFieldInstance(models.Model):
 
 
 class SystemFieldTextInstance(SystemFieldInstance):
-    relevant_field = models.ForeignKey(SystemFieldText,
-                                             on_delete=models.CASCADE)
+    relevant_field = models.ForeignKey(SystemFieldText, on_delete=models.CASCADE)
     value = models.CharField(max_length = 1000,
                               null=True,
                               blank=True)
@@ -685,7 +802,7 @@ class Enhancement_Instance(models.Model):
                                              on_delete=models.PROTECT)
     relevant_power = models.ForeignKey(Power,
                                        on_delete=models.CASCADE)
-    detail = models.CharField(max_length = 1500,
+    detail = models.CharField(max_length=1500,
                               null=True,
                               blank=True)
 
@@ -729,10 +846,11 @@ class Drawback_Instance(models.Model):
         else:
             return "{} :: {}".format(self.relevant_power.name,str(self.relevant_drawback))
 
+
 class Parameter_Value(models.Model):
     relevant_power_param = models.ForeignKey(Power_Param, on_delete=models.CASCADE)
-    relevant_power = models.ForeignKey(Power,
-                                       on_delete=models.CASCADE)
+
+    relevant_power = models.ForeignKey(Power, on_delete=models.CASCADE)
     value = models.IntegerField()
 
     def __str__(self):
@@ -747,6 +865,7 @@ class Parameter_Value(models.Model):
         return output
 
     level_description = property(get_level_description)
+
 
 class PowerTutorial(models.Model):
     modal_base = models.TextField(max_length=3000)
