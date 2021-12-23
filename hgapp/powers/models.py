@@ -1,26 +1,29 @@
 from django.conf import settings
 from django.db import models
-from django.utils.html import escape
+from django.db.models import Q
+from django.urls import reverse
 
-# Create your models here.
 from characters.models import Character, HIGH_ROLLER_STATUS, Attribute, Roll, NO_PARRY_INFO, NO_SPEED_INFO, DODGE_ONLY, \
     ATTACK_PARRY_TYPE, ROLL_SPEED, THROWN, Attribute
 from guardian.shortcuts import assign_perm, remove_perm
 from django.utils.html import mark_safe, escape, linebreaks
+from django.db.utils import IntegrityError
+
+
 
 ACTIVATION_STYLE = (
     ('PASSIVE', 'Passive'),
     ('ACTIVE', 'Active'),
 )
 
-# EFFECT = "EFFECT"
-# VECTOR = "VECTOR"
-# MODALITY = "MODALITY"
-# BASE_POWER_TYPE = (
-#     (EFFECT, 'Effect'),
-#     (VECTOR, 'Vector'),
-#     (MODALITY, 'Modality'),
-# )
+EFFECT = "EFFECT"
+VECTOR = "VECTOR"
+MODALITY = "MODALITY"
+BASE_POWER_TYPE = (
+    (EFFECT, 'Effect'),
+    (VECTOR, 'Vector'),
+    (MODALITY, 'Modality'),
+)
 
 EPHEMERAL = "EPHEMERAL"
 UNIQUE = "UNIQUE"
@@ -31,17 +34,24 @@ FIELD_SUBSTITUTION_MODE = (
     (ADDITIVE, "Additive")
 )
 
+CREATION_NEW = 'NEW'
+CREATION_IMPROVEMENT = 'IMPROVEMENT'
+CREATION_REVISION = "REVISION"
+CREATION_ADJUSTMENT = 'ADJUSTMENT'
 CREATION_REASON = (
-    ('NEW', 'New'),
-    ('IMPROVEMENT', 'Improvement'),
-    ('REVISION', 'Revision'),
-    ('ADJUSTMENT', 'Adjustment'),
+    (CREATION_NEW, 'New'),
+    (CREATION_IMPROVEMENT, 'Improvement'),
+    (CREATION_REVISION, 'Revision'),
+    (CREATION_ADJUSTMENT, 'Adjustment'),
 )
 
+SYS_ALL = 'ALL'
+SYS_LEGACY_POWERS = 'HOUSEGAMES15'
+SYS_PS2 = 'PS2'
 DICE_SYSTEM = (
-    ('ALL', 'All'),
-    ('HOUSEGAMES15', 'House Games 1.5'),
-    ('PS2', 'New Powers System'),
+    (SYS_ALL, 'All'),
+    (SYS_LEGACY_POWERS, 'House Games 1.5'),
+    (SYS_PS2, 'New Powers System'),
 )
 
 
@@ -65,9 +75,12 @@ class PremadeCategory(models.Model):
 
 
 class FieldSubstitution(models.Model):
-    marker = models.CharField(max_length=300)
+    marker = models.SlugField(max_length=300)
     replacement = models.CharField(max_length=300, blank=True) # '$' in string to replace value
     mode = models.CharField(choices=FIELD_SUBSTITUTION_MODE, default=ADDITIVE, max_length=25)
+
+    def __str__(self):
+        return "[[{}]] {} ({})".format(self.marker, self.get_mode_display(), self.replacement)
 
 
 # Enhancements and Drawbacks
@@ -85,7 +98,7 @@ class Modifier(models.Model):
                                        default=HIGH_ROLLER_STATUS[0])
     system = models.CharField(choices=DICE_SYSTEM,
                               max_length=55,
-                              default=DICE_SYSTEM[0])
+                              default=SYS_ALL)
     description = models.CharField(max_length= 250)
     eratta = models.TextField(blank=True,
                               null=True)
@@ -213,8 +226,8 @@ class Base_Power_Category(models.Model):
         return " ".join([self.name])
 
 
-# abstract class for Gift Modality, Vector, Effect (Base_Power)
-class GiftComponent(models.Model):
+# class for Gift Modality, Vector, Effect
+class Base_Power(models.Model):
     name = models.CharField(max_length= 50)
     slug = models.SlugField("Unique URL-Safe Name",
                             max_length=50,
@@ -223,14 +236,58 @@ class GiftComponent(models.Model):
     description = models.TextField(max_length=5000)
     eratta = models.TextField(blank=True, null=True)
     is_public = models.BooleanField(default=True)
-    num_free_enhancements = models.IntegerField(default=0)
-    substitutions = models.ManyToManyField(FieldSubstitution)
+    num_free_enhancements = models.IntegerField("gift point credit", default=0)
+    substitutions = models.ManyToManyField(FieldSubstitution, verbose_name="Field substitutions")
+
+    # Component type, Effect, Modality, or Vector
+    base_type = models.CharField(choices=BASE_POWER_TYPE,
+                                 max_length=25,
+                                 default=EFFECT,
+                                 verbose_name="component type",
+                                 help_text="DO NOT CHANGE THIS AFTER INITIAL CREATION")
+
+    # Legacy v1 power system
+    enhancements = models.ManyToManyField(verbose_name="legacy enhancements", to=Enhancement,
+                                          blank=True)
+    drawbacks = models.ManyToManyField(verbose_name="legacy drawbacks", to=Drawback,
+                                       blank=True)
+
+    allowed_vectors = models.ManyToManyField("Base_Power", related_name="vector_effects", blank=True)
+    allowed_modalities = models.ManyToManyField("Base_Power", related_name="vector_modalities", blank=True)
+
+    avail_enhancements = models.ManyToManyField(Enhancement, verbose_name="enhancements",
+                                                related_name="avail_enhancements",
+                                                blank=True)
+    avail_drawbacks = models.ManyToManyField(Drawback, verbose_name="drawbacks",
+                                             related_name="avail_drawbacks",
+                                             blank=True)
+    blacklist_parameters = models.ManyToManyField(Parameter, related_name="blacklist_params",
+                                                  blank=True)
+    blacklist_enhancements = models.ManyToManyField(Enhancement,
+                                                    related_name="blacklist_enhancements",
+                                                    blank=True)
+    blacklist_drawbacks = models.ManyToManyField(Drawback,
+                                                 related_name="blacklist_drawbacks",
+                                                 blank=True)
+
+    required_status = models.CharField(choices=HIGH_ROLLER_STATUS,
+                                       max_length=25,
+                                       default=HIGH_ROLLER_STATUS[0][0])
+    category = models.ForeignKey(Base_Power_Category,
+                                 on_delete=models.PROTECT,
+                                 blank=True, null=True)
+    parameters = models.ManyToManyField(Parameter,
+                                        through="Power_Param",
+                                        through_fields=('relevant_base_power', 'relevant_parameter'))
 
     class Meta:
-        abstract = True
+        verbose_name = "Gift Component"
 
     def __str__(self):
         return self.name + " (" + self.summary + ")"
+
+    def get_absolute_url(self):
+        return reverse('powers:powers_create_power', kwargs={'base_power_slug': self.slug})
 
     def example_powers(self):
         return Power_Full.objects.filter(base=self, tags__in=["example"])
@@ -242,54 +299,11 @@ class GiftComponent(models.Model):
         return Base_Power_System.objects.filter(dice_system=DICE_SYSTEM[1][0]).get(base_power=self)
 
 
-class GiftModality(GiftComponent):
-    blacklist_parameters = models.ManyToManyField(Parameter, related_name="modality_blacklist_params")
-    avail_enhancements = models.ManyToManyField(Enhancement, related_name="modality_avail_enhancements")
-    avail_drawbacks = models.ManyToManyField(Drawback, related_name="modality_avail_drawbacks")
-    blacklist_enhancements = models.ManyToManyField(Enhancement, related_name="modality_blacklist_enhancements")
-    blacklist_drawbacks = models.ManyToManyField(Drawback, related_name="modality_blacklist_drawbacks")
-    parameters = models.ManyToManyField(Parameter,
-                                        through="ModalityParam",
-                                        through_fields=('relevant_modality', 'relevant_parameter'))
 
 
-class Vector(GiftComponent):
-    blacklist_parameters = models.ManyToManyField(Parameter, related_name="vector_blacklist_params")
-    avail_enhancements = models.ManyToManyField(Enhancement, related_name="vector_avail_enhancements")
-    avail_drawbacks = models.ManyToManyField(Drawback, related_name="vector_avail_drawbacks")
-    blacklist_enhancements = models.ManyToManyField(Enhancement, related_name="vector_blacklist_enhancements")
-    blacklist_drawbacks = models.ManyToManyField(Drawback, related_name="vector_blacklist_drawbacks")
-    parameters = models.ManyToManyField(Parameter,
-                                        through="VectorParam",
-                                        through_fields=('relevant_vector', 'relevant_parameter'))
 
-
-# An Effect, named "Base_Power" for legacy reasons.
-class Base_Power(GiftComponent):
-    enhancements = models.ManyToManyField(Enhancement)
-    drawbacks = models.ManyToManyField(Drawback)
-
-    allowed_vectors = models.ManyToManyField(Vector)
-    allowed_modalities = models.ManyToManyField(GiftModality)
-
-    blacklist_parameters = models.ManyToManyField(Parameter, related_name="base_blacklist_params")
-    avail_enhancements = models.ManyToManyField(Enhancement, related_name="base_avail_enhancements")
-    avail_drawbacks = models.ManyToManyField(Drawback, related_name="base_avail_drawbacks")
-    blacklist_enhancements = models.ManyToManyField(Enhancement, related_name="base_blacklist_enhancements")
-    blacklist_drawbacks = models.ManyToManyField(Drawback, related_name="base_blacklist_drawbacks")
-
-    required_status = models.CharField(choices=HIGH_ROLLER_STATUS,
-                                       max_length=25,
-                                       default=HIGH_ROLLER_STATUS[0][0])
-    category = models.ForeignKey(Base_Power_Category,
-                                 on_delete=models.PROTECT)
-    parameters = models.ManyToManyField(Parameter,
-                                        through="Power_Param",
-                                        through_fields=('relevant_base_power', 'relevant_parameter'))
-
-
-# abstract class for system for components (Modality, Vector, Effect)
-class ComponentSystem(models.Model):
+# class for system for components (Modality, Vector, Effect)
+class Base_Power_System(models.Model):
     dice_system = models.CharField(choices=DICE_SYSTEM,
                                    max_length=55,
                                    default=DICE_SYSTEM[1])
@@ -298,12 +312,6 @@ class ComponentSystem(models.Model):
                               null=True)
     default_description_prompt = models.TextField(blank=True,
                                                   null=True)
-
-    class Meta:
-        abstract = True
-
-
-class Base_Power_System(ComponentSystem):
     base_power = models.ForeignKey(Base_Power,
                                    on_delete=models.PROTECT)
     class Meta:
@@ -313,33 +321,20 @@ class Base_Power_System(ComponentSystem):
         return ":".join([self.base_power.name,str(self.dice_system)])
 
 
-class VectorSystem(ComponentSystem):
-    vector = models.ForeignKey(Vector, on_delete=models.PROTECT)
-
-    class Meta:
-        unique_together = (("vector", "dice_system"))
-
-    def __str__(self):
-        return ":".join([self.vector.name, str(self.dice_system)])
-
-
-class GiftModalitySystem(ComponentSystem):
-    gift_modality = models.ForeignKey(GiftModality, on_delete=models.PROTECT)
-
-    class Meta:
-        unique_together = (("gift_modality", "dice_system"))
-
-    def __str__(self):
-        return ":".join([self.vector.name, str(self.dice_system)])
-
-
-# Joining between a parameter and a power component (modality, effect, vector)
-class ParamComponent(models.Model):
+# Joining between Parameter and Componeent
+class Power_Param(models.Model):
     relevant_parameter = models.ForeignKey(Parameter, on_delete=models.CASCADE)
     dice_system = models.CharField(choices=DICE_SYSTEM, max_length=55, default=DICE_SYSTEM[1][0])
+    seasoned = models.IntegerField("Seasoned Threshold")
+    veteran = models.IntegerField("Veteran Threshold")
+    default = models.IntegerField("Default Level")
+    relevant_base_power = models.ForeignKey(Base_Power, on_delete=models.CASCADE)
 
     class Meta:
-        abstract = True
+        unique_together = ("relevant_parameter", "relevant_base_power", "dice_system")
+
+    def __str__(self):
+        return ":".join([str(self.relevant_parameter), self.relevant_base_power.name])
 
     def get_status_tag(self, level):
         switcher = {
@@ -353,41 +348,6 @@ class ParamComponent(models.Model):
             return ""
 
 
-# Joining between Parameter and Effect
-class Power_Param(ParamComponent):
-    seasoned = models.IntegerField("Seasoned Threshold")
-    veteran = models.IntegerField("Veteran Threshold")
-    default = models.IntegerField("Default Level")
-    relevant_base_power = models.ForeignKey(Base_Power, on_delete=models.CASCADE)
-
-    class Meta:
-        unique_together = ("relevant_parameter", "relevant_base_power", "dice_system")
-
-    def __str__(self):
-        return ":".join([str(self.relevant_parameter), self.relevant_base_power.name])
-
-
-# Joining between Parameter and Vector
-class VectorParam(ParamComponent):
-    relevant_vector = models.ForeignKey(Vector, on_delete=models.CASCADE)
-
-    class Meta:
-        unique_together = ("relevant_parameter", "relevant_vector", "dice_system")
-
-    def __str__(self):
-        return ":".join([str(self.relevant_parameter), self.relevant_base_power.name])
-
-
-# Joining between Parameter and Gift Modality
-class ModalityParam(ParamComponent):
-    relevant_modality = models.ForeignKey(GiftModality, on_delete=models.CASCADE)
-
-    class Meta:
-        unique_together = ("relevant_parameter", "relevant_modality", "dice_system")
-
-    def __str__(self):
-        return ":".join([str(self.relevant_parameter), self.relevant_base_power.name])
-
 # Power full is essentially a "Gift" object
 # Each Power_Full has at least one PowerHistory for an Effect/Vector and exactly one PowerHistory for a gift modality
     # Modality cost/credit is applied against all Effects on the gift
@@ -397,7 +357,7 @@ class Power_Full(models.Model):
     base = models.ForeignKey(Base_Power, on_delete=models.PROTECT)
     private = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
-    pub_date = models.DateTimeField('date published')
+    pub_date = models.DateTimeField('date published', auto_now_add=True)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL,
                               on_delete=models.CASCADE,
                               blank=True,
@@ -422,6 +382,7 @@ class Power_Full(models.Model):
             ('view_private_power_full', 'View private power full'),
             ('edit_power_full', 'Edit power full'),
         )
+        verbose_name = "Gift"
 
     def delete(self):
         self.character = None
@@ -549,37 +510,37 @@ class PowerHistory(models.Model):
 
 # TODO: remove permissioning from this and use Power_Full permissioning.
 class Power(models.Model):
-    name = models.CharField(max_length = 150)
-    flavor_text = models.TextField(max_length = 2000)
-    description = models.TextField(max_length = 2500)
+    name = models.CharField(max_length=150)
+    flavor_text = models.TextField(max_length=2000)
+    description = models.TextField(max_length=2500)
+
     # TODO: ensure power_history parent and parent_power are same.
     # TODO: remove blank=True null=True after migration
     parent_power = models.ForeignKey(Power_Full,
                                      blank=True,
                                      null=True,
                                      on_delete=models.CASCADE)
+
+    # TODO: remove blank=True and null=True after migration
     power_history = models.ForeignKey(PowerHistory,
                                      blank=True,
                                      null=True,
-                                     on_delete=models.CASCADE) #TODO: remove blank=True and null=True after migration
+                                     on_delete=models.CASCADE)
     dice_system = models.CharField(choices=DICE_SYSTEM, max_length=55)
 
-    # TODO: ensure if base or vector is set, both are set.
-    base = models.ForeignKey(Base_Power, on_delete=models.CASCADE, blank=True, null=True)
-    vector = models.ForeignKey(Vector, on_delete=models.CASCADE, blank=True, null=True)
-
-    # TODO: ensure if modality is set, base and vector are not.
-    modality = models.ForeignKey(GiftModality, on_delete=models.CASCADE, blank=True, null=True)
+    base = models.ForeignKey(Base_Power, on_delete=models.CASCADE, blank=True, null=True, related_name="power_effect")
+    vector = models.ForeignKey(Base_Power, on_delete=models.CASCADE, blank=True, null=True, related_name="power_vector")
+    modality = models.ForeignKey(Base_Power, on_delete=models.CASCADE, blank=True, null=True, related_name="power_modality")
 
     private = models.BooleanField(default=False)
 
-    activation_style = models.CharField(choices=ACTIVATION_STYLE, max_length = 25, default=ACTIVATION_STYLE[0][0])
-    creation_reason = models.CharField(choices=CREATION_REASON, max_length = 25)
-    creation_reason_expanded_text = models.TextField(max_length = 1500,
+    activation_style = models.CharField(choices=ACTIVATION_STYLE, max_length=25, default=ACTIVATION_STYLE[0][0])
+    creation_reason = models.CharField(choices=CREATION_REASON, max_length=25)
+    creation_reason_expanded_text = models.TextField(max_length=1500,
                                                      blank=True,
                                                      null=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL,
-                              on_delete=models.CASCADE,
+                                   on_delete=models.CASCADE,
                                    blank=True,
                                    null=True)
     system = models.TextField(max_length = 14000,
@@ -593,15 +554,51 @@ class Power(models.Model):
                                                    blank=True,
                                                    through="Drawback_Instance",
                                                    through_fields=('relevant_power', 'relevant_drawback'))
-    pub_date = models.DateTimeField('date published')
+    pub_date = models.DateTimeField('date published', auto_now_add=True)
     parameter_values = models.ManyToManyField(Power_Param,
                                               through="Parameter_Value",
                                               through_fields=('relevant_power', 'relevant_power_param'))
 
     class Meta:
+        constraints = [
+        ]
         permissions = (
             ('view_private_power', 'View private power'),
         )
+
+    def __str__(self):
+        return self.name + " (" + self.description + ")"
+
+    def __check_constraints(self):
+        if hasattr(self, "modality") and self.modality:
+            if not self.modality.base_type == MODALITY:
+                raise IntegrityError("Power modality must be modality base")
+            if (hasattr(self, "base") and self.base) or (hasattr(self, "vector") and self.vector):
+                raise IntegrityError("modality cannot have effect or vector set")
+        if hasattr(self, "vector") and self.vector:
+            if not self.vector.base_type == VECTOR:
+                raise IntegrityError("Power vector must be vector base")
+        if hasattr(self, "base") and self.base:
+            if not self.base.base_type == EFFECT:
+                raise IntegrityError("Power effect must be effect base")
+        if (hasattr(self, "base") and self.base or hasattr(self, "vector") and self.vector) and not (self.base and self.vector):
+            raise IntegrityError("Power with effect or vector must have both")
+
+
+    def save(self, *args, **kwargs):
+        self.__check_constraints()
+        new_power = not self.pk
+        if hasattr(self, "system") and self.system:
+            if self.system == self.base.get_system().system_text:
+                self.system = None
+        super(Power, self).save(*args, **kwargs)
+        if new_power and hasattr(self, "parent_power") and self.parent_power:
+            parent = self.parent_power
+            parent.latest_rev = self
+            parent.save()
+
+    def get_absolute_url(self):
+        return reverse('powers:powers_view_power', kwargs={'power_id': self.pk})
 
     def get_system(self):
         if hasattr(self, "system") and self.system:
@@ -704,20 +701,6 @@ class Power(models.Model):
             return "revising"
         if self.creation_reason == CREATION_REASON[3][0]:
             return "adjusting"
-
-    def __str__(self):
-        return self.name + " (" + self.description + ")"
-
-    def save(self, *args, **kwargs):
-        new_power = not self.pk
-        if hasattr(self, "system") and self.system:
-            if self.system == self.base.get_system().system_text:
-                self.system = None
-        super(Power, self).save(*args, **kwargs)
-        if new_power and hasattr(self, "parent_power") and self.parent_power:
-            parent = self.parent_power
-            parent.latest_rev = self
-            parent.save()
 
 
 class SystemField(models.Model):

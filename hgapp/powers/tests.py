@@ -1,8 +1,10 @@
 from django.test import TestCase, override_settings
 from django.urls import reverse
+from django.contrib.auth.models import User
 import os
-from powers.models import Base_Power, Base_Power_Category, PowerTutorial
-import hgapp.settings
+from powers.models import Base_Power, Base_Power_Category, PowerTutorial, Power, EFFECT, VECTOR, MODALITY, SYS_PS2,\
+    SYS_ALL, SYS_LEGACY_POWERS, CREATION_NEW
+from django.db.utils import IntegrityError
 
 PACKAGE_ROOT = os.path.abspath(os.path.dirname(__file__))
 #Required to render our templates using sekizai, tho we don't do that any more so we should revisit.
@@ -32,7 +34,7 @@ TEMPLATES = [
 ]
 
 def setup_tutorial():
-    PowerTutorial.objects.create(
+    return PowerTutorial.objects.create(
         modal_base="nada",
         modal_base_header = "any",
         modal_edit_header = "what",
@@ -46,15 +48,27 @@ def create_base_power_category(category_slug):
         description = category_slug
     )
 
-def create_base_power(power_slug, base_power_category, public):
+def create_base_power(power_slug, category=None, public=True, type=EFFECT):
     return Base_Power.objects.create(
         slug = power_slug,
-        category = base_power_category,
+        category = category,
         summary = "summary of base power",
         description = "description of base power",
         eratta = "eratta of base power",
         is_public = public,
+        base_type=type,
     )
+
+def create_power(system=SYS_PS2, effect=None, vector=None, modality=None, created_by=None):
+    return Power.objects.create(
+        name="name",
+        flavor_text="flavor",
+        description="description",
+        dice_system=system,
+        base=effect,
+        vector=vector,
+        modality=modality,
+        creation_reason=CREATION_NEW,)
 
 class CreatePowerTests(TestCase):
     @classmethod
@@ -66,7 +80,7 @@ class CreatePowerTests(TestCase):
     def test_public_powers_show_in_list_of_all(self):
         create_base_power(
             power_slug = "blast",
-            base_power_category = create_base_power_category("Offense"),
+            category = create_base_power_category("Offense"),
             public = True)
         response = self.client.get(reverse('powers:powers_create_all'))
         self.assertQuerysetEqual(
@@ -78,7 +92,7 @@ class CreatePowerTests(TestCase):
     def test_non_public_powers_do_not_show_in_list_of_all(self):
         create_base_power(
             power_slug="blast",
-            base_power_category=create_base_power_category("Offense"),
+            category=create_base_power_category("Offense"),
             public=False)
         response = self.client.get(reverse('powers:powers_create_all'))
         self.assertQuerysetEqual(
@@ -91,7 +105,7 @@ class CreatePowerTests(TestCase):
         category_name = "Offense"
         create_base_power(
             power_slug="blast",
-            base_power_category=create_base_power_category(category_name),
+            category=create_base_power_category(category_name),
             public=True)
         response = self.client.get(reverse('powers:powers_create_category', args=(category_name,)))
         self.assertQuerysetEqual(
@@ -104,11 +118,49 @@ class CreatePowerTests(TestCase):
         category_name = "Offense"
         create_base_power(
             power_slug="blast",
-            base_power_category=create_base_power_category(category_name),
+            category=create_base_power_category(category_name),
             public=False)
         response = self.client.get(reverse('powers:powers_create_category', args=(category_name,)))
         self.assertQuerysetEqual(
             response.context['powers_list'],
             []
         )
+
+class PowerModelTests(TestCase):
+    def setUp(self):
+        self.tutorial = setup_tutorial()
+        self.category_name = "Offense"
+        self.base_effect = create_base_power(
+            power_slug="blast",
+            category=create_base_power_category(self.category_name),
+            public=True,
+            type=EFFECT)
+        self.base_vector = create_base_power(
+            power_slug="direct",
+            public=True,
+            type=VECTOR)
+        self.base_modality = create_base_power(
+            power_slug="power",
+            public=True,
+            type=MODALITY)
+        self.user1 = User.objects.create_user(
+            username='jacob', email='jacob@…', password='top_secret')
+
+    def test_power_constraints(self):
+        # successful
+        create_power(effect=self.base_effect, vector=self.base_vector)
+        create_power(modality=self.base_modality)
+
+        # wrong effect type
+        with self.assertRaises(IntegrityError):
+            create_power(effect=self.base_vector, vector=self.base_vector)
+        # wrong vector type
+        with self.assertRaises(IntegrityError):
+            create_power(effect=self.base_effect, vector=self.base_effect)
+        # wrong modality type
+        with self.assertRaises(IntegrityError):
+            create_power(modality=self.base_effect)
+        # can't set all three
+        with self.assertRaises(IntegrityError):
+            create_power(modality=self.base_modality, vector=self.base_vector, effect=self.base_effect)
 
