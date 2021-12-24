@@ -122,6 +122,7 @@ class BasePowerAdmin(admin.ModelAdmin):
                 .order_by("name")
         return super().formfield_for_manytomany(db_field, request, **kwargs)
 
+
 @admin.register(Base_Power_System)
 class BasePowerSystemAdmin(admin.ModelAdmin):
     inlines = [SystemFieldTextTabular, SystemFieldRollTabular]
@@ -155,6 +156,7 @@ class PowerFullAdmin(admin.ModelAdmin):
 @admin.register(FieldSubstitution)
 class FieldSubstitutionAdmin(admin.ModelAdmin):
     list_display = ('marker', 'mode', 'replacement')
+
 
 admin.site.register(Power_Param)
 admin.site.register(Parameter_Value)

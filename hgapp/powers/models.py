@@ -8,8 +8,7 @@ from characters.models import Character, HIGH_ROLLER_STATUS, Attribute, Roll, NO
 from guardian.shortcuts import assign_perm, remove_perm
 from django.utils.html import mark_safe, escape, linebreaks
 from django.db.utils import IntegrityError
-
-
+from hgapp.utilities import get_object_or_none
 
 ACTIVATION_STYLE = (
     ('PASSIVE', 'Passive'),
@@ -82,6 +81,12 @@ class FieldSubstitution(models.Model):
     def __str__(self):
         return "[[{}]] {} ({})".format(self.marker, self.get_mode_display(), self.replacement)
 
+    def to_blob(self):
+        # marker is key in map that uses this.
+        return {
+            "replacement": self.replacement,
+            "mode": self.mode,
+        }
 
 # Enhancements and Drawbacks
 class Modifier(models.Model):
@@ -237,7 +242,7 @@ class Base_Power(models.Model):
     eratta = models.TextField(blank=True, null=True)
     is_public = models.BooleanField(default=True)
     num_free_enhancements = models.IntegerField("gift point credit", default=0)
-    substitutions = models.ManyToManyField(FieldSubstitution, verbose_name="Field substitutions")
+    substitutions = models.ManyToManyField(FieldSubstitution, verbose_name="Field substitutions", blank=True)
 
     # Component type, Effect, Modality, or Vector
     base_type = models.CharField(choices=BASE_POWER_TYPE,
@@ -252,6 +257,7 @@ class Base_Power(models.Model):
     drawbacks = models.ManyToManyField(verbose_name="legacy drawbacks", to=Drawback,
                                        blank=True)
 
+    # V2 Power system only
     allowed_vectors = models.ManyToManyField("Base_Power", related_name="vector_effects", blank=True)
     allowed_modalities = models.ManyToManyField("Base_Power", related_name="vector_modalities", blank=True)
 
@@ -295,9 +301,32 @@ class Base_Power(models.Model):
     def used_power_fulls(self):
         return Power_Full.objects.filter(base=self, character__isnull=False, is_deleted=False)
 
-    def get_system(self):
-        return Base_Power_System.objects.filter(dice_system=DICE_SYSTEM[1][0]).get(base_power=self)
+    def get_system(self, system=SYS_LEGACY_POWERS):
+        return get_object_or_none(Base_Power_System.objects.filter(dice_system=system, base_power=self))
 
+    def to_blob(self):
+        # Used by v2 powers system for passing to FE and on BE for form validation.
+        system = self.get_system(SYS_PS2)
+        return {
+            'slug': self.slug,
+            'name': self.name,
+            'summary': self.summary,
+            'description': self.description,
+            'eratta': self.eratta,
+            'gift_credit': self.num_free_enhancements,
+            'required_status': self.required_status,
+            'category': self.category.pk if self.category else None,
+            'substitutions': {x.marker: x.to_blob() for x in self.substitutions.all()},
+            'allowed_vectors': [x.pk for x in self.allowed_vectors.all()],
+            'allowed_modalities': [x.pk for x in self.allowed_modalities.all()],
+            'enhancements': [x.pk for x in self.avail_drawbacks.all()],
+            'drawbacks': [x.pk for x in self.avail_enhancements.all()],
+            'parameters': [x.relevant_parameter.pk for x in self.power_param_set.exclude(dice_system=SYS_LEGACY_POWERS).all()],
+            'blacklist_enhancements': [x.pk for x in self.blacklist_enhancements.all()],
+            'blacklist_drawbacks': [x.pk for x in self.blacklist_drawbacks.all()],
+            'blacklist_parameters': [x.pk for x in self.blacklist_parameters.all()],
+            'system': system.system_text if system else None,
+        }
 
 
 
@@ -306,7 +335,7 @@ class Base_Power(models.Model):
 class Base_Power_System(models.Model):
     dice_system = models.CharField(choices=DICE_SYSTEM,
                                    max_length=55,
-                                   default=DICE_SYSTEM[1])
+                                   default=SYS_LEGACY_POWERS)
     system_text = models.TextField()
     eratta = models.TextField(blank=True,
                               null=True)
@@ -324,7 +353,7 @@ class Base_Power_System(models.Model):
 # Joining between Parameter and Componeent
 class Power_Param(models.Model):
     relevant_parameter = models.ForeignKey(Parameter, on_delete=models.CASCADE)
-    dice_system = models.CharField(choices=DICE_SYSTEM, max_length=55, default=DICE_SYSTEM[1][0])
+    dice_system = models.CharField(choices=DICE_SYSTEM, max_length=55, default=SYS_LEGACY_POWERS)
     seasoned = models.IntegerField("Seasoned Threshold")
     veteran = models.IntegerField("Veteran Threshold")
     default = models.IntegerField("Default Level")

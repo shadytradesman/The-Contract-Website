@@ -7,7 +7,6 @@ from django.views import generic
 from django.db import transaction
 from django.db.models import Prefetch
 
-
 from characters.models import Character
 from .createPowerFormUtilities import get_create_power_context_from_base, \
     get_create_power_context_from_power, get_edit_power_context_from_power, create_new_power_and_parent, \
@@ -15,6 +14,16 @@ from .createPowerFormUtilities import get_create_power_context_from_base, \
 from .models import Power, Base_Power_Category, Base_Power, Base_Power_System, DICE_SYSTEM, Power_Full, PowerTag, \
     PremadeCategory, PowerTutorial
 from .forms import DeletePowerForm
+from .ps2Utilities import generate_json_blob
+
+def create_ps2(request):
+    if request.user.is_anonymous or not request.user.profile.ps2_user:
+        raise PermissionDenied("You are not authorized to create a new power in this system.")
+    context = {
+        'power_blob': generate_json_blob(),
+    }
+    return render(request, 'powers/ps2_create_pages/create_ps2.html', context)
+
 
 def create(request, character_id=None):
     category_list = Base_Power_Category.objects\
