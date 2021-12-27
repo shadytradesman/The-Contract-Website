@@ -5,7 +5,6 @@
                v-bind:name="component.type"
                v-bind:value="component.slug"
                @click="$emit('click-action', component)"
-               v-model="selected"
                >
         <span  style="padding-left: 10px;">
             { component.displayName }

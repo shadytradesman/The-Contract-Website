@@ -82,8 +82,8 @@ class FieldSubstitution(models.Model):
         return "[[{}]] {} ({})".format(self.marker, self.get_mode_display(), self.replacement)
 
     def to_blob(self):
-        # marker is key in map that uses this.
         return {
+            "marker": self.marker,
             "replacement": self.replacement,
             "mode": self.mode,
         }
@@ -134,7 +134,7 @@ class Modifier(models.Model):
             "eratta": self.eratta,
             "multiplicity_allowed": self.multiplicity_allowed,
             "detail_field_label": self.detail_field_label,
-            'substitutions': {x.marker: x.to_blob() for x in self.substitutions.all()},
+            'substitutions': [x.to_blob() for x in self.substitutions.all()],
         }
 
 

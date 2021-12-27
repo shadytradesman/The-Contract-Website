@@ -7,8 +7,10 @@
 {% endblock %}
 
 {% block extra_scripts %}
-	<script src="https://unpkg.com/vue@next"></script>
+	{% comment %} <script src="https://unpkg.com/vue@next"></script> {% endcomment %}
+	<script src="{% static 'powers/vue.next.js' %}"></script>
 	{% include "powers/ps2_create_pages/script_component_snip.html" %}
+	{% include "powers/ps2_create_pages/script_modifier_snip.html" %}
 	{{power_blob|json_script:"powerBlob"}}
 	<script src="{% static 'powers/ps2_create_script.js' %}"></script>
 {% endblock %}
@@ -59,6 +61,24 @@
 		</div>
 		<div class="col-md-6">
 			<h3 class="text-center">Modifiers</h3>
+			<h4>Enhancements</h4>
+			<div id="js-enhancements-container">
+				<power-modifier
+						v-for="modifier in enhancements"
+						:key="modifier.id"
+						:modifier="modifier"
+						@click-action="clickEnhancement">
+				</power-modifier>
+			</div>
+			<h4>Drawbacks</h4>
+			<div id="js-drawbacks-container">
+				<power-modifier
+						v-for="modifier in drawbacks"
+						:key="modifier.id"
+						:modifier="modifier"
+						@click-action="clickDrawback">
+				</power-modifier>
+			</div>
 		</div>
 	</div>
 </div>

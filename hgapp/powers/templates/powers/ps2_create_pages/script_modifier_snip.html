@@ -1,14 +1,19 @@
 <script type="text/html" id="js-modifier-template">
-    <div class="thumbnail">
-        <input type="checkbox" name="mod-__mod_slug__">
-        <label>
-            __mod_name__
-            &ensp;
-            (__mod_system__)
-        </label>
-        <div class="">
-            __mod_detail__
-        </div>
-        <i><small class="text-danger"><div class="js-modifier-requirements"></div></small></i>
-    </div>
+    <label v-bind:for="modifier.id" class="thumbnail" style="margin: 5px;">
+        <input type="checkbox"
+               v-bind:id="modifier.id"
+               v-bind:slug="modifier.slug"
+               @click="$emit('click-action', modifier)"
+        >
+        <span style="padding-left: 10px;">
+            <b>
+                { modifier.displayName }
+            </b>
+            <span style="font-weight: 400;">
+                (
+                { modifier.description }
+                )
+            </span>
+        </span>
+    </label>
 </script>
