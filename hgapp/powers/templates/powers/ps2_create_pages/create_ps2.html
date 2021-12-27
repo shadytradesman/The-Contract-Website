@@ -7,6 +7,8 @@
 {% endblock %}
 
 {% block extra_scripts %}
+	<script src="https://unpkg.com/vue@next"></script>
+	{% include "powers/ps2_create_pages/script_component_snip.html" %}
 	{{power_blob|json_script:"powerBlob"}}
 	<script src="{% static 'powers/ps2_create_script.js' %}"></script>
 {% endblock %}
@@ -16,26 +18,47 @@
 {% endblock %}
 
 {% block body_base %}
-<div class="container-fluid">
+<div class="container-fluid" id="vue-app">
 	<div class="row" style="max-height: 300px; overflow:scroll;">
 		<div id="modalities" class="col-md-4">
 			<h3>Modalities</h3>
+			<gift-component
+					v-for="component in modalities"
+					:key="component.id"
+					:component="component"
+					@click-action="clickModality">
+			</gift-component>
 		</div>
 		<div id="effects" class="col-md-4">
 			<h3>Effects</h3>
+			<gift-component
+					v-for="component in effects"
+					:key="component.id"
+					:component="component"
+					@click-action="clickEffect">
+			</gift-component>
 		</div>
 		<div id="vectors" class="col-md-4">
 			<h3>Vectors</h3>
+			<gift-component
+					v-for="component in vectors"
+					:key="component.id"
+					:component="component"
+					@click-action="clickVector">
+			</gift-component>
 		</div>
 	</div>
 	<div class="row">
 		<div class="col-md-6">
-			<h3>Unrendered System</h3>
-			<div id="unrendered-system"></div>
-			<h3>Rendered System</h3>
-			<div id="rendered-system"></div>
+			<h3 class="text-center">Unrendered System</h3>
+			<div id="unrendered-system" v-html="unrenderedSystem">
+			</div>
+			<h3 class="text-center">Rendered System</h3>
+			<div id="rendered-system" v-html="renderedSystem">
+			</div>
 		</div>
 		<div class="col-md-6">
+			<h3 class="text-center">Modifiers</h3>
 		</div>
 	</div>
 </div>

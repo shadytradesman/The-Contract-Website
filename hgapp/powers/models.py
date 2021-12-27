@@ -123,6 +123,20 @@ class Modifier(models.Model):
     class Meta:
         abstract = True
 
+    def to_blob(self):
+        return {
+            "name": self.name,
+            "slug": self.slug,
+            'required_enhancements': [x.pk for x in self.required_Enhancements.all()],
+            'required_drawbacks': [x.pk for x in self.required_drawbacks.all()],
+            "required_status": self.required_status,
+            "description": self.description,
+            "eratta": self.eratta,
+            "multiplicity_allowed": self.multiplicity_allowed,
+            "detail_field_label": self.detail_field_label,
+            'substitutions': {x.marker: x.to_blob() for x in self.substitutions.all()},
+        }
+
 
 class Enhancement(Modifier):
     def form_name(self):
@@ -261,6 +275,7 @@ class Base_Power(models.Model):
     allowed_vectors = models.ManyToManyField("Base_Power", related_name="vector_effects", blank=True)
     allowed_modalities = models.ManyToManyField("Base_Power", related_name="vector_modalities", blank=True)
 
+    # TODO: default this to the existing enhancements and drawbacks
     avail_enhancements = models.ManyToManyField(Enhancement, verbose_name="enhancements",
                                                 related_name="avail_enhancements",
                                                 blank=True)
@@ -307,25 +322,28 @@ class Base_Power(models.Model):
     def to_blob(self):
         # Used by v2 powers system for passing to FE and on BE for form validation.
         system = self.get_system(SYS_PS2)
+        text_fields = system.systemfieldtext_set.all() if system else None
+        roll_fields = system.systemfieldroll_set.all() if system else None
         return {
             'slug': self.slug,
             'name': self.name,
             'summary': self.summary,
             'description': self.description,
             'eratta': self.eratta,
+            'type': self.base_type,
             'gift_credit': self.num_free_enhancements,
             'required_status': self.required_status,
             'category': self.category.pk if self.category else None,
             'substitutions': {x.marker: x.to_blob() for x in self.substitutions.all()},
             'allowed_vectors': [x.pk for x in self.allowed_vectors.all()],
             'allowed_modalities': [x.pk for x in self.allowed_modalities.all()],
-            'enhancements': [x.pk for x in self.avail_drawbacks.all()],
-            'drawbacks': [x.pk for x in self.avail_enhancements.all()],
+            'enhancements': [x.pk for x in self.avail_enhancements.all()],
+            'drawbacks': [x.pk for x in self.avail_drawbacks.all()],
             'parameters': [x.relevant_parameter.pk for x in self.power_param_set.exclude(dice_system=SYS_LEGACY_POWERS).all()],
             'blacklist_enhancements': [x.pk for x in self.blacklist_enhancements.all()],
             'blacklist_drawbacks': [x.pk for x in self.blacklist_drawbacks.all()],
             'blacklist_parameters': [x.pk for x in self.blacklist_parameters.all()],
-            'system': system.system_text if system else None,
+            'system_text': system.system_text if system else None,
         }
 
 

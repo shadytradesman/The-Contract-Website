@@ -1,18 +1,30 @@
 import json
+from collections import defaultdict
 from .models import SYS_ALL, SYS_LEGACY_POWERS, SYS_PS2, EFFECT, VECTOR, MODALITY, Base_Power, Enhancement, Drawback
 
 def generate_json_blob():
     return json.dumps(generate_power_blob())
 
 def generate_power_blob():
+    vectors = _generate_component_blob(VECTOR)
+    effects = _generate_component_blob(EFFECT)
+    modalities = _generate_component_blob(MODALITY)
+    effects_by_modality = defaultdict(list)
+    vectors_by_effect = defaultdict(list)
+    for effect in effects.values():
+        for modality_key in effect["allowed_modalities"]:
+            effects_by_modality[modality_key].append(effect["slug"])
+        vectors_by_effect[effect["slug"]].extend(effect["allowed_vectors"])
     return {
-        'vectors': _generate_component_blob(VECTOR),
-        'effects': _generate_component_blob(EFFECT),
-        'modalities': _generate_component_blob(MODALITY),
+        'vectors': vectors,
+        'effects': effects,
+        'modalities': modalities,
         'component_categories': _generate_component_category_blob(),
         'enhancements': _generate_modifier_blob(Enhancement),
         'drawbacks': _generate_modifier_blob(Drawback),
         'parameters': _generate_param_blob(),
+        'effects_by_modality': effects_by_modality,
+        'vectors_by_effect': vectors_by_effect,
     }
 
     #json_dumps dict
@@ -45,9 +57,8 @@ def _generate_component_blob(base_type):
 
 
 def _generate_modifier_blob(ModifierClass):
-    ModifierClass.objects.exclude(system=SYS_LEGACY_POWERS).all()
-    # Note this will include orphaned modifiers. Is this okay?
-    pass
+    modifiers = ModifierClass.objects.exclude(system=SYS_LEGACY_POWERS).all()
+    return {x.pk: x.to_blob() for x in modifiers}
 
 
 def _generate_param_blob():
