@@ -1,4 +1,5 @@
 const powerBlob = JSON.parse(JSON.parse(document.getElementById('powerBlob').textContent));
+console.log(powerBlob);
 var unrenderedSystemText = "";
 
 function componentToVue(component, type) {
@@ -41,8 +42,8 @@ const ComponentRendering = {
     }
   },
   methods: {
-      clickModality(component) {
-          const allowed_effects = powerBlob["effects_by_modality"][component.slug];
+      clickModality(modality) {
+          const allowed_effects = powerBlob["effects_by_modality"][modality.slug];
           this.effects = Object.values(powerBlob.effects)
               .filter(comp => allowed_effects.includes(comp.slug))
               .map(comp => componentToVue(comp, "effect"));
@@ -57,14 +58,14 @@ const ComponentRendering = {
               this.vectors = [];
               this.selectedVector = '';
           }
-          this.generalClick(component);
+          this.generalClick(modality);
       },
-      clickEffect(component) {
-          const allowed_vectors = powerBlob["vectors_by_effect"][component.slug];
+      clickEffect(effect) {
+          const allowed_vectors = powerBlob["vectors_by_effect"][effect.slug];
           this.vectors = Object.values(powerBlob.vectors)
               .filter(comp => allowed_vectors.includes(comp.slug))
               .map(comp => componentToVue(comp, "vector"));
-          this.generalClick(component);
+          this.generalClick(effect);
       },
       clickVector(component) {
           console.log("clicked vector");

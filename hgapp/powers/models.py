@@ -100,10 +100,10 @@ class Modifier(models.Model):
                                                 blank=True)
     required_status = models.CharField(choices=HIGH_ROLLER_STATUS,
                                        max_length=25,
-                                       default=HIGH_ROLLER_STATUS[0])
+                                       default=HIGH_ROLLER_STATUS[0][0])
     system = models.CharField(choices=DICE_SYSTEM,
                               max_length=55,
-                              default=SYS_ALL)
+                              default=SYS_PS2)
     description = models.CharField(max_length= 250)
     eratta = models.TextField(blank=True,
                               null=True)
@@ -124,6 +124,16 @@ class Modifier(models.Model):
         abstract = True
 
     def to_blob(self):
+        substitutions = self.substitutions.all()
+        if substitutions.count() == 0:
+            default_sub = FieldSubstitution(
+                marker=self.slug,
+                replacement = self.description,
+                mode = ADDITIVE
+            )
+            sub_list = [default_sub.to_blob()]
+        else:
+            sub_list = [x.to_blob() for x in self.substitutions.all()]
         return {
             "name": self.name,
             "slug": self.slug,
@@ -134,7 +144,7 @@ class Modifier(models.Model):
             "eratta": self.eratta,
             "multiplicity_allowed": self.multiplicity_allowed,
             "detail_field_label": self.detail_field_label,
-            'substitutions': [x.to_blob() for x in self.substitutions.all()],
+            'substitutions': sub_list,
         }
 
 
@@ -185,12 +195,33 @@ class Parameter(models.Model):
                                   null=True,
                                   on_delete=models.CASCADE)
     substitutions = models.ManyToManyField(FieldSubstitution)
+    seasoned_level = models.IntegerField("Seasoned Threshold",
+                                   default=-1,
+                                   help_text="If legacy power system, this field is ignored. 8+ for no restriction.")
+    veteran_level = models.IntegerField("Veteran Threshold",
+                                  default=-1,
+                                  help_text="If legacy power system, this field is ignored. 8+ for no restriction")
+    default = models.IntegerField("Default Level",
+                                  default=1,
+                                  help_text="If legacy power system, this field is ignored. 8+ for no retriction")
 
     def display(self):
         return " ".join([self.name])
 
     def __str__(self):
         return " ".join([self.name]) + " [" +self.slug + "]"
+
+    def to_blob(self):
+        return {
+            "name": self.name,
+            "slug": self.slug,
+            "levels": self.get_levels(),
+            "eratta": self.eratta,
+            "seasoned_level": self.seasoned_level,
+            "veteran_level": self.veteran_level,
+            "default": self.default,
+            'substitutions': {x.marker: x.to_blob() for x in self.substitutions.all()},
+        }
 
     def get_levels(self):
         levels = []
@@ -272,10 +303,15 @@ class Base_Power(models.Model):
                                        blank=True)
 
     # V2 Power system only
-    allowed_vectors = models.ManyToManyField("Base_Power", related_name="vector_effects", blank=True)
-    allowed_modalities = models.ManyToManyField("Base_Power", related_name="vector_modalities", blank=True)
+    allowed_vectors = models.ManyToManyField("Base_Power",
+                                             related_name="vector_effects",
+                                             blank=True,
+                                             help_text="Set on Effects and Modalities only. No effect on Vectors.")
+    allowed_modalities = models.ManyToManyField("Base_Power",
+                                                related_name="vector_modalities",
+                                                blank=True,
+                                                help_text="Set on Effects only. No effect on Vectors or Modalities." )
 
-    # TODO: default this to the existing enhancements and drawbacks
     avail_enhancements = models.ManyToManyField(Enhancement, verbose_name="enhancements",
                                                 related_name="avail_enhancements",
                                                 blank=True)
@@ -344,16 +380,16 @@ class Base_Power(models.Model):
             'blacklist_drawbacks': [x.pk for x in self.blacklist_drawbacks.all()],
             'blacklist_parameters': [x.pk for x in self.blacklist_parameters.all()],
             'system_text': system.system_text if system else None,
+            'text_fields': [x.to_blob() for x in text_fields] if text_fields else [],
+            'roll_fields': [x.to_blob() for x in roll_fields] if roll_fields else [],
         }
-
-
 
 
 # class for system for components (Modality, Vector, Effect)
 class Base_Power_System(models.Model):
     dice_system = models.CharField(choices=DICE_SYSTEM,
                                    max_length=55,
-                                   default=SYS_LEGACY_POWERS)
+                                   default=SYS_PS2)
     system_text = models.TextField()
     eratta = models.TextField(blank=True,
                               null=True)
@@ -365,16 +401,19 @@ class Base_Power_System(models.Model):
         unique_together = (("base_power", "dice_system"))
 
     def __str__(self):
-        return ":".join([self.base_power.name,str(self.dice_system)])
+        return ":".join([self.base_power.name, str(self.dice_system)])
 
 
 # Joining between Parameter and Componeent
 class Power_Param(models.Model):
     relevant_parameter = models.ForeignKey(Parameter, on_delete=models.CASCADE)
-    dice_system = models.CharField(choices=DICE_SYSTEM, max_length=55, default=SYS_LEGACY_POWERS)
-    seasoned = models.IntegerField("Seasoned Threshold")
-    veteran = models.IntegerField("Veteran Threshold")
-    default = models.IntegerField("Default Level")
+    dice_system = models.CharField(choices=DICE_SYSTEM, max_length=55, default=SYS_PS2)
+    seasoned = models.IntegerField("Seasoned Threshold",
+                                   help_text="If v2 power system, this field is ignored.")
+    veteran = models.IntegerField("Veteran Threshold",
+                                  help_text="If v2 power system, this field is ignored.")
+    default = models.IntegerField("Default Level",
+                                  help_text="If v2 power system, this field is ignored.")
     relevant_base_power = models.ForeignKey(Base_Power, on_delete=models.CASCADE)
 
     class Meta:
@@ -763,6 +802,11 @@ class SystemField(models.Model):
         unique_together = (("base_power_system", "name"))
         abstract = True
 
+    def to_blob(self):
+        return {
+            "name": self.name,
+            "eratta": self.eratta,
+        }
 
 class SystemFieldRoll(SystemField):
     allow_mind = models.BooleanField(default=False)
@@ -779,7 +823,9 @@ class SystemFieldRoll(SystemField):
                                            on_delete=models.CASCADE,
                                            null=True,
                                            blank=True)
-    difficulty = models.PositiveIntegerField(null=True, blank=True)
+    difficulty = models.PositiveIntegerField(null=True,
+                                             blank=True,
+                                             help_text="Not used in new Powers system")
     caster_rolls = models.BooleanField(default=True)
 
     def render_speed(self):
@@ -788,6 +834,19 @@ class SystemFieldRoll(SystemField):
         else:
             return self.get_speed_display()
 
+    def to_blob(self):
+        roll_blob = {
+            "allow_mind": self.allow_mind,
+            "allow_body": self.allow_body,
+            "allow_std_roll": self.allow_std_roll,
+            "allow_parry": self.allow_std_roll,
+            "parry_type": self.parry_type,
+            "speed": self.speed,
+            "required_attribute": self.required_attribute,
+        }
+        field_blob = super(SystemFieldRoll, self)
+        field_blob.update(roll_blob)
+        return field_blob
 
 class SystemFieldText(SystemField):
     pass
