@@ -9,8 +9,6 @@
 {% block extra_scripts %}
 	{% comment %} <script src="https://unpkg.com/vue@next"></script> {% endcomment %}
 	<script src="{% static 'powers/vue.next.js' %}"></script>
-	{% include "powers/ps2_create_pages/script_component_snip.html" %}
-	{% include "powers/ps2_create_pages/script_modifier_snip.html" %}
 	{{power_blob|json_script:"powerBlob"}}
 	<script src="{% static 'powers/ps2_create_script.js' %}"></script>
 {% endblock %}
@@ -24,30 +22,57 @@
 	<div class="row" style="max-height: 300px; overflow:scroll;">
 		<div id="modalities" class="col-md-4">
 			<h3>Modalities</h3>
-			<gift-component
-					v-for="component in modalities"
-					:key="component.id"
-					:component="component"
-					@click-action="clickModality">
-			</gift-component>
+			<div v-for="component in modalities"
+				 :key="component.id">
+				<label v-bind:for="component.id" class="thumbnail" style="margin: 5px;">
+					<input type="radio"
+						   v-bind:id="component.id"
+						   v-bind:name="component.type"
+						   v-bind:value="component.slug"
+						   v-model="selectedModality"
+						   @change="clickModality"
+					>
+					<span  style="padding-left: 10px;">
+						{ component.displayName }
+					</span>
+				</label>
+			</div>
 		</div>
 		<div id="effects" class="col-md-4">
 			<h3>Effects</h3>
-			<gift-component
-					v-for="component in effects"
-					:key="component.id"
-					:component="component"
-					@click-action="clickEffect">
-			</gift-component>
+			<div v-for="component in effects"
+				 :key="component.id">
+				<label v-bind:for="component.id" class="thumbnail" style="margin: 5px;">
+					<input type="radio"
+						   v-bind:id="component.id"
+						   v-bind:name="component.type"
+						   v-bind:value="component.slug"
+						   v-model="selectedEffect"
+						   @change="clickEffect"
+					>
+					<span  style="padding-left: 10px;">
+						{ component.displayName }
+					</span>
+				</label>
+			</div>
 		</div>
 		<div id="vectors" class="col-md-4">
 			<h3>Vectors</h3>
-			<gift-component
-					v-for="component in vectors"
-					:key="component.id"
-					:component="component"
-					@click-action="clickVector">
-			</gift-component>
+			<div v-for="component in vectors"
+				 :key="component.id">
+				<label v-bind:for="component.id" class="thumbnail" style="margin: 5px;">
+					<input type="radio"
+						   v-bind:id="component.id"
+						   v-bind:name="component.type"
+						   v-bind:value="component.slug"
+						   v-model="selectedVector"
+						   @change="clickVector"
+					>
+					<span  style="padding-left: 10px;">
+						{ component.displayName }
+					</span>
+				</label>
+			</div>
 		</div>
 	</div>
 	<div class="row">
@@ -63,21 +88,25 @@
 			<h3 class="text-center">Modifiers</h3>
 			<h4>Enhancements</h4>
 			<div id="js-enhancements-container">
-				<power-modifier
-						v-for="modifier in enhancements"
-						:key="modifier.id"
-						:modifier="modifier"
-						@click-action="clickEnhancement">
-				</power-modifier>
+				<div v-for="modifier in enhancements"
+						:key="modifier.id" >
+					{% with 'selectedEnhancements' as vue_model_name %}
+						{% with 'clickEnhancement' as vue_on_click %}
+							{% include "powers/ps2_create_pages/snip_modifier_template.html" %}
+						{% endwith %}
+					{% endwith %}
+				</div>
 			</div>
 			<h4>Drawbacks</h4>
 			<div id="js-drawbacks-container">
-				<power-modifier
-						v-for="modifier in drawbacks"
-						:key="modifier.id"
-						:modifier="modifier"
-						@click-action="clickDrawback">
-				</power-modifier>
+				<div v-for="modifier in drawbacks"
+						:key="modifier.id">
+					{% with 'selectedDrawbacks' as vue_model_name %}
+					{% with 'clickDrawback' as vue_on_click %}
+					{% include "powers/ps2_create_pages/snip_modifier_template.html" %}
+					{% endwith %}
+					{% endwith %}
+				</div>
 			</div>
 		</div>
 	</div>

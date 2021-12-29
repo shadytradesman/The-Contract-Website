@@ -64,7 +64,7 @@ def _generate_modifier_blob(ModifierClass):
 
 def _generate_param_blob():
     power_params = Power_Param.objects.filter(dice_system=SYS_PS2).select_related("relevant_parameter").all()
-    return {x.pk: x.to_blob() for x.relevant_parameter in power_params}
+    return {x.relevant_parameter.pk: x.relevant_parameter.to_blob() for x in power_params}
 
 
 def _generate_component_category_blob():

@@ -32,10 +32,15 @@ const ComponentRendering = {
   data() {
     return {
       modalities: [],
+      selectedModality: "",
       effects: [],
+      selectedEffect: "",
       vectors: [],
+      selectedVector: "",
       enhancements: [],
+      selectedEnhancements: [],
       drawbacks: [],
+      selectedDrawbacks: [],
       parameters: [],
       unrenderedSystem: '',
       renderedSystem: '',
@@ -43,47 +48,51 @@ const ComponentRendering = {
   },
   methods: {
       clickModality(modality) {
-          const allowed_effects = powerBlob["effects_by_modality"][modality.slug];
+          const allowed_effects = powerBlob["effects_by_modality"][this.selectedModality];
           this.effects = Object.values(powerBlob.effects)
               .filter(comp => allowed_effects.includes(comp.slug))
               .map(comp => componentToVue(comp, "effect"));
-
-          // Auto-check vectors if effects available.
-          checkedEffects = $('input[name="EFFECT"]:checked');
-          if (checkedEffects.length) {
-              const slug = checkedEffects[0].value;
-              checkedEffects = this.effects.filter(comp => comp.slug == slug);
-              this.clickEffect(checkedEffects[0]);
-          } else {
-              this.vectors = [];
-              this.selectedVector = '';
+          if (!allowed_effects.includes(this.selectedEffect)) {
+              this.selectedEffect = allowed_effects[0];
           }
-          this.generalClick(modality);
+          this.updateAvailableVectors();
+          this.componentClick();
       },
       clickEffect(effect) {
-          const allowed_vectors = powerBlob["vectors_by_effect"][effect.slug];
+          this.updateAvailableVectors();
+          this.componentClick();
+      },
+      updateAvailableVectors() {
+          if (this.selectedEffect.length == 0) {
+              this.vectors = [];
+              this.selectedVector = '';
+              return;
+          }
+          const effect_vectors = powerBlob["vectors_by_effect"][this.selectedEffect];
+          const modality_vectors = powerBlob["vectors_by_modality"][this.selectedModality];
+          const allowed_vectors = effect_vectors.filter(x => modality_vectors.includes(x));
           this.vectors = Object.values(powerBlob.vectors)
               .filter(comp => allowed_vectors.includes(comp.slug))
               .map(comp => componentToVue(comp, "vector"));
-          this.generalClick(effect);
+          if (!allowed_vectors.includes(this.selectedVector)) {
+              this.selectedVector = allowed_vectors[0];
+          }
       },
-      clickVector(component) {
-          console.log("clicked vector");
-          console.log(component.displayName);
-          this.generalClick(component);
+      clickVector(vector) {
+          this.componentClick();
       },
-      generalClick(component) {
-        // TODO: figure out how to do this in a vue-y way.
-		checkedModalities = $('input[name="MODALITY"]:checked');
-		checkedEffects = $('input[name="EFFECT"]:checked');
-		checkedVectors = $('input[name="VECTOR"]:checked');
-		if (checkedEffects.length && checkedModalities.length && checkedVectors.length) {
-			this.populatePowerForm(powerBlob.modalities[checkedModalities[0].value],
-				powerBlob.effects[checkedEffects[0].value],
-				powerBlob.vectors[checkedVectors[0].value]);
+      componentClick() {
+		if (this.selectedVector.length && this.selectedModality.length && this.selectedEffect.length) {
+			this.populatePowerForm(powerBlob.modalities[this.selectedModality],
+				powerBlob.effects[this.selectedEffect],
+				powerBlob.vectors[this.selectedVector]);
         }
       },
       populatePowerForm(modality, effect, vector) {
+        console.log("updating power form with the following modality, effect and vector");
+        console.log(modality);
+        console.log(effect);
+        console.log(vector);
         this.unrenderedSystem = modality["system_text"] + "<br><br>" + vector["system_text"] + "<br><br>" + effect["system_text"] + "<br>";
         this.enhancements = modifiersFromComponents([modality, effect, vector], "enhancements");
         this.drawbacks = modifiersFromComponents([modality, effect, vector], "drawbacks");
@@ -92,7 +101,8 @@ const ComponentRendering = {
       },
       clickEnhancement(component) {
           console.log("clicked Enhancement");
-          this.reRenderSystemText();
+          console.log(this.selectedEnhancements);
+//          this.reRenderSystemText();
       },
       clickDrawback(component) {
           console.log("clicked Drawback");
@@ -129,21 +139,6 @@ const ComponentRendering = {
   }
 }
 const app = Vue.createApp(ComponentRendering);
-
-const giftComponentTemplate = $('#js-gift-component-template').html();
-const modifierTemplate= $('#js-modifier-template').html();
-
-app.component('gift-component', {
-  delimiters: ['{', '}'],
-  props: ['component'],
-  template: giftComponentTemplate
-})
-
-app.component('power-modifier', {
-  delimiters: ['{', '}'],
-  props: ['modifier'],
-  template: modifierTemplate
-})
 
 const mountedApp = app.mount('#vue-app');
 

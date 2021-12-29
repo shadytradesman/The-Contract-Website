@@ -1,0 +1,18 @@
+
+<label v-bind:for="modifier.id" class="thumbnail" style="margin: 5px;">
+    <input type="checkbox" v-bind:id="modifier.id"
+           v-bind:value="modifier.slug"
+           v-model="{{vue_model_name}}"
+           @change="{{vue_on_click}}"
+    >
+    <span style="padding-left: 10px;">
+        <b>
+            { modifier.displayName }
+        </b>
+        <span style="font-weight: 400;">
+            (
+            { modifier.description }
+            )
+        </span>
+    </span>
+</label>
