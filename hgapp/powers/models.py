@@ -112,7 +112,7 @@ class Modifier(models.Model):
                                           null=True,
                                           max_length=35)
     is_general = models.BooleanField(default=False)
-    substitutions = models.ManyToManyField(FieldSubstitution)
+    substitutions = models.ManyToManyField(FieldSubstitution, blank=True, null=True)
 
     def __str__(self):
         return self.name + " [" + self.slug + "] (" + self.description + ")"

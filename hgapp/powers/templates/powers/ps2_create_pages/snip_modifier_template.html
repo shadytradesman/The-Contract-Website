@@ -2,8 +2,9 @@
 <label v-bind:for="modifier.id" class="thumbnail" style="margin: 5px;">
     <input type="checkbox" v-bind:id="modifier.id"
            v-bind:value="modifier.slug"
-           v-model="{{vue_model_name}}"
+           v-model="selected{{vue_model_name}}"
            @change="{{vue_on_click}}"
+           :disabled="modifier.slug in disabled{{vue_model_name}}"
     >
     <span style="padding-left: 10px;">
         <b>
@@ -14,5 +15,12 @@
             { modifier.description }
             )
         </span>
+        <div v-if="modifier.slug in disabled{{vue_model_name}}">
+            <div v-for="reason in disabled{{vue_model_name}}[modifier.slug]">
+                <small style="color: red;">
+                    { reason }
+                </small>
+            </div>
+        </div>
     </span>
 </label>

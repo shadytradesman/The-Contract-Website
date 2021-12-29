@@ -36,7 +36,7 @@ def generate_power_blob():
         # An Effect is only available on a given modality if it appears in this mapping.
         'effects_by_modality': effects_by_modality,
 
-        #A Vector is only available on a given Modality + Effect if it appears in both mappings.
+        # A Vector is only available on a given Modality + Effect if it appears in both mappings.
         'vectors_by_effect': vectors_by_effect,
         'vectors_by_modality': vectors_by_modality,
     }

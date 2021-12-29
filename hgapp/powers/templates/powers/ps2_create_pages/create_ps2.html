@@ -90,7 +90,7 @@
 			<div id="js-enhancements-container">
 				<div v-for="modifier in enhancements"
 						:key="modifier.id" >
-					{% with 'selectedEnhancements' as vue_model_name %}
+					{% with 'Enhancements' as vue_model_name %}
 						{% with 'clickEnhancement' as vue_on_click %}
 							{% include "powers/ps2_create_pages/snip_modifier_template.html" %}
 						{% endwith %}
@@ -101,7 +101,7 @@
 			<div id="js-drawbacks-container">
 				<div v-for="modifier in drawbacks"
 						:key="modifier.id">
-					{% with 'selectedDrawbacks' as vue_model_name %}
+					{% with 'Drawbacks' as vue_model_name %}
 					{% with 'clickDrawback' as vue_on_click %}
 					{% include "powers/ps2_create_pages/snip_modifier_template.html" %}
 					{% endwith %}

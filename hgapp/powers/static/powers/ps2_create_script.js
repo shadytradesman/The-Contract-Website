@@ -27,6 +27,35 @@ function modifiersFromComponents(components, modifier) {
     return selectedModifierIds.filter(x => !blacklistModifierIds.includes(x)).map(id => modifierToVue(powerBlob[modifier][id], modifier));
 }
 
+function getDisabledModifiers(modType, availModifiers, selectedModifiers) {
+    const powerBlobFieldName = modType + "s";
+    const requiredFieldName = "required_" + modType + "s";
+    unfulfilledModifiers = availModifiers
+          .filter(modifier => {
+              const required = powerBlob[powerBlobFieldName][modifier.slug][requiredFieldName];
+              if (required.length == 0) {
+                  return false;
+              }
+              const unsatisfiedRequirements = required
+                  .filter(reqEnh => !selectedModifiers.includes(reqEnh));
+              if (unsatisfiedRequirements.length == 0) {
+                  return false;
+              }
+              return true;
+          });
+    disabledModifiers = {};
+    unfulfilledModifiers.forEach(mod => {
+       requiredSlugs = powerBlob[powerBlobFieldName][mod.slug][requiredFieldName];
+       if (!(mod.slug in disabledModifiers)) {
+           disabledModifiers[mod.slug] = [];
+       }
+       requiredSlugs.forEach(reqSlug => {
+           disabledModifiers[mod.slug].push("Requires: " + powerBlob[powerBlobFieldName][reqSlug]["name"]);
+       });
+    });
+    return disabledModifiers;
+}
+
 const ComponentRendering = {
   delimiters: ['{', '}'],
   data() {
@@ -39,8 +68,10 @@ const ComponentRendering = {
       selectedVector: "",
       enhancements: [],
       selectedEnhancements: [],
+      disabledEnhancements: {}, // map of disabled enhancements slug to reason.
       drawbacks: [],
       selectedDrawbacks: [],
+      disabledDrawbacks: {}, // map of disabled drawback slug to reason.
       parameters: [],
       unrenderedSystem: '',
       renderedSystem: '',
@@ -96,36 +127,45 @@ const ComponentRendering = {
         this.unrenderedSystem = modality["system_text"] + "<br><br>" + vector["system_text"] + "<br><br>" + effect["system_text"] + "<br>";
         this.enhancements = modifiersFromComponents([modality, effect, vector], "enhancements");
         this.drawbacks = modifiersFromComponents([modality, effect, vector], "drawbacks");
+        this.calculateRestrictedModifiers();
 //        this.parameters = modifiersFromComponents([modality, effect, vector], "parameters");
         this.reRenderSystemText();
+      },
+      calculateRestrictedModifiers() {
+          this.disabledEnhancements = {};
+          this.disabledDrawbacks = {};
+          // enhancements with unfufilled prereqs
+          this.disabledEnhancements = getDisabledModifiers("enhancement", this.enhancements, this.selectedEnhancements);
+          this.selectedEnhancements = this.selectedEnhancements.filter(mod => !(mod in this.disabledEnhancements));
+          this.disabledDrawbacks = getDisabledModifiers("drawback", this.drawbacks, this.selectedDrawbacks);
+          this.selectedDrawbacks = this.selectedDrawbacks.filter(mod => !(mod in this.disabledDrawbacks));
       },
       clickEnhancement(component) {
           console.log("clicked Enhancement");
           console.log(this.selectedEnhancements);
-//          this.reRenderSystemText();
+          this.calculateRestrictedModifiers();
+          this.reRenderSystemText();
       },
       clickDrawback(component) {
           console.log("clicked Drawback");
+          this.calculateRestrictedModifiers();
           this.reRenderSystemText();
       },
       reRenderSystemText() {
-          const replacementMap = this.buildReplacementMap();
-          //TODO: implement
-          unrenderedSystem = this.unrenderedSystem;
+//          const replacementMap = this.buildReplacementMap();
+          // TODO: implement
+          var unrenderedSystem = this.unrenderedSystem;
           this.renderedSystem = "";
       },
       buildReplacementMap() {
-		checkedEnhancements = $('#js-enhancements-container').find('input:checked');
-		console.log(checkedEnhancements);
-		enhancementObjects = checkedEnhancements
-            .map(function() {
-                return powerBlob["enhancements"][this.getAttribute("slug")];
-            });
-        console.log(enhancementObjects);
-		replacementByMarker = {};
-		enhancementObjects.each(enhancement => {
-            console.log(enhancement);
-            enhancement["substitutions"].each(substitution => {
+          enhancementObjects = checkedEnhancements.map(function() {
+              return powerBlob["enhancements"][this.getAttribute("slug")];
+          });
+          console.log(enhancementObjects);
+          replacementByMarker = {};
+          enhancementObjects.each(enhancement => {
+              console.log(enhancement);
+              enhancement["substitutions"].each(substitution => {
                 if (null === substitution.replacement) {
                     substitution.replacement = enhancement.description;
                 }
