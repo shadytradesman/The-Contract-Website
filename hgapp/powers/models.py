@@ -76,6 +76,9 @@ class PremadeCategory(models.Model):
 class FieldSubstitutionMarker(models.Model):
     marker = models.SlugField(max_length=50, primary_key=True)
 
+    def __str__(self):
+        return self.marker
+
 
 # abstract class to be sub-classed by the many-to-many tables connecting components to FieldSubstitionMarkers
 class FieldSubstitution(models.Model):
@@ -89,11 +92,11 @@ class FieldSubstitution(models.Model):
         abstract = True
 
     def __str__(self):
-        return "[[{}]] {} ({})".format(self.marker, self.get_mode_display(), self.replacement)
+        return "[[{}]] {} ({})".format(self.relevant_marker, self.get_mode_display(), self.replacement)
 
     def to_blob(self):
         return {
-            "marker": self.marker,
+            "marker": self.relevant_marker.marker,
             "replacement": self.replacement,
             "mode": self.mode,
         }
@@ -150,17 +153,6 @@ class Modifier(models.Model):
         return self.name + " (" + self.description + ")"
 
     def to_blob(self):
-        substitutions = self.substitutions.all()
-        # If no substitutions, add a "default" substitution.
-        if substitutions.count() == 0:
-            default_sub = FieldSubstitution(
-                marker="additional-effects",
-                replacement = self.description,
-                mode = ADDITIVE
-            )
-            sub_list = [default_sub.to_blob()]
-        else:
-            sub_list = [x.to_blob() for x in self.substitutions.all()]
         return {
             "name": self.name,
             "slug": self.slug,
@@ -171,7 +163,6 @@ class Modifier(models.Model):
             "eratta": self.eratta,
             "multiplicity_allowed": self.multiplicity_allowed,
             "detail_field_label": self.detail_field_label,
-            'substitutions': sub_list,
         }
 
 
@@ -179,6 +170,25 @@ class Enhancement(Modifier):
     substitutions = models.ManyToManyField(FieldSubstitutionMarker,
                                            through=EnhancementFieldSubstitution,
                                            through_fields=('relevant_enhancement', 'relevant_marker'))
+
+    def to_blob(self):
+        field_blob = super(Enhancement, self).to_blob()
+        # If no substitutions, add a "default" substitution.
+        if self.substitutions.count() == 0:
+            default_sub = {
+                "marker": "additional-effects",
+                "replacement": self.description,
+                "mode": ADDITIVE,
+            }
+            sub_list = [default_sub]
+        else:
+            substitutions = self.enhancement_field_substitution_set.select_related("relevant_marker").all()
+            sub_list = [x.to_blob() for x in substitutions]
+        sub_blob = {
+            "substitutions": sub_list
+        }
+        field_blob.update(sub_blob)
+        return field_blob
 
     def form_name(self):
         return self.slug + "-e-is_selected"
@@ -191,6 +201,25 @@ class Drawback(Modifier):
     substitutions = models.ManyToManyField(FieldSubstitutionMarker,
                                            through=DrawbackFieldSubstitution,
                                            through_fields=('relevant_drawback', 'relevant_marker'))
+
+    def to_blob(self):
+        field_blob = super(Drawback, self).to_blob()
+        # If no substitutions, add a "default" substitution.
+        if self.substitutions.count() == 0:
+            default_sub = {
+                "marker": "additional-restrictions",
+                "replacement": self.description,
+                "mode": ADDITIVE,
+            }
+            sub_list = [default_sub]
+        else:
+            substitutions = self.drawback_field_substitution_set.select_related("relevant_marker").all()
+            sub_list = [x.to_blob() for x in substitutions]
+        sub_blob = {
+            "substitutions": sub_list
+        }
+        field_blob.update(sub_blob)
+        return field_blob
 
     def form_name(self):
         return self.slug + "-d-is_selected"
@@ -289,6 +318,25 @@ class Parameter(models.Model):
             if self.get_value_for_level(n) is None:
                 return n
         return 7
+
+    def to_blob(self):
+        # If no substitutions, add a "default" substitution.
+        field_blob = {
+            "name": self.name,
+            "slug": self.slug,
+        }
+        if self.substitutions.count() == 0:
+            default_sub = {
+                "marker": self.slug,
+                "replacement": "$",
+                "mode": ADDITIVE,
+            }
+            sub_list = [default_sub]
+        else:
+            substitutions = self.parameter_field_substitution_set.select_related("relevant_marker").all()
+            sub_list = [x.to_blob() for x in substitutions]
+        field_blob["substitutions"] = sub_list
+        return field_blob
 
 
 class Base_Power_Category(models.Model):
@@ -398,15 +446,15 @@ class Base_Power(models.Model):
             'gift_credit': self.num_free_enhancements,
             'required_status': self.required_status,
             'category': self.category.pk if self.category else None,
-            'substitutions': [x.to_blob() for x in self.substitutions.all()],
-            'allowed_vectors': [x.pk for x in self.allowed_vectors.all()],
-            'allowed_modalities': [x.pk for x in self.allowed_modalities.all()],
-            'enhancements': [x.pk for x in self.avail_enhancements.all()],
-            'drawbacks': [x.pk for x in self.avail_drawbacks.all()],
-            'parameters': [x.relevant_parameter.pk for x in self.power_param_set.exclude(dice_system=SYS_LEGACY_POWERS).all()],
-            'blacklist_enhancements': [x.pk for x in self.blacklist_enhancements.all()],
-            'blacklist_drawbacks': [x.pk for x in self.blacklist_drawbacks.all()],
-            'blacklist_parameters': [x.pk for x in self.blacklist_parameters.all()],
+            'substitutions': [x.to_blob() for x in self.basepowerfieldsubstitution_set.all()],
+            'allowed_vectors': list(self.allowed_vectors.values_list('pk', flat=True)),
+            'allowed_modalities': list(self.allowed_modalities.values_list('pk', flat=True)),
+            'enhancements': list(self.avail_enhancements.values_list('pk', flat=True)),
+            'drawbacks': list(self.avail_drawbacks.values_list('pk', flat=True)),
+            'parameters': [x.to_blob() for x in self.power_param_set.exclude(dice_system=SYS_LEGACY_POWERS).select_related("relevant_parameter").all()],
+            'blacklist_enhancements': list(self.blacklist_enhancements.values_list("pk", flat=True)),
+            'blacklist_drawbacks': list(self.blacklist_drawbacks.values_list("pk", flat=True)),
+            'blacklist_parameters': list(self.blacklist_parameters.values_list("pk", flat=True)),
             'system_text': system.system_text if system else None,
             'text_fields': [x.to_blob() for x in text_fields] if text_fields else [],
             'roll_fields': [x.to_blob() for x in roll_fields] if roll_fields else [],
@@ -954,7 +1002,7 @@ class SystemFieldRoll(SystemField):
             "speed": self.speed,
             "required_attribute": self.required_attribute,
         }
-        field_blob = super(SystemFieldRoll, self)
+        field_blob = super(SystemFieldRoll, self).to_blob()
         field_blob.update(roll_blob)
         return field_blob
 

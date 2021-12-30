@@ -13,7 +13,7 @@ from .models import Enhancement, Parameter, Base_Power, Drawback, Power_Param, P
     EFFECT, VECTOR, MODALITY, SYS_LEGACY_POWERS, SYS_ALL, SYS_PS2, FieldSubstitutionMarker
 
 
-class PowerParamTabular(admin.TabularInline):
+class PowerParamTabular(admin.StackedInline):
     model = Power_Param
     extra = 0
 
@@ -86,6 +86,13 @@ class EnhancementAdmin(admin.ModelAdmin):
     filter_horizontal = ["required_Enhancements", "required_drawbacks"]
     list_per_page = 2000
 
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        if db_field.name == "required_Enhancements":
+            kwargs["queryset"] = Enhancement.objects.order_by("is_general", "name")
+        if db_field.name == "required_drawbacks":
+            kwargs["queryset"] = Drawback.objects.order_by("is_general", "name")
+        return super().formfield_for_manytomany(db_field, request, **kwargs)
+
 
 @admin.register(Drawback)
 class DrawbackAdmin(admin.ModelAdmin):
@@ -99,6 +106,7 @@ class DrawbackAdmin(admin.ModelAdmin):
             kwargs["queryset"] = Enhancement.objects.order_by("is_general", "name")
         if db_field.name == "required_drawbacks":
             kwargs["queryset"] = Drawback.objects.order_by("is_general", "name")
+        return super().formfield_for_manytomany(db_field, request, **kwargs)
 
 
 @admin.register(Parameter)

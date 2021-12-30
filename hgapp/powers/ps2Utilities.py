@@ -1,7 +1,9 @@
 import json
 from collections import defaultdict
+
+from django.db.models import Prefetch
 from .models import SYS_ALL, SYS_LEGACY_POWERS, SYS_PS2, EFFECT, VECTOR, MODALITY, Base_Power, Enhancement, Drawback, \
-    Power_Param
+    Power_Param, Parameter
 
 def generate_json_blob():
     return json.dumps(generate_power_blob())
@@ -49,22 +51,27 @@ def generate_power_blob():
 def _generate_component_blob(base_type):
     # TODO: select related and stuff.
     components = Base_Power.objects.filter(is_public=True, base_type=base_type)\
-        .prefetch_related("substitutions") \
-        .prefetch_related("parameters") \
-        .prefetch_related("avail_enhancements") \
-        .prefetch_related("avail_drawbacks") \
-        .all()
+        .prefetch_related("basepowerfieldsubstitution_set") \
+        .prefetch_related("power_param_set").all()
+        #TODO: Determine if these prefetches do anything
+        # .prefetch_related("avail_enhancements") \
+        # .prefetch_related("avail_drawbacks") \
+        # .prefetch_related("blacklist_enhancements") \
+        # .prefetch_related("blacklist_drawbacks") \
+        # .all()
     return {x.pk: x.to_blob() for x in components}
 
 
 def _generate_modifier_blob(ModifierClass):
-    modifiers = ModifierClass.objects.exclude(system=SYS_LEGACY_POWERS).all()
+    related_field = "enhancementfieldsubstitution_set" if ModifierClass is Enhancement else "drawbackfieldsubstitution_set"
+    modifiers = ModifierClass.objects.exclude(system=SYS_LEGACY_POWERS).prefetch_related(related_field).all()
     return {x.pk: x.to_blob() for x in modifiers}
 
 
 def _generate_param_blob():
-    power_params = Power_Param.objects.filter(dice_system=SYS_PS2).select_related("relevant_parameter").all()
-    return {x.relevant_parameter.pk: x.relevant_parameter.to_blob() for x in power_params}
+    params = Parameter.objects\
+        .prefetch_related("parameterfieldsubstitution_set").all()
+    return {x.pk: x.to_blob() for x in params}
 
 
 def _generate_component_category_blob():
