@@ -964,6 +964,7 @@ class SystemField(models.Model):
             "eratta": self.eratta,
         }
 
+# SystemFieldRoll substitution should have [[defensive-roll-difficulty]]
 class SystemFieldRoll(SystemField):
     allow_mind = models.BooleanField(default=False)
     allow_body = models.BooleanField(default=False)

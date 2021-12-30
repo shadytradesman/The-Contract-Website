@@ -207,12 +207,17 @@ function findReplacementCandidate(systemText) {
                     endMarker = parenEndByStart[curChar];
                 }
                 parenDepth = parenDepth + 1;
+                // this avoids the case where we have four+ starts in a row ala [[[[
+                i++;
             } else if (endMarker != null && curChar === endMarker) {
                 // two end markers
                 parenDepth = parenDepth - 1;
                 if (parenDepth === 0) {
                     end = i;
                     break;
+                } else {
+                    // this avoids the case where we have four+ ends in a row ala ]]]]
+                    i++;
                 }
             }
         }
@@ -318,12 +323,21 @@ const ComponentRendering = {
       },
       componentClick() {
 		if (this.selectedVector.length && this.selectedModality.length && this.selectedEffect.length) {
-			this.populatePowerForm(powerBlob.modalities[this.selectedModality],
-				powerBlob.effects[this.selectedEffect],
-				powerBlob.vectors[this.selectedVector]);
+			this.populatePowerForm();
         }
       },
-      populatePowerForm(modality, effect, vector) {
+      getSelectedComponents() {
+           return [
+               powerBlob.modalities[this.selectedModality],
+               powerBlob.effects[this.selectedEffect],
+               powerBlob.vectors[this.selectedVector]
+           ]
+      },
+      populatePowerForm() {
+        components = this.getSelectedComponents();
+        const modality = components[0];
+        const effect = components[1];
+        const vector = components[2];
         console.log("updating power form with the following modality, effect and vector");
         console.log(modality);
         console.log(effect);
@@ -367,6 +381,7 @@ const ComponentRendering = {
           addReplacementsForModifiers(replacements,
                                       this.selectedDrawbacks.map(mod => powerBlob["drawbacks"][mod]),
                                       this.detailsByDrawbacks);
+          this.addReplacementsForComponents(replacements);
 
           console.log("Raw replacement map");
           console.log(replacements);
@@ -375,6 +390,24 @@ const ComponentRendering = {
           console.log("replacement map with collapsed subs");
           console.log(replacements);
           return replacements;
+      },
+      addReplacementsForComponents(replacements) {
+          components = this.getSelectedComponents();
+          components.forEach(component => {
+              component["substitutions"].forEach(sub => {
+                  const marker = sub["marker"];
+                  var replacement = sub["replacement"];
+                  const newSub = {
+                      mode: sub["mode"],
+                      replacement: replacement,
+                  }
+                  if (marker in replacements ) {
+                      replacements[marker].push(newSub);
+                  } else {
+                      replacements[marker] = [newSub];
+                  }
+              })
+          });
       }
   }
 }
