@@ -382,11 +382,11 @@ class Base_Power(models.Model):
     allowed_vectors = models.ManyToManyField("Base_Power",
                                              related_name="vector_effects",
                                              blank=True,
-                                             help_text="Set on Effects and Modalities only. No effect on Vectors.")
+                                             help_text="Set on Effects and Modalities only. Ignored on Vectors.")
     allowed_modalities = models.ManyToManyField("Base_Power",
                                                 related_name="vector_modalities",
                                                 blank=True,
-                                                help_text="Set on Effects only. No effect on Vectors or Modalities." )
+                                                help_text="Set on Effects only. Ignored on Vectors and Modalities." )
 
     avail_enhancements = models.ManyToManyField(Enhancement, verbose_name="enhancements",
                                                 related_name="avail_enhancements",
@@ -483,8 +483,7 @@ class Base_Power_System(models.Model):
 # Joining between Parameter and Componeent
 class Power_Param(models.Model):
     relevant_parameter = models.ForeignKey(Parameter, on_delete=models.CASCADE)
-    # TODO: edit this dice_system to default to SYS_PS2 after initial migration to make new instance creation easier.
-    dice_system = models.CharField(choices=DICE_SYSTEM, max_length=55, default=SYS_LEGACY_POWERS)
+    dice_system = models.CharField(choices=DICE_SYSTEM, max_length=55, default=SYS_PS2)
     seasoned = models.IntegerField("Seasoned Threshold" )
     veteran = models.IntegerField("Veteran Threshold")
     default = models.IntegerField("Default Level")
@@ -531,13 +530,12 @@ class Power_Param(models.Model):
 
     def to_blob(self):
         return {
-            "name": self.name,
             "param_id": self.relevant_parameter.pk,
             "levels": self.get_levels(),
             "eratta": self.eratta,
             "default_level": self.default,
-            "seasoned_threshold": self.seasoned_level,
-            "veteran_threshold": self.veteran_level,
+            "seasoned_threshold": self.seasoned,
+            "veteran_threshold": self.veteran,
         }
 
     def get_status_tag(self, level):

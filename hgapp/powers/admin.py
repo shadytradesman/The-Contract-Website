@@ -118,6 +118,7 @@ class ParameterAdmin(admin.ModelAdmin):
 @admin.register(Base_Power)
 class BasePowerAdmin(admin.ModelAdmin):
     list_per_page = 2000
+    ordering = ("-base_type", "name")
     prepopulated_fields = {"slug": ("name",)}
     list_display = ('name', 'base_type', 'category', 'is_public')
     inlines = [PowerParamTabular, SystemInline, BasePowerFieldSubTabular]
@@ -168,6 +169,9 @@ class BasePowerAdmin(admin.ModelAdmin):
             kwargs["queryset"] = Drawback.objects\
                 .filter(Q(system=SYS_ALL) | Q(system=SYS_PS2))\
                 .order_by("name")
+        if db_field.name == "blacklist_parameters":
+            kwargs["queryset"] = Parameter.objects.order_by("name")
+
         return super().formfield_for_manytomany(db_field, request, **kwargs)
 
 
