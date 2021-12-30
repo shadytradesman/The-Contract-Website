@@ -15,6 +15,10 @@
             { modifier.description }
             )
         </span>
+        <div v-if="modifier.detailLabel" class="form-inline">
+            <b style="padding-right: 10px;">{modifier.detailLabel}:</b>
+            <input type="text" v-model="detailsBy{{vue_model_name}}[modifier.slug]" class="form-control">
+        </div>
         <div v-if="modifier.slug in disabled{{vue_model_name}}">
             <div v-for="reason in disabled{{vue_model_name}}[modifier.slug]">
                 <small style="color: red;">

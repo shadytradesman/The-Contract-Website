@@ -28,6 +28,8 @@ function modifiersFromComponents(components, modifier) {
 }
 
 function getDisabledModifiers(modType, availModifiers, selectedModifiers) {
+    // given a modType ("enhancement"), available modifiers, and selected modifiers.
+    // return a mapping of disabled modifiers of that type to an array of reasons they are disabled.
     const powerBlobFieldName = modType + "s";
     const requiredFieldName = "required_" + modType + "s";
     unfulfilledModifiers = availModifiers
@@ -56,6 +58,206 @@ function getDisabledModifiers(modType, availModifiers, selectedModifiers) {
     return disabledModifiers;
 }
 
+function addReplacementsForModifiers(replacements, selectedModifiers, detailsByModifiers) {
+  selectedModifiers
+      .forEach(mod => {
+          mod["substitutions"].forEach(sub => {
+              const marker = sub["marker"];
+              var replacement = sub["replacement"];
+              if (replacement.includes("$")) {
+                  var subString = mod in detailsByModifiers ? detailsByModifiers[mod["slug"]] : "";
+                  subString = subString.replace("((", "(");
+                  subString = subString.replace("[[", "[");
+                  subString = subString.replace("{{", "{");
+                  subString = subString.replace("))", ")");
+                  subString = subString.replace("]]", "]");
+                  subString = subString.replace("}}", "}");
+                  replacement = replacement.replace("$", subString);
+              }
+              const newSub = {
+                  mode: sub["mode"],
+                  replacement: replacement,
+              }
+              if (marker in replacements ) {
+                  replacements[marker].push(newSub);
+              } else {
+                  replacements[marker] = [newSub];
+              }
+          })
+      });
+}
+
+
+
+const parenJoinString = {
+    '(': ', ',
+    '[': '. ',
+    '{': '.<br>',
+}
+function collapseSubstitutions(replacements) {
+    // normalizes lists of substitutions so that they follow the semantics associated with the modes:
+    // EPHEMERAL, UNIQUE, and ADDITIVE.
+    // EPHEMERAL subs are replaced by all other types
+    // UNIQUE subs replace all other types, leaving a single substitution.
+    // ADDITIVE subs can exist in any quantity.
+    // return a mapping of marker string to list of replacement texts.
+    var cleanedReplacements = {};
+    for (var marker in replacements) {
+        substitutions = replacements[marker];
+        if (substitutions.length == 0) {
+            throw "Empty subs for marker: " + marker;
+        }
+        if (substitutions.length == 1) {
+            // no need to deal with modes when there's only one.
+            cleanedReplacements[marker] = substitutions.map(sub => sub.replacement);
+            continue;
+        }
+        const uniqueSubs = substitutions.filter(sub => sub["mode"] == "UNIQUE");
+        if (uniqueSubs.length > 1) {
+            throw "Multiple subs are unique for marker: " + marker;
+        }
+        if (uniqueSubs.length == 1) {
+           cleanedReplacements[marker] = [uniqueSubs[0].replacement];
+           continue;
+        }
+
+        const ephemeralSubs = substitutions.filter(sub => sub["mode"] == "EPHEMERAL");
+        const nonEphemeralSubs = substitutions.filter(sub => sub["mode"] != "EPHEMERAL");
+        if (ephemeralSubs.length > 0 && nonEphemeralSubs.length > 0) {
+            cleanedReplacements[marker] = nonEphemeralSubs.map(sub => sub.replacement);
+            continue;
+        }
+        if (ephemeralSubs.length > 1) {
+            cleanedReplacements[marker] = [ephemeralSubs[0].replacement];
+            continue;
+        }
+        cleanedReplacements[marker] = substitutions.map(sub => sub.replacement);
+    }
+    return cleanedReplacements;
+}
+
+function performSystemTextReplacements(unrenderedSystem, replacementMap) {
+    console.log("replacementmap");
+    console.log(replacementMap);
+    var systemText = unrenderedSystem;
+    var toReplace = findReplacementCandidate(systemText);
+    var replacementCount = 0;
+    while (toReplace != null) {
+        console.log("replacing: ");
+        console.log(toReplace);
+        systemText = replaceInSystemText(systemText, replacementMap, toReplace);
+        var toReplace = findReplacementCandidate(systemText);
+        replacementCount ++;
+        if (replacementCount > 1000) {
+            throw "More than one thousand replacements in system text. . . infinite loop?"
+        }
+    }
+    return systemText;
+}
+
+function replaceInSystemText(systemText, replacementMap, toReplace) {
+    const markers = toReplace.markers;
+    var replacements = [];
+    for (var i = 0; i < markers.length; i++) {
+        if (markers[i] in replacementMap) {
+            replacements = replacements.concat(replacementMap[markers[i]])
+        }
+    }
+
+    var replacementText = "";
+    if (replacements.length === 0 && toReplace.defaultValue) {
+        replacementText = toReplace.defaultValue;
+    }
+    if (replacements.length === 1 ) {
+        replacementText = replacements[0];
+    }
+    if (replacements.length > 1) {
+        if (toReplace.type === '(') {
+            replacements[replacements.length - 1] = "and " + replacements[replacements.length - 1];
+        }
+        if (toReplace.type === '[' || toReplace.type === '{') {
+            replacements = replacements.map(rep => rep[0].toUpperCase() + rep.slice(1));
+        }
+        replacementText = replacements.join(parenJoinString[toReplace.type]);
+    }
+    return systemText.slice(0, toReplace.start) + replacementText + systemText.slice(toReplace.end + 1);
+}
+
+const parenEndByStart = {
+    '(': ')',
+    '[': ']',
+    '{': '}',
+}
+function findReplacementCandidate(systemText) {
+    var markerStarts = ['(', '[', '{'];
+    var endMarker = null;
+    var parenDepth = 0;
+    var parenType = null;
+    var start = null;
+    var end = null;
+    var defaultContentStartIndex = null;
+    for (var i = 0; i < systemText.length; i++) {
+        const curChar = systemText[i];
+        if (i > 0 && systemText[i-1] === curChar) {
+            if (markerStarts.includes(curChar)) {
+                // two start markers
+                if (start === null) {
+                    start = i - 1;
+                    markerStarts = [curChar];
+                    endMarker = parenEndByStart[curChar];
+                }
+                parenDepth = parenDepth + 1;
+            } else if (endMarker != null && curChar === endMarker) {
+                // two end markers
+                parenDepth = parenDepth - 1;
+                if (parenDepth === 0) {
+                    end = i;
+                    break;
+                }
+            }
+        }
+        if (start != null && defaultContentStartIndex === null && curChar === '|' && parenDepth === 1) {
+            defaultContentStartIndex = i;
+        }
+    }
+
+    if (start === null) {
+        // no candidate found
+        return null;
+    }
+
+    if (end === null) {
+        throw "unmatched start symbols found at: " + start;
+    }
+
+    // do markers
+    const markerEnd = defaultContentStartIndex === null ? end - 1 : defaultContentStartIndex;
+    var markerSection = systemText.slice(start + 2, markerEnd);
+    markerSection = markerSection.trim();
+    const markers = markerSection.split(',');
+    if (markerStarts[0] != '(' && markers.length > 1) {
+        // only list sub markers allow multiple marker strings.
+        throw "Too many marker strings for non-list sub starting at: " + start;
+    }
+
+    // default values
+    var defaultValue = null;
+    if (defaultContentStartIndex != null) {
+        defaultValue = systemText.slice(defaultContentStartIndex + 1, end - 1);
+        defaultValue = defaultValue.trim();
+    }
+
+    return {
+        type: markerStarts[0],
+        markers: markers,
+        defaultValue: defaultValue,
+        start: start,
+        end: end
+    };
+}
+
+
+
 const ComponentRendering = {
   delimiters: ['{', '}'],
   data() {
@@ -68,9 +270,11 @@ const ComponentRendering = {
       selectedVector: "",
       enhancements: [],
       selectedEnhancements: [],
+      detailsByEnhancements: {},
       disabledEnhancements: {}, // map of disabled enhancements slug to reason.
       drawbacks: [],
       selectedDrawbacks: [],
+      detailsByDrawbacks: {},
       disabledDrawbacks: {}, // map of disabled drawback slug to reason.
       parameters: [],
       unrenderedSystem: '',
@@ -127,14 +331,14 @@ const ComponentRendering = {
         this.unrenderedSystem = modality["system_text"] + "<br><br>" + vector["system_text"] + "<br><br>" + effect["system_text"] + "<br>";
         this.enhancements = modifiersFromComponents([modality, effect, vector], "enhancements");
         this.drawbacks = modifiersFromComponents([modality, effect, vector], "drawbacks");
-        this.calculateRestrictedModifiers();
 //        this.parameters = modifiersFromComponents([modality, effect, vector], "parameters");
+
+        this.calculateRestrictedModifiers();
         this.reRenderSystemText();
       },
       calculateRestrictedModifiers() {
           this.disabledEnhancements = {};
           this.disabledDrawbacks = {};
-          // enhancements with unfufilled prereqs
           this.disabledEnhancements = getDisabledModifiers("enhancement", this.enhancements, this.selectedEnhancements);
           this.selectedEnhancements = this.selectedEnhancements.filter(mod => !(mod in this.disabledEnhancements));
           this.disabledDrawbacks = getDisabledModifiers("drawback", this.drawbacks, this.selectedDrawbacks);
@@ -142,7 +346,6 @@ const ComponentRendering = {
       },
       clickEnhancement(component) {
           console.log("clicked Enhancement");
-          console.log(this.selectedEnhancements);
           this.calculateRestrictedModifiers();
           this.reRenderSystemText();
       },
@@ -152,29 +355,26 @@ const ComponentRendering = {
           this.reRenderSystemText();
       },
       reRenderSystemText() {
-//          const replacementMap = this.buildReplacementMap();
-          // TODO: implement
-          var unrenderedSystem = this.unrenderedSystem;
-          this.renderedSystem = "";
+          const replacementMap = this.buildReplacementMap();
+          this.renderedSystem = performSystemTextReplacements(this.unrenderedSystem, replacementMap);
       },
       buildReplacementMap() {
-          enhancementObjects = checkedEnhancements.map(function() {
-              return powerBlob["enhancements"][this.getAttribute("slug")];
-          });
-          console.log(enhancementObjects);
-          replacementByMarker = {};
-          enhancementObjects.each(enhancement => {
-              console.log(enhancement);
-              enhancement["substitutions"].each(substitution => {
-                if (null === substitution.replacement) {
-                    substitution.replacement = enhancement.description;
-                }
-                replacementByMarker[substitution["marker"]] = substitution;
-            })
-		});
-		console.log(replacementByMarker);
-//		checkedEnhancements.each(enhancement => )
+          // replacement marker to list of substitution objects
+          replacements = {}
+          addReplacementsForModifiers(replacements,
+                                      this.selectedEnhancements.map(mod => powerBlob["enhancements"][mod]),
+                                      this.detailsByEnhancements);
+          addReplacementsForModifiers(replacements,
+                                      this.selectedDrawbacks.map(mod => powerBlob["drawbacks"][mod]),
+                                      this.detailsByDrawbacks);
 
+          console.log("Raw replacement map");
+          console.log(replacements);
+
+          replacements = collapseSubstitutions(replacements);
+          console.log("replacement map with collapsed subs");
+          console.log(replacements);
+          return replacements;
       }
   }
 }

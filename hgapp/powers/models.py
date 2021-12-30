@@ -75,7 +75,8 @@ class PremadeCategory(models.Model):
 
 class FieldSubstitution(models.Model):
     marker = models.SlugField(max_length=300)
-    replacement = models.CharField(max_length=300, blank=True) # '$' in string to replace value
+    replacement = models.CharField(max_length=300, blank=True,
+                                   help_text="A '$' in this string will be replaced with user input")
     mode = models.CharField(choices=FIELD_SUBSTITUTION_MODE, default=ADDITIVE, max_length=25)
 
     def __str__(self):
@@ -125,9 +126,10 @@ class Modifier(models.Model):
 
     def to_blob(self):
         substitutions = self.substitutions.all()
+        # If no substitutions, add a "default" substitution.
         if substitutions.count() == 0:
             default_sub = FieldSubstitution(
-                marker=self.slug,
+                marker="additional-effects",
                 replacement = self.description,
                 mode = ADDITIVE
             )
@@ -370,7 +372,7 @@ class Base_Power(models.Model):
             'gift_credit': self.num_free_enhancements,
             'required_status': self.required_status,
             'category': self.category.pk if self.category else None,
-            'substitutions': {x.marker: x.to_blob() for x in self.substitutions.all()},
+            'substitutions': [x.to_blob() for x in self.substitutions.all()],
             'allowed_vectors': [x.pk for x in self.allowed_vectors.all()],
             'allowed_modalities': [x.pk for x in self.allowed_modalities.all()],
             'enhancements': [x.pk for x in self.avail_enhancements.all()],
