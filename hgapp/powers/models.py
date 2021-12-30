@@ -73,11 +73,20 @@ class PremadeCategory(models.Model):
                                   blank=True)
 
 
+class FieldSubstitutionMarker(models.Model):
+    marker = models.SlugField(max_length=50, primary_key=True)
+
+
+# abstract class to be sub-classed by the many-to-many tables connecting components to FieldSubstitionMarkers
 class FieldSubstitution(models.Model):
-    marker = models.SlugField(max_length=300)
-    replacement = models.CharField(max_length=300, blank=True,
+    relevant_marker = models.ForeignKey(FieldSubstitutionMarker,
+                                        on_delete=models.CASCADE)
+    replacement = models.CharField(max_length=350, blank=True,
                                    help_text="A '$' in this string will be replaced with user input")
     mode = models.CharField(choices=FIELD_SUBSTITUTION_MODE, default=ADDITIVE, max_length=25)
+
+    class Meta:
+        abstract = True
 
     def __str__(self):
         return "[[{}]] {} ({})".format(self.marker, self.get_mode_display(), self.replacement)
@@ -88,6 +97,23 @@ class FieldSubstitution(models.Model):
             "replacement": self.replacement,
             "mode": self.mode,
         }
+
+
+class EnhancementFieldSubstitution(FieldSubstitution):
+    relevant_enhancement = models.ForeignKey("Enhancement", on_delete=models.PROTECT)
+
+
+class DrawbackFieldSubstitution(FieldSubstitution):
+    relevant_drawback = models.ForeignKey("Drawback", on_delete=models.PROTECT)
+
+
+class ParameterFieldSubstitution(FieldSubstitution):
+    relevant_parameter = models.ForeignKey("Parameter", on_delete=models.PROTECT)
+
+
+class BasePowerFieldSubstitution(FieldSubstitution):
+    relevant_base_power = models.ForeignKey("Base_Power", on_delete=models.PROTECT)
+
 
 # Enhancements and Drawbacks
 class Modifier(models.Model):
@@ -113,16 +139,15 @@ class Modifier(models.Model):
                                           null=True,
                                           max_length=35)
     is_general = models.BooleanField(default=False)
-    substitutions = models.ManyToManyField(FieldSubstitution, blank=True, null=True)
+
+    class Meta:
+        abstract = True
 
     def __str__(self):
         return self.name + " [" + self.slug + "] (" + self.description + ")"
 
     def display(self):
         return self.name + " (" + self.description + ")"
-
-    class Meta:
-        abstract = True
 
     def to_blob(self):
         substitutions = self.substitutions.all()
@@ -151,6 +176,10 @@ class Modifier(models.Model):
 
 
 class Enhancement(Modifier):
+    substitutions = models.ManyToManyField(FieldSubstitutionMarker,
+                                           through=EnhancementFieldSubstitution,
+                                           through_fields=('relevant_enhancement', 'relevant_marker'))
+
     def form_name(self):
         return self.slug + "-e-is_selected"
 
@@ -159,6 +188,10 @@ class Enhancement(Modifier):
 
 
 class Drawback(Modifier):
+    substitutions = models.ManyToManyField(FieldSubstitutionMarker,
+                                           through=DrawbackFieldSubstitution,
+                                           through_fields=('relevant_drawback', 'relevant_marker'))
+
     def form_name(self):
         return self.slug + "-d-is_selected"
 
@@ -171,59 +204,50 @@ class Parameter(models.Model):
     slug = models.SlugField("Unique URL-Safe Name",
                             max_length=50,
                             primary_key = True)
-    level_zero = models.CharField(max_length= 60)
+    substitutions = models.ManyToManyField(FieldSubstitutionMarker,
+                                           through=ParameterFieldSubstitution,
+                                           through_fields=('relevant_parameter', 'relevant_marker'))
+    attribute_bonus = models.ForeignKey(Attribute,
+                                        blank=True,
+                                        null=True,
+                                        on_delete=models.CASCADE)
+
+    # LEGACY FIELDS, IGNORED IN Power SYSTEM 2
+    level_zero = models.CharField(max_length= 60,
+                                  help_text="IGNORED IN NEW POWERS SYSTEM. Use field on Power_Param instead.")
     level_one = models.CharField(max_length= 60,
                                  blank=True,
-                                 null=True)
+                                 null=True,
+                                 help_text="IGNORED IN NEW POWERS SYSTEM. Use field on Power_Param instead.")
     level_two = models.CharField(max_length= 60,
-                                blank=True,
-                                null=True)
+                                 blank=True,
+                                 null=True,
+                                 help_text="IGNORED IN NEW POWERS SYSTEM. Use field on Power_Param instead.")
     level_three = models.CharField(max_length= 60,
                                    blank=True,
-                                   null=True)
+                                   null=True,
+                                   help_text="IGNORED IN NEW POWERS SYSTEM. Use field on Power_Param instead.")
     level_four = models.CharField(max_length= 60,
                                   blank=True,
-                                  null=True)
+                                  null=True,
+                                  help_text="IGNORED IN NEW POWERS SYSTEM. Use field on Power_Param instead.")
     level_five = models.CharField(max_length= 60,
                                   blank=True,
-                                  null=True)
+                                  null=True,
+                                  help_text="IGNORED IN NEW POWERS SYSTEM. Use field on Power_Param instead.")
     level_six = models.CharField(max_length= 60,
                                  blank=True,
-                                 null=True)
+                                 null=True,
+                                 help_text="IGNORED IN NEW POWERS SYSTEM. Use field on Power_Param instead.")
     eratta = models.TextField(blank=True,
-                              null=True)
-    attribute_bonus = models.ForeignKey(Attribute,
-                                  blank=True,
-                                  null=True,
-                                  on_delete=models.CASCADE)
-    substitutions = models.ManyToManyField(FieldSubstitution)
-    seasoned_level = models.IntegerField("Seasoned Threshold",
-                                   default=-1,
-                                   help_text="If legacy power system, this field is ignored. 8+ for no restriction.")
-    veteran_level = models.IntegerField("Veteran Threshold",
-                                  default=-1,
-                                  help_text="If legacy power system, this field is ignored. 8+ for no restriction")
-    default = models.IntegerField("Default Level",
-                                  default=1,
-                                  help_text="If legacy power system, this field is ignored. 8+ for no retriction")
+                              null=True,
+                              help_text="IGNORED IN NEW POWERS SYSTEM. Use field on Power_Param instead.")
 
     def display(self):
         return " ".join([self.name])
 
     def __str__(self):
         return " ".join([self.name]) + " [" +self.slug + "]"
-
-    def to_blob(self):
-        return {
-            "name": self.name,
-            "slug": self.slug,
-            "levels": self.get_levels(),
-            "eratta": self.eratta,
-            "seasoned_level": self.seasoned_level,
-            "veteran_level": self.veteran_level,
-            "default": self.default,
-            'substitutions': {x.marker: x.to_blob() for x in self.substitutions.all()},
-        }
 
     def get_levels(self):
         levels = []
@@ -289,7 +313,9 @@ class Base_Power(models.Model):
     eratta = models.TextField(blank=True, null=True)
     is_public = models.BooleanField(default=True)
     num_free_enhancements = models.IntegerField("gift point credit", default=0)
-    substitutions = models.ManyToManyField(FieldSubstitution, verbose_name="Field substitutions", blank=True)
+    substitutions = models.ManyToManyField(FieldSubstitutionMarker,
+                                           through=BasePowerFieldSubstitution,
+                                           through_fields=('relevant_base_power', 'relevant_marker'))
 
     # Component type, Effect, Modality, or Vector
     base_type = models.CharField(choices=BASE_POWER_TYPE,
@@ -409,14 +435,45 @@ class Base_Power_System(models.Model):
 # Joining between Parameter and Componeent
 class Power_Param(models.Model):
     relevant_parameter = models.ForeignKey(Parameter, on_delete=models.CASCADE)
-    dice_system = models.CharField(choices=DICE_SYSTEM, max_length=55, default=SYS_PS2)
-    seasoned = models.IntegerField("Seasoned Threshold",
-                                   help_text="If v2 power system, this field is ignored.")
-    veteran = models.IntegerField("Veteran Threshold",
-                                  help_text="If v2 power system, this field is ignored.")
-    default = models.IntegerField("Default Level",
-                                  help_text="If v2 power system, this field is ignored.")
+    # TODO: edit this dice_system to default to SYS_PS2 after initial migration to make new instance creation easier.
+    dice_system = models.CharField(choices=DICE_SYSTEM, max_length=55, default=SYS_LEGACY_POWERS)
+    seasoned = models.IntegerField("Seasoned Threshold" )
+    veteran = models.IntegerField("Veteran Threshold")
+    default = models.IntegerField("Default Level")
     relevant_base_power = models.ForeignKey(Base_Power, on_delete=models.CASCADE)
+
+    # The following fields are only used by the PS2 power system
+    level_zero = models.CharField(max_length=60,
+                                  blank=True,
+                                  null=True,
+                                  help_text="Only used by new Powers system. Ignored in old system.")
+    level_one = models.CharField(max_length=60,
+                                 blank=True,
+                                 null=True,
+                                 help_text="Only used by new Powers system. Ignored in old system.")
+    level_two = models.CharField(max_length=60,
+                                 blank=True,
+                                 null=True,
+                                 help_text="Only used by new Powers system. Ignored in old system.")
+    level_three = models.CharField(max_length=60,
+                                   blank=True,
+                                   null=True,
+                                   help_text="Only used by new Powers system. Ignored in old system.")
+    level_four = models.CharField(max_length=60,
+                                  blank=True,
+                                  null=True,
+                                  help_text="Only used by new Powers system. Ignored in old system.")
+    level_five = models.CharField(max_length=60,
+                                  blank=True,
+                                  null=True,
+                                  help_text="Only used by new Powers system. Ignored in old system.")
+    level_six = models.CharField(max_length=60,
+                                 blank=True,
+                                 null=True,
+                                 help_text="Only used by new Powers system. Ignored in old system.")
+    eratta = models.TextField(blank=True,
+                              null=True,
+                              help_text="Only used by new Powers system. Ignored in old system.")
 
     class Meta:
         unique_together = ("relevant_parameter", "relevant_base_power", "dice_system")
@@ -424,17 +481,68 @@ class Power_Param(models.Model):
     def __str__(self):
         return ":".join([str(self.relevant_parameter), self.relevant_base_power.name])
 
+    def to_blob(self):
+        return {
+            "name": self.name,
+            "param_id": self.relevant_parameter.pk,
+            "levels": self.get_levels(),
+            "eratta": self.eratta,
+            "default_level": self.default,
+            "seasoned_threshold": self.seasoned_level,
+            "veteran_threshold": self.veteran_level,
+        }
+
     def get_status_tag(self, level):
         switcher = {
-            self.default : " (Default)",
-            self.seasoned : " (Seasoned)",
-            self.veteran : " (Veteran)",
+            self.default: " (Default)",
+            self.seasoned: " (Seasoned)",
+            self.veteran: " (Veteran)",
         }
         if level in switcher:
             return switcher[level]
         else:
             return ""
 
+    def get_levels(self):
+        levels = []
+        if hasattr(self, "level_zero") and self.level_zero:
+            levels.append(self.level_zero)
+        if hasattr(self, "level_one") and self.level_one:
+            levels.append(self.level_one)
+        if hasattr(self, "level_two") and self.level_two:
+            levels.append(self.level_two)
+        if hasattr(self, "level_three") and self.level_three:
+            levels.append(self.level_three)
+        if hasattr(self, "level_four") and self.level_four:
+            levels.append(self.level_four)
+        if hasattr(self, "level_five") and self.level_five:
+            levels.append(self.level_five)
+        if hasattr(self, "level_six") and self.level_six:
+            levels.append(self.level_six)
+        return levels
+
+    def get_value_for_level(self, level):
+        if level is 0:
+            return self.level_zero
+        if level is 1:
+            return self.level_one
+        if level is 2:
+            return self.level_two
+        if level is 3:
+            return self.level_three
+        if level is 4:
+            return self.level_four
+        if level is 5:
+            return self.level_five
+        if level is 6:
+            return self.level_six
+        raise ValueError
+
+    def get_max_level(self):
+        for n in range(7):
+            if self.get_value_for_level(n) is None:
+                return n
+        return 7
 
 # Power full is essentially a "Gift" object
 # Each Power_Full has at least one PowerHistory for an Effect/Vector and exactly one PowerHistory for a gift modality

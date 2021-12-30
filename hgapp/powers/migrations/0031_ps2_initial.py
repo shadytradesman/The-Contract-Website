@@ -19,7 +19,7 @@ def reverse_migrate_initial_ps2(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('powers', '0030_auto_20211228_0143'),
+        ('powers', '0030_auto_20211230_1829'),
     ]
 
     operations = [
