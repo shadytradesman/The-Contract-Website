@@ -118,12 +118,12 @@
 						<span data-toggle="tooltip"
 							  data-placement="top"
 							  v-bind:title="field.eratta"
-							  class="field-eratta",
-							  @input="changeParam">
+							  class="field-eratta"
+							  >
 						<i class="fa fa-question-circle fa-1x"></i></span>
 					</span>
 					<div v-if="field.isText">
-						<input type="text" v-model="fieldTextInput[field.id]" class="form-control">
+							<input type="text" v-model="fieldTextInput[field.id]" class="form-control" @input="changeParam">
 					</div>
 					<div v-if="field.isRoll" class="form-inline">
 						<select v-model="fieldRollInput[field.id][0]" class="form-control" @change="changeParam">
@@ -142,7 +142,7 @@
 	<div class="row">
 		<div class="col-md-6">
 			<h4 class="text-center">Enhancements</h4>
-			<div id="js-enhancements-container">
+			<div id="js-enhancements-container" v-if="enhancements.length > 0">
 				<div v-for="modifier in enhancements"
 						:key="modifier.id" >
 					{% with 'Enhancements' as vue_model_name %}
@@ -155,7 +155,7 @@
 		</div>
 		<div class="col-md-6">
 			<h4 class="text-center">Drawbacks</h4>
-			<div id="js-drawbacks-container">
+			<div id="js-drawbacks-container" v-if="drawbacks.length > 0">
 				<div v-for="modifier in drawbacks"
 						:key="modifier.id">
 					{% with 'Drawbacks' as vue_model_name %}
