@@ -4,7 +4,7 @@ from django.db.models import Q
 from django.urls import reverse
 
 from characters.models import Character, HIGH_ROLLER_STATUS, Attribute, Roll, NO_PARRY_INFO, NO_SPEED_INFO, DODGE_ONLY, \
-    ATTACK_PARRY_TYPE, ROLL_SPEED, THROWN, Attribute
+    ATTACK_PARRY_TYPE, ROLL_SPEED, THROWN, Attribute, Ability
 from guardian.shortcuts import assign_perm, remove_perm
 from django.utils.html import mark_safe, escape, linebreaks
 from django.db.utils import IntegrityError
@@ -52,6 +52,11 @@ DICE_SYSTEM = (
     (SYS_LEGACY_POWERS, 'House Games 1.5'),
     (SYS_PS2, 'New Powers System'),
 )
+
+# System field roll choices
+BODY_ = ("BODY", "Body")
+MIND_ = ("MIND", "Mind")
+PARRY_ = ("PARRY", "Dodge or Defend")
 
 
 class PowerTag(models.Model):
@@ -182,7 +187,7 @@ class Enhancement(Modifier):
             }
             sub_list = [default_sub]
         else:
-            substitutions = self.enhancement_field_substitution_set.select_related("relevant_marker").all()
+            substitutions = self.enhancementfieldsubstitution_set.select_related("relevant_marker").all()
             sub_list = [x.to_blob() for x in substitutions]
         sub_blob = {
             "substitutions": sub_list
@@ -213,7 +218,7 @@ class Drawback(Modifier):
             }
             sub_list = [default_sub]
         else:
-            substitutions = self.drawback_field_substitution_set.select_related("relevant_marker").all()
+            substitutions = self.drawbackfieldsubstitution_set.select_related("relevant_marker").all()
             sub_list = [x.to_blob() for x in substitutions]
         sub_blob = {
             "substitutions": sub_list
@@ -959,6 +964,8 @@ class SystemField(models.Model):
 
     def to_blob(self):
         return {
+            "marker": self.name.strip().lower().replace(" ", "-"),
+            "id": self.pk,
             "name": self.name,
             "eratta": self.eratta,
         }
@@ -990,12 +997,35 @@ class SystemFieldRoll(SystemField):
         else:
             return self.get_speed_display()
 
+    def get_choices(self):
+        # returns a tuple of lists of tuples.
+        # The first list is the choices for the "attribute selection" form
+        # The second list are the choices for the "ability selection" form and may be empty if the field should not appear.
+        attribute_choices = []
+        ability_choices = []
+        if self.allow_std_roll:
+            if hasattr(self, "required_attribute") and self.required_attribute:
+                required_attr = self.required_attribute
+                attribute_choices.append((required_attr.id, required_attr.name))
+            else:
+                attribute_choices.extend(
+                    [(x.id, x.name) for x in Attribute.objects.filter(is_deprecated=False).order_by('name')])
+            primary_abilities = Ability.objects.filter(is_primary=True).order_by('name')
+            ability_choices = [('', '------'), ]
+            ability_choices.extend([(x.id, x.name) for x in primary_abilities])
+        if self.allow_parry:
+            attribute_choices.append(PARRY_)
+        if self.allow_mind:
+            attribute_choices.append(MIND_)
+        if self.allow_body:
+            attribute_choices.append(BODY_)
+        return attribute_choices, ability_choices
+
     def to_blob(self):
+        attribute_choices, ability_choices = self.get_choices()
         roll_blob = {
-            "allow_mind": self.allow_mind,
-            "allow_body": self.allow_body,
-            "allow_std_roll": self.allow_std_roll,
-            "allow_parry": self.allow_std_roll,
+            "attribute_choices": attribute_choices,
+            "ability_choices": ability_choices,
             "parry_type": self.parry_type,
             "speed": self.speed,
             "required_attribute": self.required_attribute,

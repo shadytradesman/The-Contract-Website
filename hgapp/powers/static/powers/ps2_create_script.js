@@ -31,6 +31,22 @@ function powerParamToVue(powerParam) {
     }
 }
 
+function systemFieldToVue(systemField, isRoll) {
+    const type = isRoll ? "roll" : "text";
+    const attributeChoices = isRoll ? systemField["attribute_choices"] : [];
+    const abilityChoices = isRoll ? systemField["ability_choices"] : [];
+    return {
+        id: type + systemField.id,
+        marker: systemField.marker,
+        name: systemField.name,
+        eratta: systemField.eratta,
+        isRoll: isRoll,
+        isText: !isRoll,
+        attributeChoices: attributeChoices,
+        abilityChoices: abilityChoices,
+    }
+}
+
 function modifiersFromComponents(components, modifier) {
     selectedModifierIds = components.flatMap(component => component[modifier]);
     blacklistModifierIds = components.flatMap(component => component["blacklist_" + modifier]);
@@ -40,6 +56,12 @@ function modifiersFromComponents(components, modifier) {
 function paramsFromComponents(components, modifier) {
     powerParams = components.flatMap(component => component["parameters"]);
     return powerParams.map(param => powerParamToVue(param));
+}
+
+function fieldsFromComponents(components) {
+    textFields = components.flatMap(component => component["text_fields"]).map(field => systemFieldToVue(field, false));
+    rollFields = components.flatMap(component => component["roll_fields"]).map(field => systemFieldToVue(field, true));
+    return textFields.concat(rollFields);
 }
 
 function getDisabledModifiers(modType, availModifiers, selectedModifiers) {
@@ -80,7 +102,7 @@ function addReplacementsForModifiers(replacements, selectedModifiers, detailsByM
               const marker = sub["marker"];
               var replacement = sub["replacement"];
               if (replacement.includes("$")) {
-                  var subString = mod in detailsByModifiers ? detailsByModifiers[mod["slug"]] : "";
+                  var subString = mod["slug"] in detailsByModifiers ? detailsByModifiers[mod["slug"]] : "";
                   subString = subString.replace("((", "(");
                   subString = subString.replace("[[", "[");
                   subString = subString.replace("{{", "{");
@@ -107,7 +129,7 @@ function addReplacementsForModifiers(replacements, selectedModifiers, detailsByM
 const parenJoinString = {
     '(': ', ',
     '[': '. ',
-    '{': '.<br>',
+    '{': '<br><br>',
 }
 function collapseSubstitutions(replacements) {
     // normalizes lists of substitutions so that they follow the semantics associated with the modes:
@@ -147,6 +169,9 @@ function collapseSubstitutions(replacements) {
             continue;
         }
         cleanedReplacements[marker] = substitutions.map(sub => sub.replacement);
+    }
+    for (var marker in cleanedReplacements) {
+        cleanedReplacements[marker] = cleanedReplacements[marker].filter(sub => sub.length > 0);
     }
     return cleanedReplacements;
 }
@@ -277,7 +302,12 @@ function findReplacementCandidate(systemText) {
     };
 }
 
-
+let handler = {
+  get: function(target, name) {
+    return target.hasOwnProperty(name) ? target[name] : [];
+  }
+};
+let emptyObj = {};
 
 const ComponentRendering = {
   delimiters: ['{', '}'],
@@ -299,6 +329,9 @@ const ComponentRendering = {
       disabledDrawbacks: {}, // map of disabled drawback slug to reason.
       parameters: [],
       parameterSelections: {},
+      systemFields: [],
+      fieldTextInput: {},
+      fieldRollInput: new Proxy(emptyObj, handler),
       unrenderedSystem: '',
       renderedSystem: '',
     }
@@ -362,16 +395,25 @@ const ComponentRendering = {
         console.log(modality);
         console.log(effect);
         console.log(vector);
-        this.unrenderedSystem = modality["system_text"] + "<br><br>" + vector["system_text"] + "<br><br>" + effect["system_text"] + "<br>";
+        this.unrenderedSystem = "<p>" + modality["system_text"] + "</p><p>" + vector["system_text"] + "</p><p>" + effect["system_text"] + "</p>";
         this.enhancements = modifiersFromComponents(components, "enhancements");
         this.drawbacks = modifiersFromComponents(components, "drawbacks");
         this.parameters = paramsFromComponents(components);
         this.parameters.forEach(param => {
             this.parameterSelections[param.id] = param.levels[param["defaultLevel"]];
         });
-        console.log(this.parameters);
-
-//        this.parameters = modifiersFromComponents([modality, effect, vector], "parameters");
+        this.systemFields = fieldsFromComponents(components);
+        this.systemFields.forEach(field => {
+            if (field.isRoll) {
+                var defaultChoices = [field.attributeChoices[0][1]];
+                if (field.abilityChoices.length > 0) {
+                    defaultChoices.push(field.abilityChoices[0][1]);
+                }
+                this.fieldRollInput[field.id] = defaultChoices;
+            } else {
+                this.fieldTextInput[field.id] = " ";
+            }
+        });
 
         this.calculateRestrictedModifiers();
         this.reRenderSystemText();
@@ -409,6 +451,7 @@ const ComponentRendering = {
                                       this.detailsByDrawbacks);
           this.addReplacementsForComponents(replacements);
           this.addReplacementsForParameters(replacements);
+          this.addReplacementsForFields(replacements);
 
           console.log("Raw replacement map");
           console.log(replacements);
@@ -456,6 +499,30 @@ const ComponentRendering = {
                   }
               });
           }
+      },
+      addReplacementsForFields(replacements) {
+          this.systemFields.forEach(field => {
+              if (! (field.marker in replacements)) {
+                  replacements[field.marker] = [];
+              }
+              if (field.isText) {
+                  replacements[field.marker].push({
+                      mode: "EPHEMERAL",
+                      replacement: this.fieldTextInput[field.id],
+                  });
+              }
+              if (field.isRoll) {
+                  const choices = this.fieldRollInput[field.id];
+                  var replacement = choices[0];
+                  if (choices.length > 1) {
+                      replacement = replacement + " + " + choices[1];
+                  }
+                  replacements[field.marker].push({
+                      mode: "EPHEMERAL",
+                      replacement: replacement,
+                  });
+              }
+          })
       }
   }
 }
