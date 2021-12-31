@@ -323,7 +323,6 @@ class Parameter(models.Model):
         # If no substitutions, add a "default" substitution.
         field_blob = {
             "name": self.name,
-            "slug": self.slug,
         }
         if self.substitutions.count() == 0:
             default_sub = {
@@ -333,7 +332,7 @@ class Parameter(models.Model):
             }
             sub_list = [default_sub]
         else:
-            substitutions = self.parameter_field_substitution_set.select_related("relevant_marker").all()
+            substitutions = self.parameterfieldsubstitution_set.select_related("relevant_marker").all()
             sub_list = [x.to_blob() for x in substitutions]
         field_blob["substitutions"] = sub_list
         return field_blob

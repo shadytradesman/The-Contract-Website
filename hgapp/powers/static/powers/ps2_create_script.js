@@ -21,10 +21,25 @@ function modifierToVue(modifier, type) {
     }
 }
 
+function powerParamToVue(powerParam) {
+    return {
+        id: powerParam.param_id,
+        name: powerBlob["parameters"][powerParam.param_id]["name"],
+        eratta: powerParam.eratta,
+        defaultLevel: powerParam["default_level"],
+        levels: powerParam.levels
+    }
+}
+
 function modifiersFromComponents(components, modifier) {
     selectedModifierIds = components.flatMap(component => component[modifier]);
     blacklistModifierIds = components.flatMap(component => component["blacklist_" + modifier]);
     return selectedModifierIds.filter(x => !blacklistModifierIds.includes(x)).map(id => modifierToVue(powerBlob[modifier][id], modifier));
+}
+
+function paramsFromComponents(components, modifier) {
+    powerParams = components.flatMap(component => component["parameters"]);
+    return powerParams.map(param => powerParamToVue(param));
 }
 
 function getDisabledModifiers(modType, availModifiers, selectedModifiers) {
@@ -137,14 +152,12 @@ function collapseSubstitutions(replacements) {
 }
 
 function performSystemTextReplacements(unrenderedSystem, replacementMap) {
-    console.log("replacementmap");
-    console.log(replacementMap);
     var systemText = unrenderedSystem;
     var toReplace = findReplacementCandidate(systemText);
     var replacementCount = 0;
     while (toReplace != null) {
-        console.log("replacing: ");
-        console.log(toReplace);
+//        console.log("replacing: ");
+//        console.log(toReplace);
         systemText = replaceInSystemText(systemText, replacementMap, toReplace);
         var toReplace = findReplacementCandidate(systemText);
         replacementCount ++;
@@ -189,6 +202,9 @@ const parenEndByStart = {
     '{': '}',
 }
 function findReplacementCandidate(systemText) {
+    // Finds the first pair of opening parenthesis, indicating a replacement substring.
+    // Proceeds to the matching closure of the parens, skipping any nested replacements
+    // returns a little replacement candidate object.
     var markerStarts = ['(', '[', '{'];
     var endMarker = null;
     var parenDepth = 0;
@@ -282,6 +298,7 @@ const ComponentRendering = {
       detailsByDrawbacks: {},
       disabledDrawbacks: {}, // map of disabled drawback slug to reason.
       parameters: [],
+      parameterSelections: {},
       unrenderedSystem: '',
       renderedSystem: '',
     }
@@ -321,6 +338,9 @@ const ComponentRendering = {
       clickVector(vector) {
           this.componentClick();
       },
+      changeParam(param) {
+          this.reRenderSystemText();
+      },
       componentClick() {
 		if (this.selectedVector.length && this.selectedModality.length && this.selectedEffect.length) {
 			this.populatePowerForm();
@@ -343,8 +363,14 @@ const ComponentRendering = {
         console.log(effect);
         console.log(vector);
         this.unrenderedSystem = modality["system_text"] + "<br><br>" + vector["system_text"] + "<br><br>" + effect["system_text"] + "<br>";
-        this.enhancements = modifiersFromComponents([modality, effect, vector], "enhancements");
-        this.drawbacks = modifiersFromComponents([modality, effect, vector], "drawbacks");
+        this.enhancements = modifiersFromComponents(components, "enhancements");
+        this.drawbacks = modifiersFromComponents(components, "drawbacks");
+        this.parameters = paramsFromComponents(components);
+        this.parameters.forEach(param => {
+            this.parameterSelections[param.id] = param.levels[param["defaultLevel"]];
+        });
+        console.log(this.parameters);
+
 //        this.parameters = modifiersFromComponents([modality, effect, vector], "parameters");
 
         this.calculateRestrictedModifiers();
@@ -382,6 +408,7 @@ const ComponentRendering = {
                                       this.selectedDrawbacks.map(mod => powerBlob["drawbacks"][mod]),
                                       this.detailsByDrawbacks);
           this.addReplacementsForComponents(replacements);
+          this.addReplacementsForParameters(replacements);
 
           console.log("Raw replacement map");
           console.log(replacements);
@@ -408,6 +435,27 @@ const ComponentRendering = {
                   }
               })
           });
+      },
+      addReplacementsForParameters(replacements) {
+          for (parameter in this.parameterSelections){
+              const selection = this.parameterSelections[parameter];
+              powerBlob["parameters"][parameter]["substitutions"].forEach(sub => {
+                  const marker = sub["marker"];
+                  var replacement = sub["replacement"];
+                  if (replacement.includes("$")) {
+                      replacement = replacement.replace("$", selection);
+                  }
+                  const newSub = {
+                      mode: sub["mode"],
+                      replacement: replacement,
+                  }
+                  if (marker in replacements ) {
+                      replacements[marker].push(newSub);
+                  } else {
+                      replacements[marker] = [newSub];
+                  }
+              });
+          }
       }
   }
 }

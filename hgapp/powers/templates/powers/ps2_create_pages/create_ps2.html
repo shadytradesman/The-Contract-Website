@@ -77,16 +77,37 @@
 	</div>
 	<div class="row">
 		<div class="col-md-6">
-			<h3 class="text-center">Unrendered System</h3>
-			<div id="unrendered-system" v-html="unrenderedSystem">
-			</div>
-			<h3 class="text-center">Rendered System</h3>
-			<div id="rendered-system" v-html="renderedSystem">
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<h3 class="text-center" style="margin-top: 5px;">Rendered System</h3>
+					<div id="rendered-system" v-html="renderedSystem">
+					</div>
+					<h4 class="text-center" style="margin-top: 20px">Unrendered System</h4>
+					<small>
+						<div id="unrendered-system" v-html="unrenderedSystem">
+						</div>
+					</small>
+				</div>
 			</div>
 		</div>
 		<div class="col-md-6">
 			<h3 class="text-center">Modifiers</h3>
-			<h4>Enhancements</h4>
+			<h4>Parameters</h4>
+			<div id="js-parameters-container">
+				<div v-for="param in parameters"
+					 :key="param.id" >
+						<h5>{param.name}</h5>
+						<select v-model="parameterSelections[param.id]" class="form-control" @change="changeParam">
+							<option disabled value="">Select</option>
+							<option v-for="value in param.levels" :value="value">{value}</option>
+						</select>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-6">
+			<h4 class="text-center">Enhancements</h4>
 			<div id="js-enhancements-container">
 				<div v-for="modifier in enhancements"
 						:key="modifier.id" >
@@ -97,7 +118,9 @@
 					{% endwith %}
 				</div>
 			</div>
-			<h4>Drawbacks</h4>
+		</div>
+		<div class="col-md-6">
+			<h4 class="text-center">Drawbacks</h4>
 			<div id="js-drawbacks-container">
 				<div v-for="modifier in drawbacks"
 						:key="modifier.id">

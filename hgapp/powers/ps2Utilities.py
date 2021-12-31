@@ -31,6 +31,8 @@ def generate_power_blob():
         'enhancements': _generate_modifier_blob(Enhancement),
         'drawbacks': _generate_modifier_blob(Drawback),
 
+        # The parameters dictionary only contains the parameter's name and substitution.
+        # The level info is on the gift components
         'parameters': _generate_param_blob(),
 
         'component_categories': _generate_component_category_blob(),
