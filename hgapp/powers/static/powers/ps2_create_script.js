@@ -14,7 +14,7 @@ function componentToVue(component, type) {
 function modifierToVue(modifier, type) {
     return {
         id: type + "-" + modifier.slug,
-        num: "0", // for modifier multiplicity, default to 0 for first mod of a given slug.
+        details: "",
         slug: modifier.slug,
         displayName: modifier.name,
         description: modifier.description,
@@ -111,6 +111,17 @@ function getDisabledModifiers(modType, availModifiers, selectedModifiers, active
     return disabledModifiers;
 }
 
+function buildModifierDetailsMap(vueModifiers) {
+    let detailsMap = {};
+    vueModifiers.forEach(mod => {
+        if (!(mod.slug in detailsMap)) {
+            detailsMap[mod.slug] = [];
+        }
+        detailsMap[mod.slug].push(mod.details);
+    })
+    return detailsMap;
+}
+
 function addReplacementsForModifiers(replacements, selectedModifiers, detailsByModifiers) {
   selectedModifiers
       .forEach(mod => {
@@ -120,14 +131,14 @@ function addReplacementsForModifiers(replacements, selectedModifiers, detailsByM
               if (replacement.includes("$")) {
                   var subStrings = mod["slug"] in detailsByModifiers ? detailsByModifiers[mod["slug"]] : [""];
                   subStrings = subStrings.map(uncleanedString => {
-                      var substring = uncleanedString;
+                      let subString = uncleanedString;
                       subString = subString.replace("((", "(");
                       subString = subString.replace("[[", "[");
                       subString = subString.replace("{{", "{");
                       subString = subString.replace("))", ")");
                       subString = subString.replace("]]", "]");
                       subString = subString.replace("}}", "}");
-                      return substring;
+                      return subString;
                   })
                   if (subStrings.length > 1) {
                       subStrings[subStrings.length - 1] = "and " + subStrings[subStrings.length - 1];
@@ -343,11 +354,9 @@ const ComponentRendering = {
       selectedVector: "",
       enhancements: [],
       selectedEnhancements: [],
-      detailsByEnhancements: {},
       disabledEnhancements: {}, // map of disabled enhancements slug to reason.
       drawbacks: [],
       selectedDrawbacks: [],
-      detailsByDrawbacks: {},
       disabledDrawbacks: {}, // map of disabled drawback slug to reason.
       parameters: [],
       parameterSelections: {},
@@ -479,10 +488,10 @@ const ComponentRendering = {
           replacements = {}
           addReplacementsForModifiers(replacements,
                                       this.selectedEnhancements.map(mod => powerBlob["enhancements"][mod]),
-                                      this.detailsByEnhancements);
+                                      buildModifierDetailsMap(this.enhancements));
           addReplacementsForModifiers(replacements,
                                       this.selectedDrawbacks.map(mod => powerBlob["drawbacks"][mod]),
-                                      this.detailsByDrawbacks);
+                                      buildModifierDetailsMap(this.drawbacks));
           this.addReplacementsForComponents(replacements);
           this.addReplacementsForParameters(replacements);
           this.addReplacementsForFields(replacements);
