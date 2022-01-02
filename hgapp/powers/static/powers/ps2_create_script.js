@@ -64,7 +64,7 @@ function fieldsFromComponents(components) {
     return textFields.concat(rollFields);
 }
 
-function getDisabledModifiers(modType, availModifiers, selectedModifiers) {
+function getDisabledModifiers(modType, availModifiers, selectedModifiers, activeUniqueReplacementsByMarker) {
     // given a modType ("enhancement"), available modifiers, and selected modifiers.
     // return a mapping of disabled modifiers of that type to an array of reasons they are disabled.
     const powerBlobFieldName = modType + "s";
@@ -84,13 +84,27 @@ function getDisabledModifiers(modType, availModifiers, selectedModifiers) {
           });
     disabledModifiers = {};
     unfulfilledModifiers.forEach(mod => {
-       requiredSlugs = powerBlob[powerBlobFieldName][mod.slug][requiredFieldName];
        if (!(mod.slug in disabledModifiers)) {
            disabledModifiers[mod.slug] = [];
        }
+       requiredSlugs = powerBlob[powerBlobFieldName][mod.slug][requiredFieldName];
        requiredSlugs.forEach(reqSlug => {
            disabledModifiers[mod.slug].push("Requires: " + powerBlob[powerBlobFieldName][reqSlug]["name"]);
        });
+    });
+    availModifiers.forEach(modifier => {
+        let blobMod = powerBlob[powerBlobFieldName][modifier.slug];
+        blockedSubs = blobMod["substitutions"]
+            .filter(sub => sub["mode"] === "UNIQUE")
+            .filter(sub => sub["marker"] in activeUniqueReplacementsByMarker
+                && activeUniqueReplacementsByMarker[sub["marker"]]["slug"] != blobMod["slug"]);
+        if (blockedSubs.length > 0) {
+            if (!(modifier.slug in disabledModifiers)) {
+               disabledModifiers[modifier.slug] = [];
+            }
+        }
+        blockedSubs.forEach(sub => disabledModifiers[modifier.slug]
+            .push("Exclusive with " + activeUniqueReplacementsByMarker[sub["marker"]]["name"]));
     });
     return disabledModifiers;
 }
@@ -331,9 +345,10 @@ const ComponentRendering = {
       parameterSelections: {},
       systemFields: [],
       fieldTextInput: {},
-      fieldRollInput: new Proxy(emptyObj, handler),
+      fieldRollInput: new Proxy({}, handler),
       unrenderedSystem: '',
       renderedSystem: '',
+      activeUniqueReplacementsByMarker: {}
     }
   },
   methods: {
@@ -419,12 +434,23 @@ const ComponentRendering = {
         this.reRenderSystemText();
       },
       calculateRestrictedModifiers() {
+          this.populateUniqueReplacementsMap();
           this.disabledEnhancements = {};
           this.disabledDrawbacks = {};
-          this.disabledEnhancements = getDisabledModifiers("enhancement", this.enhancements, this.selectedEnhancements);
+          this.disabledEnhancements = getDisabledModifiers("enhancement", this.enhancements, this.selectedEnhancements, this.activeUniqueReplacementsByMarker);
           this.selectedEnhancements = this.selectedEnhancements.filter(mod => !(mod in this.disabledEnhancements));
-          this.disabledDrawbacks = getDisabledModifiers("drawback", this.drawbacks, this.selectedDrawbacks);
+          this.disabledDrawbacks = getDisabledModifiers("drawback", this.drawbacks, this.selectedDrawbacks, this.activeUniqueReplacementsByMarker);
           this.selectedDrawbacks = this.selectedDrawbacks.filter(mod => !(mod in this.disabledDrawbacks));
+      },
+      populateUniqueReplacementsMap() {
+          // modifiers that have "unique" field replacements "block" modifiers that uniquely replace the same thing.
+          this.activeUniqueReplacementsByMarker = {};
+          this.selectedEnhancements.concat(this.selectedDrawbacks).forEach(mod => {
+              let modifier = mod in powerBlob["enhancements"] ? powerBlob["enhancements"][mod] : powerBlob["drawbacks"][mod];
+              modifier["substitutions"].filter(sub => sub["mode"] === "UNIQUE").forEach(sub => {
+                 this.activeUniqueReplacementsByMarker[sub["marker"]] = modifier;
+             });
+          });
       },
       clickEnhancement(component) {
           console.log("clicked Enhancement");
@@ -480,9 +506,9 @@ const ComponentRendering = {
           });
       },
       addReplacementsForParameters(replacements) {
-          for (parameter in this.parameterSelections){
-              const selection = this.parameterSelections[parameter];
-              powerBlob["parameters"][parameter]["substitutions"].forEach(sub => {
+          this.parameters.forEach(parameter => {
+              const selection = this.parameterSelections[parameter.id];
+              powerBlob["parameters"][parameter.id]["substitutions"].forEach(sub => {
                   const marker = sub["marker"];
                   var replacement = sub["replacement"];
                   if (replacement.includes("$")) {
@@ -498,7 +524,7 @@ const ComponentRendering = {
                       replacements[marker] = [newSub];
                   }
               });
-          }
+          });
       },
       addReplacementsForFields(replacements) {
           this.systemFields.forEach(field => {

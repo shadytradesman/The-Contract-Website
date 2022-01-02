@@ -832,7 +832,8 @@ class Power(models.Model):
 
 
     def save(self, *args, **kwargs):
-        self.__check_constraints()
+        # TODO: uncomment this after switch to v2 power system.
+        # self.__check_constraints()
         new_power = not self.pk
         if hasattr(self, "system") and self.system:
             if self.system == self.base.get_system().system_text:
