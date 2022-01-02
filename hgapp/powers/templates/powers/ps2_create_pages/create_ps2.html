@@ -102,9 +102,16 @@
 				<div v-for="param in parameters"
 					 :key="param.id" >
 						<h5>{param.name}</h5>
-						<select v-model="parameterSelections[param.id]" class="form-control" @change="changeParam">
+						<select v-model="parameterSelections[param.id]" class="form-control" @change="changeParam" :disabled="param.id in disabledParameters">
 							<option v-for="value in param.levels" :value="value">{value}</option>
 						</select>
+					<div v-if="param.id in disabledParameters">
+						<div v-for="reason in disabledParameters[param.id]">
+							<small style="color: red;">
+								{ reason }
+							</small>
+						</div>
+					</div>
 				</div>
 			</div>
 			<div id="js-fields-container" v-if="systemFields.length > 0">

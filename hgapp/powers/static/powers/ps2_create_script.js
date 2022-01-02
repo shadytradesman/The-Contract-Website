@@ -12,14 +12,22 @@ function componentToVue(component, type) {
 }
 
 function modifierToVue(modifier, type) {
+    return modifierToVue(modifier, type, 0);
+}
+
+function modifierToVue(modifier, type, idNum = 0) {
     return {
-        id: type + "-" + modifier.slug,
+        id: modifier.slug + "$" + idNum + "-" + type,
         details: "",
         slug: modifier.slug,
         displayName: modifier.name,
         description: modifier.description,
         detailLabel: modifier.detail_field_label === null ? false : modifier.detail_field_label,
     }
+}
+
+function slugFromVueModifierId(vueModifierId) {
+    return vueModifierId.slice(0, vueModifierId.indexOf("$"));
 }
 
 function powerParamToVue(powerParam) {
@@ -64,6 +72,25 @@ function fieldsFromComponents(components) {
     textFields = components.flatMap(component => component["text_fields"]).map(field => systemFieldToVue(field, false));
     rollFields = components.flatMap(component => component["roll_fields"]).map(field => systemFieldToVue(field, true));
     return textFields.concat(rollFields);
+}
+
+function getDisabledParameters(availParameters, activeUniqueReplacementsByMarker) {
+    disabledModifiers = {};
+    availParameters.forEach(modifier => {
+        let blobMod = powerBlob["parameters"][modifier.id];
+        blockedSubs = blobMod["substitutions"]
+            .filter(sub => sub["mode"] === "UNIQUE")
+            .filter(sub => sub["marker"] in activeUniqueReplacementsByMarker
+                && activeUniqueReplacementsByMarker[sub["marker"]]["id"] != modifier.id);
+        if (blockedSubs.length > 0) {
+            if (!(modifier.id in disabledModifiers)) {
+               disabledModifiers[modifier.id] = [];
+            }
+        }
+        blockedSubs.forEach(sub => disabledModifiers[modifier.id]
+            .push("Exclusive with " + activeUniqueReplacementsByMarker[sub["marker"]]["name"]));
+    });
+    return disabledModifiers;
 }
 
 function getDisabledModifiers(modType, availModifiers, selectedModifiers, activeUniqueReplacementsByMarker) {
@@ -123,27 +150,36 @@ function buildModifierDetailsMap(vueModifiers) {
 }
 
 function addReplacementsForModifiers(replacements, selectedModifiers, detailsByModifiers) {
+  let includedModSlugs = [];
   selectedModifiers
       .forEach(mod => {
           mod["substitutions"].forEach(sub => {
               const marker = sub["marker"];
               var replacement = sub["replacement"];
               if (replacement.includes("$")) {
-                  var subStrings = mod["slug"] in detailsByModifiers ? detailsByModifiers[mod["slug"]] : [""];
-                  subStrings = subStrings.map(uncleanedString => {
-                      let subString = uncleanedString;
-                      subString = subString.replace("((", "(");
-                      subString = subString.replace("[[", "[");
-                      subString = subString.replace("{{", "{");
-                      subString = subString.replace("))", ")");
-                      subString = subString.replace("]]", "]");
-                      subString = subString.replace("}}", "}");
-                      return subString;
-                  })
-                  if (subStrings.length > 1) {
-                      subStrings[subStrings.length - 1] = "and " + subStrings[subStrings.length - 1];
+                  let substitution = "";
+                  if (mod["joining_strategy"] != "ALL") {
+                      var subStrings = mod["slug"] in detailsByModifiers ? detailsByModifiers[mod["slug"]] : [""];
+                      subStrings = subStrings.filter(sub => !(sub.length === 0)).map(uncleanedString => {
+                          let subString = uncleanedString;
+                          subString = subString.replace("((", "(");
+                          subString = subString.replace("[[", "[");
+                          subString = subString.replace("{{", "{");
+                          subString = subString.replace("))", ")");
+                          subString = subString.replace("]]", "]");
+                          subString = subString.replace("}}", "}");
+                          return subString;
+                      })
+                      if (subStrings.length > 1) {
+                          let joiningWord = mod["joining_strategy"] === "OR" ? "or " : "and ";
+                          subStrings[subStrings.length - 1] = joiningWord + subStrings[subStrings.length - 1];
+                      }
+                      substitution = subStrings.join(", ");
+                  } else {
+                      substitution = detailsByModifiers[mod["slug"]][includedModSlugs.filter(includedSlug => includedSlug === mod["slug"]).length];
                   }
-                  replacement = replacement.replace("$", subStrings.join(", "));
+                  replacement = replacement.replace("$", substitution);
+                  includedModSlugs.push(mod["slug"]);
               }
               const newSub = {
                   mode: sub["mode"],
@@ -162,7 +198,7 @@ function addReplacementsForModifiers(replacements, selectedModifiers, detailsByM
 
 const parenJoinString = {
     '(': ', ',
-    '[': '. ',
+    '[': ' ',
     '{': '<br><br>',
 }
 function collapseSubstitutions(replacements) {
@@ -342,6 +378,8 @@ let handler = {
   }
 };
 
+
+let modCounter = 1; // used when creating unique ids for modifiers
 const ComponentRendering = {
   delimiters: ['{', '}'],
   data() {
@@ -360,6 +398,7 @@ const ComponentRendering = {
       disabledDrawbacks: {}, // map of disabled drawback slug to reason.
       parameters: [],
       parameterSelections: {},
+      disabledParameters: {},
       systemFields: [],
       fieldTextInput: {},
       fieldRollInput: new Proxy({}, handler),
@@ -404,6 +443,7 @@ const ComponentRendering = {
           this.componentClick();
       },
       changeParam(param) {
+          this.calculateRestrictedElements();
           this.reRenderSystemText();
       },
       componentClick() {
@@ -447,36 +487,69 @@ const ComponentRendering = {
             }
         });
 
-        this.calculateRestrictedModifiers();
+        this.calculateRestrictedElements();
         this.reRenderSystemText();
       },
-      calculateRestrictedModifiers() {
+      calculateRestrictedElements() {
           this.populateUniqueReplacementsMap();
           this.disabledEnhancements = {};
           this.disabledDrawbacks = {};
-          this.disabledEnhancements = getDisabledModifiers("enhancement", this.enhancements, this.selectedEnhancements, this.activeUniqueReplacementsByMarker);
-          this.selectedEnhancements = this.selectedEnhancements.filter(mod => !(mod in this.disabledEnhancements));
-          this.disabledDrawbacks = getDisabledModifiers("drawback", this.drawbacks, this.selectedDrawbacks, this.activeUniqueReplacementsByMarker);
-          this.selectedDrawbacks = this.selectedDrawbacks.filter(mod => !(mod in this.disabledDrawbacks));
+          this.disabledEnhancements = getDisabledModifiers("enhancement", this.enhancements, this.selectedEnhancements.map(slugFromVueModifierId), this.activeUniqueReplacementsByMarker);
+          this.selectedEnhancements = this.selectedEnhancements.filter(mod => !(slugFromVueModifierId(mod) in this.disabledEnhancements));
+          this.disabledDrawbacks = getDisabledModifiers("drawback", this.drawbacks, this.selectedDrawbacks.map(slugFromVueModifierId), this.activeUniqueReplacementsByMarker);
+          this.selectedDrawbacks = this.selectedDrawbacks.filter(mod => !(slugFromVueModifierId(mod) in this.disabledDrawbacks));
+          this.disabledParameters = {};
+          this.disabledParameters = getDisabledParameters(this.parameters, this.activeUniqueReplacementsByMarker);
+
       },
       populateUniqueReplacementsMap() {
           // modifiers that have "unique" field replacements "block" modifiers that uniquely replace the same thing.
           this.activeUniqueReplacementsByMarker = {};
-          this.selectedEnhancements.concat(this.selectedDrawbacks).forEach(mod => {
+          this.selectedEnhancements.concat(this.selectedDrawbacks).map(slugFromVueModifierId).forEach(mod => {
               let modifier = mod in powerBlob["enhancements"] ? powerBlob["enhancements"][mod] : powerBlob["drawbacks"][mod];
               modifier["substitutions"].filter(sub => sub["mode"] === "UNIQUE").forEach(sub => {
                  this.activeUniqueReplacementsByMarker[sub["marker"]] = modifier;
              });
           });
+          this.parameters.filter(param => param.levels[param["defaultLevel"]] != this.parameterSelections[param["id"]]).forEach(param => {
+              powerBlob["parameters"][param.id]["substitutions"].filter(sub => sub["mode"] === "UNIQUE").forEach(sub => {
+                  this.activeUniqueReplacementsByMarker[sub["marker"]] = param;
+              });
+          });
       },
-      clickEnhancement(component) {
+      clickEnhancement(modifier) {
           console.log("clicked Enhancement");
-          this.calculateRestrictedModifiers();
+          let modSlug = slugFromVueModifierId(modifier.target.value);
+          let mod = powerBlob["enhancements"][modSlug];
+          // TODO: deduplicate with clickDrawback logic
+          if (mod.multiplicity_allowed) {
+              let numSelected = this.selectedEnhancements.map(slugFromVueModifierId).filter(enh => enh === modSlug).length;
+              let numAvail = this.enhancements.filter(enh => enh["slug"] === modSlug).length;
+              if (numSelected == numAvail && numAvail < 4) {
+                  modCounter++;
+                  this.enhancements.push(modifierToVue(mod, "enhancements", modCounter));
+              } else if (numAvail - numSelected > 1){
+                  this.enhancements = this.enhancements.filter(mod => mod["id"] != modifier.target.id);
+              }
+          }
+          this.calculateRestrictedElements();
           this.reRenderSystemText();
       },
-      clickDrawback(component) {
+      clickDrawback(modifier) {
           console.log("clicked Drawback");
-          this.calculateRestrictedModifiers();
+          let modSlug = slugFromVueModifierId(modifier.target.value);
+          let mod = powerBlob["drawbacks"][modSlug];
+          if (mod.multiplicity_allowed) {
+              let numSelected = this.selectedDrawbacks.map(slugFromVueModifierId).filter(draw => draw === modSlug).length;
+              let numAvail = this.drawbacks.filter(enh => enh["slug"] === modSlug).length;
+              if (numSelected == numAvail && numAvail < 4) {
+                  modCounter++;
+                  this.drawbacks.push(modifierToVue(mod, "drawbacks", modCounter));
+              } else if (numAvail - numSelected > 1){
+                  this.drawbacks = this.drawbacks.filter(mod => mod["id"] != modifier.target.id);
+              }
+          }
+          this.calculateRestrictedElements();
           this.reRenderSystemText();
       },
       reRenderSystemText() {
@@ -487,10 +560,10 @@ const ComponentRendering = {
           // replacement marker to list of substitution objects
           replacements = {}
           addReplacementsForModifiers(replacements,
-                                      this.selectedEnhancements.map(mod => powerBlob["enhancements"][mod]),
-                                      buildModifierDetailsMap(this.enhancements));
+                                      this.selectedEnhancements.map(slugFromVueModifierId).map(mod => powerBlob["enhancements"][mod]),
+                                      buildModifierDetailsMap(this.enhancements.filter(enh => this.selectedEnhancements.includes(enh["id"]))));
           addReplacementsForModifiers(replacements,
-                                      this.selectedDrawbacks.map(mod => powerBlob["drawbacks"][mod]),
+                                      this.selectedDrawbacks.map(slugFromVueModifierId).map(mod => powerBlob["drawbacks"][mod]),
                                       buildModifierDetailsMap(this.drawbacks));
           this.addReplacementsForComponents(replacements);
           this.addReplacementsForParameters(replacements);
@@ -523,7 +596,7 @@ const ComponentRendering = {
           });
       },
       addReplacementsForParameters(replacements) {
-          this.parameters.forEach(parameter => {
+          this.parameters.filter(param => !(param.id in this.disabledParameters)).forEach(parameter => {
               const selection = this.parameterSelections[parameter.id];
               powerBlob["parameters"][parameter.id]["substitutions"].forEach(sub => {
                   const marker = sub["marker"];

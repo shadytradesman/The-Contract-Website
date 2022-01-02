@@ -33,6 +33,16 @@ FIELD_SUBSTITUTION_MODE = (
     (ADDITIVE, "Additive")
 )
 
+# for modifiers where there are details and multiplicity allowed.
+SUB_JOINING_AND = "AND"
+SUB_JOINING_OR = "OR"
+SUB_ALL = "ALL"
+SUB_MULTIPLE_STRATEGY = (
+    (SUB_JOINING_AND, "Join using 'and'"),
+    (SUB_JOINING_OR, "Join using 'or'"),
+    (SUB_ALL, "Display all seperately"),
+)
+
 CREATION_NEW = 'NEW'
 CREATION_IMPROVEMENT = 'IMPROVEMENT'
 CREATION_REVISION = "REVISION"
@@ -147,6 +157,11 @@ class Modifier(models.Model):
                                           null=True,
                                           max_length=35)
     is_general = models.BooleanField(default=False)
+    multiple_sub_strategy = models.CharField(choices=SUB_MULTIPLE_STRATEGY,
+                                             default=SUB_JOINING_AND,
+                                             max_length=55,
+                                             help_text="When a modifier has multiplicity allowed and details, this " +
+                                                       "specifies how the details should be joined before they are subbed.")
 
     class Meta:
         abstract = True
@@ -168,6 +183,7 @@ class Modifier(models.Model):
             "eratta": self.eratta,
             "multiplicity_allowed": self.multiplicity_allowed,
             "detail_field_label": self.detail_field_label,
+            "joining_strategy": self.multiple_sub_strategy,
         }
 
 
@@ -333,7 +349,7 @@ class Parameter(models.Model):
             default_sub = {
                 "marker": self.slug,
                 "replacement": "$",
-                "mode": ADDITIVE,
+                "mode": UNIQUE,
             }
             sub_list = [default_sub]
         else:
