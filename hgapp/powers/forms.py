@@ -153,7 +153,7 @@ class SystemFieldRollForm(forms.Form):
         if "system_field" in self.initial:
             sys_field = self.initial["system_field"]
             attribute_choices, ability_choices = sys_field.get_choices()
-            if ability_choices.length > 0:
+            if len(ability_choices) > 0:
                 self.fields['ability_roll'] = forms.ChoiceField(label="{} roll Ability".format(sys_field.name),
                                                                 choices=ability_choices,
                                                                 required=False,
