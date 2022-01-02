@@ -7,14 +7,23 @@ from django.views import generic
 from django.db import transaction
 from django.db.models import Prefetch
 
-
 from characters.models import Character
 from .createPowerFormUtilities import get_create_power_context_from_base, \
     get_create_power_context_from_power, get_edit_power_context_from_power, create_new_power_and_parent, \
     create_power_for_new_edit, refund_or_assign_rewards
 from .models import Power, Base_Power_Category, Base_Power, Base_Power_System, DICE_SYSTEM, Power_Full, PowerTag, \
-    PremadeCategory, PowerTutorial
+    PremadeCategory, PowerTutorial, SYS_PS2, EFFECT, VECTOR, MODALITY
 from .forms import DeletePowerForm
+from .ps2Utilities import generate_json_blob
+
+def create_ps2(request):
+    if not request.user.is_superuser and (request.user.is_anonymous or not request.user.profile.ps2_user):
+        raise PermissionDenied("You are not authorized to create a new power in this system.")
+    context = {
+        'power_blob': generate_json_blob(),
+    }
+    return render(request, 'powers/ps2_create_pages/create_ps2.html', context)
+
 
 def create(request, character_id=None):
     category_list = Base_Power_Category.objects\
@@ -50,7 +59,7 @@ def powers_and_effects(request):
     return render(request, 'powers/powers_and_effects.html', context)
 
 def create_category(request, category_slug, character_id=None):
-    powers_list = Base_Power.objects.filter(category = category_slug, is_public = True)
+    powers_list = Base_Power.objects.filter(category=category_slug, is_public=True)
     category = get_object_or_404(Base_Power_Category, pk=category_slug)
     character = None
     if character_id:
@@ -67,7 +76,7 @@ def create_category(request, category_slug, character_id=None):
     return render(request, 'powers/choosebasecat.html', context)
 
 def create_all(request, character_id=None):
-    powers_list = Base_Power.objects.filter(is_public = True).order_by('name')
+    powers_list = Base_Power.objects.filter(is_public=True).order_by('name')
     character = None
     if character_id:
         character = get_object_or_404(Character, pk=character_id)
@@ -83,6 +92,8 @@ def create_all(request, character_id=None):
 
 def create_power(request, base_power_slug, character_id=None):
     base_power = get_object_or_404(Base_Power, pk=base_power_slug)
+    if base_power.base_type in [VECTOR, MODALITY] or base_power.base_power_system_set.exclude(dice_system=SYS_PS2).count() == 0:
+        raise PermissionDenied("SHH! Pay no attention to the man behind the curtain")
     character = None
     if character_id:
         character = get_object_or_404(Character, pk=character_id)

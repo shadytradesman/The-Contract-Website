@@ -12,3 +12,4 @@ hgapp/.package*
 *__pycache__*
 *~
 *.log
+*vue.next.js

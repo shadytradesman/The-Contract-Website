@@ -5,10 +5,10 @@ import bleach
 import json
 
 from .forms import CreatePowerForm, make_enhancement_form, make_drawback_form, make_parameter_form, \
-    SystemFieldRollForm, SystemFieldTextForm, MIND_, BODY_, PARRY_
+    SystemFieldRollForm, SystemFieldTextForm
 from .models import Enhancement_Instance, Drawback_Instance, Power, DICE_SYSTEM, Enhancement, Drawback, \
     Power_Param, SystemFieldText, SystemFieldRoll, SystemFieldTextInstance, SystemFieldRollInstance, \
-    Parameter_Value, Base_Power_System, Power_Full, CREATION_REASON, PowerTutorial
+    Parameter_Value, Base_Power_System, Power_Full, CREATION_REASON, PowerTutorial, MIND_, BODY_, PARRY_
 
 from characters.models import Roll, Attribute, Ability, NO_PARRY_INFO, REACTION, THROWN
 
@@ -57,7 +57,6 @@ def get_create_power_context_from_power(power, new=True):
     initial = {'system': power.get_system(),
      'description': power.description,
      'flavor': power.flavor_text,
-     'activation_style': power.activation_style,
      'power_name': power.name}
     if power.parent_power:
         initial['tags'] = power.parent_power.tags.all()
@@ -337,7 +336,6 @@ def _get_power_from_form(power_form, base):
                   flavor_text=power_form.cleaned_data['flavor'],
                   description=power_form.cleaned_data['description'],
                   system=power_form.cleaned_data['system'],
-                  activation_style=power_form.cleaned_data['activation_style'],
                   base=base,
                   dice_system=DICE_SYSTEM[1][0],
                   pub_date=timezone.now())
