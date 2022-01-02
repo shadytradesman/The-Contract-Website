@@ -954,6 +954,12 @@ class SystemField(models.Model):
     base_power_system = models.ForeignKey(Base_Power_System, on_delete=models.CASCADE)
     name = models.CharField(max_length=250)
     eratta = models.CharField(max_length=1000, blank=True, null=True)
+    relevant_marker = models.ForeignKey(FieldSubstitutionMarker,
+                                        on_delete=models.CASCADE,
+                                        blank=True, null=True,
+                                        help_text="If not specified, this is the name of the field slugified.")
+    replacement = models.CharField(max_length=350, blank=True,
+                                   help_text="A '$' in this string will be replaced with user input. Defaults to '$' if empty.")
 
     def __str__(self):
         base_name = self.base_power_system.base_power.name
@@ -965,7 +971,8 @@ class SystemField(models.Model):
 
     def to_blob(self):
         return {
-            "marker": self.name.strip().lower().replace(" ", "-"),
+            "marker": self.relevant_marker.marker if self.relevant_marker else self.name.strip().lower().replace(" ", "-"),
+            "replacement": self.replacement if self.replacement else "$",
             "id": self.pk,
             "name": self.name,
             "eratta": self.eratta,

@@ -14,6 +14,7 @@ function componentToVue(component, type) {
 function modifierToVue(modifier, type) {
     return {
         id: type + "-" + modifier.slug,
+        num: "0", // for modifier multiplicity, default to 0 for first mod of a given slug.
         slug: modifier.slug,
         displayName: modifier.name,
         description: modifier.description,
@@ -38,6 +39,7 @@ function systemFieldToVue(systemField, isRoll) {
     return {
         id: type + systemField.id,
         marker: systemField.marker,
+        replacement: systemField.replacement,
         name: systemField.name,
         eratta: systemField.eratta,
         isRoll: isRoll,
@@ -116,14 +118,21 @@ function addReplacementsForModifiers(replacements, selectedModifiers, detailsByM
               const marker = sub["marker"];
               var replacement = sub["replacement"];
               if (replacement.includes("$")) {
-                  var subString = mod["slug"] in detailsByModifiers ? detailsByModifiers[mod["slug"]] : "";
-                  subString = subString.replace("((", "(");
-                  subString = subString.replace("[[", "[");
-                  subString = subString.replace("{{", "{");
-                  subString = subString.replace("))", ")");
-                  subString = subString.replace("]]", "]");
-                  subString = subString.replace("}}", "}");
-                  replacement = replacement.replace("$", subString);
+                  var subStrings = mod["slug"] in detailsByModifiers ? detailsByModifiers[mod["slug"]] : [""];
+                  subStrings = subStrings.map(uncleanedString => {
+                      var substring = uncleanedString;
+                      subString = subString.replace("((", "(");
+                      subString = subString.replace("[[", "[");
+                      subString = subString.replace("{{", "{");
+                      subString = subString.replace("))", ")");
+                      subString = subString.replace("]]", "]");
+                      subString = subString.replace("}}", "}");
+                      return substring;
+                  })
+                  if (subStrings.length > 1) {
+                      subStrings[subStrings.length - 1] = "and " + subStrings[subStrings.length - 1];
+                  }
+                  replacement = replacement.replace("$", subStrings.join(", "));
               }
               const newSub = {
                   mode: sub["mode"],
@@ -321,7 +330,6 @@ let handler = {
     return target.hasOwnProperty(name) ? target[name] : [];
   }
 };
-let emptyObj = {};
 
 const ComponentRendering = {
   delimiters: ['{', '}'],
@@ -528,26 +536,28 @@ const ComponentRendering = {
       },
       addReplacementsForFields(replacements) {
           this.systemFields.forEach(field => {
-              if (! (field.marker in replacements)) {
+              if (!(field.marker in replacements)) {
                   replacements[field.marker] = [];
               }
+              let sub = "";
               if (field.isText) {
-                  replacements[field.marker].push({
-                      mode: "EPHEMERAL",
-                      replacement: this.fieldTextInput[field.id],
-                  });
+                  sub = this.fieldTextInput[field.id];
               }
               if (field.isRoll) {
                   const choices = this.fieldRollInput[field.id];
-                  var replacement = choices[0];
+                  sub = choices[0];
                   if (choices.length > 1) {
-                      replacement = replacement + " + " + choices[1];
+                      sub = sub + " + " + choices[1];
                   }
-                  replacements[field.marker].push({
-                      mode: "EPHEMERAL",
-                      replacement: replacement,
-                  });
               }
+              let replacement = field.replacement;
+              if (replacement.includes("$")) {
+                  replacement = replacement.replace("$", sub);
+              }
+              replacements[field.marker].push({
+                  replacement: replacement,
+                  mode: "EPHEMERAL",
+              });
           })
       }
   }
