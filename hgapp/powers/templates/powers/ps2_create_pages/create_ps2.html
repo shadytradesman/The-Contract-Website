@@ -7,8 +7,7 @@
 {% endblock %}
 
 {% block extra_scripts %}
-	{% comment %} <script src="https://unpkg.com/vue@next"></script> {% endcomment %}
-	<script src="{% static 'powers/vue.next.js' %}"></script>
+	<script src="https://unpkg.com/vue@3.2.26/dist/vue.global.prod.js"></script>
 	{{power_blob|json_script:"powerBlob"}}
 	<script src="{% static 'powers/ps2_create_script.js' %}"></script>
 {% endblock %}
