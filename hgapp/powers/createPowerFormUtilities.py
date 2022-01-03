@@ -8,7 +8,7 @@ from .forms import CreatePowerForm, make_enhancement_form, make_drawback_form, m
     SystemFieldRollForm, SystemFieldTextForm
 from .models import Enhancement_Instance, Drawback_Instance, Power, DICE_SYSTEM, Enhancement, Drawback, \
     Power_Param, SystemFieldText, SystemFieldRoll, SystemFieldTextInstance, SystemFieldRollInstance, \
-    Parameter_Value, Base_Power_System, Power_Full, CREATION_REASON, PowerTutorial, MIND_, BODY_, PARRY_
+    Parameter_Value, Base_Power_System, Power_Full, CREATION_REASON, PowerTutorial, MIND_, BODY_, PARRY_, SYS_LEGACY_POWERS
 
 from characters.models import Roll, Attribute, Ability, NO_PARRY_INFO, REACTION, THROWN
 
@@ -23,7 +23,7 @@ def get_create_power_context_from_base(base_power, character=None):
     for drawback in Drawback.objects.filter(pk__in=base_power.drawbacks.all()):
         drawback_forms.append(formset_factory(make_drawback_form(drawback), extra = 1)())
     parameter_forms = []
-    for parameter in Power_Param.objects.filter(relevant_base_power=base_power).all():
+    for parameter in Power_Param.objects.filter(relevant_base_power=base_power, dice_system=SYS_LEGACY_POWERS).all():
         parameter_forms.append(formset_factory(make_parameter_form(parameter))())
     roll_fields_formset = _get_system_roll_field_formset(system)
     text_fields_formset = _get_system_text_field_formset(system)
