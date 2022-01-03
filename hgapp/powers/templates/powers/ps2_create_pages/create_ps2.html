@@ -18,7 +18,18 @@
 
 {% block body_base %}
 <div class="container-fluid" id="vue-app">
-	<div class="row" style="max-height: 300px; overflow:scroll;">
+	<div class="row">
+		<div class="css-gift-cost-cont">
+				<span data-spy="affix" data-offset-top="0">
+    				<div class="text-center nav navbar-nav css-gift-cost">
+        				Current Gift Cost: <b><span id="current_gift_cost_number" v-html="giftCost">1</span></b>
+    				</div>
+				</span>
+			<div class="css-fake-height-div">
+			</div>
+		</div>
+	</div>
+	<div class="row" style="max-height: 350px; overflow:scroll;">
 		<div id="modalities" class="col-md-4">
 			<h3>Modalities</h3>
 			<div v-for="component in modalities"
@@ -123,7 +134,18 @@
 					 :key="param.id" >
 						<h5>{param.name}</h5>
 						<select v-model="parameterSelections[param.id]" class="form-control" @change="changeParam" :disabled="param.id in disabledParameters">
-							<option v-for="value in param.levels" :value="value">{value}</option>
+							<option v-for="(value, index) in param.levels" :value="value">
+								{value}
+								<template v-if="index === param.defaultLevel">
+									(Default)
+								</template>
+								<template v-if="param.seasonedLevel === index">
+									(Seasoned)
+								</template>
+								<template v-if="param.veteranLevel === index">
+									(Veteran)
+								</template>
+							</option>
 						</select>
 					<div v-if="param.id in disabledParameters">
 						<div v-for="reason in disabledParameters[param.id]">

@@ -15,7 +15,8 @@ function componentToVue(component, type) {
         slug: component.slug,
         displayName: component.name,
         summary: component.summary,
-        type: component.type
+        type: component.type,
+        giftCredit: component["gift_credit"],
     }
 }
 
@@ -44,7 +45,17 @@ function powerParamToVue(powerParam) {
         name: powerBlob["parameters"][powerParam.param_id]["name"],
         eratta: powerParam.eratta,
         defaultLevel: powerParam["default_level"],
-        levels: powerParam.levels
+        seasonedLevel: powerParam["seasoned_threshold"],
+        vetLevel: powerParam["veteran_threshold"],
+        levels: powerParam.levels,
+    }
+}
+
+function giftCostOfVueParam(powerParam, currentLevel) {
+    for (let i = 0; i < powerParam.levels.length; i++) {
+        if (powerParam.levels[i] === currentLevel) {
+            return i - powerParam.defaultLevel;
+        }
     }
 }
 
@@ -287,12 +298,12 @@ function replaceInSystemText(systemText, replacementMap, toReplace) {
     if (replacements.length === 1 ) {
         replacementText = replacements[0];
     }
+    if (toReplace.type === '{') {
+        replacements[0] = "<br><br>" + replacements[0];
+    }
     if (replacements.length > 1) {
         if (toReplace.type === '(') {
             replacements[replacements.length - 1] = "and " + replacements[replacements.length - 1];
-        }
-        if (toReplace.type === '[' || toReplace.type === '{') {
-            replacements = replacements.map(rep => rep[0].toUpperCase() + rep.slice(1));
         }
         replacementText = replacements.join(parenJoinString[toReplace.type]);
     }
@@ -412,7 +423,8 @@ const ComponentRendering = {
       fieldRollInput: new Proxy({}, handler),
       unrenderedSystem: '',
       renderedSystem: '',
-      activeUniqueReplacementsByMarker: {}
+      activeUniqueReplacementsByMarker: {},
+      giftCost: 0,
     }
   },
   methods: {
@@ -453,6 +465,7 @@ const ComponentRendering = {
       changeParam(param) {
           this.calculateRestrictedElements();
           this.reRenderSystemText();
+          this.updateGiftCost();
       },
       componentClick() {
 		if (this.selectedVector.length && this.selectedModality.length && this.selectedEffect.length) {
@@ -497,6 +510,17 @@ const ComponentRendering = {
 
         this.calculateRestrictedElements();
         this.reRenderSystemText();
+        this.updateGiftCost();
+      },
+      updateGiftCost() {
+          let cost = 1 + this.selectedEnhancements.length - this.selectedDrawbacks.length;
+          this.getSelectedComponents().forEach(comp => {
+              cost = cost - comp["gift_credit"];
+          });
+          this.parameters.forEach(param => {
+              cost = cost + giftCostOfVueParam(param, this.parameterSelections[param.id]);
+          });
+          this.giftCost = cost;
       },
       calculateRestrictedElements() {
           this.populateUniqueReplacementsMap();
@@ -542,6 +566,7 @@ const ComponentRendering = {
           }
           this.calculateRestrictedElements();
           this.reRenderSystemText();
+          this.updateGiftCost();
       },
       clickDrawback(modifier) {
           console.log("clicked Drawback");
@@ -559,6 +584,7 @@ const ComponentRendering = {
           }
           this.calculateRestrictedElements();
           this.reRenderSystemText();
+          this.updateGiftCost();
       },
       reRenderSystemText() {
           const replacementMap = this.buildReplacementMap();
