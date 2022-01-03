@@ -295,6 +295,9 @@ function replaceInSystemText(systemText, replacementMap, toReplace) {
     if (replacements.length === 0 && toReplace.defaultValue) {
         replacementText = toReplace.defaultValue;
     }
+    if (toReplace.type === '(') {
+        replacements[0] = replacements[0][0].toUpperCase() + replacements[0].slice(1);
+    }
     if (replacements.length === 1 ) {
         replacementText = replacements[0];
     }
@@ -305,7 +308,11 @@ function replaceInSystemText(systemText, replacementMap, toReplace) {
         if (toReplace.type === '(') {
             replacements[replacements.length - 1] = "and " + replacements[replacements.length - 1];
         }
-        replacementText = replacements.join(parenJoinString[toReplace.type]);
+        let joinString = parenJoinString[toReplace.type];
+        if (toReplace.type == '(' && replacements.length == 2) {
+            joinString = " ";
+        }
+        replacementText = replacements.join(joinString);
     }
     return systemText.slice(0, toReplace.start) + replacementText + systemText.slice(toReplace.end + 1);
 }
