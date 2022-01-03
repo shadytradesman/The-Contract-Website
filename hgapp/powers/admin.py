@@ -15,36 +15,64 @@ from .models import Enhancement, Parameter, Base_Power, Drawback, Power_Param, P
 
 class PowerParamTabular(admin.StackedInline):
     model = Power_Param
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "relevant_parameter":
+            kwargs["queryset"] = Parameter.objects.order_by("name")
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
     extra = 0
 
 
 class SystemFieldTextTabular(admin.TabularInline):
     model = SystemFieldText
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "relevant_marker":
+            kwargs["queryset"] = FieldSubstitutionMarker.objects.order_by("marker")
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
     extra = 0
 
 
 class SystemFieldRollTabular(admin.TabularInline):
     model = SystemFieldRoll
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "relevant_marker":
+            kwargs["queryset"] = FieldSubstitutionMarker.objects.order_by("marker")
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
     extra = 0
 
 
 class ParameterFieldSubTabular(admin.TabularInline):
     model = ParameterFieldSubstitution
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "relevant_marker":
+            kwargs["queryset"] = FieldSubstitutionMarker.objects.order_by("marker")
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
     extra = 0
 
 
 class EnhancementFieldSubTabular(admin.TabularInline):
     model = EnhancementFieldSubstitution
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "relevant_marker":
+            kwargs["queryset"] = FieldSubstitutionMarker.objects.order_by("marker")
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
     extra = 0
 
 
 class DrawbackFieldSubTabular(admin.TabularInline):
     model = DrawbackFieldSubstitution
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "relevant_marker":
+            kwargs["queryset"] = FieldSubstitutionMarker.objects.order_by("marker")
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
     extra = 0
 
 
 class BasePowerFieldSubTabular(admin.TabularInline):
     model = BasePowerFieldSubstitution
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "relevant_marker":
+            kwargs["queryset"] = FieldSubstitutionMarker.objects.order_by("marker")
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
     extra = 0
 
 
