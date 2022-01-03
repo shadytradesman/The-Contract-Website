@@ -1,3 +1,10 @@
+$(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip({
+        trigger : 'hover'
+    });
+});
+
+
 const powerBlob = JSON.parse(JSON.parse(document.getElementById('powerBlob').textContent));
 console.log(powerBlob);
 var unrenderedSystemText = "";
@@ -7,6 +14,7 @@ function componentToVue(component, type) {
         id: type + "-" + component.slug,
         slug: component.slug,
         displayName: component.name,
+        summary: component.summary,
         type: component.type
     }
 }
@@ -638,7 +646,7 @@ const ComponentRendering = {
               }
               replacements[field.marker].push({
                   replacement: replacement,
-                  mode: "EPHEMERAL",
+                  mode: "ADDITIVE",
               });
           })
       }

@@ -24,16 +24,23 @@
 			<div v-for="component in modalities"
 				 :key="component.id">
 				<label v-bind:for="component.id" class="thumbnail" style="margin: 5px;">
-					<input type="radio"
-						   v-bind:id="component.id"
-						   v-bind:name="component.type"
-						   v-bind:value="component.slug"
-						   v-model="selectedModality"
-						   @change="clickModality"
-					>
-					<span  style="padding-left: 10px;">
-						{ component.displayName }
-					</span>
+					<div>
+						<input type="radio"
+							   v-bind:id="component.id"
+							   v-bind:name="component.type"
+							   v-bind:value="component.slug"
+							   v-model="selectedModality"
+							   @change="clickModality"
+						>
+						<span  style="padding-left: 10px;">
+							{ component.displayName }
+						</span>
+					</div>
+					<div>
+						<small>
+							{ component.summary }
+						</small>
+					</div>
 				</label>
 			</div>
 		</div>
@@ -42,16 +49,23 @@
 			<div v-for="component in effects"
 				 :key="component.id">
 				<label v-bind:for="component.id" class="thumbnail" style="margin: 5px;">
-					<input type="radio"
-						   v-bind:id="component.id"
-						   v-bind:name="component.type"
-						   v-bind:value="component.slug"
-						   v-model="selectedEffect"
-						   @change="clickEffect"
-					>
-					<span  style="padding-left: 10px;">
-						{ component.displayName }
-					</span>
+					<div>
+						<input type="radio"
+							   v-bind:id="component.id"
+							   v-bind:name="component.type"
+							   v-bind:value="component.slug"
+							   v-model="selectedEffect"
+							   @change="clickEffect"
+						>
+						<span  style="padding-left: 10px;">
+							{ component.displayName }
+						</span>
+					</div>
+					<div>
+						<small>
+							{ component.summary }
+						</small>
+					</div>
 				</label>
 			</div>
 		</div>
@@ -60,16 +74,23 @@
 			<div v-for="component in vectors"
 				 :key="component.id">
 				<label v-bind:for="component.id" class="thumbnail" style="margin: 5px;">
-					<input type="radio"
-						   v-bind:id="component.id"
-						   v-bind:name="component.type"
-						   v-bind:value="component.slug"
-						   v-model="selectedVector"
-						   @change="clickVector"
-					>
-					<span  style="padding-left: 10px;">
-						{ component.displayName }
-					</span>
+					<div>
+						<input type="radio"
+							   v-bind:id="component.id"
+							   v-bind:name="component.type"
+							   v-bind:value="component.slug"
+							   v-model="selectedVector"
+							   @change="clickVector"
+						>
+						<span  style="padding-left: 10px;">
+							{ component.displayName }
+						</span>
+					</div>
+					<div>
+						<small>
+							{ component.summary }
+						</small>
+					</div>
 				</label>
 			</div>
 		</div>
@@ -117,17 +138,14 @@
 				<h4>Fields</h4>
 				<div v-for="field in systemFields"
 					 :key="field.id">
-					<h5>
+					<h5 style="margin-bottom: 5px;">
 						{field.name}
 					</h5>
-					<span v-if="field.eratta">
-						<span data-toggle="tooltip"
-							  data-placement="top"
-							  v-bind:title="field.eratta"
-							  class="field-eratta"
-							  >
-						<i class="fa fa-question-circle fa-1x"></i></span>
-					</span>
+					<div v-if="field.eratta">
+						<small>
+							{ field.eratta }
+						</small>
+					</div>
 					<div v-if="field.isText">
 							<input type="text" v-model="fieldTextInput[field.id]" class="form-control" @input="changeParam">
 					</div>
