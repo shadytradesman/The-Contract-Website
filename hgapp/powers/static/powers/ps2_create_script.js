@@ -175,6 +175,7 @@ function addReplacementsForModifiers(replacements, selectedModifiers, detailsByM
           mod["substitutions"].forEach(sub => {
               const marker = sub["marker"];
               var replacement = sub["replacement"];
+              let numIncludedForSlug = includedModSlugs.filter(includedSlug => includedSlug === mod["slug"]).length;
               if (replacement.includes("$")) {
                   let substitution = "";
                   if (mod["joining_strategy"] != "ALL") {
@@ -195,7 +196,7 @@ function addReplacementsForModifiers(replacements, selectedModifiers, detailsByM
                       }
                       substitution = subStrings.join(", ");
                   } else {
-                      substitution = detailsByModifiers[mod["slug"]][includedModSlugs.filter(includedSlug => includedSlug === mod["slug"]).length];
+                      substitution = detailsByModifiers[mod["slug"]][numIncludedForSlug];
                   }
                   replacement = replacement.replace("$", substitution);
                   includedModSlugs.push(mod["slug"]);
@@ -204,10 +205,12 @@ function addReplacementsForModifiers(replacements, selectedModifiers, detailsByM
                   mode: sub["mode"],
                   replacement: replacement,
               }
-              if (marker in replacements ) {
-                  replacements[marker].push(newSub);
-              } else {
-                  replacements[marker] = [newSub];
+              if (mod["joining_strategy"] == "ALL" || numIncludedForSlug == 0) {
+                  if (marker in replacements ) {
+                      replacements[marker].push(newSub);
+                  } else {
+                      replacements[marker] = [newSub];
+                  }
               }
           })
       });
@@ -605,7 +608,7 @@ const ComponentRendering = {
                                       buildModifierDetailsMap(this.enhancements.filter(enh => this.selectedEnhancements.includes(enh["id"]))));
           addReplacementsForModifiers(replacements,
                                       this.selectedDrawbacks.map(slugFromVueModifierId).map(mod => powerBlob["drawbacks"][mod]),
-                                      buildModifierDetailsMap(this.drawbacks));
+                                      buildModifierDetailsMap(this.drawbacks.filter(enh => this.selectedDrawbacks.includes(enh["id"]))));
           this.addReplacementsForComponents(replacements);
           this.addReplacementsForParameters(replacements);
           this.addReplacementsForFields(replacements);
