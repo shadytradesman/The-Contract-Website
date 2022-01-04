@@ -190,6 +190,7 @@ function addReplacementsForModifiers(replacements, selectedModifiers, detailsByM
                           subString = subString.replace("}}", "}");
                           return subString;
                       })
+                      let joiningString = subStrings.length > 2 ? ", " : " ";
                       if (subStrings.length > 1) {
                           let joiningWord = mod["joining_strategy"] === "OR" ? "or " : "and ";
                           subStrings[subStrings.length - 1] = joiningWord + subStrings[subStrings.length - 1];
@@ -264,6 +265,9 @@ function collapseSubstitutions(replacements) {
     }
     for (var marker in cleanedReplacements) {
         cleanedReplacements[marker] = cleanedReplacements[marker].filter(sub => sub.length > 0);
+        if (cleanedReplacements[marker].length == 0) {
+            cleanedReplacements[marker] = [""];
+        }
     }
     return cleanedReplacements;
 }
