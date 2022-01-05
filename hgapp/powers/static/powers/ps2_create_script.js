@@ -310,7 +310,7 @@ function replaceInSystemText(systemText, replacementMap, toReplace) {
     if (replacements.length === 0 && toReplace.defaultValue) {
         replacementText = toReplace.defaultValue;
     }
-    if (toReplace.type === '(') {
+    if (toReplace.type === '(' && replacements.length > 0) {
         replacements[0] = replacements[0][0].toUpperCase() + replacements[0].slice(1);
     }
     if (replacements.length === 1 ) {
