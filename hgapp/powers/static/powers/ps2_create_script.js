@@ -310,7 +310,7 @@ function replaceInSystemText(systemText, replacementMap, toReplace) {
     if (replacements.length === 0 && toReplace.defaultValue) {
         replacementText = toReplace.defaultValue;
     }
-    if (toReplace.type === '(' && replacements.length > 0) {
+    if (toReplace.type === '(' && replacements.length > 0 && replacements[0].length > 0) {
         replacements[0] = replacements[0][0].toUpperCase() + replacements[0].slice(1);
     }
     if (replacements.length === 1 ) {
@@ -526,7 +526,7 @@ const ComponentRendering = {
                 }
                 this.fieldRollInput[field.id] = defaultChoices;
             } else {
-                this.fieldTextInput[field.id] = " ";
+                this.fieldTextInput[field.id] = "________";
             }
         });
 
