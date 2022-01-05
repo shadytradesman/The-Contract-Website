@@ -87,9 +87,13 @@ function paramsFromComponents(components, modifier) {
     return powerParams.map(param => powerParamToVue(param));
 }
 
-function fieldsFromComponents(components) {
-    textFields = components.flatMap(component => component["text_fields"]).map(field => systemFieldToVue(field, false));
-    rollFields = components.flatMap(component => component["roll_fields"]).map(field => systemFieldToVue(field, true));
+function fieldsFromComponents(components, unrenderedSystemText) {
+    textFields = components.flatMap(component => component["text_fields"])
+        .filter(field => unrenderedSystemText.includes(field["marker"]))
+        .map(field => systemFieldToVue(field, false));
+    rollFields = components.flatMap(component => component["roll_fields"])
+        .filter(field => unrenderedSystemText.includes(field["marker"]))
+        .map(field => systemFieldToVue(field, true));
     return textFields.concat(rollFields);
 }
 
@@ -106,8 +110,12 @@ function getDisabledParameters(availParameters, activeUniqueReplacementsByMarker
                disabledModifiers[modifier.id] = [];
             }
         }
-        blockedSubs.forEach(sub => disabledModifiers[modifier.id]
-            .push("Exclusive with " + activeUniqueReplacementsByMarker[sub["marker"]]["name"]));
+        blockedSubs.forEach(sub => {
+            let warningString = "Exclusive with " + activeUniqueReplacementsByMarker[sub["marker"]]["name"];
+            if (!disabledModifiers[modifier.id].includes(warningString)) {
+                disabledModifiers[modifier.id].push(warningString);
+            }
+        });
     });
     return disabledModifiers;
 }
@@ -509,7 +517,7 @@ const ComponentRendering = {
         this.parameters.forEach(param => {
             this.parameterSelections[param.id] = param.levels[param["defaultLevel"]];
         });
-        this.systemFields = fieldsFromComponents(components);
+        this.systemFields = fieldsFromComponents(components, this.unrenderedSystem);
         this.systemFields.forEach(field => {
             if (field.isRoll) {
                 var defaultChoices = [field.attributeChoices[0][1]];

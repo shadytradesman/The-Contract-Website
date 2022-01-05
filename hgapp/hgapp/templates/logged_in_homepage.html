@@ -38,6 +38,14 @@
             : <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
         </h4>
         {% endwith %}
+        {% if request.user.profile.ps2_user or request.user.is_superuser %}
+            <div class="text-center">
+                <a href="{% url 'powers:powers_create_ps2' %}">
+                    <h4 style="margin-bottom: 0px;">Try the new Power Builder!</h4>
+                </a>
+
+            </div>
+        {% endif %}
     </div>
      </div>
     <br>

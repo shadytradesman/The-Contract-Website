@@ -1030,7 +1030,7 @@ class SystemFieldRoll(SystemField):
         if self.allow_std_roll:
             if hasattr(self, "required_attribute") and self.required_attribute:
                 required_attr = self.required_attribute
-                attribute_choices.append((required_attr.id, required_attr.name))
+                attribute_choices.append((required_attr.pk, required_attr.name))
             else:
                 attribute_choices.extend(
                     [(x.id, x.name) for x in Attribute.objects.filter(is_deprecated=False).order_by('name')])
@@ -1052,7 +1052,6 @@ class SystemFieldRoll(SystemField):
             "ability_choices": ability_choices,
             "parry_type": self.parry_type,
             "speed": self.speed,
-            "required_attribute": self.required_attribute,
         }
         field_blob = super(SystemFieldRoll, self).to_blob()
         field_blob.update(roll_blob)
