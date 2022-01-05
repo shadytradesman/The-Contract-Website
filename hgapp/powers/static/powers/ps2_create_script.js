@@ -183,7 +183,7 @@ function addReplacementsForModifiers(replacements, selectedModifiers, detailsByM
           mod["substitutions"].forEach(sub => {
               const marker = sub["marker"];
               var replacement = sub["replacement"];
-              let numIncludedForSlug = includedModSlugs.filter(includedSlug => includedSlug === mod["slug"]).length;
+              let numIncludedForSlug = includedModSlugs.filter(includedSlug => includedSlug === mod["slug"] + sub["marker"]).length;
               if (replacement.includes("$")) {
                   let substitution = "";
                   if (mod["joining_strategy"] != "ALL") {
@@ -208,7 +208,7 @@ function addReplacementsForModifiers(replacements, selectedModifiers, detailsByM
                       substitution = detailsByModifiers[mod["slug"]][numIncludedForSlug];
                   }
                   replacement = replacement.replace("$", substitution);
-                  includedModSlugs.push(mod["slug"]);
+                  includedModSlugs.push(mod["slug"] + sub["marker"]);
               }
               const newSub = {
                   mode: sub["mode"],
