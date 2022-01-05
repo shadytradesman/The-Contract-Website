@@ -559,7 +559,7 @@ const ComponentRendering = {
       populateUniqueReplacementsMap() {
           // modifiers that have "unique" field replacements "block" modifiers that uniquely replace the same thing.
           this.activeUniqueReplacementsByMarker = {};
-          this.selectedEnhancements.concat(this.selectedDrawbacks).map(slugFromVueModifierId).forEach(mod => {
+          this.getSelectedAndActiveEnhancements().concat(this.getSelectedAndActiveDrawbacks()).map(mod => slugFromVueModifierId(mod["id"])).forEach(mod => {
               let modifier = mod in powerBlob["enhancements"] ? powerBlob["enhancements"][mod] : powerBlob["drawbacks"][mod];
               modifier["substitutions"].filter(sub => sub["mode"] === "UNIQUE").forEach(sub => {
                  this.activeUniqueReplacementsByMarker[sub["marker"]] = modifier;
@@ -612,15 +612,21 @@ const ComponentRendering = {
           const replacementMap = this.buildReplacementMap();
           this.renderedSystem = performSystemTextReplacements(this.unrenderedSystem, replacementMap);
       },
+      getSelectedAndActiveEnhancements() {
+          return this.enhancements.filter(enh => this.selectedEnhancements.includes(enh["id"]));
+      },
+      getSelectedAndActiveDrawbacks() {
+          return this.drawbacks.filter(drawb => this.selectedDrawbacks.includes(drawb["id"]));
+      },
       buildReplacementMap() {
           // replacement marker to list of substitution objects
           replacements = {}
           addReplacementsForModifiers(replacements,
-                                      this.selectedEnhancements.map(slugFromVueModifierId).map(mod => powerBlob["enhancements"][mod]),
-                                      buildModifierDetailsMap(this.enhancements.filter(enh => this.selectedEnhancements.includes(enh["id"]))));
+                                      this.getSelectedAndActiveEnhancements().map(mod => slugFromVueModifierId(mod["id"])).map(mod => powerBlob["enhancements"][mod]),
+                                      buildModifierDetailsMap(this.getSelectedAndActiveEnhancements()));
           addReplacementsForModifiers(replacements,
-                                      this.selectedDrawbacks.map(slugFromVueModifierId).map(mod => powerBlob["drawbacks"][mod]),
-                                      buildModifierDetailsMap(this.drawbacks.filter(enh => this.selectedDrawbacks.includes(enh["id"]))));
+                                      this.getSelectedAndActiveDrawbacks().map(mod => slugFromVueModifierId(mod["id"])).map(mod => powerBlob["drawbacks"][mod]),
+                                      buildModifierDetailsMap(this.getSelectedAndActiveDrawbacks()));
           this.addReplacementsForComponents(replacements);
           this.addReplacementsForParameters(replacements);
           this.addReplacementsForFields(replacements);
