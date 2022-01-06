@@ -229,6 +229,7 @@ function addReplacementsForModifiers(replacements, selectedModifiers, detailsByM
 
 const parenJoinString = {
     '(': ', ',
+    '@': ', ',
     '[': ' ',
     '{': '<br><br>',
 }
@@ -310,7 +311,7 @@ function replaceInSystemText(systemText, replacementMap, toReplace) {
     if (replacements.length === 0 && toReplace.defaultValue) {
         replacementText = toReplace.defaultValue;
     }
-    if (toReplace.type === '(' && replacements.length > 0 && replacements[0].length > 0) {
+    if (['('].includes(toReplace.type) && replacements.length > 0 && replacements[0].length > 0) {
         replacements[0] = replacements[0][0].toUpperCase() + replacements[0].slice(1);
     }
     if (replacements.length === 1 ) {
@@ -323,8 +324,11 @@ function replaceInSystemText(systemText, replacementMap, toReplace) {
         if (toReplace.type === '(') {
             replacements[replacements.length - 1] = "and " + replacements[replacements.length - 1];
         }
+        if (toReplace.type === '@') {
+            replacements[replacements.length - 1] = "or " + replacements[replacements.length - 1];
+        }
         let joinString = parenJoinString[toReplace.type];
-        if (toReplace.type == '(' && replacements.length == 2) {
+        if (['@', '('].includes(toReplace.type) && replacements.length == 2) {
             joinString = " ";
         }
         replacementText = replacements.join(joinString);
@@ -334,6 +338,7 @@ function replaceInSystemText(systemText, replacementMap, toReplace) {
 
 const parenEndByStart = {
     '(': ')',
+    '@': '%',
     '[': ']',
     '{': '}',
 }
@@ -341,7 +346,7 @@ function findReplacementCandidate(systemText) {
     // Finds the first pair of opening parenthesis, indicating a replacement substring.
     // Proceeds to the matching closure of the parens, skipping any nested replacements
     // returns a little replacement candidate object.
-    var markerStarts = ['(', '[', '{'];
+    var markerStarts = ['(', '[', '{', '@'];
     var endMarker = null;
     var parenDepth = 0;
     var parenType = null;
@@ -392,7 +397,7 @@ function findReplacementCandidate(systemText) {
     var markerSection = systemText.slice(start + 2, markerEnd);
     markerSection = markerSection.trim();
     const markers = markerSection.split(',');
-    if (markerStarts[0] != '(' && markers.length > 1) {
+    if (!['(', '@'].includes(markerStarts[0]) && markers.length > 1) {
         // only list sub markers allow multiple marker strings.
         throw "Too many marker strings for non-list sub starting at: " + start;
     }

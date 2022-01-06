@@ -486,7 +486,11 @@ class Base_Power_System(models.Model):
     dice_system = models.CharField(choices=DICE_SYSTEM,
                                    max_length=55,
                                    default=SYS_PS2)
-    system_text = models.TextField()
+    system_text = models.TextField(help_text="((marker1,marker2)) : join markers with 'and', capitalize first.<br>"
+                                             "[[marker|default]] : replace marker, or use default if no replacement.<br>"
+                                             "[[marker]] : replace marker or blank if no replacement.<br>"
+                                             "{{marker}} : replace marker, paragraph breaks between multiple entries.<br>"
+                                             "@@marker1,marker2%% : join markers with 'or', no capitalization added.")
     eratta = models.TextField(blank=True,
                               null=True)
     default_description_prompt = models.TextField(blank=True,

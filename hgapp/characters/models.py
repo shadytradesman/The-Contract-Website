@@ -881,6 +881,8 @@ class Character(models.Model):
             return mind_val
 
     def get_attribute_values_by_id(self):
+        if not self.stats_snapshot:
+            return {}
         attributes = self.get_attributes()
         attribute_val_by_id = {}
         for attr in attributes:
@@ -888,6 +890,8 @@ class Character(models.Model):
         return attribute_val_by_id
 
     def get_ability_values_by_id(self):
+        if not self.stats_snapshot:
+            return {}
         ability_val_by_id = {}
         char_ability_values = self.stats_snapshot.abilityvalue_set.all()
         for x in char_ability_values:
