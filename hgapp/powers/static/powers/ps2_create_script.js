@@ -79,6 +79,7 @@ function modifierToVue(modifier, type, idNum = 0) {
         displayName: modifier.name,
         description: modifier.description,
         detailLabel: modifier.detail_field_label === null ? false : modifier.detail_field_label,
+        requiredStatusLabel: modifier.required_status[0] === "ANY" ? false : modifier.required_status[1],
     }
 }
 

@@ -178,7 +178,7 @@ class Modifier(models.Model):
             "slug": self.slug,
             'required_enhancements': [x.pk for x in self.required_Enhancements.all()],
             'required_drawbacks': [x.pk for x in self.required_drawbacks.all()],
-            "required_status": self.required_status,
+            "required_status": [self.required_status, self.get_required_status_display()],
             "description": self.description,
             "eratta": self.eratta,
             "multiplicity_allowed": self.multiplicity_allowed,

@@ -24,3 +24,7 @@
     top: 60px;
     z-index: 9999 !important;
 }
+
+.css-modifier-text {
+    font-weight: 400;
+}
