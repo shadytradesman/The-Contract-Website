@@ -251,18 +251,21 @@ function addReplacementsForModifiers(replacements, selectedModifiers, detailsByM
                           let joiningWord = mod["joining_strategy"] === "OR" ? "or " : "and ";
                           subStrings[subStrings.length - 1] = joiningWord + subStrings[subStrings.length - 1];
                       }
-                      substitution = subStrings.join(", ");
+                      substitution = subStrings.join(joiningString);
                   } else {
                       substitution = detailsByModifiers[mod["slug"]][numIncludedForSlug];
                   }
                   replacement = replacement.replace("$", substitution);
-                  includedModSlugs.push(mod["slug"] + sub["marker"]);
               }
               const newSub = {
                   mode: sub["mode"],
                   replacement: replacement,
               }
+              includedModSlugs.push(mod["slug"] + sub["marker"]);
               if (mod["joining_strategy"] == "ALL" || numIncludedForSlug == 0) {
+                  if (sub["mode"] === "UNIQUE" && numIncludedForSlug === 1) {
+                      return;
+                  }
                   if (marker in replacements ) {
                       replacements[marker].push(newSub);
                   } else {
@@ -490,10 +493,11 @@ const ComponentRendering = {
   delimiters: ['{', '}'],
   data() {
     return {
+      expandedTab: "modalities",
       modalities: [],
-      selectedModality: "",
+      selectedModality: null,
       effects: [],
-      selectedEffect: "",
+      selectedEffect: null,
       vectors: [],
       selectedVector: "",
       enhancements: [],
@@ -515,29 +519,46 @@ const ComponentRendering = {
     }
   },
   methods: {
+      openModalityTab() {
+          this.expandedTab = "modalities";
+      },
+      openEffectsTab() {
+          this.expandedTab = "effects";
+      },
+      openCustomizationTab() {
+          this.expandedTab = "customize";
+      },
       clickModality(modality) {
-          const allowed_effects = powerBlob["effects_by_modality"][this.selectedModality];
+          const allowed_effects = powerBlob["effects_by_modality"][this.selectedModality.slug];
           this.effects = Object.values(powerBlob.effects)
               .filter(comp => allowed_effects.includes(comp.slug))
               .map(comp => componentToVue(comp, "effect"));
-          if (!allowed_effects.includes(this.selectedEffect)) {
-              this.selectedEffect = allowed_effects[0];
+          let openEffects = false;
+          if (this.selectedEffect === null || !allowed_effects.includes(this.selectedEffect.slug)) {
+              this.selectedEffect = null;
+              openEffects = true;
           }
           this.updateAvailableVectors();
           this.componentClick();
+          if (openEffects) {
+              this.openEffectsTab();
+          } else {
+              this.openCustomizationTab();
+          }
       },
       clickEffect(effect) {
           this.updateAvailableVectors();
           this.componentClick();
+          this.openCustomizationTab();
       },
       updateAvailableVectors() {
-          if (this.selectedEffect.length == 0) {
+          if (this.selectedEffect === null) {
               this.vectors = [];
               this.selectedVector = '';
               return;
           }
-          const effect_vectors = powerBlob["vectors_by_effect"][this.selectedEffect];
-          const modality_vectors = powerBlob["vectors_by_modality"][this.selectedModality];
+          const effect_vectors = powerBlob["vectors_by_effect"][this.selectedEffect.slug];
+          const modality_vectors = powerBlob["vectors_by_modality"][this.selectedModality.slug];
           const allowed_vectors = effect_vectors.filter(x => modality_vectors.includes(x));
           this.vectors = Object.values(powerBlob.vectors)
               .filter(comp => allowed_vectors.includes(comp.slug))
@@ -555,14 +576,14 @@ const ComponentRendering = {
           this.updateGiftCost();
       },
       componentClick() {
-		if (this.selectedVector.length && this.selectedModality.length && this.selectedEffect.length) {
+		if (this.selectedVector.length && this.selectedModality && this.selectedEffect) {
 			this.populatePowerForm();
         }
       },
       getSelectedComponents() {
            return [
-               powerBlob.modalities[this.selectedModality],
-               powerBlob.effects[this.selectedEffect],
+               powerBlob.modalities[this.selectedModality.slug],
+               powerBlob.effects[this.selectedEffect.slug],
                powerBlob.vectors[this.selectedVector]
            ]
       },

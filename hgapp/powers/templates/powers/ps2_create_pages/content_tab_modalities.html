@@ -1,0 +1,23 @@
+<h2 class="text-center">Select a Gift Type</h2>
+<div v-for="component in modalities"
+     :key="component.id">
+    <label v-bind:for="component.id" class="thumbnail" style="margin: 5px;">
+        <div>
+            <input type="radio"
+                   v-bind:id="component.id"
+                   v-bind:name="component.type"
+                   v-bind:value="component"
+                   v-model="selectedModality"
+                   @change="clickModality"
+            >
+            <span  style="padding-left: 10px;">
+                { component.displayName }
+            </span>
+        </div>
+        <div>
+            <small>
+                { component.summary }
+            </small>
+        </div>
+    </label>
+</div>

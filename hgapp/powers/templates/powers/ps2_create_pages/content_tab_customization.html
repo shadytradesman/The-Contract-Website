@@ -1,0 +1,122 @@
+<h2 class="text-center">Customize</h2>
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <label class="control-label  " for="id_power_name">Power Name</label>
+        <div class=" ">
+            <input type="text" name="power_name" maxlength="100" class=" form-control" required="" id="id_power_name">
+        </div>
+</div>
+        <div class="form-group">
+            <label class="control-label  " for="id_description">Description</label>
+        <div class=" ">
+            <textarea name="description" cols="40" rows="10" class=" form-control" required="" id="id_description"></textarea>
+        </div>
+</div>
+    </div>
+    <div class="col-md-6">
+        <div v-if="vectors.length > 1">
+            <h4>Style</h4>
+            <div v-for="component in vectors"
+                 :key="component.id">
+                <label v-bind:for="component.id" class="thumbnail" style="margin: 5px;">
+                    <div>
+                        <input type="radio"
+                               v-bind:id="component.id"
+                               v-bind:name="component.type"
+                               v-bind:value="component.slug"
+                               v-model="selectedVector"
+                               @change="clickVector"
+                        >
+                        <span  style="padding-left: 10px;">
+                                { component.displayName }
+                            </span>
+                    </div>
+                </label>
+            </div>
+        </div>
+        <div id="js-parameters-container" v-if="parameters.length > 0">
+            <h4>Parameters</h4>
+            <div v-for="param in parameters"
+                 :key="param.id" >
+                <h5>{param.name}</h5>
+                <select v-model="parameterSelections[param.id]" class="form-control" @change="changeParam" :disabled="param.id in disabledParameters">
+                    <option v-for="(value, index) in param.levels" :value="value">
+                        {value}
+                        <template v-if="index === param.defaultLevel">
+                            (Default)
+                        </template>
+                        <template v-if="param.seasonedLevel === index">
+                            (Seasoned)
+                        </template>
+                        <template v-if="param.veteranLevel === index">
+                            (Veteran)
+                        </template>
+                    </option>
+                </select>
+                <div v-if="param.id in disabledParameters">
+                    <div v-for="reason in disabledParameters[param.id]">
+                        <small style="color: red;">
+                            { reason }
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="js-fields-container" v-if="systemFields.length > 0">
+            <hr>
+            <div v-for="field in systemFields"
+                 :key="field.id">
+                <h5 style="margin-bottom: 5px;">
+                    {field.name}
+                </h5>
+                <div v-if="field.eratta">
+                    <small>
+                        { field.eratta }
+                    </small>
+                </div>
+                <div v-if="field.isText">
+                    <input type="text" v-model="fieldTextInput[field.id]" class="form-control" @input="changeParam">
+                </div>
+                <div v-if="field.isRoll" class="form-inline">
+                    <select v-model="fieldRollInput[field.id][0]" class="form-control" @change="changeParam">
+                        <option v-for="value in field.attributeChoices" :value="value[1]">{value[1]}</option>
+                    </select>
+                    <span v-if="field.abilityChoices.length > 0" style="padding-left: 10px;">
+							<select v-model="fieldRollInput[field.id][1]" class="form-control" @change="changeParam">
+								<option v-for="value in field.abilityChoices" :value="value[1]">{value[1]}</option>
+							</select>
+						</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <h4 class="text-center">Enhancements</h4>
+        <div id="js-enhancements-container" v-if="enhancements.length > 0">
+            <div v-for="modifier in enhancements"
+                 :key="modifier.id" >
+                {% with 'Enhancements' as vue_model_name %}
+                {% with 'clickEnhancement' as vue_on_click %}
+                {% include "powers/ps2_create_pages/snip_modifier_template.html" %}
+                {% endwith %}
+                {% endwith %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <h4 class="text-center">Drawbacks</h4>
+        <div id="js-drawbacks-container" v-if="drawbacks.length > 0">
+            <div v-for="modifier in drawbacks"
+                 :key="modifier.id">
+                {% with 'Drawbacks' as vue_model_name %}
+                {% with 'clickDrawback' as vue_on_click %}
+                {% include "powers/ps2_create_pages/snip_modifier_template.html" %}
+                {% endwith %}
+                {% endwith %}
+            </div>
+        </div>
+    </div>
+</div>

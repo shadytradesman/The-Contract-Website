@@ -28,3 +28,44 @@
 .css-modifier-text {
     font-weight: 400;
 }
+
+.css-component-tab {
+    width: 100%;
+    cursor: pointer;
+    background-image: none;
+    border: 1px solid transparent;
+    padding: 6px 12px;
+    border-radius: 4px;
+    background-color: #353e4b;
+    margin-bottom: 5px;
+}
+
+.css-component-tab:hover {
+    border: 1px solid white;
+    color: white;
+}
+
+.css-component-tab-title {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+@media (min-width: 768px) {
+    .css-tabs-and-system {
+        position: fixed;
+        width: inherit;
+        margin-left: -15px;
+        margin-right: -15px;
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    .css-tabs-and-system>.panel-default {
+        max-height: 83vh;
+        overflow: auto;
+    }
+
+    .css-content-section {
+        min-height: 83vh;
+    }
+}
