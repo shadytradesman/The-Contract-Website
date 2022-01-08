@@ -106,7 +106,7 @@
 			<div class="panel panel-default">
 				<div class="panel-body">
 					<h3 class="text-center" style="margin-top: 5px;">System</h3>
-					<div id="rendered-system" v-html="renderedSystem">
+					<div id="rendered-system" v-html="renderedSystem" class="js-render-power-keywords" @updated="systemTextUpdated">
 					</div>
 					<a class="btn btn-default btn-xs" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
 						Show Unrendered System

@@ -1,9 +1,56 @@
+function activateTooltips() {
+    $('[data-toggle="tooltip"]').tooltip();
+}
+
+$(document).ready(activateTooltips);
+
+/* Power Keywords */
+
+const powerKeywordDict = {
+    // Targeting
+	"Sapient": "An intelligent being that thinks and is self-aware.",
+	"Non-Sapient": "Anything that does not think or is not self-aware.",
+	"Living": "Beings that are alive.",
+	"Non-Living": "Anything that is not alive.",
+	"Dead": "Anything that were once alive but no longer is.",
+	"Animate": "Any being that can move or think on its own.",
+	"Construct": "Any being that is sapient and non-living.",
+	"Inanimate": "Anything that cannot move or think on its own.",
+	"Creature": "Anything that is living, animate, and non-sapient.",
+	"Object": "Anything that is non-living, inanimate, and also free-standing, loose, or otherwise not currently a part of another structure or device.",
+    "Device": "Any Object that was designed or created for some purpose.",
+    "Plant": "Any non-sapient living thing that cannot act.",
+    "Computer": "A non-living device that takes input, processes data, and produces output. Generally electric.",
+    "Vehicle": "A device designed to move from one place to another while carrying cargo or passengers.",
+    "Alien": "Something that is not of this world or not common to this world.",
+
+    // Other
+    "Concentration": "While concentrating you can only take Free Actions and a single Quick Action per Round. Disrupting events (like taking damage) cause the effect to end."
+};
+
 $(document).ready(function(){
-    $('[data-toggle="tooltip"]').tooltip({
-        trigger : 'hover'
-    });
+    updateHoverText();
 });
 
+function updateHoverText() {
+    $('.js-render-power-keywords').each(function(){
+        $(this).html(replaceHoverText($(this).html()));
+    });
+}
+
+function replaceHoverText(text) {
+    let modifiedText = text;
+    for(var key in powerKeywordDict) {
+        let reg = new RegExp('[\\s]' + key + "[.,\\ss]", 'gm');
+        modifiedText = modifiedText.replaceAll(reg, replaceSubstring);
+    }
+    return modifiedText;
+}
+
+function replaceSubstring(match) {
+	const trimmed = match.trim();
+	return ' <span class="css-keyword-with-tooltip" data-toggle="tooltip" title="' + powerKeywordDict[trimmed] + '">' + trimmed + '</span> ';
+}
 
 const powerBlob = JSON.parse(JSON.parse(document.getElementById('powerBlob').textContent));
 console.log(powerBlob);
@@ -286,8 +333,6 @@ function performSystemTextReplacements(unrenderedSystem, replacementMap) {
     var toReplace = findReplacementCandidate(systemText);
     var replacementCount = 0;
     while (toReplace != null) {
-//        console.log("replacing: ");
-//        console.log(toReplace);
         systemText = replaceInSystemText(systemText, replacementMap, toReplace);
         var toReplace = findReplacementCandidate(systemText);
         replacementCount ++;
@@ -300,40 +345,54 @@ function performSystemTextReplacements(unrenderedSystem, replacementMap) {
 
 function replaceInSystemText(systemText, replacementMap, toReplace) {
     const markers = toReplace.markers;
-    var replacements = [];
+    var replacements = null;
     for (var i = 0; i < markers.length; i++) {
         if (markers[i] in replacementMap) {
+            if (replacements === null) {
+                replacements = [];
+            }
             replacements = replacements.concat(replacementMap[markers[i]])
         }
     }
+    let replacementText = getReplacementText(replacements, toReplace);
+    return systemText.slice(0, toReplace.start) + replacementText + systemText.slice(toReplace.end + 1);
+}
 
-    var replacementText = "";
-    if (replacements.length === 0 && toReplace.defaultValue) {
-        replacementText = toReplace.defaultValue;
+function getReplacementText(replacements, toReplace) {
+    if (replacements === null) {
+        // no replacements exist in replacement map at all.
+        if (toReplace.defaultValue) {
+            return toReplace.defaultValue;
+        } else {
+            return "";
+        }
     }
-    if (['('].includes(toReplace.type) && replacements.length > 0 && replacements[0].length > 0) {
-        replacements[0] = replacements[0][0].toUpperCase() + replacements[0].slice(1);
-    }
-    if (replacements.length === 1 ) {
-        replacementText = replacements[0];
+    replacements = replacements.filter(rep => rep.length != 0);
+    if (replacements.length === 0) {
+        // only zero-length replacements appeared in replacement map.
+        return "";
     }
     if (toReplace.type === '{') {
         replacements[0] = "<br><br>" + replacements[0];
     }
-    if (replacements.length > 1) {
-        if (toReplace.type === '(') {
-            replacements[replacements.length - 1] = "and " + replacements[replacements.length - 1];
-        }
-        if (toReplace.type === '@') {
-            replacements[replacements.length - 1] = "or " + replacements[replacements.length - 1];
-        }
-        let joinString = parenJoinString[toReplace.type];
-        if (['@', '('].includes(toReplace.type) && replacements.length == 2) {
-            joinString = " ";
-        }
-        replacementText = replacements.join(joinString);
+    if (replacements.length === 1 ) {
+        return replacements[0];
     }
-    return systemText.slice(0, toReplace.start) + replacementText + systemText.slice(toReplace.end + 1);
+    if (['('].includes(toReplace.type) && replacements[0].length > 0) {
+        replacements[0] = replacements[0][0].toUpperCase() + replacements[0].slice(1);
+    }
+
+    if (toReplace.type === '(') {
+        replacements[replacements.length - 1] = "and " + replacements[replacements.length - 1];
+    }
+    if (toReplace.type === '@') {
+        replacements[replacements.length - 1] = "or " + replacements[replacements.length - 1];
+    }
+    let joinString = parenJoinString[toReplace.type];
+    if (['@', '('].includes(toReplace.type) && replacements.length == 2) {
+        joinString = " ";
+    }
+    return replacements.join(joinString);
 }
 
 const parenEndByStart = {
@@ -615,7 +674,11 @@ const ComponentRendering = {
       },
       reRenderSystemText() {
           const replacementMap = this.buildReplacementMap();
-          this.renderedSystem = performSystemTextReplacements(this.unrenderedSystem, replacementMap);
+          let partiallyRenderedSystem = performSystemTextReplacements(this.unrenderedSystem, replacementMap);
+          this.renderedSystem = replaceHoverText(partiallyRenderedSystem);
+          this.$nextTick(function () {
+              activateTooltips();
+          });
       },
       getSelectedAndActiveEnhancements() {
           return this.enhancements.filter(enh => this.selectedEnhancements.includes(enh["id"]));
