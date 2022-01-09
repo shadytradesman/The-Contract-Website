@@ -1,9 +1,14 @@
-<div v-if="expandedTab === 'modalities'">
-    {% include "powers/ps2_create_pages/content_tab_modalities.html" %}
-</div>
-<div v-if="expandedTab === 'effects'">
-    {% include "powers/ps2_create_pages/content_tab_effects.html" %}
-</div>
-<div v-if="expandedTab === 'customize'">
-    {% include "powers/ps2_create_pages/content_tab_customization.html" %}
+<h2 class="text-center css-tab-header" v-html="tabHeader"></h2>
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div v-if="expandedTab === 'modalities'">
+            {% include "powers/ps2_create_pages/content_tab_modalities.html" %}
+        </div>
+        <div v-if="expandedTab === 'effects'">
+            {% include "powers/ps2_create_pages/content_tab_effects.html" %}
+        </div>
+        <div v-if="expandedTab === 'customize'">
+            {% include "powers/ps2_create_pages/content_tab_customization.html" %}
+        </div>
+    </div>
 </div>

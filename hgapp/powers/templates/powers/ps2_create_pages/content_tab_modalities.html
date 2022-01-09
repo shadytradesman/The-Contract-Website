@@ -1,4 +1,3 @@
-<h2 class="text-center">Select a Gift Type</h2>
 <div v-for="component in modalities"
      :key="component.id">
     <label v-bind:for="component.id" class="thumbnail" style="margin: 5px;">
@@ -8,7 +7,8 @@
                    v-bind:name="component.type"
                    v-bind:value="component"
                    v-model="selectedModality"
-                   @change="clickModality"
+                   @change="changeModality"
+                   @click="clickModality"
             >
             <span  style="padding-left: 10px;">
                 { component.displayName }

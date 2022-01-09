@@ -1,4 +1,3 @@
-<h2 class="text-center">Select an Effect</h2>
 <div v-for="component in effects"
      :key="component.id">
     <label v-bind:for="component.id" class="thumbnail" style="margin: 5px;">
@@ -8,7 +7,8 @@
                    v-bind:name="component.type"
                    v-bind:value="component"
                    v-model="selectedEffect"
-                   @change="clickEffect"
+                   @change="changeEffect"
+                   @click="clickEffect"
             >
             <span  style="padding-left: 10px;">
                                 { component.displayName }

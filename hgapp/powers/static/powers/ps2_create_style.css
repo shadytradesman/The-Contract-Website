@@ -40,7 +40,7 @@
     margin-bottom: 5px;
 }
 
-.css-component-tab:hover {
+.css-component-tab:hover, .css-component-tab.hover {
     border: 1px solid white;
     color: white;
 }
@@ -68,4 +68,8 @@
     .css-content-section {
         min-height: 83vh;
     }
+}
+
+.css-tab-header {
+    margin-top: 0px;
 }

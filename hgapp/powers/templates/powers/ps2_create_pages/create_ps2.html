@@ -19,11 +19,12 @@
 {% block body_base %}
 <div class="container-fluid" id="vue-app">
 	<div class="row">
+		<h1 class="text-center visible-lg-block" v-if="selectedModality === null">Creating a <i>new</i> Gift</h1>
+		<div v-if="selectedModality != null" style="margin-bottom: 10px;"></div>
 		<div class="col-xs-12" :class="{ 'col-lg-4': selectedModality }" v-if="selectedModality">
 			{% include "powers/ps2_create_pages/section_tabs_and_system.html" %}
 		</div>
 		<div class="col-xs-12 css-content-section" :class="{ 'col-lg-8': selectedModality }">
-			<h1 class="text-center visible-lg-block">Creating a <i>new</i> Gift</h1>
 			{% include "powers/ps2_create_pages/section_content.html" %}
 		</div>
 	</div>

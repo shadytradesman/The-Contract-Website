@@ -1,41 +1,47 @@
 <div class="css-tabs-and-system">
-<div class="panel panel-default ">
-    <div class="panel-body">
-        <div class="row">
-            <div class="col-xs-6 col-lg-12" v-if="selectedModality">
-                <div class="css-component-tab" @click="openModalityTab">
-                    <div class="css-component-tab-title">
-                        { selectedModality.displayName }
-                    </div>
-                    <small><i>(click to change)</i></small>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="form-group visible-lg-block">
+                <label class="control-label  " for="id_power_name">New Gift Name</label>
+                <div class=" ">
+                    <input type="text" name="power_name" maxlength="100" class=" form-control" required="" id="id_power_name">
                 </div>
             </div>
-            <div class="col-xs-6 col-lg-12" v-if="selectedEffect">
-                <div class="css-component-tab" @click="openEffectsTab">
-                    <div class="css-component-tab-title">
-                        { selectedEffect.displayName }
+            <div class="row">
+                <div class="col-xs-6 col-lg-12" v-if="selectedModality">
+                    <div class="css-component-tab" @click="clickModalityTab" :class="{'hover':expandedTab === 'modalities'}">
+                        <div class="css-component-tab-title">
+                            { selectedModality.displayName }
+                        </div>
+                        <small><i>(click to change)</i></small>
                     </div>
-                    <small><i>(click to change)</i></small>
+                </div>
+                <div class="col-xs-6 col-lg-12" v-if="selectedEffect">
+                    <div class="css-component-tab" @click="clickEffectsTab" :class="{'hover':expandedTab === 'effects'}">
+                        <div class="css-component-tab-title">
+                            { selectedEffect.displayName }
+                        </div>
+                        <small><i>(click to change)</i></small>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div v-if="selectedEffect">
-            <div>
-                {% include "powers/ps2_create_pages/snip_affix_cost_system.html" %}
-            </div>
-            <h3 class="text-center" style="margin-top: 5px;">System</h3>
-            <div id="rendered-system" v-html="renderedSystem" class="js-render-power-keywords">
-            </div>
-            <a class="btn btn-default btn-xs" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
-                Show Unrendered System
-            </a>
-            <div class="collapse" id="collapseExample">
-                <small>
-                    <div id="unrendered-system" v-html="unrenderedSystem">
-                    </div>
-                </small>
+            <div v-if="selectedEffect">
+                <div>
+                    {% include "powers/ps2_create_pages/snip_affix_cost_system.html" %}
+                </div>
+                <h3 class="text-center" style="margin-top: 5px;">System</h3>
+                <div id="rendered-system" v-html="renderedSystem" class="js-render-power-keywords">
+                </div>
+                <a class="btn btn-default btn-xs" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+                    Show Unrendered System
+                </a>
+                <div class="collapse" id="collapseExample">
+                    <small>
+                        <div id="unrendered-system" v-html="unrenderedSystem">
+                        </div>
+                    </small>
+                </div>
             </div>
         </div>
     </div>
-</div>
 </div>

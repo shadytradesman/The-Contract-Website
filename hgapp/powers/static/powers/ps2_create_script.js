@@ -494,6 +494,7 @@ const ComponentRendering = {
   data() {
     return {
       expandedTab: "modalities",
+      tabHeader: "Select a Gift Type",
       modalities: [],
       selectedModality: null,
       effects: [],
@@ -521,14 +522,49 @@ const ComponentRendering = {
   methods: {
       openModalityTab() {
           this.expandedTab = "modalities";
+          this.tabHeader = "Select a Gift Type";
       },
       openEffectsTab() {
           this.expandedTab = "effects";
+          this.tabHeader = "Select an Effect";
       },
       openCustomizationTab() {
           this.expandedTab = "customize";
+          this.tabHeader = "Customize";
+      },
+      clickModalityTab() {
+          if (this.expandedTab === "modalities") {
+              if (this.selectedEffect === null) {
+                  this.openEffectsTab();
+              } else {
+                  this.openCustomizationTab();
+              }
+          } else {
+              this.openModalityTab();
+          }
+      },
+      clickEffectsTab() {
+          if (this.expandedTab === "effects") {
+              this.openCustomizationTab();
+          } else {
+              this.openEffectsTab();
+          }
       },
       clickModality(modality) {
+          if (this.selectedModality && modality.target.getAttribute("id") === this.selectedModality.id) {
+              if (this.selectedEffect === null) {
+                  this.openEffectsTab();
+              } else {
+                  this.openCustomizationTab();
+              }
+          }
+      },
+      clickEffect(effect) {
+          if (this.selectedEffect && effect.target.getAttribute("id") === this.selectedEffect.id) {
+              this.openCustomizationTab();
+          }
+      },
+      changeModality(modality) {
           const allowed_effects = powerBlob["effects_by_modality"][this.selectedModality.slug];
           this.effects = Object.values(powerBlob.effects)
               .filter(comp => allowed_effects.includes(comp.slug))
@@ -546,7 +582,7 @@ const ComponentRendering = {
               this.openCustomizationTab();
           }
       },
-      clickEffect(effect) {
+      changeEffect(effect) {
           this.updateAvailableVectors();
           this.componentClick();
           this.openCustomizationTab();

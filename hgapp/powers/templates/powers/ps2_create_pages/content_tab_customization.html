@@ -1,19 +1,4 @@
-<h2 class="text-center">Customize</h2>
 <div class="row">
-    <div class="col-md-6">
-        <div class="form-group">
-            <label class="control-label  " for="id_power_name">Power Name</label>
-        <div class=" ">
-            <input type="text" name="power_name" maxlength="100" class=" form-control" required="" id="id_power_name">
-        </div>
-</div>
-        <div class="form-group">
-            <label class="control-label  " for="id_description">Description</label>
-        <div class=" ">
-            <textarea name="description" cols="40" rows="10" class=" form-control" required="" id="id_description"></textarea>
-        </div>
-</div>
-    </div>
     <div class="col-md-6">
         <div v-if="vectors.length > 1">
             <h4>Style</h4>
@@ -64,7 +49,6 @@
             </div>
         </div>
         <div id="js-fields-container" v-if="systemFields.length > 0">
-            <hr>
             <div v-for="field in systemFields"
                  :key="field.id">
                 <h5 style="margin-bottom: 5px;">
@@ -91,7 +75,16 @@
             </div>
         </div>
     </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label class="control-label  " for="id_description">Description</label>
+            <div class=" ">
+                <textarea name="description" cols="40" rows="10" class=" form-control" required="" id="id_description"></textarea>
+            </div>
+        </div>
+    </div>
 </div>
+<hr>
 <div class="row">
     <div class="col-md-6">
         <h4 class="text-center">Enhancements</h4>
@@ -118,5 +111,9 @@
                 {% endwith %}
             </div>
         </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
     </div>
 </div>
