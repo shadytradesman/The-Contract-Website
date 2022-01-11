@@ -369,6 +369,13 @@ class Base_Power_Category(models.Model):
     def __str__(self):
         return " ".join([self.name])
 
+    def to_blob(self):
+        return {
+            "name": self.name,
+            "description": self.description,
+            "components": list(self.base_power_set.order_by("name").values_list("pk", flat=True)),
+        }
+
 
 # class for Gift Modality, Vector, Effect
 class Base_Power(models.Model):

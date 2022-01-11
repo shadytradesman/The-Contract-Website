@@ -1,14 +1,9 @@
 <div class="css-tabs-and-system">
     <div class="panel panel-default">
         <div class="panel-body">
-            <div class="form-group visible-lg-block">
-                <label class="control-label  " for="id_power_name">New Gift Name</label>
-                <div class=" ">
-                    <input type="text" name="power_name" maxlength="100" class=" form-control" required="" id="id_power_name">
-                </div>
-            </div>
             <div class="row">
                 <div class="col-xs-6 col-lg-12" v-if="selectedModality">
+                    <b>Gift Type</b>
                     <div class="css-component-tab" @click="clickModalityTab" :class="{'hover':expandedTab === 'modalities'}">
                         <div class="css-component-tab-title">
                             { selectedModality.displayName }
@@ -16,12 +11,19 @@
                         <small><i>(click to change)</i></small>
                     </div>
                 </div>
-                <div class="col-xs-6 col-lg-12" v-if="selectedEffect">
+                <div class="col-xs-6 col-lg-12">
+                    <b>Effect</b>
+
                     <div class="css-component-tab" @click="clickEffectsTab" :class="{'hover':expandedTab === 'effects'}">
-                        <div class="css-component-tab-title">
-                            { selectedEffect.displayName }
+                        <div  v-if="selectedEffect">
+                            <div class="css-component-tab-title">
+                                { selectedEffect.displayName }
+                            </div>
+                            <small><i>(click to change)</i></small>
                         </div>
-                        <small><i>(click to change)</i></small>
+                        <div v-if="!selectedEffect">
+                            <span class="text-muted">Select an Effect</span>
+                        </div>
                     </div>
                 </div>
             </div>

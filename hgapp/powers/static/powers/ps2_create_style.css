@@ -12,7 +12,7 @@
     border-radius: 4px;
     border-width: 1px;
     border-style: solid;
-    padding: 5px;
+    padding: 10px;
     background-color: #5a5f6c;
 }
 
@@ -40,7 +40,7 @@
     margin-bottom: 5px;
 }
 
-.css-component-tab:hover, .css-component-tab.hover {
+.css-component-tab.hover {
     border: 1px solid white;
     color: white;
 }
@@ -68,8 +68,29 @@
     .css-content-section {
         min-height: 83vh;
     }
+
+    .css-component-tab:hover {
+        border: 1px solid white;
+        color: white;
+    }
 }
 
 .css-tab-header {
     margin-top: 0px;
 }
+
+.css-effect-radio {
+    border-radius: 4px;
+    border: 1px solid transparent;
+    background-color: #353e4b;
+    cursor: pointer;
+}
+
+.css-effect-radio:hover {
+    border: 1px solid grey;
+}
+
+.css-selected-effect {
+    border-color: white;
+}
+

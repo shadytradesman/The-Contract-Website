@@ -124,10 +124,36 @@ function systemFieldToVue(systemField, isRoll) {
     }
 }
 
-function modifiersFromComponents(components, modifier) {
-    selectedModifierIds = components.flatMap(component => component[modifier]);
-    blacklistModifierIds = components.flatMap(component => component["blacklist_" + modifier]);
-    return selectedModifierIds.filter(x => !blacklistModifierIds.includes(x)).map(id => modifierToVue(powerBlob[modifier][id], modifier));
+function modifiersFromComponents(components, modifier, existing) {
+    selectedModifierSlugs = components.flatMap(component => component[modifier]);
+    blacklistModifierSlugs = components.flatMap(component => component["blacklist_" + modifier]);
+    let allowedModifiers = selectedModifierSlugs.filter(x => !blacklistModifierSlugs.includes(x));
+    let updatedModifiers = existing.filter(mod => allowedModifiers.includes(mod.slug));
+    let activeModifierSlugs = existing.map(mod => mod.slug);
+    let newModifiers = allowedModifiers.filter(mod => !activeModifierSlugs.includes(mod)).map(id => modifierToVue(powerBlob[modifier][id], modifier));
+    updatedModifiers = updatedModifiers.concat(newModifiers);
+    return sortVueModifiers(updatedModifiers);
+}
+
+function sortVueModifiers(modifiers) {
+    modifiers.sort((a,b) => a.displayName.localeCompare(b.displayName));
+    return modifiers;
+}
+
+function handleModifierMultiplicity(modSlug, modId, modType, existingModifiers, selectedAndActiveModifiers) {
+    let returnedModifiers = existingModifiers;
+    let mod = powerBlob[modType][modSlug];
+    if (mod.multiplicity_allowed) {
+      let numSelected = selectedAndActiveModifiers.filter(curMod => curMod.slug === modSlug).length;
+      let numAvail = existingModifiers.filter(curMod => curMod["slug"] === modSlug).length;
+      if (numSelected == numAvail && numAvail < 4) {
+          modCounter++;
+          returnedModifiers.push(modifierToVue(mod, modType, modCounter));
+      } else if (numAvail - numSelected > 1){
+          returnedModifiers = existingModifiers.filter(mod => mod["id"] != modId);
+      }
+    }
+    return sortVueModifiers(returnedModifiers);
 }
 
 function paramsFromComponents(components, modifier) {
@@ -498,6 +524,7 @@ const ComponentRendering = {
       modalities: [],
       selectedModality: null,
       effects: [],
+      categoriesWithEffects: [],
       selectedEffect: null,
       vectors: [],
       selectedVector: "",
@@ -520,6 +547,17 @@ const ComponentRendering = {
     }
   },
   methods: {
+      scrollToContent() {
+          this.$nextTick(function () {
+              let yPos = document.getElementById("js-content-header").getBoundingClientRect().y -60;
+              window.scrollTo(0, yPos);
+          });
+      },
+      scrollToTop() {
+          this.$nextTick(function () {
+              window.scrollTo(0, 0);
+          });
+      },
       openModalityTab() {
           this.expandedTab = "modalities";
           this.tabHeader = "Select a Gift Type";
@@ -536,18 +574,23 @@ const ComponentRendering = {
           if (this.expandedTab === "modalities") {
               if (this.selectedEffect === null) {
                   this.openEffectsTab();
+                  this.scrollToContent();
               } else {
                   this.openCustomizationTab();
+                  this.scrollToTop();
               }
           } else {
               this.openModalityTab();
+              this.scrollToContent();
           }
       },
       clickEffectsTab() {
           if (this.expandedTab === "effects") {
               this.openCustomizationTab();
+              this.scrollToContent();
           } else {
               this.openEffectsTab();
+              this.scrollToContent();
           }
       },
       clickModality(modality) {
@@ -569,6 +612,19 @@ const ComponentRendering = {
           this.effects = Object.values(powerBlob.effects)
               .filter(comp => allowed_effects.includes(comp.slug))
               .map(comp => componentToVue(comp, "effect"));
+          let categories = powerBlob["component_categories"]
+          let categoriesWithEffects= []
+          categories.forEach(category => {
+              let catEffects = this.effects.filter(effect => category.components.includes(effect.slug));
+              if (catEffects.length > 0) {
+              categoriesWithEffects.push({
+                  "name": category.name,
+                  "description": category.description,
+                  "effects": catEffects,
+              })
+              }
+          });
+          this.categoriesWithEffects = categoriesWithEffects;
           let openEffects = false;
           if (this.selectedEffect === null || !allowed_effects.includes(this.selectedEffect.slug)) {
               this.selectedEffect = null;
@@ -581,11 +637,13 @@ const ComponentRendering = {
           } else {
               this.openCustomizationTab();
           }
+          this.scrollToTop();
       },
       changeEffect(effect) {
           this.updateAvailableVectors();
           this.componentClick();
           this.openCustomizationTab();
+          this.scrollToTop();
       },
       updateAvailableVectors() {
           if (this.selectedEffect === null) {
@@ -633,8 +691,8 @@ const ComponentRendering = {
         console.log(effect);
         console.log(vector);
         this.unrenderedSystem = "<p>" + modality["system_text"] + "</p><p>" + vector["system_text"] + "</p><p>" + effect["system_text"] + "</p>";
-        this.enhancements = modifiersFromComponents(components, "enhancements");
-        this.drawbacks = modifiersFromComponents(components, "drawbacks");
+        this.drawbacks = modifiersFromComponents(components, "drawbacks", this.drawbacks);
+        this.enhancements = modifiersFromComponents(components, "enhancements", this.enhancements);
         this.parameters = paramsFromComponents(components);
         this.parameters.forEach(param => {
             this.parameterSelections[param.id] = param.levels[param["defaultLevel"]];
@@ -696,18 +754,7 @@ const ComponentRendering = {
       clickEnhancement(modifier) {
           console.log("clicked Enhancement");
           let modSlug = slugFromVueModifierId(modifier.target.value);
-          let mod = powerBlob["enhancements"][modSlug];
-          // TODO: deduplicate with clickDrawback logic
-          if (mod.multiplicity_allowed) {
-              let numSelected = this.selectedEnhancements.map(slugFromVueModifierId).filter(enh => enh === modSlug).length;
-              let numAvail = this.enhancements.filter(enh => enh["slug"] === modSlug).length;
-              if (numSelected == numAvail && numAvail < 4) {
-                  modCounter++;
-                  this.enhancements.push(modifierToVue(mod, "enhancements", modCounter));
-              } else if (numAvail - numSelected > 1){
-                  this.enhancements = this.enhancements.filter(mod => mod["id"] != modifier.target.id);
-              }
-          }
+          this.enhancements = handleModifierMultiplicity(modSlug, modifier.target.id, "enhancements", this.enhancements, this.getSelectedAndActiveEnhancements());
           this.calculateRestrictedElements();
           this.reRenderSystemText();
           this.updateGiftCost();
@@ -715,17 +762,7 @@ const ComponentRendering = {
       clickDrawback(modifier) {
           console.log("clicked Drawback");
           let modSlug = slugFromVueModifierId(modifier.target.value);
-          let mod = powerBlob["drawbacks"][modSlug];
-          if (mod.multiplicity_allowed) {
-              let numSelected = this.selectedDrawbacks.map(slugFromVueModifierId).filter(draw => draw === modSlug).length;
-              let numAvail = this.drawbacks.filter(enh => enh["slug"] === modSlug).length;
-              if (numSelected == numAvail && numAvail < 4) {
-                  modCounter++;
-                  this.drawbacks.push(modifierToVue(mod, "drawbacks", modCounter));
-              } else if (numAvail - numSelected > 1){
-                  this.drawbacks = this.drawbacks.filter(mod => mod["id"] != modifier.target.id);
-              }
-          }
+          this.drawbacks = handleModifierMultiplicity(modSlug, modifier.target.id, "drawbacks", this.drawbacks, this.getSelectedAndActiveDrawbacks());
           this.calculateRestrictedElements();
           this.reRenderSystemText();
           this.updateGiftCost();

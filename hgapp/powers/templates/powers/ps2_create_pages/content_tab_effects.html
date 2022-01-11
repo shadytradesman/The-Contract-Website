@@ -1,23 +1,50 @@
-<div v-for="component in effects"
-     :key="component.id">
-    <label v-bind:for="component.id" class="thumbnail" style="margin: 5px;">
-        <div>
-            <input type="radio"
-                   v-bind:id="component.id"
-                   v-bind:name="component.type"
-                   v-bind:value="component"
-                   v-model="selectedEffect"
-                   @change="changeEffect"
-                   @click="clickEffect"
-            >
-            <span  style="padding-left: 10px;">
-                                { component.displayName }
-                            </span>
+<div v-for="category in categoriesWithEffects">
+    <div class="panel panel-default" style="margin-bottom: 5px;">
+        <div class="panel-heading">
+            <h3 style="margin-top: 5px !important; margin-bottom: 5px !important; font-size: 22px; ">
+                {category.name}
+                <small>
+                    <div class="visible-xs-block">
+                        {category.description}
+                    </div>
+                    <span class="hidden-xs">
+                        {category.description}
+                    </span>
+                </small>
+            </h3>
         </div>
-        <div>
-            <small>
-                { component.summary }
-            </small>
+        <div class="panel-body" style="padding-top: 10px; padding-bottom: 10px;">
+            <div class="row">
+                <div v-for="component in category.effects"
+                     :key="component.id">
+                    <div class="col-xs-12 col-lg-6" style="padding-left:40px;">
+                        <label v-bind:for="component.id"
+                               style="margin: 5px; width: 100%; height: 100%;"
+                               class="css-effect-radio"
+                               :class="{'css-selected-effect': selectedEffect && component.id === selectedEffect.id}">
+                            <div>
+                                <input type="radio"
+                                       v-bind:id="component.id"
+                                       v-bind:name="component.type"
+                                       v-bind:value="component"
+                                       v-model="selectedEffect"
+                                       @change="changeEffect"
+                                       @click="clickEffect"
+                                       style="display:none;"
+                                >
+                                <h4 style=" padding-left: 10px; margin-top: 4px !important; margin-bottom: 4px !important; display: inline-block;">
+                                    {component.displayName}
+                                    <div>
+                                        <small>
+                                            { component.summary }
+                                        </small>
+                                    </div>
+                                </h4>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
         </div>
-    </label>
+    </div>
 </div>

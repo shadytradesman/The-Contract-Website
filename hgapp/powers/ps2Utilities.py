@@ -3,7 +3,7 @@ from collections import defaultdict
 
 from django.db.models import Prefetch
 from .models import SYS_ALL, SYS_LEGACY_POWERS, SYS_PS2, EFFECT, VECTOR, MODALITY, Base_Power, Enhancement, Drawback, \
-    Power_Param, Parameter
+    Power_Param, Parameter, Base_Power_Category
 
 def generate_json_blob():
     return json.dumps(generate_power_blob())
@@ -78,4 +78,5 @@ def _generate_param_blob():
 
 
 def _generate_component_category_blob():
-    pass
+    categories = Base_Power_Category.objects.order_by("name").all()
+    return [x.to_blob() for x in categories]
