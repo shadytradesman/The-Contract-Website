@@ -385,7 +385,7 @@ def _create_power_from_post_and_base(base_power, request, power_full):
                                                     new_power=power)
         for drawback_instance in drawback_instances:
             drawback_instance.save()
-        for power_param in Power_Param.objects.filter(relevant_base_power=base_power):
+        for power_param in Power_Param.objects.filter(relevant_base_power=base_power, dice_system=SYS_LEGACY_POWERS):
             param_val = Parameter_Value(relevant_power=power,
                                         relevant_power_param=power_param,
                                         value=request.POST[power_param.relevant_parameter.slug])
