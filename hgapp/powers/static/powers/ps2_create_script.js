@@ -66,6 +66,19 @@ function componentToVue(component, type) {
         giftCredit: component["gift_credit"],
     }
 }
+const filterDisplayByVecSlug = {
+    "direct": "Targeted Effects",
+    "at-will": "Self-targeting Effects",
+    "passive": "Passive Effects",
+    "trap": "Trap Effects",
+}
+function vectorSlugToEffectFilter(vecSlug) {
+    return {
+        id: "effect-filter-" + vecSlug,
+        value: vecSlug,
+        display: filterDisplayByVecSlug[vecSlug],
+    };
+}
 
 function modifierToVue(modifier, type) {
     return modifierToVue(modifier, type, 0);
@@ -526,6 +539,8 @@ const ComponentRendering = {
       effects: [],
       categoriesWithEffects: [],
       selectedEffect: null,
+      effectFilters: [],
+      selectedEffectFilter: "",
       vectors: [],
       selectedVector: "",
       enhancements: [],
@@ -607,40 +622,73 @@ const ComponentRendering = {
               this.openCustomizationTab();
           }
       },
+      updateEffectCategoryDisplay() {
+          let categories = powerBlob["component_categories"]
+          let categoriesWithEffects= []
+          categories.forEach(category => {
+              let catEffects = this.effects.filter(effect => category.components.includes(effect.slug))
+                  .filter(effect => this.satisfiesEffectFilter(effect.slug));
+              if (catEffects.length > 0) {
+                  categoriesWithEffects.push({
+                      "name": category.name,
+                      "description": category.description,
+                      "effects": catEffects,
+                  })
+              }
+          });
+          this.categoriesWithEffects = categoriesWithEffects;
+      },
       changeModality(modality) {
           const allowed_effects = powerBlob["effects_by_modality"][this.selectedModality.slug];
           this.effects = Object.values(powerBlob.effects)
               .filter(comp => allowed_effects.includes(comp.slug))
               .map(comp => componentToVue(comp, "effect"));
-          let categories = powerBlob["component_categories"]
-          let categoriesWithEffects= []
-          categories.forEach(category => {
-              let catEffects = this.effects.filter(effect => category.components.includes(effect.slug));
-              if (catEffects.length > 0) {
-              categoriesWithEffects.push({
-                  "name": category.name,
-                  "description": category.description,
-                  "effects": catEffects,
-              })
-              }
-          });
-          this.categoriesWithEffects = categoriesWithEffects;
-          let openEffects = false;
+
+          this.updateEffectFilters();
+          this.updateEffectCategoryDisplay();
+
+          let shouldOpenEffectsTab = false;
           if (this.selectedEffect === null || !allowed_effects.includes(this.selectedEffect.slug)) {
               this.selectedEffect = null;
-              openEffects = true;
+              shouldOpenEffectsTab = true;
           }
           this.updateAvailableVectors();
+
           this.componentClick();
-          if (openEffects) {
+          if (shouldOpenEffectsTab) {
               this.openEffectsTab();
           } else {
               this.openCustomizationTab();
           }
           this.scrollToTop();
       },
+      changeEffectFilter() {
+          this.updateEffectCategoryDisplay();
+      },
+      updateEffectFilters() {
+          let allAvailableVectors = Array.from(new Set(this.effects
+              .flatMap(effect => this.getAvailableVectorsForEffectAndModality(effect.slug, this.selectedModality.slug))));
+          let newEffectFilters = [];
+          newEffectFilters.push({
+              id: "effect-filter-ALL",
+              value: "ALL",
+              display: "All Effects",
+          });
+          this.effectFilters = newEffectFilters.concat(allAvailableVectors.map(vecSlug => vectorSlugToEffectFilter(vecSlug)));
+          this.selectedEffectFilter = "ALL";
+      },
+      satisfiesEffectFilter(effectSlug) {
+          if (this.selectedEffectFilter === "ALL") {
+              return true;
+          }
+          let allAvailableVectors = this.getAvailableVectorsForEffectAndModality(effectSlug, this.selectedModality.slug);
+          return allAvailableVectors.includes(this.selectedEffectFilter);
+      },
       changeEffect(effect) {
           this.updateAvailableVectors();
+          if (this.selectedEffectFilter != "ALL") {
+              this.selectedVector = this.selectedEffectFilter;
+          }
           this.componentClick();
           this.openCustomizationTab();
           this.scrollToTop();
@@ -651,15 +699,18 @@ const ComponentRendering = {
               this.selectedVector = '';
               return;
           }
-          const effect_vectors = powerBlob["vectors_by_effect"][this.selectedEffect.slug];
-          const modality_vectors = powerBlob["vectors_by_modality"][this.selectedModality.slug];
-          const allowed_vectors = effect_vectors.filter(x => modality_vectors.includes(x));
+          const allowedVectors = this.getAvailableVectorsForEffectAndModality(this.selectedEffect.slug, this.selectedModality.slug);
           this.vectors = Object.values(powerBlob.vectors)
-              .filter(comp => allowed_vectors.includes(comp.slug))
+              .filter(comp => allowedVectors.includes(comp.slug))
               .map(comp => componentToVue(comp, "vector"));
-          if (!allowed_vectors.includes(this.selectedVector)) {
-              this.selectedVector = allowed_vectors[0];
+          if (!allowedVectors.includes(this.selectedVector)) {
+              this.selectedVector = allowedVectors[0];
           }
+      },
+      getAvailableVectorsForEffectAndModality(effectSlug, modalitySlug) {
+          const effectVectors = powerBlob["vectors_by_effect"][effectSlug];
+          const modalityVectors = powerBlob["vectors_by_modality"][modalitySlug];
+          return effectVectors.filter(x => modalityVectors.includes(x));
       },
       clickVector(vector) {
           this.componentClick();
