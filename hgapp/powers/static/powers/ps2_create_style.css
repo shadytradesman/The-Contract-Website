@@ -29,28 +29,109 @@
     font-weight: 400;
 }
 
-.css-component-tab {
-    width: 100%;
-    cursor: pointer;
-    background-image: none;
-    border: 1px solid transparent;
-    padding: 6px 12px;
-    border-radius: 4px;
-    background-color: #353e4b;
-    margin-bottom: 5px;
+/* TOP WORKFLOW BAR */
+
+.css-creating-gift-header {
 }
 
-.css-component-tab.hover {
-    border: 1px solid white;
-    color: white;
+.css-step-container {
+    display: inline-block;
+    width: 40%;
+    text-align: center;
+    height: 100%;
+    position: relative;
+}
+
+.css-customize-container {
+    width: 20%;
+}
+
+.css-component-tab {
+    cursor: pointer;
+    background-image: none;
+}
+
+.css-step-unfinished {
+    height: 100%;
+    color: #939286;
+}
+
+.css-step-finished:hover {
+    cursor: pointer;
+    background-color: #555e7b;
+}
+
+.css-step-contents {
+    left: 50%;
+    height: 100%;
+    border: 1px solid transparent;
+    padding: 5px;
+    padding-top: 10px;
+    border-radius: 4px;
+}
+
+.css-step-icon {
+    font-size: 18px;
+    line-height: 1.3;
+}
+
+.css-step-icon:after {
+    font-size: 18px;
+    line-height: 1.3;
+}
+
+.css-step-contents.css-step-active {
+    background-color: #353e4b;
+}
+
+/* connecting bar for steps after */
+.css-step-after:after {
+    height: 3px;
+    content: "";
+    display: inline-block;
+    position: absolute;
+    top: 20px;
+    width: 48%;
+    background-color: white;
+}
+
+.css-step-before:before {
+    height: 3px;
+    content: "";
+    display: inline-block;
+    position: absolute;
+    top: 20px;
+    left: 0px;
+    width: 48%;
+    background-color: white;
+}
+
+.css-step-unfinished .css-step-after:after {
+    background-color:  #939286;
+}
+
+.css-step-unfinished .css-step-before:before {
+    background-color:  #939286;
+}
+
+.css-step-active .css-step-before:before {
+    background-color:  white;
 }
 
 .css-component-tab-title {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: bold;
+    line-height: 1.1;
+}
+
+.css-step-contents.css-step-active {
+    color: #c6965a;
 }
 
 @media (min-width: 768px) {
+    .css-creating-gift-header {
+    }
+
     .css-tabs-and-system {
         position: fixed;
         width: inherit;
@@ -67,11 +148,6 @@
 
     .css-content-section {
         min-height: 83vh;
-    }
-
-    .css-component-tab:hover {
-        border: 1px solid white;
-        color: white;
     }
 }
 
@@ -94,3 +170,6 @@
     border-color: white;
 }
 
+.css-description {
+    font-size: 15px;
+}

@@ -557,6 +557,8 @@ const ComponentRendering = {
       fieldRollInput: new Proxy({}, handler),
       unrenderedSystem: '',
       renderedSystem: '',
+      unrenderedDescription: "",
+      renderedSystem: "",
       activeUniqueReplacementsByMarker: {},
       giftCost: 0,
     }
@@ -586,26 +588,32 @@ const ComponentRendering = {
           this.tabHeader = "Customize";
       },
       clickModalityTab() {
-          if (this.expandedTab === "modalities") {
+          if (this.expandedTab === "modalities" && this.selectedModality) {
               if (this.selectedEffect === null) {
                   this.openEffectsTab();
-                  this.scrollToContent();
+                  this.scrollToTop();
               } else {
                   this.openCustomizationTab();
                   this.scrollToTop();
               }
           } else {
               this.openModalityTab();
-              this.scrollToContent();
+              this.scrollToTop();
           }
       },
       clickEffectsTab() {
-          if (this.expandedTab === "effects") {
+          if (this.expandedTab === "effects" && this.selectedEffect) {
               this.openCustomizationTab();
-              this.scrollToContent();
+              this.scrollToTop();
           } else {
               this.openEffectsTab();
-              this.scrollToContent();
+              this.scrollToTop();
+          }
+      },
+      clickCustomizationTab() {
+          if (this.selectedModality && this.selectedEffect) {
+              this.openCustomizationTab();
+              this.scrollToTop();
           }
       },
       clickModality(modality) {
@@ -741,7 +749,8 @@ const ComponentRendering = {
         console.log(modality);
         console.log(effect);
         console.log(vector);
-        this.unrenderedSystem = "<p>" + modality["system_text"] + "</p><p>" + vector["system_text"] + "</p><p>" + effect["system_text"] + "</p>";
+        this.unrenderedSystem = "<p>" + vector["system_text"] + "</p><p>" + effect["system_text"] + "</p>";
+        this.unrenderedDescription = modality["system_text"];
         this.drawbacks = modifiersFromComponents(components, "drawbacks", this.drawbacks);
         this.enhancements = modifiersFromComponents(components, "enhancements", this.enhancements);
         this.parameters = paramsFromComponents(components);
@@ -820,6 +829,7 @@ const ComponentRendering = {
       },
       reRenderSystemText() {
           const replacementMap = this.buildReplacementMap();
+          this.renderedDescription = performSystemTextReplacements(this.unrenderedDescription, replacementMap);
           let partiallyRenderedSystem = performSystemTextReplacements(this.unrenderedSystem, replacementMap);
           this.renderedSystem = replaceHoverText(partiallyRenderedSystem);
           this.$nextTick(function () {

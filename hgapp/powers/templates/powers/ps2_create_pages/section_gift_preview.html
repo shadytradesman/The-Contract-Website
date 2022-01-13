@@ -1,0 +1,37 @@
+<div class="css-tabs-and-system">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="text-center" style="margin-top: 0px; margin-bottom: 0px">Gift Preview</h3>
+        </div>
+        <div class="panel-body">
+            <div class="css-description" v-text="renderedDescription">
+            </div>
+            <div>
+                {% include "powers/ps2_create_pages/snip_affix_cost_system.html" %}
+            </div>
+            <h4 style="margin-top: 15px;">System</h4>
+            <div id="rendered-system" v-html="renderedSystem" class="js-render-power-keywords">
+            </div>
+            <a class="btn btn-default btn-xs" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+                Show Unrendered System
+            </a>
+            <div class="collapse" id="collapseExample">
+                <small>
+                    <div id="unrendered-system" v-html="unrenderedSystem">
+                    </div>
+                </small>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12" >
+                    <div class="form-group">
+                        <label class="control-label" for="id_description">Description</label>
+                        <div class=" ">
+                            <textarea name="description" cols="40" rows="10" class=" form-control" required="" id="id_description"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
