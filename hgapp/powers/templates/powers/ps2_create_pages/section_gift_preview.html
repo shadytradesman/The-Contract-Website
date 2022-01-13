@@ -1,19 +1,30 @@
 <div class="css-tabs-and-system">
     <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="text-center" style="margin-top: 0px; margin-bottom: 0px">Gift Preview</h3>
+        <div class="panel-heading text-center">
+            <h3 style="margin-top: 0px; margin-bottom: 0px">Gift Preview</h3>
+            <div>
+                Current Cost:
+                <span v-html="giftCost"></span>
+            </div>
+
         </div>
         <div class="panel-body">
+            <div class="form-group">
+                <label class="control-label  " for="id_power_name">Name</label>
+                <div class=" ">
+                    <input type="text" name="power_name" maxlength="100" class=" form-control" required="" id="id_power_name">
+                </div>
+            </div>
             <div class="css-description" v-text="renderedDescription">
             </div>
-            <div>
+            <div class="visible-xs-block">
                 {% include "powers/ps2_create_pages/snip_affix_cost_system.html" %}
             </div>
             <h4 style="margin-top: 15px;">System</h4>
             <div id="rendered-system" v-html="renderedSystem" class="js-render-power-keywords">
             </div>
             <a class="btn btn-default btn-xs" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
-                Show Unrendered System
+                Show Unrendered System (dev only)
             </a>
             <div class="collapse" id="collapseExample">
                 <small>
@@ -21,11 +32,20 @@
                     </div>
                 </small>
             </div>
-
             <div class="row">
-                <div class="col-md-12" >
+                <div class="col-xs-12" >
+                    <h4>
+                        Description
+                        <div>
+                            <small>
+                                Describe what the Power looks like when it is used, how it works, and its impact on the owner, target, and environment.
+                            </small>
+                            <div v-if="selectedEffect.visibility">
+                                By default, { selectedEffect.visibility }
+                            </div>
+                        </div>
+                    </h4>
                     <div class="form-group">
-                        <label class="control-label" for="id_description">Description</label>
                         <div class=" ">
                             <textarea name="description" cols="40" rows="10" class=" form-control" required="" id="id_description"></textarea>
                         </div>

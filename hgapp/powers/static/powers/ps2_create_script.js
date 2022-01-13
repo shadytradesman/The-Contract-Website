@@ -64,6 +64,7 @@ function componentToVue(component, type) {
         summary: component.summary,
         type: component.type,
         giftCredit: component["gift_credit"],
+        visibility: component.default_description_prompt,
     }
 }
 const filterDisplayByVecSlug = {
@@ -198,7 +199,7 @@ function getDisabledParameters(availParameters, activeUniqueReplacementsByMarker
             }
         }
         blockedSubs.forEach(sub => {
-            let warningString = "Exclusive with " + activeUniqueReplacementsByMarker[sub["marker"]]["name"];
+            let warningString = "Can't be taken with " + activeUniqueReplacementsByMarker[sub["marker"]]["name"];
             if (!disabledModifiers[modifier.id].includes(warningString)) {
                 disabledModifiers[modifier.id].push(warningString);
             }
@@ -247,7 +248,7 @@ function getDisabledModifiers(modType, availModifiers, selectedModifiers, active
             }
         }
         blockedSubs.forEach(sub => disabledModifiers[modifier.slug]
-            .push("Exclusive with " + activeUniqueReplacementsByMarker[sub["marker"]]["name"]));
+            .push("Cannot be taken with " + activeUniqueReplacementsByMarker[sub["marker"]]["name"]));
     });
     return disabledModifiers;
 }
@@ -605,7 +606,7 @@ const ComponentRendering = {
           if (this.expandedTab === "effects" && this.selectedEffect) {
               this.openCustomizationTab();
               this.scrollToTop();
-          } else {
+          } else if (this.selectedModality) {
               this.openEffectsTab();
               this.scrollToTop();
           }
@@ -775,7 +776,7 @@ const ComponentRendering = {
         this.updateGiftCost();
       },
       updateGiftCost() {
-          let cost = 1 + this.selectedEnhancements.length - this.selectedDrawbacks.length;
+          let cost = 1 + this.getSelectedAndActiveEnhancements().length - this.getSelectedAndActiveDrawbacks().length;
           this.getSelectedComponents().forEach(comp => {
               cost = cost - comp["gift_credit"];
           });

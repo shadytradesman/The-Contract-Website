@@ -91,7 +91,7 @@
     display: inline-block;
     position: absolute;
     top: 20px;
-    width: 48%;
+    width: 50%;
     background-color: white;
 }
 
@@ -102,7 +102,7 @@
     position: absolute;
     top: 20px;
     left: 0px;
-    width: 48%;
+    width: 50%;
     background-color: white;
 }
 
@@ -172,4 +172,5 @@
 
 .css-description {
     font-size: 15px;
+    font-weight: bold;
 }

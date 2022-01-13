@@ -483,6 +483,7 @@ class Base_Power(models.Model):
             'blacklist_drawbacks': list(self.blacklist_drawbacks.values_list("pk", flat=True)),
             'blacklist_parameters': list(self.blacklist_parameters.values_list("pk", flat=True)),
             'system_text': system.system_text if system else None,
+            'default_description_prompt': system.default_description_prompt if system else None,
             'text_fields': [x.to_blob() for x in text_fields] if text_fields else [],
             'roll_fields': [x.to_blob() for x in roll_fields] if roll_fields else [],
         }
