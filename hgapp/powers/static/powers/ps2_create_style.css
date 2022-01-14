@@ -128,7 +128,7 @@
     color: #c6965a;
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 992px) {
     .css-creating-gift-header {
     }
 
@@ -172,5 +172,17 @@
 
 .css-description {
     font-size: 15px;
+    font-weight: bold;
+}
+
+/* SYSTEM TEXT STYLING */
+
+.css-system-text-user-input {
+    font-style: italic;
+    color: #c3c2b6;
+    font-weight: bold;
+}
+
+.css-system-text-roll {
     font-weight: bold;
 }

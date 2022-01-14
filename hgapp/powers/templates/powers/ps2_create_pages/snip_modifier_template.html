@@ -6,10 +6,17 @@
            @change="{{vue_on_click}}"
            :disabled="modifier.slug in disabled{{vue_model_name}}"
     >
-    <span style="padding-left: 10px;">
+    <span style="padding-left: 5px;">
         <b>
             { modifier.displayName }
         </b>
+        <span v-if="modifier.eratta">
+            <span data-toggle="tooltip"
+                  data-placement="top"
+                  v-bind:title="modifier.eratta"
+                  style="padding-left: 5px;"
+            ><i class="fa fa-question-circle fa-1x"></i></span>
+        </span>
         <span class="css-modifier-text">
             ({ modifier.description })
         </span>

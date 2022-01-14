@@ -91,6 +91,7 @@ function modifierToVue(modifier, type, idNum = 0) {
         details: "",
         slug: modifier.slug,
         displayName: modifier.name,
+        eratta: modifier.eratta,
         description: modifier.description,
         detailLabel: modifier.detail_field_label === null ? false : modifier.detail_field_label,
         requiredStatusLabel: modifier.required_status[0] === "ANY" ? false : modifier.required_status[1],
@@ -264,6 +265,15 @@ function buildModifierDetailsMap(vueModifiers) {
     return detailsMap;
 }
 
+function subUserInputForDollarSign(replacementText, userInput) {
+    userInput = '<span class="css-system-text-user-input">' + userInput + "</span>";
+    return replacementText.replace("$", userInput);
+}
+
+function markRollText(rollReplacementText) {
+    return '<span class="css-system-text-roll">' + rollReplacementText + "</span>";
+}
+
 function addReplacementsForModifiers(replacements, selectedModifiers, detailsByModifiers) {
   let includedModSlugs = [];
   selectedModifiers
@@ -295,7 +305,7 @@ function addReplacementsForModifiers(replacements, selectedModifiers, detailsByM
                   } else {
                       substitution = detailsByModifiers[mod["slug"]][numIncludedForSlug];
                   }
-                  replacement = replacement.replace("$", substitution);
+                  replacement = subUserInputForDollarSign(replacement, substitution);
               }
               const newSub = {
                   mode: sub["mode"],
@@ -419,13 +429,12 @@ function getReplacementText(replacements, toReplace) {
     if (toReplace.type === '{') {
         replacements[0] = "<br><br>" + replacements[0];
     }
+    if (replacements[0].length > 0 && toReplace.capitalize) {
+        replacements[0] = replacements[0][0].toUpperCase() + replacements[0].slice(1);
+    }
     if (replacements.length === 1 ) {
         return replacements[0];
     }
-    if (['('].includes(toReplace.type) && replacements[0].length > 0) {
-        replacements[0] = replacements[0][0].toUpperCase() + replacements[0].slice(1);
-    }
-
     if (toReplace.type === '(') {
         replacements[replacements.length - 1] = "and " + replacements[replacements.length - 1];
     }
@@ -449,13 +458,14 @@ function findReplacementCandidate(systemText) {
     // Finds the first pair of opening parenthesis, indicating a replacement substring.
     // Proceeds to the matching closure of the parens, skipping any nested replacements
     // returns a little replacement candidate object.
-    var markerStarts = ['(', '[', '{', '@'];
-    var endMarker = null;
-    var parenDepth = 0;
-    var parenType = null;
-    var start = null;
-    var end = null;
-    var defaultContentStartIndex = null;
+    let markerStarts = ['(', '[', '{', '@'];
+    let endMarker = null;
+    let parenDepth = 0;
+    let parenType = null;
+    let start = null;
+    let end = null;
+    let defaultContentStartIndex = null;
+    let capitalize = false;
     for (var i = 0; i < systemText.length; i++) {
         const curChar = systemText[i];
         if (i > 0 && systemText[i-1] === curChar) {
@@ -474,6 +484,13 @@ function findReplacementCandidate(systemText) {
                 parenDepth = parenDepth - 1;
                 if (parenDepth === 0) {
                     end = i;
+                    if (['(', '@'].includes(markerStarts[0]) && i + 1 < systemText.length) {
+                        // if ending a joining list, check for capitalization flag that appears immediately afterwards.
+                        if (systemText[i+1] == '^') {
+                            capitalize = true;
+                            end = i + 1; // also replace ^
+                        }
+                    }
                     break;
                 } else {
                     // this avoids the case where we have four+ ends in a row ala ]]]]
@@ -496,7 +513,8 @@ function findReplacementCandidate(systemText) {
     }
 
     // do markers
-    const markerEnd = defaultContentStartIndex === null ? end - 1 : defaultContentStartIndex;
+    const endParenIndex = capitalize ? end - 2 : end -1 ; // capitalization flag increases length by 1
+    const markerEnd = defaultContentStartIndex === null ? endParenIndex : defaultContentStartIndex;
     var markerSection = systemText.slice(start + 2, markerEnd);
     markerSection = markerSection.trim();
     const markers = markerSection.split(',');
@@ -514,6 +532,7 @@ function findReplacementCandidate(systemText) {
 
     return {
         type: markerStarts[0],
+        capitalize: capitalize,
         markers: markers,
         defaultValue: defaultValue,
         start: start,
@@ -709,11 +728,12 @@ const ComponentRendering = {
               return;
           }
           const allowedVectors = this.getAvailableVectorsForEffectAndModality(this.selectedEffect.slug, this.selectedModality.slug);
-          this.vectors = Object.values(powerBlob.vectors)
+          let unsortedVectors = Object.values(powerBlob.vectors)
               .filter(comp => allowedVectors.includes(comp.slug))
               .map(comp => componentToVue(comp, "vector"));
+          this.vectors = sortVueModifiers(unsortedVectors);
           if (!allowedVectors.includes(this.selectedVector)) {
-              this.selectedVector = allowedVectors[0];
+              this.selectedVector = this.vectors[0].slug;
           }
       },
       getAvailableVectorsForEffectAndModality(effectSlug, modalitySlug) {
@@ -774,6 +794,9 @@ const ComponentRendering = {
         this.calculateRestrictedElements();
         this.reRenderSystemText();
         this.updateGiftCost();
+        this.$nextTick(function () {
+            activateTooltips();
+        });
       },
       updateGiftCost() {
           let cost = 1 + this.getSelectedAndActiveEnhancements().length - this.getSelectedAndActiveDrawbacks().length;
@@ -921,7 +944,10 @@ const ComponentRendering = {
               }
               let replacement = field.replacement;
               if (replacement.includes("$")) {
-                  replacement = replacement.replace("$", sub);
+                  replacement = field.isRoll ? replacement.replace("$", sub) : subUserInputForDollarSign(replacement, sub);
+              }
+              if (field.isRoll) {
+                  replacement = markRollText(replacement);
               }
               replacements[field.marker].push({
                   replacement: replacement,
