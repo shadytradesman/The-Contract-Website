@@ -20,10 +20,18 @@
 <div class="container-fluid" id="vue-app">
 	<div class="row">
 		<div style="margin-bottom: 10px;"></div>
+		<div class="col-xs-12">
+			<div class="hidden-lg">
+				{% include "powers/ps2_create_pages/snip_head_and_steps.html" %}
+			</div>
+		</div>
 		<div class="col-xs-12" :class="{ 'col-lg-4': selectedModality && selectedEffect }" v-if="selectedModality && selectedEffect">
 			{% include "powers/ps2_create_pages/section_gift_preview.html" %}
 		</div>
 		<div class="col-xs-12 css-content-section" :class="{ 'col-lg-8': selectedModality && selectedEffect }">
+			<div class="hidden-xs hidden-sm hidden-md">
+				{% include "powers/ps2_create_pages/snip_head_and_steps.html" %}
+			</div>
 			{% include "powers/ps2_create_pages/section_content.html" %}
 		</div>
 	</div>
