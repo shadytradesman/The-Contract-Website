@@ -17,7 +17,7 @@ from .forms import DeletePowerForm
 from .ps2Utilities import generate_json_blob
 
 def create_ps2(request):
-    if not request.user.is_superuser and (request.user.is_anonymous or not request.user.profile.ps2_user):
+    if not request.user.is_superuser and (request.user.is_anonymous or not request.user.profile.ps2_user or not request.user.proile.early_access_user):
         raise PermissionDenied("You are not authorized to create a new power in this system.")
     context = {
         'power_blob': generate_json_blob(),

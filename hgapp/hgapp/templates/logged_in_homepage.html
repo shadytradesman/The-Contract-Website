@@ -27,6 +27,16 @@
         {% include "_messages.html" %}
     </div>
     <div class="css-transparent-overlay-dark" style="padding-top: 5px; padding-left: 10px; padding-bottom: 10px;">
+        {% if request.user.profile.ps2_user or request.user.is_superuser or request.user.profile.early_access_user %}
+        <div class="alert alert-info text-center" style="margin-top: 5px; margin-bottom: 5px; max-width: 800px; margin: auto;">
+            <h4  style="margin-top: 0px; margin-bottom: 0px; display: inline-block;">Early Access:</h4>
+            <span>
+                <a href="{% url 'powers:powers_create_ps2' %}">
+                    <h4 style="margin-top: 0px; margin-bottom: 0px; display: inline-block;">Try the new Power Builder!</h4>
+                </a>
+            </span>
+        </div>
+        {% endif %}
         {% with latest_blog_post as post %}
         <h4 class="css-blog-header" style="margin-bottom: 0px;">
             <a href="{%url 'pinax_blog:blog' %}">
@@ -38,14 +48,6 @@
             : <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
         </h4>
         {% endwith %}
-        {% if request.user.profile.ps2_user or request.user.is_superuser %}
-            <div class="text-center">
-                <a href="{% url 'powers:powers_create_ps2' %}">
-                    <h4 style="margin-bottom: 0px;">Try the new Power Builder!</h4>
-                </a>
-
-            </div>
-        {% endif %}
     </div>
      </div>
     <br>
@@ -121,11 +123,17 @@
         </div>
 </section>
 <section>
-        <p class="lead text-center">
-            {% blocktrans %}
-                <a href="https://forms.gle/JjpWcz8QpfurrK8A7">Send Feedback or Report a Bug</a>
-            {% endblocktrans %}
-        </p>
+    <div class="text-center">
+        <a class="btn btn-default btn-lg" href="https://forms.gle/JjpWcz8QpfurrK8A7">Send Feedback or Report a Bug</a>
+        <br class="visible-xs-block ">
+        <br class="visible-xs-block ">
+        <a class="btn btn-default btn-lg" href="https://www.patreon.com/ContractRpg">
+            <div>
+                <img class="float-left" src="/static/overrides/other_graphics/Digital-Patreon-Logo_FieryCoral.png" style="width: 30px; height: 30px; position: absolute;">
+                <span style="padding-left: 35px;"> Support us on Patreon</span>
+            </div>
+        </a>
+    </div>
 </section>
 </div>
 {% endblock %}
