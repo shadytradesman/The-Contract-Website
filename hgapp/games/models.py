@@ -57,7 +57,7 @@ ANYONE = 'ANYONE'
 CLOSED = 'CLOSED'
 INVITE_MODE = (
     (INVITE_ONLY, 'Invited Players Only'),
-    (WORLD_MEMBERS, 'World Members Only'),
+    (WORLD_MEMBERS, 'Playgroup Members Only'),
     (ANYONE, 'Any Player'),
     (CLOSED, 'Closed for RSVPs'),
 )
@@ -151,7 +151,7 @@ class Game(models.Model):
         if self.invitation_mode == INVITE_ONLY:
             return "Invite Players using the form below."
         if self.invitation_mode == WORLD_MEMBERS:
-            return "Simply share this page with any World members you wish to invite, or invite any Player using the form below."
+            return "Simply share this page with any Playgroup members you wish to invite, or invite any Player using the form below."
         else:
             return "Simply share this page with any Player you wish to invite."
 
@@ -178,7 +178,7 @@ class Game(models.Model):
             return "This Game only allows those with an invitation to RSVP."
         if self.invitation_mode == WORLD_MEMBERS:
             if not self.cell.get_player_membership(player):
-                return "This Game only allows those who are a member of its World to RSVP without an invite."
+                return "This Game only allows those who are a member of its Playgroup to RSVP without an invite."
             else:
                 return None
         # ANYONE case

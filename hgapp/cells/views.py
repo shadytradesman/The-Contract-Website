@@ -42,7 +42,8 @@ class EditWorld(View):
             initial_data_cell = get_object_or_404(Cell, id=self.INITIAL_DATA_CELL_ID)
         self.__check_permissions()
         self.initial = {
-            "name": initial_data_cell.name,
+            "name": initial_data_cell.name if 'cell_id' in self.kwargs else "",
+            "setting_name": initial_data_cell.setting_name,
             "setting_sheet_blurb": initial_data_cell.setting_sheet_blurb,
             "setting_description": initial_data_cell.setting_description,
             "setting_summary": initial_data_cell.setting_summary,
@@ -62,7 +63,7 @@ class EditWorld(View):
             if new_cell:
                 self.cell = Cell(creator=request.user)
             self.cell.name = form.cleaned_data['name']
-            self.cell.setting_name = form.cleaned_data['name']
+            self.cell.setting_name = form.cleaned_data['setting_name']
             self.cell.setting_sheet_blurb = form.cleaned_data['setting_sheet_blurb']
             self.cell.setting_description = form.cleaned_data['setting_description']
             self.cell.setting_summary = form.cleaned_data['setting_summary']
@@ -348,7 +349,7 @@ def rsvp_invite(request, cell_id, secret_key = None, accept = None):
     invite = get_object_or_none(cell.open_invitations().filter(invited_player=request.user))
     if not invite:
         if not cell.allow_self_invites and (not secret_key or not cell.invite_link_secret_key == secret_key):
-            raise PermissionDenied("You have not been invited to this World or your invite link has expired. Ask for a new one.")
+            raise PermissionDenied("You have not been invited to this Playgroup or your invite link has expired. Ask for a new one.")
     if request.method == 'POST':
         form = RsvpForm(request.POST)
         if form.is_valid():
@@ -593,7 +594,7 @@ class ManageRoles(View):
     def __check_permissions(self):
         if self.cell:
             if not self.cell.player_can_admin(self.request.user):
-                raise PermissionDenied("You don't have permissions to edit this World's roles.")
+                raise PermissionDenied("You don't have permissions to edit this Playgroup's roles.")
 
     def __get_context_data(self):
         RolePermissionFormSet = formset_factory(self.form_class, extra=0)

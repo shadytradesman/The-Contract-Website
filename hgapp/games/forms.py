@@ -90,21 +90,21 @@ def make_game_form(user):
         scheduled_start_time = forms.DateTimeField(widget=DateTimePicker(options=False),
                                                    input_formats=[date_format],
                                                    help_text='For planning purposes. Places no actual restrictions on starting the Contract.')
-        cell = forms.ModelChoiceField(label="World",
+        cell = forms.ModelChoiceField(label="Playgroup",
                                       queryset=queryset,
-                                      empty_label="Select a World",
-                                      help_text="Select a World for this Contract. This generally defines the setting of "
+                                      empty_label="Select a Playgroup",
+                                      help_text="Select a Playgroup for this Contract. This generally defines the setting of "
                                                 "the Contract, although some Scenarios may see the Contractors spirited away "
                                                 "to other dimensions, pocket realms, or similar. "
-                                                "World leaders have the power to edit or void Contracts "
-                                                "run in their World.",
+                                                "Playgroup leaders have the power to edit or void Contracts "
+                                                "run in their Playgroup.",
                                       required=True)
 
         invite_all_members = forms.BooleanField(initial=False,
                                                 required=False,
-                                                label='Invite all World Members',
+                                                label='Invite all Playgroup Members',
                                                 help_text="Automatically send an invite and notification to all members "
-                                                          "of the chosen World. ")
+                                                          "of the chosen Playgroup. ")
         required_character_status = forms.ChoiceField(label="Required Contractor Status",
                                                       choices=REQUIRED_HIGH_ROLLER_STATUS,
                                                       help_text='Players will only be able to RSVP with Contractors of the selected Status.')
@@ -173,7 +173,7 @@ def buildContractorChoiceIterator(game_cell=None):
                 yield ("", self.field.empty_label)
             for world, contractors in groups:
                 yield [
-                    "In-World" if game_cell and world else "Out-of-World" if game_cell else world.name if world else None,
+                    "In-Playgroup" if game_cell and world else "Out-of-Playgroup" if game_cell else world.name if world else None,
                     [
                         (contractor.id, contractor.name)
                         for contractor in contractors

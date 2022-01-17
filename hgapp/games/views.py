@@ -210,9 +210,9 @@ def create_game(request, cell_id=None):
             title = form.cleaned_data['title'] if "title" in form.cleaned_data and form.cleaned_data['title'] else "untitled"
             form_cell = form.cleaned_data['cell']
             if not form_cell.get_player_membership(request.user):
-                raise PermissionDenied("You are not a member of this World.")
+                raise PermissionDenied("You are not a member of this Playgroup.")
             if not (form_cell.player_can_manage_games(request.user) or form_cell.player_can_run_games(request.user)):
-                raise PermissionDenied("You do not have permission to run Games in this World")
+                raise PermissionDenied("You do not have permission to run Contracts in this Playgroup")
             game = Game(
                 title = title,
                 creator = request.user,

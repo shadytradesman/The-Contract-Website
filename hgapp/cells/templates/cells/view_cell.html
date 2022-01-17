@@ -3,7 +3,7 @@
 {% load i18n %}
 {% load static %}
 
-{% block head_title %}Viewing World{% endblock %}
+{% block head_title %}Viewing Playgroup{% endblock %}
 
 {% block body_class %}home{% endblock %}
 
@@ -24,19 +24,19 @@
         <h1>
         {{ cell.name }}
         </h1>
-        A World {{cell.setting_sheet_blurb}}.
+        A world {{cell.setting_sheet_blurb}}.
     </div>
     {% include "_messages.html" %}
     <br>
     {% include "cells/view_cell_navbar_snip.html" %}
     {% if invite %}
         <div class="alert alert-success text-center">
-            <h5>You have been invited to join this World</h5>
+            <h5>You have been invited to join this Playgroup</h5>
             <h4><a href="{% url 'cells:cells_rsvp_invite' cell.id %}">Click here to RSVP</a></h4>
         </div>
     {% elif cell.allow_self_invites and not user_membership %}
         <div class="alert alert-success text-center">
-        <b style="margin-top: 5px;">This World has open memberships.</b>
+        <b style="margin-top: 5px;">This Playgroup has open memberships.</b>
         {% if user.is_anonymous %}
             But you must
             <a href="{% url 'account_signup' %}">Sign up</a>

@@ -4,7 +4,7 @@
 {% load static %}
 
 {% block head_title %}
-    Find a World
+    Find a Playgroup
 {% endblock %}
 
 {% block extra_head %}
@@ -22,7 +22,7 @@
 <div class="container">
     {% include "characters/edit_pages/choose_world_modal.html" %}
     <h1 class="text-center">
-        Find a World
+        Find a Playgroup
     </h1>
     <div class="panel panel-default">
         <div class="panel-body">
@@ -32,16 +32,16 @@
                         <div class="text-center">
                             <p>
                             <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#worldTutorialModal">
-                                What are Worlds?
+                                What are Playgroups?
                             </button>
                             </p>
                         </div>
                         <p>
-                            The Worlds on this list are looking for new Players and have off-site communities.
+                            The Playgroups on this list are looking for new Players and have off-site communities.
                             They are ordered by recent activity.
                         </p>
                         <p>
-                            If you want to start your own World
+                            If you want to start your own Playgroup
                             <a href="{% url 'cells:cells_create' %}" class="btn btn-default btn-xs">
                                 click here
                             </a>
@@ -82,7 +82,7 @@
                                     {% if cell.is_community_link_public and cell.community_link %}
                                         <div>
                                             <a href="{{cell.community_link}}">
-                                                <b>Visit this World's off-site community.</b>
+                                                <b>Visit this Playgroup's off-site community.</b>
                                             </a>
                                         </div>
                                     {% endif %}

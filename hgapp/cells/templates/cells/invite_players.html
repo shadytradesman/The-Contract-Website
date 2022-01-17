@@ -54,7 +54,7 @@
                 </ul>
                 {% endif %}
                 <h2>Using invite link</h2>
-                <p>Anyone with this link will be able to join your World.</p>
+                <p>Anyone with this link will be able to join your Playgroup.</p>
                 <div class="row">
                     <div class="col-xs-1">
                         <a class="btn btn-default" id="copySecretLink"><i class="fa fa-copy"></i> copy</a>
@@ -79,9 +79,9 @@
                 <p>
                     <b>
                         {% if cell.allow_self_invites %}
-                            This World allows self-invites.
+                            This Playgroup allows self-invites.
                         {% else %}
-                            Players must be invited to join this World.
+                            Players must be invited to join this Playgroup.
                         {% endif %}
                     </b>
                     You may change this behavior in <a href="{% url 'cells:cells_edit_find_world' cell.id %}">Recruitment Settings</a>

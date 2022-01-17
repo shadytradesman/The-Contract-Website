@@ -28,7 +28,7 @@ CELL_PERMISSIONS = (
     ('manage_roles', 'Run Games'), # change to: can run games?
     ('post_events', 'Post World Events'),
     ('manage_member_characters', 'Manage Contractors'),
-    ('edit_world', 'Edit World'),
+    ('edit_world', 'Edit Playgroup'),
     ('manage_games', 'Manage Games'),
 )
 

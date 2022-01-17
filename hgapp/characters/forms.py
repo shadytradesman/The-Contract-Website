@@ -74,7 +74,7 @@ def make_character_form(user, existing_character=None, supplied_cell=None):
                       'to_do_list', 'contracts', 'pronoun')
             help_texts = {
                 'name': _('Name'),
-                'private': _("If checked, this Contractor will only be viewable by their World's leaders and any GMs "
+                'private': _("If checked, this Contractor will only be viewable by their Playgroup's leaders and any GMs "
                              "running Games for them."),
                 'pronoun': _(""),
                 'tagline': _('A subtitle that introduces your Contractor in a flavorful way'),

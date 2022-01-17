@@ -228,7 +228,7 @@ def random_string():
 
 class Character(models.Model):
     name = models.CharField(max_length=100)
-    tagline = models.CharField(max_length=200)
+    tagline = models.CharField(max_length=200, blank=True)
     player = models.ForeignKey(settings.AUTH_USER_MODEL,
                               on_delete=models.CASCADE,
                               null=True)

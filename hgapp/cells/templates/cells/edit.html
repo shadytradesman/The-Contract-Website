@@ -15,9 +15,9 @@
 
 {% block head_title %}
     {% if cell %}
-        Editing World
+        Editing Playgroup
     {% else %}
-        New World
+        New Playgroup
     {% endif %}
 {% endblock %}
 
@@ -36,7 +36,7 @@
         {% if cell %}
             Editing {{cell.name}}
         {% else %}
-            Creating a new World
+            Creating a new Playgroup
         {% endif %}
     </h1>
     {% if cell %}
@@ -53,11 +53,8 @@
                         <div role="alert" class="alert alert-info text-center">
                             {% if not cell %}
                             <p>
-                                Most play groups share a single World where all Players take turns acting as GM.
-                            </p>
-                            <p>
                                 <a href="https://www.thecontractrpg.com/guide/gm-manual/#world-leader">
-                                    Learn more about leading a World
+                                    Learn more about leading a Playgroup
                                 </a>
                             </p>
                             <p>
@@ -71,7 +68,7 @@
                             {% else %}
                             <p>
                                 <a href="https://www.thecontractrpg.com/guide/gm-manual/#world-leader">
-                                    Learn more about leading a World
+                                    Learn more about leading a Playgroup
                                 </a>
                             </p>
 
@@ -81,14 +78,22 @@
                 </div>
                 <div class="row">
                     <div class="col-xs-12">
-                        <div id="css-name-field" class="css-essential-field">
+                        <div id="" class="css-essential-field">
                             {{ form.name }}
                             <figcaption class="help-block">
                                 {{ form.name.help_text|safe}}
                             </figcaption>
                         </div>
+                    </div>
+                    <div class="col-xs-12">
+                        <div id="css-name-field" class="css-essential-field">
+                            {{ form.setting_name }}
+                            <figcaption class="help-block">
+                                {{ form.setting_name.help_text|safe}}
+                            </figcaption>
+                        </div>
                         <div class="clearfix visible-xs-block visible-md-block visible-sm-block"></div>
-                        <span class="css-essential-text"> is a world </span>
+                        <span class="css-essential-text"> is a world</span>
                         <div id="css-concept-field" class="css-essential-field"  >
                             {{ form.setting_sheet_blurb }}
                             <figcaption class="help-block">
@@ -101,10 +106,10 @@
                 {{form.setting_summary|bootstrap}}
                 <h3>Full Description</h3>
                 <p>
-                    Spill the beans. Describe your World's setting in as much detail as you like. At a bare minimum, you should
+                    Spill the beans. Describe your Playgroup's setting in as much detail as you like. At a bare minimum, you should
                     answer:
                     <ul>
-                        <li>How commonplace is the supernatural in this World?</li>
+                        <li>How commonplace is the supernatural in this setting?</li>
                         <li>Are the Contracts (Contractors, Harbingers) known? By who?</li>
                     </ul>
                 {{ form.setting_description | bootstrap }}
@@ -125,8 +130,8 @@
                     </p>
                     <h3>Contractor Creation Prompt</h3>
                     <p>
-                        This text will be shown to anyone creating a Contractor in this World. What sorts of people become
-                        Contractors in this setting? If absent, your World's Summary will be used.
+                        This text will be shown to anyone creating a Contractor in this Playgroup. What sorts of people become
+                        Contractors in this setting? If absent, your Setting's Summary will be used.
                         {{ form.setting_create_char_info | bootstrap }}
                     </p>
                 </div>
@@ -134,7 +139,7 @@
                     <input class="btn btn-primary btn-lg" type="submit" value="Done!" />
                     <div>
                         <small>
-                            You may edit your World at any time.
+                            You may edit your Playgroup at any time.
                         </small>
                     </div>
                 </div>
