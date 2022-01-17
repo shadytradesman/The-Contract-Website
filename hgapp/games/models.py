@@ -273,7 +273,7 @@ class Game(models.Model):
             return
         for game_attendance in self.game_attendance_set.all():
             game_attendance.give_reward()
-        if self.achieves_golden_ratio():
+        if self.achieves_golden_ratio() and self.cell and self.cell.use_golden_ratio:
             gm_reward = Reward(relevant_game=self,
                                rewarded_player=self.gm,
                                is_improvement=True)
@@ -302,9 +302,10 @@ class Game(models.Model):
     def recalculate_gm_reward(self, originally_achieves_golden_ratio):
         current_reward = self.get_gm_reward()
         now_achieves_ratio = self.recalculate_golden_ratio(originally_achieves_golden_ratio)
-        if now_achieves_ratio and current_reward and current_reward.is_new_player_gm_reward:
+        should_have_ratio_reward = now_achieves_ratio and self.cell and self.cell.use_golden_ratio
+        if should_have_ratio_reward and current_reward and current_reward.is_new_player_gm_reward:
                 current_reward.mark_void()
-        if not now_achieves_ratio:
+        if not should_have_ratio_reward:
             if self.is_introductory_game():
                 if not current_reward or not current_reward.is_new_player_gm_reward:
                     gm_reward = Reward(relevant_game=self,
@@ -317,11 +318,12 @@ class Game(models.Model):
     def recalculate_golden_ratio(self, original_value):
         current_value = self.achieves_golden_ratio()
         if current_value != original_value:
-            if current_value == True:
+            if current_value and self.cell and self.cell.use_golden_ratio:
                 gm_reward = Reward(relevant_game=self,
                                    rewarded_player=self.gm,
                                    is_improvement=True)
                 gm_reward.save()
+                # TODO: Why mark this experience reward void and then re-grant it?
                 if hasattr(self, "gm_experience_reward") and self.gm_experience_reward:
                     self.gm_experience_reward.mark_void()
                 self._grant_gm_exp_reward()

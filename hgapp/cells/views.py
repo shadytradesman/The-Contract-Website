@@ -49,6 +49,7 @@ class EditWorld(View):
             "setting_summary": initial_data_cell.setting_summary,
             "setting_create_char_info": initial_data_cell.setting_create_char_info,
             "are_contractors_portable": initial_data_cell.are_contractors_portable,
+            "use_golden_ratio": initial_data_cell.use_golden_ratio,
             "house_rules": initial_data_cell.house_rules,
         }
         return super().dispatch(*args, **kwargs)
@@ -69,6 +70,7 @@ class EditWorld(View):
             self.cell.setting_summary = form.cleaned_data['setting_summary']
             self.cell.setting_create_char_info = form.cleaned_data['setting_create_char_info']
             self.cell.house_rules = form.cleaned_data['house_rules']
+            self.cell.use_golden_ratio = form.cleaned_data['use_golden_ratio']
             self.cell.are_contractors_portable = form.cleaned_data['are_contractors_portable']
             with transaction.atomic():
                 self.cell.save()

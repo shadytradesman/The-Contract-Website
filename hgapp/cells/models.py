@@ -50,6 +50,9 @@ class Cell(models.Model):
                                      through="CellMembership",
                                      through_fields=('relevant_cell', 'member_player'))
 
+    # Reward Preferences
+    use_golden_ratio = models.BooleanField(default=False)
+
     # Invites
     invitations = models.ManyToManyField(settings.AUTH_USER_MODEL,
                                          through="CellInvite",

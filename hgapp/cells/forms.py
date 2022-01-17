@@ -30,9 +30,17 @@ class EditWorldForm(forms.Form):
                                   max_length=48000,
                                   required=False,
                                   help_text='Rules that exist only in this Playgroup.')
+    use_golden_ratio = forms.BooleanField(label='Enable Golden Ratio',
+                                                  required=False,
+                                                  help_text='If this box is checked, GMs who run Contracts in this '
+                                                            'Playgroup will receive an Improvement if they run a '
+                                                            'Contract where at least one Contractor dies while another '
+                                                            'achieves Victory. Note: GMs cannot receive both a Golden '
+                                                            'Ratio and "Gm for a brand New Player" Improvement from the '
+                                                            'same Contract.')
     are_contractors_portable = forms.BooleanField(label='Contractors are Portable',
                                                   required=False,
-                                                  help_text='Check this box to allow Contractors to participate in Games in other Playgroups. '
+                                                  help_text='Check this box to allow Contractors to participate in Contracts in other Playgroups. '
                                                             'If your House Rules affect Gifts, Experience, or Powers, uncheck this box.')
     setting_create_char_info = forms.CharField(label='',
                                                widget=TinyMCE(attrs={'cols': 80, 'rows': 30}),

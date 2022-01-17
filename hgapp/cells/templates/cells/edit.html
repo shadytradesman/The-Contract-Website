@@ -116,7 +116,7 @@
                 </p>
                 <br>
                 {% if not cell %}
-                    <a class="btn btn-default btn-sm wiki-entry-collapsible">Additional Customization Options</a>
+                    <a class="btn btn-default btn-sm wiki-entry-collapsible">Show Additional Customization Options</a>
                 {% endif %}
                 <div class="collapse-content clearfix"
                      {% if not cell %} style="display:none;" {% endif %}>
@@ -127,6 +127,7 @@
                         {{ form.house_rules }}
                         <br>
                         {{ form.are_contractors_portable|bootstrap }}
+                        {{ form.use_golden_ratio|bootstrap }}
                     </p>
                     <h3>Contractor Creation Prompt</h3>
                     <p>
