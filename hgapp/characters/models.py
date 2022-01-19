@@ -87,6 +87,17 @@ PORT_STATUS = (
     (VETERAN_PORTED, "Ported as Veteran"),
 )
 
+# numbers included for sorting.
+MINOR_SCAR = "1MINOR"
+MAJOR_SCAR = "2MAJOR"
+SEVERE_SCAR = "3SEVERE"
+EXTREME_SCAR = "4EXTREME"
+SCAR_SEVERITY = (
+    (MINOR_SCAR, "Minor Scars"),
+    (MAJOR_SCAR, "Major Scars"),
+    (SEVERE_SCAR, "Severe Scars"),
+    (EXTREME_SCAR, "Extreme Scars"),
+)
 
 BODY_STATUS = (
     'Scuffed',
@@ -223,7 +234,6 @@ PORTED_EXP_ADJUSTMENT = {
 
 def random_string():
     return hashlib.sha224(bytes(random.randint(1, 99999999))).hexdigest()
-
 
 
 class Character(models.Model):
@@ -963,10 +973,20 @@ class Character(models.Model):
                 self.set_bonus_for_attribute(attr, bonus_by_attribute.get(attr))
 
 
+class StockBattleScar(models.Model):
+    type = models.CharField(choices=SCAR_SEVERITY,
+                            max_length=45,
+                            default=MINOR_SCAR)
+    description = models.CharField(max_length=500)
+    system = models.CharField(max_length=500)
+
+
 class BattleScar(models.Model):
     character = models.ForeignKey(Character,
                                    on_delete=models.CASCADE)
     description = models.CharField(max_length=500)
+    system = models.CharField(max_length=500, blank=True)
+
 
 class WorldElement(models.Model):
     character = models.ForeignKey(Character,

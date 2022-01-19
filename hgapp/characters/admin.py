@@ -3,7 +3,7 @@ from django.contrib import admin
 # Register your models here.
 from characters.models import Character, Graveyard_Header, Character_Death, Attribute, Ability, Asset, Liability, \
     CharacterTutorial, ContractStats, Limit, LiabilityDetails, AssetDetails, AttributeValue, AbilityValue, ExperienceReward, \
-    TraumaRevision, Condition, Circumstance, Artifact, Roll
+    TraumaRevision, Condition, Circumstance, Artifact, Roll, StockBattleScar
 
 
 class AbilityValueTabular(admin.TabularInline):
@@ -44,3 +44,4 @@ admin.site.register(Condition)
 admin.site.register(Circumstance)
 admin.site.register(Artifact)
 admin.site.register(Roll)
+admin.site.register(StockBattleScar)

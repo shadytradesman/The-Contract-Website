@@ -19,7 +19,7 @@ from characters.models import Character, BasicStats, Character_Death, Graveyard_
 from powers.models import Power_Full
 from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, get_ability_form, \
     AssetForm, LiabilityForm, BattleScarForm, TraumaForm, InjuryForm, SourceValForm, make_allocate_gm_exp_form, EquipmentForm,\
-    DeleteCharacterForm, BioForm, make_world_element_form
+    DeleteCharacterForm, BioForm, make_world_element_form, get_default_scar_choice_field
 from characters.form_utilities import get_edit_context, character_from_post, update_character_from_post, \
     grant_trauma_to_character, delete_trauma_rev, get_world_element_class_from_url_string
 from characters.view_utilities import get_characters_next_journal_credit, get_world_element_default_dict
@@ -245,12 +245,14 @@ def view_character(request, character_id, secret_key = None):
     artifact_form = None
     world_element_initial_cell = character.world_element_initial_cell()
     world_element_cell_choices = None
+    default_scar_field = None
     if user_can_edit:
         # We only need these choices if the user can edit, both for forms and for char sheet.
         world_element_cell_choices = character.world_element_cell_choices()
         circumstance_form = make_world_element_form(world_element_cell_choices, world_element_initial_cell)
         condition_form = make_world_element_form(world_element_cell_choices, world_element_initial_cell)
         artifact_form = make_world_element_form(world_element_cell_choices, world_element_initial_cell)
+        default_scar_field = get_default_scar_choice_field()
 
     artifacts = get_world_element_default_dict(world_element_cell_choices)
     for artifact in character.artifact_set.all():
@@ -284,6 +286,7 @@ def view_character(request, character_id, secret_key = None):
         'timeline': dict(timeline),
         'tutorial': get_object_or_404(CharacterTutorial),
         'battle_scar_form': BattleScarForm(),
+        'default_scar_field': default_scar_field,
         'trauma_form': TraumaForm(prefix="trauma"),
         'injury_form': InjuryForm(request.POST, prefix="injury"),
         'exp_cost': exp_cost,
@@ -458,7 +461,8 @@ def post_scar(request, character_id, secret_key = None):
         __check_edit_perms(request, character, secret_key)
         form = BattleScarForm(request.POST)
         if form.is_valid():
-            battle_scar = BattleScar(description = form.cleaned_data['description'],
+            battle_scar = BattleScar(description = form.cleaned_data['scar_description'],
+                                     system = form.cleaned_data['scar_system'],
                                      character=character)
             with transaction.atomic():
                 battle_scar.save()

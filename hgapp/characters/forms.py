@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.validators import MaxValueValidator, MinValueValidator
 from overrides.widgets import CustomStylePagedown
 
-from characters.models import Character, BasicStats, Character_Death, BattleScar, PORT_STATUS
+from characters.models import Character, BasicStats, Character_Death, BattleScar, PORT_STATUS, StockBattleScar
 from cells.models import Cell
 
 ATTRIBUTE_VALUES = {
@@ -262,10 +262,39 @@ class LimitForm(forms.Form):
         if 'limit_rev_id' in self.initial:
             self.fields['limit_rev_id'].initial = self.initial['limit_rev_id']
 
+
+# method to get floating field because field is used only on FE and never submitted to the backend.
+def get_default_scar_choice_field():
+    stock_scars = StockBattleScar.objects.order_by("type").all()
+    options = [("", "Create Custom Scar")]
+    if stock_scars.count() > 0:
+        current_options = []
+        current_type = stock_scars[0].get_type_display()
+        for scar in stock_scars:
+            if scar.get_type_display() != current_type:
+                options.append((current_type, current_options))
+                current_options = []
+                current_type = scar.get_type_display()
+            current_options.append((scar.system, scar.description))
+        options.append((current_type, current_options))
+    default_field = forms.ChoiceField(choices=options,
+                                      label="Select Scar",
+                                      required=False,)
+    class DefaultScarForm(forms.Form):
+        premade_scar_field = default_field
+    return DefaultScarForm
+
+
+
 class BattleScarForm(forms.Form):
-    description = forms.CharField(max_length=900,
-                                  label=None,
-                                  widget=forms.TextInput(attrs={'class': 'form-control'}))
+    scar_description = forms.CharField(max_length=500,
+                                  label="Description",
+                                  widget=forms.TextInput(attrs={'class': 'form-csontrol'}))
+    scar_system = forms.CharField(max_length=500,
+                              label="System",
+                              widget=forms.TextInput(attrs={'class': 'form-csontrol'}))
+
+
 class TraumaForm(forms.Form):
     description = forms.CharField(max_length=900,
                                   label=None,
