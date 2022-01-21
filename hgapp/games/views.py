@@ -131,7 +131,7 @@ def edit_scenario(request, scenario_id):
 
 def view_scenario(request, scenario_id, game_id=None):
     scenario = get_object_or_404(Scenario, id=scenario_id)
-    if not scenario.player_is_spoiled(request.user) and not scenario.player_discovered(request.user):
+    if not scenario.is_public() and not scenario.player_discovered(request.user):
         raise PermissionDenied("You don't have permission to view this scenario")
     show_spoiler_warning = scenario.is_public() \
                            and not (request.user.is_authenticated and scenario.player_discovered(request.user)) \

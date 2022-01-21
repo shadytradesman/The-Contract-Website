@@ -830,7 +830,7 @@ class Scenario(models.Model):
         return public
 
     def player_is_spoiled(self, player):
-        return self.is_public() or player.has_perm("view_scenario", self)
+        return player.has_perm("view_scenario", self)
 
     def is_spoilable_for_player(self, player):
         if player.is_anonymous:

@@ -356,6 +356,15 @@ input[type="number"] {
     border-left: 1px solid #a6763a;
 }
 
+.css-complication-reference {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    margin-top: 5px;
+    border-top: 1px solid #a6763a;
+    border-bottom: 1px solid #a6763a;
+    border-right: 1px solid #a6763a;
+}
+
 .js-injury-value-input {
     display: inline-block;
 }
@@ -393,4 +402,24 @@ input[type="number"] {
     font-size: 12px;
     background-color: #262d37 !important;
     padding-top: 10px;
+}
+
+.css-complication-list {
+    list-style-type: none;
+    margin-left: 10px;
+    padding-left: 10px;
+}
+
+.css-complication-list  li{
+  padding-left: 10px;
+}
+
+.css-complication-list  li::marker {
+  content: attr(data-icon);
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.css-complication-system {
+  font-size: 12px;
 }
