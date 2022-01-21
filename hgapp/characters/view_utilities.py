@@ -1,5 +1,6 @@
 from journals.models import Journal
 from hgapp.utilities import get_object_or_none
+from .models import Weapon
 from collections import defaultdict
 
 # If applicable, returns an object containing info about what journal a character can write for a reward.
@@ -34,3 +35,9 @@ def get_world_element_default_dict(world_element_cell_choices):
         return defaultdict(list)
 
 
+def get_weapons_by_type():
+    weapons = Weapon.objects.order_by("type").all()
+    weapons_by_type = defaultdict(list)
+    for weapon in weapons:
+        weapons_by_type[(weapon.type, weapon.get_type_display())].append(weapon)
+    return dict(weapons_by_type)

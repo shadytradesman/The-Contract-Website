@@ -7,8 +7,7 @@ window.onbeforeunload = function() {
         return true;
     }
 };
-var setFormSubmitting = function() { formSubmitting = true; isDirty=false; };
-
+var setFormSubmitting = function() { formSubmitting = true; isDirty=false; $("#char-submit").prop('disabled', true);};
 
 function makeIncDecButtons(element, type) {
     element.append('<span class="inc val-adjuster-'+type+' btn btn-default btn-xs"><i class="fa fa-plus"></i></span>');

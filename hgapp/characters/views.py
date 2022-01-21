@@ -22,7 +22,7 @@ from characters.forms import make_character_form, CharacterDeathForm, ConfirmAss
     DeleteCharacterForm, BioForm, make_world_element_form, get_default_scar_choice_field
 from characters.form_utilities import get_edit_context, character_from_post, update_character_from_post, \
     grant_trauma_to_character, delete_trauma_rev, get_world_element_class_from_url_string
-from characters.view_utilities import get_characters_next_journal_credit, get_world_element_default_dict
+from characters.view_utilities import get_characters_next_journal_credit, get_world_element_default_dict, get_weapons_by_type
 
 from journals.models import Journal, JournalCover
 from cells.models import Cell
@@ -63,7 +63,7 @@ def edit_character(request, character_id, secret_key = None):
     __check_edit_perms(request, character, secret_key)
     if request.method == 'POST':
         with transaction.atomic():
-            character = Character.objects.select_for_update().get(pk=character.pk)
+            character = Character.objects.select_for_update(nowait=True).get(pk=character.pk)
             update_character_from_post(request.user, existing_character=character, POST=request.POST)
         url_args = (character.id,) if request.user.is_authenticated else (character.id, character.edit_secret_key,)
         return HttpResponseRedirect(reverse('characters:characters_view', args=url_args))
@@ -310,6 +310,7 @@ def view_character(request, character_id, secret_key = None):
         'initial_cell': world_element_initial_cell,
         'assets': assets,
         'liabilities': liabilities,
+        'weapons_by_type': get_weapons_by_type(),
     }
     return render(request, 'characters/view_pages/view_character.html', context)
 

@@ -1,0 +1,41 @@
+<div class="text-center">
+    <div>
+        All firearms use <b>{{weapons.0.attack_roll.render_html_for_current_contractor}}</b>
+    </div>
+    <div>
+        Firearms may be fired at targets at up to twice the listed range at +2 Difficulty.
+    </div>
+</div>
+<div class="row css-equip-header">
+    <div class="col-xs-5">
+        Firearm
+    </div>
+    <div class="col-xs-3">
+        Damage
+    </div>
+    <div class="col-xs-4">
+        Range
+    </div>
+</div>
+<div class="css-equip-container">
+    {% for weapon in weapons %}
+    <div class="row css-equip-row">
+        <div class="col-xs-5">
+            {{weapon.name}}
+        </div>
+        <div class="col-xs-3">
+            +{{ weapon.bonus_damage }}
+            {% if weapon.damage_errata %}
+            <span data-toggle="tooltip"
+                  title="{{weapon.damage_errata}}"
+                  data-container="#weap-{{weapon_type.0}}"
+                  data-placement="left"
+            ><i class="fa fa-question-circle fa-1x"></i></span>
+            {% endif %}
+        </div>
+        <div class="col-xs-4">
+            {{weapon.range}}
+        </div>
+    </div>
+    {% endfor %}
+</div>

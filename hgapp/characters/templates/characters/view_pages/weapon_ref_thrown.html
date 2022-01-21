@@ -1,0 +1,47 @@
+<div class="text-center">
+    Thrown Weapon damage is capped at your Brawn rating <b>(<span class="js-roll-num-dice" data-attr-id="1">0</span>)</b>
+</div>
+<div class="row css-equip-header">
+    <div class="col-xs-4">
+        Weapon
+    </div>
+    <div class="col-xs-4">
+        Roll
+    </div>
+    <div class="col-xs-2">
+        Damage
+    </div>
+    <div class="col-xs-2">
+        Range
+    </div>
+</div>
+<div class="css-equip-container">
+    {% for weapon in weapons %}
+    <div class="row css-equip-row">
+        <div class="col-xs-4">
+            {{weapon.name}}
+        </div>
+        <div class="col-xs-4">
+            {% if weapon.attack_roll %}
+            {{weapon.attack_roll.render_html_for_current_contractor}}
+            {% endif %}
+            {% if weapon.attack_roll_text %}
+                {{ weapon.attack_roll_text }}
+            {% endif %}
+        </div>
+        <div class="col-xs-2">
+            +{{ weapon.bonus_damage }}
+            {% if weapon.damage_errata %}
+            <span data-toggle="tooltip"
+                  title="{{weapon.damage_errata}}"
+                  data-container="#weap-{{weapon_type.0}}"
+                  data-placement="left"
+            ><i class="fa fa-question-circle fa-1x"></i></span>
+            {% endif %}
+        </div>
+        <div class="col-xs-2">
+            {{ weapon.range}}
+        </div>
+    </div>
+    {% endfor %}
+</div>

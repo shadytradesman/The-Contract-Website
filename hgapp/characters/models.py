@@ -136,6 +136,19 @@ PENALTIES = (
     "Dead"
 )
 
+WEAPON_MELEE = "MELEE" # swords, clubs, axes
+WEAPON_FIREARM = "FIREARM" # guns
+WEAPON_THROWN = "THROWN" # javalins, slings, shurikens
+WEAPON_PROJECTILE = "PROJECTILE" # bows, slingshots, crossbows
+WEAPON_OTHER = "OTHER" # Stun guns, caltrops, etc.
+WEAPON_TYPE = (
+    (WEAPON_MELEE, "Melee"),
+    (WEAPON_FIREARM, "Firearm"),
+    (WEAPON_THROWN, "Thrown"),
+    (WEAPON_PROJECTILE, "Projectile"),
+    (WEAPON_OTHER, "Other")
+)
+
 EQUIPMENT_DEFAULT = """
 Track your current equipment here. You may start with anything your Contractor would reasonably have access to. 
 
@@ -1276,6 +1289,27 @@ class Roll(models.Model):
                         speed=speed)
             roll.save()
             return roll
+
+
+class Weapon(models.Model):
+    name = models.CharField(max_length=100)
+    type = models.CharField(choices=WEAPON_TYPE,
+                            max_length=30,
+                            default=WEAPON_MELEE)
+    bonus_damage = models.IntegerField(default=0)
+    damage_errata = models.CharField(max_length=300, blank=True) # errata displayed directly after damage
+    attack_roll = models.ForeignKey(Roll,
+                                    blank=True,
+                                    null=True,
+                                    on_delete=models.CASCADE)
+    # intended to use instead of attack_roll for daggers. Can also be used as addendum for discretionary Difficulty.
+    attack_roll_text = models.CharField(max_length=300, blank=True)
+    range = models.CharField(max_length=300, blank=True)
+    errata = models.CharField(max_length=300, blank=True)
+
+    def __str__(self):
+        return self.name + "(" + self.type + ")"
+
 
 class Quirk(models.Model):
     name = models.CharField(max_length=150)

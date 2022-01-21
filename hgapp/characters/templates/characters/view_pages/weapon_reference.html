@@ -1,0 +1,44 @@
+<div class="css-weapon-reference row">
+    <a class="wiki-entry-collapsible text-center" role="button">
+        <div class="col-xs-12">
+            <small>
+                <i>
+                    (Click to toggle Weapons reference)
+                </i>
+            </small>
+        </div>
+    </a>
+    <div class="collapse-content clearfix" style="display:none;" style="margin-top: 10px;">
+        <ul class="nav nav-tabs nav-justified nav-justified-sm css-nav-tabs" role="tablist">
+            {% for weapon_type, weapons in weapons_by_type.items %}
+                {% if weapon_type.0 != 'OTHER' %}
+                    <li role="presentation" {% if forloop.counter0 == 0 %}class="active" {% endif %}>
+                        <a class="css-weapon-tab-header" href="#weap-{{weapon_type.0}}" aria-controls="weap-{{weapon_type.0}}" role="tab" data-toggle="tab">{{weapon_type.1}}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+        <div class="tab-content css-tab-content col-xs-12">
+            {% for weapon_type, weapons in weapons_by_type.items %}
+                <div role="tabpanel" class="tab-pane {% if forloop.counter0 == 0 %}active{% endif %}" id="weap-{{weapon_type.0}}">
+                    {% if weapon_type.0 == 'FIREARM' %}
+                        {% include "characters/view_pages/weapon_ref_firearms.html" %}
+                    {% elif weapon_type.0 == 'MELEE' %}
+                        {% include "characters/view_pages/weapon_ref_melee.html" %}
+                    {% elif weapon_type.0 == 'PROJECTILE' %}
+                        {% include "characters/view_pages/weapon_ref_projectile.html" %}
+                    {% elif weapon_type.0 == 'THROWN' %}
+                        {% include "characters/view_pages/weapon_ref_thrown.html" %}
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <div class="row css-equip-row">
+                <div class="col-xs-12 text-center">
+                    <a href="/guide/rules/#weapons">
+                         Player's Guide section on Weapons
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
