@@ -55,18 +55,17 @@
                     <div class="text-center">
                         <h4>It's my Turn</h4>
                     </div>
-                    <div class="text-center">
-                        <small>
-                        <span data-toggle="tooltip" title="
+                    <span data-toggle="tooltip" title="
                             Movement may be taken immediately before OR After your Action and cannot be split.
                             Your Action may be anything; the most common are listed below.
                             ">
+                        <div class="text-center">
+                            <small>
                                 You get one <b>Movement</b> and one <b>Action</b> on your turn every Round of Combat.
-                            </span>
-
-                        </small>
-                    </div>
-                    <b>Movement</b>
+                            </small>
+                        </div>
+                        <b>Movement</b>
+                    </span>
                     <ul>
                         <li>
                             Movement is taken immediately before OR after your Action. It cannot be split.
@@ -87,9 +86,10 @@
                                 </li>
                             </ul>
                             <li data-toggle="tooltip" title="Sprint: (Outcome + Brawn + Dexterity + 1) x 5 feet.">
-                                <b>All-out Sprint:</b> instead of using Movement or Dash, you may spend your Action and roll
+                                <b>All-out Sprint:</b> instead of using free Movement or Dash, you may spend your Action and roll
                                 {{tutorial.sprint_roll.render_html_for_current_contractor}}.
-                                You move (<span class="js-roll-num-dice" data-attr-id="1" data-attr2-id="2" data-multiplier="5" data-additional="5">0</span> + Outcome*5 Feet).
+                                You move
+                                <b>(<span class="js-roll-num-dice" data-attr-id="1" data-attr2-id="2" data-multiplier="5" data-additional="5">0</span> + (Outcome x 5) Feet)</b>.
                             </li>
                         </li>
                     </ul>
@@ -98,24 +98,19 @@
                         <li>
                             <b>Attack</b> with your <a href="/guide/rules/#weapons">weapon or hands.</a>
                         </li>
-                        <li>
-                            <span data-toggle="tooltip" title="
+                        <li data-toggle="tooltip" title="
                                 Example: if your Evade Outcome is 4 and you are attacked twice with an Outcome of 3 each time,
                                 you would avoid the first attack and suffer the second as though its Outcome was 2.
                                 ">
-                                <b>Evade</b> by rolling to Defend or Dodge. Your Outcome is "spent" to reduce the
-                                Outcome of any incoming attacks until your next Action.
-                            </span>
+                            <b>Evade</b> by rolling to Defend or Dodge. Your Outcome is "spent" to reduce the
+                            Outcome of any incoming attacks until your next Action.
                         </li>
-                        <li>
-                            <span data-toggle="tooltip" title="
+                        <li data-toggle="tooltip" title="
                                 Most Powers require an Action to activate.
                                 ">
-                                <b>Activate a Power</b> or <b>use an Ability</b> as normal.
-                            </span>
+                            <b>Activate a Power</b> or <b>use an Ability</b> as normal.
                         </li>
-                        <li>
-                            <span data-toggle="tooltip" title="
+                        <li data-toggle="tooltip" title="
                                 The Action and event cannot be changed once declared.
                                 This does not allow you to take two Actions in a Round.
                                 You may break the hold to React to incoming attacks.
@@ -123,7 +118,6 @@
                                 ">
                             <b>Hold your Action</b> by declaring an Action and a triggering event.
                                 If the event occurs before your turn on the next Round, you perform the Action.
-                            </span>
                         </li>
                     </ul>
                 </div>
@@ -131,61 +125,71 @@
                     <div class="text-center">
                         <h4>I'm being attacked</h4>
                     </div>
-                    <div class="text-center">
-                        <small>
-                            <span data-toggle="tooltip" title="
+                    <span  data-toggle="tooltip" title="
                                 You cannot react to ranged firearms attacks without a Power.
                                 ">
-                                If you have not yet spent your Action this Round, you may use it as a Reaction.
-                            </span>
-                        </small>
-                    </div>
-                    <b>Reactions</b>
+                        <div class="text-center">
+                            <small>
+                                <span>
+                                    If you have not yet spent your Action this Round, you may use it as a Reaction.
+                                </span>
+                            </small>
+                        </div>
+                        <b>Reactions</b>
+                    </span>
                     <ul>
-                        <li>
-                            <span data-toggle="tooltip" title="
+                        <li data-toggle="tooltip" title="
                                 You cannot dodge ranged firearms attacks as a Reaction without a Power.
                                 ">
-                                <b>Dodge</b> by rolling
-                                {{tutorial.dodge_roll.render_html_for_current_contractor}}.
-                                Your Outcome is subtracted from the attacker's.
-                            </span>
+                            <b>Dodge</b> by rolling
+                            {{tutorial.dodge_roll.render_html_for_current_contractor}}.
+                            Your Outcome is subtracted from the attacker's.
                         </li>
-                        <li>
-                            <span data-toggle="tooltip" title="
+                        <li data-toggle="tooltip" title="
                                 Unarmed people can Defend against other unarmed attacks.
                                 Melee weapons can Defend against unarmed, melee, or thrown attacks.
                                 Firearms cannot Defend but may be Defended only against if the attacker is within reach.
                                 ">
-                                <b>Defend</b> with your weapon by rolling its attack roll.
-                                Your Outcome is subtracted from the attacker's. Availability depends on weapon match-up (tap/hover).
-                            </span>
+                            <b>Defend</b> with your weapon by rolling its attack roll.
+                            Your Outcome is subtracted from the attacker's. Availability depends on weapon match-up (tap/hover).
                         </li>
-                        <li>
-                            <span data-toggle="tooltip" title="
+                        <li data-toggle="tooltip" title="
                                     The requirements for Clashing are the same as for Defending.
                                     On a tie, both attacks succeed with their full Outcome. You cannot Clash as a
                                     Desperate Defense.
                                 ">
-                                <b>Clash</b> with the attacker using the same roll you would use to Defend.
-                                The higher Outcome (not contested) is treated as the result of a successful, undefended attack
-                                roll against the loser.
-                            </span>
+                            <b>Clash</b> with the attacker using the same roll you would use to Defend.
+                            The higher Outcome (not contested) is treated as the result of a successful, undefended attack
+                            roll against the loser.
                         </li>
                     </ul>
-                    <b>Desperate Defense</b>
-                    <ul>
-                        <li>
-                            <span data-toggle="tooltip" title="
+                    <span  data-toggle="tooltip" title="
                                     This penalty can reduce your next Action's roll to 0 dice. You cannot use a Desperate
                                     Defense if you have already Exerted your Mind this Round.
                                 ">
+                        <b>Desperate Defense</b>
+                        <ul>
+                            <li>
                                 If you have already used your Action, you may Exert your Mind to perform a Reaction.
                                 Your next Round's Action receives a -2 dice penalty. You cannot Clash as a Desperate
                                 Defense.
-                            </span>
-                        </li>
-                    </ul>
+                            </li>
+                        </ul>
+                    </span>
+                    <span data-toggle="tooltip" title="
+                                 Do not roll for a Complication for this Injury.
+                                ">
+                        <b>Will to Live</b>
+                        <ul>
+                            <li>
+                                <span >
+                                    Once per Contract, if you would take an Injury that would kill you, you may reduce its
+                                    Severity by up to 5 to a minimum of 5. You receive a Major Battle Scar and take one
+                                    point of Mind damage.
+                                </span>
+                            </li>
+                        </ul>
+                    </span>
                 </div>
             </div>
             <div class="row">
