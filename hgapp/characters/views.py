@@ -529,11 +529,34 @@ def post_injury(request, character_id, secret_key = None):
 def delete_injury(request, injury_id, secret_key = None):
     if request.is_ajax and request.method == "POST":
         injury = get_object_or_404(Injury, id=injury_id)
-        form = InjuryForm(request.POST, prefix="injury")
         __check_edit_perms(request, injury.character, secret_key)
         with transaction.atomic():
             injury.delete()
         return JsonResponse({}, status=200)
+    return JsonResponse({"error": ""}, status=400)
+
+def dec_injury(request, injury_id, secret_key = None):
+    if request.is_ajax and request.method == "POST":
+        injury = get_object_or_404(Injury, id=injury_id)
+        __check_edit_perms(request, injury.character, secret_key)
+        new_sev = injury.severity - 1
+        with transaction.atomic():
+            if new_sev <= 0:
+                injury.delete()
+            else:
+                injury.severity = new_sev
+                injury.save()
+        return JsonResponse({"severity": new_sev}, status=200)
+    return JsonResponse({"error": ""}, status=400)
+
+def inc_injury(request, injury_id, secret_key = None):
+    if request.is_ajax and request.method == "POST":
+        injury = get_object_or_404(Injury, id=injury_id)
+        __check_edit_perms(request, injury.character, secret_key)
+        with transaction.atomic():
+            injury.severity = injury.severity + 1
+            injury.save()
+        return JsonResponse({"severity": injury.severity}, status=200)
     return JsonResponse({"error": ""}, status=400)
 
 def set_mind_damage(request, character_id, secret_key = None):

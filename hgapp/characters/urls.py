@@ -67,7 +67,6 @@ urlpatterns = [
         name="post_bio"),
     url(r'^post/ajax/c/(?P<character_id>[\d]+)/bio/$', views.post_bio, name="post_bio"),
 
-
     url(r'^post/ajax/c/(?P<character_id>[\d]+)/trauma/(?P<secret_key>[\da-z]*)$', views.post_trauma, name="post_trauma"),
     url(r'^post/ajax/c/(?P<character_id>[\d]+)/trauma/$', views.post_trauma, name="post_trauma"),
 
@@ -78,9 +77,17 @@ urlpatterns = [
     url(r'^post/ajax/c/(?P<character_id>[\d]+)/injury/(?P<secret_key>[\da-z]*)$', views.post_injury,
         name="post_injury"),
 
+
     url(r'^post/ajax/delete-injury/s/(?P<injury_id>[\d\w]+)/$', views.delete_injury, name="delete_injury"),
     url(r'^post/ajax/delete-injury/s/(?P<injury_id>[\d\w]+)/(?P<secret_key>[\da-z]*)$', views.delete_injury,
         name="delete_injury"),
+
+    url(r'^post/ajax/dec-injury/s/(?P<injury_id>[\d\w]+)/$', views.dec_injury, name="dec_injury"),
+    url(r'^post/ajax/dec-injury/s/(?P<injury_id>[\d\w]+)/(?P<secret_key>[\da-z]*)$', views.dec_injury,
+        name="dec_injury"),
+    url(r'^post/ajax/inc-injury/s/(?P<injury_id>[\d\w]+)/$', views.inc_injury, name="inc_injury"),
+    url(r'^post/ajax/inc-injury/s/(?P<injury_id>[\d\w]+)/(?P<secret_key>[\da-z]*)$', views.inc_injury,
+        name="inc_injury"),
 
     # Sets character's mental damage to requested value in "severity" field of injury form. If out of bounds,
     # sets character's injury to either their number of mental health levels or 0.

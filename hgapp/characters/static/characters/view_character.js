@@ -224,6 +224,8 @@ $(".injury-form").submit(function (e) {
     e.preventDefault();
     var serializedData = $(this).serialize();
     var delUrl = $(this).attr("data-delete-injury-url");
+    var incUrl = $(this).attr("data-inc-injury-url");
+    var decUrl = $(this).attr("data-dec-injury-url");
     $.ajax({
         type: 'POST',
         url: $(this).attr("data-new-injury-url"),
@@ -234,10 +236,15 @@ $(".injury-form").submit(function (e) {
 
             var instance = JSON.parse(response["instance"]);
             var fields = instance[0]["fields"];
-            delUrl = delUrl.replace(/injuryIdJs/g, JSON.parse(response["id"]));
+            let injuryId = JSON.parse(response["id"]);
+            delUrl = delUrl.replace(/injuryIdJs/g, injuryId);
+            incUrl = incUrl.replace(/injuryIdJs/g, injuryId);
+            decUrl = decUrl.replace(/injuryIdJs/g, injuryId);
             var tmplMarkup = $('#injury-template').html();
             var compiledTmpl = tmplMarkup.replace(/__description__/g, fields["description"||""]);
             var compiledTmpl = compiledTmpl.replace(/__delUrl__/g, delUrl);
+            var compiledTmpl = compiledTmpl.replace(/__incUrl__/g, incUrl);
+            var compiledTmpl = compiledTmpl.replace(/__decUrl__/g, decUrl);
             var compiledTmpl = compiledTmpl.replace(/__severity__/g, response["severity"]);
             $("#js-injury-container").append(
                 compiledTmpl
@@ -263,6 +270,31 @@ $("#js-injury-container").on("submit",".js-delete-injury-form", function (e) {
         data: serializedData,
         success: function (response) {
             injuryForm.parent().parent().remove();
+            updateHealthDisplay();
+        },
+        error: function (response) {
+            console.log(response);
+            alert(response["responseJSON"]["error"]);
+        }
+    })
+})
+
+// inc/dec injury
+$("#js-injury-container").on("submit",".js-edit-injury-form", function (e) {
+    e.preventDefault();
+    var serializedData = $(this).serialize();
+    var injuryForm = $(this);
+    $.ajax({
+        type: 'POST',
+        url: $(this).attr("data-edit-injury-url"),
+        data: serializedData,
+        success: function (response) {
+            let severity = response["severity"];
+            if (severity <= 0) {
+                injuryForm.parent().parent().remove();
+            } else {
+                $(injuryForm.siblings(".injury-severity")[0]).text(severity);
+            }
             updateHealthDisplay();
         },
         error: function (response) {
