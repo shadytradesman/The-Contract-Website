@@ -7,14 +7,18 @@ from .models import ROLE, WebHook
 
 class EditWorldForm(forms.Form):
     name = forms.CharField(label='Name',
+                           max_length=195,
+                           widget=forms.TextInput(attrs={'class': 'form-control'}),
+                           help_text='The name of your Playgroup. For example, \"Costa College Contractors\"')
+    setting_name = forms.CharField(label='Setting Name',
                                    max_length=195,
                                    widget=forms.TextInput(attrs={'class': 'form-control'}),
-                                   help_text='The name of your World. For example, \"Earth, 1989\" or \"Feudal Japan.\"')
-    setting_sheet_blurb = forms.CharField(label='Character Sheet Setting Summary',
+                                   help_text='The name of your Playgroup\'s Setting. For example, \"Earth, 1989\" or \"Feudal Japan.\"')
+    setting_sheet_blurb = forms.CharField(label='Character Sheet Setting Blurb',
                                           max_length=500,
                                           required=False,
                                           widget=forms.TextInput(attrs={'class': 'form-control'}),
-                                          help_text= '"much like our own. . .", "where it\'s still the eighties. . .", "where dinosaurs rule. . ." '
+                                          help_text= '"in the California Bay Area. . .", "where it\'s still the eighties. . .", "where dinosaurs rule. . ." '
                                                      ' Appears on the Character Sheets for Contractors who call this Setting home.')
     setting_description = forms.CharField(label='',
                                           widget=TinyMCE(attrs={'cols': 70, 'rows': 10}),
@@ -25,21 +29,29 @@ class EditWorldForm(forms.Form):
                                   widget=TinyMCE(attrs={'cols': 70, 'rows': 10}),
                                   max_length=48000,
                                   required=False,
-                                  help_text='Rules that exist only in this World.')
+                                  help_text='Rules that exist only in this Playgroup.')
+    use_golden_ratio = forms.BooleanField(label='Enable Golden Ratio',
+                                                  required=False,
+                                                  help_text='If this box is checked, GMs who run Contracts in this '
+                                                            'Playgroup will receive an Improvement if they run a '
+                                                            'Contract where at least one Contractor dies while another '
+                                                            'achieves Victory. Note: GMs cannot receive both a Golden '
+                                                            'Ratio and "Gm for a brand New Player" Improvement from the '
+                                                            'same Contract.')
     are_contractors_portable = forms.BooleanField(label='Contractors are Portable',
                                                   required=False,
-                                                  help_text='Check this box to allow Contractors to participate in Games in other Worlds. '
+                                                  help_text='Check this box to allow Contractors to participate in Contracts in other Playgroups. '
                                                             'If your House Rules affect Gifts, Experience, or Powers, uncheck this box.')
     setting_create_char_info = forms.CharField(label='',
                                                widget=TinyMCE(attrs={'cols': 80, 'rows': 30}),
                                                max_length=9800,
                                                required=False,
                                                help_text='')
-    setting_summary = forms.CharField(label='World Summary',
+    setting_summary = forms.CharField(label='Setting Summary',
                                                  widget=forms.Textarea(),
                                                  max_length=9500,
                                                  required=False,
-                                                 help_text='A brief overview / introduction for this World\'s Setting, used '
+                                                 help_text='A brief overview / introduction for this Playgroup\'s Setting, used '
                                                            'throughout the site.')
 
 
@@ -56,28 +68,28 @@ class CustomInviteForm(forms.Form):
 class RecruitmentForm(forms.Form):
     list_publicly = forms.BooleanField(label='List Publicly',
                                        required=False,
-                                       help_text='If you check this box and provide a link to a community below, your World will appear on the "Find Worlds" page.')
+                                       help_text='If you check this box and provide a link to a community below, your Playgroup will appear on the "Find Playgroups" page.')
     allow_self_invites = forms.BooleanField(label='Open Memberships',
                                             required=False,
-                                            help_text='If checked, anyone with an account may join your World. '
-                                                      'Otherwise, they must use an invite link or a World member with '
+                                            help_text='If checked, anyone with an account may join your Playgroup. '
+                                                      'Otherwise, they must use an invite link or a Playgroup member with '
                                                       '"manage memberships" permissions must invite them.')
-    cell_sell = forms.CharField(label='World Sell',
+    cell_sell = forms.CharField(label='Playgroup Sell',
                                 widget=forms.Textarea,
                                 max_length=1500,
                                 required=False,
-                                help_text='Summarize your World to prospective Players. What is the setting? What kinds of '
+                                help_text='Summarize your Playgroup to prospective Players. What is the setting? What kinds of '
                                           'Players should join? How can they join you and start playing?')
     community_link = forms.URLField(label='Community Link',
                                      max_length=1000,
                                      required=False,
-                                     help_text='Link to a forum, Discord Server, or other site where the members of this World hang out. '
-                                               '<b>You must fill this field for your World to appear on the "Find a World" list.</b> '
+                                     help_text='Link to a forum, Discord Server, or other site where the members of this Playgroup hang out. '
+                                               '<b>You must fill this field for your Playgroup to appear on the "Find a Playgroup" list.</b> '
                                                '<i>Note: If you use a Discord invite link, ensure it is set to never expire.</i>')
     is_community_link_public = forms.BooleanField(label='Show Community Link to Non-Members',
                                                   required=False,
                                                   initial=True,
-                                                  help_text='If checked, your World\'s Community Link will be visible to non-members.' )
+                                                  help_text='If checked, your Playgroup\'s Community Link will be visible to non-members.' )
 
 
 class RsvpForm(forms.Form):

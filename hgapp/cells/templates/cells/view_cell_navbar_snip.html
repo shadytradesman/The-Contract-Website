@@ -48,14 +48,14 @@
     {% if can_edit_world or can_manage_memberships or can_manage_games %}
         <li class="dropdown">
             <a id="dLabel" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Manage World
+                Manage Playgroup
                 <span class="caret"></span>
             </a>
             <ul class="dropdown-menu" aria-labelledby="dLabel">
                 {% if can_edit_world %}
                 <li>
                     <a href="{% url 'cells:cells_edit' cell.id %}">
-                        Edit World
+                        Edit Playgroup
                     </a>
                 </li>
                 {% endif %}
@@ -111,7 +111,7 @@
     {% endif %}
     <li>
         <a href="{% url 'cells:cells_leave_cell' cell.id %}">
-            Leave World
+            Leave Playgroup
         </a>
     </li>
 </ul>
@@ -121,7 +121,7 @@
 {% if show_webhook_tip %}
     <div class="text-center" style="margin-bottom: 10px;">
         <a class="btn btn-default" href="{% url 'cells:cells_manage_webhooks' cell.id %}">
-            Add Webhooks to your World's Discord Server!
+            Add Webhooks to your Playgroup's Discord Server!
         </a>
     </div>
 {% endif %}

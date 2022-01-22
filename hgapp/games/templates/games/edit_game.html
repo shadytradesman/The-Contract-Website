@@ -105,11 +105,11 @@
                 {% if not form.cell.field.choices.queryset.all|length %}
                     <div class="row">
                         <div class="alert-danger col-xs-7 col-xs-offset-2">
-                            <h4>You are not a member of any <a href="/guide/rules/#worlds">Worlds</a></h4>
+                            <h4>You are not a member of any <a href="/guide/rules/#worlds">Playgroups</a></h4>
                             <p>
-                                All Contracts must take place inside a World. Ask your friends for an invite,
+                                All Contracts must take place inside a Playgroup. Ask your friends for an invite,
                                 <a href="{% url 'cells:find_world' ">
-                                    find a World to join,
+                                    find a Playgroup to join,
                                 </a>
                                 or
                                 <a href="{% url 'cells:cells_create' %}">make your own</a>!
@@ -131,7 +131,7 @@
                         </div>
                         <div id="js-scenario-already-play">
                             <div class="alert alert-info text-center">
-                                <b>This Scenario has already been run in this World</b>
+                                <b>This Scenario has already been run in this Playgroup</b>
                                 <p>
                                     Re-running some Scenarios can introduce story consistency issues.
                                 </p>

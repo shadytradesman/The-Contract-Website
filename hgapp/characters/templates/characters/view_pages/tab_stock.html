@@ -45,7 +45,7 @@
                 </div>
             {% endif %}
         </div>
-        <hr>
+        {% include "characters/view_pages/weapon_reference.html" %}
         <h3 class="text-center" data-toggle="tooltip" title='{{tutorial.artifacts|safe}}'>
             Artifacts
         </h3>
@@ -60,11 +60,11 @@
                             Examples of Artifacts include healing potions, scrolls, sci-fi technology, or any supernatural
                             item that was not created with The Contract's Power system.
                             Artifacts are not subject to standardized balance.
-                            Therefore, their effects may be altered or ignored outside the World where they were obtained.
+                            Therefore, their effects may be altered or ignored outside the Playgroup where they were obtained.
                         </p>
                         {% if user_can_edit %}
                         <p>
-                            Until you participate in a Contract or join a World, you cannot add
+                            Until you participate in a Contract or join a Playgroup, you cannot add
                             Artifacts to your Contractor.
                         </p>
                         {% endif %}

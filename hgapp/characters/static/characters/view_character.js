@@ -39,7 +39,7 @@ function updateLimitVisibility() {
 }
 
 // expandable trauma deletion reasons
-$(document).on("click", ".js-trauma-del", function() {
+$(document).on("click", ".js-expand-next-block", function() {
     var button = $(this);
     this.classList.toggle("active");
     var content = this.nextElementSibling;
@@ -74,6 +74,14 @@ $.ajaxSetup({
     }
 });
 
+$("#id_premade_scar_field").change(function (e) {
+    let selectedOption = e.target.options[e.target.selectedIndex];
+    if (selectedOption.value.length > 0) {
+        $("#id_scar_description").val(selectedOption.text);
+        $("#id_scar_system").val(selectedOption.value);
+    }
+})
+
 // add battle scar
 $("#scar-form").submit(function (e) {
     e.preventDefault();
@@ -86,13 +94,14 @@ $("#scar-form").submit(function (e) {
         data: serializedData,
         success: function (response) {
             $("#scar-form").trigger('reset');
-            $("#id_description").focus();
+            $("#id_scar_description").focus();
 
             var instance = JSON.parse(response["instance"]);
             var fields = instance[0]["fields"];
             delUrl = delUrl.replace(/scarIdJs/g, JSON.parse(response["id"]));
             var tmplMarkup = $('#scar-template').html();
             var compiledTmpl = tmplMarkup.replace(/__description__/g, fields["description"||""]);
+            var compiledTmpl = compiledTmpl.replace(/__system__/g, fields["system"||""]);
             var compiledTmpl = compiledTmpl.replace(/__delUrl__/g, delUrl);
             $("#js-scar-container").append(
                 compiledTmpl
@@ -116,7 +125,7 @@ $("#js-scar-container").on("submit",".js-delete-scar-form", function (e) {
         url: $(this).attr("data-del-scar-url"),
         data: serializedData,
         success: function (response) {
-            scarForm.parent().parent().remove();
+            scarForm.parent().remove();
         },
         error: function (response) {
             console.log(response);

@@ -4,7 +4,7 @@ from django.db.models import Q
 from django.urls import reverse
 
 from characters.models import Character, HIGH_ROLLER_STATUS, Attribute, Roll, NO_PARRY_INFO, NO_SPEED_INFO, DODGE_ONLY, \
-    ATTACK_PARRY_TYPE, ROLL_SPEED, THROWN, Attribute, Ability
+    ATTACK_PARRY_TYPE, ROLL_SPEED, THROWN, Attribute, Ability, Weapon, WEAPON_MELEE, WEAPON_TYPE
 from guardian.shortcuts import assign_perm, remove_perm
 from django.utils.html import mark_safe, escape, linebreaks
 from django.db.utils import IntegrityError
@@ -1070,8 +1070,22 @@ class SystemFieldRoll(SystemField):
         field_blob.update(roll_blob)
         return field_blob
 
+
 class SystemFieldText(SystemField):
     pass
+
+
+class SystemFieldWeapon(SystemField):
+    # blank for all weapon types allowed
+    weapon_type = models.CharField(choices=WEAPON_TYPE,
+                                   default=WEAPON_MELEE,
+                                   max_length=30,
+                                   blank=True,
+                                   help_text="Provides the following substitutions based on the selected weapon: <br>"
+                                             "selected-weapon-name, selected-weapon-type, selected-weapon-bonus-damage, "
+                                             "selected-weapon-attack-roll, selected-weapon-attack-roll-difficulty, "
+                                             "selected-weapon-attack-text, selected-weapon-range, "
+                                             "selected-weapon-errata")
 
 
 class SystemFieldInstance(models.Model):
@@ -1107,6 +1121,12 @@ class SystemFieldRollInstance(SystemFieldInstance):
             return self.roll.render_html_for_current_contractor()
         else:
             return self.roll.render_value_for_power()
+
+
+class SystemFieldWeaponInstance(SystemField):
+    relevant_field = models.ForeignKey(SystemFieldWeapon, on_delete=models.CASCADE)
+    weapon = models.ForeignKey(Weapon, on_delete=models.CASCADE)
+
 
 class Enhancement_Instance(models.Model):
     relevant_enhancement = models.ForeignKey(Enhancement,

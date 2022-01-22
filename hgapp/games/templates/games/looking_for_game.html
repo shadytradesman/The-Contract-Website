@@ -45,7 +45,7 @@
                             <li>
                                 If you are looking for a regular playgroup, visit
                                 <a href="{% url 'cells:cells_find_world' %}" class="btn btn-default btn-xs">
-                                    Find a World
+                                    Find a Playgroup
                                 </a>
                             </li>
                             <li>
@@ -93,7 +93,7 @@
                                         {% user_display game.gm %}
                                     </a>
                                     <br>
-                                    <b>In World: </b>
+                                    <b>In Playgroup: </b>
                                     <a href="{% url 'cells:cells_view_cell' game.cell.id %}">
                                         {{game.cell.name}}
                                     </a>

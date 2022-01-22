@@ -11,7 +11,7 @@
             <a href="{% url 'profiles:profiles_view_profile' request.user.id %}"><i class="fa fa-user"></i> {% user_display request.user %}</a>
         </li>
         <li>
-            <a href="{% url 'account_settings' %}"><i class="fa fa-cog"></i> </a>
+            <a href="{% url 'account_settings' %}"><i class="fa fa-cog"></i> <span class="visible-xs-inline">Account Settings</span></a>
         </li>
         <li>
             {% if unread_count %}

@@ -28,7 +28,7 @@ CELL_PERMISSIONS = (
     ('manage_roles', 'Run Games'), # change to: can run games?
     ('post_events', 'Post World Events'),
     ('manage_member_characters', 'Manage Contractors'),
-    ('edit_world', 'Edit World'),
+    ('edit_world', 'Edit Playgroup'),
     ('manage_games', 'Manage Games'),
 )
 
@@ -49,6 +49,9 @@ class Cell(models.Model):
     members = models.ManyToManyField(settings.AUTH_USER_MODEL,
                                      through="CellMembership",
                                      through_fields=('relevant_cell', 'member_player'))
+
+    # Reward Preferences
+    use_golden_ratio = models.BooleanField(default=False)
 
     # Invites
     invitations = models.ManyToManyField(settings.AUTH_USER_MODEL,

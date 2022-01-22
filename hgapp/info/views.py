@@ -94,7 +94,7 @@ def how_to_play(request):
     expand_step.append(True) # zero index fix
     expand_step.append(not request.user.is_authenticated) #login
     expand_step.append(not request.user.is_authenticated or request.user.character_set.count() == 0) # create contractor
-    expand_step.append(not request.user.is_authenticated or request.user.cell_set.count() == 0) # create / join World
+    expand_step.append(not request.user.is_authenticated or request.user.cell_set.count() == 0) # create / join Playgroup
     context= {
         "quickstart_info": quickstart_info,
         "character": character,

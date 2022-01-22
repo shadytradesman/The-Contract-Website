@@ -48,6 +48,7 @@ class GameModelTests(TestCase):
                             name = "cell name",
                             creator = self.cell_owner,
                             setting_name = "world name",
+                            use_golden_ratio=True,
                             setting_description = "Test description")
         self.setup_stat_elements()
         self.char_user1_cell = make_test_char(self.user1, self.cell)

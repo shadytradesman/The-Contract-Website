@@ -87,6 +87,17 @@ PORT_STATUS = (
     (VETERAN_PORTED, "Ported as Veteran"),
 )
 
+# numbers included for sorting.
+MINOR_SCAR = "1MINOR"
+MAJOR_SCAR = "2MAJOR"
+SEVERE_SCAR = "3SEVERE"
+EXTREME_SCAR = "4EXTREME"
+SCAR_SEVERITY = (
+    (MINOR_SCAR, "Minor Scars"),
+    (MAJOR_SCAR, "Major Scars"),
+    (SEVERE_SCAR, "Severe Scars"),
+    (EXTREME_SCAR, "Extreme Scars"),
+)
 
 BODY_STATUS = (
     'Scuffed',
@@ -123,6 +134,19 @@ PENALTIES = (
     -4,
     "Incap",
     "Dead"
+)
+
+WEAPON_MELEE = "MELEE" # swords, clubs, axes
+WEAPON_FIREARM = "FIREARM" # guns
+WEAPON_THROWN = "THROWN" # javalins, slings, shurikens
+WEAPON_PROJECTILE = "PROJECTILE" # bows, slingshots, crossbows
+WEAPON_OTHER = "OTHER" # Stun guns, caltrops, etc.
+WEAPON_TYPE = (
+    (WEAPON_MELEE, "Melee"),
+    (WEAPON_FIREARM, "Firearm"),
+    (WEAPON_THROWN, "Thrown"),
+    (WEAPON_PROJECTILE, "Projectile"),
+    (WEAPON_OTHER, "Other")
 )
 
 EQUIPMENT_DEFAULT = """
@@ -189,13 +213,13 @@ EXP_REWARD_VALUES = {
     EXP_WIN_V2: 3,
     EXP_WIN_IN_WORLD_V2: 5,
     EXP_WIN_RINGER_V2: 3,
-    EXP_GM: 4,
+    EXP_GM: 6,
     EXP_JOURNAL: 1,
 }
 
-EXP_NEW_CHAR = 145
+EXP_NEW_CHAR = 150
 EXP_COST_QUIRK_MULTIPLIER = 3
-EXP_ADV_COST_ATTR_MULTIPLIER = 4
+EXP_ADV_COST_ATTR_MULTIPLIER = 5
 EXP_ADV_COST_SKILL_MULTIPLIER = 2
 EXP_ADV_COST_SOURCE_MULTIPLIER = 2
 EXP_COST_SKILL_INITIAL = 2
@@ -225,10 +249,9 @@ def random_string():
     return hashlib.sha224(bytes(random.randint(1, 99999999))).hexdigest()
 
 
-
 class Character(models.Model):
     name = models.CharField(max_length=100)
-    tagline = models.CharField(max_length=200)
+    tagline = models.CharField(max_length=200, blank=True)
     player = models.ForeignKey(settings.AUTH_USER_MODEL,
                               on_delete=models.CASCADE,
                               null=True)
@@ -963,10 +986,20 @@ class Character(models.Model):
                 self.set_bonus_for_attribute(attr, bonus_by_attribute.get(attr))
 
 
+class StockBattleScar(models.Model):
+    type = models.CharField(choices=SCAR_SEVERITY,
+                            max_length=45,
+                            default=MINOR_SCAR)
+    description = models.CharField(max_length=500)
+    system = models.CharField(max_length=500)
+
+
 class BattleScar(models.Model):
     character = models.ForeignKey(Character,
                                    on_delete=models.CASCADE)
     description = models.CharField(max_length=500)
+    system = models.CharField(max_length=500, blank=True)
+
 
 class WorldElement(models.Model):
     character = models.ForeignKey(Character,
@@ -1256,6 +1289,27 @@ class Roll(models.Model):
                         speed=speed)
             roll.save()
             return roll
+
+
+class Weapon(models.Model):
+    name = models.CharField(max_length=100)
+    type = models.CharField(choices=WEAPON_TYPE,
+                            max_length=30,
+                            default=WEAPON_MELEE)
+    bonus_damage = models.IntegerField(default=0)
+    damage_errata = models.CharField(max_length=300, blank=True) # errata displayed directly after damage
+    attack_roll = models.ForeignKey(Roll,
+                                    blank=True,
+                                    null=True,
+                                    on_delete=models.CASCADE)
+    # intended to use instead of attack_roll for daggers. Can also be used as addendum for discretionary Difficulty.
+    attack_roll_text = models.CharField(max_length=300, blank=True)
+    range = models.CharField(max_length=300, blank=True)
+    errata = models.CharField(max_length=300, blank=True)
+
+    def __str__(self):
+        return self.name + "(" + self.type + ")"
+
 
 class Quirk(models.Model):
     name = models.CharField(max_length=150)

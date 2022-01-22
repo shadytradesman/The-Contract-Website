@@ -83,12 +83,12 @@
     {% if character.number_of_victories > 3 %}
         <div class="alert alert-danger text-center css-char-alert" role="alert">
             <p>
-                {{character.name}} does not have a home World despite completing {{character.number_completed_games}} Contracts.
+                {{character.name}} does not have a home Playgroup despite completing {{character.number_completed_games}} Contracts.
                 They should not play in any Contracts until they have a home.
                 {% if user_can_edit %}
                     <br>
                     <a href="{% url 'cells:cells_find_world' %}">
-                        Find a World to join
+                        Find a Playgroup to join
                     </a>
                     or
                     <a href="{% url 'cells:cells_create' %}" >
@@ -105,12 +105,12 @@
     {% else %}
         <div class="alert alert-warning text-center css-char-alert" role="alert">
             <p>
-                {{character.name}} does not have a home World. They cannot interact with Contractors on their Downtimes.
-                They must choose a World before their fourth Contract.
+                {{character.name}} does not have a home Playgroup. They cannot interact with Contractors on their Downtimes.
+                They must choose a Playgroup before their fourth Contract.
                 {% if user_can_edit %}
                     <br>
                     <a href="{% url 'cells:cells_find_world' %}">
-                        Find a World to join
+                        Find a Playgroup to join
                     </a>
                     or
                     <a href="{% url 'cells:cells_create' %}" >

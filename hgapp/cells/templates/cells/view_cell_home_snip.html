@@ -43,7 +43,7 @@
         Use <b>World Events</b> to announce important developments in {{cell.name}}.
         <br>
         These may be the result of a Contract, the actions of a Contractor, or a special event. Contractors and NPCs in this
-        World may hear about these events and choose to investigate.
+        setting may hear about these events and choose to investigate.
         <br>
         <a href="{% url 'cells:cells_post_world_event' cell.id %}">Post a new World Event</a>
     </div>
@@ -70,7 +70,7 @@
         {% else %}
             <div class="text-center">
                 <p>
-                    You cannot view any Journals written for Contracts that occurred in this World.
+                    You cannot view any Journals written for Contracts that occurred in this Playgroup.
                 </p>
             </div>
         {% endif %}
@@ -78,7 +78,7 @@
     <div class="col-md-6">
         <div class="text-center">
             <h4>Latest Completed Contracts</h4>
-            <small>{{cell.num_completed_games}} Contracts have been run in this World</small>
+            <small>{{cell.num_completed_games}} Contracts have been run in this Playgroup</small>
         </div>
         {% if completed_games %}
             {% for game in completed_games|slice:":3" %}
