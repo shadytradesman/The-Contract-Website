@@ -3,7 +3,7 @@
         All firearms use <b>{{weapons.0.attack_roll.render_html_for_current_contractor}}</b>
     </div>
     <div>
-        Firearms may be fired at targets at up to twice the listed range at +2 Difficulty.
+        Firearms may be fired at targets at up to 3x the listed range at up to +3 Difficulty.
     </div>
 </div>
 <div class="row css-equip-header">
@@ -22,6 +22,13 @@
     <div class="row css-equip-row">
         <div class="col-xs-5">
             {{weapon.name}}
+            {% if weapon.errata %}
+            <span data-toggle="tooltip"
+                  title="{{weapon.errata}}"
+                  data-container="#weap-{{weapon_type.0}}"
+                  data-placement="left"
+            ><i class="fa fa-question-circle fa-1x"></i></span>
+            {% endif %}
         </div>
         <div class="col-xs-3">
             +{{ weapon.bonus_damage }}
