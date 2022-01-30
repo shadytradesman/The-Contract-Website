@@ -266,8 +266,8 @@ elif 'LOCAL_CONTRACT_POSTGRES' in os.environ:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'postgres',
-            'USER': 'shady',
+            'NAME': 'contract',
+            'USER': 'spencerstecko',
             'PASSWORD': 'password',
             'HOST': 'localhost',
             'PORT': '5432',

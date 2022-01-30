@@ -36,7 +36,7 @@ def get_world_element_default_dict(world_element_cell_choices):
 
 
 def get_weapons_by_type():
-    weapons = Weapon.objects.order_by("type").all()
+    weapons = Weapon.objects.order_by("type", "bonus_damage").all()
     weapons_by_type = defaultdict(list)
     for weapon in weapons:
         weapons_by_type[(weapon.type, weapon.get_type_display())].append(weapon)
