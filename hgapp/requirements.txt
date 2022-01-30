@@ -43,7 +43,7 @@ markdown2==2.3.9
 paramiko==2.7.1
 pathspec==0.5.9
 pilkit==2.0
-Pillow==8.4.0
+Pillow==9.0.0
 pinax-eventlog==2.0.3
 pinax-images==5.0.1
 pinax-theme-bootstrap==8.0.1
