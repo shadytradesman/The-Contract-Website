@@ -1094,6 +1094,8 @@ class ExperienceReward(models.Model):
             return 0
         if hasattr(self, 'custom_value') and self.custom_value:
             return self.custom_value
+        if self.type == EXP_CUSTOM:
+            return 0
         return EXP_REWARD_VALUES[self.type]
 
     def log_bad_source(self):

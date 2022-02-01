@@ -68,7 +68,7 @@
                             <i>{{invitation.attendance.notes}}</i>
                         </p>
                     {% endif %}
-                    {% if invitation.attendance.journal_set.first %}
+                    {% if invitation.attendance.journal_set.first and invitation.attendance.attending_character %}
                         <p>
                             <a href="{% url 'journals:journal_read_game' invitation.attendance.attending_character.id game.id %}"
                                 class="btn btn-default btn-xs"

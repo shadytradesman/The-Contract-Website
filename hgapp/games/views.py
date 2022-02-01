@@ -363,11 +363,14 @@ def view_game(request, game_id):
     game = get_object_or_404(Game, id=game_id)
     my_invitation = None
     user_membership = None
-    if request.user.is_authenticated:
+    if request.user.is_authenticated and game.cell:
         user_membership = game.cell.get_player_membership(request.user)
         my_invitation = get_object_or_none(request.user.game_invite_set.filter(relevant_game=game_id))
-    can_view_community_link = game.cell.is_community_link_public or user_membership
-    community_link = game.cell.community_link if can_view_community_link else None
+    can_view_community_link = False
+    community_link = None
+    if game.cell:
+        can_view_community_link = game.cell.is_community_link_public or user_membership
+        community_link = game.cell.community_link if can_view_community_link else None
     scenario_spoiled = game.scenario.player_is_spoiled(request.user)
     invite_form = None
     can_edit = game.player_can_edit(request.user)

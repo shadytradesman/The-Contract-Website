@@ -1,3 +1,5 @@
+import logging
+
 from django.db import models
 from django.db.models import Count
 from django.conf import settings
@@ -18,6 +20,8 @@ from django.utils.safestring import SafeText
 from games.games_constants import GAME_STATUS, get_completed_game_excludes_query
 
 from hgapp.utilities import get_object_or_none
+
+logger = logging.getLogger("app." + __name__)
 
 WIN = 'WIN'
 LOSS = 'LOSS'
@@ -510,10 +514,18 @@ class Game_Attendance(models.Model):
     def confirm_and_reward(self):
         self.is_confirmed=True
         self.save()
-        self.attending_character.update_contractor_game_stats()
+        if self.attending_character:
+            self.attending_character.update_contractor_game_stats()
         self.give_reward()
 
     def get_reward(self):
+        objects = Reward.objects.filter(rewarded_player=self.get_player(), relevant_game=self.relevant_game, is_void=False, is_journal=False)
+        # this is because of an error where Edgar somehow got both an Improvement and Gift on killer chicken island (game 125)
+        if objects.count() > 1:
+            objects[0].mark_void()
+            logger.error('Error: too many gifts for game: %s \n gifts: %s',
+                         str(self.pk),
+                         str(objects))
         return get_object_or_none(Reward, rewarded_player=self.get_player(), relevant_game=self.relevant_game, is_void=False, is_journal=False)
 
     def get_player(self):
