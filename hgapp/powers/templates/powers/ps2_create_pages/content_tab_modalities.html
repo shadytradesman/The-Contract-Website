@@ -1,7 +1,12 @@
-<div v-for="component in modalities"
-     :key="component.id">
-    <label v-bind:for="component.id" class="thumbnail" style="margin: 5px;">
-        <div>
+<div style="display: flex;  align-items: stretch; margin-top: 30px; margin-bottom: 30px;">
+    <div v-for="component in modalities"
+         :key="component.id"
+        style="margin-left: 10px; margin-right: 10px; flex: 1;">
+        <label
+                v-bind:for="component.id"
+                class="css-component-radio css-modality-radio"
+                :class="{'css-selected-component': selectedModality && component.id === selectedModality.id}"
+                style="margin: 5px; width: 100%;">
             <input type="radio"
                    v-bind:id="component.id"
                    v-bind:name="component.type"
@@ -9,15 +14,22 @@
                    v-model="selectedModality"
                    @change="changeModality"
                    @click="clickModality"
+                   style="display:none;"
             >
-            <span  style="padding-left: 10px;">
+            <h3 style="margin-top: 5px;">
                 { component.displayName }
-            </span>
-        </div>
-        <div>
-            <small>
+            </h3>
+            <h5 style="margin-top: 0px;">
                 { component.summary }
-            </small>
-        </div>
-    </label>
+            </h5>
+            <div class="text-muted">
+                <small>
+                    { component.description }
+                </small>
+            </div>
+        </label>
+    </div>
+</div>
+<div>
+
 </div>

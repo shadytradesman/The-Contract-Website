@@ -155,20 +155,32 @@
     margin-top: 0px;
 }
 
-.css-effect-radio {
+.css-component-radio {
     border-radius: 4px;
     border: 1px solid transparent;
     background-color: #353e4b;
     cursor: pointer;
+    padding: 10px;
 }
 
-.css-effect-radio:hover {
+.css-component-radio:hover {
     border: 1px solid grey;
 }
 
-.css-selected-effect {
+.css-selected-component {
     border-color: white;
 }
+
+.css-modality-radio {
+    text-align: center;
+}
+
+.css-effect-radio {
+}
+
+.css-effect-radio:hover {
+}
+
 
 .css-description {
     font-size: 15px;

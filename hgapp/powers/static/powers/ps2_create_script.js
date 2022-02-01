@@ -62,6 +62,7 @@ function componentToVue(component, type) {
         slug: component.slug,
         displayName: component.name,
         summary: component.summary,
+        description: component.description,
         type: component.type,
         giftCredit: component["gift_credit"],
         visibility: component.default_description_prompt,
