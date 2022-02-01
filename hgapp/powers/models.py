@@ -318,19 +318,19 @@ class Parameter(models.Model):
         return levels
 
     def get_value_for_level(self, level):
-        if level is 0:
+        if level == 0:
             return self.level_zero
-        if level is 1:
+        if level == 1:
             return self.level_one
-        if level is 2:
+        if level == 2:
             return self.level_two
-        if level is 3:
+        if level == 3:
             return self.level_three
-        if level is 4:
+        if level == 4:
             return self.level_four
-        if level is 5:
+        if level == 5:
             return self.level_five
-        if level is 6:
+        if level == 6:
             return self.level_six
         raise ValueError
 
@@ -414,6 +414,11 @@ class Base_Power(models.Model):
                                                 related_name="vector_modalities",
                                                 blank=True,
                                                 help_text="Set on Effects only. Ignored on Vectors and Modalities." )
+    vector_cost_credit = models.ManyToManyField("Base_Power",
+                                                through="VectorCostCredit",
+                                                through_fields=('relevant_effect', 'relevant_vector'),
+                                                help_text="SET ON EFFECTS ONLY. Any Gift using this Effect and the "
+                                                          "listed Vector will be reduced in cost by the credit.")
 
     avail_enhancements = models.ManyToManyField(Enhancement, verbose_name="enhancements",
                                                 related_name="avail_enhancements",
@@ -486,6 +491,24 @@ class Base_Power(models.Model):
             'default_description_prompt': system.default_description_prompt if system else None,
             'text_fields': [x.to_blob() for x in text_fields] if text_fields else [],
             'roll_fields': [x.to_blob() for x in roll_fields] if roll_fields else [],
+        }
+
+
+class VectorCostCredit(models.Model):
+    relevant_vector = models.ForeignKey(Base_Power, on_delete=models.CASCADE, related_name="cost_vector")
+    relevant_effect = models.ForeignKey(Base_Power, on_delete=models.CASCADE, related_name="cost_effect")
+    gift_credit = models.IntegerField("Gift Credit",
+                                      help_text="The cost of any Gift using this combination of Effect and Vector is "
+                                                "reduced by this amount.")
+
+    def __str__(self):
+        return ":".join([self.relevant_vector.name, self.relevant_effect.name, str(self.gift_credit)])
+
+    def to_blob(self):
+        return {
+            "vector": self.relevant_vector.pk,
+            "effect": self.relevant_effect.pk,
+            "credit": self.gift_credit,
         }
 
 
@@ -601,19 +624,19 @@ class Power_Param(models.Model):
         return levels
 
     def get_value_for_level(self, level):
-        if level is 0:
+        if level == 0:
             return self.level_zero
-        if level is 1:
+        if level == 1:
             return self.level_one
-        if level is 2:
+        if level == 2:
             return self.level_two
-        if level is 3:
+        if level == 3:
             return self.level_three
-        if level is 4:
+        if level == 4:
             return self.level_four
-        if level is 5:
+        if level == 5:
             return self.level_five
-        if level is 6:
+        if level == 6:
             return self.level_six
         raise ValueError
 

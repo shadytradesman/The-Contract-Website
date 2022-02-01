@@ -3,10 +3,11 @@ from collections import defaultdict
 
 from django.db.models import Prefetch
 from .models import SYS_ALL, SYS_LEGACY_POWERS, SYS_PS2, EFFECT, VECTOR, MODALITY, Base_Power, Enhancement, Drawback, \
-    Power_Param, Parameter, Base_Power_Category
+    Power_Param, Parameter, Base_Power_Category, VectorCostCredit
 
 def generate_json_blob():
     return json.dumps(generate_power_blob())
+
 
 def generate_power_blob():
     vectors = _generate_component_blob(VECTOR)
@@ -43,6 +44,8 @@ def generate_power_blob():
         # A Vector is only available on a given Modality + Effect if it appears in both mappings.
         'vectors_by_effect': vectors_by_effect,
         'vectors_by_modality': vectors_by_modality,
+
+        'effect_vector_gift_credit': _generate_effect_vector_gift_credits_blob(),
     }
 
     # generate the json blob for the fe and for backend form validation.
@@ -80,3 +83,9 @@ def _generate_param_blob():
 def _generate_component_category_blob():
     categories = Base_Power_Category.objects.order_by("name").all()
     return [x.to_blob() for x in categories]
+
+
+def _generate_effect_vector_gift_credits_blob():
+    cost_credits = VectorCostCredit.objects.all()
+    return [x.to_blob() for x in cost_credits]
+

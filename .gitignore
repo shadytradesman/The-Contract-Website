@@ -13,3 +13,4 @@ hgapp/.package*
 *~
 *.log
 *vue.next.js
+*.DS_Store

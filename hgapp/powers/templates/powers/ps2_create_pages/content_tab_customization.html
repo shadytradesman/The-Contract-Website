@@ -20,15 +20,10 @@
     </div>
     <div v-for="field in systemFields"
          :key="field.id"
-         style="width: 50%;">
+         style="width: 50%; padding-left: 10px; padding-right: 10px;">
         <h5 style="margin-bottom: 5px;">
             {field.name}
         </h5>
-        <div v-if="field.eratta">
-            <small>
-                { field.eratta }
-            </small>
-        </div>
         <div v-if="field.isText">
             <input type="text" v-model="fieldTextInput[field.id]" class="form-control" @input="changeParam">
         </div>
@@ -41,6 +36,11 @@
                     <option v-for="value in field.abilityChoices" :value="value[1]">{value[1]}</option>
                 </select>
             </span>
+        </div>
+        <div v-if="field.eratta">
+            <small>
+                { field.eratta }
+            </small>
         </div>
     </div>
 </div>

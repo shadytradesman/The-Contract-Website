@@ -10,7 +10,7 @@ from .models import Enhancement, Parameter, Base_Power, Drawback, Power_Param, P
     Base_Power_Category, Base_Power_System, PowerTag, PremadeCategory,\
     Enhancement_Instance, Drawback_Instance, Power_Full, PowerTutorial, SystemFieldText, SystemFieldRoll, \
     ParameterFieldSubstitution, BasePowerFieldSubstitution, EnhancementFieldSubstitution, DrawbackFieldSubstitution,\
-    EFFECT, VECTOR, MODALITY, SYS_LEGACY_POWERS, SYS_ALL, SYS_PS2, FieldSubstitutionMarker
+    EFFECT, VECTOR, MODALITY, SYS_LEGACY_POWERS, SYS_ALL, SYS_PS2, FieldSubstitutionMarker, VectorCostCredit
 
 
 class PowerParamTabular(admin.StackedInline):
@@ -29,6 +29,19 @@ class SystemFieldTextTabular(admin.TabularInline):
             kwargs["queryset"] = FieldSubstitutionMarker.objects.order_by("marker")
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
     extra = 0
+
+
+class VectorCostCreditTabular(admin.TabularInline):
+    model = VectorCostCredit
+    fk_name = "relevant_effect"
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "relevant_vector":
+            kwargs["queryset"] = Base_Power.objects.filter(base_type=VECTOR)
+        if db_field.name == "relevant_effect":
+            kwargs["queryset"] = Base_Power.objects.filter(base_type=EFFECT)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+        extra = 0
 
 
 class SystemFieldRollTabular(admin.TabularInline):
@@ -149,7 +162,7 @@ class BasePowerAdmin(admin.ModelAdmin):
     ordering = ("-base_type", "name")
     prepopulated_fields = {"slug": ("name",)}
     list_display = ('name', 'base_type', 'category', 'is_public')
-    inlines = [PowerParamTabular, SystemInline, BasePowerFieldSubTabular]
+    inlines = [PowerParamTabular, SystemInline, BasePowerFieldSubTabular, VectorCostCreditTabular]
     filter_horizontal = ["enhancements", "drawbacks", "substitutions", "avail_enhancements", "avail_drawbacks",
                          "blacklist_parameters", "blacklist_enhancements", "blacklist_drawbacks",
                          "allowed_vectors", "allowed_modalities"]
@@ -207,6 +220,9 @@ class BasePowerAdmin(admin.ModelAdmin):
 class BasePowerSystemAdmin(admin.ModelAdmin):
     inlines = [SystemFieldTextTabular, SystemFieldRollTabular]
 
+@admin.register(VectorCostCredit)
+class VectorCostCreditAdmin(admin.ModelAdmin):
+    pass
 
 @admin.register(PowerTag)
 class PowerTagAdmin(admin.ModelAdmin):

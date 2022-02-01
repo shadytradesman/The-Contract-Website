@@ -806,6 +806,11 @@ const ComponentRendering = {
           this.parameters.forEach(param => {
               cost = cost + giftCostOfVueParam(param, this.parameterSelections[param.id]);
           });
+          let credit = powerBlob["effect_vector_gift_credit"].filter(cred => cred["vector"] === this.selectedVector
+                && cred["effect"] === this.selectedEffect["slug"])
+                .forEach(comp => {
+                    cost = cost-comp["credit"];
+                });
           this.giftCost = cost;
       },
       calculateRestrictedElements() {
