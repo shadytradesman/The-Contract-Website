@@ -23,18 +23,36 @@
 		<div class="col-xs-12">
 			{% include "powers/ps2_create_pages/snip_head_and_steps.html" %}
 		</div>
-		<div class="col-xs-12 hidden-sm hidden-xs" :class="{
-			'col-md-4': expandedTab === 'customize',
-			'css-hidden': expandedTab != 'customize'
+		<div class="visible-xs-block">
+			<div class="css-gift-cost-cont">
+				<span data-spy="affix" data-offset-top="160">
+					<div class="text-center css-gift-cost">
+						<a class="btn btn-default">
+							<span>Gift Preview</span>
+						</a>
+						Gift Cost: <span v-html="giftCost"></span>
+					</div>
+				</span>
+				<div class="css-fake-height-div">
+				</div>
+			</div>
+		</div>
+		<div class="col-xs-12 hidden-xs"
+			 :class="{
+				'col-md-4': expandedTab === 'customize',
+				'col-sm-6': expandedTab === 'customize',
+				'css-hidden': expandedTab != 'customize'
 			}">
 			<div data-spy="affix" data-offset-top="80">
 				{% include "powers/ps2_create_pages/section_gift_preview.html" %}
 			</div>
 		</div>
-		<div class="hidden-md hidden-lg col-xs-12">
-			{% include "powers/ps2_create_pages/section_gift_preview.html" %}
-		</div>
-		<div class="col-xs-12 css-content-section" :class="{ 'col-md-8': expandedTab === 'customize' }">
+		<div class="col-xs-12 css-content-section"
+			 :class="{
+			 	'col-md-8': expandedTab === 'customize',
+			 	'col-sm-6': expandedTab === 'customize'
+			 	}"
+		>
 			{% include "powers/ps2_create_pages/section_content.html" %}
 		</div>
 	</div>

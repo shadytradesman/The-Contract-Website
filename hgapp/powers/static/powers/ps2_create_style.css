@@ -232,3 +232,17 @@
 .css-component-gift-price {
     color: #a94442;
 }
+
+
+.css-customization-field {
+    width: 100%;
+    padding-right: 5px;
+    padding-left: 5px;
+}
+
+@media (min-width: 992px) {
+    .css-customization-field {
+        width: 50%;
+    }
+
+}

@@ -1,15 +1,25 @@
 <div class="text-muted text-center">
-    Customize your Gift's behavior. When you're satisfied, <a href="#sec-customize-flavor">finish by adding flavor.</a>
+    Customize your Gift's behavior.
+    <div class="visible-xs-block"></div>
+    When you're satisfied, <a href="#sec-customize-flavor">finish by adding flavor.</a>
+</div>
+<div class="visible-xs-block" style="padding: 10px;">
+    <b>Here is what we have so far:</b>
+    <div style="border: solid 1px grey;">
+        {% include "powers/ps2_create_pages/section_gift_preview.html" %}
+    </div>
 </div>
 
 <div style="display: flex; flex-wrap: wrap;">
-    <div v-if="vectors.length > 1" style="width: 50%; padding-right: 10px;">
+    <div v-if="vectors.length > 1"
+         class="css-customization-field">
         <h5>
             Style
         </h5>
         <div v-for="component in vectors"
+             class="css-customization-field"
              :key="component.id"
-             style="display: inline-block; width: 50%; padding-right: 5px; padding-left: 5px;">
+             style="display: inline-block;">
             <label v-bind:for="component.id"
                    class="css-component-radio css-vector-radio"
                    :class="{'css-selected-component': component.slug === selectedVector}"
@@ -33,7 +43,7 @@
     </div>
     <div v-for="field in systemFields"
          :key="field.id"
-         style="width: 50%; padding-left: 10px; padding-right: 10px;">
+         class="css-customization-field">
         <h5 style="margin-bottom: 5px;">
             {field.name}
         </h5>
@@ -58,7 +68,7 @@
     </div>
     <div v-for="param in parameters"
          :key="param.id"
-         style="width: 50%; padding-left: 10px; padding-right: 10px;">
+         class="css-customization-field">
         <h5 style="margin-bottom: 5px;">{param.name}</h5>
         <select v-model="parameterSelections[param.id]"
                 class="form-control"
@@ -88,7 +98,7 @@
 </div>
 
 <div class="row">
-    <div class="col-sm-6">
+    <div class="col-md-6 col-sm-12">
         <h4 class="text-center" style="margin-bottom: 0px;">Enhancements</h4>
         <div class="text-center" style="margin-bottom: 5px;">
             <small class="text-muted">
@@ -109,7 +119,7 @@
             </div>
         </div>
     </div>
-    <div class="col-sm-6">
+    <div class="col-md-6 col-sm-12">
         <h4 class="text-center" style="margin-bottom: 0px;">Drawbacks</h4>
         <div class="text-center" style="margin-bottom: 5px;">
             <small class="text-muted">

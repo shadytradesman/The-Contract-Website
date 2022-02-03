@@ -25,9 +25,6 @@
         <div v-if="giftDescription" style="margin: auto; width: 50%;">
             <hr style="margin-top: 10px; margin-bottom: 10px;">
         </div>
-        <div class="visible-xs-block">
-            {% include "powers/ps2_create_pages/snip_affix_cost_system.html" %}
-        </div>
         <div id="rendered-system" v-html="renderedSystem" class="js-render-power-keywords">
         </div>
         {% if request.user.is_superuser %}
