@@ -1,4 +1,6 @@
-
+.css-hidden {
+    display: none;
+}
 .css-gift-cost-cont {
     width: 290px;
     margin: auto;
@@ -21,6 +23,10 @@
 }
 
 .affix {
+    width: inherit;
+    padding-left: 15px;
+    padding-right: 15px;
+    left: 0px;
     top: 60px;
     z-index: 9999 !important;
 }
@@ -137,8 +143,8 @@
     }
 
     .css-tabs-and-system {
-        position: fixed;
-        width: inherit;
+        /*width: inherit;*/
+        width: 100%;
         margin-left: -15px;
         margin-right: -15px;
         padding-left: 15px;
