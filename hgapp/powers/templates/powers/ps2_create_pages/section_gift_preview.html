@@ -1,55 +1,46 @@
 <div class="css-tabs-and-system">
     <div class="panel panel-default">
-        <div class="panel-heading text-center">
-            <h3 style="margin-top: 0px; margin-bottom: 0px">Gift Preview</h3>
-            <div>
-                Current Cost:
+        <div class="panel-heading">
+            <h3 class="" style="margin-top: 5px; margin-bottom: 5px">
+                <span v-if="giftName" v-text="giftName"></span>
+                <span v-if="giftName === null">Gift Preview</span>
+                <small>
+                    <i>
+                        <span v-if="giftTagline.length > 0" v-text="giftTagline" style="margin-left: 10px;">
+                        </span>
+                    </i>
+                </small>
+                <small>
+                    <div class="css-description" v-text="renderedDescription" style="margin-top: 5px;">
+                    </div>
+                </small>
+            </h3>
+            <div class="">
+                Gift Cost:
                 <span v-html="giftCost"></span>
             </div>
         </div>
-        <div class="panel-body">
-            <div class="form-group">
-                <label class="control-label" for="id_power_name">Name</label>
-                <div class=" ">
-                    <input type="text" name="power_name" maxlength="100" class=" form-control" required="" id="id_power_name">
-                </div>
+        <div class="panel-body" style="padding-top: 5px;">
+            <div v-if="giftDescription" v-text="giftDescription" class="css-system-text-user-input" style="margin-top: 5px; margin-bottom: 5px;">
             </div>
-            <div class="css-description" v-text="renderedDescription">
+            <div v-if="giftDescription" style="margin: auto; width: 50%;">
+                <hr style="margin-top: 10px; margin-bottom: 10px;">
             </div>
             <div class="visible-xs-block">
                 {% include "powers/ps2_create_pages/snip_affix_cost_system.html" %}
             </div>
-            <h4 style="margin-top: 15px;">System</h4>
             <div id="rendered-system" v-html="renderedSystem" class="js-render-power-keywords">
             </div>
+            {% if request.user.is_superuser %}
             <a class="btn btn-default btn-xs" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
                 Show Unrendered System (dev only)
             </a>
+            {% endif %}
             <div class="collapse" id="collapseExample">
                 <small>
                     <div id="unrendered-system" v-html="unrenderedSystem">
                     </div>
                 </small>
-            </div>
-            <div class="row">
-                <div class="col-xs-12" >
-                    <h4>
-                        Description
-                        <div>
-                            <small>
-                                Describe what the Power looks like when it is used, how it works, and its impact on the owner, target, and environment.
-                            </small>
-                            <div v-if="selectedEffect.visibility">
-                                By default, { selectedEffect.visibility }
-                            </div>
-                        </div>
-                    </h4>
-                    <div class="form-group">
-                        <div class=" ">
-                            <textarea name="description" cols="40" rows="10" class=" form-control" required="" id="id_description"></textarea>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>

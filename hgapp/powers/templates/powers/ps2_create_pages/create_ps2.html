@@ -21,17 +21,12 @@
 	<div class="row">
 		<div style="margin-bottom: 10px;"></div>
 		<div class="col-xs-12">
-			<div class="hidden-lg hidden-md">
-				{% include "powers/ps2_create_pages/snip_head_and_steps.html" %}
-			</div>
+			{% include "powers/ps2_create_pages/snip_head_and_steps.html" %}
 		</div>
-		<div class="col-xs-12" :class="{ 'col-md-4': selectedModality && selectedEffect }" v-if="selectedModality && selectedEffect">
+		<div class="col-xs-12" :class="{ 'col-md-4': expandedTab === 'customize' }" v-if="expandedTab === 'customize'">
 			{% include "powers/ps2_create_pages/section_gift_preview.html" %}
 		</div>
-		<div class="col-xs-12 css-content-section" :class="{ 'col-md-8': selectedModality && selectedEffect }">
-			<div class="hidden-xs hidden-sm">
-				{% include "powers/ps2_create_pages/snip_head_and_steps.html" %}
-			</div>
+		<div class="col-xs-12 css-content-section" :class="{ 'col-md-8': expandedTab === 'customize' }">
 			{% include "powers/ps2_create_pages/section_content.html" %}
 		</div>
 	</div>

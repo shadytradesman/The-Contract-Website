@@ -1,3 +1,13 @@
+<div class="text-muted text-center">
+    A Gift's Effect determines what it <i>does</i>. Flavor is added during customization.
+    <br>
+    <small>
+        For example, Alternate Form could be used by both werewolves and magical girls.
+        <br>
+        Injure could be anything from a fireball to a sudden stroke of bad luck for the target.
+    </small>
+</div>
+
 <span v-if="effectFilters.length > 1">
     <h4 style="display: inline-block; margin-right: 15px;">Filters:</h4>
 </span>
@@ -34,7 +44,7 @@
             <div class="row">
                 <div v-for="component in category.effects"
                      :key="component.id">
-                    <div class="col-xs-12 col-lg-6" style="padding-left:40px;">
+                    <div class="col-xs-12 col-sm-6" style="padding-left:30px;">
                         <label v-bind:for="component.id"
                                style="margin: 5px; width: 100%; height: 100%;"
                                class="css-component-radio css-effect-radio"
@@ -49,14 +59,23 @@
                                        @click="clickEffect"
                                        style="display:none;"
                                 >
-                                <h4 style="margin-top: 4px !important; margin-bottom: 4px !important; display: inline-block;">
+                                <h4 class="css-component-header" style="margin-top: 4px !important; margin-bottom: 4px !important; display: inline-block;">
                                     {component.displayName}
                                     <div>
                                         <small>
-                                            { component.summary }
+                                            <b>{ component.summary } </b>
+                                            <i>
+                                            <span style="padding-left: 5px;" class="text-muted" v-html="getCostForEffect(component.slug, component.giftCredit)">
+                                            </span>
+                                            </i>
                                         </small>
                                     </div>
                                 </h4>
+                                <div class="text-muted">
+                                    <small >
+
+                                    </small>
+                                </div>
                             </div>
                         </label>
                     </div>

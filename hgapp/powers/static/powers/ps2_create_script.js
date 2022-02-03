@@ -46,6 +46,12 @@ function replaceHoverText(text) {
     }
     return modifiedText;
 }
+function displayCost(cost) {
+    let prefix =  cost >= 0 ? "+" : "";
+    let content = prefix + cost;
+    let cssClass = cost < 0 ? "css-component-gift-credit" : cost == 0 ? "" : "css-component-gift-price";
+    return "<span class=\"" + cssClass +"\">" + content + "</span>";
+};
 
 function replaceSubstring(match) {
 	const trimmed = match.trim();
@@ -582,6 +588,9 @@ const ComponentRendering = {
       renderedSystem: "",
       activeUniqueReplacementsByMarker: {},
       giftCost: 0,
+      giftName: null,
+      giftDescription: null,
+      giftTagline: "",
     }
   },
   methods: {
@@ -606,7 +615,7 @@ const ComponentRendering = {
       },
       openCustomizationTab() {
           this.expandedTab = "customize";
-          this.tabHeader = "Customize";
+          this.tabHeader = "Customize System";
       },
       clickModalityTab() {
           if (this.expandedTab === "modalities" && this.selectedModality) {
@@ -693,6 +702,33 @@ const ComponentRendering = {
       },
       changeEffectFilter() {
           this.updateEffectCategoryDisplay();
+      },
+      getCostForEffect(effectSlug, effectGiftCredit) {
+        // A cost is only displayed for an Effect if there is only one Vector for the Effect and the combined cost is non-zero.
+        const allowedVectors = this.getAvailableVectorsForEffectAndModality(effectSlug, this.selectedModality.slug)
+            .map(comp => componentToVue(powerBlob.vectors[comp], "vector"));
+        let costs = allowedVectors.map(vector => {
+            let cost = this.additionalCostOfEffectAndVector(effectSlug, vector["slug"]);
+            return cost - vector["giftCredit"] - effectGiftCredit;
+        });
+        if (costs.length > 1 ) {
+            // will display cost on style selection.
+            return null;
+        }
+        costs = costs.filter(cost => cost != 0);
+        if (costs.length == 1) {
+            return "(Gift Cost: " + displayCost(costs[0]) + ")";
+        }
+        return null;
+      },
+      getCostForVector(vectorSlug) {
+        // the displayed cost for a vector is the combined cost of the effect and vector together.
+        let credit = powerBlob.vectors[vectorSlug]["gift_credit"] + this.selectedEffect.giftCredit;
+        let cost = this.additionalCostOfEffectAndVector(this.selectedEffect["slug"], vectorSlug) - credit;
+        if (cost != 0) {
+            return "(Gift Cost: " + displayCost(cost) + ")";
+        }
+        return null;
       },
       updateEffectFilters() {
           let allAvailableVectors = Array.from(new Set(this.effects
@@ -807,12 +843,17 @@ const ComponentRendering = {
           this.parameters.forEach(param => {
               cost = cost + giftCostOfVueParam(param, this.parameterSelections[param.id]);
           });
-          let credit = powerBlob["effect_vector_gift_credit"].filter(cred => cred["vector"] === this.selectedVector
-                && cred["effect"] === this.selectedEffect["slug"])
-                .forEach(comp => {
-                    cost = cost-comp["credit"];
-                });
+          cost = cost + this.additionalCostOfEffectAndVector(this.selectedEffect["slug"], this.selectedVector)
           this.giftCost = cost;
+      },
+      additionalCostOfEffectAndVector(effectSlug, vectorSlug) {
+          let cost =0;
+          powerBlob["effect_vector_gift_credit"].filter(cred => cred["vector"] === vectorSlug
+                && cred["effect"] === effectSlug)
+                .forEach(comp => {
+                    cost= cost - comp["credit"];
+                });
+          return cost;
       },
       calculateRestrictedElements() {
           this.populateUniqueReplacementsMap();
@@ -969,4 +1010,7 @@ const mountedApp = app.mount('#vue-app');
 
 $(function() {
     mountedApp.modalities = Object.values(powerBlob.modalities).map(comp => componentToVue(comp, "mod"));
+    mountedApp.$nextTick(function () {
+      activateTooltips();
+  });
 });

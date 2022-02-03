@@ -27,6 +27,7 @@
 
 .css-modifier-text {
     font-weight: 400;
+    font-size: 13px;
 }
 
 /* TOP WORKFLOW BAR */
@@ -128,6 +129,9 @@
     color: #c6965a;
 }
 
+
+/* OVERALL LAYOUT */
+
 @media (min-width: 992px) {
     .css-creating-gift-header {
     }
@@ -155,12 +159,13 @@
     margin-top: 0px;
 }
 
+/* COMPONENTS */
+
 .css-component-radio {
     border-radius: 4px;
     border: 1px solid transparent;
     background-color: #353e4b;
     cursor: pointer;
-    padding: 10px;
 }
 
 .css-component-radio:hover {
@@ -171,11 +176,24 @@
     border-color: white;
 }
 
+.css-selected-component .css-component-header {
+    color: #c6965a;
+}
+
 .css-modality-radio {
     text-align: center;
+    padding: 10px;
 }
 
 .css-effect-radio {
+    padding: 5px;
+    padding-left: 10px;
+}
+
+.css-vector-radio {
+    width: 100%;
+    margin: 5px;
+    padding: 5px;
 }
 
 .css-effect-radio:hover {
@@ -185,6 +203,7 @@
 .css-description {
     font-size: 15px;
     font-weight: bold;
+    margin-bottom: 5px;
 }
 
 /* SYSTEM TEXT STYLING */
@@ -192,9 +211,18 @@
 .css-system-text-user-input {
     font-style: italic;
     color: #c3c2b6;
-    font-weight: bold;
 }
 
 .css-system-text-roll {
     font-weight: bold;
+}
+
+/* GIFT CREDIT / COST */
+
+.css-component-gift-credit {
+    color: #499773;
+}
+
+.css-component-gift-price {
+    color: #a94442;
 }

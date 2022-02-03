@@ -1,4 +1,8 @@
-<div style="display: flex;  align-items: stretch; margin-top: 30px; margin-bottom: 30px;">
+<div class="text-muted text-center">
+    A Gift's Type determines how it manifests. Is it an intrinsic superpower, a unique item, or the ability to craft extraordinary objects?
+</div>
+
+<div style="display: flex;  align-items: stretch; flex-wrap: wrap; margin-top: 30px; margin-bottom: 30px;">
     <div v-for="component in modalities"
          :key="component.id"
         style="margin-left: 10px; margin-right: 10px; flex: 1;">
@@ -16,15 +20,24 @@
                    @click="clickModality"
                    style="display:none;"
             >
-            <h3 style="margin-top: 5px;">
+            <h3 class="css-component-header"  style="margin-top: 5px;">
                 { component.displayName }
             </h3>
-            <h5 style="margin-top: 0px;">
+            <h5 style="margin-top: 0px; margin-bottom: 5px;">
                 { component.summary }
             </h5>
             <div class="text-muted">
                 <small>
                     { component.description }
+                </small>
+            </div>
+            <div class="text-right text-muted"
+                 data-toggle="tooltip"
+                 title="Gift Types add or subtract from a completed Gift's overall cost.">
+                <small>
+                    Gift Cost:
+                    <span v-if="component.giftCredit > 0" class="css-component-gift-credit">-{component.giftCredit - 1}</span>
+                    <span v-if="component.giftCredit == 0" class="css-component-gift-price">+1</span>
                 </small>
             </div>
         </label>
