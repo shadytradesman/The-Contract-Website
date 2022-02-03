@@ -18,26 +18,34 @@
 
 {% block body_base %}
 <div class="container-fluid" id="vue-app">
+	<div class="modal fade" id="tutorialModal" tabindex="-1" role="dialog" aria-labelledby="tutorialModalLabel" >
+		<div class="modal-dialog modal-lg" role="document" style="top: 100px;">
+			<div class="modal-content" >
+				{% include "powers/ps2_create_pages/section_gift_preview.html" %}
+			</div>
+		</div>
+	</div>
 	<div class="row">
 		<div style="margin-bottom: 10px;"></div>
 		<div class="col-xs-12">
 			{% include "powers/ps2_create_pages/snip_head_and_steps.html" %}
 		</div>
-		<div class="visible-xs-block">
+		<div class="hidden-sm hidden-md hidden-lg css-gift-preview-button"
+				:class="{'css-hidden': expandedTab != 'customize'}">
 			<div class="css-gift-cost-cont">
-				<span data-spy="affix" data-offset-top="160">
-					<div class="text-center css-gift-cost">
-						<a class="btn btn-default">
-							<span>Gift Preview</span>
-						</a>
-						Gift Cost: <span v-html="giftCost"></span>
+				<span data-spy="affix" data-offset-top="275">
+					<div class="css-gift-cost">
+						<button class="btn btn-default" type="button" data-toggle="modal" data-target="#tutorialModal">
+							Gift Preview
+						</button>
+						<span style="margin-top: 7px; margin-left: 10px;">
+							Cost: <span v-html="giftCost"></span>
+						</span>
 					</div>
 				</span>
-				<div class="css-fake-height-div">
-				</div>
 			</div>
 		</div>
-		<div class="col-xs-12 hidden-xs"
+		<div class="col-xs-12 hidden-xs css-gift-preview-sidebar"
 			 :class="{
 				'col-md-4': expandedTab === 'customize',
 				'col-sm-6': expandedTab === 'customize',
