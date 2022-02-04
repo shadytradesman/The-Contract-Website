@@ -9,10 +9,10 @@
 </div>
 
 <span v-if="effectFilters.length > 1">
-    <h4 style="display: inline-block; margin-right: 15px;">Filters:</h4>
+    <h4 style="display: inline-block; margin-right: 15px; margin-bottom: 5px;">Filter Effects:</h4>
 </span>
-<div v-for="effectFilter in effectFilters" style="display: inline-block; margin-right: 15px;">
-
+<div class="visible-xs-block"></div>
+<div v-for="effectFilter in effectFilters" style="display: inline-block; margin-right: 15px; margin-top: 5px;" class="radio">
     <label v-bind:for="effectFilter.id"
            class="css-effect-filter-radio" >
             <input type="radio"

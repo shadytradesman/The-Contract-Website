@@ -75,10 +75,10 @@ function componentToVue(component, type) {
     }
 }
 const filterDisplayByVecSlug = {
-    "direct": "Targeted Effects",
-    "at-will": "Self-targeting Effects",
-    "passive": "Passive Effects",
-    "trap": "Trap Effects",
+    "direct": "Targeted",
+    "at-will": "Self-targeting",
+    "passive": "Passive",
+    "trap": "Trap",
 }
 function vectorSlugToEffectFilter(vecSlug) {
     return {
@@ -591,6 +591,7 @@ const ComponentRendering = {
       giftName: null,
       giftDescription: null,
       giftTagline: "",
+      giftPreviewModalFirstShow: true,
     }
   },
   methods: {
@@ -616,6 +617,11 @@ const ComponentRendering = {
       openCustomizationTab() {
           this.expandedTab = "customize";
           this.tabHeader = "Customize System";
+          this.$nextTick(function () {
+            if (this.giftPreviewModalFirstShow && window.innerWidth <= 992) {
+                $('#giftPreviewModal').modal({});
+            }
+          });
       },
       clickModalityTab() {
           if (this.expandedTab === "modalities" && this.selectedModality) {
@@ -737,7 +743,7 @@ const ComponentRendering = {
           newEffectFilters.push({
               id: "effect-filter-ALL",
               value: "ALL",
-              display: "All Effects",
+              display: "All",
           });
           this.effectFilters = newEffectFilters.concat(allAvailableVectors.map(vecSlug => vectorSlugToEffectFilter(vecSlug)));
           this.selectedEffectFilter = "ALL";
@@ -1013,4 +1019,7 @@ $(function() {
     mountedApp.$nextTick(function () {
       activateTooltips();
   });
+  $('#giftPreviewModal').on('hidden.bs.modal', function (e) {
+    mountedApp.giftPreviewModalFirstShow = false;
+  })
 });

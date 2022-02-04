@@ -18,10 +18,25 @@
 
 {% block body_base %}
 <div class="container-fluid" id="vue-app">
-	<div class="modal fade" id="tutorialModal" tabindex="-1" role="dialog" aria-labelledby="tutorialModalLabel" >
+	<div class="modal fade" id="giftPreviewModal" tabindex="-1" role="dialog" aria-labelledby="giftPreviewModalLabel" >
 		<div class="modal-dialog modal-lg" role="document" style="top: 100px;">
 			<div class="modal-content" >
+				<div v-if="giftPreviewModalFirstShow" style="padding: 10px;">
+					<div class="text-center">
+						<b>
+							This preview shows your Gift's default system.
+						</b>
+					</div>
+					As you customize your Gift, its system and cost will be updated in real-time.
+				</div>
 				{% include "powers/ps2_create_pages/section_gift_preview.html" %}
+				<div class="modal-footer" v-if="giftPreviewModalFirstShow">
+					<div class="text-center">
+						<button type="button" class="btn btn-default" data-dismiss="modal">
+							Start Customizing
+						</button>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -33,10 +48,10 @@
 		<div class="hidden-sm hidden-md hidden-lg css-gift-preview-button"
 				:class="{'css-hidden': expandedTab != 'customize'}">
 			<div class="css-gift-cost-cont">
-				<span data-spy="affix" data-offset-top="275">
+				<span data-spy="affix" data-offset-top="290">
 					<div class="css-gift-cost">
-						<button class="btn btn-default" type="button" data-toggle="modal" data-target="#tutorialModal">
-							Gift Preview
+						<button class="btn btn-default" type="button" data-toggle="modal" data-target="#giftPreviewModal">
+							Preview Gift
 						</button>
 						<span style="margin-top: 7px; margin-left: 10px;">
 							Cost: <span v-html="giftCost"></span>

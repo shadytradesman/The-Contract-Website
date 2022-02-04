@@ -3,10 +3,19 @@
     <div class="visible-xs-block"></div>
     When you're satisfied, <a href="#sec-customize-flavor">finish by adding flavor.</a>
 </div>
-<div class="visible-xs-block" style="padding: 10px;">
-    <b>Here is what we have so far:</b>
-    <div style="border: solid 1px grey;">
-        {% include "powers/ps2_create_pages/section_gift_preview.html" %}
+<div class="visible-xs-block text-center" style="padding: 10px;">
+    <b>Click this button any time to preview your Gift:</b>
+    <div class="css-gift-cost-cont" style="display: block; position: relative;">
+        <span >
+            <div class="css-gift-cost">
+                <button class="btn btn-default" type="button" data-toggle="modal" data-target="#giftPreviewModal">
+                    Preview Gift
+                </button>
+                <span style="margin-top: 7px; margin-left: 10px;">
+                    Cost: <span v-html="giftCost"></span>
+                </span>
+            </div>
+        </span>
     </div>
 </div>
 
