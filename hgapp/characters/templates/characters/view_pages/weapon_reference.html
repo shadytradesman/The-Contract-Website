@@ -11,7 +11,7 @@
     <div class="collapse-content clearfix" style="display:none;" style="margin-top: 10px;">
         <ul class="nav nav-tabs nav-justified nav-justified-sm css-nav-tabs" role="tablist">
             {% for weapon_type, weapons in weapons_by_type.items %}
-                {% if weapon_type.0 != 'OTHER' %}
+                {% if weapon_type.0 != 'OTHER' and weapon_type.0 != 'UNARMED' %}
                     <li role="presentation" {% if forloop.counter0 == 0 %}class="active" {% endif %}>
                         <a class="css-weapon-tab-header" href="#weap-{{weapon_type.0}}" aria-controls="weap-{{weapon_type.0}}" role="tab" data-toggle="tab">{{weapon_type.1}}</a>
                     </li>

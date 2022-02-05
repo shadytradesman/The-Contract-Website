@@ -3,7 +3,8 @@ from collections import defaultdict
 
 from django.db.models import Prefetch
 from .models import SYS_ALL, SYS_LEGACY_POWERS, SYS_PS2, EFFECT, VECTOR, MODALITY, Base_Power, Enhancement, Drawback, \
-    Power_Param, Parameter, Base_Power_Category, VectorCostCredit
+    Power_Param, Parameter, Base_Power_Category, VectorCostCredit, ADDITIVE
+from characters.models import Weapon
 
 def generate_json_blob():
     return json.dumps(generate_power_blob())
@@ -46,6 +47,9 @@ def generate_power_blob():
         'vectors_by_modality': vectors_by_modality,
 
         'effect_vector_gift_credit': _generate_effect_vector_gift_credits_blob(),
+
+        # Weapon choice system fields use a Weapon's pk as the non-display value. Stats in this blob by pk.
+        'weapon_replacements_by_pk': _generate_weapons_blob()
     }
 
     # generate the json blob for the fe and for backend form validation.
@@ -80,6 +84,27 @@ def _generate_param_blob():
         .prefetch_related("parameterfieldsubstitution_set").all()
     return {x.pk: x.to_blob() for x in params}
 
+
+def _generate_weapons_blob():
+    weapons = Weapon.objects.all()
+    return {x.pk: _replacements_from_weapon(x) for x in weapons}
+
+
+def _replacements_from_weapon(weapon):
+    return [
+        _replacement("selected-weapon-name", weapon.name),
+        _replacement("selected-weapon-type", weapon.get_type_display()),
+        _replacement("selected-weapon-attack-roll", weapon.attack_roll_replacement()),
+        _replacement("selected-weapon-damage", str(weapon.bonus_damage)),
+        _replacement("selected-weapon-range", weapon.range),
+    ]
+
+def _replacement(marker, replacmeent):
+    return {
+        "marker": marker,
+        "replacement": replacmeent,
+        "mode": ADDITIVE
+    }
 
 def _generate_component_category_blob():
     categories = Base_Power_Category.objects.order_by("name").all()

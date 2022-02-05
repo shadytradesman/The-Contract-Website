@@ -137,12 +137,14 @@ PENALTIES = (
 )
 
 WEAPON_MELEE = "MELEE" # swords, clubs, axes
+WEAPON_UNARMED = "UNARMED" # swords, clubs, axes
 WEAPON_FIREARM = "FIREARM" # guns
 WEAPON_THROWN = "THROWN" # javalins, slings, shurikens
 WEAPON_PROJECTILE = "PROJECTILE" # bows, slingshots, crossbows
 WEAPON_OTHER = "OTHER" # Stun guns, caltrops, etc.
 WEAPON_TYPE = (
     (WEAPON_MELEE, "Melee"),
+    (WEAPON_UNARMED, "Unarmed"),
     (WEAPON_FIREARM, "Firearm"),
     (WEAPON_THROWN, "Thrown"),
     (WEAPON_PROJECTILE, "Projectile"),
@@ -1198,6 +1200,7 @@ class Roll(models.Model):
             roll = main_component
         return roll
 
+
     def render_html_for_current_contractor(self):
         if self.parry_type != NO_PARRY_INFO:
             return self.get_defense_text()
@@ -1306,11 +1309,22 @@ class Weapon(models.Model):
                                     on_delete=models.CASCADE)
     # intended to use instead of attack_roll for daggers. Can also be used as addendum for discretionary Difficulty.
     attack_roll_text = models.CharField(max_length=300, blank=True)
+    attack_system_text = models.CharField(max_length=300, blank=True,
+                                          help_text="If no actual roll is specified, use this in power system text")
     range = models.CharField(max_length=300, blank=True)
     errata = models.CharField(max_length=300, blank=True)
 
     def __str__(self):
         return self.name + "(" + self.type + ")"
+
+    def attack_roll_replacement(self):
+        if self.attack_roll:
+            attack_roll = self.attack_roll.render_value_for_power()
+        elif self.attack_system_text:
+            attack_roll = self.attack_system_text
+        else:
+            attack_roll = "UNDEFINED"
+        return attack_roll
 
 
 class Quirk(models.Model):

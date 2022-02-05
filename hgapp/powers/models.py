@@ -468,6 +468,7 @@ class Base_Power(models.Model):
         system = self.get_system(SYS_PS2)
         text_fields = system.systemfieldtext_set.all() if system else None
         roll_fields = system.systemfieldroll_set.all() if system else None
+        weapon_fields = system.systemfieldweapon_set.all() if system else None
         return {
             'slug': self.slug,
             'name': self.name,
@@ -491,6 +492,7 @@ class Base_Power(models.Model):
             'default_description_prompt': system.default_description_prompt if system else None,
             'text_fields': [x.to_blob() for x in text_fields] if text_fields else [],
             'roll_fields': [x.to_blob() for x in roll_fields] if roll_fields else [],
+            'weapon_fields': [x.to_blob() for x in weapon_fields] if weapon_fields else [],
         }
 
 
@@ -522,6 +524,7 @@ class Base_Power_System(models.Model):
                                              "((marker))^ or @@marker%%^ : join as list and capitalize first character. <br>"
                                              "[[marker|default]] : replace marker, or use default if no replacement.<br>"
                                              "[[marker]] : replace marker or blank if no replacement.<br>"
+                                             "##marker1,marker2++ : sum the markers together and display the result.<br>"
                                              "{{marker}} : replace marker, paragraph breaks between multiple entries.")
     eratta = models.TextField(blank=True,
                               null=True)
@@ -1110,6 +1113,15 @@ class SystemFieldWeapon(SystemField):
                                              "selected-weapon-attack-text, selected-weapon-range, "
                                              "selected-weapon-errata")
 
+    def to_blob(self):
+        weapons = Weapon.objects.filter(type=self.weapon_type).order_by("bonus_damage").all()
+        weapon_choices = [(weap.pk, weap.name) for weap in weapons]
+        choice_blob = {
+            "weapon_choices": weapon_choices,
+        }
+        field_blob = super(SystemFieldWeapon, self).to_blob()
+        field_blob.update(choice_blob)
+        return field_blob
 
 class SystemFieldInstance(models.Model):
     relevant_power = models.ForeignKey(Power, on_delete=models.CASCADE)

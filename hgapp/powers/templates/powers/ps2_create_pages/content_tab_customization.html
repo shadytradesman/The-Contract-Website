@@ -74,6 +74,11 @@
                 </select>
             </span>
         </div>
+        <div v-if="field.isWeapon" class="form-inline">
+            <select v-model="fieldWeaponInput[field.id]" class="form-control" @change="changeParam">
+                <option v-for="value in field.weaponChoices" :value="value[0]">{value[1]}</option>
+            </select>
+        </div>
         <div v-if="field.eratta">
             <small>
                 { field.eratta }

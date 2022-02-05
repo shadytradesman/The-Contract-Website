@@ -9,8 +9,9 @@ from django.urls import reverse
 from .models import Enhancement, Parameter, Base_Power, Drawback, Power_Param, Power, Parameter_Value, \
     Base_Power_Category, Base_Power_System, PowerTag, PremadeCategory,\
     Enhancement_Instance, Drawback_Instance, Power_Full, PowerTutorial, SystemFieldText, SystemFieldRoll, \
-    ParameterFieldSubstitution, BasePowerFieldSubstitution, EnhancementFieldSubstitution, DrawbackFieldSubstitution,\
-    EFFECT, VECTOR, MODALITY, SYS_LEGACY_POWERS, SYS_ALL, SYS_PS2, FieldSubstitutionMarker, VectorCostCredit
+    SystemFieldWeapon, ParameterFieldSubstitution, BasePowerFieldSubstitution, EnhancementFieldSubstitution, \
+    DrawbackFieldSubstitution,EFFECT, VECTOR, MODALITY, SYS_LEGACY_POWERS, SYS_ALL, SYS_PS2, FieldSubstitutionMarker,\
+    VectorCostCredit
 
 
 class PowerParamTabular(admin.StackedInline):
@@ -30,6 +31,13 @@ class SystemFieldTextTabular(admin.TabularInline):
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
     extra = 0
 
+class SystemFieldWeaponTabular(admin.TabularInline):
+    model = SystemFieldWeapon
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "relevant_marker":
+            kwargs["queryset"] = FieldSubstitutionMarker.objects.order_by("marker")
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+    extra = 0
 
 class VectorCostCreditTabular(admin.TabularInline):
     model = VectorCostCredit
@@ -218,7 +226,7 @@ class BasePowerAdmin(admin.ModelAdmin):
 
 @admin.register(Base_Power_System)
 class BasePowerSystemAdmin(admin.ModelAdmin):
-    inlines = [SystemFieldTextTabular, SystemFieldRollTabular]
+    inlines = [SystemFieldTextTabular, SystemFieldRollTabular, SystemFieldWeaponTabular]
 
 @admin.register(VectorCostCredit)
 class VectorCostCreditAdmin(admin.ModelAdmin):

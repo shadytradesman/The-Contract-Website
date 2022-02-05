@@ -82,6 +82,7 @@ const filterDisplayByVecSlug = {
     "at-will": "Self-targeting",
     "passive": "Passive",
     "trap": "Trap",
+    "functional": "Extraordinary Object",
 }
 function vectorSlugToEffectFilter(vecSlug) {
     return {
@@ -132,10 +133,12 @@ function giftCostOfVueParam(powerParam, currentLevel) {
     }
 }
 
-function systemFieldToVue(systemField, isRoll) {
-    const type = isRoll ? "roll" : "text";
+function systemFieldToVue(systemField, type) {
+    let isRoll = type === "roll";
+    let isWeapon = type === "weapon";
     const attributeChoices = isRoll ? systemField["attribute_choices"] : [];
     const abilityChoices = isRoll ? systemField["ability_choices"] : [];
+    const weaponChoices = isWeapon ? systemField["weapon_choices"] : [];
     return {
         id: type + systemField.id,
         marker: systemField.marker,
@@ -143,7 +146,9 @@ function systemFieldToVue(systemField, isRoll) {
         name: systemField.name,
         eratta: systemField.eratta,
         isRoll: isRoll,
-        isText: !isRoll,
+        isText: type === "text",
+        isWeapon: isWeapon,
+        weaponChoices: weaponChoices,
         attributeChoices: attributeChoices,
         abilityChoices: abilityChoices,
     }
@@ -189,11 +194,13 @@ function paramsFromComponents(components, modifier) {
 function fieldsFromComponents(components, unrenderedSystemText) {
     textFields = components.flatMap(component => component["text_fields"])
         .filter(field => unrenderedSystemText.includes(field["marker"]))
-        .map(field => systemFieldToVue(field, false));
+        .map(field => systemFieldToVue(field, "text"));
     rollFields = components.flatMap(component => component["roll_fields"])
         .filter(field => unrenderedSystemText.includes(field["marker"]))
-        .map(field => systemFieldToVue(field, true));
-    return textFields.concat(rollFields);
+        .map(field => systemFieldToVue(field, "roll"));
+    weaponFields = components.flatMap(component => component["weapon_fields"])
+        .map(field => systemFieldToVue(field, "weapon"));
+    return textFields.concat(rollFields.concat(weaponFields));
 }
 
 function getDisabledParameters(availParameters, activeUniqueReplacementsByMarker) {
@@ -343,6 +350,7 @@ const parenJoinString = {
     '@': ', ',
     '[': ' ',
     '{': '<br><br>',
+    '+': '',
 }
 function collapseSubstitutions(replacements) {
     // normalizes lists of substitutions so that they follow the semantics associated with the modes:
@@ -431,6 +439,9 @@ function getReplacementText(replacements, toReplace) {
             return "";
         }
     }
+    if (toReplace.type === '#') {
+        return replacements.reduce((a,b) => parseInt(a) + parseInt(b)).toString();
+    }
     replacements = replacements.filter(rep => rep.length != 0);
     if (replacements.length === 0) {
         // only zero-length replacements appeared in replacement map.
@@ -463,12 +474,13 @@ const parenEndByStart = {
     '@': '%',
     '[': ']',
     '{': '}',
+    '#': '+',
 }
 function findReplacementCandidate(systemText) {
     // Finds the first pair of opening parenthesis, indicating a replacement substring.
     // Proceeds to the matching closure of the parens, skipping any nested replacements
     // returns a little replacement candidate object.
-    let markerStarts = ['(', '[', '{', '@'];
+    let markerStarts = ['(', '[', '{', '@', '#'];
     let endMarker = null;
     let parenDepth = 0;
     let parenType = null;
@@ -528,7 +540,7 @@ function findReplacementCandidate(systemText) {
     var markerSection = systemText.slice(start + 2, markerEnd);
     markerSection = markerSection.trim();
     const markers = markerSection.split(',');
-    if (!['(', '@'].includes(markerStarts[0]) && markers.length > 1) {
+    if (!['(', '@', '#'].includes(markerStarts[0]) && markers.length > 1) {
         // only list sub markers allow multiple marker strings.
         throw "Too many marker strings for non-list sub starting at: " + start;
     }
@@ -585,6 +597,7 @@ const ComponentRendering = {
       systemFields: [],
       fieldTextInput: {},
       fieldRollInput: new Proxy({}, handler),
+      fieldWeaponInput: {},
       unrenderedSystem: '',
       renderedSystem: '',
       unrenderedDescription: "",
@@ -827,7 +840,9 @@ const ComponentRendering = {
         });
         this.systemFields = fieldsFromComponents(components, this.unrenderedSystem);
         this.systemFields.forEach(field => {
-            if (field.isRoll) {
+            if (field.isWeapon) {
+                this.fieldWeaponInput[field.id] = field.weaponChoices[0][0];
+            } else if (field.isRoll) {
                 var defaultChoices = [field.attributeChoices[0][1]];
                 if (field.abilityChoices.length > 0) {
                     defaultChoices.push(field.abilityChoices[0][1]);
@@ -999,31 +1014,41 @@ const ComponentRendering = {
       },
       addReplacementsForFields(replacements) {
           this.systemFields.forEach(field => {
-              if (!(field.marker in replacements)) {
-                  replacements[field.marker] = [];
+              if (field.isWeapon) {
+                weaponReplacements = powerBlob["weapon_replacements_by_pk"][this.fieldWeaponInput[field.id]];
+                weaponReplacements.forEach(repl => {
+                    replacements[repl.marker] = [{
+                        replacement: repl.replacement,
+                        mode: repl.mode,
+                    }]
+                })
+              } else {
+                if (!(field.marker in replacements)) {
+                    replacements[field.marker] = [];
+                }
+                let sub = "";
+                if (field.isText) {
+                    sub = this.fieldTextInput[field.id];
+                }
+                if (field.isRoll) {
+                    const choices = this.fieldRollInput[field.id];
+                    sub = choices[0];
+                    if (choices.length > 1) {
+                        sub = sub + " + " + choices[1];
+                    }
+                }
+                let replacement = field.replacement;
+                if (replacement.includes("$")) {
+                    replacement = field.isRoll ? replacement.replace("$", sub) : subUserInputForDollarSign(replacement, sub);
+                }
+                if (field.isRoll) {
+                    replacement = markRollText(replacement);
+                }
+                replacements[field.marker].push({
+                    replacement: replacement,
+                    mode: "ADDITIVE",
+                });
               }
-              let sub = "";
-              if (field.isText) {
-                  sub = this.fieldTextInput[field.id];
-              }
-              if (field.isRoll) {
-                  const choices = this.fieldRollInput[field.id];
-                  sub = choices[0];
-                  if (choices.length > 1) {
-                      sub = sub + " + " + choices[1];
-                  }
-              }
-              let replacement = field.replacement;
-              if (replacement.includes("$")) {
-                  replacement = field.isRoll ? replacement.replace("$", sub) : subUserInputForDollarSign(replacement, sub);
-              }
-              if (field.isRoll) {
-                  replacement = markRollText(replacement);
-              }
-              replacements[field.marker].push({
-                  replacement: replacement,
-                  mode: "ADDITIVE",
-              });
           })
       }
   }
