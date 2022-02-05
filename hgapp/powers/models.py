@@ -524,6 +524,7 @@ class Base_Power_System(models.Model):
                                              "((marker))^ or @@marker%%^ : join as list and capitalize first character. <br>"
                                              "[[marker|default]] : replace marker, or use default if no replacement.<br>"
                                              "[[marker]] : replace marker or blank if no replacement.<br>"
+                                             ";;marker// : replace marker with bulleted list.<br>"
                                              "##marker1,marker2++ : sum the markers together and display the result.<br>"
                                              "{{marker}} : replace marker, paragraph breaks between multiple entries.")
     eratta = models.TextField(blank=True,

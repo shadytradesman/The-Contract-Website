@@ -351,6 +351,7 @@ const parenJoinString = {
     '[': ' ',
     '{': '<br><br>',
     '+': '',
+    ';': "</li><li>",
 }
 function collapseSubstitutions(replacements) {
     // normalizes lists of substitutions so that they follow the semantics associated with the modes:
@@ -450,6 +451,10 @@ function getReplacementText(replacements, toReplace) {
     if (toReplace.type === '{') {
         replacements[0] = "<br><br>" + replacements[0];
     }
+    if (toReplace.type === ';') {
+        replacements[0] = "<ul class=\"css-power-system-list\"><li>" + replacements[0];
+        replacements[replacements.length -1] = replacements[replacements.length -1] + "</li></ul>"
+    }
     if (replacements[0].length > 0 && toReplace.capitalize) {
         replacements[0] = replacements[0][0].toUpperCase() + replacements[0].slice(1);
     }
@@ -475,12 +480,13 @@ const parenEndByStart = {
     '[': ']',
     '{': '}',
     '#': '+',
+    ';': '/',
 }
 function findReplacementCandidate(systemText) {
     // Finds the first pair of opening parenthesis, indicating a replacement substring.
     // Proceeds to the matching closure of the parens, skipping any nested replacements
     // returns a little replacement candidate object.
-    let markerStarts = ['(', '[', '{', '@', '#'];
+    let markerStarts = ['(', '[', '{', '@', '#', ';'];
     let endMarker = null;
     let parenDepth = 0;
     let parenType = null;
