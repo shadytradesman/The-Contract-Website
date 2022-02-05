@@ -1,5 +1,8 @@
 function activateTooltips() {
-    $('[data-toggle="tooltip"]').tooltip();
+    $('[data-toggle="tooltip"]').tooltip("enable");
+    $('body').tooltip({
+          selector: '.has-popover'
+        });
 }
 
 $(document).ready(activateTooltips);
@@ -588,6 +591,7 @@ const ComponentRendering = {
       renderedSystem: "",
       activeUniqueReplacementsByMarker: {},
       giftCost: 0,
+      giftCostTooltip: " ",
       giftName: null,
       giftDescription: null,
       giftTagline: "",
@@ -618,7 +622,7 @@ const ComponentRendering = {
           this.expandedTab = "customize";
           this.tabHeader = "Customize System";
           this.$nextTick(function () {
-            if (this.giftPreviewModalFirstShow && window.innerWidth <= 992) {
+            if (this.giftPreviewModalFirstShow && window.innerWidth <= 770) {
                 $('#giftPreviewModal').modal({});
             }
           });
@@ -842,15 +846,29 @@ const ComponentRendering = {
         });
       },
       updateGiftCost() {
-          let cost = 1 + this.getSelectedAndActiveEnhancements().length - this.getSelectedAndActiveDrawbacks().length;
+          let componentsCost = 1;
           this.getSelectedComponents().forEach(comp => {
-              cost = cost - comp["gift_credit"];
+              componentsCost = componentsCost - comp["gift_credit"];
           });
+          componentsCost = componentsCost + this.additionalCostOfEffectAndVector(this.selectedEffect["slug"], this.selectedVector)
+
+          let enhancementsCost = this.getSelectedAndActiveEnhancements().length
+          let drawbacksCost = - this.getSelectedAndActiveDrawbacks().length;
+
+          let parametersCost = 0;
           this.parameters.forEach(param => {
-              cost = cost + giftCostOfVueParam(param, this.parameterSelections[param.id]);
+              parametersCost = parametersCost + giftCostOfVueParam(param, this.parameterSelections[param.id]);
           });
-          cost = cost + this.additionalCostOfEffectAndVector(this.selectedEffect["slug"], this.selectedVector)
-          this.giftCost = cost;
+            // displayCost
+          let toolTip = "Type, Effect, and Style: " + displayCost(componentsCost);
+          toolTip = toolTip + (enhancementsCost != 0 ? "<br>Enhancements: " + displayCost(enhancementsCost) : "");
+          toolTip = toolTip + (drawbacksCost != 0 ? "<br>Drawbacks: " + displayCost(drawbacksCost) : "");
+          toolTip = toolTip + (parametersCost != 0 ? "<br>Parameters: " + displayCost(parametersCost) : "");
+          this.giftCostTooltip = toolTip;
+          this.giftCost = componentsCost + enhancementsCost + drawbacksCost + parametersCost;
+          this.$nextTick(function () {
+              activateTooltips();
+          });
       },
       additionalCostOfEffectAndVector(effectSlug, vectorSlug) {
           let cost =0;
@@ -1018,8 +1036,8 @@ $(function() {
     mountedApp.modalities = Object.values(powerBlob.modalities).map(comp => componentToVue(comp, "mod"));
     mountedApp.$nextTick(function () {
       activateTooltips();
-  });
-  $('#giftPreviewModal').on('hidden.bs.modal', function (e) {
-    mountedApp.giftPreviewModalFirstShow = false;
-  })
+    });
+    $('#giftPreviewModal').on('hidden.bs.modal', function (e) {
+      mountedApp.giftPreviewModalFirstShow = false;
+    })
 });

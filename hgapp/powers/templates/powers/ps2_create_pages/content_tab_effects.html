@@ -9,26 +9,24 @@
 </div>
 
 <span v-if="effectFilters.length > 1">
-    <h4 style="display: inline-block; margin-right: 15px; margin-bottom: 5px;">Filter Effects:</h4>
+    <h4 style="display: inline-block; margin-right: 15px; margin-bottom: 5px;">Filter Effects</h4>
 </span>
-<div class="visible-xs-block"></div>
 <div v-for="effectFilter in effectFilters" style="display: inline-block; margin-right: 15px; margin-top: 5px;" class="radio">
     <label v-bind:for="effectFilter.id"
-           class="css-effect-filter-radio" >
+           class="css-effect-filter-radio">
             <input type="radio"
                    v-bind:id="effectFilter.id"
                    name="effect-filter"
                    v-bind:value="effectFilter.value"
                    v-model="selectedEffectFilter"
-                   @change="changeEffectFilter"
-            >
+                   @change="changeEffectFilter">
         {effectFilter.display}
     </label>
 </div>
 <div v-for="category in categoriesWithEffects">
     <div class="panel panel-default" style="margin-bottom: 5px;">
         <div class="panel-heading">
-            <h3 style="margin-top: 5px !important; margin-bottom: 5px !important; font-size: 22px; ">
+            <h3 style="margin-top: 5px !important; margin-bottom: 5px !important; font-size: 22px;">
                 {category.name}
                 <small>
                     <div class="visible-xs-block">

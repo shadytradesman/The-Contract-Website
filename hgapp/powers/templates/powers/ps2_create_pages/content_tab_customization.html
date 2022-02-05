@@ -11,8 +11,13 @@
                 <button class="btn btn-default" type="button" data-toggle="modal" data-target="#giftPreviewModal">
                     Preview Gift
                 </button>
-                <span style="margin-top: 7px; margin-left: 10px;">
-                    Cost: <span v-html="giftCost"></span>
+                <span    style="margin-top: 7px; margin-left: 10px;"
+                        data-html="true"
+                        v-bind:data-original-title="giftCostTooltip"
+                        v-bind:data-title="giftCostTooltip"
+                        class="has-popover">
+                     Cost:
+                    <span v-html="giftCost"></span>
                 </span>
             </div>
         </span>

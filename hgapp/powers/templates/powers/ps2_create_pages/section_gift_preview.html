@@ -14,7 +14,12 @@
                 </div>
             </small>
         </h3>
-        <div class="">
+        <div
+             data-html="true"
+             v-bind:data-original-title="giftCostTooltip"
+             v-bind:data-title="giftCostTooltip"
+             class="has-popover"
+        >
             Gift Cost:
             <span v-html="giftCost"></span>
         </div>
