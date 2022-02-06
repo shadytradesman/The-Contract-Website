@@ -844,7 +844,7 @@ const ComponentRendering = {
         this.parameters.forEach(param => {
             this.parameterSelections[param.id] = param.levels[param["defaultLevel"]];
         });
-        this.systemFields = fieldsFromComponents(components, this.unrenderedSystem);
+        this.systemFields = fieldsFromComponents(components, this.unrenderedSystem + this.unrenderedDescription);
         this.systemFields.forEach(field => {
             if (field.isWeapon) {
                 this.fieldWeaponInput[field.id] = field.weaponChoices[0][0];
