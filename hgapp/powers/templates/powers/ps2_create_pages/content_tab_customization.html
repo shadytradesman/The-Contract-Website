@@ -165,7 +165,7 @@
     <div class="form-group">
         <label class="control-label" for="id_power_name">Name</label>
         <div class=" ">
-            <input v-model="giftName" type="text" name="power_name" maxlength="100" class=" form-control" required="" id="id_power_name">
+            <input v-model="giftName" @input="changeParam" type="text" name="power_name" maxlength="100" class=" form-control" required="" id="id_power_name">
         </div>
         <br>
         <label class="control-label" for="id_gift_tagline">Tagline</label>

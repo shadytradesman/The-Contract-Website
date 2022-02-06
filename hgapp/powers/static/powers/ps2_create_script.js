@@ -961,6 +961,10 @@ const ComponentRendering = {
       buildReplacementMap() {
           // replacement marker to list of substitution objects
           replacements = {}
+          replacements["gift-name"] = [{
+            mode: "UNIQUE",
+            replacement: this.giftName === null ? "signature item" : this.giftName
+          }];
           addReplacementsForModifiers(replacements,
                                       this.getSelectedAndActiveEnhancements().map(mod => slugFromVueModifierId(mod["id"])).map(mod => powerBlob["enhancements"][mod]),
                                       buildModifierDetailsMap(this.getSelectedAndActiveEnhancements()));
