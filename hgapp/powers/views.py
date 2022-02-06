@@ -29,6 +29,7 @@ def create(request, character_id=None):
     category_list = Base_Power_Category.objects\
         .prefetch_related(Prefetch('base_power_set',queryset=Base_Power.objects.order_by('name')))\
         .order_by('name')
+    category_list = [x for x in category_list if x.base_power_set.filter(is_public=True).count() > 0]
     character=None
     if character_id:
         character = get_object_or_404(Character, pk=character_id)
