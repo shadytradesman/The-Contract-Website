@@ -223,7 +223,7 @@ $(document).on("click", ".val-adjuster", function() {
 $(".injury-form").submit(function (e) {
     e.preventDefault();
     var serializedData = $(this).serialize();
-    var delUrl = $(this).attr("data-delete-injury-url");
+    var stabilizeUrl = $(this).attr("data-stabilize-injury-url");
     var incUrl = $(this).attr("data-inc-injury-url");
     var decUrl = $(this).attr("data-dec-injury-url");
     $.ajax({
@@ -237,20 +237,28 @@ $(".injury-form").submit(function (e) {
             var instance = JSON.parse(response["instance"]);
             var fields = instance[0]["fields"];
             let injuryId = JSON.parse(response["id"]);
-            delUrl = delUrl.replace(/injuryIdJs/g, injuryId);
+            stabilizeUrl = stabilizeUrl.replace(/injuryIdJs/g, injuryId);
             incUrl = incUrl.replace(/injuryIdJs/g, injuryId);
             decUrl = decUrl.replace(/injuryIdJs/g, injuryId);
-            var tmplMarkup = $('#injury-template').html();
-            var compiledTmpl = tmplMarkup.replace(/__description__/g, fields["description"||""]);
-            var compiledTmpl = compiledTmpl.replace(/__delUrl__/g, delUrl);
-            var compiledTmpl = compiledTmpl.replace(/__incUrl__/g, incUrl);
-            var compiledTmpl = compiledTmpl.replace(/__decUrl__/g, decUrl);
-            var compiledTmpl = compiledTmpl.replace(/__severity__/g, response["severity"]);
+            let stabilityTemplate = $("#injury-stabilization-template").html();
+            if (response["severity"] < 4) {
+                stabilityTemplate = "";
+            }
+            let tmplMarkup = $('#injury-template').html();
+            let compiledTmpl = tmplMarkup.replace(/__description__/g, fields["description"||""]);
+            compiledTmpl = compiledTmpl.replace(/__stabilization__/g, stabilityTemplate);
+            compiledTmpl = compiledTmpl.replace(/__stabilizeUrl__/g, stabilizeUrl);
+            compiledTmpl = compiledTmpl.replace(/__incUrl__/g, incUrl);
+            compiledTmpl = compiledTmpl.replace(/__decUrl__/g, decUrl);
+            compiledTmpl = compiledTmpl.replace(/__severity__/g, response["severity"]);
             $("#js-injury-container").append(
                 compiledTmpl
             )
             $("#js-no-injuries").remove();
             updateHealthDisplay();
+            $('[data-toggle="tooltip"]').tooltip({
+                trigger : 'hover'
+            });
         },
         error: function (response) {
             console.log(response);
@@ -259,27 +267,7 @@ $(".injury-form").submit(function (e) {
     })
 })
 
-// delete injury
-$("#js-injury-container").on("submit",".js-delete-injury-form", function (e) {
-    e.preventDefault();
-    var serializedData = $(this).serialize();
-    var injuryForm = $(this);
-    $.ajax({
-        type: 'POST',
-        url: $(this).attr("data-del-injury-url"),
-        data: serializedData,
-        success: function (response) {
-            injuryForm.parent().parent().remove();
-            updateHealthDisplay();
-        },
-        error: function (response) {
-            console.log(response);
-            alert(response["responseJSON"]["error"]);
-        }
-    })
-})
-
-// inc/dec injury
+// inc/dec/stabilize injury
 $("#js-injury-container").on("submit",".js-edit-injury-form", function (e) {
     e.preventDefault();
     var serializedData = $(this).serialize();
@@ -294,6 +282,12 @@ $("#js-injury-container").on("submit",".js-edit-injury-form", function (e) {
                 injuryForm.parent().parent().remove();
             } else {
                 $(injuryForm.siblings(".injury-severity")[0]).text(severity);
+            }
+            if (response["stabilized"]) {
+                injuryForm.closest(".js-injury-stabilization-status").html($("#stabilized-icon-template").html());
+                $('[data-toggle="tooltip"]').tooltip({
+                    trigger : 'hover'
+                });
             }
             updateHealthDisplay();
         },

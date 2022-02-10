@@ -1032,6 +1032,7 @@ class Injury(models.Model):
     character = models.ForeignKey(Character,
                                    on_delete=models.CASCADE)
     description = models.CharField(max_length=500)
+    is_stabilized = models.BooleanField(default=False)
     severity = models.PositiveIntegerField(default=1)
 
 class BasicStats(models.Model):

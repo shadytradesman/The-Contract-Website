@@ -526,15 +526,6 @@ def post_injury(request, character_id, secret_key = None):
             return JsonResponse({"error": form.errors}, status=400)
     return JsonResponse({"error": ""}, status=400)
 
-def delete_injury(request, injury_id, secret_key = None):
-    if request.is_ajax and request.method == "POST":
-        injury = get_object_or_404(Injury, id=injury_id)
-        __check_edit_perms(request, injury.character, secret_key)
-        with transaction.atomic():
-            injury.delete()
-        return JsonResponse({}, status=200)
-    return JsonResponse({"error": ""}, status=400)
-
 def dec_injury(request, injury_id, secret_key = None):
     if request.is_ajax and request.method == "POST":
         injury = get_object_or_404(Injury, id=injury_id)
@@ -546,7 +537,8 @@ def dec_injury(request, injury_id, secret_key = None):
             else:
                 injury.severity = new_sev
                 injury.save()
-        return JsonResponse({"severity": new_sev}, status=200)
+        return JsonResponse({"severity": new_sev,
+                             "stabilized": injury.is_stabilized}, status=200)
     return JsonResponse({"error": ""}, status=400)
 
 def inc_injury(request, injury_id, secret_key = None):
@@ -556,7 +548,19 @@ def inc_injury(request, injury_id, secret_key = None):
         with transaction.atomic():
             injury.severity = injury.severity + 1
             injury.save()
-        return JsonResponse({"severity": injury.severity}, status=200)
+        return JsonResponse({"severity": injury.severity,
+                             "stabilized": injury.is_stabilized}, status=200)
+    return JsonResponse({"error": ""}, status=400)
+
+def stabilize_injury(request, injury_id, secret_key = None):
+    if request.is_ajax and request.method == "POST":
+        injury = get_object_or_404(Injury, id=injury_id)
+        __check_edit_perms(request, injury.character, secret_key)
+        with transaction.atomic():
+            injury.is_stabilized = True
+            injury.save()
+        return JsonResponse({"severity": injury.severity,
+                             "stabilized": injury.is_stabilized}, status=200)
     return JsonResponse({"error": ""}, status=400)
 
 def set_mind_damage(request, character_id, secret_key = None):

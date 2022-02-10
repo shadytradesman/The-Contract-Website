@@ -10,6 +10,25 @@
         <b>__description__</b> (__system__)
     </li>
 </script>
+<script type="text/html" id="stabilized-icon-template">
+    <i class="fa fa-medkit" aria-hidden="true" data-toggle="tooltip"
+       title="This Injury is Stabilized and will not degrade."></i>
+</script>
+<script type="text/html" id="injury-stabilization-template">
+    <div class="pull-right js-injury-stabilization-status">
+        <i class="fa fa-heartbeat text-danger" aria-hidden="true" data-toggle="tooltip"
+           title="This Injury is not Stabilized. It will worsen in Severity by one level every half hour until Stabilized."></i>
+        <form class="js-edit-injury-form"
+              data-edit-injury-url="__stabilizeUrl__"
+              style="display: inline-block;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-xs btn-primary" data-toggle="tooltip"
+                    title="Mark Injury Stabilized">
+                <i class="fa fa fa-medkit" aria-hidden="true" ></i>
+            </button>
+        </form>
+    </div>
+</script>
 <script type="text/html" id="injury-template">
     <span>
         <div class="stat-value col-xs-3 text-center css-injury-val">
@@ -33,12 +52,7 @@
         </div>
         <div class="stat-value col-xs-9">
             __description__
-            {% if user_can_edit and not character.is_dead %}
-                <form class="js-delete-injury-form pull-right" data-del-injury-url=__delUrl__>
-                    {% csrf_token %}
-                    <input type="submit" class="btn btn-xs btn-danger" value="X"/>
-                </form>
-            {%endif%}
+            __stabilization__
         </div>
         <div class="clearfix"></div>
     </span>
@@ -49,37 +63,55 @@
         <div class="text-left" id="js-injury-container">
             {% for injury in character.injury_set.all %}
                 <span>
-                    <div class="stat-value col-xs-3 text-center css-injury-val">
-                        {% if user_can_edit and not character.is_dead %}
-                        <form class="js-edit-injury-form"
-                              style="display: inline-block;"
-                              data-edit-injury-url="{% url 'characters:dec_injury' injury.id secret_key %}">
-                                {% csrf_token %}
-                            <button type="submit" class="btn btn-default btn-xs">
-                                <i class="fa fa-minus"></i>
-                            </button>
-                        </form>
-                        {% endif %}
-                        <b class="injury-severity">{{injury.severity}}</b>
-                        {% if user_can_edit and not character.is_dead %}
-                        <form class="js-edit-injury-form"
-                              style="display: inline-block;"
-                              data-edit-injury-url="{% url 'characters:inc_injury' injury.id secret_key %}">
-                                {% csrf_token %}
-                            <button type="submit" class="btn btn-default btn-xs">
-                                <i class="fa fa-plus"></i>
-                            </button>
-                        </form>
-                        {% endif %}
-                    </div>
-                    <div class="stat-value col-xs-9">
-                        {{injury.description}}
-                        {% if user_can_edit and not character.is_dead %}
-                            <form class="js-delete-injury-form pull-right" data-del-injury-url="{% url 'characters:delete_injury' injury.id secret_key %}">
-                                {% csrf_token %}
-                                <input type="submit" class="btn btn-xs btn-danger" value="X"/>
+                    {% if user_can_edit and not character.is_dead %}
+                        <div class="stat-value col-xs-3 text-center css-injury-val">
+                            <form class="js-edit-injury-form"
+                                  style="display: inline-block;"
+                                  data-edit-injury-url="{% url 'characters:dec_injury' injury.id secret_key %}">
+                                    {% csrf_token %}
+                                <button type="submit" class="btn btn-default btn-xs">
+                                    <i class="fa fa-minus"></i>
+                                </button>
                             </form>
-                        {%endif%}
+                            <b class="injury-severity">{{injury.severity}}</b>
+                            <form class="js-edit-injury-form"
+                                  style="display: inline-block;"
+                                  data-edit-injury-url="{% url 'characters:inc_injury' injury.id secret_key %}">
+                                    {% csrf_token %}
+                                <button type="submit" class="btn btn-default btn-xs">
+                                    <i class="fa fa-plus"></i>
+                                </button>
+                            </form>
+                        </div>
+                    {% else %}
+                        <div class="stat-value col-xs-1 text-center css-injury-val">
+                            <b class="injury-severity">{{injury.severity}}</b>
+                        </div>
+                    {%endif%}
+                    <div class="css-injury-description {% if user_can_edit and not character.is_dead %}col-xs-9 {% else %} col-xs-11 {% endif %}">
+                        {{injury.description}}
+                        <div class="pull-right js-injury-stabilization-status">
+                            {% if injury.severity > 3 %}
+                                {% if injury.is_stabilized %}
+                                    <i class="fa fa-medkit" aria-hidden="true" data-toggle="tooltip"
+                                       title="This Injury is Stabilized and will not degrade."></i>
+                                {% else %}
+                                <i class="fa fa-heartbeat text-danger" aria-hidden="true" data-toggle="tooltip"
+                                   title="This Injury is not Stabilized. It will worsen in Severity by one level every half hour until Stabilized."></i>
+                                    {% if user_can_edit and not character.is_dead %}
+                                        <form class="js-edit-injury-form"
+                                              data-edit-injury-url="{% url 'characters:stabilize_injury' injury.id secret_key %}"
+                                              style="display: inline-block;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-xs btn-primary" data-toggle="tooltip"
+                                                title="Mark Injury Stabilized">
+                                                <i class="fa fa fa-medkit" aria-hidden="true" ></i>
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                {% endif %}
+                            {% endif %}
+                        </div>
                     </div>
                     <div class="clearfix"></div>
                 </span>
@@ -96,7 +128,7 @@
                       data-new-injury-url="{% url 'characters:post_injury' character.id secret_key %}"
                       data-inc-injury-url="{% url 'characters:inc_injury' 'injuryIdJs' secret_key %}"
                       data-dec-injury-url="{% url 'characters:dec_injury' 'injuryIdJs' secret_key %}"
-                      data-delete-injury-url="{% url 'characters:delete_injury' 'injuryIdJs' secret_key %}">
+                      data-stabilize-injury-url="{% url 'characters:stabilize_injury' 'injuryIdJs' secret_key %}">
                     {{ injury_form.about.errors }}
                     {{ injury_form.non_field_errors }}
                     {% csrf_token %}
