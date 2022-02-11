@@ -21,6 +21,7 @@
 	<div class="modal fade" id="giftPreviewModal" tabindex="-1" role="dialog" aria-labelledby="giftPreviewModalLabel" >
 		<div class="modal-dialog modal-lg" role="document" style="top: 100px;">
 			<div class="modal-content" >
+				<h3 class="text-center" v-if="giftName === null">Gift Preview</h3>
 				<div v-if="giftPreviewModalFirstShow" style="padding: 10px;">
 					<div class="text-center">
 						<b>
@@ -44,7 +45,7 @@
 	</div>
 	<div class="row">
 		<div style="margin-bottom: 10px;"></div>
-		<div class="col-xs-12">
+		<div class="col-xs-12 css-gift-workflow">
 			{% include "powers/ps2_create_pages/snip_head_and_steps.html" %}
 		</div>
 		<div class="hidden-sm hidden-md hidden-lg css-gift-preview-button"

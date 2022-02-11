@@ -6,20 +6,23 @@
     </small>
 </div>
 
-<span v-if="effectFilters.length > 1">
-    <h4 style="display: inline-block; margin-right: 15px; margin-bottom: 5px;">Filter Effects</h4>
-</span>
-<div v-for="effectFilter in effectFilters" style="display: inline-block; margin-right: 15px; margin-top: 5px;" class="radio">
-    <label v-bind:for="effectFilter.id"
-           class="css-effect-filter-radio">
+<div class="css-effect-filters" v-if="effectFilters.length > 1" style="margin-bottom: 15px; margin-top: 15px;">
+    <h4 style="margin-bottom: 0px; margin-left: 10px;"> {modalityEffectFilterPrompt} {selectedEffectFilter.display}</h4>
+    <div  v-for="effectFilter in effectFilters" style="display: inline-block; margin-left: 5px; margin-right: 5px; margin-top: 5px;" >
+        <label v-bind:for="effectFilter.id"
+               class="css-component-radio css-effect-filter-radio"
+               :class="{'css-selected-filter': selectedEffectFilter && selectedEffectFilter.value === effectFilter.value}"
+        >
             <input type="radio"
                    v-bind:id="effectFilter.id"
                    name="effect-filter"
-                   v-bind:value="effectFilter.value"
+                   v-bind:value="effectFilter"
                    v-model="selectedEffectFilter"
-                   @change="changeEffectFilter">
-        {effectFilter.display}
-    </label>
+                   @change="changeEffectFilter"
+                   style="display:none;">
+            {effectFilter.display}
+        </label>
+    </div>
 </div>
 <div v-for="category in categoriesWithEffects">
     <div class="panel panel-default" style="margin-bottom: 5px;">

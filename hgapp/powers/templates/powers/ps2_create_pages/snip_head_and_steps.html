@@ -22,8 +22,11 @@
                             { selectedModality.displayName }
                         </div>
                     </div>
-                    <div v-if="!selectedModality" class="css-step-unfinished">
+                    <div v-if="!selectedModality" class="css-step-unfinished hidden-xs">
                         Select a Gift Type
+                    </div>
+                    <div v-if="!selectedModality" class="css-step-unfinished visible-xs-block">
+                        Gift Type
                     </div>
                 </div>
             </div>

@@ -2,7 +2,7 @@
     <div class="panel-heading">
         <h3 class="" style="margin-top: 5px; margin-bottom: 5px">
             <span v-if="giftName" v-text="giftName"></span>
-            <span v-if="giftName === null">Gift Preview</span>
+            <span v-if="giftName === null" class="hidden-xs">Gift Preview</span>
             <small>
                 <i>
                     <span v-if="giftTagline.length > 0" v-text="giftTagline" style="margin-left: 10px;">

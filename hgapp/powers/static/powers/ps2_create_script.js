@@ -78,17 +78,43 @@ function componentToVue(component, type) {
     }
 }
 const filterDisplayByVecSlug = {
-    "direct": "Targeted",
-    "at-will": "Self-targeting",
-    "passive": "Passive",
-    "trap": "Trap",
-    "functional": "Extraordinary Object",
+    "direct": {
+        "signature-item-mod": "is used on a target",
+        "power": "is used on a target",
+        "craftable-consumable": "are used on targets",
+        "craftable-artifact": "can be used on targets",
+    },
+    "at-will": {
+        "signature-item-mod": "can be activated to empower myself",
+        "power": "temporarily empowers myself",
+        "craftable-consumable": "empower their users",
+        "craftable-artifact": "empower their users when activated",
+    },
+    "passive": {
+        "signature-item-mod": "grants a passive benefit when worn",
+        "power": "is passive",
+        "craftable-consumable": "??",
+        "craftable-artifact": "grant a passive benefit when worn",
+
+    },
+    "trap": {
+        "signature-item-mod": "???",
+        "power": "places traps",
+        "craftable-consumable": "are traps",
+        "craftable-artifact": "??",
+    },
+    "functional": {
+        "signature-item-mod": "is a weapon or vehicle",
+        "power": "??",
+        "craftable-consumable": "???",
+        "craftable-artifact": "are weapons or vehicles",
+    },
 }
-function vectorSlugToEffectFilter(vecSlug) {
+function vectorSlugToEffectFilter(vecSlug, modalitySlug) {
     return {
         id: "effect-filter-" + vecSlug,
         value: vecSlug,
-        display: filterDisplayByVecSlug[vecSlug],
+        display: filterDisplayByVecSlug[vecSlug][modalitySlug],
     };
 }
 
@@ -584,11 +610,12 @@ const ComponentRendering = {
       tabHeader: "Select a Gift Type",
       modalities: [],
       selectedModality: null,
+      modalityEffectFilterPrompt: "",
       effects: [],
       categoriesWithEffects: [],
       selectedEffect: null,
       effectFilters: [],
-      selectedEffectFilter: "",
+      selectedEffectFilter: null,
       vectors: [],
       selectedVector: "",
       enhancements: [],
@@ -763,25 +790,38 @@ const ComponentRendering = {
           let allAvailableVectors = Array.from(new Set(this.effects
               .flatMap(effect => this.getAvailableVectorsForEffectAndModality(effect.slug, this.selectedModality.slug))));
           let newEffectFilters = [];
-          newEffectFilters.push({
+          if (this.selectedModality.slug === "craftable-artifact") {
+            this.modalityEffectFilterPrompt = "I craft Artifacts that";
+          }
+          if (this.selectedModality.slug === "craftable-consumable") {
+            this.modalityEffectFilterPrompt = "I craft Consumables that";
+          }
+          if (this.selectedModality.slug === "power") {
+            this.modalityEffectFilterPrompt = "My Power";
+          }
+          if (this.selectedModality.slug === "signature-item-mod") {
+            this.modalityEffectFilterPrompt = "My Signature Item";
+          }
+
+          this.effectFilters = newEffectFilters.concat(allAvailableVectors.map(vecSlug => vectorSlugToEffectFilter(vecSlug, this.selectedModality.slug)));
+          let allFilter = {
               id: "effect-filter-ALL",
               value: "ALL",
-              display: "All",
-          });
-          this.effectFilters = newEffectFilters.concat(allAvailableVectors.map(vecSlug => vectorSlugToEffectFilter(vecSlug)));
-          this.selectedEffectFilter = "ALL";
+              display: "",
+          };
+          this.selectedEffectFilter = allFilter;
       },
       satisfiesEffectFilter(effectSlug) {
-          if (this.selectedEffectFilter === "ALL") {
+          if (this.selectedEffectFilter.value === "ALL") {
               return true;
           }
           let allAvailableVectors = this.getAvailableVectorsForEffectAndModality(effectSlug, this.selectedModality.slug);
-          return allAvailableVectors.includes(this.selectedEffectFilter);
+          return allAvailableVectors.includes(this.selectedEffectFilter.value);
       },
       changeEffect(effect) {
           this.updateAvailableVectors();
-          if (this.selectedEffectFilter != "ALL") {
-              this.selectedVector = this.selectedEffectFilter;
+          if (this.selectedEffectFilter.value != "ALL") {
+              this.selectedVector = this.selectedEffectFilter.value;
           }
           this.componentClick();
           this.openCustomizationTab();
