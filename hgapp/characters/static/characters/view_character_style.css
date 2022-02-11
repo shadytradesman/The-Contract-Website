@@ -413,22 +413,6 @@ input[type="number"] {
     padding-top: 10px;
 }
 
-.css-complication-list {
-    list-style-type: none;
-    margin-left: 10px;
-    padding-left: 10px;
-}
-
-.css-complication-list  li{
-  padding-left: 10px;
-}
-
-.css-complication-list  li::marker {
-  content: attr(data-icon);
-  font-size: 15px;
-  font-weight: bold;
-}
-
-.css-complication-system {
-  font-size: 12px;
+.css-stabilization-text {
+  font-size: 90%;
 }

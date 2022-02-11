@@ -143,10 +143,17 @@
         {% endif %}
     </div>
 </div>
-{% include "characters/view_pages/complication_reference.html" %}
+{% include "characters/view_pages/stabilization_reference.html" %}
 <div class="row text-center">
     <div class="col-xs-12">
-        <h3 data-toggle="tooltip" title='{{tutorial.battle_scars}}'>Battle Scars</h3>
+        <h3 data-toggle="tooltip" title='{{tutorial.battle_scars}}' style="margin-bottom: 5px;">
+            Battle Scars
+        </h3>
+        <div class="text-muted" style="margin-bottom: 10px;" data-toggle="tooltip" title="Instead, the highest penalty is used">
+            <i><small>
+                Penalties from Battle Scars do not stack with <span style="color: #fb7e48;">Wound Penalty</span>
+            </small></i>
+        </div>
         <div class="text-left" id="js-scar-container">
             {% for scar in character.battlescar_set.all %}
                 <li class="stat-value">

@@ -93,10 +93,10 @@ MAJOR_SCAR = "2MAJOR"
 SEVERE_SCAR = "3SEVERE"
 EXTREME_SCAR = "4EXTREME"
 SCAR_SEVERITY = (
-    (MINOR_SCAR, "Minor Scars"),
-    (MAJOR_SCAR, "Major Scars"),
-    (SEVERE_SCAR, "Severe Scars"),
-    (EXTREME_SCAR, "Extreme Scars"),
+    (MINOR_SCAR, "Minor Scars (Severity 4)"),
+    (MAJOR_SCAR, "Major Scars (Severity 5)"),
+    (SEVERE_SCAR, "Severe Scars (Severity 6)"),
+    (EXTREME_SCAR, "Extreme Scars (Severity 7+)"),
 )
 
 BODY_STATUS = (
