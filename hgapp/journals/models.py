@@ -98,6 +98,8 @@ class Journal(models.Model):
             if self.experience_reward and not self.experience_reward.is_void:
                 raise ValueError("journal is granting exp reward when it already has one.",
                                  str(self.id))
+            if Journal.objects.filter(game_attendance=self.game_attendance, is_downtime=True, is_valid=True, is_deleted=False).count() > 1:
+                return
             exp_reward = ExperienceReward(
                 rewarded_character=character,
                 rewarded_player=character.player,
@@ -110,6 +112,7 @@ class Journal(models.Model):
     @staticmethod
     def get_num_journals_until_improvement(character):
         num_valid = Journal.objects.filter(game_attendance__attending_character=character.id,
+                                           is_deleted=False,
                                            is_valid=True,
                                            is_downtime=False).count()
         num_journal_rewards = Reward.objects.filter(is_journal=True,

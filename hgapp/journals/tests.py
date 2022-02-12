@@ -9,7 +9,7 @@ from games.models import Game, Scenario, WIN, Game_Attendance, Game_Invite
 from games.games_constants import GAME_STATUS
 from profiles.signals import make_profile_for_new_user
 
-from .models import Journal
+from journals.models import Journal
 
 EXP_WIN = EXP_REWARD_VALUES[EXP_WIN_IN_WORLD_V2]
 JOURNAL_EXP = EXP_REWARD_VALUES[EXP_JOURNAL]
@@ -226,6 +226,19 @@ class JournalModelTests(TestCase):
                 self.assertIsNone(journal.get_improvement())
                 self.assertIsNotNone(journal.get_exp_reward())
 
+    def test_downtimes_one_reward(self):
+        journal = self.__make_journal(writer=self.user1,
+                                      game_attendance=self.char1_attendances[0],
+                                      is_downtime=False)
+        journal.set_content(VALID_JOURNAL_CONTENT)
+        for x in range(6):
+            downtime_journal = self.__make_journal(writer=self.user1,
+                                            game_attendance=self.char1_attendances[0],
+                                          is_downtime=True)
+            downtime_journal.set_content(VALID_JOURNAL_CONTENT)
+        self.assertEquals(self.char1.num_unspent_improvements(), 0)
+        self.assertEquals(self.char1.exp_earned(), EXP_NEW_CHAR + (12 * EXP_WIN) + (2 * JOURNAL_EXP))
+
     def test_journals_void_rewards(self):
         journals = []
         for x in range(6):
@@ -265,6 +278,24 @@ class JournalModelTests(TestCase):
         improvement_journal.refresh_from_db()
         self.assertIsNotNone(improvement_journal.get_improvement())
         self.assertIsNone(improvement_journal.get_exp_reward())
+        self.assertEquals(self.char1.num_unspent_improvements(), 1)
+        self.assertEquals(self.char1.exp_earned(), EXP_NEW_CHAR + (12 * EXP_WIN) + (5 * JOURNAL_EXP))
+
+
+        improvement_journal.set_content(INVALID_JOURNAL_CONTENT)
+        improvement_journal.refresh_from_db()
+        self.assertIsNone(improvement_journal.get_improvement())
+        self.assertIsNone(improvement_journal.get_exp_reward())
+        self.assertEquals(self.char1.num_unspent_improvements(), 0)
+        self.assertEquals(self.char1.exp_earned(), EXP_NEW_CHAR + (12 * EXP_WIN) + (5 * JOURNAL_EXP))
+
+        journal = self.__make_journal(writer=self.user1,
+                                      game_attendance=self.char1_attendances[7],
+                                      is_downtime=False)
+        journal.set_content(VALID_JOURNAL_CONTENT)
+        journals.append(journal)
+        self.assertIsNotNone(journal.get_improvement())
+        self.assertIsNone(journal.get_exp_reward())
         self.assertEquals(self.char1.num_unspent_improvements(), 1)
         self.assertEquals(self.char1.exp_earned(), EXP_NEW_CHAR + (12 * EXP_WIN) + (5 * JOURNAL_EXP))
 
