@@ -11,7 +11,7 @@ from .models import Enhancement, Parameter, Base_Power, Drawback, Power_Param, P
     Enhancement_Instance, Drawback_Instance, Power_Full, PowerTutorial, SystemFieldText, SystemFieldRoll, \
     SystemFieldWeapon, ParameterFieldSubstitution, BasePowerFieldSubstitution, EnhancementFieldSubstitution, \
     DrawbackFieldSubstitution,EFFECT, VECTOR, MODALITY, SYS_LEGACY_POWERS, SYS_ALL, SYS_PS2, FieldSubstitutionMarker,\
-    VectorCostCredit
+    VectorCostCredit, EnhancementGroup
 
 
 class PowerParamTabular(admin.StackedInline):
@@ -271,3 +271,4 @@ admin.site.register(Drawback_Instance)
 admin.site.register(PowerTutorial)
 admin.site.register(SystemFieldText)
 admin.site.register(SystemFieldRoll)
+admin.site.register(EnhancementGroup)

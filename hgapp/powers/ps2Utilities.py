@@ -3,11 +3,12 @@ from collections import defaultdict
 
 from django.db.models import Prefetch
 from .models import SYS_ALL, SYS_LEGACY_POWERS, SYS_PS2, EFFECT, VECTOR, MODALITY, Base_Power, Enhancement, Drawback, \
-    Power_Param, Parameter, Base_Power_Category, VectorCostCredit, ADDITIVE
+    Power_Param, Parameter, Base_Power_Category, VectorCostCredit, ADDITIVE, EnhancementGroup
 from characters.models import Weapon
 
 def generate_json_blob():
     return json.dumps(generate_power_blob())
+
 
 
 def generate_power_blob():
@@ -49,7 +50,9 @@ def generate_power_blob():
         'effect_vector_gift_credit': _generate_effect_vector_gift_credits_blob(),
 
         # Weapon choice system fields use a Weapon's pk as the non-display value. Stats in this blob by pk.
-        'weapon_replacements_by_pk': _generate_weapons_blob()
+        'weapon_replacements_by_pk': _generate_weapons_blob(),
+
+        'enhancement_group_by_pk': _generate_enhancement_groups_blob()
     }
 
     # generate the json blob for the fe and for backend form validation.
@@ -115,3 +118,6 @@ def _generate_effect_vector_gift_credits_blob():
     cost_credits = VectorCostCredit.objects.all()
     return [x.to_blob() for x in cost_credits]
 
+def _generate_enhancement_groups_blob():
+    groups = EnhancementGroup.objects.all()
+    return {x.pk: x.to_blob() for x in groups}

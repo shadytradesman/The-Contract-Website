@@ -24,6 +24,15 @@ BASE_POWER_TYPE = (
     (MODALITY, 'Modality'),
 )
 
+MOD_GIFT = "MOD_GIFT"
+MOD_ACTIVATION = "MOD_ACTIVATION"
+MOD_EFFECT = "MOD_EFFECT"
+MODIFIER_CATEGORY = {
+    (MOD_GIFT, "Gift Type"),
+    (MOD_ACTIVATION, "Activation / Targeting"),
+    (MOD_EFFECT, "Effect")
+}
+
 EPHEMERAL = "EPHEMERAL"
 UNIQUE = "UNIQUE"
 ADDITIVE = "ADDITIVE"
@@ -133,6 +142,35 @@ class BasePowerFieldSubstitution(FieldSubstitution):
     relevant_base_power = models.ForeignKey("Base_Power", on_delete=models.PROTECT)
 
 
+class EnhancementGroup(models.Model):
+    label = models.CharField(max_length=80)
+    min_required = models.IntegerField("Num Enhancements Required",
+                                       blank=True,
+                                       null=True,
+                                       help_text="if specified, the minimum number of required enhancements of this group."
+                                                 " For example, informational enhancements or commune enhancements")
+    seasoned_threshold = models.IntegerField("Seasoned Threshold",
+                                       blank=True,
+                                         null=True,
+                                       help_text="Requires Seasoned to take this many enhancements of this group")
+    veteran_threshold = models.IntegerField("Veteran Threshold",
+                                             blank=True,
+                                            null=True,
+                                             help_text="Requires Veteran to take this many enhancements of this group")
+
+    def __str__(self):
+        return self.label
+
+    def to_blob(self):
+        return {
+            "pk": self.pk,
+            "label": self.label,
+            "min_required": self.min_required,
+            "seasoned_threshold": self.seasoned_threshold,
+            "veteran_threshold": self.veteran_threshold,
+        }
+
+
 # Enhancements and Drawbacks
 class Modifier(models.Model):
     name = models.CharField(max_length = 50)
@@ -146,6 +184,10 @@ class Modifier(models.Model):
     required_status = models.CharField(choices=HIGH_ROLLER_STATUS,
                                        max_length=25,
                                        default=HIGH_ROLLER_STATUS[0][0])
+    category = models.CharField(choices=MODIFIER_CATEGORY,
+                                max_length=30,
+                                default=MOD_EFFECT,
+                                help_text="For filtering on create gift page")
     system = models.CharField(choices=DICE_SYSTEM,
                               max_length=55,
                               default=SYS_PS2)
@@ -179,6 +221,7 @@ class Modifier(models.Model):
             'required_enhancements': [x.pk for x in self.required_Enhancements.all()],
             'required_drawbacks': [x.pk for x in self.required_drawbacks.all()],
             "required_status": [self.required_status, self.get_required_status_display()],
+            "category": self.category,
             "description": self.description,
             "eratta": self.eratta,
             "multiplicity_allowed": self.multiplicity_allowed,
@@ -191,6 +234,10 @@ class Enhancement(Modifier):
     substitutions = models.ManyToManyField(FieldSubstitutionMarker,
                                            through=EnhancementFieldSubstitution,
                                            through_fields=('relevant_enhancement', 'relevant_marker'))
+    group = models.ForeignKey(EnhancementGroup,
+                              blank=True,
+                              null=True,
+                              on_delete=models.CASCADE)
 
     def to_blob(self):
         field_blob = super(Enhancement, self).to_blob()
@@ -205,10 +252,11 @@ class Enhancement(Modifier):
         else:
             substitutions = self.enhancementfieldsubstitution_set.select_related("relevant_marker").all()
             sub_list = [x.to_blob() for x in substitutions]
-        sub_blob = {
-            "substitutions": sub_list
+        enh_blob = {
+            "substitutions": sub_list,
+            "group": self.group.pk if self.group else None,
         }
-        field_blob.update(sub_blob)
+        field_blob.update(enh_blob)
         return field_blob
 
     def form_name(self):

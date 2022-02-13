@@ -132,6 +132,7 @@ function modifierToVue(modifier, type, idNum = 0) {
         description: modifier.description,
         detailLabel: modifier.detail_field_label === null ? false : modifier.detail_field_label,
         requiredStatusLabel: modifier.required_status[0] === "ANY" ? false : modifier.required_status[1],
+        group: modifier.group,
     }
 }
 
@@ -642,6 +643,7 @@ const ComponentRendering = {
       giftDescription: null,
       giftTagline: "",
       giftPreviewModalFirstShow: true,
+      warnings: [],
     }
   },
   methods: {
@@ -854,6 +856,7 @@ const ComponentRendering = {
           this.calculateRestrictedElements();
           this.reRenderSystemText();
           this.updateGiftCost();
+          this.populateWarnings();
       },
       componentClick() {
 		if (this.selectedVector.length && this.selectedModality && this.selectedEffect) {
@@ -902,6 +905,7 @@ const ComponentRendering = {
         this.calculateRestrictedElements();
         this.reRenderSystemText();
         this.updateGiftCost();
+        this.populateWarnings();
         this.$nextTick(function () {
             activateTooltips();
         });
@@ -940,6 +944,31 @@ const ComponentRendering = {
                 });
           return cost;
       },
+      populateWarnings() {
+        // NOTE: This method must be called after gift cost is calculated.
+        let new_warnings = [];
+
+        // gift cost warning
+        if (this.giftCost <= 0) {
+            new_warnings.push("Gifts must cost a minimum of one Gift Credit");
+        }
+
+        // Group min required enhancements warnings
+        function onlyUnique(value, index, self) {
+            return self.indexOf(value) === index;
+        }
+        let selectedEnhancements = this.getSelectedAndActiveEnhancements();
+        let active_groups = this.enhancements.filter(enh => null != enh.group)
+            .map(enh => powerBlob["enhancement_group_by_pk"][enh.group]).filter(onlyUnique);
+        active_groups.forEach(group => {
+            const numSelectedOfGroup = selectedEnhancements.filter(enh => enh["group"] === group.pk).length;
+            if (null != group.min_required && numSelectedOfGroup < group.min_required) {
+                new_warnings.push("This Gift requires at least " + group.min_required + " " + group.label + " Enhancement");
+            }
+        });
+
+        this.warnings = new_warnings;
+      },
       calculateRestrictedElements() {
           this.populateUniqueReplacementsMap();
           this.disabledEnhancements = {};
@@ -974,6 +1003,7 @@ const ComponentRendering = {
           this.calculateRestrictedElements();
           this.reRenderSystemText();
           this.updateGiftCost();
+          this.populateWarnings();
       },
       clickDrawback(modifier) {
           console.log("clicked Drawback");
@@ -982,6 +1012,7 @@ const ComponentRendering = {
           this.calculateRestrictedElements();
           this.reRenderSystemText();
           this.updateGiftCost();
+          this.populateWarnings();
       },
       reRenderSystemText() {
           const replacementMap = this.buildReplacementMap();
