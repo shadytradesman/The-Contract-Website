@@ -88,7 +88,14 @@
     <div v-for="param in parameters"
          :key="param.id"
          class="css-customization-field">
-        <h5 style="margin-bottom: 5px;">{param.name}</h5>
+        <div style="margin-bottom: 5px;">
+            <h5 style="margin-bottom: 0px; display: inline-block">{param.name}</h5>
+            <small class="text-muted" v-if="giftCostOfVueParam(param) != 0">
+                Gift Cost:
+                <span v-html="costDisplay(giftCostOfVueParam(param))">
+                </span>
+            </small>
+        </div>
         <select v-model="parameterSelections[param.id]"
                 class="form-control"
                 @change="changeParam"
@@ -119,11 +126,11 @@
 <div class="row">
     <div class="col-md-6 col-sm-12">
         <h4 class="text-center" style="margin-bottom: 0px;">Enhancements</h4>
-        <div class="text-center" style="margin-bottom: 5px;">
-            <small class="text-muted">
+        <div class="text-center" style="margin-bottom: 5px; height: 20px">
+            <small class="text-muted" v-if="enhancementsCost != 0">
                 Gift Cost:
-                <span class="css-component-gift-price">
-                    +1 per Enhancement
+                <span class="css-component-gift-price" >
+                    +{ enhancementsCost }
                 </span>
             </small>
         </div>
@@ -140,11 +147,10 @@
     </div>
     <div class="col-md-6 col-sm-12">
         <h4 class="text-center" style="margin-bottom: 0px;">Drawbacks</h4>
-        <div class="text-center" style="margin-bottom: 5px;">
-            <small class="text-muted">
+        <div class="text-center" style="margin-bottom: 5px; height: 20px">
+            <small class="text-muted" v-if="drawbacksCost != 0">
                 Gift Cost:
-                <span class="css-component-gift-credit">
-                    -1 per Drawback
+                <span class="css-component-gift-credit" v-text="drawbacksCost">
                 </span>
             </small>
         </div>

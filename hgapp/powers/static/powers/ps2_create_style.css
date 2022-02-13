@@ -48,9 +48,52 @@
     }
 }
 
+.css-modifier {
+    display: block;
+    padding: 8px;
+    margin: 5px;
+    line-height: 1.42857143;
+    background-color: #313843;
+    border: 1px solid #000;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.css-mod-selected {
+    background-color: #3f4757;
+}
+
+.css-mod-disabled {
+    cursor: not-allowed;
+}
+
 .css-modifier-text {
     font-weight: 400;
     font-size: 13px;
+}
+
+.css-cat-MOD_EFFECT {
+    border-color: #635e2b;
+}
+
+.css-cat-MOD_EFFECT.css-mod-selected, .css-cat-MOD_EFFECT.css-mod-enabled:hover{
+    border-color: #a39e6b;
+}
+
+.css-cat-MOD_GIFT {
+    border-color: #2c5c46;
+}
+
+.css-cat-MOD_GIFT.css-mod-selected, .css-cat-MOD_GIFT.css-mod-enabled:hover{
+    border-color: #508b72;
+}
+
+.css-cat-MOD_ACTIVATION {
+    border-color: #504b62;
+}
+
+.css-cat-MOD_ACTIVATION.css-mod-selected, .css-cat-MOD_ACTIVATION.css-mod-enabled:hover{
+    border-color: #807b92;
 }
 
 /* TOP WORKFLOW BAR */

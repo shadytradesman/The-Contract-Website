@@ -132,6 +132,8 @@ function modifierToVue(modifier, type, idNum = 0) {
         description: modifier.description,
         detailLabel: modifier.detail_field_label === null ? false : modifier.detail_field_label,
         requiredStatusLabel: modifier.required_status[0] === "ANY" ? false : modifier.required_status[1],
+        category: modifier.category,
+        categoryClass: "css-cat-" + modifier.category,
         group: modifier.group,
     }
 }
@@ -638,7 +640,10 @@ const ComponentRendering = {
       renderedSystem: "",
       activeUniqueReplacementsByMarker: {},
       giftCost: 0,
+      enhancementsCost: 0,
+      drawbacksCost: 0,
       giftCostTooltip: " ",
+      requiredStatus: null,
       giftName: null,
       giftDescription: null,
       giftTagline: "",
@@ -779,6 +784,9 @@ const ComponentRendering = {
         }
         return null;
       },
+      costDisplay(cost) {
+        return displayCost(cost)
+      },
       getCostForVector(vectorSlug) {
         // the displayed cost for a vector is the combined cost of the effect and vector together.
         let credit = powerBlob.vectors[vectorSlug]["gift_credit"] + this.selectedEffect.giftCredit;
@@ -787,6 +795,9 @@ const ComponentRendering = {
             return "(Gift Cost: " + displayCost(cost) + ")";
         }
         return null;
+      },
+      giftCostOfVueParam(param) {
+        return giftCostOfVueParam(param, this.parameterSelections[param.id]);
       },
       updateEffectFilters() {
           let allAvailableVectors = Array.from(new Set(this.effects
@@ -819,6 +830,9 @@ const ComponentRendering = {
           }
           let allAvailableVectors = this.getAvailableVectorsForEffectAndModality(effectSlug, this.selectedModality.slug);
           return allAvailableVectors.includes(this.selectedEffectFilter.value);
+      },
+      groupLabelFromId(groupId) {
+        return powerBlob["enhancement_group_by_pk"][groupId]["label"];
       },
       changeEffect(effect) {
           this.updateAvailableVectors();
@@ -917,20 +931,20 @@ const ComponentRendering = {
           });
           componentsCost = componentsCost + this.additionalCostOfEffectAndVector(this.selectedEffect["slug"], this.selectedVector)
 
-          let enhancementsCost = this.getSelectedAndActiveEnhancements().length
-          let drawbacksCost = - this.getSelectedAndActiveDrawbacks().length;
+          this.enhancementsCost = this.getSelectedAndActiveEnhancements().length
+          this.drawbacksCost = - this.getSelectedAndActiveDrawbacks().length;
 
           let parametersCost = 0;
           this.parameters.forEach(param => {
-              parametersCost = parametersCost + giftCostOfVueParam(param, this.parameterSelections[param.id]);
+              parametersCost = parametersCost + this.giftCostOfVueParam(param);
           });
             // displayCost
           let toolTip = "Type, Effect, and Style: " + displayCost(componentsCost);
-          toolTip = toolTip + (enhancementsCost != 0 ? "<br>Enhancements: " + displayCost(enhancementsCost) : "");
-          toolTip = toolTip + (drawbacksCost != 0 ? "<br>Drawbacks: " + displayCost(drawbacksCost) : "");
+          toolTip = toolTip + (this.enhancementsCost != 0 ? "<br>Enhancements: " + displayCost(this.enhancementsCost) : "");
+          toolTip = toolTip + (this.drawbacksCost != 0 ? "<br>Drawbacks: " + displayCost(this.drawbacksCost) : "");
           toolTip = toolTip + (parametersCost != 0 ? "<br>Parameters: " + displayCost(parametersCost) : "");
           this.giftCostTooltip = toolTip;
-          this.giftCost = componentsCost + enhancementsCost + drawbacksCost + parametersCost;
+          this.giftCost = componentsCost + this.enhancementsCost + this.drawbacksCost + parametersCost;
           this.$nextTick(function () {
               activateTooltips();
           });
