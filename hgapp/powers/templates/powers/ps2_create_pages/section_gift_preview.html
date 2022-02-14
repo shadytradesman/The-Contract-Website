@@ -14,12 +14,12 @@
                 </div>
             </small>
         </h3>
+        <div v-if="requiredStatus" class="pull-right"  data-toggle="tooltip" title="Seasoned = 10+ Victories. Veteran = 25+ Victories">Requires <b>{requiredStatus}</b> Status</div>
         <div
              data-html="true"
              v-bind:data-original-title="giftCostTooltip"
              v-bind:data-title="giftCostTooltip"
-             class="has-popover"
-        >
+             class="has-popover" >
             Gift Cost:
             <span v-html="giftCost"></span>
         </div>

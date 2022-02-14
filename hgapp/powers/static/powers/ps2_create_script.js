@@ -4,6 +4,9 @@ function activateTooltips() {
           selector: '.has-popover'
         });
 }
+function onlyUnique(value, index, self) {
+    return self.indexOf(value) === index;
+}
 
 $(document).ready(activateTooltips);
 
@@ -49,6 +52,7 @@ function replaceHoverText(text) {
     }
     return modifiedText;
 }
+
 function displayCost(cost) {
     let prefix =  cost >= 0 ? "+" : "";
     let content = prefix + cost;
@@ -75,6 +79,7 @@ function componentToVue(component, type) {
         type: component.type,
         giftCredit: component["gift_credit"],
         visibility: component.default_description_prompt,
+        requiredStatus: component.required_status,
     }
 }
 const filterDisplayByVecSlug = {
@@ -110,6 +115,7 @@ const filterDisplayByVecSlug = {
         "craftable-artifact": "are weapons or vehicles",
     },
 }
+
 function vectorSlugToEffectFilter(vecSlug, modalitySlug) {
     return {
         id: "effect-filter-" + vecSlug,
@@ -132,6 +138,7 @@ function modifierToVue(modifier, type, idNum = 0) {
         description: modifier.description,
         detailLabel: modifier.detail_field_label === null ? false : modifier.detail_field_label,
         requiredStatusLabel: modifier.required_status[0] === "ANY" ? false : modifier.required_status[1],
+        requiredStatus: modifier.required_status,
         category: modifier.category,
         categoryClass: "css-cat-" + modifier.category,
         group: modifier.group,
@@ -151,6 +158,20 @@ function powerParamToVue(powerParam) {
         seasonedLevel: powerParam["seasoned_threshold"],
         vetLevel: powerParam["veteran_threshold"],
         levels: powerParam.levels,
+    }
+}
+
+function requiredStatusOfParam(powerParam, currentLevel) {
+    for (let i = 0; i < powerParam.levels.length; i++) {
+        if (powerParam.levels[i] === currentLevel) {
+            if (i >= powerParam.vetLevel) {
+                return ["VETERAN", "Veteran"];
+            }
+            if (i >= powerParam.seasonedLevel) {
+                return ["SEASONED", "Seasoned"];
+            }
+            return null;
+        }
     }
 }
 
@@ -870,6 +891,7 @@ const ComponentRendering = {
           this.calculateRestrictedElements();
           this.reRenderSystemText();
           this.updateGiftCost();
+          this.updateRequiredStatus();
           this.populateWarnings();
       },
       componentClick() {
@@ -919,6 +941,7 @@ const ComponentRendering = {
         this.calculateRestrictedElements();
         this.reRenderSystemText();
         this.updateGiftCost();
+        this.updateRequiredStatus();
         this.populateWarnings();
         this.$nextTick(function () {
             activateTooltips();
@@ -949,6 +972,46 @@ const ComponentRendering = {
               activateTooltips();
           });
       },
+      updateRequiredStatus() {
+        let requiredStatus = null;
+        function mergeStatuses(currentStatus, requiredStatus) {
+            if (null == requiredStatus || requiredStatus[0] === "ANY") {
+                return currentStatus;
+            }
+            if (requiredStatus[0] === "VETERAN") {
+                return requiredStatus;
+            }
+            if (requiredStatus[0] === "SEASONED" && (null === currentStatus || currentStatus[0] === "ANY")) {
+                return requiredStatus;
+            }
+            return currentStatus;
+        }
+        let selectedEnhancements = this.getSelectedAndActiveEnhancements();
+        let countByGroups = {};
+        let active_groups = this.enhancements.filter(enh => null != enh.group)
+            .map(enh => powerBlob["enhancement_group_by_pk"][enh.group]).filter(onlyUnique);
+
+        selectedEnhancements.forEach(enh => {
+            requiredStatus = mergeStatuses(requiredStatus, enh.requiredStatus);
+        });
+        this.getSelectedComponents().forEach(comp => {
+            requiredStatus = mergeStatuses(requiredStatus, comp.requiredStatus);
+        });
+        this.parameters.forEach(param => {
+            requiredStatus = mergeStatuses(requiredStatus, requiredStatusOfParam(param, this.parameterSelections[param.id]));
+        });
+        active_groups.forEach(group => {
+            const numSelectedOfGroup = selectedEnhancements.filter(enh => enh["group"] === group.pk).length;
+            if (group.veteran_threshold && numSelectedOfGroup >= group.veteran_threshold) {
+                requiredStatus = mergeStatuses(requiredStatus, ["VETERAN", "Veteran"]);
+            }
+            if (group.seasoned_threshold && numSelectedOfGroup >= group.seasoned_threshold) {
+                requiredStatus = mergeStatuses(requiredStatus, ["SEASONED", "Seasoned"]);
+            }
+        });
+
+        this.requiredStatus = requiredStatus == null || requiredStatus[0] == "ANY" ? null : requiredStatus[1];
+      },
       additionalCostOfEffectAndVector(effectSlug, vectorSlug) {
           let cost =0;
           powerBlob["effect_vector_gift_credit"].filter(cred => cred["vector"] === vectorSlug
@@ -968,9 +1031,6 @@ const ComponentRendering = {
         }
 
         // Group min required enhancements warnings
-        function onlyUnique(value, index, self) {
-            return self.indexOf(value) === index;
-        }
         let selectedEnhancements = this.getSelectedAndActiveEnhancements();
         let active_groups = this.enhancements.filter(enh => null != enh.group)
             .map(enh => powerBlob["enhancement_group_by_pk"][enh.group]).filter(onlyUnique);
@@ -1017,6 +1077,7 @@ const ComponentRendering = {
           this.calculateRestrictedElements();
           this.reRenderSystemText();
           this.updateGiftCost();
+          this.updateRequiredStatus();
           this.populateWarnings();
       },
       clickDrawback(modifier) {
@@ -1026,6 +1087,7 @@ const ComponentRendering = {
           this.calculateRestrictedElements();
           this.reRenderSystemText();
           this.updateGiftCost();
+          this.updateRequiredStatus();
           this.populateWarnings();
       },
       reRenderSystemText() {
