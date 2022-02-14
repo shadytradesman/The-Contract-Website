@@ -315,8 +315,12 @@ function getDisabledModifiers(modType, availModifiers, selectedModifiers, active
                disabledModifiers[modifier.slug] = [];
             }
         }
-        blockedSubs.forEach(sub => disabledModifiers[modifier.slug]
-            .push("Cannot be taken with " + activeUniqueReplacementsByMarker[sub["marker"]]["name"]));
+        blockedSubs.forEach(sub => {
+            let message = "Cannot be taken with " + activeUniqueReplacementsByMarker[sub["marker"]]["name"];
+            if (!disabledModifiers[modifier.slug].includes(message)) {
+                disabledModifiers[modifier.slug].push(message);
+            }
+        });
     });
     return disabledModifiers;
 }
@@ -1053,7 +1057,6 @@ const ComponentRendering = {
           this.selectedDrawbacks = this.selectedDrawbacks.filter(mod => !(slugFromVueModifierId(mod) in this.disabledDrawbacks));
           this.disabledParameters = {};
           this.disabledParameters = getDisabledParameters(this.parameters, this.activeUniqueReplacementsByMarker);
-
       },
       populateUniqueReplacementsMap() {
           // modifiers that have "unique" field replacements "block" modifiers that uniquely replace the same thing.
