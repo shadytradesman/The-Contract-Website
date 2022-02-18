@@ -628,6 +628,10 @@ let handler = {
   }
 };
 
+function randomFromList(list) {
+    return list[Math.floor(Math.random() * list.length)];
+}
+
 
 let modCounter = 1; // used when creating unique ids for modifiers
 const ComponentRendering = {
@@ -677,6 +681,52 @@ const ComponentRendering = {
     }
   },
   methods: {
+      randomGift() {
+        this.selectedModality = randomFromList(this.modalities);
+        this.changeModality();
+        this.selectedEffect = randomFromList(this.effects);
+        this.changeEffect();
+        if (this.vectors.length > 1) {
+            this.selectedVector = randomFromList(this.vectors).slug;
+        }
+        this.clickVector();
+
+        let numEnhancements = Math.floor(Math.random() * 6);
+        let numDrawbacks = Math.floor(Math.random() * numEnhancements - 1); // drawbacks < enhancements
+
+        this.selectedEnhancements =  [];
+        this.selectedDrawbacks = [];
+
+        for (let i = 0; i < numEnhancements; i++) {
+            let availEnhancements = this.enhancements.filter(enh => !(enh.slug in this.disabledEnhancements));
+            if (availEnhancements == 0) {
+                numDrawbacks = Math.max(i, numDrawbacks);
+                break;
+            }
+            let selectedEnhancement = randomFromList(availEnhancements);
+            this.selectedEnhancements.push(selectedEnhancement.id);
+            this.enhancements = handleModifierMultiplicity(selectedEnhancement.slug, selectedEnhancement.id, "enhancements", this.enhancements, this.getSelectedAndActiveEnhancements());
+            this.calculateRestrictedElements();
+        }
+
+        for (let i = 0; i < numDrawbacks; i++) {
+            let availDrawbacks = this.drawbacks.filter(mod => !(mod.slug in this.disabledDrawbacks));
+            if (availDrawbacks == 0) {
+                break;
+            }
+            let selectedDrawback = randomFromList(availDrawbacks);
+            this.selectedDrawbacks.push(selectedDrawback.id);
+            this.drawbacks = handleModifierMultiplicity(selectedDrawback.slug, selectedDrawback.id, "drawbacks", this.drawbacks, this.getSelectedAndActiveDrawbacks());
+            this.calculateRestrictedElements();
+        }
+
+        this.reRenderSystemText();
+        this.updateGiftCost();
+        this.updateRequiredStatus();
+        this.populateWarnings();
+        this.openCustomizationTab();
+        $("#giftPreviewModal").modal({});
+      },
       scrollToContent() {
           this.$nextTick(function () {
               let yPos = document.getElementById("js-content-header").getBoundingClientRect().y -60;

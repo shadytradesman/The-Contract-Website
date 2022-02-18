@@ -1,4 +1,3 @@
-
 <label v-bind:for="modifier.id" class="css-modifier"
        :class="[
         modifier.slug in disabled{{vue_model_name}} ? 'text-muted' : '',
@@ -11,8 +10,7 @@
            v-model="selected{{vue_model_name}}"
            @change="{{vue_on_click}}"
            :disabled="modifier.slug in disabled{{vue_model_name}}"
-           style="display:none;"
-    >
+           style="display:none;">
     <span>
         <b><span v-if="modifier.group">{groupLabelFromId(modifier.group)}: </span>{ modifier.displayName }</b>
         <span class="css-modifier-text">

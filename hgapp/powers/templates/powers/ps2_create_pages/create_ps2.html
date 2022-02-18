@@ -33,6 +33,11 @@
 					</div>
 				</div>
 				{% include "powers/ps2_create_pages/section_gift_preview.html" %}
+				<div class="text-center">
+					<a @click="randomGift" href="#">
+							Generate Random Gift
+					</a>
+				</div>
 				<div class="modal-footer" v-if="giftPreviewModalFirstShow">
 					<div class="text-center">
 						<button type="button" class="btn btn-default" data-dismiss="modal">
@@ -82,8 +87,7 @@
 			 :class="{
 			 	'col-md-8': expandedTab === 'customize',
 			 	'col-sm-6': expandedTab === 'customize'
-			 	}"
-		>
+			 	}" >
 			{% include "powers/ps2_create_pages/section_content.html" %}
 		</div>
 	</div>
