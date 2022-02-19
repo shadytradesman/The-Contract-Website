@@ -858,7 +858,7 @@ class Scenario(models.Model):
         return get_object_or_none(Scenario_Discovery, relevant_scenario=self, discovering_player=player)
 
     def choice_txt(self):
-        return "{} ({}, {}-{} players)".format(self.title, self.get_suggested_status_display(), self.min_players, self.max_players)
+        return "{} ({} words, {}-{} {} Contractors)".format(self.title, self.num_words, self.min_players, self.max_players, self.get_suggested_status_display())
 
     def finished_games(self):
         return self.game_set.filter(status__in=[GAME_STATUS[2][0], GAME_STATUS[3][0], GAME_STATUS[6][0]]).all()

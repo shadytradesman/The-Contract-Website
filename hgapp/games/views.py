@@ -193,7 +193,7 @@ def view_scenario_gallery(request):
 
 def create_game(request, cell_id=None):
     if not request.user.is_authenticated:
-        raise PermissionDenied("You must be logged in to create a Game")
+        raise PermissionDenied("You must be logged in to schedule a Contract")
     cell = None
     if cell_id:
         cell = get_object_or_404(Cell, id=cell_id)
