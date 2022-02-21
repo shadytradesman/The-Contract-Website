@@ -948,6 +948,7 @@ class Cycle(models.Model):
     title = models.CharField(max_length=130)
     summary = models.TextField(max_length=5000)
 
+
 class Reward(models.Model):
     relevant_game = models.ForeignKey(
         Game,

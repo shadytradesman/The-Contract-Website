@@ -27,6 +27,13 @@ class SignupView(account.views.SignupView):
        return Account.create(request=self.request, user=self.created_user, create_email=False, timezone=form.cleaned_data["timezone"])
 
 
+class LoginView(account.views.LoginView):
+    def get_initial(self):
+        return {
+            "remember": True
+        }
+
+
 class PasswordResetTokenView(account.views.PasswordResetTokenView):
     def get_context_data(self, **kwargs):
         ctx = super(PasswordResetTokenView, self).get_context_data(**kwargs)

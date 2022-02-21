@@ -151,6 +151,9 @@ MIDDLEWARE = [
     'hgapp.middleware.TimezoneMiddleware'
 ]
 
+ACCOUNT_REMEMBER_ME_EXPIRY = 60 * 60 * 24 * 365 * 10
+SESSION_COOKIE_AGE = ACCOUNT_REMEMBER_ME_EXPIRY
+
 ROOT_URLCONF = 'hgapp.urls'
 CSRF_FAILURE_VIEW = 'hgapp.views.csrf_failure'
 
