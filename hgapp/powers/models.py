@@ -1,10 +1,9 @@
 from django.conf import settings
 from django.db import models
-from django.db.models import Q
 from django.urls import reverse
 
 from characters.models import Character, HIGH_ROLLER_STATUS, Attribute, Roll, NO_PARRY_INFO, NO_SPEED_INFO, DODGE_ONLY, \
-    ATTACK_PARRY_TYPE, ROLL_SPEED, THROWN, Attribute, Ability, Weapon, WEAPON_MELEE, WEAPON_TYPE
+    ATTACK_PARRY_TYPE, ROLL_SPEED, THROWN, Attribute, Ability, Weapon, WEAPON_MELEE, WEAPON_TYPE, Artifact
 from guardian.shortcuts import assign_perm, remove_perm
 from django.utils.html import mark_safe, escape, linebreaks
 from django.db.utils import IntegrityError
@@ -699,12 +698,8 @@ class Power_Param(models.Model):
         return 7
 
 # Power full is essentially a "Gift" object
-# Each Power_Full has at least one PowerHistory for an Effect/Vector and exactly one PowerHistory for a gift modality
-    # Modality cost/credit is applied against all Effects on the gift
 class Power_Full(models.Model):
-    name = models.CharField(max_length = 500)
     dice_system = models.CharField(choices=DICE_SYSTEM, max_length=55)
-    base = models.ForeignKey(Base_Power, on_delete=models.PROTECT)
     private = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
     pub_date = models.DateTimeField('date published', auto_now_add=True)
@@ -716,29 +711,37 @@ class Power_Full(models.Model):
                                   blank=True,
                                   null=True,
                                   on_delete=models.CASCADE)
-    tags = models.ManyToManyField(PowerTag, blank=True) # This is for stock Gifts
-    example_description = models.CharField(max_length = 9000,
+    latest_rev = models.ForeignKey("Power",
+                                   on_delete=models.CASCADE,
+                                   blank=True,
+                                   null=True)
+
+    # Denormalized fields with Power revisions. Do not use these?
+    base = models.ForeignKey(Base_Power, on_delete=models.PROTECT)
+    name = models.CharField(max_length=500)
+
+    # Fields for Stock Gifts
+    tags = models.ManyToManyField(PowerTag, blank=True)
+    example_description = models.CharField(max_length=9000,
                                            blank=True,
                                            null=True)
-
-    # TODO: Delete and replace with method that gives set of power histories
-    latest_rev = models.ForeignKey("Power",
-                              on_delete=models.CASCADE,
-                              blank=True,
-                              null=True)
 
     class Meta:
         permissions = (
             ('view_private_power_full', 'View private power full'),
             ('edit_power_full', 'Edit power full'),
         )
+        indexes = [
+            models.Index(fields=['owner', 'is_deleted', 'dice_system']),
+            models.Index(fields=['character', 'dice_system']),
+        ]
         verbose_name = "Gift"
 
     def delete(self):
         self.character = None
         for reward in self.reward_list():
             reward.refund_keeping_character_assignment()
-        self.is_deleted=True
+        self.is_deleted = True
         self.save()
 
     def save(self, *args, **kwargs):
@@ -843,71 +846,63 @@ class Power_Full(models.Model):
             return self.name + " [NO ASSOCIATED USER]"
 
 
-# A given "revision track" of a Power.
-# Multiple Powers may have the same PowerHistory, and the most recent one is the "canonical" one.
-# A given Power_full may have multiple PowerHistorys
-    # always has at least two in the new system (an Effect+Vector and a Gift Modality)
-class PowerHistory(models.Model):
-    parent_power = models.ForeignKey(Power_Full,
-                                     blank=True,
-                                     null=True,
-                                     on_delete=models.CASCADE)
-    latest_rev = models.ForeignKey("Power",
-                                   on_delete=models.CASCADE,
-                                   blank=True,
-                                   null=True)
-
-
 # TODO: remove permissioning from this and use Power_Full permissioning.
 class Power(models.Model):
     name = models.CharField(max_length=150)
-    flavor_text = models.TextField(max_length=2000)
+    flavor_text = models.TextField(max_length=2000) # tagline
     description = models.TextField(max_length=2500)
+    dice_system = models.CharField(choices=DICE_SYSTEM, max_length=55)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                   on_delete=models.CASCADE,
+                                   blank=True,
+                                   null=True)
+    pub_date = models.DateTimeField('date published', auto_now_add=True)
 
-    # TODO: ensure power_history parent and parent_power are same.
+    # Crafting
+    artifacts = models.ManyToManyField(Artifact,
+                                       through="ArtifactPower",
+                                       through_fields=('relevant_power', 'relevant_artifact'))
+
+    # Structure and system
+    system = models.TextField(max_length=54000,
+                              blank=True,
+                              null=True) # HTML rendered system text, safe to display
+    errata = models.TextField(max_length=54000, blank=True, default="") # HTML rendered errata, safe to display
+    base = models.ForeignKey(Base_Power, on_delete=models.CASCADE, blank=True, null=True, related_name="power_effect")
+    vector = models.ForeignKey(Base_Power, on_delete=models.CASCADE, blank=True, null=True, related_name="power_vector")
+    modality = models.ForeignKey(Base_Power, on_delete=models.CASCADE, blank=True, null=True, related_name="power_modality")
+    selected_enhancements = models.ManyToManyField(Enhancement,
+                                                   blank=True,
+                                                   through="Enhancement_Instance",
+                                                   through_fields=('relevant_power', 'relevant_enhancement'))
+    selected_drawbacks = models.ManyToManyField(Drawback,
+                                                blank=True,
+                                                through="Drawback_Instance",
+                                                through_fields=('relevant_power', 'relevant_drawback'))
+    parameter_values = models.ManyToManyField(Power_Param,
+                                              through="Parameter_Value",
+                                              through_fields=('relevant_power', 'relevant_power_param'))
+    # note: Access system field instances through reverse lookups
+
+    # REVISIONING
+    creation_reason = models.CharField(choices=CREATION_REASON, max_length=25)
+    creation_reason_expanded_text = models.TextField(max_length=1500,
+                                                     blank=True,
+                                                     null=True)
     # TODO: remove blank=True null=True after migration
     parent_power = models.ForeignKey(Power_Full,
                                      blank=True,
                                      null=True,
                                      on_delete=models.CASCADE)
 
-    # TODO: remove blank=True and null=True after migration
-    power_history = models.ForeignKey(PowerHistory,
-                                     blank=True,
-                                     null=True,
-                                     on_delete=models.CASCADE)
-    dice_system = models.CharField(choices=DICE_SYSTEM, max_length=55)
-
-    base = models.ForeignKey(Base_Power, on_delete=models.CASCADE, blank=True, null=True, related_name="power_effect")
-    vector = models.ForeignKey(Base_Power, on_delete=models.CASCADE, blank=True, null=True, related_name="power_vector")
-    modality = models.ForeignKey(Base_Power, on_delete=models.CASCADE, blank=True, null=True, related_name="power_modality")
-
-    private = models.BooleanField(default=False)
-
+    # UNUSED FIELDS?
+    # Maybe someday this can be used with character sheet integrations for passive/active powers that may sometimes
+    # be on or off
     activation_style = models.CharField(choices=ACTIVATION_STYLE, max_length=25, default=ACTIVATION_STYLE[0][0])
-    creation_reason = models.CharField(choices=CREATION_REASON, max_length=25)
-    creation_reason_expanded_text = models.TextField(max_length=1500,
-                                                     blank=True,
-                                                     null=True)
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL,
-                                   on_delete=models.CASCADE,
-                                   blank=True,
-                                   null=True)
-    system = models.TextField(max_length = 14000,
-                              blank=True,
-                              null=True)
-    selected_enhancements = models.ManyToManyField(Enhancement,
-                                                   blank=True,
-                                                   through="Enhancement_Instance",
-                                                   through_fields=('relevant_power', 'relevant_enhancement'))
-    selected_drawbacks = models.ManyToManyField(Drawback,
-                                                   blank=True,
-                                                   through="Drawback_Instance",
-                                                   through_fields=('relevant_power', 'relevant_drawback'))
-    pub_date = models.DateTimeField('date published', auto_now_add=True)
-    parameter_values = models.ManyToManyField(Power_Param,
-                                              through="Parameter_Value",
-                                              through_fields=('relevant_power', 'relevant_power_param'))
+
+    # FIELDS THAT SHOULD BE REMOVED
+    # Power_full should be responsible for privacy controls and probably ownership as well.
+    private = models.BooleanField(default=False)
 
     class Meta:
         constraints = [
@@ -915,6 +910,9 @@ class Power(models.Model):
         permissions = (
             ('view_private_power', 'View private power'),
         )
+        indexes = [
+            models.Index(fields=['parent_power', 'pub_date']),
+        ]
 
     def __str__(self):
         return self.name + " (" + self.description + ")"
@@ -1053,6 +1051,12 @@ class Power(models.Model):
         if self.creation_reason == CREATION_REASON[3][0]:
             return "adjusting"
 
+class ArtifactPower(models.Model):
+    relevant_artifact = models.ForeignKey(Artifact, on_delete=models.PROTECT)
+    relevant_power = models.ForeignKey(Power, on_delete=models.CASCADE)
+    detail = models.CharField(max_length=1500,
+                              null=True,
+                              blank=True)
 
 class SystemField(models.Model):
     base_power_system = models.ForeignKey(Base_Power_System, on_delete=models.CASCADE)
