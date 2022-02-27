@@ -6,7 +6,7 @@ from . import views
 app_name = 'powers'
 urlpatterns = [
     # ex: .com/powers/create-ps2/
-    url(r'^create-ps2/$', views.create_ps2, name='powers_create_ps2'),
+    url(r'^create-ps2/$', views.Create.as_view(), name='powers_create_ps2'),
 
     # ex: .com/powers/create/
     url(r'^create/$', views.create, name='powers_create'),

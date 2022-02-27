@@ -1,16 +1,23 @@
-<label v-bind:for="modifier.id" class="css-modifier"
+<label v-bind:for="modifier.checkboxId"
+       class="css-modifier"
        :class="[
         modifier.slug in disabled{{vue_model_name}} ? 'text-muted' : '',
         modifier.categoryClass,
-        selected{{vue_model_name}}.includes(modifier.id) ? 'css-mod-selected': '',
+        selected{{vue_model_name}}.includes(modifier) ? 'css-mod-selected': '',
         modifier.slug in disabled{{vue_model_name}} ? 'css-mod-disabled' : 'css-mod-enabled',
         ]">
-    <input type="checkbox" v-bind:id="modifier.id"
-           v-bind:value="modifier.id"
+    <input type="checkbox"
+           v-bind:id="modifier.checkboxId"
+           v-bind:name="modifier.checkboxName"
+           v-bind:value="modifier"
            v-model="selected{{vue_model_name}}"
            @change="{{vue_on_click}}"
            :disabled="modifier.slug in disabled{{vue_model_name}}"
            style="display:none;">
+    <span class="js-data-prefix-container" v-bind:data-prefix="modifier.idNum">
+        {{modifier_formset.empty_form.mod_slug}}
+        {{modifier_formset.empty_form.is_enhancement}}
+    </span>
     <span>
         <b><span v-if="modifier.group">{groupLabelFromId(modifier.group)}: </span>{ modifier.displayName }</b>
         <span class="css-modifier-text">
@@ -24,9 +31,16 @@
         <span v-if="modifier.requiredStatusLabel" class="css-modifier-text">
             Requires <b>{ modifier.requiredStatusLabel }</b> status.
         </span>
-        <div v-if="modifier.detailLabel && selected{{vue_model_name}}.includes(modifier.id)" class="form-inline" style="margin-top: 5px;">
+        <div v-if="modifier.detailLabel && selected{{vue_model_name}}.includes(modifier)" class="form-inline" style="margin-top: 5px;">
             <b style="padding-right: 10px;">{modifier.detailLabel}:</b>
-            <input type="text" v-model="modifier.details" class="form-control" @input="changeParam" :disabled="modifier.slug in disabled{{vue_model_name}}">
+            <input type="text"
+                   required
+                   v-model="modifier.details"
+                   class="form-control"
+                   @input="changeParam"
+                   :disabled="modifier.slug in disabled{{vue_model_name}}"
+                   v-bind:id="modifier.detailsId"
+                   v-bind:name="modifier.detailsName">
         </div>
         <div v-if="modifier.slug in disabled{{vue_model_name}}">
             <div v-for="reason in disabled{{vue_model_name}}[modifier.slug]">

@@ -3,7 +3,11 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.core.exceptions import PermissionDenied
+from django.views import View
 from django.views import generic
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.forms import formset_factory
 from django.db import transaction
 from django.db.models import Prefetch
 
@@ -14,15 +18,48 @@ from .createPowerFormUtilities import get_create_power_context_from_base, \
 from .models import Power, Base_Power_Category, Base_Power, Base_Power_System, DICE_SYSTEM, Power_Full, PowerTag, \
     PremadeCategory, PowerTutorial, SYS_PS2, EFFECT, VECTOR, MODALITY
 from .forms import DeletePowerForm
-from .ps2Utilities import generate_json_blob
+from .ps2Utilities import generate_json_blob, get_edit_context, create_new_power
 
-def create_ps2(request):
-    if request.user.is_anonymous or not (request.user.is_superuser or request.user.profile.ps2_user or request.user.profile.early_access_user):
-        raise PermissionDenied("You are not authorized to create a new power in this system.")
-    context = {
-        'power_blob': generate_json_blob(),
-    }
-    return render(request, 'powers/ps2_create_pages/create_ps2.html', context)
+@method_decorator(login_required(login_url='account_login'), name='dispatch')
+class Create(View):
+    # form_class = JournalForm
+    template_name = 'powers/ps2_create_pages/create_ps2.html'
+    # initial = None
+    # journal = None
+
+    def dispatch(self, *args, **kwargs):
+        redirect = self.__check_permissions()
+        if redirect:
+            return redirect
+        return super().dispatch(*args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, self.__get_context_data())
+
+    def post(self, request, *args, **kwargs):
+        power = create_new_power(request)
+        pass
+        # form = self.form_class(request.POST)
+        # if form.is_valid():
+        #     with transaction.atomic():
+        #         journal = Journal(title=form.cleaned_data['title'],
+        #                           writer=request.user,
+        #                           game_attendance=self.game_attendance,
+        #                           is_downtime=self.is_downtime,
+        #                           is_deleted=False,
+        #                           is_nsfw=form.cleaned_data['is_nsfw'],
+        #                           contains_spoilers=form.cleaned_data['contains_spoilers'])
+        #         journal.save()
+        #         journal.set_content(form.cleaned_data['content'])
+        #     return HttpResponseRedirect(reverse('journals:journal_read_game', args=(self.character.id, self.game.id)))
+        # raise ValueError("Invalid journal form")
+
+    def __check_permissions(self):
+        if not (self.request.user.is_superuser or self.request.user.profile.ps2_user or self.request.user.profile.early_access_user):
+            raise PermissionDenied("You are not authorized to create a new power in this system.")
+
+    def __get_context_data(self):
+        return get_edit_context()
 
 
 def create(request, character_id=None):

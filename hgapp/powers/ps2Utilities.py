@@ -1,14 +1,18 @@
 import json
 from collections import defaultdict
 
+from django.forms import formset_factory
 from django.db.models import Prefetch
+
 from .models import SYS_ALL, SYS_LEGACY_POWERS, SYS_PS2, EFFECT, VECTOR, MODALITY, Base_Power, Enhancement, Drawback, \
     Power_Param, Parameter, Base_Power_Category, VectorCostCredit, ADDITIVE, EnhancementGroup
+from .formsPs2 import PowerForm, ModifierForm, ParameterForm, SystemFieldTextForm, SystemFieldRollForm, \
+    SystemFieldWeaponForm
 from characters.models import Weapon
+
 
 def generate_json_blob():
     return json.dumps(generate_power_blob())
-
 
 
 def generate_power_blob():
@@ -60,6 +64,33 @@ def generate_power_blob():
             # Cache in per-component caches so it doesn't have to be regenerated as much?
     # TODO: invalidate cache when any relevant model (enhancement, base power) is saved.
 
+
+def get_edit_context(existing_power=None):
+    modifiers_formset = formset_factory(ModifierForm, extra=0)(prefix="modifiers")
+    if existing_power:
+        pass
+    else:
+        pass
+
+    context = {
+        'power_blob': generate_json_blob(),
+        'modifier_formset': modifiers_formset,
+    }
+    return context
+
+def create_new_power(request):
+    modifiers_formset = formset_factory(ModifierForm, extra=0)(request.POST, prefix="modifiers")
+    print(modifiers_formset)
+    if modifiers_formset.is_valid():
+        print(modifiers_formset.cleaned_data)
+    else:
+        print("invalid!!")
+        print(modifiers_formset.errors)
+
+
+# PRIVATE METHODS
+
+
 def _generate_component_blob(base_type):
     # TODO: select related and stuff.
     # TODO: filter on is_public=True
@@ -102,12 +133,14 @@ def _replacements_from_weapon(weapon):
         _replacement("selected-weapon-range", weapon.range),
     ]
 
+
 def _replacement(marker, replacmeent):
     return {
         "marker": marker,
         "replacement": replacmeent,
         "mode": ADDITIVE
     }
+
 
 def _generate_component_category_blob():
     categories = Base_Power_Category.objects.order_by("name").all()
@@ -118,6 +151,9 @@ def _generate_effect_vector_gift_credits_blob():
     cost_credits = VectorCostCredit.objects.all()
     return [x.to_blob() for x in cost_credits]
 
+
 def _generate_enhancement_groups_blob():
     groups = EnhancementGroup.objects.all()
     return {x.pk: x.to_blob() for x in groups}
+
+
