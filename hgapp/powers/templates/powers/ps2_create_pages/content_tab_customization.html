@@ -1,3 +1,5 @@
+{% load bootstrap %}
+
 <div class="text-muted text-center">
     Customize your Gift's behavior.
     <div class="visible-xs-block"></div>
@@ -168,37 +170,16 @@
 </div>
 <div id="sec-customize-flavor">
     <h2 class="text-center">Customize Flavor and Finish</h2>
-    <div class="form-group">
-        <label class="control-label" for="id_power_name">Name</label>
-        <div class=" ">
-            <input v-model="giftName" @input="changeParam" type="text" name="power_name" maxlength="100" class=" form-control" required="" id="id_power_name">
-        </div>
-        <br>
-        <label class="control-label" for="id_gift_tagline">Tagline</label>
-        <div class=" ">
-            <input v-model="giftTagline" type="text" name="gift_tagline" maxlength="100" class=" form-control" required="" id="id_gift_tagline">
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-xs-12" >
-            <h4>
-                Description
-                <div>
-                    <small>
-                        Describe what the Power looks like when it is used, how it works, and its impact on the owner, target, and environment.
-                    </small>
-                    <div v-if="selectedEffect.visibility">
-                        By default, { selectedEffect.visibility }
-                    </div>
-                </div>
-            </h4>
-            <div class="form-group">
-                <div class=" ">
-                    <textarea  v-model="giftDescription" name="description" cols="40" rows="10" class=" form-control" required="" id="id_description"></textarea>
-                </div>
-            </div>
-        </div>
-    </div>
+    {{power_form.name|bootstrap}}
+    {{power_form.tagline|bootstrap}}
+    {{power_form.description|bootstrap}}
+    {% if request.user.is_superuser %}
+        {{power_form.tags|bootstrap}}
+        {{power_form.example_description|bootstrap}}
+    {% endif %}
+    {{power_form.effect}}
+    {{power_form.vector}}
+    {{power_form.modality}}
     <div v-if="warnings.length > 0">
         <h3>Gift incomplete:</h3>
         <div class="alert alert-warning">

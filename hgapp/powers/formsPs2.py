@@ -3,16 +3,27 @@ from .models import Enhancement, Drawback, Power_Full, PowerTag, Base_Power, EFF
 
 
 class PowerForm(forms.Form):
-    name = forms.CharField(label='Power Name', max_length=100)
-    flavor = forms.CharField(label='Put a ribbon on it',
-                             help_text='A snippet of text that introduces the Power in a flavorful way',
-                             max_length=100)
+    name = forms.CharField(label='Gift Name',
+                           max_length=100,
+                           required=True,
+                           widget=forms.TextInput(attrs={
+                                "v-model": "giftName",
+                                "@input": "changeParam",
+                           }))
+    tagline = forms.CharField(label='Tagline',
+                              max_length=100,
+                              required=False,
+                              widget=forms.TextInput(attrs={
+                                  "v-model": "giftTagline",
+                              }))
     description = forms.CharField(label='Description',
-                                  widget=forms.Textarea,
-                                  max_length=2500)
-    modality = forms.ModelChoiceField(queryset=Base_Power.objects.filter(base_type=MODALITY).all(), required=True,)
-    effect = forms.ModelChoiceField(queryset=Base_Power.objects.filter(base_type=EFFECT).all(), required=True,)
-    vector = forms.ModelChoiceField(queryset=Base_Power.objects.filter(base_type=VECTOR).all(), required=True,)
+                                  widget=forms.Textarea(attrs={
+                                     "v-model": "giftDescription",
+                                  }),
+                                  max_length=2500,
+                                  required=True,
+                                  help_text="Describe what the Power looks like when it is used, how it works, "
+                                            "and its impact on the owner, target, and environment.")
 
     # admin only fields
     tags = forms.ModelMultipleChoiceField(queryset=PowerTag.objects.order_by("tag").all(),
@@ -23,6 +34,23 @@ class PowerForm(forms.Form):
                                           required=False,
                                           help_text='Admin only, optional, for the stock powers page. Follow-up advice for this power. '
                                                     'What sorts of Enhancements and Drawbacks would be good?')
+
+    # Hidden Fields
+    modality = forms.ModelChoiceField(queryset=Base_Power.objects.filter(base_type=MODALITY).all(),
+                                      required=True,
+                                      widget=forms.HiddenInput(attrs={
+                                          'v-bind:value': 'selectedModality.slug',
+                                      }))
+    effect = forms.ModelChoiceField(queryset=Base_Power.objects.filter(base_type=EFFECT).all(),
+                                    required=True,
+                                    widget=forms.HiddenInput(attrs={
+                                        'v-bind:value': 'selectedEffect.slug',
+                                    }))
+    vector = forms.ModelChoiceField(queryset=Base_Power.objects.filter(base_type=VECTOR).all(),
+                                    required=True,
+                                    widget=forms.HiddenInput(attrs={
+                                        'v-bind:value': 'selectedVector',
+                                    }))
 
 
 # The forms below are not rendered in the FE but are populated by vue and passed to the backend for validation and
