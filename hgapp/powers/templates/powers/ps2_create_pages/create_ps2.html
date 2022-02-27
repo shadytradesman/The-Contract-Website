@@ -21,6 +21,7 @@
 <form action="{% url 'powers:powers_create_ps2' %}" method="post">
 	{% csrf_token %}
 	{{ modifier_formset.management_form }}
+	{{ params_formset.management_form }}
 	<div class="container-fluid" id="vue-app">
 		<div class="modal fade" id="giftPreviewModal" tabindex="-1" role="dialog" aria-labelledby="giftPreviewModalLabel" >
 			<div class="modal-dialog modal-lg" role="document" style="top: 100px;">

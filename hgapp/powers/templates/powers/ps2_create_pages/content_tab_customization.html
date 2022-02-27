@@ -87,9 +87,13 @@
             </small>
         </div>
     </div>
-    <div v-for="param in parameters"
+    <div v-for="(param, p_index) in parameters"
          :key="param.id"
          class="css-customization-field">
+        <span class="js-data-prefix-container" v-bind:data-prefix="p_index">
+            {{params_formset.empty_form.level}}
+            {{params_formset.empty_form.power_param_id}}
+        </span>
         <div style="margin-bottom: 5px;">
             <h5 style="margin-bottom: 0px; display: inline-block">{param.name}</h5>
             <small class="text-muted" v-if="giftCostOfVueParam(param) != 0">

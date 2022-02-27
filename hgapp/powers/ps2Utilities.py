@@ -67,6 +67,7 @@ def generate_power_blob():
 
 def get_edit_context(existing_power=None):
     modifiers_formset = formset_factory(ModifierForm, extra=0)(prefix="modifiers")
+    params_formset = formset_factory(ParameterForm, extra=0)(prefix="parameters")
     power_form = PowerForm()
     if existing_power:
         pass
@@ -76,6 +77,7 @@ def get_edit_context(existing_power=None):
     context = {
         'power_blob': generate_json_blob(),
         'modifier_formset': modifiers_formset,
+        'params_formset': params_formset,
         'power_form': power_form,
     }
     return context
@@ -95,6 +97,15 @@ def create_new_power(request):
     else:
         print("POWER FORM INVALID")
         print(power_form.errors)
+    params_formset = formset_factory(ParameterForm, extra=0)(request.POST, prefix="parameters")
+    if params_formset.is_valid():
+        print("PARAMS VALID")
+        print(params_formset.cleaned_data)
+    else:
+        print("PARAMS INVALID")
+        print(params_formset.errors)
+        for form in params_formset:
+            print(form.errors)
 
 # PRIVATE METHODS
 

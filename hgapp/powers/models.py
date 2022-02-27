@@ -637,6 +637,7 @@ class Power_Param(models.Model):
 
     def to_blob(self):
         return {
+            "id": self.pk,
             "param_id": self.relevant_parameter.pk,
             "levels": self.get_levels(),
             "eratta": self.eratta,

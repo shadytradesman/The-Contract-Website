@@ -22,7 +22,7 @@ class PowerForm(forms.Form):
                                   }),
                                   max_length=2500,
                                   required=True,
-                                  help_text="Describe what the Power looks like when it is used, how it works, "
+                                  help_text="Describe what the Gift looks like when it is used, how it works, "
                                             "and its impact on the owner, target, and environment.")
 
     # admin only fields
@@ -53,10 +53,6 @@ class PowerForm(forms.Form):
                                     }))
 
 
-# The forms below are not rendered in the FE but are populated by vue and passed to the backend for validation and
-# cleaning. Their initial values are populated, so the BE can tell if a field has changed.
-
-
 class ModifierForm(forms.Form):
     # input fields
     details = forms.CharField(required=False, max_length=1200)
@@ -72,10 +68,17 @@ class ModifierForm(forms.Form):
 
 
 class ParameterForm(forms.Form):
-    # input fields
-    level = forms.IntegerField(required=True)
-    # metadata fields
-    power_param_id = forms.IntegerField(label=None, widget=forms.HiddenInput(),)
+    level = forms.IntegerField(
+        required=True,
+        widget=forms.HiddenInput(attrs={
+            'v-bind:value': 'selectedLevelOfParam(param)',
+
+        }), )
+    power_param_id = forms.IntegerField(
+        label=None,
+        widget=forms.HiddenInput(attrs={
+            'v-bind:value': 'param.powParamId',
+        }),)
 
 
 class SystemFieldTextForm(forms.Form):
@@ -83,7 +86,8 @@ class SystemFieldTextForm(forms.Form):
     detail_text = forms.CharField(required=False, max_length=500)
 
     # metadata fields
-    field_id = forms.IntegerField(label=None, widget=forms.HiddenInput(), )
+    field_id = forms.IntegerField(label=None,
+                                  widget=forms.HiddenInput(), )
 
 
 class SystemFieldRollForm(forms.Form):

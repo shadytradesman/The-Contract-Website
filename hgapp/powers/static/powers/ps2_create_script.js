@@ -171,6 +171,7 @@ function modifierToVueWithId(modifier, type, idNum) {
 
 function powerParamToVue(powerParam) {
     return {
+        powParamId: powerParam.id,
         id: powerParam.param_id,
         name: powerBlob["parameters"][powerParam.param_id]["name"],
         eratta: powerParam.eratta,
@@ -199,6 +200,14 @@ function giftCostOfVueParam(powerParam, currentLevel) {
     for (let i = 0; i < powerParam.levels.length; i++) {
         if (powerParam.levels[i] === currentLevel) {
             return i - powerParam.defaultLevel;
+        }
+    }
+}
+
+function selectedLevelOfParam(powerParam, currentLevel) {
+    for (let i = 0; i < powerParam.levels.length; i++) {
+        if (powerParam.levels[i] === currentLevel) {
+            return i;
         }
     }
 }
@@ -894,8 +903,12 @@ const ComponentRendering = {
       giftCostOfVueParam(param) {
         return giftCostOfVueParam(param, this.parameterSelections[param.id]);
       },
+      selectedLevelOfParam(param) {
+        return selectedLevelOfParam(param, this.parameterSelections[param.id]);
+      },
       updateManagementForms() {
           $('#id_modifiers-TOTAL_FORMS').attr('value', this.enhancements.length + this.drawbacks.length + 1);
+          $('#id_parameters-TOTAL_FORMS').attr('value', this.parameters.length);
           this.$nextTick(function () {
                 setFormInputPrefixValues();
           });
