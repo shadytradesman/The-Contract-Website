@@ -57,14 +57,16 @@
             </label>
         </div>
     </div>
-    <div v-for="field in systemFields"
+    <div v-for="(field, fieldIndex) in systemFields"
          :key="field.id"
          class="css-customization-field">
         <h5 style="margin-bottom: 5px;">
             {field.name}
         </h5>
         <div v-if="field.isText">
-            <input type="text" v-model="fieldTextInput[field.id]" class="form-control" @input="changeParam">
+            <span class="js-data-prefix-container" v-bind:data-prefix="fieldIndex">
+                {{ sys_field_text_formset.empty_form }}
+            </span>
         </div>
         <div v-if="field.isRoll" class="form-inline">
             <select v-model="fieldRollInput[field.id][0]" class="form-control" @change="changeParam">

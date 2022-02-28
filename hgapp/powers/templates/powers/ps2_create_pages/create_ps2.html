@@ -22,6 +22,7 @@
 	{% csrf_token %}
 	{{ modifier_formset.management_form }}
 	{{ params_formset.management_form }}
+	{{ sys_field_text_formset.management_form }}
 	<div class="container-fluid" id="vue-app">
 		<div class="modal fade" id="giftPreviewModal" tabindex="-1" role="dialog" aria-labelledby="giftPreviewModalLabel" >
 			<div class="modal-dialog modal-lg" role="document" style="top: 100px;">

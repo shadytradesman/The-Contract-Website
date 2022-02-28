@@ -220,6 +220,7 @@ function systemFieldToVue(systemField, type) {
     const weaponChoices = isWeapon ? systemField["weapon_choices"] : [];
     return {
         id: type + systemField.id,
+        pk: systemField.id,
         marker: systemField.marker,
         replacement: systemField.replacement,
         name: systemField.name,
@@ -909,6 +910,7 @@ const ComponentRendering = {
       updateManagementForms() {
           $('#id_modifiers-TOTAL_FORMS').attr('value', this.enhancements.length + this.drawbacks.length + 1);
           $('#id_parameters-TOTAL_FORMS').attr('value', this.parameters.length);
+          $('#id_sys_field_text-TOTAL_FORMS').attr('value', this.systemFields.filter(field => field.isText).length);
           this.$nextTick(function () {
                 setFormInputPrefixValues();
           });

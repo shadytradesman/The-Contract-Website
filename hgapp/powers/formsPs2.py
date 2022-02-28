@@ -81,27 +81,29 @@ class ParameterForm(forms.Form):
         }),)
 
 
-class SystemFieldTextForm(forms.Form):
-    # input fields
-    detail_text = forms.CharField(required=False, max_length=500)
-
-    # metadata fields
+class SystemField(forms.Form):
     field_id = forms.IntegerField(label=None,
-                                  widget=forms.HiddenInput(), )
+                                  widget=forms.HiddenInput(attrs={
+                                      'v-bind:value': 'field.pk',
+                                  }),)
 
 
-class SystemFieldRollForm(forms.Form):
+class SystemFieldTextForm(SystemField):
+    detail_text = forms.CharField(required=True,
+                                  max_length=500,
+                                  widget=forms.TextInput(attrs={
+                                      "v-model": "fieldTextInput[field.id]",
+                                      "class": "form-control",
+                                      "@input": "changeParam",
+                                  }))
+
+
+class SystemFieldRollForm(SystemField):
     # input fields
     ability_choice = forms.CharField(required=False, max_length=500)
     attribute_choice = forms.CharField(required=False, max_length=500)
 
-    # metadata fields
-    field_id = forms.IntegerField(label=None, widget=forms.HiddenInput(), )
 
-
-class SystemFieldWeaponForm(forms.Form):
+class SystemFieldWeaponForm(SystemField):
     # input fields
     weapon_choice = forms.CharField(required=False, max_length=500)
-
-    # metadata fields
-    field_id = forms.IntegerField(label=None, widget=forms.HiddenInput(), )
