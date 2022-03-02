@@ -69,6 +69,7 @@ def get_edit_context(existing_power=None):
     modifiers_formset = formset_factory(ModifierForm, extra=0)(prefix="modifiers")
     params_formset = formset_factory(ParameterForm, extra=0)(prefix="parameters")
     sys_field_text_formset = formset_factory(SystemFieldTextForm, extra=0)(prefix="sys_field_text")
+    sys_field_weapon_formset = formset_factory(SystemFieldWeaponForm, extra=0)(prefix="sys_field_weapon")
     power_form = PowerForm()
     if existing_power:
         pass
@@ -81,6 +82,7 @@ def get_edit_context(existing_power=None):
         'params_formset': params_formset,
         'power_form': power_form,
         'sys_field_text_formset': sys_field_text_formset,
+        'sys_field_weapon_formset': sys_field_weapon_formset,
     }
     return context
 
@@ -115,6 +117,16 @@ def create_new_power(request):
     else:
         print("SYS FIELD TEXT INVALID")
         print(sys_field_text_formset.errors)
+    sys_field_weapon_formset = formset_factory(SystemFieldWeaponForm, extra=0)(request.POST, prefix="sys_field_weapon")
+    if sys_field_weapon_formset.is_valid():
+        print("weapon field valid")
+        print(sys_field_weapon_formset.cleaned_data)
+    else:
+        print("weapon field INVALID")
+        print(sys_field_weapon_formset.errors)
+        for form in sys_field_weapon_formset:
+            print(form.errors)
+
 
 # PRIVATE METHODS
 

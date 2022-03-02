@@ -1,5 +1,6 @@
 from django import forms
 from .models import Enhancement, Drawback, Power_Full, PowerTag, Base_Power, EFFECT, MODALITY, VECTOR
+from characters.models import Weapon
 
 
 class PowerForm(forms.Form):
@@ -91,6 +92,7 @@ class SystemField(forms.Form):
 class SystemFieldTextForm(SystemField):
     detail_text = forms.CharField(required=True,
                                   max_length=500,
+                                  label="",
                                   widget=forms.TextInput(attrs={
                                       "v-model": "fieldTextInput[field.id]",
                                       "class": "form-control",
@@ -98,12 +100,16 @@ class SystemFieldTextForm(SystemField):
                                   }))
 
 
+class SystemFieldWeaponForm(SystemField):
+    weapon_choice = forms.ModelChoiceField(queryset=Weapon.objects.all(),
+                                           required=True,
+                                           widget=forms.HiddenInput(attrs={
+                                               'v-bind:value': 'fieldWeaponInput[field.id]',
+                                           }))
+
+
 class SystemFieldRollForm(SystemField):
     # input fields
     ability_choice = forms.CharField(required=False, max_length=500)
     attribute_choice = forms.CharField(required=False, max_length=500)
 
-
-class SystemFieldWeaponForm(SystemField):
-    # input fields
-    weapon_choice = forms.CharField(required=False, max_length=500)

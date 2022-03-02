@@ -911,6 +911,7 @@ const ComponentRendering = {
           $('#id_modifiers-TOTAL_FORMS').attr('value', this.enhancements.length + this.drawbacks.length + 1);
           $('#id_parameters-TOTAL_FORMS').attr('value', this.parameters.length);
           $('#id_sys_field_text-TOTAL_FORMS').attr('value', this.systemFields.filter(field => field.isText).length);
+          $('#id_sys_field_weapon-TOTAL_FORMS').attr('value', this.systemFields.filter(field => field.isWeapon).length);
           this.$nextTick(function () {
                 setFormInputPrefixValues();
           });
