@@ -785,7 +785,7 @@ class Power_Full(models.Model):
             return self.latest_rev
 
     def get_point_value(self):
-        return self.power_set.order_by('-pub_date').all()[0].get_point_value()
+        return self.latest_revision().get_point_value()
 
     def set_self_and_children_privacy(self, is_private):
         if is_private:
@@ -979,7 +979,7 @@ class Power(models.Model):
         total_parameter_cost = 0
         for param_val in self.parameter_value_set.all():
             total_parameter_cost = total_parameter_cost + (param_val.value - param_val.relevant_power_param.default)
-        return  cost_of_power \
+        return cost_of_power \
                 + self.selected_enhancements.count() \
                 - self.base.num_free_enhancements \
                 - self.selected_drawbacks.count() \

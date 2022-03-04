@@ -1,0 +1,133 @@
+from .models import CREATION_NEW, CREATION_REVISION, CREATION_ADJUSTMENT, CREATION_IMPROVEMENT
+
+def get_power_creation_reason(new_power, old_power):
+    if old_power is None:
+        # new
+        return CREATION_NEW
+    new_points = new_power.get_point_value()
+    old_points = old_power.get_point_value()
+
+    if new_points > old_points:
+        return CREATION_IMPROVEMENT
+    if new_points < old_points \
+            or _get_param_difference_text(new_power, old_power) \
+            or _get_added_enhancements(new_power, old_power) \
+            or _get_removed_enhancements(new_power, old_power) \
+            or _get_added_drawbacks(new_power, old_power) \
+            or _get_removed_drawbacks(new_power, old_power):
+        return CREATION_REVISION
+    return CREATION_ADJUSTMENT
+
+
+def get_power_creation_reason_expanded_text(new_power, old_power):
+    edit_text = ""
+    if new_power.creation_reason == CREATION_ADJUSTMENT:
+        edit_text = "Text field change"
+    if new_power.creation_reason == CREATION_REVISION or new_power.creation_reason == CREATION_IMPROVEMENT:
+        added_enhancements = _get_added_enhancements(new_power, old_power)
+        if len(added_enhancements) > 0:
+            edit_text = edit_text + "Added Enhancement"
+            if len(added_enhancements) > 1:
+                edit_text = edit_text + "s"
+            edit_text = edit_text + ": "
+            for enhancement in added_enhancements:
+                edit_text = edit_text + enhancement.relevant_enhancement.name + ", "
+
+        removed_enhancements = _get_removed_enhancements(new_power, old_power)
+        if len(removed_enhancements) > 0:
+            edit_text = edit_text + "Removed Enhancement"
+            if len(removed_enhancements) > 1:
+                edit_text = edit_text + "s"
+            edit_text = edit_text + ": "
+            for enhancement in removed_enhancements:
+                edit_text = edit_text + enhancement.relevant_enhancement.name + ", "
+
+        added_drawbacks = _get_added_drawbacks(new_power, old_power)
+        if len(added_drawbacks) > 0:
+            edit_text = edit_text + "Added Drawback"
+            if len(added_drawbacks) > 1:
+                edit_text = edit_text + "s"
+            edit_text = edit_text + ": "
+            for drawback in added_drawbacks:
+                edit_text = edit_text + drawback.relevant_drawback.name + ", "
+
+        removed_drawbacks = _get_removed_drawbacks(new_power, old_power)
+        if len(removed_drawbacks) > 0:
+            edit_text = edit_text + "Removed Drawback"
+            if len(removed_drawbacks) > 1:
+                edit_text = edit_text + "s"
+            edit_text = edit_text + ": "
+            for drawback in removed_drawbacks:
+                edit_text = edit_text + drawback.relevant_drawback.name + ", "
+        edit_text = edit_text + _get_param_difference_text(new_power, old_power)
+
+    #stopgap bugfix measure until we fix the _get_added_enhancements method by properly using form fields.
+    if len(edit_text) < 3:
+        edit_text = "Power Adjustment"
+
+    if edit_text[-2] == ',':
+        edit_text = edit_text[:-2]
+    return edit_text[:1500]
+
+
+def _get_added_enhancements(new_power, old_power):
+    added_enhancements = []
+    for new_enhancement in new_power.enhancement_instance_set.all():
+        in_old = False
+        for old_enhancement in old_power.enhancement_instance_set.all():
+            if old_enhancement.relevant_enhancement.slug == new_enhancement.relevant_enhancement.slug:
+                in_old = True
+        if not in_old:
+            added_enhancements.append(new_enhancement)
+    return added_enhancements
+
+
+def _get_removed_enhancements(new_power, old_power):
+    removed_enhancements = []
+    for old_enhancement in old_power.enhancement_instance_set.all():
+        in_new = False
+        for new_enhancement in new_power.enhancement_instance_set.all():
+            if old_enhancement.relevant_enhancement.slug == new_enhancement.relevant_enhancement.slug:
+                in_new = True
+        if not in_new:
+            removed_enhancements.append(old_enhancement)
+    return removed_enhancements
+
+
+def _get_added_drawbacks(new_power, old_power):
+    added_drawbacks = []
+    for new_drawback in new_power.drawback_instance_set.all():
+        in_old = False
+        for old_drawback in old_power.drawback_instance_set.all():
+            if old_drawback.relevant_drawback.slug == new_drawback.relevant_drawback.slug:
+                in_old = True
+        if not in_old:
+            added_drawbacks.append(new_drawback)
+    return added_drawbacks
+
+
+def _get_removed_drawbacks(new_power, old_power):
+    removed_drawbacks = []
+    for old_drawback in old_power.drawback_instance_set.all():
+        in_new = False
+        for new_drawback in new_power.drawback_instance_set.all():
+            if old_drawback.relevant_drawback.slug == new_drawback.relevant_drawback.slug:
+                in_new = True
+        if not in_new:
+            removed_drawbacks.append(old_drawback)
+    return removed_drawbacks
+
+
+def _get_param_difference_text(new_power, old_power):
+    param_text = ""
+    param_counter = 0
+    for new_param_value in new_power.parameter_value_set.order_by('relevant_power_param_id').all():
+        try:
+            old_param_value = old_power.parameter_value_set.order_by('relevant_power_param_id').all()[param_counter]
+            if old_param_value.value != new_param_value.value:
+                param_text = param_text + "Parameter {} changed from {} to {}. "
+                param_text = param_text.format(new_param_value.relevant_power_param.relevant_parameter.name, old_param_value.value, new_param_value.value)
+        except:
+            return "Base Parameters Changed. "
+        param_counter = param_counter + 1
+    return param_text

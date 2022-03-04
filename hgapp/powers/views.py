@@ -18,7 +18,7 @@ from .createPowerFormUtilities import get_create_power_context_from_base, \
 from .models import Power, Base_Power_Category, Base_Power, Base_Power_System, DICE_SYSTEM, Power_Full, PowerTag, \
     PremadeCategory, PowerTutorial, SYS_PS2, EFFECT, VECTOR, MODALITY
 from .forms import DeletePowerForm
-from .ps2Utilities import generate_json_blob, get_edit_context, create_new_power
+from .ps2Utilities import get_edit_context, create_new_power
 
 @method_decorator(login_required(login_url='account_login'), name='dispatch')
 class Create(View):
