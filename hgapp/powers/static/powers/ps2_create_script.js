@@ -912,6 +912,7 @@ const ComponentRendering = {
           $('#id_parameters-TOTAL_FORMS').attr('value', this.parameters.length);
           $('#id_sys_field_text-TOTAL_FORMS').attr('value', this.systemFields.filter(field => field.isText).length);
           $('#id_sys_field_weapon-TOTAL_FORMS').attr('value', this.systemFields.filter(field => field.isWeapon).length);
+          $('#id_sys_field_roll-TOTAL_FORMS').attr('value', this.systemFields.filter(field => field.isRoll).length);
           this.$nextTick(function () {
                 setFormInputPrefixValues();
           });
@@ -1024,9 +1025,9 @@ const ComponentRendering = {
             if (field.isWeapon) {
                 this.fieldWeaponInput[field.id] = field.weaponChoices[0][0];
             } else if (field.isRoll) {
-                var defaultChoices = [field.attributeChoices[0][1]];
+                let defaultChoices = [field.attributeChoices[0]];
                 if (field.abilityChoices.length > 0) {
-                    defaultChoices.push(field.abilityChoices[0][1]);
+                    defaultChoices.push(field.abilityChoices[0]);
                 }
                 this.fieldRollInput[field.id] = defaultChoices;
             } else {
@@ -1289,9 +1290,9 @@ const ComponentRendering = {
                 }
                 if (field.isRoll) {
                     const choices = this.fieldRollInput[field.id];
-                    sub = choices[0];
+                    sub = choices[0][1];
                     if (choices.length > 1) {
-                        sub = sub + " + " + choices[1];
+                        sub = sub + " + " + choices[1][1];
                     }
                 }
                 let replacement = field.replacement;

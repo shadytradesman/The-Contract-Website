@@ -109,7 +109,17 @@ class SystemFieldWeaponForm(SystemField):
 
 
 class SystemFieldRollForm(SystemField):
-    # input fields
-    ability_choice = forms.CharField(required=False, max_length=500)
-    attribute_choice = forms.CharField(required=False, max_length=500)
+    attribute_roll = forms.CharField(required=True,
+                                     max_length=500,
+                                     label="",
+                                     widget=forms.HiddenInput(attrs={
+                                         "v-model": "fieldRollInput[field.id][0][0]",
+                                     }))
+    ability_roll = forms.CharField(required=False,
+                                   max_length=500,
+                                   label="",
+                                   widget=forms.HiddenInput(attrs={
+                                       "v-if": "field.abilityChoices.length > 0",
+                                       "v-model": "fieldRollInput[field.id][1][0]",
+                                   }))
 

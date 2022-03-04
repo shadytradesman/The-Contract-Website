@@ -1128,7 +1128,7 @@ class SystemFieldRoll(SystemField):
                 attribute_choices.extend(
                     [(x.id, x.name) for x in Attribute.objects.filter(is_deprecated=False).order_by('name')])
             primary_abilities = Ability.objects.filter(is_primary=True).order_by('name')
-            ability_choices = [('', '------'), ]
+            ability_choices = []
             ability_choices.extend([(x.id, x.name) for x in primary_abilities])
         if self.allow_parry:
             attribute_choices.append(PARRY_)

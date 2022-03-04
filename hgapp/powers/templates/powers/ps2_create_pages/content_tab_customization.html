@@ -70,12 +70,15 @@
         </div>
         <div v-if="field.isRoll" class="form-inline">
             <select v-model="fieldRollInput[field.id][0]" class="form-control" @change="changeParam">
-                <option v-for="value in field.attributeChoices" :value="value[1]">{value[1]}</option>
+                <option v-for="value in field.attributeChoices" :value="value">{value[1]}</option>
             </select>
             <span v-if="field.abilityChoices.length > 0" style="padding-left: 10px;">
                 <select v-model="fieldRollInput[field.id][1]" class="form-control" @change="changeParam">
-                    <option v-for="value in field.abilityChoices" :value="value[1]">{value[1]}</option>
+                    <option v-for="value in field.abilityChoices" :value="value">{value[1]}</option>
                 </select>
+            </span>
+            <span class="js-data-prefix-container" v-bind:data-prefix="fieldIndex">
+                {{ sys_field_roll_formset.empty_form }}
             </span>
         </div>
         <div v-if="field.isWeapon" class="form-inline">

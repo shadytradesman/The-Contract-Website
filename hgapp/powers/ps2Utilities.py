@@ -70,6 +70,7 @@ def get_edit_context(existing_power=None):
     params_formset = formset_factory(ParameterForm, extra=0)(prefix="parameters")
     sys_field_text_formset = formset_factory(SystemFieldTextForm, extra=0)(prefix="sys_field_text")
     sys_field_weapon_formset = formset_factory(SystemFieldWeaponForm, extra=0)(prefix="sys_field_weapon")
+    sys_field_roll_formset = formset_factory(SystemFieldRollForm, extra=0)(prefix="sys_field_roll")
     power_form = PowerForm()
     if existing_power:
         pass
@@ -83,6 +84,7 @@ def get_edit_context(existing_power=None):
         'power_form': power_form,
         'sys_field_text_formset': sys_field_text_formset,
         'sys_field_weapon_formset': sys_field_weapon_formset,
+        'sys_field_roll_formset': sys_field_roll_formset,
     }
     return context
 
@@ -125,6 +127,15 @@ def create_new_power(request):
         print("weapon field INVALID")
         print(sys_field_weapon_formset.errors)
         for form in sys_field_weapon_formset:
+            print(form.errors)
+    sys_field_roll_formset = formset_factory(SystemFieldRollForm, extra=0)(request.POST, prefix="sys_field_roll")
+    if sys_field_roll_formset.is_valid():
+        print("roll formset valid")
+        print(sys_field_roll_formset.cleaned_data)
+    else:
+        print("roll fomrset INVALID")
+        print(sys_field_roll_formset.errors)
+        for form in sys_field_roll_formset:
             print(form.errors)
 
 
