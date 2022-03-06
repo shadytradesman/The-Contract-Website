@@ -974,6 +974,7 @@ class Power(models.Model):
         is_owner = player == self.created_by
         return is_owner or not self.private or player.has_perm("view_private_power", self) or self.player_manages_via_cell(player)
 
+    # TODO: denormalize this and use signals to update when gift components (base_powers) are changed.
     def get_point_value(self):
         cost_of_power = 1
         total_parameter_cost = 0

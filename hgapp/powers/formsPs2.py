@@ -1,5 +1,7 @@
 from django import forms
-from .models import Enhancement, Drawback, Power_Full, PowerTag, Base_Power, EFFECT, MODALITY, VECTOR
+from django.forms import formset_factory
+
+from .models import PowerTag, Base_Power, EFFECT, MODALITY, VECTOR
 from characters.models import Weapon
 
 
@@ -123,3 +125,22 @@ class SystemFieldRollForm(SystemField):
                                        "v-model": "fieldRollInput[field.id][1][0]",
                                    }))
 
+
+def get_params_formset(POST=None):
+    return formset_factory(ParameterForm, extra=0)(POST, prefix="parameters")
+
+
+def get_modifiers_formset(POST=None):
+    return formset_factory(ModifierForm, extra=0)(POST, prefix="modifiers")
+
+
+def get_sys_field_text_formset(POST=None):
+    return formset_factory(SystemFieldTextForm, extra=0)(POST, prefix="sys_field_text")
+
+
+def get_sys_field_weapon_formset(POST=None):
+    return formset_factory(SystemFieldWeaponForm, extra=0)(POST, prefix="sys_field_weapon")
+
+
+def get_sys_field_roll_formset(POST=None):
+    return formset_factory(SystemFieldRollForm, extra=0)(POST, prefix="sys_field_roll")
