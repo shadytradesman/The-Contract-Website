@@ -62,7 +62,7 @@ class ModifierForm(forms.Form):
     is_selected = forms.BooleanField(required=False)
 
     # metadata fields
-    mod_slug = forms.CharField(label=None, widget=forms.HiddenInput(attrs={
+    mod_slug = forms.CharField(required=True, label=None, widget=forms.HiddenInput(attrs={
         'v-bind:value': 'modifier.slug',
       }),) # slug for the Enhancement or Drawback
     is_enhancement = forms.BooleanField(required=False, label=None, widget=forms.HiddenInput(attrs={

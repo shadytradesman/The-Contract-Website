@@ -18,7 +18,7 @@ from .createPowerFormUtilities import get_create_power_context_from_base, \
 from .models import Power, Base_Power_Category, Base_Power, Base_Power_System, DICE_SYSTEM, Power_Full, PowerTag, \
     PremadeCategory, PowerTutorial, SYS_PS2, EFFECT, VECTOR, MODALITY
 from .forms import DeletePowerForm
-from .ps2Utilities import get_edit_context, create_new_power
+from .ps2Utilities import get_edit_context, save_gift
 
 @method_decorator(login_required(login_url='account_login'), name='dispatch')
 class Create(View):
@@ -37,22 +37,9 @@ class Create(View):
         return render(request, self.template_name, self.__get_context_data())
 
     def post(self, request, *args, **kwargs):
-        power = create_new_power(request)
-        pass
-        # form = self.form_class(request.POST)
-        # if form.is_valid():
-        #     with transaction.atomic():
-        #         journal = Journal(title=form.cleaned_data['title'],
-        #                           writer=request.user,
-        #                           game_attendance=self.game_attendance,
-        #                           is_downtime=self.is_downtime,
-        #                           is_deleted=False,
-        #                           is_nsfw=form.cleaned_data['is_nsfw'],
-        #                           contains_spoilers=form.cleaned_data['contains_spoilers'])
-        #         journal.save()
-        #         journal.set_content(form.cleaned_data['content'])
-        #     return HttpResponseRedirect(reverse('journals:journal_read_game', args=(self.character.id, self.game.id)))
-        # raise ValueError("Invalid journal form")
+        with transaction.atomic():
+            new_power_full = save_gift(request)
+        return HttpResponseRedirect(reverse('powers:powers_view_power', args=(new_power_full.id,)))
 
     def __check_permissions(self):
         if not (self.request.user.is_superuser or self.request.user.profile.ps2_user or self.request.user.profile.early_access_user):

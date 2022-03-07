@@ -1,4 +1,29 @@
-from .models import CREATION_NEW, CREATION_REVISION, CREATION_ADJUSTMENT, CREATION_IMPROVEMENT
+from .models import CREATION_NEW, CREATION_REVISION, CREATION_ADJUSTMENT, CREATION_IMPROVEMENT, BODY_, MIND_, PARRY_
+from django.shortcuts import get_object_or_404
+from characters.models import Roll, Attribute, Ability, NO_PARRY_INFO, REACTION, THROWN
+
+
+def get_roll_from_form_and_system(form, system_field):
+    attr = form.cleaned_data["attribute_roll"]
+    difficulty = 6
+    if system_field.difficulty:
+        difficulty = system_field.difficulty
+    if attr == BODY_[0] or attr == MIND_[0] or attr == PARRY_[0]:
+        if attr == BODY_[0]:
+            return Roll.get_body_roll(difficulty=difficulty)
+        elif attr == MIND_[0]:
+            return Roll.get_mind_roll(difficulty=difficulty)
+        elif attr == PARRY_[0]:
+            return Roll.get_roll(difficulty=difficulty, parry_type=system_field.parry_type, speed=REACTION)
+        else:
+            raise ValueError("Unexpected attr")
+    else:
+        attribute = get_object_or_404(Attribute, id=attr)
+        ability = get_object_or_404(Ability, id=form.cleaned_data["ability_roll"])
+        return Roll.get_roll(attribute = attribute,
+                             ability = ability,
+                             difficulty = difficulty,
+                             speed=system_field.speed)
 
 def get_power_creation_reason(new_power, old_power):
     if old_power is None:
