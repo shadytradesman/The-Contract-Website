@@ -757,6 +757,68 @@ const ComponentRendering = {
         this.openCustomizationTab();
         $("#giftPreviewModal").modal({});
       },
+      setStateForEdit(powerEditBlob) {
+        this.giftName = powerEditBlob["name"];
+        this.giftTagline = powerEditBlob["flavor_text"];
+        this.giftDescription = powerEditBlob["description"];
+        let selectedModality = this.modalities.find(comp => comp.slug === powerEditBlob["modality_pk"]);
+        if (!selectedModality) {
+            return;
+        }
+        this.selectedModality = selectedModality;
+        this.changeModality();
+        let selectedEffect = this.effects.find(comp => comp.slug === powerEditBlob["effect_pk"]);
+        if (!selectedEffect) {
+            return;
+        }
+        this.selectedEffect = selectedEffect;
+        this.changeEffect();
+        if (this.vectors.length > 1) {
+            let selectedVector = this.vectors.find(comp => comp.slug === powerEditBlob["vector_pk"]);
+            if (!selectedVector) {
+                return;
+            }
+            this.selectedVector = selectedVector;
+        }
+        this.clickVector();
+
+        this.selectedEnhancements =  [];
+        this.selectedDrawbacks = [];
+
+        powerEditBlob["enhancements"].forEach(mod => {
+            let availEnhancements = this.enhancements.filter(enh => !(enh.slug in this.disabledEnhancements));
+            let selectedEnhancement = availEnhancements.find(enh => enh.slug === mod["slug"]);
+            if (selectedEnhancement) {
+                if (mod["detail"] != null) {
+                    selectedDrawback.details = mod["detail"];
+                }
+                this.selectedEnhancements.push(selectedEnhancement);
+                this.enhancements = handleModifierMultiplicity(selectedEnhancement.slug, selectedEnhancement.id, "enhancements", this.enhancements, this.getSelectedAndActiveEnhancements());
+                this.calculateRestrictedElements();
+            }
+        });
+
+        powerEditBlob["drawbacks"].forEach(mod => {
+            let availDrawbacks = this.drawbacks.filter(drawback => !(drawback.slug in this.disabledDrawbacks));
+            let selectedDrawback = availDrawbacks.find(drawback => drawback.slug === mod["slug"]);
+            if (selectedDrawback) {
+                if (mod["detail"] != null) {
+                    selectedDrawback.details = mod["detail"];
+                }
+                this.selectedDrawbacks.push(selectedDrawback);
+                this.drawbacks = handleModifierMultiplicity(selectedDrawback.slug, selectedDrawback.id, "drawbacks", this.drawbacks, this.getSelectedAndActiveDrawbacks());
+                this.calculateRestrictedElements();
+            }
+        });
+
+        this.updateManagementForms();
+        this.reRenderSystemText();
+        this.updateGiftCost();
+        this.updateRequiredStatus();
+        this.populateWarnings();
+        this.openCustomizationTab();
+        $("#giftPreviewModal").modal({});
+      },
       scrollToContent() {
           this.$nextTick(function () {
               let yPos = document.getElementById("js-content-header").getBoundingClientRect().y -60;
@@ -1313,10 +1375,15 @@ const ComponentRendering = {
 }
 const app = Vue.createApp(ComponentRendering);
 
-const mountedApp = app.mount('#vue-app');
 
 $(function() {
+    const mountedApp = app.mount('#vue-app');
     mountedApp.modalities = Object.values(powerBlob.modalities).map(comp => componentToVue(comp, "mod"));
+    if ((document.getElementById('powerEditBlob').textContent.length > 2)) {
+        console.log(document.getElementById('powerEditBlob').textContent.length)
+        const powerEditBlob = JSON.parse(JSON.parse(document.getElementById('powerEditBlob').textContent));
+        mountedApp.setStateForEdit(powerEditBlob);
+    }
     mountedApp.$nextTick(function () {
       activateTooltips();
     });

@@ -2,6 +2,7 @@
 
 {% load i18n %}
 
+
 {% block head_title %}Viewing Power{% endblock %}
 
 {% block body_class %}home{% endblock %}
@@ -24,65 +25,52 @@
     <br>
     <div class="panel panel-default">
         <div class="panel-heading">
-            <h2>
-                {{ power.name }}
-                <br>
-                <small><i>{{ power.flavor_text|linebreaks }}</i></small>
-            </h2>
-            <p>
-                A {{power_full.get_point_value}} Gift
-                <a href="{% url 'powers:powers_view_base' power_full.base.slug %}">{{power_full.base.name}}</a>
-                Power
-            {% if power.parent_power.character %}
-                used by <a href="{% url 'characters:characters_view' power.parent_power.character.id %}">{{ power.parent_power.character.name }}</a>,
-            {% endif %}
-            {% if power.parent_power.owner %}
-                created by <a href="{% url 'profiles:profiles_view_profile' power.parent_power.owner.id %}">{% user_display power.parent_power.owner %}</a>.
-            {% endif %}
-            </p>
-            {%if power.private %}
-                <h5><i class="fa fa-user-secret fa-2x"></i> Power is private because it is assigned to a private character.</h5>
-            {% endif %}
             <div class="text-center">
                 <ul class="nav nav-pills nav-justified  css-power-view-buttons">
                     {% if request.user.is_authenticated %}
-                        {% player_can_edit_power power request.user as can_edit %}
-                        {% if can_edit %}
-                            <li>
-                                <a href="{% url 'powers:powers_edit_power' power.parent_power.id %}" class="btn btn-primary">Edit Power</a>
-                            </li>
-                        {% endif %}
-                        {% if request.user == power.parent_power.owner %}
-                            <li>
-                                <a href="{% url 'powers:powers_delete_power' power.parent_power.id %}" class="btn btn-default">Delete Power</a>
-                            </li>
-                        {% endif %}
+                    {% player_can_edit_power power request.user as can_edit %}
+                    {% if can_edit %}
+                    <li>
+                        <a href="{% url 'powers:powers_edit_ps2' power.parent_power.id %}" class="btn btn-primary">Edit Power</a>
+                    </li>
+                    {% endif %}
+                    {% if request.user == power.parent_power.owner %}
+                    <li>
+                        <a href="{% url 'powers:powers_delete_power' power.parent_power.id %}" class="btn btn-default">Delete Power</a>
+                    </li>
+                    {% endif %}
                     {% endif %}
                     <li>
                         <a href="{% url 'powers:powers_create_power_from_existing' power.id %}" class="btn btn-default">Copy and Edit New</a>
                     </li>
                 </ul>
             </div>
+            <h2>
+                {{ power.name }}
+                <small><i>{{ power.flavor_text}}</i></small>
+            </h2>
+            <div>
+                TODO: put that description blurb here
+            </div>
+            <p>
+                Gift Cost: {{power_full.get_point_value}}
+                <div>
+                    {% if power.parent_power.character %}
+                        used by <a href="{% url 'characters:characters_view' power.parent_power.character.id %}">{{ power.parent_power.character.name }}</a>,
+                    {% endif %}
+                    {% if power.parent_power.owner %}
+                        created by <a href="{% url 'profiles:profiles_view_profile' power.parent_power.owner.id %}">{% user_display power.parent_power.owner %}</a>.
+                    {% endif %}
+                </div>
+                {%if power.private %}
+                    <h5><i class="fa fa-user-secret fa-2x"></i> Power is private because it is assigned to a private character.</h5>
+                {% endif %}
+            </p>
         </div>
         <div class="panel-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <h4>Description</h4>
-                    <p>
-                        {{ power.description|linebreaks }}
-                    </p>
-                </div>
-                <div class="col-md-6">
-                    <h4>
-                        System
-                    </h4>
-                    <span class="js-render-power-keywords">
-                        <p><i>
-                            {{ power.render_system }}
-                        </i></p>
-                    </span>
-                </div>
-            </div>
+                <i class="text-muted">{{ power.description|safe }}</i>
+            <hr style="width: 50%;">
+            {{ power.system|safe }}
             <hr>
             <div class="row">
                 {% if power.enhancement_instance_set.all %}

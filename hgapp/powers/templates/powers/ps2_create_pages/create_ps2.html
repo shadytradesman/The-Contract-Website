@@ -10,6 +10,7 @@
 <!--	<script src="https://unpkg.com/vue@3.2.26/dist/vue.global.prod.js"></script>-->
 	<script src="{% static 'powers/vue.global.prod.js' %}"></script>
 	{{power_blob|json_script:"powerBlob"}}
+	{{power_edit_blob|json_script:"powerEditBlob"}}
 	<script src="{% static 'powers/ps2_create_script.js' %}"></script>
 {% endblock %}
 
@@ -18,7 +19,7 @@
 {% endblock %}
 
 {% block body_base %}
-<form action="{% url 'powers:powers_create_ps2' %}" method="post">
+<form action="{{form_url}}" method="post">
 	{% csrf_token %}
 	{{ modifier_formset.management_form }}
 	{{ params_formset.management_form }}

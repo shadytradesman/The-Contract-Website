@@ -1,5 +1,6 @@
 import json, logging
 from collections import defaultdict
+from django.urls import reverse
 
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
@@ -288,13 +289,6 @@ def get_edit_context(existing_power_full=None):
     sys_field_weapon_formset = get_sys_field_weapon_formset()
     sys_field_roll_formset = get_sys_field_roll_formset()
     power_form = PowerForm()
-    if existing_power_full:
-        # when an existing gift is edited, populate a new blob that describes its state and then simulate vue clicks
-        # ala the random power generator.
-        pass
-    else:
-        pass
-
     context = {
         'power_blob': PowerBlob().get_json_power_blob(),
         'modifier_formset': modifiers_formset,
@@ -304,11 +298,15 @@ def get_edit_context(existing_power_full=None):
         'sys_field_weapon_formset': sys_field_weapon_formset,
         'sys_field_roll_formset': sys_field_roll_formset,
     }
+    form_url = reverse("powers:powers_create_ps2")
+    if existing_power_full:
+        context['power_edit_blob'] = json.dumps(existing_power_full.latest_revision().to_edit_blob())
+        form_url = reverse("powers:powers_edit_ps2", kwargs={"power_full_id": existing_power_full.pk})
+    context["form_url"] = form_url
     return context
 
 
 # TODO: permissions are checked before this method is called.
-# TODO: put inside transaction if we don't do it a the view level
 def save_gift(request, power_full=None, character=None):
     if not request.POST:
         raise ValueError("Can only create new gift from post request")
@@ -327,6 +325,7 @@ def save_gift(request, power_full=None, character=None):
         if request.user.is_superuser:
             power_full.tags.set(power_form.cleaned_data["tags"])
             power_full.example_description = power_form.cleaned_data["example_description"]
+        power_full.latest_rev = new_power
         power_full.save()
         new_power.parent_power = power_full
         new_power.save()
@@ -345,6 +344,7 @@ def _populate_power_system_and_errata(power_blob, power, modifier_instances, par
 
 def _create_new_power_and_save(power_form, request):
     power_blob = PowerBlob()
+    print("new power generation")
 
     # power is not saved yet
     power = _get_power_from_form_and_validate(power_form=power_form, power_blob=power_blob, user=request.user)
@@ -484,7 +484,7 @@ def _populate_power_change_log(new_power, power_full):
         new_power.creation_reason_expanded_text = "Initial power creation"
 
 
-def _create_new_power_full(power_form, new_power, character):
+def _create_new_power_full(power_form, new_power, character=None):
     new_power_full = Power_Full(
         name=power_form.cleaned_data['name'],
         dice_system=SYS_PS2,

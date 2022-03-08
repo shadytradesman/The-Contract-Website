@@ -918,6 +918,7 @@ class Power(models.Model):
     def __str__(self):
         return self.name + " (" + self.description + ")"
 
+    #TODO: this seems to be for base powers??/
     def __check_constraints(self):
         if hasattr(self, "modality") and self.modality:
             if not self.modality.base_type == MODALITY:
@@ -933,10 +934,9 @@ class Power(models.Model):
         if (hasattr(self, "base") and self.base or hasattr(self, "vector") and self.vector) and not (self.base and self.vector):
             raise IntegrityError("Power with effect or vector must have both")
 
-
     def save(self, *args, **kwargs):
-        # TODO: uncomment this after switch to v2 power system.
-        # self.__check_constraints()
+        # if self.dice_system == SYS_PS2:
+        #     self.__check_constraints()
         new_power = not self.pk
         if hasattr(self, "system") and self.system:
             if self.system == self.base.get_system().system_text:
@@ -946,6 +946,24 @@ class Power(models.Model):
             parent = self.parent_power
             parent.latest_rev = self
             parent.save()
+
+    def to_edit_blob(self):
+        return {
+            "effect_pk": self.base.pk,
+            "vector_pk": self.vector.pk,
+            "modality_pk": self.modality.pk,
+            "name": self.name,
+            "flavor_text": self.flavor_text,
+            "description": self.description,
+
+            "enhancements": [x.to_blob() for x in self.selected_enhancements.all()],
+            "drawbacks": [x.to_blob() for x in self.selected_drawbacks.all()],
+            "parameters": [x.to_blob() for x in self.parameter_values.all()],
+
+            "text_fields": [x.to_blob() for x in self.systemfieldtextinstance_set.all()] if hasattr(self, 'systemfieldtextinstance_set') else None,
+            "roll_fields": [x.to_blob() for x in self.systemfieldrollinstance_set.all()] if hasattr(self, 'systemfieldrollinstance_set') else None,
+            "weapon_fields": [x.to_blob() for x in self.systemfieldweaponinstance_set.all()] if hasattr(self, 'systemfieldweaponinstance_set') else None,
+        }
 
     def get_absolute_url(self):
         return reverse('powers:powers_view_power', kwargs={'power_id': self.pk})
@@ -1197,6 +1215,12 @@ class SystemFieldTextInstance(SystemFieldInstance):
     def render_value(self):
         return escape(self.value)
 
+    def to_blob(self):
+        return {
+            "field_id": self.relevant_field.pk,
+            "value": self.value
+        }
+
 
 class SystemFieldRollInstance(SystemFieldInstance):
     relevant_field = models.ForeignKey(SystemFieldRoll,
@@ -1205,6 +1229,31 @@ class SystemFieldRollInstance(SystemFieldInstance):
 
     class Meta:
         unique_together = (("relevant_field", "relevant_power"))
+
+    def to_blob(self):
+        return {
+            "field_id": self.relevant_field.pk,
+            "roll_attribute": self._get_roll_initial_attribute(self.roll),
+            "roll_ability": self._get_roll_initial_ability(self.roll),
+        }
+
+    def _get_roll_initial_ability(self, roll):
+        if roll.ability:
+            return roll.ability.id
+        else:
+            return None
+
+    def _get_roll_initial_attribute(self, roll):
+        if roll.attribute:
+            return roll.attribute.id
+        elif roll.is_mind:
+            return MIND_
+        elif roll.is_body:
+            return BODY_
+        elif roll.parry_type != NO_PARRY_INFO:
+            return PARRY_
+        else:
+            raise ValueError("Unknown roll attribute")
 
     def render_value(self):
         if self.relevant_field.caster_rolls:
@@ -1216,6 +1265,12 @@ class SystemFieldRollInstance(SystemFieldInstance):
 class SystemFieldWeaponInstance(SystemField):
     relevant_field = models.ForeignKey(SystemFieldWeapon, on_delete=models.CASCADE)
     weapon = models.ForeignKey(Weapon, on_delete=models.CASCADE)
+
+    def to_blob(self):
+        return {
+            "field_id": self.relevant_field.pk,
+            "weapon_id": self.weapon.pk,
+        }
 
 
 class Enhancement_Instance(models.Model):
@@ -1236,12 +1291,17 @@ class Enhancement_Instance(models.Model):
         output = output + "\n"
         return output
 
+    def to_blob(self):
+        return {
+            "enhancement_slug": self.relevant_enhancement.pk,
+            "detail": self.detail,
+        }
+
     def __str__(self):
         if self.relevant_enhancement.detail_field_label:
             return "{} :: {} {}: {}".format(self.relevant_power.name,str(self.relevant_enhancement), self.relevant_enhancement.detail_field_label, self.detail)
         else:
             return "{} :: {}".format(self.relevant_power.name,str(self.relevant_enhancement))
-
 
 
 class Drawback_Instance(models.Model):
@@ -1261,6 +1321,12 @@ class Drawback_Instance(models.Model):
         output = output + "\n"
         return output
 
+    def to_blob(self):
+        return {
+            "drawback_slug": self.relevant_drawback.pk,
+            "detail": self.detail,
+        }
+
     def __str__(self):
         if self.relevant_drawback.detail_field_label:
             return "{} :: {} {}: {}".format(self.relevant_power.name,str(self.relevant_drawback), self.relevant_drawback.detail_field_label, self.detail)
@@ -1276,6 +1342,12 @@ class Parameter_Value(models.Model):
 
     def __str__(self):
         return " ".join([str(self.relevant_power_param), str(self.relevant_power), str(self.value)])
+
+    def to_blob(self):
+        return {
+            "power_param_pk": self.relevant_power_param.pk,
+            "value": self.value,
+        }
 
     def get_level_description(self):
         return self.relevant_power_param.relevant_parameter.get_value_for_level(level=self.value)
