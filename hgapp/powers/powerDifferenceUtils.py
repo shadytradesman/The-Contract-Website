@@ -29,8 +29,8 @@ def get_power_creation_reason(new_power, old_power):
     if old_power is None:
         # new
         return CREATION_NEW
-    new_points = new_power.get_point_value()
-    old_points = old_power.get_point_value()
+    new_points = new_power.get_gift_cost()
+    old_points = old_power.get_gift_cost()
 
     if new_points > old_points:
         return CREATION_IMPROVEMENT

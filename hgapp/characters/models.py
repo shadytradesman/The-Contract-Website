@@ -418,7 +418,7 @@ class Character(models.Model):
     def get_power_cost_total(self):
         total = 0
         for power in self.power_full_set.all():
-            total = total + power.get_point_value()
+            total = total + power.get_gift_cost()
         return total
 
     def world_element_cell_choices(self):
@@ -658,7 +658,7 @@ class Character(models.Model):
         num_improvements_to_spend = 0
         if num_unspent_gifts > 0:
             rewards_to_be_spent.append(unspent_gifts[0])
-        for a in range(power_full.get_point_value() - 1):
+        for a in range(power_full.get_gift_cost() - 1):
             if len(unspent_improvements) > a:
                 num_improvements_to_spend += 1
                 rewards_to_be_spent.append(unspent_improvements[a])

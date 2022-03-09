@@ -30,7 +30,7 @@
                 <small><i>{{ power.flavor_text|linebreaks }}</i></small>
             </h2>
             <p>
-                A {{power_full.get_point_value}} Gift
+                A {{power_full.get_gift_cost}} Gift
                 <a href="{% url 'powers:powers_view_base' power_full.base.slug %}">{{power_full.base.name}}</a>
                 Power
             {% if power.parent_power.character %}

@@ -53,7 +53,7 @@
                 TODO: put that description blurb here
             </div>
             <p>
-                Gift Cost: {{power_full.get_point_value}}
+                Gift Cost: {{power_full.get_gift_cost}}
                 <div>
                     {% if power.parent_power.character %}
                         used by <a href="{% url 'characters:characters_view' power.parent_power.character.id %}">{{ power.parent_power.character.name }}</a>,

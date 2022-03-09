@@ -78,8 +78,8 @@
                             <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
                                 <div class="thumbnail">
                                 <p>
-                                    <b>{{ power.name }} - </b> {{power.get_point_value}} point {{power.base.name}} power</p>
-                                    {% if power.get_point_value > power.reward_list|length %}
+                                    <b>{{ power.name }} - </b> {{power.get_gift_cost}} point {{power.base.name}} power</p>
+                                    {% if power.get_gift_cost > power.reward_list|length %}
                                         <p class="text-danger">
                                             {{power.reward_list|length}} Rewards assigned
                                         </p>
@@ -110,7 +110,7 @@
                                 <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
                                     <div class="thumbnail">
                                     <p>
-                                        <b>{{ power.name }} - </b> {{power.get_point_value}} gift {{power.base.name}}  power <br>
+                                        <b>{{ power.name }} - </b> {{power.get_gift_cost}} gift {{power.base.name}}  power <br>
 
                                     </p>
                                     </div>

@@ -784,8 +784,8 @@ class Power_Full(models.Model):
             self.save()
             return self.latest_rev
 
-    def get_point_value(self):
-        return self.latest_revision().get_point_value()
+    def get_gift_cost(self):
+        return self.latest_revision().get_gift_cost()
 
     def set_self_and_children_privacy(self, is_private):
         if is_private:
@@ -858,6 +858,8 @@ class Power(models.Model):
                                    blank=True,
                                    null=True)
     pub_date = models.DateTimeField('date published', auto_now_add=True)
+
+    gift_cost = models.IntegerField(null=True) # denormalized, access with get_gift_cost()
 
     # Crafting
     artifacts = models.ManyToManyField(Artifact,
@@ -964,6 +966,14 @@ class Power(models.Model):
             "weapon_fields": [x.to_blob() for x in self.systemfieldweaponinstance_set.all()] if hasattr(self, 'systemfieldweaponinstance_set') else None,
         }
 
+    def get_gift_cost(self):
+        if hasattr(self, "gift_cost") and self.gift_cost:
+            return self.gift_cost
+        else:
+            self.gift_cost = self._get_point_value()
+            self.save()
+            return self.gift_cost
+
     def get_absolute_url(self):
         return reverse('powers:powers_view_power', kwargs={'power_id': self.pk})
 
@@ -991,17 +1001,23 @@ class Power(models.Model):
         is_owner = player == self.created_by
         return is_owner or not self.private or player.has_perm("view_private_power", self) or self.player_manages_via_cell(player)
 
-    # TODO: denormalize this and use signals to update when gift components (base_powers) are changed.
-    def get_point_value(self):
+    def _get_point_value(self):
         cost_of_power = 1
         total_parameter_cost = 0
         for param_val in self.parameter_value_set.all():
             total_parameter_cost = total_parameter_cost + (param_val.value - param_val.relevant_power_param.default)
-        return cost_of_power \
+        cost_of_power = cost_of_power \
                 + self.selected_enhancements.count() \
                 - self.base.num_free_enhancements \
                 - self.selected_drawbacks.count() \
                 + total_parameter_cost
+        if self.dice_system == SYS_PS2:
+            cost_of_power = cost_of_power - self.vector.num_free_enhancements - self.modality.num_free_enhancements
+            extra_credit = get_object_or_none(VectorCostCredit, relevant_vector=self.vector, relevant_effect=self.base)
+            if extra_credit:
+                cost_of_power = cost_of_power - extra_credit.gift_credit
+        return cost_of_power
+
 
     def reveal_to_player(self, player):
         assign_perm('view_power', player, self)
@@ -1043,7 +1059,7 @@ class Power(models.Model):
 
     def archive_txt(self):
         output = "{}\nA {} point {} {} power\nCreated by {}\n"
-        output = output.format(self.name, self.get_point_value(), self.get_activation_style_display(), self.base.name, self.created_by.username)
+        output = output.format(self.name, self.get_gift_cost(), self.get_activation_style_display(), self.base.name, self.created_by.username)
         output = output + "{}\nDescription: {}\nSystem: {}\n"
         output = output.format(self.flavor_text,self.description, self.get_system())
         output = output + "Parameters:\n-------------\n"

@@ -378,7 +378,7 @@ def toggle_power(request, character_id, power_full_id):
             return None
     else:
         rewards_to_be_spent = character.reward_cost_for_power(power_full)
-        reward_deficit = power_full.get_point_value() - len(rewards_to_be_spent)
+        reward_deficit = power_full.get_gift_cost() - len(rewards_to_be_spent)
         insufficient_gifts = False
         if character.num_unspent_gifts() == 0:
             insufficient_gifts = True

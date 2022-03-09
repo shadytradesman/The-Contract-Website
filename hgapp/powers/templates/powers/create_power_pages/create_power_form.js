@@ -56,7 +56,7 @@ window.onload = checkModifierRequirements();
 function updateGiftCost() {
     gift_cost = getGiftCost();
     $('#current_gift_cost_number').text(gift_cost);
-    delta = gift_cost - {% if og_power %} {{og_power.get_point_value}} {% else %} 0 {% endif %};
+    delta = gift_cost - {% if og_power %} {{og_power.get_gift_cost}} {% else %} 0 {% endif %};
     delta_text = delta.toString();
     if (delta >= 0) {
         delta_text = "+" + delta_text;

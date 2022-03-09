@@ -20,7 +20,7 @@
           <a href="{% url 'powers:powers_view_power' curr_power.id %}">
         {% endif %}
         <b>{{ curr_power.pub_date }}</b>
-        - {{ curr_power.get_creation_reason_display }} Cost: {{ curr_power.get_point_value }}. {{curr_power.creation_reason_expanded_text}}</a>
+        - {{ curr_power.get_creation_reason_display }} Cost: {{ curr_power.get_gift_cost }}. {{curr_power.creation_reason_expanded_text}}</a>
       </p>
     </div>
     {% if curr_power.relevant_power.all %}
