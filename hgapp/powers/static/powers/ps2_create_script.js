@@ -786,11 +786,14 @@ const ComponentRendering = {
         this.selectedDrawbacks = [];
 
         powerEditBlob["enhancements"].forEach(mod => {
-            let availEnhancements = this.enhancements.filter(enh => !(enh.slug in this.disabledEnhancements));
-            let selectedEnhancement = availEnhancements.find(enh => enh.slug === mod["slug"]);
+
+            let availEnhancements = this.enhancements.filter(enh =>
+                !(enh.slug in this.disabledEnhancements)
+                && !(this.selectedEnhancements.map(e => e.id).includes(enh.id)));
+            let selectedEnhancement = availEnhancements.find(enh => enh.slug === mod["enhancement_slug"]);
             if (selectedEnhancement) {
                 if (mod["detail"] != null) {
-                    selectedDrawback.details = mod["detail"];
+                    selectedEnhancement.details = mod["detail"];
                 }
                 this.selectedEnhancements.push(selectedEnhancement);
                 this.enhancements = handleModifierMultiplicity(selectedEnhancement.slug, selectedEnhancement.id, "enhancements", this.enhancements, this.getSelectedAndActiveEnhancements());
@@ -799,8 +802,10 @@ const ComponentRendering = {
         });
 
         powerEditBlob["drawbacks"].forEach(mod => {
-            let availDrawbacks = this.drawbacks.filter(drawback => !(drawback.slug in this.disabledDrawbacks));
-            let selectedDrawback = availDrawbacks.find(drawback => drawback.slug === mod["slug"]);
+            let availDrawbacks = this.drawbacks.filter(drawback =>
+                !(drawback.slug in this.disabledDrawbacks)
+                && !(this.selectedDrawbacks.map(d => d.id).includes(drawback.id)));
+            let selectedDrawback = availDrawbacks.find(drawback => drawback.slug === mod["drawback_slug"]);
             if (selectedDrawback) {
                 if (mod["detail"] != null) {
                     selectedDrawback.details = mod["detail"];
@@ -809,6 +814,22 @@ const ComponentRendering = {
                 this.drawbacks = handleModifierMultiplicity(selectedDrawback.slug, selectedDrawback.id, "drawbacks", this.drawbacks, this.getSelectedAndActiveDrawbacks());
                 this.calculateRestrictedElements();
             }
+        });
+
+        powerEditBlob["text_fields"].forEach(editField => {
+            this.systemFields.forEach(sysField => {
+                if (sysField.isText && sysField.pk === editField["field_id"]) {
+                    this.fieldTextInput[sysField.id] = editField["value"];
+                }
+            });
+        });
+
+        powerEditBlob["weapon_fields"].forEach(editField => {
+            this.systemFields.forEach(sysField => {
+                if (sysField.isWeapon && sysField.pk === editField["field_id"]) {
+                    this.fieldWeaponInput[sysField.id] = editField["weapon_id"];
+                }
+            });
         });
 
         this.updateManagementForms();

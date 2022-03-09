@@ -935,12 +935,11 @@ class Power(models.Model):
             raise IntegrityError("Power with effect or vector must have both")
 
     def save(self, *args, **kwargs):
-        # if self.dice_system == SYS_PS2:
-        #     self.__check_constraints()
         new_power = not self.pk
-        if hasattr(self, "system") and self.system:
-            if self.system == self.base.get_system().system_text:
-                self.system = None
+        if self.dice_system != SYS_PS2:
+            if hasattr(self, "system") and self.system:
+                if self.system == self.base.get_system().system_text:
+                    self.system = None
         super(Power, self).save(*args, **kwargs)
         if new_power and hasattr(self, "parent_power") and self.parent_power:
             parent = self.parent_power
@@ -956,9 +955,9 @@ class Power(models.Model):
             "flavor_text": self.flavor_text,
             "description": self.description,
 
-            "enhancements": [x.to_blob() for x in self.selected_enhancements.all()],
-            "drawbacks": [x.to_blob() for x in self.selected_drawbacks.all()],
-            "parameters": [x.to_blob() for x in self.parameter_values.all()],
+            "enhancements": [x.to_blob() for x in self.enhancement_instance_set.all()],
+            "drawbacks": [x.to_blob() for x in self.drawback_instance_set.all()],
+            "parameters": [x.to_blob() for x in self.parameter_value_set.all()],
 
             "text_fields": [x.to_blob() for x in self.systemfieldtextinstance_set.all()] if hasattr(self, 'systemfieldtextinstance_set') else None,
             "roll_fields": [x.to_blob() for x in self.systemfieldrollinstance_set.all()] if hasattr(self, 'systemfieldrollinstance_set') else None,
@@ -1262,7 +1261,7 @@ class SystemFieldRollInstance(SystemFieldInstance):
             return self.roll.render_value_for_power()
 
 
-class SystemFieldWeaponInstance(SystemField):
+class SystemFieldWeaponInstance(SystemFieldInstance):
     relevant_field = models.ForeignKey(SystemFieldWeapon, on_delete=models.CASCADE)
     weapon = models.ForeignKey(Weapon, on_delete=models.CASCADE)
 
