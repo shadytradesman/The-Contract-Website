@@ -832,6 +832,25 @@ const ComponentRendering = {
             });
         });
 
+        powerEditBlob["roll_fields"].forEach(editField => {
+            this.systemFields.forEach(sysField => {
+                if (sysField.isRoll && sysField.pk === editField["field_id"]) {
+                    this.fieldRollInput[sysField.id][0] = editField["roll_attribute"];
+                    if (editField["roll_ability"]) {
+                        this.fieldRollInput[sysField.id][1] = editField["roll_ability"];
+                    }
+                }
+            });
+        });
+
+        powerEditBlob["parameters"].forEach(editParam => {
+            this.parameters.forEach(param => {
+                if (editParam["power_param_pk"] == param["powParamId"]) {
+                    this.parameterSelections[param.id] = param["levels"][editParam["value"]];
+                }
+            });
+        });
+
         this.updateManagementForms();
         this.reRenderSystemText();
         this.updateGiftCost();

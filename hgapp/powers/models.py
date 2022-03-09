@@ -1238,13 +1238,13 @@ class SystemFieldRollInstance(SystemFieldInstance):
 
     def _get_roll_initial_ability(self, roll):
         if roll.ability:
-            return roll.ability.id
+            return [roll.ability.id, roll.ability.name]
         else:
             return None
 
     def _get_roll_initial_attribute(self, roll):
         if roll.attribute:
-            return roll.attribute.id
+            return [roll.attribute.id, roll.attribute.name]
         elif roll.is_mind:
             return MIND_
         elif roll.is_body:
