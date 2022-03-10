@@ -56,7 +56,6 @@ class PowerBlob:
         new_drawback_count_by_slug = {}
 
         for form in modifier_forms:
-            print(form.cleaned_data)
             mod_slug = form.cleaned_data["mod_slug"]
             if form.cleaned_data["is_enhancement"]:
                 modifier = enhancements[mod_slug]
@@ -119,14 +118,11 @@ class PowerBlob:
         weapon_field_ids = set()
         roll_field_ids = set()
         for component in components:
-            print("COMPONENT")
-            print(component)
             if "text_fields" in component:
                 text_field_ids.update(set([x["id"] for x in component["text_fields"]]))
             if "weapon_fields" in component:
                 weapon_field_ids.update(set([x["id"] for x in component["weapon_fields"]]))
             if "roll_fields" in component:
-                print(component["roll_fields"])
                 roll_field_ids.update(set([x["id"] for x in component["roll_fields"]]))
         for form in text_forms:
             field_id = form.cleaned_data["field_id"]
@@ -344,7 +340,6 @@ def _populate_power_system_and_errata(power_blob, power, modifier_instances, par
 
 def _create_new_power_and_save(power_form, request):
     power_blob = PowerBlob()
-    print("new power generation")
 
     # power is not saved yet
     power = _get_power_from_form_and_validate(power_form=power_form, power_blob=power_blob, user=request.user)
@@ -368,7 +363,6 @@ def _create_new_power_and_save(power_form, request):
         param.save()
     for field in field_instances:
         field.relevant_power = power
-        print("Field::::", field)
         field.save()
     return power
 
@@ -391,19 +385,15 @@ def _get_modifier_instances_and_validate(POST, power_blob, effect, vector, modal
     modifiers_formset = get_modifiers_formset(POST)
     if modifiers_formset.is_valid():
         selected_modifier_forms = [x for x in modifiers_formset if "is_selected" in x.cleaned_data and x.cleaned_data["is_selected"]]
-        print(selected_modifier_forms)
         power_blob.validate_new_mod_forms(effect, vector, modality, selected_modifier_forms)
         modifiers = []
         for form in selected_modifier_forms:
             details = form.cleaned_data["details"] if "details" in form.cleaned_data else None
-            print(form.cleaned_data)
             if form.cleaned_data["is_enhancement"]:
-                print("enhancement")
                 enhancement = get_object_or_404(Enhancement, pk=form.cleaned_data["mod_slug"])
                 new_instance = Enhancement_Instance(relevant_enhancement=enhancement, detail=details)
                 modifiers.append(new_instance)
             else:
-                print("DRAWBACK FOUND")
                 drawback = get_object_or_404(Drawback, pk=form.cleaned_data["mod_slug"])
                 new_instance = Drawback_Instance(relevant_drawback=drawback, detail=details)
                 modifiers.append(new_instance)
@@ -432,24 +422,18 @@ def _get_param_instances_and_validate(POST, power_blob, effect, vector, modality
 def _get_field_text_instances(sys_field_text_formset):
     instances = []
     for form in sys_field_text_formset:
-        print("FORM: ", form.cleaned_data)
         system_field = get_object_or_404(SystemFieldText, id=form.cleaned_data["field_id"])
-        print("TEXT_FIELD: ", system_field)
         field_instance = SystemFieldTextInstance(relevant_field=system_field, value=form.cleaned_data["detail_text"])
         instances.append(field_instance)
-    print("TEXT INSTANCES: ", instances)
     return instances
 
 
 def _get_field_weapon_instances(sys_field_weapon_formset):
     instances = []
     for form in sys_field_weapon_formset:
-        print("FORM: ", form.cleaned_data)
         system_field = get_object_or_404(SystemFieldWeapon, id=form.cleaned_data["field_id"])
-        print("WEAPON_FIELD: ", system_field)
         field_instance = SystemFieldWeaponInstance(relevant_field=system_field, weapon=form.cleaned_data["weapon_choice"])
         instances.append(field_instance)
-    print("INSTANCES: ", instances)
     return instances
 
 
