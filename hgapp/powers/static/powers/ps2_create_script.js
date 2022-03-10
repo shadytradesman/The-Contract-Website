@@ -4,6 +4,21 @@ function activateTooltips() {
           selector: '.has-popover'
         });
 }
+
+// This method sets the __prefix__ values that appear in django "empty" formset forms so formsets
+// can have dynamically added and subtracted entries
+function setFormInputPrefixValues() {
+    $(".js-data-prefix-container").each(function(){
+        let prefixNum = $(this).attr("data-prefix");
+        $(this).children("input").each(function() {
+            let currName = $(this).attr("name");
+            let currId = $(this).attr("id");
+            $(this).attr("name", currName.replace(/__prefix__/g, prefixNum));
+            $(this).attr("id", currId.replace(/__prefix__/g, prefixNum));
+        })
+    })
+}
+
 function onlyUnique(value, index, self) {
     return self.indexOf(value) === index;
 }
@@ -125,12 +140,21 @@ function vectorSlugToEffectFilter(vecSlug, modalitySlug) {
 }
 
 function modifierToVue(modifier, type) {
-    return modifierToVue(modifier, type, 0);
+    modCounter++;
+    return modifierToVueWithId(modifier, type, modCounter);
 }
 
-function modifierToVue(modifier, type, idNum = 0) {
+function modifierToVueWithId(modifier, type, idNum) {
+    let domNameBase = "modifiers-" + idNum;
+    let idBase = "id_" + domNameBase;
     return {
-        id: modifier.slug + "$" + idNum + "-" + type,
+        id: idBase,
+        idNum: idNum,
+        isEnhancement: type == "enhancements",
+        checkboxName: domNameBase + "-is_selected",
+        checkboxId: idBase + "-is_selected",
+        detailsName: domNameBase + "-details",
+        detailsId: idBase + "-details",
         details: "",
         slug: modifier.slug,
         displayName: modifier.name,
@@ -145,12 +169,9 @@ function modifierToVue(modifier, type, idNum = 0) {
     }
 }
 
-function slugFromVueModifierId(vueModifierId) {
-    return vueModifierId.slice(0, vueModifierId.indexOf("$"));
-}
-
 function powerParamToVue(powerParam) {
     return {
+        powParamId: powerParam.id,
         id: powerParam.param_id,
         name: powerBlob["parameters"][powerParam.param_id]["name"],
         eratta: powerParam.eratta,
@@ -183,6 +204,14 @@ function giftCostOfVueParam(powerParam, currentLevel) {
     }
 }
 
+function selectedLevelOfParam(powerParam, currentLevel) {
+    for (let i = 0; i < powerParam.levels.length; i++) {
+        if (powerParam.levels[i] === currentLevel) {
+            return i;
+        }
+    }
+}
+
 function systemFieldToVue(systemField, type) {
     let isRoll = type === "roll";
     let isWeapon = type === "weapon";
@@ -191,6 +220,7 @@ function systemFieldToVue(systemField, type) {
     const weaponChoices = isWeapon ? systemField["weapon_choices"] : [];
     return {
         id: type + systemField.id,
+        pk: systemField.id,
         marker: systemField.marker,
         replacement: systemField.replacement,
         name: systemField.name,
@@ -227,8 +257,7 @@ function handleModifierMultiplicity(modSlug, modId, modType, existingModifiers, 
       let numSelected = selectedAndActiveModifiers.filter(curMod => curMod.slug === modSlug).length;
       let numAvail = existingModifiers.filter(curMod => curMod["slug"] === modSlug).length;
       if (numSelected == numAvail && numAvail < 4) {
-          modCounter++;
-          returnedModifiers.push(modifierToVue(mod, modType, modCounter));
+          returnedModifiers.push(modifierToVue(mod, modType));
       } else if (numAvail - numSelected > 1){
           returnedModifiers = existingModifiers.filter(mod => mod["id"] != modId);
       }
@@ -704,7 +733,7 @@ const ComponentRendering = {
                 break;
             }
             let selectedEnhancement = randomFromList(availEnhancements);
-            this.selectedEnhancements.push(selectedEnhancement.id);
+            this.selectedEnhancements.push(selectedEnhancement);
             this.enhancements = handleModifierMultiplicity(selectedEnhancement.slug, selectedEnhancement.id, "enhancements", this.enhancements, this.getSelectedAndActiveEnhancements());
             this.calculateRestrictedElements();
         }
@@ -715,11 +744,114 @@ const ComponentRendering = {
                 break;
             }
             let selectedDrawback = randomFromList(availDrawbacks);
-            this.selectedDrawbacks.push(selectedDrawback.id);
+            this.selectedDrawbacks.push(selectedDrawback);
             this.drawbacks = handleModifierMultiplicity(selectedDrawback.slug, selectedDrawback.id, "drawbacks", this.drawbacks, this.getSelectedAndActiveDrawbacks());
             this.calculateRestrictedElements();
         }
 
+        this.updateManagementForms();
+        this.reRenderSystemText();
+        this.updateGiftCost();
+        this.updateRequiredStatus();
+        this.populateWarnings();
+        this.openCustomizationTab();
+        $("#giftPreviewModal").modal({});
+      },
+      setStateForEdit(powerEditBlob) {
+        this.giftName = powerEditBlob["name"];
+        this.giftTagline = powerEditBlob["flavor_text"];
+        this.giftDescription = powerEditBlob["description"];
+        let selectedModality = this.modalities.find(comp => comp.slug === powerEditBlob["modality_pk"]);
+        if (!selectedModality) {
+            return;
+        }
+        this.selectedModality = selectedModality;
+        this.changeModality();
+        let selectedEffect = this.effects.find(comp => comp.slug === powerEditBlob["effect_pk"]);
+        if (!selectedEffect) {
+            return;
+        }
+        this.selectedEffect = selectedEffect;
+        this.changeEffect();
+        if (this.vectors.length > 1) {
+            let selectedVector = this.vectors.find(comp => comp.slug === powerEditBlob["vector_pk"]);
+            if (!selectedVector) {
+                return;
+            }
+            this.selectedVector = selectedVector;
+        }
+        this.clickVector();
+
+        this.selectedEnhancements =  [];
+        this.selectedDrawbacks = [];
+
+        powerEditBlob["enhancements"].forEach(mod => {
+
+            let availEnhancements = this.enhancements.filter(enh =>
+                !(enh.slug in this.disabledEnhancements)
+                && !(this.selectedEnhancements.map(e => e.id).includes(enh.id)));
+            let selectedEnhancement = availEnhancements.find(enh => enh.slug === mod["enhancement_slug"]);
+            if (selectedEnhancement) {
+                if (mod["detail"] != null) {
+                    selectedEnhancement.details = mod["detail"];
+                }
+                this.selectedEnhancements.push(selectedEnhancement);
+                this.enhancements = handleModifierMultiplicity(selectedEnhancement.slug, selectedEnhancement.id, "enhancements", this.enhancements, this.getSelectedAndActiveEnhancements());
+                this.calculateRestrictedElements();
+            }
+        });
+
+        powerEditBlob["drawbacks"].forEach(mod => {
+            let availDrawbacks = this.drawbacks.filter(drawback =>
+                !(drawback.slug in this.disabledDrawbacks)
+                && !(this.selectedDrawbacks.map(d => d.id).includes(drawback.id)));
+            let selectedDrawback = availDrawbacks.find(drawback => drawback.slug === mod["drawback_slug"]);
+            if (selectedDrawback) {
+                if (mod["detail"] != null) {
+                    selectedDrawback.details = mod["detail"];
+                }
+                this.selectedDrawbacks.push(selectedDrawback);
+                this.drawbacks = handleModifierMultiplicity(selectedDrawback.slug, selectedDrawback.id, "drawbacks", this.drawbacks, this.getSelectedAndActiveDrawbacks());
+                this.calculateRestrictedElements();
+            }
+        });
+
+        powerEditBlob["text_fields"].forEach(editField => {
+            this.systemFields.forEach(sysField => {
+                if (sysField.isText && sysField.pk === editField["field_id"]) {
+                    this.fieldTextInput[sysField.id] = editField["value"];
+                }
+            });
+        });
+
+        powerEditBlob["weapon_fields"].forEach(editField => {
+            this.systemFields.forEach(sysField => {
+                if (sysField.isWeapon && sysField.pk === editField["field_id"]) {
+                    this.fieldWeaponInput[sysField.id] = editField["weapon_id"];
+                }
+            });
+        });
+
+        powerEditBlob["roll_fields"].forEach(editField => {
+            this.systemFields.forEach(sysField => {
+                if (sysField.isRoll && sysField.pk === editField["field_id"]) {
+                    this.fieldRollInput[sysField.id][0] = editField["roll_attribute"];
+                    if (editField["roll_ability"]) {
+                        this.fieldRollInput[sysField.id][1] = editField["roll_ability"];
+                    }
+                }
+            });
+        });
+
+        powerEditBlob["parameters"].forEach(editParam => {
+            this.parameters.forEach(param => {
+                if (editParam["power_param_pk"] == param["powParamId"]) {
+                    this.parameterSelections[param.id] = param["levels"][editParam["value"]];
+                }
+            });
+        });
+
+        this.updateManagementForms();
         this.reRenderSystemText();
         this.updateGiftCost();
         this.updateRequiredStatus();
@@ -874,6 +1006,19 @@ const ComponentRendering = {
       giftCostOfVueParam(param) {
         return giftCostOfVueParam(param, this.parameterSelections[param.id]);
       },
+      selectedLevelOfParam(param) {
+        return selectedLevelOfParam(param, this.parameterSelections[param.id]);
+      },
+      updateManagementForms() {
+          $('#id_modifiers-TOTAL_FORMS').attr('value', this.enhancements.length + this.drawbacks.length + 1);
+          $('#id_parameters-TOTAL_FORMS').attr('value', this.parameters.length);
+          $('#id_sys_field_text-TOTAL_FORMS').attr('value', this.systemFields.filter(field => field.isText).length);
+          $('#id_sys_field_weapon-TOTAL_FORMS').attr('value', this.systemFields.filter(field => field.isWeapon).length);
+          $('#id_sys_field_roll-TOTAL_FORMS').attr('value', this.systemFields.filter(field => field.isRoll).length);
+          this.$nextTick(function () {
+                setFormInputPrefixValues();
+          });
+      },
       updateEffectFilters() {
           let allAvailableVectors = Array.from(new Set(this.effects
               .flatMap(effect => this.getAvailableVectorsForEffectAndModality(effect.slug, this.selectedModality.slug))));
@@ -982,9 +1127,9 @@ const ComponentRendering = {
             if (field.isWeapon) {
                 this.fieldWeaponInput[field.id] = field.weaponChoices[0][0];
             } else if (field.isRoll) {
-                var defaultChoices = [field.attributeChoices[0][1]];
+                let defaultChoices = [field.attributeChoices[0]];
                 if (field.abilityChoices.length > 0) {
-                    defaultChoices.push(field.abilityChoices[0][1]);
+                    defaultChoices.push(field.abilityChoices[0]);
                 }
                 this.fieldRollInput[field.id] = defaultChoices;
             } else {
@@ -993,12 +1138,14 @@ const ComponentRendering = {
         });
 
         this.calculateRestrictedElements();
+        this.updateManagementForms();
         this.reRenderSystemText();
         this.updateGiftCost();
         this.updateRequiredStatus();
         this.populateWarnings();
         this.$nextTick(function () {
             activateTooltips();
+            setFormInputPrefixValues();
         });
       },
       updateGiftCost() {
@@ -1024,6 +1171,7 @@ const ComponentRendering = {
           this.giftCost = componentsCost + this.enhancementsCost + this.drawbacksCost + parametersCost;
           this.$nextTick(function () {
               activateTooltips();
+              setFormInputPrefixValues();
           });
       },
       updateRequiredStatus() {
@@ -1101,17 +1249,17 @@ const ComponentRendering = {
           this.populateUniqueReplacementsMap();
           this.disabledEnhancements = {};
           this.disabledDrawbacks = {};
-          this.disabledEnhancements = getDisabledModifiers("enhancement", this.enhancements, this.selectedEnhancements.map(slugFromVueModifierId), this.activeUniqueReplacementsByMarker);
-          this.selectedEnhancements = this.selectedEnhancements.filter(mod => !(slugFromVueModifierId(mod) in this.disabledEnhancements));
-          this.disabledDrawbacks = getDisabledModifiers("drawback", this.drawbacks, this.selectedDrawbacks.map(slugFromVueModifierId), this.activeUniqueReplacementsByMarker);
-          this.selectedDrawbacks = this.selectedDrawbacks.filter(mod => !(slugFromVueModifierId(mod) in this.disabledDrawbacks));
+          this.disabledEnhancements = getDisabledModifiers("enhancement", this.enhancements, this.selectedEnhancements.map(mod => mod.slug), this.activeUniqueReplacementsByMarker);
+          this.selectedEnhancements = this.selectedEnhancements.filter(mod => !(mod.slug in this.disabledEnhancements));
+          this.disabledDrawbacks = getDisabledModifiers("drawback", this.drawbacks, this.selectedDrawbacks.map(mod => mod.slug), this.activeUniqueReplacementsByMarker);
+          this.selectedDrawbacks = this.selectedDrawbacks.filter(mod => !(mod.slug in this.disabledDrawbacks));
           this.disabledParameters = {};
           this.disabledParameters = getDisabledParameters(this.parameters, this.activeUniqueReplacementsByMarker);
       },
       populateUniqueReplacementsMap() {
           // modifiers that have "unique" field replacements "block" modifiers that uniquely replace the same thing.
           this.activeUniqueReplacementsByMarker = {};
-          this.getSelectedAndActiveEnhancements().concat(this.getSelectedAndActiveDrawbacks()).map(mod => slugFromVueModifierId(mod["id"])).forEach(mod => {
+          this.getSelectedAndActiveEnhancements().concat(this.getSelectedAndActiveDrawbacks()).map(mod => mod["slug"]).forEach(mod => {
               let modifier = mod in powerBlob["enhancements"] ? powerBlob["enhancements"][mod] : powerBlob["drawbacks"][mod];
               modifier["substitutions"].filter(sub => sub["mode"] === "UNIQUE").forEach(sub => {
                  this.activeUniqueReplacementsByMarker[sub["marker"]] = modifier;
@@ -1125,9 +1273,10 @@ const ComponentRendering = {
       },
       clickEnhancement(modifier) {
           console.log("clicked Enhancement");
-          let modSlug = slugFromVueModifierId(modifier.target.value);
-          this.enhancements = handleModifierMultiplicity(modSlug, modifier.target.id, "enhancements", this.enhancements, this.getSelectedAndActiveEnhancements());
+          let modSlug = modifier.target._value.slug;
+          this.enhancements = handleModifierMultiplicity(modSlug, modifier.target._value.id, "enhancements", this.enhancements, this.getSelectedAndActiveEnhancements());
           this.calculateRestrictedElements();
+          this.updateManagementForms();
           this.reRenderSystemText();
           this.updateGiftCost();
           this.updateRequiredStatus();
@@ -1135,9 +1284,10 @@ const ComponentRendering = {
       },
       clickDrawback(modifier) {
           console.log("clicked Drawback");
-          let modSlug = slugFromVueModifierId(modifier.target.value);
-          this.drawbacks = handleModifierMultiplicity(modSlug, modifier.target.id, "drawbacks", this.drawbacks, this.getSelectedAndActiveDrawbacks());
+          let modSlug = modifier.target._value.slug;
+          this.drawbacks = handleModifierMultiplicity(modSlug, modifier.target._value.id, "drawbacks", this.drawbacks, this.getSelectedAndActiveDrawbacks());
           this.calculateRestrictedElements();
+          this.updateManagementForms();
           this.reRenderSystemText();
           this.updateGiftCost();
           this.updateRequiredStatus();
@@ -1153,10 +1303,10 @@ const ComponentRendering = {
           });
       },
       getSelectedAndActiveEnhancements() {
-          return this.enhancements.filter(enh => this.selectedEnhancements.includes(enh["id"]));
+          return this.enhancements.filter(enh => this.selectedEnhancements.map(enh => enh.id).includes(enh["id"]));
       },
       getSelectedAndActiveDrawbacks() {
-          return this.drawbacks.filter(drawb => this.selectedDrawbacks.includes(drawb["id"]));
+          return this.drawbacks.filter(drawb => this.selectedDrawbacks.map(mod => mod.id).includes(drawb["id"]));
       },
       buildReplacementMap() {
           // replacement marker to list of substitution objects
@@ -1166,10 +1316,10 @@ const ComponentRendering = {
             replacement: this.giftName === null ? "signature item" : this.giftName
           }];
           addReplacementsForModifiers(replacements,
-                                      this.getSelectedAndActiveEnhancements().map(mod => slugFromVueModifierId(mod["id"])).map(mod => powerBlob["enhancements"][mod]),
+                                      this.getSelectedAndActiveEnhancements().map(mod => mod["slug"]).map(mod => powerBlob["enhancements"][mod]),
                                       buildModifierDetailsMap(this.getSelectedAndActiveEnhancements()));
           addReplacementsForModifiers(replacements,
-                                      this.getSelectedAndActiveDrawbacks().map(mod => slugFromVueModifierId(mod["id"])).map(mod => powerBlob["drawbacks"][mod]),
+                                      this.getSelectedAndActiveDrawbacks().map(mod => mod["slug"]).map(mod => powerBlob["drawbacks"][mod]),
                                       buildModifierDetailsMap(this.getSelectedAndActiveDrawbacks()));
           this.addReplacementsForComponents(replacements);
           this.addReplacementsForParameters(replacements);
@@ -1242,9 +1392,9 @@ const ComponentRendering = {
                 }
                 if (field.isRoll) {
                     const choices = this.fieldRollInput[field.id];
-                    sub = choices[0];
+                    sub = choices[0][1];
                     if (choices.length > 1) {
-                        sub = sub + " + " + choices[1];
+                        sub = sub + " + " + choices[1][1];
                     }
                 }
                 let replacement = field.replacement;
@@ -1265,10 +1415,15 @@ const ComponentRendering = {
 }
 const app = Vue.createApp(ComponentRendering);
 
-const mountedApp = app.mount('#vue-app');
 
 $(function() {
+    const mountedApp = app.mount('#vue-app');
     mountedApp.modalities = Object.values(powerBlob.modalities).map(comp => componentToVue(comp, "mod"));
+    if ((document.getElementById('powerEditBlob').textContent.length > 2)) {
+        console.log(document.getElementById('powerEditBlob').textContent.length)
+        const powerEditBlob = JSON.parse(JSON.parse(document.getElementById('powerEditBlob').textContent));
+        mountedApp.setStateForEdit(powerEditBlob);
+    }
     mountedApp.$nextTick(function () {
       activateTooltips();
     });

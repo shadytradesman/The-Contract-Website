@@ -1,0 +1,37 @@
+
+{% load games_tags %}
+
+{% if power_full %}
+  <hr>
+  <h3>Edit History</h3>
+  {% if power.id != power_list.0.id %}
+    <h4>You are viewing an old version of this power.</h4>
+    <p>To view the most recent version <a href="{% url 'powers:powers_view_power_full' power_full.id %}">Click Here</a></p>
+  {% endif %}
+  {% for curr_power in power_list %}
+    <div>
+      <p>
+        {% if curr_power.id == power.id %}
+          <b><i class="fa fa-caret-right fa-1x"></i> -</b>
+        {% endif %}
+        {%if curr_power.id == power_list.0.id %}
+          <a href="{% url 'powers:powers_view_power_full' power_full.id %}">
+        {% else %}
+          <a href="{% url 'powers:powers_view_power' curr_power.id %}">
+        {% endif %}
+        <b>{{ curr_power.pub_date }}</b>
+        - {{ curr_power.get_creation_reason_display }} Cost: {{ curr_power.get_gift_cost }}. {{curr_power.creation_reason_expanded_text}}</a>
+      </p>
+    </div>
+    {% if curr_power.relevant_power.all %}
+      <div style="margin-left: 50px">
+        Revision purchased with:
+        <div class="small">
+          {% for reward in curr_power.relevant_power.all %}
+          {% render_reward  reward %}
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+  {% endfor %}
+{% endif %}

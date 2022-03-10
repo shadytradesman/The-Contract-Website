@@ -3,7 +3,11 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.core.exceptions import PermissionDenied
+from django.views import View
 from django.views import generic
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.forms import formset_factory
 from django.db import transaction
 from django.db.models import Prefetch
 
@@ -14,15 +18,61 @@ from .createPowerFormUtilities import get_create_power_context_from_base, \
 from .models import Power, Base_Power_Category, Base_Power, Base_Power_System, DICE_SYSTEM, Power_Full, PowerTag, \
     PremadeCategory, PowerTutorial, SYS_PS2, EFFECT, VECTOR, MODALITY
 from .forms import DeletePowerForm
-from .ps2Utilities import generate_json_blob
+from .ps2Utilities import get_edit_context, save_gift
 
-def create_ps2(request):
-    if request.user.is_anonymous or not (request.user.is_superuser or request.user.profile.ps2_user or request.user.profile.early_access_user):
-        raise PermissionDenied("You are not authorized to create a new power in this system.")
-    context = {
-        'power_blob': generate_json_blob(),
-    }
-    return render(request, 'powers/ps2_create_pages/create_ps2.html', context)
+@method_decorator(login_required(login_url='account_login'), name='dispatch')
+class EditPower(View):
+    template_name = 'powers/ps2_create_pages/create_ps2.html'
+    existing_power = None
+    character = None
+
+    def dispatch(self, *args, **kwargs):
+        redirect = self.__check_permissions()
+        if redirect:
+            return redirect
+        return super().dispatch(*args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, self.__get_context_data())
+
+    def post(self, request, *args, **kwargs):
+        with transaction.atomic():
+            new_power_full = save_gift(request, power_full=self.existing_power, character=self.character)
+        return HttpResponseRedirect(reverse('powers:powers_view_power', args=(new_power_full.id,)))
+
+    def __check_permissions(self):
+        if not (self.request.user.is_superuser or self.request.user.profile.ps2_user or self.request.user.profile.early_access_user):
+            raise PermissionDenied("You are not authorized to create a new power in this system.")
+
+    def __get_context_data(self):
+        return get_edit_context(existing_power_full=self.existing_power)
+
+
+class CreatePower(EditPower):
+
+    def dispatch(self, *args, **kwargs):
+        if 'character_id' in self.kwargs:
+            self.character = get_object_or_404(Character, id=self.kwargs['character_id'])
+        return super().dispatch(*args, **kwargs)
+
+    def __check_permissions(self):
+        if self.character and not self.character.player_can_edit(self.request.user):
+            raise PermissionDenied("You can't give Gifts to a Character you can't edit.")
+        return super().__check_permissions()
+
+
+class EditExistingPower(EditPower):
+
+    def dispatch(self, *args, **kwargs):
+        self.existing_power = get_object_or_404(Power_Full, id=self.kwargs['power_full_id'])
+        if self.existing_power.character:
+            self.character = self.existing_power.character
+        return super().dispatch(*args, **kwargs)
+
+    def __check_permissions(self):
+        if not self.existing_power.player_can_edit(self.request.user):
+            raise PermissionDenied("This Power has been deleted, or you're not allowed to view it")
+        return super().__check_permissions()
 
 
 def create(request, character_id=None):
@@ -172,38 +222,61 @@ def delete_power(request, power_id):
                    "power": power_full}
         return render(request, 'powers/delete_power.html', context)
 
-def power_view(request, power_id):
-    power = get_object_or_404(Power, id=power_id)
-    if not power.player_can_view(request.user):
-        raise PermissionDenied("This Power has been deleted, or you're not allowed to view it")
-    attribute_val_by_id = None
-    ability_val_by_id = None
-    if power.parent_power:
-        power_full = Power_Full.objects.get(id=power.parent_power.id)
-        power_list = power_full.power_set.order_by('-pub_date').all()
-        if power_list[0] == power and "history" not in request.path:
-            return HttpResponseRedirect(reverse('powers:powers_view_power_full', args=(power_full.id,)))
-        if power_full.character:
-            attribute_val_by_id = power_full.character.get_attribute_values_by_id()
-            ability_val_by_id  = power_full.character.get_ability_values_by_id()
-    else:
-        power_full = None
-        power_list = None
-    context = {}
-    context['power'] = power
-    context['power_list'] = power_list
-    context['power_full'] = power_full
-    context['ability_value_by_id'] = ability_val_by_id
-    context['attribute_value_by_id'] = attribute_val_by_id
-    return render(request, 'powers/viewpower.html', context)
+
+class ViewPower(View):
+    template_name = None
+    power = None
+
+    def dispatch(self, *args, **kwargs):
+        self.power = get_object_or_404(Power, id=kwargs["power_id"])
+        redirect = self.__check_permissions()
+        if redirect:
+            return redirect
+        if self.power.parent_power:
+            power_full = Power_Full.objects.get(id=self.power.parent_power.id)
+            if power_full.latest_revision() == self.power and "history" not in self.request.path:
+                return HttpResponseRedirect(reverse('powers:powers_view_power_full', args=(power_full.id,)))
+        return super().dispatch(*args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        if self.power.dice_system == SYS_PS2:
+            self.template_name = 'powers/ps2_view_pages/view_power.html'
+        else:
+            self.template_name = 'powers/viewpower.html'
+        return render(request, self.template_name, self.__get_context_data())
+
+    def __check_permissions(self):
+        if not self.power.player_can_view(self.request.user):
+            raise PermissionDenied("This Power has been deleted or you're not allowed to view it")
+
+    def __get_context_data(self):
+        attribute_val_by_id = None
+        ability_val_by_id = None
+        if self.power.parent_power:
+            power_full = Power_Full.objects.get(id=self.power.parent_power.id)
+            power_list = power_full.power_set.order_by('-pub_date').all()
+            if power_full.character:
+                attribute_val_by_id = power_full.character.get_attribute_values_by_id()
+                ability_val_by_id = power_full.character.get_ability_values_by_id()
+        else:
+            power_full = None
+            power_list = None
+        context = {}
+        context['power'] = self.power
+        context['power_list'] = power_list
+        context['power_full'] = power_full
+        context['ability_value_by_id'] = ability_val_by_id
+        context['attribute_value_by_id'] = attribute_val_by_id
+        return context
 
 
 def power_full_view(request, power_full_id):
     power_full = get_object_or_404(Power_Full, id=power_full_id)
     if not power_full.player_can_view(request.user):
-        raise PermissionDenied("This Power has been deleted, or you're not allowed to view it")
-    most_recent_power = power_full.power_set.order_by('-pub_date').all()[0]
-    return power_view(request, power_id=most_recent_power.id)
+        raise PermissionDenied("This Power has been deleted or you're not allowed to view it")
+    most_recent_power = power_full.latest_revision()
+    return ViewPower.as_view()(request, power_id=most_recent_power.id)
+
 
 def stock(request):
     generic_categories = PremadeCategory.objects.filter(is_generic=True).all()

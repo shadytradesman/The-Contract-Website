@@ -1,10 +1,9 @@
 from django.conf import settings
 from django.db import models
-from django.db.models import Q
 from django.urls import reverse
 
 from characters.models import Character, HIGH_ROLLER_STATUS, Attribute, Roll, NO_PARRY_INFO, NO_SPEED_INFO, DODGE_ONLY, \
-    ATTACK_PARRY_TYPE, ROLL_SPEED, THROWN, Attribute, Ability, Weapon, WEAPON_MELEE, WEAPON_TYPE
+    ATTACK_PARRY_TYPE, ROLL_SPEED, THROWN, Attribute, Ability, Weapon, WEAPON_MELEE, WEAPON_TYPE, Artifact
 from guardian.shortcuts import assign_perm, remove_perm
 from django.utils.html import mark_safe, escape, linebreaks
 from django.db.utils import IntegrityError
@@ -638,6 +637,7 @@ class Power_Param(models.Model):
 
     def to_blob(self):
         return {
+            "id": self.pk,
             "param_id": self.relevant_parameter.pk,
             "levels": self.get_levels(),
             "eratta": self.eratta,
@@ -699,12 +699,8 @@ class Power_Param(models.Model):
         return 7
 
 # Power full is essentially a "Gift" object
-# Each Power_Full has at least one PowerHistory for an Effect/Vector and exactly one PowerHistory for a gift modality
-    # Modality cost/credit is applied against all Effects on the gift
 class Power_Full(models.Model):
-    name = models.CharField(max_length = 500)
     dice_system = models.CharField(choices=DICE_SYSTEM, max_length=55)
-    base = models.ForeignKey(Base_Power, on_delete=models.PROTECT)
     private = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
     pub_date = models.DateTimeField('date published', auto_now_add=True)
@@ -716,29 +712,37 @@ class Power_Full(models.Model):
                                   blank=True,
                                   null=True,
                                   on_delete=models.CASCADE)
-    tags = models.ManyToManyField(PowerTag, blank=True) # This is for stock Gifts
-    example_description = models.CharField(max_length = 9000,
+    latest_rev = models.ForeignKey("Power",
+                                   on_delete=models.CASCADE,
+                                   blank=True,
+                                   null=True)
+
+    # Denormalized fields with Power revisions. Do not use these?
+    base = models.ForeignKey(Base_Power, on_delete=models.PROTECT)
+    name = models.CharField(max_length=500)
+
+    # Fields for Stock Gifts
+    tags = models.ManyToManyField(PowerTag, blank=True)
+    example_description = models.CharField(max_length=9000,
                                            blank=True,
                                            null=True)
-
-    # TODO: Delete and replace with method that gives set of power histories
-    latest_rev = models.ForeignKey("Power",
-                              on_delete=models.CASCADE,
-                              blank=True,
-                              null=True)
 
     class Meta:
         permissions = (
             ('view_private_power_full', 'View private power full'),
             ('edit_power_full', 'Edit power full'),
         )
+        indexes = [
+            models.Index(fields=['owner', 'is_deleted', 'dice_system']),
+            models.Index(fields=['character', 'dice_system']),
+        ]
         verbose_name = "Gift"
 
     def delete(self):
         self.character = None
         for reward in self.reward_list():
             reward.refund_keeping_character_assignment()
-        self.is_deleted=True
+        self.is_deleted = True
         self.save()
 
     def save(self, *args, **kwargs):
@@ -780,8 +784,8 @@ class Power_Full(models.Model):
             self.save()
             return self.latest_rev
 
-    def get_point_value(self):
-        return self.power_set.order_by('-pub_date').all()[0].get_point_value()
+    def get_gift_cost(self):
+        return self.latest_revision().get_gift_cost()
 
     def set_self_and_children_privacy(self, is_private):
         if is_private:
@@ -843,71 +847,65 @@ class Power_Full(models.Model):
             return self.name + " [NO ASSOCIATED USER]"
 
 
-# A given "revision track" of a Power.
-# Multiple Powers may have the same PowerHistory, and the most recent one is the "canonical" one.
-# A given Power_full may have multiple PowerHistorys
-    # always has at least two in the new system (an Effect+Vector and a Gift Modality)
-class PowerHistory(models.Model):
-    parent_power = models.ForeignKey(Power_Full,
-                                     blank=True,
-                                     null=True,
-                                     on_delete=models.CASCADE)
-    latest_rev = models.ForeignKey("Power",
-                                   on_delete=models.CASCADE,
-                                   blank=True,
-                                   null=True)
-
-
 # TODO: remove permissioning from this and use Power_Full permissioning.
 class Power(models.Model):
     name = models.CharField(max_length=150)
-    flavor_text = models.TextField(max_length=2000)
+    flavor_text = models.TextField(max_length=2000) # tagline
     description = models.TextField(max_length=2500)
+    dice_system = models.CharField(choices=DICE_SYSTEM, max_length=55)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                   on_delete=models.CASCADE,
+                                   blank=True,
+                                   null=True)
+    pub_date = models.DateTimeField('date published', auto_now_add=True)
 
-    # TODO: ensure power_history parent and parent_power are same.
+    gift_cost = models.IntegerField(null=True) # denormalized, access with get_gift_cost()
+
+    # Crafting
+    artifacts = models.ManyToManyField(Artifact,
+                                       through="ArtifactPower",
+                                       through_fields=('relevant_power', 'relevant_artifact'))
+
+    # Structure and system
+    system = models.TextField(max_length=54000,
+                              blank=True,
+                              null=True) # HTML rendered system text, safe to display
+    errata = models.TextField(max_length=54000, blank=True, default="") # HTML rendered errata, safe to display
+    base = models.ForeignKey(Base_Power, on_delete=models.CASCADE, blank=True, null=True, related_name="power_effect")
+    vector = models.ForeignKey(Base_Power, on_delete=models.CASCADE, blank=True, null=True, related_name="power_vector")
+    modality = models.ForeignKey(Base_Power, on_delete=models.CASCADE, blank=True, null=True, related_name="power_modality")
+    selected_enhancements = models.ManyToManyField(Enhancement,
+                                                   blank=True,
+                                                   through="Enhancement_Instance",
+                                                   through_fields=('relevant_power', 'relevant_enhancement'))
+    selected_drawbacks = models.ManyToManyField(Drawback,
+                                                blank=True,
+                                                through="Drawback_Instance",
+                                                through_fields=('relevant_power', 'relevant_drawback'))
+    parameter_values = models.ManyToManyField(Power_Param,
+                                              through="Parameter_Value",
+                                              through_fields=('relevant_power', 'relevant_power_param'))
+    # note: Access system field instances through reverse lookups
+
+    # REVISIONING
+    creation_reason = models.CharField(choices=CREATION_REASON, max_length=25)
+    creation_reason_expanded_text = models.TextField(max_length=1500,
+                                                     blank=True,
+                                                     null=True)
     # TODO: remove blank=True null=True after migration
     parent_power = models.ForeignKey(Power_Full,
                                      blank=True,
                                      null=True,
                                      on_delete=models.CASCADE)
 
-    # TODO: remove blank=True and null=True after migration
-    power_history = models.ForeignKey(PowerHistory,
-                                     blank=True,
-                                     null=True,
-                                     on_delete=models.CASCADE)
-    dice_system = models.CharField(choices=DICE_SYSTEM, max_length=55)
-
-    base = models.ForeignKey(Base_Power, on_delete=models.CASCADE, blank=True, null=True, related_name="power_effect")
-    vector = models.ForeignKey(Base_Power, on_delete=models.CASCADE, blank=True, null=True, related_name="power_vector")
-    modality = models.ForeignKey(Base_Power, on_delete=models.CASCADE, blank=True, null=True, related_name="power_modality")
-
-    private = models.BooleanField(default=False)
-
+    # UNUSED FIELDS?
+    # Maybe someday this can be used with character sheet integrations for passive/active powers that may sometimes
+    # be on or off
     activation_style = models.CharField(choices=ACTIVATION_STYLE, max_length=25, default=ACTIVATION_STYLE[0][0])
-    creation_reason = models.CharField(choices=CREATION_REASON, max_length=25)
-    creation_reason_expanded_text = models.TextField(max_length=1500,
-                                                     blank=True,
-                                                     null=True)
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL,
-                                   on_delete=models.CASCADE,
-                                   blank=True,
-                                   null=True)
-    system = models.TextField(max_length = 14000,
-                              blank=True,
-                              null=True)
-    selected_enhancements = models.ManyToManyField(Enhancement,
-                                                   blank=True,
-                                                   through="Enhancement_Instance",
-                                                   through_fields=('relevant_power', 'relevant_enhancement'))
-    selected_drawbacks = models.ManyToManyField(Drawback,
-                                                   blank=True,
-                                                   through="Drawback_Instance",
-                                                   through_fields=('relevant_power', 'relevant_drawback'))
-    pub_date = models.DateTimeField('date published', auto_now_add=True)
-    parameter_values = models.ManyToManyField(Power_Param,
-                                              through="Parameter_Value",
-                                              through_fields=('relevant_power', 'relevant_power_param'))
+
+    # FIELDS THAT SHOULD BE REMOVED
+    # Power_full should be responsible for privacy controls and probably ownership as well.
+    private = models.BooleanField(default=False)
 
     class Meta:
         constraints = [
@@ -915,10 +913,14 @@ class Power(models.Model):
         permissions = (
             ('view_private_power', 'View private power'),
         )
+        indexes = [
+            models.Index(fields=['parent_power', 'pub_date']),
+        ]
 
     def __str__(self):
         return self.name + " (" + self.description + ")"
 
+    #TODO: this seems to be for base powers??/
     def __check_constraints(self):
         if hasattr(self, "modality") and self.modality:
             if not self.modality.base_type == MODALITY:
@@ -934,19 +936,43 @@ class Power(models.Model):
         if (hasattr(self, "base") and self.base or hasattr(self, "vector") and self.vector) and not (self.base and self.vector):
             raise IntegrityError("Power with effect or vector must have both")
 
-
     def save(self, *args, **kwargs):
-        # TODO: uncomment this after switch to v2 power system.
-        # self.__check_constraints()
         new_power = not self.pk
-        if hasattr(self, "system") and self.system:
-            if self.system == self.base.get_system().system_text:
-                self.system = None
+        if self.dice_system != SYS_PS2:
+            if hasattr(self, "system") and self.system:
+                if self.system == self.base.get_system().system_text:
+                    self.system = None
         super(Power, self).save(*args, **kwargs)
         if new_power and hasattr(self, "parent_power") and self.parent_power:
             parent = self.parent_power
             parent.latest_rev = self
             parent.save()
+
+    def to_edit_blob(self):
+        return {
+            "effect_pk": self.base.pk,
+            "vector_pk": self.vector.pk,
+            "modality_pk": self.modality.pk,
+            "name": self.name,
+            "flavor_text": self.flavor_text,
+            "description": self.description,
+
+            "enhancements": [x.to_blob() for x in self.enhancement_instance_set.all()],
+            "drawbacks": [x.to_blob() for x in self.drawback_instance_set.all()],
+            "parameters": [x.to_blob() for x in self.parameter_value_set.all()],
+
+            "text_fields": [x.to_blob() for x in self.systemfieldtextinstance_set.all()] if hasattr(self, 'systemfieldtextinstance_set') else None,
+            "roll_fields": [x.to_blob() for x in self.systemfieldrollinstance_set.all()] if hasattr(self, 'systemfieldrollinstance_set') else None,
+            "weapon_fields": [x.to_blob() for x in self.systemfieldweaponinstance_set.all()] if hasattr(self, 'systemfieldweaponinstance_set') else None,
+        }
+
+    def get_gift_cost(self):
+        if hasattr(self, "gift_cost") and self.gift_cost:
+            return self.gift_cost
+        else:
+            self.gift_cost = self._get_point_value()
+            self.save()
+            return self.gift_cost
 
     def get_absolute_url(self):
         return reverse('powers:powers_view_power', kwargs={'power_id': self.pk})
@@ -975,16 +1001,23 @@ class Power(models.Model):
         is_owner = player == self.created_by
         return is_owner or not self.private or player.has_perm("view_private_power", self) or self.player_manages_via_cell(player)
 
-    def get_point_value(self):
+    def _get_point_value(self):
         cost_of_power = 1
         total_parameter_cost = 0
         for param_val in self.parameter_value_set.all():
             total_parameter_cost = total_parameter_cost + (param_val.value - param_val.relevant_power_param.default)
-        return  cost_of_power \
+        cost_of_power = cost_of_power \
                 + self.selected_enhancements.count() \
                 - self.base.num_free_enhancements \
                 - self.selected_drawbacks.count() \
                 + total_parameter_cost
+        if self.dice_system == SYS_PS2:
+            cost_of_power = cost_of_power - self.vector.num_free_enhancements - self.modality.num_free_enhancements
+            extra_credit = get_object_or_none(VectorCostCredit, relevant_vector=self.vector, relevant_effect=self.base)
+            if extra_credit:
+                cost_of_power = cost_of_power - extra_credit.gift_credit
+        return cost_of_power
+
 
     def reveal_to_player(self, player):
         assign_perm('view_power', player, self)
@@ -1026,7 +1059,7 @@ class Power(models.Model):
 
     def archive_txt(self):
         output = "{}\nA {} point {} {} power\nCreated by {}\n"
-        output = output.format(self.name, self.get_point_value(), self.get_activation_style_display(), self.base.name, self.created_by.username)
+        output = output.format(self.name, self.get_gift_cost(), self.get_activation_style_display(), self.base.name, self.created_by.username)
         output = output + "{}\nDescription: {}\nSystem: {}\n"
         output = output.format(self.flavor_text,self.description, self.get_system())
         output = output + "Parameters:\n-------------\n"
@@ -1053,6 +1086,12 @@ class Power(models.Model):
         if self.creation_reason == CREATION_REASON[3][0]:
             return "adjusting"
 
+class ArtifactPower(models.Model):
+    relevant_artifact = models.ForeignKey(Artifact, on_delete=models.PROTECT)
+    relevant_power = models.ForeignKey(Power, on_delete=models.CASCADE)
+    detail = models.CharField(max_length=1500,
+                              null=True,
+                              blank=True)
 
 class SystemField(models.Model):
     base_power_system = models.ForeignKey(Base_Power_System, on_delete=models.CASCADE)
@@ -1123,7 +1162,7 @@ class SystemFieldRoll(SystemField):
                 attribute_choices.extend(
                     [(x.id, x.name) for x in Attribute.objects.filter(is_deprecated=False).order_by('name')])
             primary_abilities = Ability.objects.filter(is_primary=True).order_by('name')
-            ability_choices = [('', '------'), ]
+            ability_choices = []
             ability_choices.extend([(x.id, x.name) for x in primary_abilities])
         if self.allow_parry:
             attribute_choices.append(PARRY_)
@@ -1191,6 +1230,12 @@ class SystemFieldTextInstance(SystemFieldInstance):
     def render_value(self):
         return escape(self.value)
 
+    def to_blob(self):
+        return {
+            "field_id": self.relevant_field.pk,
+            "value": self.value
+        }
+
 
 class SystemFieldRollInstance(SystemFieldInstance):
     relevant_field = models.ForeignKey(SystemFieldRoll,
@@ -1200,6 +1245,31 @@ class SystemFieldRollInstance(SystemFieldInstance):
     class Meta:
         unique_together = (("relevant_field", "relevant_power"))
 
+    def to_blob(self):
+        return {
+            "field_id": self.relevant_field.pk,
+            "roll_attribute": self._get_roll_initial_attribute(self.roll),
+            "roll_ability": self._get_roll_initial_ability(self.roll),
+        }
+
+    def _get_roll_initial_ability(self, roll):
+        if roll.ability:
+            return [roll.ability.id, roll.ability.name]
+        else:
+            return None
+
+    def _get_roll_initial_attribute(self, roll):
+        if roll.attribute:
+            return [roll.attribute.id, roll.attribute.name]
+        elif roll.is_mind:
+            return MIND_
+        elif roll.is_body:
+            return BODY_
+        elif roll.parry_type != NO_PARRY_INFO:
+            return PARRY_
+        else:
+            raise ValueError("Unknown roll attribute")
+
     def render_value(self):
         if self.relevant_field.caster_rolls:
             return self.roll.render_html_for_current_contractor()
@@ -1207,9 +1277,15 @@ class SystemFieldRollInstance(SystemFieldInstance):
             return self.roll.render_value_for_power()
 
 
-class SystemFieldWeaponInstance(SystemField):
+class SystemFieldWeaponInstance(SystemFieldInstance):
     relevant_field = models.ForeignKey(SystemFieldWeapon, on_delete=models.CASCADE)
     weapon = models.ForeignKey(Weapon, on_delete=models.CASCADE)
+
+    def to_blob(self):
+        return {
+            "field_id": self.relevant_field.pk,
+            "weapon_id": self.weapon.pk,
+        }
 
 
 class Enhancement_Instance(models.Model):
@@ -1230,12 +1306,17 @@ class Enhancement_Instance(models.Model):
         output = output + "\n"
         return output
 
+    def to_blob(self):
+        return {
+            "enhancement_slug": self.relevant_enhancement.pk,
+            "detail": self.detail,
+        }
+
     def __str__(self):
         if self.relevant_enhancement.detail_field_label:
             return "{} :: {} {}: {}".format(self.relevant_power.name,str(self.relevant_enhancement), self.relevant_enhancement.detail_field_label, self.detail)
         else:
             return "{} :: {}".format(self.relevant_power.name,str(self.relevant_enhancement))
-
 
 
 class Drawback_Instance(models.Model):
@@ -1255,6 +1336,12 @@ class Drawback_Instance(models.Model):
         output = output + "\n"
         return output
 
+    def to_blob(self):
+        return {
+            "drawback_slug": self.relevant_drawback.pk,
+            "detail": self.detail,
+        }
+
     def __str__(self):
         if self.relevant_drawback.detail_field_label:
             return "{} :: {} {}: {}".format(self.relevant_power.name,str(self.relevant_drawback), self.relevant_drawback.detail_field_label, self.detail)
@@ -1270,6 +1357,12 @@ class Parameter_Value(models.Model):
 
     def __str__(self):
         return " ".join([str(self.relevant_power_param), str(self.relevant_power), str(self.value)])
+
+    def to_blob(self):
+        return {
+            "power_param_pk": self.relevant_power_param.pk,
+            "value": self.value,
+        }
 
     def get_level_description(self):
         return self.relevant_power_param.relevant_parameter.get_value_for_level(level=self.value)

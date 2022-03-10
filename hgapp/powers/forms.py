@@ -142,9 +142,6 @@ class CreatePowerForm(forms.Form):
 class DeletePowerForm(forms.Form):
     pass
 
-class SystemFieldTextForm(forms.Form):
-    description = forms.CharField(label="animals", max_length=500)
-
 class SystemFieldRollForm(forms.Form):
     system_field_id = forms.IntegerField(label=None, widget=forms.HiddenInput(),) # hidden field to track which system field we are editing.
 

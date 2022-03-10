@@ -23,7 +23,7 @@
             <div class="text-center nav navbar-nav css-gift-cost">
                 Current Gift Cost: <b><span id="current_gift_cost_number">1</span></b>
                 {% if og_power %}
-                    ({{og_power.get_point_value}} <span id="gift_cost_delta">+0</span>)
+                    ({{og_power.get_gift_cost}} <span id="gift_cost_delta">+0</span>)
                 {% endif %}
             </div>
         </span>

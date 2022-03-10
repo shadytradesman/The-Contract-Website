@@ -16,7 +16,7 @@
             {{latest_revision.name}}
         </a>
         <small>
-            - {{power_full.get_point_value}} Gift
+            - {{power_full.get_gift_cost}} Gift
             <a href="{% url 'powers:powers_view_base' power_full.base.slug %}">{{power_full.base.name}}</a>
             Power
 
@@ -24,7 +24,7 @@
                 <p class="text-danger">
                     No Gifts assigned!
                 </p>
-            {% elif power_full.character and power_full.get_point_value > power_full.reward_list|length %}
+            {% elif power_full.character and power_full.get_gift_cost > power_full.reward_list|length %}
                 <p class="text-danger">
                     {{power_full.reward_list|length}} Rewards assigned
                 </p>
@@ -91,7 +91,7 @@
         {% endif %}
     </div>
     {% if power_full.tags.all %}
-        <a href="{% url 'powers:powers_create_power_from _existing' latest_revision.id %}"
+        <a href="{% url 'powers:powers_create_power_from_existing' latest_revision.id %}"
            class="btn btn-default btn-xs">
             Customize
         </a>
