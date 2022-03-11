@@ -32,12 +32,23 @@
         </div>
         <div id="rendered-system" v-html="renderedSystem" class="js-render-power-keywords">
         </div>
+        <div v-if="giftErrata">
+                <span data-toggle="tooltip"
+                      data-html="true"
+                      data-placement="top"
+                      v-bind:data-title="giftErrata"
+                      v-bind:data-original-title="giftErrata"
+                      class="has-popover css-extended-system"
+            style="">
+                    <i class="fa fa-question-circle fa-lg"></i>
+            </span>
+        </div>
         {% if request.user.is_superuser %}
-        <a class="btn btn-default btn-xs" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+        <a class="btn btn-default btn-xs" data-toggle="collapse" href="#collapseExample1" role="button" aria-expanded="false" aria-controls="collapseExample1">
             Show Unrendered System (dev only)
         </a>
         {% endif %}
-        <div class="collapse" id="collapseExample">
+        <div class="collapse" id="collapseExample1">
             <small>
                 <div id="unrendered-system" v-html="unrenderedSystem">
                 </div>

@@ -311,6 +311,13 @@
     font-weight: bold;
 }
 
+.css-extended-system {
+    padding-left: 2px;
+    text-align: left;
+    position: relative;
+    bottom: 6px;
+}
+
 /* GIFT CREDIT / COST */
 
 .css-component-gift-credit {
