@@ -1,7 +1,7 @@
 function activateTooltips() {
     $('[data-toggle="tooltip"]').tooltip("enable");
     $('body').tooltip({
-          selector: '.has-popover'
+          selector: '.has-popover' // have to use class for some reason.
         });
 }
 
@@ -432,7 +432,7 @@ const parenJoinString = {
     '(': ', ',
     '@': ', ',
     '[': ' ',
-    '{': '<br><br>',
+    '{': '</p><p>',
     '+': '',
     ';': "</li><li>",
 }
@@ -532,7 +532,7 @@ function getReplacementText(replacements, toReplace) {
         return "";
     }
     if (toReplace.type === '{') {
-        replacements[0] = "<br><br>" + replacements[0];
+        replacements[0] = replacements[0];
     }
     if (toReplace.type === ';') {
         replacements[0] = "<ul class=\"css-power-system-list\"><li>" + replacements[0];
@@ -695,7 +695,7 @@ const ComponentRendering = {
       unrenderedSystem: '',
       renderedSystem: '',
       unrenderedDescription: "",
-      renderedSystem: "",
+      giftErrata: "",
       activeUniqueReplacementsByMarker: {},
       giftCost: 0,
       enhancementsCost: 0,
@@ -766,6 +766,7 @@ const ComponentRendering = {
             return;
         }
         this.selectedModality = selectedModality;
+        this.giftPreviewModalFirstShow = false;
         this.changeModality();
         let selectedEffect = this.effects.find(comp => comp.slug === powerEditBlob["effect_pk"]);
         if (!selectedEffect) {
@@ -857,7 +858,13 @@ const ComponentRendering = {
         this.updateRequiredStatus();
         this.populateWarnings();
         this.openCustomizationTab();
-        $("#giftPreviewModal").modal({});
+      },
+      populateErrata() {
+
+        let errataLines = [""];
+        errataLines = this.getSelectedAndActiveEnhancements.map(mod => mod["eratta"]);
+        errataLines = errataLines.concat(this.getSelectedAndActiveDrawbacks.map(mod => mod["eratta"]));
+        this.giftErrata = "";
       },
       scrollToContent() {
           this.$nextTick(function () {
@@ -1298,6 +1305,7 @@ const ComponentRendering = {
           this.renderedDescription = performSystemTextReplacements(this.unrenderedDescription, replacementMap);
           let partiallyRenderedSystem = performSystemTextReplacements(this.unrenderedSystem, replacementMap);
           this.renderedSystem = replaceHoverText(partiallyRenderedSystem);
+          this.giftErrata = performSystemTextReplacements("{{gift-errata}}", replacementMap);
           this.$nextTick(function () {
               activateTooltips();
           });
@@ -1416,8 +1424,8 @@ const ComponentRendering = {
 const app = Vue.createApp(ComponentRendering);
 
 
+const mountedApp = app.mount('#vue-app');
 $(function() {
-    const mountedApp = app.mount('#vue-app');
     mountedApp.modalities = Object.values(powerBlob.modalities).map(comp => componentToVue(comp, "mod"));
     if ((document.getElementById('powerEditBlob').textContent.length > 2)) {
         console.log(document.getElementById('powerEditBlob').textContent.length)

@@ -41,7 +41,7 @@
                     {% endif %}
                     {% endif %}
                     <li>
-                        <a href="{% url 'powers:powers_create_power_from_existing' power.id %}" class="btn btn-default">Copy and Edit New</a>
+                        <a href="{% url 'powers:powers_create_from_existing_ps2' power.parent_power.id %}" class="btn btn-default">Copy and Edit New</a>
                     </li>
                 </ul>
             </div>
@@ -50,29 +50,36 @@
                 <small><i>{{ power.flavor_text}}</i></small>
             </h2>
             <div>
-                TODO: put that description blurb here
+                {% if power.parent_power.character %}
+                Used by <a href="{% url 'characters:characters_view' power.parent_power.character.id %}">{{ power.parent_power.character.name }}</a>,
+                {% endif %}
+                {% if power.parent_power.owner %}
+                Created by <a href="{% url 'profiles:profiles_view_profile' power.parent_power.owner.id %}">{% user_display power.parent_power.owner %}</a>.
+                {% endif %}
             </div>
-            <p>
+            <div>
                 Gift Cost: {{power_full.get_gift_cost}}
-                <div>
-                    {% if power.parent_power.character %}
-                        used by <a href="{% url 'characters:characters_view' power.parent_power.character.id %}">{{ power.parent_power.character.name }}</a>,
-                    {% endif %}
-                    {% if power.parent_power.owner %}
-                        created by <a href="{% url 'profiles:profiles_view_profile' power.parent_power.owner.id %}">{% user_display power.parent_power.owner %}</a>.
-                    {% endif %}
-                </div>
                 {%if power.private %}
                     <h5><i class="fa fa-user-secret fa-2x"></i> Power is private because it is assigned to a private character.</h5>
                 {% endif %}
-            </p>
+            </div>
         </div>
         <div class="panel-body">
                 <i class="text-muted">{{ power.description|safe }}</i>
             <hr style="width: 50%;">
             {{ power.system|safe }}
-            <hr>
-            <div class="row">
+            {% if power.errata %}
+            <div>
+                <span data-toggle="tooltip"
+                      data-html="true"
+                      data-placement="top"
+                      v-bind:data-title="{{power.errata}}"
+                      class="css-extended-system">
+                    <i class="fa fa-question-circle fa-lg"></i>
+                </span>
+            </div>
+            {% endif %}
+            <div class="row hidden">
                 {% if power.enhancement_instance_set.all %}
                     <div class="col-sm-6">
                         <h3 class="text-center">Enhancements</h3>

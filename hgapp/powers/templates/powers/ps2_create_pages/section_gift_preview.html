@@ -1,4 +1,4 @@
-<div class="panel panel-default" style="margin-bottom: 0px;">
+<div class="panel panel-default css-gift-preview" style="margin-bottom: 0px;">
     <div class="panel-heading">
         <h3 class="" style="margin-top: 5px; margin-bottom: 5px">
             <span v-if="giftName" v-text="giftName"></span>
@@ -32,16 +32,15 @@
         </div>
         <div id="rendered-system" v-html="renderedSystem" class="js-render-power-keywords">
         </div>
-        {% if request.user.is_superuser %}
-        <a class="btn btn-default btn-xs" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
-            Show Unrendered System (dev only)
-        </a>
-        {% endif %}
-        <div class="collapse" id="collapseExample">
-            <small>
-                <div id="unrendered-system" v-html="unrenderedSystem">
-                </div>
-            </small>
+        <div v-if="giftErrata">
+                <span data-toggle="tooltip"
+                      data-html="true"
+                      data-placement="top"
+                      v-bind:data-title="giftErrata"
+                      v-bind:data-original-title="giftErrata"
+                      class="has-popover css-extended-system">
+                    <i class="fa fa-question-circle fa-lg"></i>
+            </span>
         </div>
     </div>
 </div>

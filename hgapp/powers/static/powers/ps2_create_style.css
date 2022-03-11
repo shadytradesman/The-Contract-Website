@@ -27,7 +27,7 @@
     padding-left: 15px;
     padding-right: 15px;
     top: 60px;
-    z-index: 9999 !important;
+    z-index: 9 !important;
 }
 
 .css-gift-preview-sidebar .affix {
@@ -302,6 +302,11 @@
 
 /* SYSTEM TEXT STYLING */
 
+.css-gift-preview {
+    overflow: auto;
+    max-height: 90vh;
+}
+
 .css-system-text-user-input {
     font-style: italic;
     color: #c3c2b6;
@@ -309,6 +314,13 @@
 
 .css-system-text-roll {
     font-weight: bold;
+}
+
+.css-extended-system {
+    padding-left: 2px;
+    text-align: left;
+    position: relative;
+    bottom: 6px;
 }
 
 /* GIFT CREDIT / COST */

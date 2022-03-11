@@ -278,7 +278,7 @@ class PowerBlob:
         return components
 
 
-def get_edit_context(existing_power_full=None):
+def get_edit_context(existing_power_full=None, is_edit=False):
     modifiers_formset = get_modifiers_formset()
     params_formset = get_params_formset()
     sys_field_text_formset = get_sys_field_text_formset()
@@ -297,6 +297,7 @@ def get_edit_context(existing_power_full=None):
     form_url = reverse("powers:powers_create_ps2")
     if existing_power_full:
         context['power_edit_blob'] = json.dumps(existing_power_full.latest_revision().to_edit_blob())
+    if is_edit:
         form_url = reverse("powers:powers_edit_ps2", kwargs={"power_full_id": existing_power_full.pk})
     context["form_url"] = form_url
     return context
@@ -335,7 +336,8 @@ def save_gift(request, power_full=None, character=None):
 
 def _populate_power_system_and_errata(power_blob, power, modifier_instances, param_instances, field_instances):
     # TODO: do the system text rendering even though it's annoying and hard.
-    power.system = "bloop"
+    power.system = "Server-side system text rendering incoming"
+    power.errata = "Server-side errata text rendering incoming"
 
 
 def _create_new_power_and_save(power_form, request):
