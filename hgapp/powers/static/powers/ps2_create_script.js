@@ -766,6 +766,7 @@ const ComponentRendering = {
             return;
         }
         this.selectedModality = selectedModality;
+        this.giftPreviewModalFirstShow = false;
         this.changeModality();
         let selectedEffect = this.effects.find(comp => comp.slug === powerEditBlob["effect_pk"]);
         if (!selectedEffect) {
@@ -857,7 +858,6 @@ const ComponentRendering = {
         this.updateRequiredStatus();
         this.populateWarnings();
         this.openCustomizationTab();
-        $("#giftPreviewModal").modal({});
       },
       populateErrata() {
 

@@ -24,6 +24,7 @@ from .ps2Utilities import get_edit_context, save_gift
 class EditPower(View):
     template_name = 'powers/ps2_create_pages/create_ps2.html'
     existing_power = None
+    power_to_edit = None
     character = None
 
     def dispatch(self, *args, **kwargs):
@@ -37,7 +38,7 @@ class EditPower(View):
 
     def post(self, request, *args, **kwargs):
         with transaction.atomic():
-            new_power_full = save_gift(request, power_full=self.existing_power, character=self.character)
+            new_power_full = save_gift(request, power_full=self.power_to_edit, character=self.character)
         return HttpResponseRedirect(reverse('powers:powers_view_power', args=(new_power_full.id,)))
 
     def __check_permissions(self):
@@ -45,7 +46,7 @@ class EditPower(View):
             raise PermissionDenied("You are not authorized to create a new power in this system.")
 
     def __get_context_data(self):
-        return get_edit_context(existing_power_full=self.existing_power)
+        return get_edit_context(existing_power_full=self.existing_power, is_edit=self.power_to_edit)
 
 
 class CreatePower(EditPower):
@@ -53,6 +54,10 @@ class CreatePower(EditPower):
     def dispatch(self, *args, **kwargs):
         if 'character_id' in self.kwargs:
             self.character = get_object_or_404(Character, id=self.kwargs['character_id'])
+        if 'power_full_id' in self.kwargs:
+            self.existing_power = get_object_or_404(Power_Full, id=self.kwargs['power_full_id'])
+            if not self.existing_power.player_can_view(self.request.user):
+                raise PermissionDenied("This Power has been deleted, or you're not allowed to view it")
         return super().dispatch(*args, **kwargs)
 
     def __check_permissions(self):
@@ -65,6 +70,7 @@ class EditExistingPower(EditPower):
 
     def dispatch(self, *args, **kwargs):
         self.existing_power = get_object_or_404(Power_Full, id=self.kwargs['power_full_id'])
+        self.power_to_edit = self.existing_power
         if self.existing_power.character:
             self.character = self.existing_power.character
         return super().dispatch(*args, **kwargs)

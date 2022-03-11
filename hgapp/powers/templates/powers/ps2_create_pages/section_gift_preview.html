@@ -38,21 +38,15 @@
                       data-placement="top"
                       v-bind:data-title="giftErrata"
                       v-bind:data-original-title="giftErrata"
-                      class="has-popover css-extended-system"
-            style="">
+                      class="has-popover css-extended-system">
                     <i class="fa fa-question-circle fa-lg"></i>
             </span>
         </div>
         {% if request.user.is_superuser %}
-        <a class="btn btn-default btn-xs" data-toggle="collapse" href="#collapseExample1" role="button" aria-expanded="false" aria-controls="collapseExample1">
-            Show Unrendered System (dev only)
-        </a>
-        {% endif %}
-        <div class="collapse" id="collapseExample1">
             <small>
                 <div id="unrendered-system" v-html="unrenderedSystem">
                 </div>
             </small>
-        </div>
+        {% endif %}
     </div>
 </div>
