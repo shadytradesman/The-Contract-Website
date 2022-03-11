@@ -1424,8 +1424,8 @@ const ComponentRendering = {
 const app = Vue.createApp(ComponentRendering);
 
 
+const mountedApp = app.mount('#vue-app');
 $(function() {
-    const mountedApp = app.mount('#vue-app');
     mountedApp.modalities = Object.values(powerBlob.modalities).map(comp => componentToVue(comp, "mod"));
     if ((document.getElementById('powerEditBlob').textContent.length > 2)) {
         console.log(document.getElementById('powerEditBlob').textContent.length)

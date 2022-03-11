@@ -1,4 +1,4 @@
-<div class="panel panel-default" style="margin-bottom: 0px;">
+<div class="panel panel-default css-gift-preview" style="margin-bottom: 0px;">
     <div class="panel-heading">
         <h3 class="" style="margin-top: 5px; margin-bottom: 5px">
             <span v-if="giftName" v-text="giftName"></span>
@@ -42,11 +42,5 @@
                     <i class="fa fa-question-circle fa-lg"></i>
             </span>
         </div>
-        {% if request.user.is_superuser %}
-            <small>
-                <div id="unrendered-system" v-html="unrenderedSystem">
-                </div>
-            </small>
-        {% endif %}
     </div>
 </div>

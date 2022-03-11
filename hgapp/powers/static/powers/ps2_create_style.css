@@ -27,7 +27,7 @@
     padding-left: 15px;
     padding-right: 15px;
     top: 60px;
-    z-index: 9999 !important;
+    z-index: 9 !important;
 }
 
 .css-gift-preview-sidebar .affix {
@@ -301,6 +301,11 @@
 }
 
 /* SYSTEM TEXT STYLING */
+
+.css-gift-preview {
+    overflow: auto;
+    max-height: 90vh;
+}
 
 .css-system-text-user-input {
     font-style: italic;
