@@ -21,7 +21,7 @@
     <span>
         <b><span v-if="modifier.group">{groupLabelFromId(modifier.group)}: </span>{ modifier.displayName }</b>
         <span class="css-modifier-text">
-            ({ modifier.description }<span v-if="modifier.eratta"><span data-toggle="tooltip"
+            (<span v-html="modifier.description"></span><span v-if="modifier.eratta"><span data-toggle="tooltip"
                       data-placement="top"
                       v-bind:title="modifier.eratta"
                       style="padding-left: 5px;"
