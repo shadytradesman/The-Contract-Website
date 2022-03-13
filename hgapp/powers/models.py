@@ -412,14 +412,20 @@ class Base_Power_Category(models.Model):
                             max_length = 25,
                             primary_key= True)
     description = models.CharField(max_length = 50)
+    color = models.CharField(max_length=8, default="#111418")
 
     def __str__(self):
         return " ".join([self.name])
+
+    def container_class(self):
+        return "css-cat-container-" + self.slug
 
     def to_blob(self):
         return {
             "name": self.name,
             "description": self.description,
+            "color": self.color,
+            "container_class": self.container_class(),
             "components": list(self.base_power_set.order_by("name").values_list("pk", flat=True)),
         }
 
@@ -438,6 +444,7 @@ class Base_Power(models.Model):
     substitutions = models.ManyToManyField(FieldSubstitutionMarker,
                                            through=BasePowerFieldSubstitution,
                                            through_fields=('relevant_base_power', 'relevant_marker'))
+    icon = models.FileField(blank=True)
 
     # Component type, Effect, Modality, or Vector
     base_type = models.CharField(choices=BASE_POWER_TYPE,
@@ -525,6 +532,7 @@ class Base_Power(models.Model):
             'type': self.base_type,
             'gift_credit': self.num_free_enhancements,
             'required_status': self.required_status,
+            'icon_url': self.icon.url if self.icon else "",
             'category': self.category.pk if self.category else None,
             'substitutions': [x.to_blob() for x in self.basepowerfieldsubstitution_set.all()],
             'allowed_vectors': list(self.allowed_vectors.values_list('pk', flat=True)),

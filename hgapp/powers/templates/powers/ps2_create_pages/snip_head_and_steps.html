@@ -14,8 +14,11 @@
                              'css-step-finished': selectedModality
                              }"
                      @click="clickModalityTab">
-                    <div class="css-step-icon css-step-after">
-                        <span class="glyphicon glyphicon-record" aria-hidden="true"></span>
+                    <div class=" css-step-after">
+                    </div>
+                    <div class="css-step-icon">
+                        <span v-if="!selectedModality" class="glyphicon glyphicon-record" aria-hidden="true"></span>
+                        <img class="css-step-image" v-if="selectedModality" v-bind:src="selectedModality.icon_url" width="40" height="40" />
                     </div>
                     <div v-if="selectedModality">
                         <div class="css-component-tab-title">
@@ -39,7 +42,8 @@
                              }"
                      @click="clickEffectsTab" >
                     <div class="css-step-icon css-step-after css-step-before">
-                        <span class="glyphicon glyphicon-record" aria-hidden="true"></span>
+                        <span v-if="!selectedEffect" class="glyphicon glyphicon-record" aria-hidden="true"></span>
+                        <img class="css-step-image" v-if="selectedEffect" v-bind:src="selectedEffect.icon_url" width="40" height="40" />
                     </div>
                     <div  v-if="selectedEffect">
                         <div class="css-component-tab-title">

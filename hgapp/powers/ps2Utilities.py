@@ -285,6 +285,7 @@ def get_edit_context(existing_power_full=None, is_edit=False):
     sys_field_weapon_formset = get_sys_field_weapon_formset()
     sys_field_roll_formset = get_sys_field_roll_formset()
     power_form = PowerForm()
+    categories = Base_Power_Category.objects.all()
     context = {
         'power_blob': PowerBlob().get_json_power_blob(),
         'modifier_formset': modifiers_formset,
@@ -293,6 +294,7 @@ def get_edit_context(existing_power_full=None, is_edit=False):
         'sys_field_text_formset': sys_field_text_formset,
         'sys_field_weapon_formset': sys_field_weapon_formset,
         'sys_field_roll_formset': sys_field_roll_formset,
+        'cat_colors': [(cat.container_class(), cat.color) for cat in categories],
     }
     form_url = reverse("powers:powers_create_ps2")
     if existing_power_full:

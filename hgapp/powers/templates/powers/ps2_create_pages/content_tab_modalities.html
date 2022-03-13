@@ -21,9 +21,10 @@
                    @click="clickModality"
                    style="display:none;"
             >
-            <h3 class="css-component-header"  style="margin-top: 5px;">
+            <h3 class="css-component-header"  style="margin-top: 5px; margin-bottom: 5px;">
                 { component.displayName }
             </h3>
+            <img v-bind:src="component.icon_url" width="100" height="100"/>
             <h5 style="margin-top: 0px; margin-bottom: 5px;">
                 { component.summary }
             </h5>

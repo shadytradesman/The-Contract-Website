@@ -4,6 +4,13 @@
 
 {% block extra_styles %}
 	<link rel="stylesheet" type="text/css" href="{% static 'powers/ps2_create_style.css' %}" />
+	<style>
+		{% for cat_color in cat_colors %}
+			.{{cat_color.0}} {
+				background-color: {{cat_color.1}};
+			}
+		{% endfor %}
+	</style>
 {% endblock %}
 
 {% block extra_scripts %}

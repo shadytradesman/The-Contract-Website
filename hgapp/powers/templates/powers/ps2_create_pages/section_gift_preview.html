@@ -1,3 +1,5 @@
+{% load static %}
+
 <div class="panel panel-default css-gift-preview" style="margin-bottom: 0px;">
     <div class="panel-heading">
         <h3 class="" style="margin-top: 5px; margin-bottom: 5px">
@@ -9,20 +11,48 @@
                     </span>
                 </i>
             </small>
-            <small>
-                <div class="css-description" v-html="renderedDescription" style="margin-top: 5px;">
-                </div>
-            </small>
         </h3>
-        <div v-if="requiredStatus" class="pull-right"  data-toggle="tooltip" title="Seasoned = 10+ Victories. Veteran = 25+ Victories">Requires <b>{requiredStatus}</b> Status</div>
-        <div
-             data-html="true"
-             v-bind:data-original-title="giftCostTooltip"
-             v-bind:data-title="giftCostTooltip"
-             class="has-popover" >
-            Gift Cost:
-            <span v-html="giftCost"></span>
+        <div v-if="requiredStatus" class="pull-right"  data-toggle="tooltip" title="Seasoned = 10+ Victories. Veteran = 25+ Victories">Requires <b>{requiredStatus}</b></div>
+        <div>
+            <span
+                    v-if="selectedModality"
+                    v-bind:data-title="'Gift Type: ' + selectedModality.displayName"
+                    class="has-popover" >
+                <img  v-bind:src="selectedModality.icon_url" width="20" height="20" >
+            </span>
+            <span
+                    v-if="selectedEffect"
+                    v-bind:data-title="'Effect: ' + selectedEffect.displayName"
+                    class="has-popover">
+                <img v-bind:src="selectedEffect.icon_url" width="20" height="20" >
+            </span>
+            <span
+                    v-if="selectedVector"
+                    v-bind:data-title="'Style: ' + selectedVector.displayName"
+                    class="has-popover">
+                <img v-bind:src="selectedVector.icon_url" width="20" height="20" >
+            </span>
+            <span
+                v-if="modifierList"
+                data-html="true"
+                v-bind:data-title="modifierList"
+                v-bind:data-original-title="modifierList"
+                data-placement="bottom"
+                class="has-popover">
+                <img src="{% static 'powers/magnifying-glass.svg' %}" width="20" height="20" >
+            </span>
+            <span data-html="true"
+                    v-bind:data-original-title="giftCostTooltip"
+                    v-bind:data-title="giftCostTooltip"
+                    class="has-popover" >
+                Gift Cost:
+                <span v-html="giftCost"></span>
+            </span>
         </div>
+        <small class="text-muted">
+            <div class="css-description" v-html="renderedDescription" style="margin-top: 5px;">
+            </div>
+        </small>
     </div>
     <div class="panel-body" style="padding-top: 5px;">
         <div v-if="giftDescription" v-text="giftDescription" class="css-system-text-user-input" style="margin-top: 5px; margin-bottom: 5px;">

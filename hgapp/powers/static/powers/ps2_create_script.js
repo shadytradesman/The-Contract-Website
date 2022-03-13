@@ -148,6 +148,7 @@ function componentToVue(component, type) {
     return {
         id: type + "-" + component.slug,
         slug: component.slug,
+        icon_url: component.icon_url,
         displayName: component.name,
         summary: component.summary,
         description: component.description,
@@ -171,10 +172,10 @@ const filterDisplayByVecSlug = {
         "craftable-artifact": "empower their users when activated",
     },
     "passive": {
-        "signature-item-mod": "grants a passive benefit when worn",
+        "signature-item-mod": "grants a passive benefit",
         "power": "is passive",
         "craftable-consumable": "??",
-        "craftable-artifact": "grant a passive benefit when worn",
+        "craftable-artifact": "grant a passive benefit",
 
     },
     "trap": {
@@ -184,10 +185,10 @@ const filterDisplayByVecSlug = {
         "craftable-artifact": "??",
     },
     "functional": {
-        "signature-item-mod": "is a weapon or vehicle",
+        "signature-item-mod": "is an enhanced version of a normal obj",
         "power": "??",
         "craftable-consumable": "???",
-        "craftable-artifact": "are weapons or vehicles",
+        "craftable-artifact": "are enhanced versions of normal objects",
     },
 }
 
@@ -738,7 +739,7 @@ const ComponentRendering = {
       effectFilters: [],
       selectedEffectFilter: null,
       vectors: [],
-      selectedVector: "",
+      selectedVector: null,
       enhancements: [],
       selectedEnhancements: [],
       disabledEnhancements: {}, // map of disabled enhancements slug to reason.
@@ -766,6 +767,7 @@ const ComponentRendering = {
       giftDescription: null,
       giftTagline: "",
       giftPreviewModalFirstShow: true,
+      modifierList: [],
       warnings: [],
     }
   },
@@ -776,7 +778,7 @@ const ComponentRendering = {
         this.selectedEffect = randomFromList(this.effects);
         this.changeEffect();
         if (this.vectors.length > 1) {
-            this.selectedVector = randomFromList(this.vectors).slug;
+            this.selectedVector = randomFromList(this.vectors);
         }
         this.clickVector();
 
@@ -1007,6 +1009,8 @@ const ComponentRendering = {
                   categoriesWithEffects.push({
                       "name": category.name,
                       "description": category.description,
+                      "color": category.color,
+                      "containerClass": category.container_class,
                       "effects": catEffects,
                   })
               }
@@ -1054,7 +1058,7 @@ const ComponentRendering = {
         }
         costs = costs.filter(cost => cost != 0);
         if (costs.length == 1) {
-            return "(Gift Cost: " + displayCost(costs[0]) + ")";
+            return " (Gift Cost: " + displayCost(costs[0]) + ")";
         }
         return null;
       },
@@ -1124,7 +1128,7 @@ const ComponentRendering = {
       changeEffect(effect) {
           this.updateAvailableVectors();
           if (this.selectedEffectFilter.value != "ALL") {
-              this.selectedVector = this.selectedEffectFilter.value;
+              this.selectedVector = this.vectors.find(comp => comp.slug === this.selectedEffectFilter.value);
           }
           this.componentClick();
           this.openCustomizationTab();
@@ -1133,7 +1137,7 @@ const ComponentRendering = {
       updateAvailableVectors() {
           if (this.selectedEffect === null) {
               this.vectors = [];
-              this.selectedVector = '';
+              this.selectedVector = null;
               return;
           }
           const allowedVectors = this.getAvailableVectorsForEffectAndModality(this.selectedEffect.slug, this.selectedModality.slug);
@@ -1141,8 +1145,8 @@ const ComponentRendering = {
               .filter(comp => allowedVectors.includes(comp.slug))
               .map(comp => componentToVue(comp, "vector"));
           this.vectors = sortVueModifiers(unsortedVectors);
-          if (!allowedVectors.includes(this.selectedVector)) {
-              this.selectedVector = this.vectors[0].slug;
+          if (!this.selectedVector || !allowedVectors.includes(this.selectedVector.slug)) {
+              this.selectedVector = this.vectors[0];
           }
       },
       getAvailableVectorsForEffectAndModality(effectSlug, modalitySlug) {
@@ -1161,7 +1165,7 @@ const ComponentRendering = {
           this.populateWarnings();
       },
       componentClick() {
-		if (this.selectedVector.length && this.selectedModality && this.selectedEffect) {
+		if (this.selectedVector && this.selectedModality && this.selectedEffect) {
 			this.populatePowerForm();
         }
       },
@@ -1169,7 +1173,7 @@ const ComponentRendering = {
            return [
                powerBlob.modalities[this.selectedModality.slug],
                powerBlob.effects[this.selectedEffect.slug],
-               powerBlob.vectors[this.selectedVector]
+               powerBlob.vectors[this.selectedVector.slug]
            ]
       },
       populatePowerForm() {
@@ -1220,7 +1224,7 @@ const ComponentRendering = {
           this.getSelectedComponents().forEach(comp => {
               componentsCost = componentsCost - comp["gift_credit"];
           });
-          componentsCost = componentsCost + this.additionalCostOfEffectAndVector(this.selectedEffect["slug"], this.selectedVector)
+          componentsCost = componentsCost + this.additionalCostOfEffectAndVector(this.selectedEffect["slug"], this.selectedVector.slug)
 
           this.enhancementsCost = this.getSelectedAndActiveEnhancements().length
           this.drawbacksCost = - this.getSelectedAndActiveDrawbacks().length;
@@ -1369,6 +1373,22 @@ const ComponentRendering = {
           this.$nextTick(function () {
               activateTooltips();
           });
+          this.updateModifierList();
+      },
+      updateModifierList() {
+        let enhancementNames =  this.getSelectedAndActiveEnhancements().map(mod => mod.displayName);
+        let drawbackNames =  this.getSelectedAndActiveDrawbacks().map(mod => mod.displayName);
+        let val = "";
+        if (enhancementNames.length > 0) {
+            val = val + "<b>Enhancements</b>:<br>" + enhancementNames.join("<br>");
+        }
+        if (drawbackNames.length > 0) {
+            if (val.length > 0) {
+                val = val + "<br>";
+            }
+            val = val + "<b>Drawbacks</b>:<br>" + drawbackNames.join("<br>");
+        }
+        this.modifierList = val;
       },
       getSelectedAndActiveEnhancements() {
           return this.enhancements.filter(enh => this.selectedEnhancements.map(enh => enh.id).includes(enh["id"]));

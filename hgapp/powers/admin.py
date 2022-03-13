@@ -181,7 +181,7 @@ class BasePowerAdmin(admin.ModelAdmin):
                        ('base_type', 'num_free_enhancements'),
                        ('required_status', 'category'),
                        ('description', 'eratta'),
-                       'avail_enhancements', 'avail_drawbacks')
+                       'avail_enhancements', 'avail_drawbacks','icon')
         }),
         ('Show component restrictions', {
             'classes': ('collapse',),
