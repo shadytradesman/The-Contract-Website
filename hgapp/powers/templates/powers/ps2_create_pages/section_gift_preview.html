@@ -16,38 +16,65 @@
         <div>
             <span
                     v-if="selectedModality"
-                    v-bind:data-title="'Gift Type: ' + selectedModality.displayName"
+                    v-bind:data-title="selectedModality.displayName"
+                    v-bind:data-original-title="selectedModality.displayName"
                     class="has-popover" >
                 <img  v-bind:src="selectedModality.icon_url" width="20" height="20" >
             </span>
             <span
                     v-if="selectedEffect"
-                    v-bind:data-title="'Effect: ' + selectedEffect.displayName"
+                    v-bind:data-title="selectedEffect.displayName"
+                    v-bind:data-original-title="selectedEffect.displayName"
                     class="has-popover">
                 <img v-bind:src="selectedEffect.icon_url" width="20" height="20" >
             </span>
             <span
                     v-if="selectedVector"
-                    v-bind:data-title="'Style: ' + selectedVector.displayName"
+                    v-bind:data-title="selectedVector.displayName"
+                    v-bind:data-original-title="selectedVector.displayName"
                     class="has-popover">
                 <img v-bind:src="selectedVector.icon_url" width="20" height="20" >
             </span>
             <span
-                v-if="modifierList"
-                data-html="true"
-                v-bind:data-title="modifierList"
-                v-bind:data-original-title="modifierList"
-                data-placement="bottom"
-                class="has-popover">
-                <img src="{% static 'powers/magnifying-glass.svg' %}" width="20" height="20" >
+                    v-if="enhancementList.length > 0"
+                    data-html="true"
+                    aria-hidden="true"
+                    v-bind:data-title="enhancementList"
+                    v-bind:data-original-title="enhancementList"
+                    data-placement="bottom"
+                    data-toggle="tooltip"
+                  >
+                <span style="position:relative; left: 2px; top: 1px; font-size: 15px;">
+                    { getSelectedAndActiveEnhancements().length}
+                </span>
+                <span class="glyphicon glyphicon-menu-up">
+                </span>
+            </span>
+            <span
+                    v-if="drawbackList.length > 0"
+                    data-html="true"
+                    aria-hidden="true"
+                    v-bind:data-title="drawbackList"
+                    v-bind:data-original-title="drawbackList"
+                    data-placement="bottom"
+                    data-toggle="tooltip"
+            >
+                <span style="position:relative; left: 2px; top: 1px; font-size: 15px;">
+                    { getSelectedAndActiveDrawbacks().length}
+                </span>
+                <span class="glyphicon glyphicon-menu-down">
+                </span>
             </span>
             <span data-html="true"
                     v-bind:data-original-title="giftCostTooltip"
                     v-bind:data-title="giftCostTooltip"
                     class="has-popover" >
-                Gift Cost:
-                <span v-html="giftCost"></span>
+                <b>
+                    Cost:
+                    <span v-html="giftCost"></span>
+                </b>
             </span>
+
         </div>
         <small class="text-muted">
             <div class="css-description" v-html="renderedDescription" style="margin-top: 5px;">

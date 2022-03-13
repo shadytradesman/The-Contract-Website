@@ -767,7 +767,8 @@ const ComponentRendering = {
       giftDescription: null,
       giftTagline: "",
       giftPreviewModalFirstShow: true,
-      modifierList: [],
+      enhancementList: "",
+      drawbackList: "",
       warnings: [],
     }
   },
@@ -1377,18 +1378,18 @@ const ComponentRendering = {
       },
       updateModifierList() {
         let enhancementNames =  this.getSelectedAndActiveEnhancements().map(mod => mod.displayName);
-        let drawbackNames =  this.getSelectedAndActiveDrawbacks().map(mod => mod.displayName);
         let val = "";
         if (enhancementNames.length > 0) {
             val = val + "<b>Enhancements</b>:<br>" + enhancementNames.join("<br>");
         }
+        this.enhancementList = val;
+
+        let drawbackNames =  this.getSelectedAndActiveDrawbacks().map(mod => mod.displayName);
+        val = "";
         if (drawbackNames.length > 0) {
-            if (val.length > 0) {
-                val = val + "<br>";
-            }
             val = val + "<b>Drawbacks</b>:<br>" + drawbackNames.join("<br>");
         }
-        this.modifierList = val;
+        this.drawbackList = val;
       },
       getSelectedAndActiveEnhancements() {
           return this.enhancements.filter(enh => this.selectedEnhancements.map(enh => enh.id).includes(enh["id"]));

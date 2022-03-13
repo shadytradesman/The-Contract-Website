@@ -38,12 +38,12 @@
              style="display: inline-block;">
             <label v-bind:for="component.id"
                    class="css-component-radio css-vector-radio"
-                   :class="{'css-selected-component': component.slug === selectedVector}"
+                   :class="{'css-selected-component': component.slug === selectedVector.slug}"
                    >
                 <input type="radio"
                        v-bind:id="component.id"
                        v-bind:name="component.type"
-                       v-bind:value="component.slug"
+                       v-bind:value="component"
                        v-model="selectedVector"
                        @change="clickVector"
                        style="display:none;"
