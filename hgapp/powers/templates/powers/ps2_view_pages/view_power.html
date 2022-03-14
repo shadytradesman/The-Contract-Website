@@ -22,62 +22,59 @@
 {% endblock %}
 
 <div class="container">
-    <br>
+    <div class="text-center" style="padding-top: 10px; padding-bottom: 10px;">
+        <ul class="nav nav-pills nav-justified  css-power-view-buttons">
+            {% if request.user.is_authenticated %}
+            {% player_can_edit_power power request.user as can_edit %}
+            {% if can_edit %}
+            <li>
+                <a href="{% url 'powers:powers_edit_ps2' power.parent_power.id %}" class="btn btn-primary">Edit Power</a>
+            </li>
+            {% endif %}
+            {% if request.user == power.parent_power.owner %}
+            <li>
+                <a href="{% url 'powers:powers_delete_power' power.parent_power.id %}" class="btn btn-default">Delete Power</a>
+            </li>
+            {% endif %}
+            {% endif %}
+            <li>
+                <a href="{% url 'powers:powers_create_from_existing_ps2' power.parent_power.id %}" class="btn btn-default">Copy and Edit New</a>
+            </li>
+        </ul>
+    </div>
     <div class="panel panel-default">
         <div class="panel-heading">
-            <div class="text-center">
-                <ul class="nav nav-pills nav-justified  css-power-view-buttons">
-                    {% if request.user.is_authenticated %}
-                    {% player_can_edit_power power request.user as can_edit %}
-                    {% if can_edit %}
-                    <li>
-                        <a href="{% url 'powers:powers_edit_ps2' power.parent_power.id %}" class="btn btn-primary">Edit Power</a>
-                    </li>
-                    {% endif %}
-                    {% if request.user == power.parent_power.owner %}
-                    <li>
-                        <a href="{% url 'powers:powers_delete_power' power.parent_power.id %}" class="btn btn-default">Delete Power</a>
-                    </li>
-                    {% endif %}
-                    {% endif %}
-                    <li>
-                        <a href="{% url 'powers:powers_create_from_existing_ps2' power.parent_power.id %}" class="btn btn-default">Copy and Edit New</a>
-                    </li>
-                </ul>
-            </div>
-            <h2>
+            <h2 style="margin-bottom: 5px; margin-top: 0px;">
                 {{ power.name }}
                 <small><i>{{ power.flavor_text}}</i></small>
             </h2>
             <div>
+                {%if power.private %}
+                    <i class="fa fa-user-secret fa-2x" data-toggle="tooltip" data-title="Power is private because it is assigned to a private character."></i>
+                {% endif %}
                 {% if power.parent_power.character %}
-                Used by <a href="{% url 'characters:characters_view' power.parent_power.character.id %}">{{ power.parent_power.character.name }}</a>,
+                    Used by <a href="{% url 'characters:characters_view' power.parent_power.character.id %}">{{ power.parent_power.character.name }}</a>,
                 {% endif %}
                 {% if power.parent_power.owner %}
-                Created by <a href="{% url 'profiles:profiles_view_profile' power.parent_power.owner.id %}">{% user_display power.parent_power.owner %}</a>.
+                    Created by <a href="{% url 'profiles:profiles_view_profile' power.parent_power.owner.id %}">{% user_display power.parent_power.owner %}</a>.
                 {% endif %}
             </div>
-            <div>
-                Gift Cost: {{power_full.get_gift_cost}}
-                {%if power.private %}
-                    <h5><i class="fa fa-user-secret fa-2x"></i> Power is private because it is assigned to a private character.</h5>
-                {% endif %}
-            </div>
+            {% include "powers/ps2_view_pages/components_snippet.html" %}
         </div>
         <div class="panel-body">
                 <i class="text-muted">{{ power.description|safe }}</i>
             <hr style="width: 50%;">
             {{ power.system|safe }}
             {% if power.errata %}
-            <div>
-                <span data-toggle="tooltip"
-                      data-html="true"
-                      data-placement="top"
-                      v-bind:data-title="{{power.errata}}"
-                      class="css-extended-system">
-                    <i class="fa fa-question-circle fa-lg"></i>
-                </span>
-            </div>
+                <div>
+                    <span data-toggle="tooltip"
+                          data-html="true"
+                          data-placement="top"
+                          data-title="{{power.errata|safe}}"
+                          class="css-extended-system">
+                        <i class="fa fa-question-circle fa-lg"></i>
+                    </span>
+                </div>
             {% endif %}
             <div class="row hidden">
                 {% if power.enhancement_instance_set.all %}

@@ -2,9 +2,22 @@
 
 <div class="panel panel-default css-gift-preview" style="margin-bottom: 0px;">
     <div class="panel-heading">
-        <h3 class="" style="margin-top: 5px; margin-bottom: 5px">
+        <h3 class="" style="margin-top: 5px; margin-bottom: 5px"
+            v-bind:data-original-title="renderedDescription"
+            v-bind:data-title="renderedDescription"
+            data-placement="bottom"
+            data-html="true"
+            data-toggle="tooltip"
+            class="has-popover">
             <span v-if="giftName" v-text="giftName"></span>
-            <span v-if="giftName === null" class="hidden-xs">Gift Preview</span>
+            <span v-if="giftName === null" class="hidden-xs">
+                Gift Preview
+            </span>
+            <span v-if="giftName === null">
+                <small>
+                <div class="text-muted" v-html="renderedDescription"> </div>
+                </small>
+            </span>
             <small>
                 <i>
                     <span v-if="giftTagline.length > 0" v-text="giftTagline" style="margin-left: 10px;">
@@ -12,12 +25,28 @@
                 </i>
             </small>
         </h3>
-        <div v-if="requiredStatus" class="pull-right"  data-toggle="tooltip" title="Seasoned = 10+ Victories. Veteran = 25+ Victories">Requires <b>{requiredStatus}</b></div>
+        <div class="pull-right">
+            <span style="border-radius: 3px; padding: 3px; background-color: #20252d;">
+                <span data-html="true"
+                      v-bind:data-original-title="giftCostTooltip"
+                      v-bind:data-title="giftCostTooltip"
+                      data-toggle="tooltip"
+                      class="has-popover"><b>Cost:
+                        <span v-html="giftCost"></span>
+                    </b>
+                </span>
+            </span>
+        </div>
+        <div v-if="requiredStatus" class="pull-right text-muted"  data-toggle="tooltip" title="Seasoned = 10+ Victories. Veteran = 25+ Victories"
+            style="margin-right: 3px;">
+            <i>Requires <b>{requiredStatus}</b></i>
+        </div>
         <div>
             <span
                     v-if="selectedModality"
                     v-bind:data-title="selectedModality.displayName"
                     v-bind:data-original-title="selectedModality.displayName"
+                    data-toggle="tooltip"
                     class="has-popover" >
                 <img  v-bind:src="selectedModality.icon_url" width="20" height="20" >
             </span>
@@ -25,6 +54,7 @@
                     v-if="selectedEffect"
                     v-bind:data-title="selectedEffect.displayName"
                     v-bind:data-original-title="selectedEffect.displayName"
+                    data-toggle="tooltip"
                     class="has-popover">
                 <img v-bind:src="selectedEffect.icon_url" width="20" height="20" >
             </span>
@@ -32,6 +62,7 @@
                     v-if="selectedVector"
                     v-bind:data-title="selectedVector.displayName"
                     v-bind:data-original-title="selectedVector.displayName"
+                    data-toggle="tooltip"
                     class="has-popover">
                 <img v-bind:src="selectedVector.icon_url" width="20" height="20" >
             </span>
@@ -44,7 +75,7 @@
                     data-placement="bottom"
                     data-toggle="tooltip"
                   >
-                <span style="position:relative; left: 2px; top: 1px; font-size: 15px;">
+                <span style="position:relative; left: 2px; top: 1px; font-size: 14px;">
                     { getSelectedAndActiveEnhancements().length}
                 </span>
                 <span class="glyphicon glyphicon-menu-up">
@@ -59,27 +90,13 @@
                     data-placement="bottom"
                     data-toggle="tooltip"
             >
-                <span style="position:relative; left: 2px; top: 1px; font-size: 15px;">
+                <span style="position:relative; left: 2px; top: 1px; font-size: 14px;">
                     { getSelectedAndActiveDrawbacks().length}
                 </span>
                 <span class="glyphicon glyphicon-menu-down">
                 </span>
             </span>
-            <span data-html="true"
-                    v-bind:data-original-title="giftCostTooltip"
-                    v-bind:data-title="giftCostTooltip"
-                    class="has-popover" >
-                <b>
-                    Cost:
-                    <span v-html="giftCost"></span>
-                </b>
-            </span>
-
         </div>
-        <small class="text-muted">
-            <div class="css-description" v-html="renderedDescription" style="margin-top: 5px;">
-            </div>
-        </small>
     </div>
     <div class="panel-body" style="padding-top: 5px;">
         <div v-if="giftDescription" v-text="giftDescription" class="css-system-text-user-input" style="margin-top: 5px; margin-bottom: 5px;">

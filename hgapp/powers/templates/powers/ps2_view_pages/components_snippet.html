@@ -1,0 +1,65 @@
+<div class="pull-right">
+    <span style="border-radius: 3px; padding: 3px; background-color: #20252d;">
+        <span data-html="true" class="has-popover"><b>Cost: {{power.get_gift_cost}}</b>
+        </span>
+    </span>
+</div>
+{% if power.required_status %}
+    <div class="pull-right text-muted"  data-toggle="tooltip" title="Seasoned = 10+ Victories. Veteran = 25+ Victories"
+         style="margin-right: 3px;">
+        <i>Requires <b>{{power.required_status}}</b></i>
+    </div>
+{% endif %}
+<div>
+    <span
+            data-title="{{power.modality.name}}"
+            data-original-title="{{power.modality.name}}"
+            data-toggle="tooltip"
+            class="has-popover" >
+        <img  src="{{power.modality.icon.url}}" width="20" height="20" >
+    </span>
+    <span
+        data-title="{{power.base.name}}"
+        data-original-title="{{power.base.name}}"
+        data-toggle="tooltip"
+        class="has-popover">
+            <img src="{{power.base.icon.url}}" width="20" height="20" >
+    </span>
+    <span
+            data-title="{{power.vector.name}}"
+            data-original-title="{{power.vector.name}}"
+            data-toggle="tooltip"
+            class="has-popover">
+                <img src="{{power.vector.icon.url}}" width="20" height="20" >
+            </span>
+    {% if power.get_num_enhancements %}
+    <span
+            data-html="true"
+            aria-hidden="true"
+            data-title="{{power.get_enhancement_list|safe}}"
+            data-original-title="{{power.get_enhancement_list|safe}}"
+            data-placement="bottom"
+            data-toggle="tooltip">
+                <span style="position:relative; left: 2px; top: 1px; font-size: 14px;">
+                    {{ power.get_num_enhancements }}
+                </span>
+                <span class="glyphicon glyphicon-menu-up">
+                </span>
+            </span>
+    {% endif %}
+    {% if power.get_num_drawbacks %}
+        <span
+            data-html="true"
+            aria-hidden="true"
+            data-title="{{power.get_drawback_list|safe}}"
+            data-original-title="{{power.get_drawback_list|safe}}"
+            data-placement="bottom"
+            data-toggle="tooltip">
+                <span style="position:relative; left: 2px; top: 1px; font-size: 14px;">
+                    {{ power.get_num_drawbacks }}
+                </span>
+                <span class="glyphicon glyphicon-menu-down">
+                </span>
+            </span>
+    {% endif %}
+</div>

@@ -357,6 +357,8 @@ def _create_new_power_and_save(power_form, request):
         request.POST, power_blob, power.base, power.vector, power.modality)
     _populate_power_system_and_errata(power_blob, power, modifier_instances, param_instances, field_instances)
 
+    power.enhancement_names = [enh.relevant_enhancement.name for enh in modifier_instances if hasattr(enh, "relevant_enhancement")]
+    power.drawback_names = [mod.relevant_drawback.name for mod in modifier_instances if hasattr(mod, "relevant_drawback")]
     # At this point, we can be sure the power is valid, so we save everything to the DB and hook up our instances.
     power.save()
     for mod in modifier_instances:

@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.db.models import JSONField
 from django.urls import reverse
 
 from characters.models import Character, HIGH_ROLLER_STATUS, Attribute, Roll, NO_PARRY_INFO, NO_SPEED_INFO, DODGE_ONLY, \
@@ -873,6 +874,9 @@ class Power(models.Model):
     artifacts = models.ManyToManyField(Artifact,
                                        through="ArtifactPower",
                                        through_fields=('relevant_power', 'relevant_artifact'))
+    required_status = models.CharField(choices=HIGH_ROLLER_STATUS,
+                                       max_length=25,
+                                       blank=True)
 
     # Structure and system
     system = models.TextField(max_length=54000,
@@ -893,6 +897,9 @@ class Power(models.Model):
     parameter_values = models.ManyToManyField(Power_Param,
                                               through="Parameter_Value",
                                               through_fields=('relevant_power', 'relevant_power_param'))
+    enhancement_names = JSONField("Enhancement Names", default=list)
+    drawback_names = JSONField("Drawback Names", default=list)
+
     # note: Access system field instances through reverse lookups
 
     # REVISIONING
@@ -927,6 +934,18 @@ class Power(models.Model):
 
     def __str__(self):
         return self.name + " (" + self.description + ")"
+
+    def get_enhancement_list(self):
+        return "<b>Enhancements:</b><br>{}".format("<br>".join(self.enhancement_names))
+
+    def get_num_enhancements(self):
+        return len(self.enhancement_names)
+
+    def get_drawback_list(self):
+        return "<b>Drawbacks:</b><br>{}".format("<br>".join(self.drawback_names))
+
+    def get_num_drawbacks(self):
+        return len(self.drawback_names)
 
     #TODO: this seems to be for base powers??/
     def __check_constraints(self):

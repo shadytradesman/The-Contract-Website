@@ -52,7 +52,7 @@ class PowerForm(forms.Form):
     vector = forms.ModelChoiceField(queryset=Base_Power.objects.filter(base_type=VECTOR).all(),
                                     required=True,
                                     widget=forms.HiddenInput(attrs={
-                                        'v-bind:value': 'selectedVector',
+                                        'v-bind:value': 'selectedVector.slug',
                                     }))
 
 
