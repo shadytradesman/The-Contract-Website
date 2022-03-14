@@ -26,7 +26,7 @@
             </small>
         </h3>
         <div class="pull-right">
-            <span style="border-radius: 3px; padding: 3px; background-color: #20252d;">
+            <span style="border-radius: 3px; padding: 4px; background-color: #20252d; font-size: 14px;">
                 <span data-html="true"
                       v-bind:data-original-title="giftCostTooltip"
                       v-bind:data-title="giftCostTooltip"
@@ -38,7 +38,7 @@
             </span>
         </div>
         <div v-if="requiredStatus" class="pull-right text-muted"  data-toggle="tooltip" title="Seasoned = 10+ Victories. Veteran = 25+ Victories"
-            style="margin-right: 3px;">
+            style="margin-right: 3px; font-size: 14px;">
             <i>Requires <b>{requiredStatus}</b></i>
         </div>
         <div>
@@ -48,7 +48,7 @@
                     v-bind:data-original-title="selectedModality.displayName"
                     data-toggle="tooltip"
                     class="has-popover" >
-                <img  v-bind:src="selectedModality.icon_url" width="20" height="20" >
+                <img  v-bind:src="selectedModality.icon_url" width="25" height="25" >
             </span>
             <span
                     v-if="selectedEffect"
@@ -56,15 +56,15 @@
                     v-bind:data-original-title="selectedEffect.displayName"
                     data-toggle="tooltip"
                     class="has-popover">
-                <img v-bind:src="selectedEffect.icon_url" width="20" height="20" >
+                <img v-bind:src="selectedEffect.icon_url" width="25" height="25" >
             </span>
             <span
-                    v-if="selectedVector"
+                    v-if="selectedVector && vectors.length > 1"
                     v-bind:data-title="selectedVector.displayName"
                     v-bind:data-original-title="selectedVector.displayName"
                     data-toggle="tooltip"
                     class="has-popover">
-                <img v-bind:src="selectedVector.icon_url" width="20" height="20" >
+                <img v-bind:src="selectedVector.icon_url" width="25" height="25" >
             </span>
             <span
                     v-if="enhancementList.length > 0"
@@ -75,7 +75,7 @@
                     data-placement="bottom"
                     data-toggle="tooltip"
                   >
-                <span style="position:relative; left: 2px; top: 1px; font-size: 14px;">
+                <span style="position:relative; left: 1px; top: 3px; font-size: 18px; line-height: 1;">
                     { getSelectedAndActiveEnhancements().length}
                 </span>
                 <span class="glyphicon glyphicon-menu-up">
@@ -90,7 +90,7 @@
                     data-placement="bottom"
                     data-toggle="tooltip"
             >
-                <span style="position:relative; left: 2px; top: 1px; font-size: 14px;">
+                <span style="position:relative; left: 1px; top: 3px; font-size: 18px; line-height: 1;">
                     { getSelectedAndActiveDrawbacks().length}
                 </span>
                 <span class="glyphicon glyphicon-menu-down">

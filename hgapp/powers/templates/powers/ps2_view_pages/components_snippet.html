@@ -16,22 +16,24 @@
             data-original-title="{{power.modality.name}}"
             data-toggle="tooltip"
             class="has-popover" >
-        <img  src="{{power.modality.icon.url}}" width="20" height="20" >
+        <img  src="{{power.modality.icon.url}}" width="25" height="25" >
     </span>
     <span
         data-title="{{power.base.name}}"
         data-original-title="{{power.base.name}}"
         data-toggle="tooltip"
         class="has-popover">
-            <img src="{{power.base.icon.url}}" width="20" height="20" >
+            <img src="{{power.base.icon.url}}" width="25" height="25" >
     </span>
-    <span
+    {% if power.shouldDisplayVector %}
+        <span
             data-title="{{power.vector.name}}"
             data-original-title="{{power.vector.name}}"
             data-toggle="tooltip"
             class="has-popover">
-                <img src="{{power.vector.icon.url}}" width="20" height="20" >
-            </span>
+                <img src="{{power.vector.icon.url}}" width="25" height="25" >
+        </span>
+    {% endif %}
     {% if power.get_num_enhancements %}
     <span
             data-html="true"
@@ -40,7 +42,7 @@
             data-original-title="{{power.get_enhancement_list|safe}}"
             data-placement="bottom"
             data-toggle="tooltip">
-                <span style="position:relative; left: 2px; top: 1px; font-size: 14px;">
+                <span style="position:relative; left: 1px; top: 3px; font-size: 18px; line-height: 1;">
                     {{ power.get_num_enhancements }}
                 </span>
                 <span class="glyphicon glyphicon-menu-up">
@@ -55,7 +57,7 @@
             data-original-title="{{power.get_drawback_list|safe}}"
             data-placement="bottom"
             data-toggle="tooltip">
-                <span style="position:relative; left: 2px; top: 1px; font-size: 14px;">
+                <span style="position:relative; left: 1px; top: 3px; font-size: 18px; line-height: 1;">
                     {{ power.get_num_drawbacks }}
                 </span>
                 <span class="glyphicon glyphicon-menu-down">

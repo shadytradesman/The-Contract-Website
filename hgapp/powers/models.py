@@ -899,6 +899,7 @@ class Power(models.Model):
                                               through_fields=('relevant_power', 'relevant_power_param'))
     enhancement_names = JSONField("Enhancement Names", default=list)
     drawback_names = JSONField("Drawback Names", default=list)
+    shouldDisplayVector = models.BooleanField(default=False)
 
     # note: Access system field instances through reverse lookups
 

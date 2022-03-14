@@ -48,6 +48,7 @@
                 {{ power.name }}
                 <small><i>{{ power.flavor_text}}</i></small>
             </h2>
+            {% include "powers/ps2_view_pages/components_snippet.html" %}
             <div>
                 {%if power.private %}
                     <i class="fa fa-user-secret fa-2x" data-toggle="tooltip" data-title="Power is private because it is assigned to a private character."></i>
@@ -59,7 +60,6 @@
                     Created by <a href="{% url 'profiles:profiles_view_profile' power.parent_power.owner.id %}">{% user_display power.parent_power.owner %}</a>.
                 {% endif %}
             </div>
-            {% include "powers/ps2_view_pages/components_snippet.html" %}
         </div>
         <div class="panel-body">
                 <i class="text-muted">{{ power.description|safe }}</i>

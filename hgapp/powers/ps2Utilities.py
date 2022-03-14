@@ -277,6 +277,13 @@ class PowerBlob:
         components = [effect, vector, modality]
         return components
 
+    def should_display_vector(self, effect, modality):
+        effect = self.blob["effects"][effect.pk]
+        modality = self.blob["modalities"][modality.pk]
+        avail_vec = set(self.blob['vectors_by_effect'][effect["slug"]])
+        avail_vec = avail_vec.intersection(set(self.blob['vectors_by_modality'][modality["slug"]]))
+        return len(avail_vec) > 1
+
 
 def get_edit_context(existing_power_full=None, is_edit=False):
     modifiers_formset = get_modifiers_formset()
@@ -359,6 +366,7 @@ def _create_new_power_and_save(power_form, request):
 
     power.enhancement_names = [enh.relevant_enhancement.name for enh in modifier_instances if hasattr(enh, "relevant_enhancement")]
     power.drawback_names = [mod.relevant_drawback.name for mod in modifier_instances if hasattr(mod, "relevant_drawback")]
+    power.shouldDisplayVector = power_blob.should_display_vector(power.base, power.modality)
     # At this point, we can be sure the power is valid, so we save everything to the DB and hook up our instances.
     power.save()
     for mod in modifier_instances:
