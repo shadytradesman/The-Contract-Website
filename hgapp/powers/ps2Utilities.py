@@ -179,6 +179,7 @@ def get_edit_context(existing_power_full=None, is_edit=False):
     categories = Base_Power_Category.objects.all()
     context = {
         'power_blob_url': PowerSystem.get_singleton().get_json_url(),
+        'image_url': PowerSystem.get_singleton().get_python()["modalities"]["power"]["icon_url"],
         'modifier_formset': modifiers_formset,
         'params_formset': params_formset,
         'power_form': power_form,
