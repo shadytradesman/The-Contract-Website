@@ -27,7 +27,6 @@
 {% endblock %}
 
 {% block body_base %}
-<img src="{{image_url}}">
 <form action="{{form_url}}" method="post">
 	{% csrf_token %}
 	{{ modifier_formset.management_form }}

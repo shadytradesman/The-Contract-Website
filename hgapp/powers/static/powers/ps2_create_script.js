@@ -1506,9 +1506,7 @@ const app = Vue.createApp(ComponentRendering);
 
 const mountedApp = app.mount('#vue-app');
 $(function() {
-    fetch(powerBlobUrl, {
-        mode: 'no-cors'
-    })
+    fetch(powerBlobUrl)
         .then(response => response.json())
         .then(data => {
             powerBlob = data;
