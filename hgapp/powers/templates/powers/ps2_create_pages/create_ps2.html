@@ -15,7 +15,9 @@
 
 {% block extra_scripts %}
 	<script src="https://unpkg.com/vue@3.2.26/dist/vue.global.prod.js"></script>
-	{{power_blob|json_script:"powerBlob"}}
+ 	<script type="text/javascript">
+		const powerBlobUrl = "{{power_blob_url}}";
+	</script>
 	{{power_edit_blob|json_script:"powerEditBlob"}}
 	<script src="{% static 'powers/ps2_create_script.js' %}"></script>
 {% endblock %}

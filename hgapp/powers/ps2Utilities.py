@@ -10,7 +10,7 @@ from characters.models import Weapon
 from .models import SYS_LEGACY_POWERS, EFFECT, VECTOR, MODALITY, Base_Power, Enhancement, Drawback, Parameter, \
     Base_Power_Category, VectorCostCredit, ADDITIVE, EnhancementGroup, CREATION_NEW, SYS_PS2, Power, Power_Full, \
     Enhancement_Instance, Drawback_Instance, Parameter_Value, Power_Param, SystemFieldText, SystemFieldTextInstance, \
-    SystemFieldWeapon, SystemFieldWeaponInstance, SystemFieldRoll, SystemFieldRollInstance
+    SystemFieldWeapon, SystemFieldWeaponInstance, SystemFieldRoll, SystemFieldRollInstance, PowerSystem
 from .formsPs2 import PowerForm, get_modifiers_formset,get_params_formset, get_sys_field_text_formset,\
     get_sys_field_weapon_formset, get_sys_field_roll_formset
 from .powerDifferenceUtils import get_roll_from_form_and_system, get_power_creation_reason, \
@@ -22,8 +22,7 @@ logger = logging.getLogger("app." + __name__)
 class PowerBlob:
 
     def __init__(self):
-        # TODO: cache this for internal accessors and upload to media file for remote call.
-        self.blob = PowerBlob._generate_power_blob()
+        self.blob = PowerSystem.get_singleton().get_python()
 
     def get_json_power_blob(self):
         return json.dumps(self.blob)
@@ -154,121 +153,6 @@ class PowerBlob:
         allowed_modifiers = selected_mod_slugs.difference(blacklisted_mod_slugs)
         return allowed_modifiers
 
-    @staticmethod
-    def _generate_power_blob():
-        vectors = PowerBlob._generate_component_blob(VECTOR)
-        effects = PowerBlob._generate_component_blob(EFFECT)
-        modalities = PowerBlob._generate_component_blob(MODALITY)
-        effects_by_modality = defaultdict(list)
-        vectors_by_effect = defaultdict(list)
-        vectors_by_modality = {}
-        for effect in effects.values():
-            for modality_key in effect["allowed_modalities"]:
-                effects_by_modality[modality_key].append(effect["slug"])
-            vectors_by_effect[effect["slug"]].extend(effect["allowed_vectors"])
-        for modality in modalities.values():
-            vectors_by_modality[modality["slug"]] = [x for x in modality["allowed_vectors"]]
-        return {
-            # Components by ID (slug)
-            'vectors': vectors,
-            'effects': effects,
-            'modalities': modalities,
-
-            # Enhancements and Drawbacks by ID (slug)
-            'enhancements': PowerBlob._generate_modifier_blob(Enhancement),
-            'drawbacks': PowerBlob._generate_modifier_blob(Drawback),
-
-            # The parameters dictionary only contains the parameter's name and substitution.
-            # The level info is on the gift components
-            'parameters': PowerBlob._generate_param_blob(),
-
-            'component_categories': PowerBlob._generate_component_category_blob(),
-
-            # An Effect is only available on a given modality if it appears in this mapping.
-            'effects_by_modality': effects_by_modality,
-
-            # A Vector is only available on a given Modality + Effect if it appears in both mappings.
-            'vectors_by_effect': vectors_by_effect,
-            'vectors_by_modality': vectors_by_modality,
-
-            'effect_vector_gift_credit': PowerBlob._generate_effect_vector_gift_credits_blob(),
-
-            # Weapon choice system fields use a Weapon's pk as the non-display value. Stats in this blob by pk.
-            'weapon_replacements_by_pk': PowerBlob._generate_weapons_blob(),
-
-            'enhancement_group_by_pk': PowerBlob._generate_enhancement_groups_blob()
-        }
-
-        # generate the json blob for the fe and for backend form validation.
-        # TODO: cache this in a wrapping method
-                # Cache in per-component caches so it doesn't have to be regenerated as much?
-        # TODO: invalidate cache when any relevant model (enhancement, base power) is saved.
-
-    @staticmethod
-    def _generate_component_blob(base_type):
-        # TODO: select related and stuff.
-        # TODO: filter on is_public=True
-        components = Base_Power.objects.filter(base_type=base_type) \
-            .order_by("name") \
-            .prefetch_related("basepowerfieldsubstitution_set") \
-            .prefetch_related("power_param_set").all()
-        #TODO: Determine if these prefetches do anything
-        # .prefetch_related("avail_enhancements") \
-        # .prefetch_related("avail_drawbacks") \
-        # .prefetch_related("blacklist_enhancements") \
-        # .prefetch_related("blacklist_drawbacks") \
-        # .all()
-        return {x.pk: x.to_blob() for x in components}
-
-    @staticmethod
-    def _generate_modifier_blob(ModifierClass):
-        related_field = "enhancementfieldsubstitution_set" if ModifierClass is Enhancement else "drawbackfieldsubstitution_set"
-        modifiers = ModifierClass.objects.exclude(system=SYS_LEGACY_POWERS).prefetch_related(related_field).all()
-        return {x.pk: x.to_blob() for x in modifiers}
-
-    @staticmethod
-    def _generate_param_blob():
-        params = Parameter.objects \
-            .prefetch_related("parameterfieldsubstitution_set").all()
-        return {x.pk: x.to_blob() for x in params}
-
-    @staticmethod
-    def _generate_weapons_blob():
-        weapons = Weapon.objects.all()
-        return {x.pk: PowerBlob._replacements_from_weapon(x) for x in weapons}
-
-    @staticmethod
-    def _replacements_from_weapon(weapon):
-        return [
-            PowerBlob._replacement("selected-weapon-name", weapon.name),
-            PowerBlob._replacement("selected-weapon-type", weapon.get_type_display()),
-            PowerBlob._replacement("selected-weapon-attack-roll", weapon.attack_roll_replacement()),
-            PowerBlob._replacement("selected-weapon-damage", str(weapon.bonus_damage)),
-            PowerBlob._replacement("selected-weapon-range", weapon.range),
-        ]
-
-    @staticmethod
-    def _replacement(marker, replacmeent):
-        return {
-            "marker": marker,
-            "replacement": replacmeent,
-            "mode": ADDITIVE
-        }
-
-    @staticmethod
-    def _generate_component_category_blob():
-        categories = Base_Power_Category.objects.order_by("name").all()
-        return [x.to_blob() for x in categories]
-
-    @staticmethod
-    def _generate_effect_vector_gift_credits_blob():
-        cost_credits = VectorCostCredit.objects.all()
-        return [x.to_blob() for x in cost_credits]
-
-    @staticmethod
-    def _generate_enhancement_groups_blob():
-        groups = EnhancementGroup.objects.all()
-        return {x.pk: x.to_blob() for x in groups}
 
     def _components_from_model(self, effect, vector, modality):
         effect = self.blob["effects"][effect.pk]
@@ -294,7 +178,7 @@ def get_edit_context(existing_power_full=None, is_edit=False):
     power_form = PowerForm()
     categories = Base_Power_Category.objects.all()
     context = {
-        'power_blob': PowerBlob().get_json_power_blob(),
+        'power_blob_url': PowerSystem.get_singleton().get_json_url(),
         'modifier_formset': modifiers_formset,
         'params_formset': params_formset,
         'power_form': power_form,

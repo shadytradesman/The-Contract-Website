@@ -140,8 +140,7 @@ function replaceSubstring(match) {
 	return ' <span class="css-keyword-with-tooltip" data-toggle="tooltip" title="' + powerKeywordDict[trimmed] + '">' + trimmed + '</span> ';
 }
 
-const powerBlob = JSON.parse(JSON.parse(document.getElementById('powerBlob').textContent));
-console.log(powerBlob);
+let powerBlob = null;
 var unrenderedSystemText = "";
 
 function componentToVue(component, type) {
@@ -1507,16 +1506,21 @@ const app = Vue.createApp(ComponentRendering);
 
 const mountedApp = app.mount('#vue-app');
 $(function() {
-    mountedApp.modalities = Object.values(powerBlob.modalities).map(comp => componentToVue(comp, "mod"));
-    if ((document.getElementById('powerEditBlob').textContent.length > 2)) {
-        console.log(document.getElementById('powerEditBlob').textContent.length)
-        const powerEditBlob = JSON.parse(JSON.parse(document.getElementById('powerEditBlob').textContent));
-        mountedApp.setStateForEdit(powerEditBlob);
-    }
-    mountedApp.$nextTick(function () {
-      activateTooltips();
-    });
-    $('#giftPreviewModal').on('hidden.bs.modal', function (e) {
-      mountedApp.giftPreviewModalFirstShow = false;
-    })
+    fetch(powerBlobUrl)
+        .then(response => response.json())
+        .then(data => {
+            powerBlob = data;
+            mountedApp.modalities = Object.values(powerBlob.modalities).map(comp => componentToVue(comp, "mod"));
+            if ((document.getElementById('powerEditBlob').textContent.length > 2)) {
+                console.log(document.getElementById('powerEditBlob').textContent.length)
+                const powerEditBlob = JSON.parse(JSON.parse(document.getElementById('powerEditBlob').textContent));
+                mountedApp.setStateForEdit(powerEditBlob);
+            }
+            mountedApp.$nextTick(function () {
+              activateTooltips();
+            });
+            $('#giftPreviewModal').on('hidden.bs.modal', function (e) {
+              mountedApp.giftPreviewModalFirstShow = false;
+            })
+        });
 });

@@ -1,7 +1,12 @@
+import uuid, json
+from collections import defaultdict
+
 from django.conf import settings
 from django.db import models
 from django.db.models import JSONField
 from django.urls import reverse
+from django.core.cache import cache
+from django.core.files.base import ContentFile
 
 from characters.models import Character, HIGH_ROLLER_STATUS, Attribute, Roll, NO_PARRY_INFO, NO_SPEED_INFO, DODGE_ONLY, \
     ATTACK_PARRY_TYPE, ROLL_SPEED, THROWN, Attribute, Ability, Weapon, WEAPON_MELEE, WEAPON_TYPE, Artifact
@@ -9,6 +14,7 @@ from guardian.shortcuts import assign_perm, remove_perm
 from django.utils.html import mark_safe, escape, linebreaks
 from django.db.utils import IntegrityError
 from hgapp.utilities import get_object_or_none
+
 
 ACTIVATION_STYLE = (
     ('PASSIVE', 'Passive'),
@@ -118,6 +124,10 @@ class FieldSubstitution(models.Model):
     def __str__(self):
         return "[[{}]] {} ({})".format(self.relevant_marker, self.get_mode_display(), self.replacement)
 
+    def save(self, *args, **kwargs):
+        super(FieldSubstitution, self).save(*args, **kwargs)
+        PowerSystem.get_singleton().mark_dirty()
+
     def to_blob(self):
         return {
             "marker": self.relevant_marker.marker,
@@ -160,6 +170,10 @@ class EnhancementGroup(models.Model):
 
     def __str__(self):
         return self.label
+
+    def save(self, *args, **kwargs):
+        super(EnhancementGroup, self).save(*args, **kwargs)
+        PowerSystem.get_singleton().mark_dirty()
 
     def to_blob(self):
         return {
@@ -210,6 +224,10 @@ class Modifier(models.Model):
 
     def __str__(self):
         return self.name + " [" + self.slug + "] (" + self.description + ")"
+
+    def save(self, *args, **kwargs):
+        super(Modifier, self).save(*args, **kwargs)
+        PowerSystem.get_singleton().mark_dirty()
 
     def display(self):
         return self.name + " (" + self.description + ")"
@@ -347,6 +365,10 @@ class Parameter(models.Model):
     def __str__(self):
         return " ".join([self.name]) + " [" +self.slug + "]"
 
+    def save(self, *args, **kwargs):
+        super(Parameter, self).save(*args, **kwargs)
+        PowerSystem.get_singleton().mark_dirty()
+
     def get_levels(self):
         levels = []
         if hasattr(self, "level_zero") and self.level_zero:
@@ -417,6 +439,10 @@ class Base_Power_Category(models.Model):
 
     def __str__(self):
         return " ".join([self.name])
+
+    def save(self, *args, **kwargs):
+        super(Base_Power_Category, self).save(*args, **kwargs)
+        PowerSystem.get_singleton().mark_dirty()
 
     def container_class(self):
         return "css-cat-container-" + self.slug
@@ -506,6 +532,10 @@ class Base_Power(models.Model):
     def __str__(self):
         return self.name + " (" + self.summary + ")"
 
+    def save(self, *args, **kwargs):
+        super(Base_Power, self).save(*args, **kwargs)
+        PowerSystem.get_singleton().mark_dirty()
+
     def get_absolute_url(self):
         return reverse('powers:powers_create_power', kwargs={'base_power_slug': self.slug})
 
@@ -562,6 +592,10 @@ class VectorCostCredit(models.Model):
     def __str__(self):
         return ":".join([self.relevant_vector.name, self.relevant_effect.name, str(self.gift_credit)])
 
+    def save(self, *args, **kwargs):
+        super(VectorCostCredit, self).save(*args, **kwargs)
+        PowerSystem.get_singleton().mark_dirty()
+
     def to_blob(self):
         return {
             "vector": self.relevant_vector.pk,
@@ -591,6 +625,10 @@ class Base_Power_System(models.Model):
                                    on_delete=models.PROTECT)
     class Meta:
         unique_together = (("base_power", "dice_system"))
+
+    def save(self, *args, **kwargs):
+        super(Base_Power_System, self).save(*args, **kwargs)
+        PowerSystem.get_singleton().mark_dirty()
 
     def __str__(self):
         return ":".join([self.base_power.name, str(self.dice_system)])
@@ -643,6 +681,10 @@ class Power_Param(models.Model):
 
     def __str__(self):
         return ":".join([str(self.relevant_parameter), self.relevant_base_power.name])
+
+    def save(self, *args, **kwargs):
+        super(Power_Param, self).save(*args, **kwargs)
+        PowerSystem.get_singleton().mark_dirty()
 
     def to_blob(self):
         return {
@@ -1140,6 +1182,10 @@ class SystemField(models.Model):
         unique_together = (("base_power_system", "name"))
         abstract = True
 
+    def save(self, *args, **kwargs):
+        super(SystemField, self).save(*args, **kwargs)
+        PowerSystem.get_singleton().mark_dirty()
+
     def to_blob(self):
         return {
             "marker": self.relevant_marker.marker if self.relevant_marker else self.name.strip().lower().replace(" ", "-"),
@@ -1169,6 +1215,7 @@ class SystemFieldRoll(SystemField):
                                              blank=True,
                                              help_text="Not used in new Powers system")
     caster_rolls = models.BooleanField(default=True)
+
 
     def render_speed(self):
         if self.speed == NO_SPEED_INFO:
@@ -1408,3 +1455,158 @@ class PowerTutorial(models.Model):
     modal_base_header = models.TextField(max_length=3000)
     modal_edit_header = models.TextField(max_length=3000)
     modal_edit = models.TextField(max_length=3000)
+
+
+class PowerSystem(models.Model):
+    json_media = models.FileField(blank=True)
+    revision = models.UUIDField(default=uuid.uuid4)
+
+    @staticmethod
+    def get_singleton():
+        return PowerSystem.objects.get()
+
+    def mark_dirty(self):
+        self.revision = uuid.uuid4()
+        self.save()
+
+    def regenerate(self):
+        python_blob = self._generate_python()
+        self.revision = uuid.uuid4()
+        self.json_media.save("power_system_json_{}".format(self.revision), ContentFile(json.dumps(python_blob)))
+        cache.set(self._get_cache_key(), python_blob, timeout=None)
+        self.save()
+        return python_blob
+
+    def get_json_url(self):
+        if self.is_dirty():
+            self.regenerate()
+        return self.json_media.url
+
+    def is_dirty(self):
+        sentinel = object()
+        cache_contents = cache.get(self._get_cache_key(), sentinel)
+        return cache_contents is sentinel
+
+    def get_python(self):
+        if self.is_dirty():
+            return self.regenerate()
+        return cache.get(self._get_cache_key())
+
+    def _get_cache_key(self):
+        return "power_blob:{}".format(self.revision)
+
+    @staticmethod
+    def _generate_python():
+        vectors = PowerSystem._generate_component_blob(VECTOR)
+        effects = PowerSystem._generate_component_blob(EFFECT)
+        modalities = PowerSystem._generate_component_blob(MODALITY)
+        effects_by_modality = defaultdict(list)
+        vectors_by_effect = defaultdict(list)
+        vectors_by_modality = {}
+        for effect in effects.values():
+            for modality_key in effect["allowed_modalities"]:
+                effects_by_modality[modality_key].append(effect["slug"])
+            vectors_by_effect[effect["slug"]].extend(effect["allowed_vectors"])
+        for modality in modalities.values():
+            vectors_by_modality[modality["slug"]] = [x for x in modality["allowed_vectors"]]
+        return {
+            # Components by ID (slug)
+            'vectors': vectors,
+            'effects': effects,
+            'modalities': modalities,
+
+            # Enhancements and Drawbacks by ID (slug)
+            'enhancements': PowerSystem._generate_modifier_blob(Enhancement),
+            'drawbacks': PowerSystem._generate_modifier_blob(Drawback),
+
+            # The parameters dictionary only contains the parameter's name and substitution.
+            # The level info is on the gift components
+            'parameters': PowerSystem._generate_param_blob(),
+
+            'component_categories': PowerSystem._generate_component_category_blob(),
+
+            # An Effect is only available on a given modality if it appears in this mapping.
+            'effects_by_modality': effects_by_modality,
+
+            # A Vector is only available on a given Modality + Effect if it appears in both mappings.
+            'vectors_by_effect': vectors_by_effect,
+            'vectors_by_modality': vectors_by_modality,
+
+            'effect_vector_gift_credit': PowerSystem._generate_effect_vector_gift_credits_blob(),
+
+            # Weapon choice system fields use a Weapon's pk as the non-display value. Stats in this blob by pk.
+            'weapon_replacements_by_pk': PowerSystem._generate_weapons_blob(),
+
+            'enhancement_group_by_pk': PowerSystem._generate_enhancement_groups_blob()
+        }
+
+        # generate the json blob for the fe and for backend form validation.
+        # TODO: cache this in a wrapping method
+        # Cache in per-component caches so it doesn't have to be regenerated as much?
+        # TODO: invalidate cache when any relevant model (enhancement, base power) is saved.
+
+    @staticmethod
+    def _generate_component_blob(base_type):
+        # TODO: select related and stuff.
+        # TODO: filter on is_public=True
+        components = Base_Power.objects.filter(base_type=base_type) \
+            .order_by("name") \
+            .prefetch_related("basepowerfieldsubstitution_set") \
+            .prefetch_related("power_param_set").all()
+        #TODO: Determine if these prefetches do anything
+        # .prefetch_related("avail_enhancements") \
+        # .prefetch_related("avail_drawbacks") \
+        # .prefetch_related("blacklist_enhancements") \
+        # .prefetch_related("blacklist_drawbacks") \
+        # .all()
+        return {x.pk: x.to_blob() for x in components}
+
+    @staticmethod
+    def _generate_modifier_blob(ModifierClass):
+        related_field = "enhancementfieldsubstitution_set" if ModifierClass is Enhancement else "drawbackfieldsubstitution_set"
+        modifiers = ModifierClass.objects.exclude(system=SYS_LEGACY_POWERS).prefetch_related(related_field).all()
+        return {x.pk: x.to_blob() for x in modifiers}
+
+    @staticmethod
+    def _generate_param_blob():
+        params = Parameter.objects \
+            .prefetch_related("parameterfieldsubstitution_set").all()
+        return {x.pk: x.to_blob() for x in params}
+
+    @staticmethod
+    def _generate_weapons_blob():
+        weapons = Weapon.objects.all()
+        return {x.pk: PowerSystem._replacements_from_weapon(x) for x in weapons}
+
+    @staticmethod
+    def _replacements_from_weapon(weapon):
+        return [
+            PowerSystem._replacement("selected-weapon-name", weapon.name),
+            PowerSystem._replacement("selected-weapon-type", weapon.get_type_display()),
+            PowerSystem._replacement("selected-weapon-attack-roll", weapon.attack_roll_replacement()),
+            PowerSystem._replacement("selected-weapon-damage", str(weapon.bonus_damage)),
+            PowerSystem._replacement("selected-weapon-range", weapon.range),
+        ]
+
+    @staticmethod
+    def _replacement(marker, replacmeent):
+        return {
+            "marker": marker,
+            "replacement": replacmeent,
+            "mode": ADDITIVE
+        }
+
+    @staticmethod
+    def _generate_component_category_blob():
+        categories = Base_Power_Category.objects.order_by("name").all()
+        return [x.to_blob() for x in categories]
+
+    @staticmethod
+    def _generate_effect_vector_gift_credits_blob():
+        cost_credits = VectorCostCredit.objects.all()
+        return [x.to_blob() for x in cost_credits]
+
+    @staticmethod
+    def _generate_enhancement_groups_blob():
+        groups = EnhancementGroup.objects.all()
+        return {x.pk: x.to_blob() for x in groups}
