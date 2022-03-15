@@ -1472,7 +1472,7 @@ class PowerSystem(models.Model):
     def regenerate(self):
         python_blob = self._generate_python()
         self.revision = uuid.uuid4()
-        self.json_media.save("power_system_json_{}".format(self.revision), ContentFile(json.dumps(python_blob)))
+        self.json_media.save("power_system_json_{}".format(self.revision), ContentFile(json.dumps(python_blob).encode("utf-8")))
         cache.set(self._get_cache_key(), python_blob, timeout=None)
         self.save()
         return python_blob
