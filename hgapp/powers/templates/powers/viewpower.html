@@ -152,7 +152,11 @@
                 </div>
             {% endif %}
             </div>
-            {% include "powers/power_view_history_snippet.html" %}
+            {% if power_full %}
+                <hr>
+                <h3>Edit History</h3>
+                {% include "powers/power_view_history_snippet.html" %}
+            {% endif %}
         </div>
     </div>
 </div>

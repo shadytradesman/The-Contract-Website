@@ -40,6 +40,7 @@
                     Gift Cost:
                     <span v-if="component.giftCredit > 0" class="css-component-gift-credit">-{component.giftCredit - 1}</span>
                     <span v-if="component.giftCredit == 0" class="css-component-gift-price">+1</span>
+                    <span v-if="component.giftCredit < 0" class="css-component-gift-price">+{-1*(component.giftCredit - 1)}</span>
                 </small>
             </div>
         </label>
