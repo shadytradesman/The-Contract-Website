@@ -269,6 +269,7 @@ def _get_power_from_form_and_validate(power_form, power_blob, user=None):
     power = Power(name=power_form.cleaned_data['name'],
                   flavor_text=power_form.cleaned_data['tagline'],
                   description=power_form.cleaned_data['description'],
+                  extended_description=power_form.cleaned_data['extended_description'],
                   base=power_form.cleaned_data["effect"],
                   vector=power_form.cleaned_data["vector"],
                   modality=power_form.cleaned_data["modality"],

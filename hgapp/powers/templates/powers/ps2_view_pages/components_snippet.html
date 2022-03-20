@@ -16,14 +16,18 @@
             data-original-title="{{power.modality.name}}"
             data-toggle="tooltip"
             class="has-popover" >
-        <img  src="{{power.modality.icon.url}}" width="25" height="25" >
+        {% if power.modality.icon %}
+            <img src="{{power.modality.icon.url}}" width="25" height="25" >
+        {% endif %}
     </span>
     <span
         data-title="{{power.base.name}}"
         data-original-title="{{power.base.name}}"
         data-toggle="tooltip"
         class="has-popover">
+        {% if power.base.icon %}
             <img src="{{power.base.icon.url}}" width="25" height="25" >
+        {% endif %}
     </span>
     {% if power.shouldDisplayVector %}
         <span
@@ -31,7 +35,9 @@
             data-original-title="{{power.vector.name}}"
             data-toggle="tooltip"
             class="has-popover">
+            {% if power.vector.icon %}
                 <img src="{{power.vector.icon.url}}" width="25" height="25" >
+            {% endif %}
         </span>
     {% endif %}
     {% if power.get_num_enhancements %}

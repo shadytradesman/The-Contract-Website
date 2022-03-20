@@ -62,18 +62,44 @@
             </div>
         </div>
         <div class="panel-body">
-                <i class="text-muted">{{ power.description|safe }}</i>
+                <i class="text-muted">{{ power.description|linebreaks}}</i>
+            {% if power.extended_description %}
+                <div>
+                    <a id="collapse-ext-desc-{{power.id}}-heading"
+                       role="button" data-toggle="collapse"
+                       data-target=".collapse-ext-desc-{{power.id}}"
+                       aria-expanded="false"
+                       aria-controls="collapse-ext-desc-{{power.id}}">
+                        <i><small>Extended Description</small></i>
+                    </a>
+                    <div
+                            class="panel-collapse collapse collapse-ext-desc-{{power.id}} css-system-text-user-input"
+                            role="tabpanel"
+                            aria-labelledby="collapse-ext-desc-{{power.id}}-heading" >
+                        {{ power.extended_description|linebreaks}}
+                    </div>
+                </div>
+            {% endif %}
             <hr style="width: 50%;">
             {{ power.system|safe }}
             {% if power.errata %}
                 <div>
-                    <span data-toggle="tooltip"
-                          data-html="true"
-                          data-placement="top"
-                          data-title="{{power.errata|safe}}"
-                          class="css-extended-system">
-                        <i class="fa fa-question-circle fa-lg"></i>
-                    </span>
+                    <a id="collapse-errata-{{power.id}}-heading"
+                       role="button" data-toggle="collapse"
+                       data-target=".collapse-errata-{{power.id}}"
+                       aria-expanded="false"
+                       aria-controls="collapse-errata-{{power.id}}">
+                        <i><small>
+                            <i class="fa fa-question-circle fa-lg"></i>
+                            Extended System
+                        </small></i>
+                    </a>
+                    <div
+                            class="panel-collapse collapse collapse-errata-{{power.id}} css-extended-system"
+                            role="tabpanel"
+                            aria-labelledby="collapse-errata-{{power.id}}-heading">
+                        {{power.errata|safe}}
+                    </div>
                 </div>
             {% endif %}
             <div class="row hidden">

@@ -902,7 +902,9 @@ class Power_Full(models.Model):
 class Power(models.Model):
     name = models.CharField(max_length=150)
     flavor_text = models.TextField(max_length=2000) # tagline
-    description = models.TextField(max_length=2500)
+    description = models.TextField("visual description", max_length=2500)
+    extended_description = models.TextField(max_length=8000, blank=True)
+    gift_summary = models.TextField("gift summary", max_length=2500, default="") #rendered "you possess a power to eat chips" etc.
     dice_system = models.CharField(choices=DICE_SYSTEM, max_length=55)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL,
                                    on_delete=models.CASCADE,
@@ -1026,6 +1028,7 @@ class Power(models.Model):
             "name": self.name,
             "flavor_text": self.flavor_text,
             "description": self.description,
+            "extended_description": self.extended_description,
 
             "enhancements": [x.to_blob() for x in self.enhancement_instance_set.all()],
             "drawbacks": [x.to_blob() for x in self.drawback_instance_set.all()],

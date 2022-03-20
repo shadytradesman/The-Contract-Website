@@ -14,7 +14,8 @@
 {% endblock %}
 
 {% block extra_scripts %}
-	<script src="https://unpkg.com/vue@3.2.26/dist/vue.global.prod.js"></script>
+<!--	<script src="https://unpkg.com/vue@3.2.26/dist/vue.global.prod.js"></script>-->
+	<script src="{% static 'powers/vue.global.prod.js' %}"></script>
  	<script type="text/javascript">
 		const powerBlobUrl = "{{power_blob_url}}";
 	</script>
@@ -49,7 +50,9 @@
 							</div>
 						</div>
 					</div>
-					{% include "powers/ps2_create_pages/section_gift_preview.html" %}
+					{% with 'modal_preview' as preview_id %}
+						{% include "powers/ps2_create_pages/section_gift_preview.html" %}
+					{% endwith %}
 					<div class="text-center">
 						<a @click="randomGift" href="#">
 								Generate Random Gift
@@ -97,7 +100,9 @@
 					'css-hidden': expandedTab != 'customize'
 				}">
 				<div data-spy="affix" data-offset-top="80">
-					{% include "powers/ps2_create_pages/section_gift_preview.html" %}
+					{% with 'sidebar_preview' as preview_id %}
+						{% include "powers/ps2_create_pages/section_gift_preview.html" %}
+					{% endwith %}
 				</div>
 			</div>
 			<div class="col-xs-12 css-content-section"

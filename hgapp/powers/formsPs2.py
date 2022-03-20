@@ -19,14 +19,21 @@ class PowerForm(forms.Form):
                               widget=forms.TextInput(attrs={
                                   "v-model": "giftTagline",
                               }))
-    description = forms.CharField(label='Description',
+    description = forms.CharField(label='Visual Description',
                                   widget=forms.Textarea(attrs={
                                      "v-model": "giftDescription",
                                   }),
-                                  max_length=2500,
+                                  max_length=2000,
                                   required=True,
-                                  help_text="Describe what the Gift looks like when it is used, how it works, "
+                                  help_text="Describe what this Gift looks like when it is used "
                                             "and its impact on the owner, target, and environment.")
+    extended_description = forms.CharField(label='Extended Description',
+                                  widget=forms.Textarea(attrs={
+                                      "v-model": "giftExtendedDescription",
+                                  }),
+                                  max_length=8000,
+                                  required=False,
+                                  help_text="(Optional) Wax poetic about this Gift's background, metaphysics, etc.")
 
     # admin only fields
     tags = forms.ModelMultipleChoiceField(queryset=PowerTag.objects.order_by("tag").all(),

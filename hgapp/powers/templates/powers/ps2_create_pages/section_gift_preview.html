@@ -101,20 +101,45 @@
     <div class="panel-body" style="padding-top: 5px;">
         <div v-if="giftDescription" v-text="giftDescription" class="css-system-text-user-input" style="margin-top: 5px; margin-bottom: 5px;">
         </div>
+        <div v-if="giftExtendedDescription">
+            <a id="collapse-ext-desc-{{preview_id}}-heading"
+                role="button" data-toggle="collapse"
+                data-target=".collapse-ext-desc-{{preview_id}}"
+                aria-expanded="false"
+                aria-controls="collapse-ext-desc-{{preview_id}}">
+                <i><small>Extended Description</small></i>
+            </a>
+            <div
+                    class="panel-collapse collapse collapse-ext-desc-{{preview_id}} css-system-text-user-input"
+                    role="tabpanel"
+                    aria-labelledby="collapse-ext-desc-{{preview_id}}-heading"
+                    v-text="giftExtendedDescription"
+            >
+            </div>
+        </div>
         <div v-if="giftDescription" style="margin: auto; width: 50%;">
             <hr style="margin-top: 10px; margin-bottom: 10px;">
         </div>
         <div id="rendered-system" v-html="renderedSystem" class="js-render-power-keywords">
         </div>
         <div v-if="giftErrata">
-                <span data-toggle="tooltip"
-                      data-html="true"
-                      data-placement="top"
-                      v-bind:data-title="giftErrata"
-                      v-bind:data-original-title="giftErrata"
-                      class="has-popover css-extended-system">
+            <a id="collapse-errata-{{preview_id}}-heading"
+               role="button" data-toggle="collapse"
+               data-target=".collapse-errata-{{preview_id}}"
+               aria-expanded="false"
+               aria-controls="collapse-errata-{{preview_id}}">
+                <i><small>
                     <i class="fa fa-question-circle fa-lg"></i>
-            </span>
+                    Extended System
+                </small></i>
+            </a>
+            <div
+                    class="panel-collapse collapse collapse-errata-{{preview_id}}"
+                    role="tabpanel"
+                    aria-labelledby="collapse-errata-{{preview_id}}-heading"
+                    v-html="giftErrata"
+            >
+            </div>
         </div>
     </div>
 </div>

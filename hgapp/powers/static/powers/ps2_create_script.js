@@ -764,6 +764,7 @@ const ComponentRendering = {
       requiredStatus: null,
       giftName: null,
       giftDescription: null,
+      giftExtendedDescription: null,
       giftTagline: "",
       giftPreviewModalFirstShow: true,
       enhancementList: "",
@@ -823,6 +824,7 @@ const ComponentRendering = {
         this.giftName = powerEditBlob["name"];
         this.giftTagline = powerEditBlob["flavor_text"];
         this.giftDescription = powerEditBlob["description"];
+        this.giftExtendedDescription = powerEditBlob["extended_description"];
         let selectedModality = this.modalities.find(comp => comp.slug === powerEditBlob["modality_pk"]);
         if (!selectedModality) {
             return;
