@@ -132,6 +132,10 @@ class PowerBlob:
             if field_id not in weapon_field_ids:
                 raise ValueError("field not expected: {}".format(form.cleaned_data))
         for form in roll_forms:
+            print(type(form))
+            print(form.is_valid())
+            print(form.errors)
+            print(form.cleaned_data)
             field_id = form.cleaned_data["field_id"]
             if field_id not in roll_field_ids:
                 raise ValueError("field not expected: {}".format(form.cleaned_data))
@@ -351,6 +355,8 @@ def _get_field_instances_and_validate(POST, power_blob, effect, vector, modality
     sys_field_weapon_formset = get_sys_field_weapon_formset(POST)
     sys_field_roll_formset = get_sys_field_roll_formset(POST)
     if sys_field_text_formset.is_valid() and sys_field_weapon_formset.is_valid() and sys_field_roll_formset.is_valid():
+        print(sys_field_roll_formset.cleaned_data)
+        print(sys_field_roll_formset.data)
         power_blob.validate_new_field_forms(
             effect, vector, modality, sys_field_text_formset, sys_field_weapon_formset, sys_field_roll_formset)
         field_instances = []
@@ -381,7 +387,8 @@ def _create_new_power_full(power_form, new_power, character=None):
     new_power_full = Power_Full(
         name=power_form.cleaned_data['name'],
         dice_system=SYS_PS2,
-        base=new_power.base)
+        base=new_power.base,
+        crafting_type=power_form.cleaned_data["modality"].crafting_type)
     if character:
         new_power_full.private = character.private
         new_power_full.character = character

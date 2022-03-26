@@ -117,6 +117,7 @@ INSTALLED_APPS = [
     'info.apps.InfoConfig',
     'journals.apps.JournalsConfig',
     'guide.apps.GuideConfig',
+    'crafting.apps.CraftingConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

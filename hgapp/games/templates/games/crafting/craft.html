@@ -1,0 +1,30 @@
+{% extends "site_base.html" %}
+
+{% load bootstrap %}
+
+{% block extra_head %}
+{% endblock %}
+
+{% block head_title %}Crafting{% endblock %}
+
+{% load account_tags %}
+
+{% block body_base %}
+<div class="container">
+    <div class="text-center">
+        <h1>{{character.name}} is crafting</h1>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <form action="{% url 'games:games_craft' character.id %}" method="post" >
+                {% for form in artifact_formset %}
+                    {{form|bootstrap}}
+                {% endfor %}
+                {% for form in consumable_forms %}
+                    {{form|bootstrap}}
+                {% endfor %}
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

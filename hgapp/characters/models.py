@@ -151,6 +151,17 @@ WEAPON_TYPE = (
     (WEAPON_OTHER, "Other")
 )
 
+ART_AVAILABLE = "AVAILABLE"
+ART_LOST = "LOST"
+ART_DESTROYED = "DESTROYED"
+ART_BROKEN = "BROKEN"
+ARTIFACT_STATUS = (
+    (ART_AVAILABLE, 'Available'),
+    (ART_LOST, 'Lost'),
+    (ART_DESTROYED, 'Destroyed'),
+    (ART_BROKEN, 'Needs repair'),
+)
+
 EQUIPMENT_DEFAULT = """
 Track your current equipment here. You may start with anything your Contractor would reasonably have access to. 
 
@@ -557,6 +568,12 @@ class Character(models.Model):
     # Latest game first
     def completed_games_rev_sort(self):
         return self.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).order_by("-relevant_game__end_time").all()
+
+    def get_current_downtime_attendance(self):
+        try:
+            return self.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).order_by("-relevant_game__end_time").all()[0]
+        except:
+            return None
 
     def assigned_coin(self):
         coins = self.reward_set.filter(is_void=False, is_charon_coin=True).all()
@@ -1004,11 +1021,10 @@ class BattleScar(models.Model):
 
 
 class WorldElement(models.Model):
-    character = models.ForeignKey(Character,
-                                  on_delete=models.CASCADE)
+    character = models.ForeignKey(Character, on_delete=models.CASCADE) # owning character
     name = models.CharField(max_length=500)
-    description = models.CharField(max_length=1000)
-    system = models.CharField(max_length=1000)
+    description = models.CharField(max_length=5000)
+    system = models.CharField(max_length=1000, blank=True)
     cell = models.ForeignKey(Cell,
                              blank=True,
                              null=True,
@@ -1025,8 +1041,15 @@ class Condition(WorldElement):
 class Circumstance(WorldElement):
     pass
 
+
 class Artifact(WorldElement):
-    pass
+    crafting_character = models.ForeignKey(Character, related_name="creator", on_delete=models.CASCADE, blank=True, null=True)
+    is_consumable = models.BooleanField(default=False)
+    is_signature = models.BooleanField(default=False)
+    quantity = models.PositiveIntegerField(default=1)
+    location = models.CharField(max_length=1000, default="")
+    availability = models.CharField(choices=ARTIFACT_STATUS, max_length=55, default=ART_AVAILABLE)
+
 
 class Injury(models.Model):
     character = models.ForeignKey(Character,

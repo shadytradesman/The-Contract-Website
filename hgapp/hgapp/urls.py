@@ -38,6 +38,7 @@ urlpatterns = [
     url(r"info/", include("info.urls"), name="info"),
     url(r"journals/", include("journals.urls"), name="journals"),
     url(r"guide/", include("guide.urls"), name="guide"),
+    url(r"crafting/", include("crafting.urls"), name="crafting"),
     url(r"^tinymce/", include("tinymce.urls")),
     url(r"^news/", include("blog.urls", namespace="pinax_blog")),
     url(r"^ajax/images/", include("pinax.images.urls", namespace="pinax_images")),

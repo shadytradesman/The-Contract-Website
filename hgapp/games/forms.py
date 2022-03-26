@@ -1,6 +1,7 @@
 from django import forms
 from itertools import groupby
-from django.forms.models import ModelChoiceField, ModelChoiceIterator
+
+from django.forms.models import ModelChoiceIterator
 from itertools import chain
 
 from characters.models import HIGH_ROLLER_STATUS, SEASONED_PORTED, VETERAN_PORTED

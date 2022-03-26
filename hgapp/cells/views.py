@@ -257,10 +257,9 @@ def view_cell(request, cell_id):
     can_view_community_link = cell.is_community_link_public or user_membership
     community_link = cell.community_link if can_view_community_link else None
 
-    journal_query = Journal.objects.filter(game_attendance__attending_character__private=False)\
-        .filter(game_attendance__relevant_game__cell=cell)
+    journal_query = Journal.objects.filter().filter(game_attendance__relevant_game__cell=cell)
     if request.user.is_anonymous:
-        journal_query.filter(contains_spoilers=False, is_nsfw=False)
+        journal_query.filter(contains_spoilers=False, is_nsfw=False, game_attendance__attending_character__private=False)
     elif not request.user.profile.view_adult_content:
         journal_query.filter(is_nsfw=False)
     public_journals = journal_query.order_by('-created_date').all()[:20]

@@ -69,6 +69,15 @@ CREATION_REASON = (
     (CREATION_ADJUSTMENT, 'Adjustment'),
 )
 
+CRAFTING_NONE = 'NONCRAFTABLE'
+CRAFTING_ARTIFACT = 'ARTIFACT_CRAFTING'
+CRAFTING_CONSUMABLE = 'CONSUMABLE_CRAFTING'
+CRAFTING_TYPE = (
+    (CRAFTING_NONE, "Not craftable"),
+    (CRAFTING_ARTIFACT, "Artifact Crafting"),
+    (CRAFTING_CONSUMABLE, "Consumable Crafting"),
+)
+
 SYS_ALL = 'ALL'
 SYS_LEGACY_POWERS = 'HOUSEGAMES15'
 SYS_PS2 = 'PS2'
@@ -525,6 +534,7 @@ class Base_Power(models.Model):
     parameters = models.ManyToManyField(Parameter,
                                         through="Power_Param",
                                         through_fields=('relevant_base_power', 'relevant_parameter'))
+    crafting_type = models.CharField(choices=CRAFTING_TYPE, default=CRAFTING_NONE, max_length=45)
 
     class Meta:
         verbose_name = "Gift Component"
@@ -752,6 +762,7 @@ class Power_Param(models.Model):
 # Power full is essentially a "Gift" object
 class Power_Full(models.Model):
     dice_system = models.CharField(choices=DICE_SYSTEM, max_length=55)
+    crafting_type = models.CharField(choices=CRAFTING_TYPE, default=CRAFTING_NONE, max_length=45)
     private = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
     pub_date = models.DateTimeField('date published', auto_now_add=True)
@@ -905,6 +916,7 @@ class Power(models.Model):
     description = models.TextField("visual description", max_length=2500)
     extended_description = models.TextField(max_length=8000, blank=True)
     gift_summary = models.TextField("gift summary", max_length=2500, default="") #rendered "you possess a power to eat chips" etc.
+    warnings = JSONField("Gift Warnings", default=list)
     dice_system = models.CharField(choices=DICE_SYSTEM, max_length=55)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL,
                                    on_delete=models.CASCADE,
@@ -913,15 +925,14 @@ class Power(models.Model):
     pub_date = models.DateTimeField('date published', auto_now_add=True)
 
     gift_cost = models.IntegerField(null=True) # denormalized, access with get_gift_cost()
+    required_status = models.CharField(choices=HIGH_ROLLER_STATUS,
+                                       max_length=25,
+                                       blank=True)
 
     # Crafting
     artifacts = models.ManyToManyField(Artifact,
                                        through="ArtifactPower",
                                        through_fields=('relevant_power', 'relevant_artifact'))
-    required_status = models.CharField(choices=HIGH_ROLLER_STATUS,
-                                       max_length=25,
-                                       blank=True)
-
     # Structure and system
     system = models.TextField(max_length=54000,
                               blank=True,
@@ -943,7 +954,7 @@ class Power(models.Model):
                                               through_fields=('relevant_power', 'relevant_power_param'))
     enhancement_names = JSONField("Enhancement Names", default=list)
     drawback_names = JSONField("Drawback Names", default=list)
-    shouldDisplayVector = models.BooleanField(default=False)
+    shouldDisplayVector = models.BooleanField(default=False) # I can't believe I used camel case here.
 
     # note: Access system field instances through reverse lookups
 
@@ -1159,12 +1170,17 @@ class Power(models.Model):
         if self.creation_reason == CREATION_REASON[3][0]:
             return "adjusting"
 
+
 class ArtifactPower(models.Model):
     relevant_artifact = models.ForeignKey(Artifact, on_delete=models.PROTECT)
     relevant_power = models.ForeignKey(Power, on_delete=models.CASCADE)
-    detail = models.CharField(max_length=1500,
-                              null=True,
-                              blank=True)
+    relevant_power_full = models.ForeignKey(Power_Full, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = (
+            ("relevant_artifact", "relevant_power_full"),
+        )
+
 
 class SystemField(models.Model):
     base_power_system = models.ForeignKey(Base_Power_System, on_delete=models.CASCADE)
