@@ -18,7 +18,7 @@ from .forms import ConsumableCraftingForm, ArtifactCraftingForm
 
 @method_decorator(login_required(login_url='account_login'), name='dispatch')
 class Craft(View):
-    template_name = 'games/crafting/craft.html'
+    template_name = 'crafting/craft.html'
     character = None
     attendance = None
 

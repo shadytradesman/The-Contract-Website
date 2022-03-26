@@ -1,0 +1,50 @@
+{% extends "site_base.html" %}
+
+{% load bootstrap %}
+{% load static %}
+
+{% block extra_head %}
+{% endblock %}
+
+{% block extra_styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'crafting/crafting_style.css' %}" />
+{% endblock %}
+
+{% block extra_scripts %}
+    <script src="{% static 'powers/vue.global.prod.js' %}"></script>
+    <script src="{% static 'crafting/crafting.js' %}"></script>
+{% endblock %}
+
+{% block head_title %}Crafting{% endblock %}
+
+{% load account_tags %}
+
+{% block body_base %}
+<div class="container">
+    <div class="text-center">
+        <h1>{{character.name}} is crafting</h1>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <form action="{% url 'crafting:crafting_craft' character.id %}" method="post" >
+                {% csrf_token %}
+                {{ artifact_formset.management_form }}
+                {% for form in artifact_formset %}
+                    {{form|bootstrap}}
+                {% endfor %}
+                {% for form in consumable_forms %}
+                    {{form|bootstrap}}
+                {% endfor %}
+
+                <div class="text-center">
+                    <input id="form-submit"
+                           {% if not request.user.is_superuser %} disabled {% endif %}
+                           class="btn btn-primary btn-md"
+                           type="submit"
+                           value="Craft Items" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
