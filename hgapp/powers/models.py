@@ -70,10 +70,12 @@ CREATION_REASON = (
 )
 
 CRAFTING_NONE = 'NONCRAFTABLE'
+CRAFTING_SIGNATURE = 'SIGNATURE ITEM'
 CRAFTING_ARTIFACT = 'ARTIFACT_CRAFTING'
 CRAFTING_CONSUMABLE = 'CONSUMABLE_CRAFTING'
 CRAFTING_TYPE = (
     (CRAFTING_NONE, "Not craftable"),
+    (CRAFTING_SIGNATURE, "Signature Item"),
     (CRAFTING_ARTIFACT, "Artifact Crafting"),
     (CRAFTING_CONSUMABLE, "Consumable Crafting"),
 )
@@ -778,6 +780,9 @@ class Power_Full(models.Model):
                                    on_delete=models.CASCADE,
                                    blank=True,
                                    null=True)
+    artifacts = models.ManyToManyField(Artifact,
+                                       through="ArtifactPowerFull",
+                                       through_fields=('relevant_power_full', 'relevant_artifact'))
 
     # Denormalized fields with Power revisions. Do not use these?
     base = models.ForeignKey(Base_Power, on_delete=models.PROTECT)
@@ -870,6 +875,9 @@ class Power_Full(models.Model):
 
     def lock_edits(self):
         remove_perm('powers.edit_power_full', self.owner)
+
+    def is_ps2(self):
+        return self.dice_system == SYS_PS2
 
     def default_perms_history_to_player(self, player):
         assign_perm('view_power_full', player, self)
@@ -1174,13 +1182,21 @@ class Power(models.Model):
 class ArtifactPower(models.Model):
     relevant_artifact = models.ForeignKey(Artifact, on_delete=models.PROTECT)
     relevant_power = models.ForeignKey(Power, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = (
+            ("relevant_artifact", "relevant_power"),
+        )
+
+
+class ArtifactPowerFull(models.Model):
+    relevant_artifact = models.ForeignKey(Artifact, on_delete=models.PROTECT)
     relevant_power_full = models.ForeignKey(Power_Full, on_delete=models.CASCADE)
 
     class Meta:
         unique_together = (
             ("relevant_artifact", "relevant_power_full"),
         )
-
 
 class SystemField(models.Model):
     base_power_system = models.ForeignKey(Base_Power_System, on_delete=models.CASCADE)

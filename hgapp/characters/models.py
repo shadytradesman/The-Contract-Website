@@ -780,6 +780,14 @@ class Character(models.Model):
         else:
             return 5
 
+    def to_create_power_blob(self):
+        return {
+            "name": self.name,
+            "avail_gifts": "do this",
+            "avail_improvements": "do this",
+            "status": self.status,
+        }
+
     # WARNING: this is an expensive call
     def regen_stats_snapshot(self):
         self.refresh_from_db()
@@ -1021,14 +1029,20 @@ class BattleScar(models.Model):
 
 
 class WorldElement(models.Model):
-    character = models.ForeignKey(Character, on_delete=models.CASCADE) # owning character
+    # owning character
+    # null for sig items without owners
+    character = models.ForeignKey(Character, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=500)
     description = models.CharField(max_length=5000)
     system = models.CharField(max_length=1000, blank=True)
+
+    # when cell is null, element is created by gift system
     cell = models.ForeignKey(Cell,
                              blank=True,
                              null=True,
                              on_delete=models.CASCADE)
+
+
     def __str__(self):
         return self.name
 
@@ -1043,11 +1057,15 @@ class Circumstance(WorldElement):
 
 
 class Artifact(WorldElement):
-    crafting_character = models.ForeignKey(Character, related_name="creator", on_delete=models.CASCADE, blank=True, null=True)
+    # Signature Items created
+    crafting_character = models.ForeignKey(Character, related_name="creator", on_delete=models.CASCADE, null=True)
+    creating_player = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                        on_delete=models.CASCADE,
+                                        null=True)
     is_consumable = models.BooleanField(default=False)
     is_signature = models.BooleanField(default=False)
     quantity = models.PositiveIntegerField(default=1)
-    location = models.CharField(max_length=1000, default="")
+    location = models.CharField(max_length=1000, default="", blank=True)
     availability = models.CharField(choices=ARTIFACT_STATUS, max_length=55, default=ART_AVAILABLE)
 
 
@@ -1057,6 +1075,7 @@ class Injury(models.Model):
     description = models.CharField(max_length=500)
     is_stabilized = models.BooleanField(default=False)
     severity = models.PositiveIntegerField(default=1)
+
 
 class BasicStats(models.Model):
     stats = models.CharField(max_length=10000)

@@ -13,11 +13,6 @@
             <span v-if="giftName === null" class="hidden-xs">
                 Gift Preview
             </span>
-            <span v-if="giftName === null">
-                <small>
-                <div class="text-muted" v-html="renderedDescription"> </div>
-                </small>
-            </span>
             <small>
                 <i>
                     <span v-if="giftTagline.length > 0" v-text="giftTagline" style="margin-left: 10px;">
@@ -97,6 +92,11 @@
                 </span>
             </span>
         </div>
+        <span>
+                    <i>
+                        <div class="text-muted" v-html="renderedDescription"> </div>
+                    </i>
+        </span>
     </div>
     <div class="panel-body" style="padding-top: 5px;">
         <div v-if="giftDescription" v-text="giftDescription" class="css-system-text-user-input" style="margin-top: 5px; margin-bottom: 5px;">

@@ -5,14 +5,15 @@ from django.urls import reverse
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
 
-from characters.models import Weapon
+from characters.models import Artifact
 
 from .models import SYS_LEGACY_POWERS, EFFECT, VECTOR, MODALITY, Base_Power, Enhancement, Drawback, Parameter, \
     Base_Power_Category, VectorCostCredit, ADDITIVE, EnhancementGroup, CREATION_NEW, SYS_PS2, Power, Power_Full, \
     Enhancement_Instance, Drawback_Instance, Parameter_Value, Power_Param, SystemFieldText, SystemFieldTextInstance, \
-    SystemFieldWeapon, SystemFieldWeaponInstance, SystemFieldRoll, SystemFieldRollInstance, PowerSystem
-from .formsPs2 import PowerForm, get_modifiers_formset,get_params_formset, get_sys_field_text_formset,\
-    get_sys_field_weapon_formset, get_sys_field_roll_formset
+    SystemFieldWeapon, SystemFieldWeaponInstance, SystemFieldRoll, SystemFieldRollInstance, PowerSystem, \
+    CRAFTING_SIGNATURE
+from .formsPs2 import PowerForm, get_modifiers_formset, get_params_formset, get_sys_field_text_formset, \
+    get_sys_field_weapon_formset, get_sys_field_roll_formset, make_select_signature_artifact_form
 from .powerDifferenceUtils import get_roll_from_form_and_system, get_power_creation_reason, \
     get_power_creation_reason_expanded_text
 
@@ -173,19 +174,24 @@ class PowerBlob:
         return len(avail_vec) > 1
 
 
-def get_edit_context(existing_power_full=None, is_edit=False):
+def get_edit_context(existing_power_full=None, is_edit=False, existing_char=None):
     modifiers_formset = get_modifiers_formset()
     params_formset = get_params_formset()
     sys_field_text_formset = get_sys_field_text_formset()
     sys_field_weapon_formset = get_sys_field_weapon_formset()
     sys_field_roll_formset = get_sys_field_roll_formset()
     power_form = PowerForm()
+    sig_item_artifact_form = make_select_signature_artifact_form(
+        existing_character=existing_char,
+        existing_power=existing_power_full)()
     categories = Base_Power_Category.objects.all()
     context = {
         'power_blob_url': PowerSystem.get_singleton().get_json_url(),
+        'character_blob': existing_char.to_create_power_blob() if existing_char else None,
         'modifier_formset': modifiers_formset,
         'params_formset': params_formset,
         'power_form': power_form,
+        'sig_item_artifact_form': sig_item_artifact_form,
         'sys_field_text_formset': sys_field_text_formset,
         'sys_field_weapon_formset': sys_field_weapon_formset,
         'sys_field_roll_formset': sys_field_roll_formset,
@@ -196,6 +202,8 @@ def get_edit_context(existing_power_full=None, is_edit=False):
         context['power_edit_blob'] = json.dumps(existing_power_full.latest_revision().to_edit_blob())
     if is_edit:
         form_url = reverse("powers:powers_edit_ps2", kwargs={"power_full_id": existing_power_full.pk})
+    elif existing_char:
+        form_url = reverse("powers:powers_create_ps2_for_char", kwargs={"character_id": existing_char.pk})
     context["form_url"] = form_url
     return context
 
@@ -206,8 +214,12 @@ def save_gift(request, power_full=None, character=None):
         raise ValueError("Can only create new gift from post request")
     power_form = PowerForm(request.POST)
     if power_form.is_valid():
-        new_power = _create_new_power_and_save(power_form=power_form, request=request)
+        SignatureArtifactForm = make_select_signature_artifact_form(
+            existing_character=character,
+            existing_power=power_full)
+        new_power = _create_new_power_and_save(power_form=power_form, request=request, SigArtifactForm=SignatureArtifactForm)
         _populate_power_change_log(new_power, power_full)
+
         if not power_full:
             # brand new Gift
             new_power.creation_reason = CREATION_NEW
@@ -215,7 +227,12 @@ def save_gift(request, power_full=None, character=None):
             power_full = _create_new_power_full(power_form, new_power, character)
             if request.user.id:
                 power_full.owner = request.user
-        power_full.save()
+            power_full.save()
+            previous_rev = None
+        else:
+            previous_rev = power_full.latest_rev
+            power_full.crafting_type = new_power.modality.crafting_type
+        _handle_sig_artifact(request, SignatureArtifactForm, power_full, new_power, previous_rev)
         if request.user.is_superuser:
             power_full.tags.set(power_form.cleaned_data["tags"])
             power_full.example_description = power_form.cleaned_data["example_description"]
@@ -237,11 +254,17 @@ def _populate_power_system_and_errata(power_blob, power, modifier_instances, par
     power.errata = "Server-side errata text rendering incoming"
 
 
-def _create_new_power_and_save(power_form, request):
+def _create_new_power_and_save(power_form, request, SigArtifactForm):
     power_blob = PowerBlob()
 
     # power is not saved yet
     power = _get_power_from_form_and_validate(power_form=power_form, power_blob=power_blob, user=request.user)
+
+    if power.modality.crafting_type == CRAFTING_SIGNATURE:
+        sig_artifact_form = SigArtifactForm(request.POST)
+        # do nothing with the form yet, just check its validity so we know whether we should save the power or not.
+        if not sig_artifact_form.is_valid():
+            raise ValueError("Invalid signature artifact form")
 
     # These instances are unsaved and do not yet reference the power.
     modifier_instances = _get_modifier_instances_and_validate(
@@ -393,4 +416,35 @@ def _create_new_power_full(power_form, new_power, character=None):
         new_power_full.private = character.private
         new_power_full.character = character
     return new_power_full
+
+
+def _handle_sig_artifact(request, SignatureArtifactForm, power_full, new_power, previous_rev=None):
+    # First get the new artifact if there is one
+    sig_artifact_form = SignatureArtifactForm(request.POST)
+    if new_power.modality.crafting_type == CRAFTING_SIGNATURE:
+        new_artifact = sig_artifact_form.cleaned_data["selected_artifact"]
+        if not new_artifact:
+            new_artifact = Artifact.create(
+                name=power_full.name,
+                description=".",
+                crafting_character=power_full.character,
+                creating_player=request.user,
+                is_signature=True,
+            )
+    else:
+        new_artifact = None
+
+    # Now update relations
+    if previous_rev:
+        if previous_rev.modality.crafting_type == CRAFTING_SIGNATURE:
+            old_artifact = previous_rev.artifacts_set.filter(is_signature=True).get()
+            previous_rev.artifacts.remove(old_artifact) # unlink old rev from old artifact
+            if old_artifact != new_artifact or new_power.modality.crafting_type != CRAFTING_SIGNATURE:
+                power_full.artifacts.remove(old_artifact) # unlink power_full from old artifact
+                if old_artifact.power_full_set.filter(crafting_type=CRAFTING_SIGNATURE).count() == 0:
+                    old_artifact.delete()
+    if new_power.modality.crafting_type == CRAFTING_SIGNATURE:
+        new_power.artifacts.add(new_artifact) # link new rev with artifact
+        power_full.artifacts.add(new_artifact) # it's okay to duplicitively add to a django many-to-many
+
 

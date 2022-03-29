@@ -205,8 +205,25 @@
 </div>
 <div id="sec-customize-flavor">
     <h2 class="text-center">Customize Flavor and Finish</h2>
-    {{power_form.name|bootstrap}}
-    {{power_form.tagline|bootstrap}}
+    <div class="row">
+        <div class="col-md-6">
+            {{power_form.name|bootstrap}}
+        </div>
+        <div class="col-md-6">
+            {{power_form.tagline|bootstrap}}
+        </div>
+    </div>
+    <div v-if="selectedModality.slug === 'signature-item-mod'" class="row">
+        <div class="col-md-6">
+            {{sig_item_artifact_form.selected_artifact|bootstrap}}
+        </div>
+        <div class="col-md-6">
+            {{sig_item_artifact_form.item_name|bootstrap}}
+        </div>
+        <div class="col-xs-12">
+            {{sig_item_artifact_form.item_description|bootstrap}}
+        </div>
+    </div>
     {{power_form.description|bootstrap}}
     {{power_form.extended_description|bootstrap}}
     {% if request.user.is_superuser %}
