@@ -276,53 +276,44 @@ class SystemTextRenderer:
         return replacements
 
     def _get_replacements_for_fields(self, power, field_instances):
-        replacements = defaultdict(list)
-        #self.system.components_from_model(power.)
+        # First we need to find the relevant fields in the power blob
+        components = self.system.components_from_model(power.base_id, power.vector_id, power.modality_id)
+        text_field_by_id = {}
+        weapon_field_by_id = {}
+        roll_field_by_id = {}
+        for component in components:
+            if "text_fields" in component:
+                text_field_by_id = {x["id"]: x for x in component["text_fields"]}
+            if "weapon_fields" in component:
+                weapon_field_by_id = {x["id"]: x for x in component["weapon_fields"]}
+            if "roll_fields" in component:
+                roll_field_by_id = {x["id"]: x for x in component["roll_fields"]}
 
+        # Now we do what the FE does
+        replacements = defaultdict(list)
         for field in field_instances:
             if field.is_weapon():
-                pass
+                weap_replacements = self.system.blob[PowerSystem.WEAP_REPLACEMENTS_BY_PK][field.weapon_id]
+                for repl in weap_replacements:
+                    replacements[repl["marker"]].append(Substitution(repl["mode"], repl["replacement"]))
             else:
-                pass
-                #relevant_field
-        """
-
-          this.systemFields.forEach(field => {
-              if (field.isWeapon) {
-                weaponReplacements = powerBlob["weapon_replacements_by_pk"][this.fieldWeaponInput[field.id]];
-                weaponReplacements.forEach(repl => {
-                    replacements[repl.marker] = [{
-                        replacement: repl.replacement,
-                        mode: repl.mode,
-                    }]
-                })
-              } else {
-                if (!(field.marker in replacements)) {
-                    replacements[field.marker] = [];
-                }
-                let sub = "";
-                if (field.isText) {
-                    sub = this.fieldTextInput[field.id];
-                }
-                if (field.isRoll) {
-                    const choices = this.fieldRollInput[field.id];
-                    sub = choices[0][1];
-                    if (choices.length > 1) {
-                        sub = sub + " + " + choices[1][1];
-                    }
-                }
-                let replacement = field.replacement;
-                if (replacement.includes("$")) {
-                    replacement = field.isRoll ? replacement.replace("$", sub) : subUserInputForDollarSign(replacement, sub);
-                }
-                if (field.isRoll) {
-                    replacement = markRollText(replacement);
-                }
-                replacements[field.marker].push({
-                    replacement: replacement,
-                    mode: "ADDITIVE",
-                });
-              }
-          })
-        """
-        pass
+                sub = ""
+                if field.is_text():
+                    sub = field.value
+                    blob_field = text_field_by_id[field.relevant_field_id]
+                if field.is_roll():
+                    blob_field = roll_field_by_id[field.relevant_field_id]
+                    if field.relevant_field.caster_rolls:
+                        sub = field.roll.render_ps2_html_for_current_contractor()
+                    else:
+                        sub = field.roll.render_value_for_ps2()
+                replacement = blob_field["replacement"]
+                if "$" in replacement:
+                    if field.is_roll():
+                        replacement = replacement.replace("$", sub)
+                        replacement = "<span class=\"css-system-text-roll\">{}</span>".format(replacement)
+                    else:
+                        replacement = SystemTextRenderer._sub_user_input_for_dollar(replacement, sub)
+                replacements[blob_field["marker"]].append(Substitution(ADDITIVE, replacement))
+        return replacements
+    
