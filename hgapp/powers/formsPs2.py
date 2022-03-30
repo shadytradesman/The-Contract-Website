@@ -107,10 +107,10 @@ class ModifierForm(forms.Form):
 
 class ParameterForm(forms.Form):
     level = forms.IntegerField(
-        required=True,
+        required=False,
         widget=forms.HiddenInput(attrs={
             'v-bind:value': 'selectedLevelOfParam(param)',
-
+            'v-bind:disabled': 'param.id in this.disabledParameters',
         }), )
     power_param_id = forms.IntegerField(
         label=None,

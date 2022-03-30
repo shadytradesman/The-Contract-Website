@@ -1496,6 +1496,23 @@ class PowerSystem(models.Model):
     json_media = models.FileField(blank=True)
     revision = models.UUIDField(default=uuid.uuid4)
 
+    # Power blob keys.
+    # DO NOT CHANGE THESE WITHOUT UPDATING THE POWER SYSTEM FRONT END AS THESE VALUES ARE HARD CODED THERE.
+    # This goes for all blob keys throughout the power models.
+    DRAWBACKS = "drawbacks"
+    ENHANCEMENTS = "enhancements"
+    ENHANCEMENT_GROUP_BY_PK = 'enhancement_group_by_pk'
+    WEAP_REPLACEMENTS_BY_PK = 'weapon_replacements_by_pk'
+    EFFECT_VECTOR_GIFT_CREDIT = 'effect_vector_gift_credit'
+    VECTORS_BY_MODALITY = 'vectors_by_modality'
+    VECTORS_BY_EFFECT = 'vectors_by_effect'
+    EFFECTS_BY_MODALITY = 'effects_by_modality'
+    COMPONENT_CATEGORIES = 'component_categories'
+    PARAMETERS = 'parameters'
+    MODALITIES = 'modalities'
+    EFFECTS = 'effects'
+    VECTORS = 'vectors'
+
     @staticmethod
     def get_singleton():
         return PowerSystem.objects.get()
@@ -1546,39 +1563,34 @@ class PowerSystem(models.Model):
             vectors_by_modality[modality["slug"]] = [x for x in modality["allowed_vectors"]]
         return {
             # Components by ID (slug)
-            'vectors': vectors,
-            'effects': effects,
-            'modalities': modalities,
+            PowerSystem.VECTORS: vectors,
+            PowerSystem.EFFECTS: effects,
+            PowerSystem.MODALITIES: modalities,
 
             # Enhancements and Drawbacks by ID (slug)
-            'enhancements': PowerSystem._generate_modifier_blob(Enhancement),
-            'drawbacks': PowerSystem._generate_modifier_blob(Drawback),
+            PowerSystem.ENHANCEMENTS: PowerSystem._generate_modifier_blob(Enhancement),
+            PowerSystem.DRAWBACKS: PowerSystem._generate_modifier_blob(Drawback),
 
             # The parameters dictionary only contains the parameter's name and substitution.
             # The level info is on the gift components
-            'parameters': PowerSystem._generate_param_blob(),
+            PowerSystem.PARAMETERS: PowerSystem._generate_param_blob(),
 
-            'component_categories': PowerSystem._generate_component_category_blob(),
+            PowerSystem.COMPONENT_CATEGORIES: PowerSystem._generate_component_category_blob(),
 
             # An Effect is only available on a given modality if it appears in this mapping.
-            'effects_by_modality': effects_by_modality,
+            PowerSystem.EFFECTS_BY_MODALITY: effects_by_modality,
 
             # A Vector is only available on a given Modality + Effect if it appears in both mappings.
-            'vectors_by_effect': vectors_by_effect,
-            'vectors_by_modality': vectors_by_modality,
+            PowerSystem.VECTORS_BY_EFFECT: vectors_by_effect,
+            PowerSystem.VECTORS_BY_MODALITY: vectors_by_modality,
 
-            'effect_vector_gift_credit': PowerSystem._generate_effect_vector_gift_credits_blob(),
+            PowerSystem.EFFECT_VECTOR_GIFT_CREDIT: PowerSystem._generate_effect_vector_gift_credits_blob(),
 
             # Weapon choice system fields use a Weapon's pk as the non-display value. Stats in this blob by pk.
-            'weapon_replacements_by_pk': PowerSystem._generate_weapons_blob(),
+            PowerSystem.WEAP_REPLACEMENTS_BY_PK: PowerSystem._generate_weapons_blob(),
 
-            'enhancement_group_by_pk': PowerSystem._generate_enhancement_groups_blob()
+            PowerSystem.ENHANCEMENT_GROUP_BY_PK: PowerSystem._generate_enhancement_groups_blob()
         }
-
-        # generate the json blob for the fe and for backend form validation.
-        # TODO: cache this in a wrapping method
-        # Cache in per-component caches so it doesn't have to be regenerated as much?
-        # TODO: invalidate cache when any relevant model (enhancement, base power) is saved.
 
     @staticmethod
     def _generate_component_blob(base_type):

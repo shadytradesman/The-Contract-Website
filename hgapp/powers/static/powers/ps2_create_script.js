@@ -443,29 +443,20 @@ function addReplacementsForModifiers(replacements, selectedModifiers, detailsByM
               var replacement = sub["replacement"];
               let numIncludedForSlug = includedModSlugs.filter(includedSlug => includedSlug === mod["slug"] + sub["marker"]).length;
               if (replacement.includes("$")) {
-                  let substitution = "";
+                  let dollarSub = "";
                   if (mod["joining_strategy"] != "ALL") {
-                      var subStrings = mod["slug"] in detailsByModifiers ? detailsByModifiers[mod["slug"]] : [""];
-                      subStrings = subStrings.filter(sub => !(sub.length === 0)).map(uncleanedString => {
-                          let subString = uncleanedString;
-                          subString = subString.replace("((", "(");
-                          subString = subString.replace("[[", "[");
-                          subString = subString.replace("{{", "{");
-                          subString = subString.replace("))", ")");
-                          subString = subString.replace("]]", "]");
-                          subString = subString.replace("}}", "}");
-                          return subString;
-                      })
-                      let joiningString = subStrings.length > 2 ? ", " : " ";
-                      if (subStrings.length > 1) {
+                      var allDetails = mod["slug"] in detailsByModifiers ? detailsByModifiers[mod["slug"]] : [""];
+                      allDetails = allDetails.filter(sub => !(sub.length === 0));
+                      let joiningString = allDetails.length > 2 ? ", " : " ";
+                      if (allDetails.length > 1) {
                           let joiningWord = mod["joining_strategy"] === "OR" ? "or " : "and ";
-                          subStrings[subStrings.length - 1] = joiningWord + subStrings[subStrings.length - 1];
+                          allDetails[allDetails.length - 1] = joiningWord + allDetails[allDetails.length - 1];
                       }
-                      substitution = subStrings.join(joiningString);
+                      dollarSub = allDetails.join(joiningString);
                   } else {
-                      substitution = detailsByModifiers[mod["slug"]][numIncludedForSlug];
+                      dollarSub = detailsByModifiers[mod["slug"]][numIncludedForSlug];
                   }
-                  replacement = subUserInputForDollarSign(replacement, substitution);
+                  replacement = subUserInputForDollarSign(replacement, dollarSub);
               }
               const newSub = {
                   mode: sub["mode"],
