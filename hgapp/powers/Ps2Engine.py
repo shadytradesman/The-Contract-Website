@@ -169,6 +169,7 @@ class Substitution:
         self.replacement = replacement
 
 
+# The code in this class MUST STAY IN SYNC with the FE code in ps2_create_script.js.
 class SystemTextRenderer:
 
     def __init__(self, power, modifier_instances, param_instances, field_instances):
@@ -244,6 +245,9 @@ class SystemTextRenderer:
         user_input = '<span class="css-system-text-user-input">' + user_input + "</span>"
         return replacement_text.replace("$", user_input)
 
+    # This method must remain functionally equal to ps2_create_script.js # addReplacementsForComponents
+    # This is to ensure consistent server-side rendering of user-created powers.
+    # DO NOT REFACTOR THIS METHOD WITHOUT CHANGING THE ASSOCIATED METHOD IN THE FE
     def _get_replacements_for_components(self, power):
         replacement_map = defaultdict(list)
         components = [
@@ -259,6 +263,9 @@ class SystemTextRenderer:
                 replacement_map[marker].append(new_sub)
         return replacement_map
 
+    # This method must remain functionally equal to ps2_create_script.js # addReplacementsForParameters
+    # This is to ensure consistent server-side rendering of user-created powers.
+    # DO NOT REFACTOR THIS METHOD WITHOUT CHANGING THE ASSOCIATED METHOD IN THE FE
     def _get_replacements_for_parameters(self, param_instances):
         replacements = defaultdict(list)
         # param_instances already does not include disabled parameters (we lean on the FE for this)
@@ -275,17 +282,17 @@ class SystemTextRenderer:
                 replacements[marker].append(Substitution(sub["mode"], replacement))
         return replacements
 
+    # This method must remain functionally equal to ps2_create_script.js # addReplacementsForFields
+    # This is to ensure consistent server-side rendering of user-created powers.
+    # DO NOT REFACTOR THIS METHOD WITHOUT CHANGING THE ASSOCIATED METHOD IN THE FE
     def _get_replacements_for_fields(self, power, field_instances):
         # First we need to find the relevant fields in the power blob
         components = self.system.components_from_model(power.base_id, power.vector_id, power.modality_id)
         text_field_by_id = {}
-        weapon_field_by_id = {}
         roll_field_by_id = {}
         for component in components:
             if "text_fields" in component:
                 text_field_by_id = {x["id"]: x for x in component["text_fields"]}
-            if "weapon_fields" in component:
-                weapon_field_by_id = {x["id"]: x for x in component["weapon_fields"]}
             if "roll_fields" in component:
                 roll_field_by_id = {x["id"]: x for x in component["roll_fields"]}
 
@@ -316,4 +323,38 @@ class SystemTextRenderer:
                         replacement = SystemTextRenderer._sub_user_input_for_dollar(replacement, sub)
                 replacements[blob_field["marker"]].append(Substitution(ADDITIVE, replacement))
         return replacements
-    
+
+    def _collapse_substitutionss(self, replacements):
+        # Normalizes lists of substitutions so that they follow the semantics associated with the replacement modes:
+        # EPHEMERAL subs are replaced by all other types
+        # UNIQUE subs replace all other types, leaving a single substitution.
+        # ADDITIVE subs can exist in any quantity.
+        # return a mapping of marker string to list of replacement texts.
+        cleaned_replacements = defaultdict(list)
+        for marker in replacements:
+            substitutions = replacements[marker]
+            if len(substitutions) == 0:
+                raise ValueError("Empty subs for marker: " + marker)
+            if len(substitutions) == 1:
+                cleaned_replacements[marker] = [substitutions[0].replacement]
+                continue
+            unique_subs = [x for x in substitutions if x.mode == UNIQUE]
+            if len(unique_subs) > 1:
+                raise ValueError("Multiple subs are unique for marker:" + marker)
+            if len(unique_subs) == 1:
+                cleaned_replacements[marker] = [unique_subs[0].replacement]
+                continue
+            ephemeral_subs = [x for x in substitutions if x.mode == EPHEMERAL]
+            non_ephemeral_subs = [x for x in substitutions if x.mode != EPHEMERAL]
+            if len(ephemeral_subs) > 0 and len(non_ephemeral_subs) > 0:
+                cleaned_replacements[marker] = [x.replacement for x in non_ephemeral_subs]
+                continue
+            if len(ephemeral_subs) > 1:
+                cleaned_replacements[marker] = [ephemeral_subs[0].replacement]
+                continue
+            cleaned_replacements[marker] = [x.replacement for x in substitutions]
+        for marker in cleaned_replacements:
+            cleaned_replacements[marker] = [x for x in cleaned_replacements[marker] if len(x) > 0]
+            if len(cleaned_replacements[marker]) == 0:
+                cleaned_replacements[marker] = [""]
+        return cleaned_replacements
