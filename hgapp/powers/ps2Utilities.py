@@ -114,16 +114,16 @@ def _create_new_power_and_save(power_form, request, SigArtifactForm):
 
     # These instances are unsaved and do not yet reference the power.
     modifier_instances = _get_modifier_instances_and_validate(
-        request.POST, power_engine, power.base, power.vector, power.modality)
+        request.POST, power_engine, power.base_id, power.vector_id, power.modality_id)
     param_instances = _get_param_instances_and_validate(
-        request.POST, power_engine, power.base, power.vector, power.modality)
+        request.POST, power_engine, power.base_id, power.vector_id, power.modality_id)
     field_instances = _get_field_instances_and_validate(
-        request.POST, power_engine, power.base, power.vector, power.modality)
+        request.POST, power_engine, power.base_id, power.vector_id, power.modality_id)
     _populate_power_system_and_errata(power_engine, power, modifier_instances, param_instances, field_instances)
 
     power.enhancement_names = [enh.relevant_enhancement.name for enh in modifier_instances if hasattr(enh, "relevant_enhancement")]
     power.drawback_names = [mod.relevant_drawback.name for mod in modifier_instances if hasattr(mod, "relevant_drawback")]
-    power.shouldDisplayVector = power_engine.should_display_vector(power.base, power.modality)
+    power.shouldDisplayVector = power_engine.should_display_vector(power.base_id, power.modality_id)
     # At this point, we can be sure the power is valid, so we save everything to the DB and hook up our instances.
     power.save()
     for mod in modifier_instances:
@@ -149,15 +149,15 @@ def _get_power_from_form_and_validate(power_form, power_engine, user=None):
                   dice_system=SYS_PS2)
     if user and user.id:
         power.created_by = user
-    power_engine.validate_components(power.base, power.vector, power.modality)
+    power_engine.validate_components(power.base_id, power.vector_id, power.modality_id)
     return power
 
 
-def _get_modifier_instances_and_validate(POST, power_engine, effect, vector, modality):
+def _get_modifier_instances_and_validate(POST, power_engine, effect_id, vector_id, modality_id):
     modifiers_formset = get_modifiers_formset(POST)
     if modifiers_formset.is_valid():
         selected_modifier_forms = [x for x in modifiers_formset if "is_selected" in x.cleaned_data and x.cleaned_data["is_selected"]]
-        power_engine.validate_new_mod_forms(effect, vector, modality, selected_modifier_forms)
+        power_engine.validate_new_mod_forms(effect_id, vector_id, modality_id, selected_modifier_forms)
         modifiers = []
         for form in selected_modifier_forms:
             details = form.cleaned_data["details"] if "details" in form.cleaned_data else None
@@ -175,10 +175,10 @@ def _get_modifier_instances_and_validate(POST, power_engine, effect, vector, mod
         raise ValueError("Invalid modifiers formset!")
 
 
-def _get_param_instances_and_validate(POST, power_engine, effect, vector, modality):
+def _get_param_instances_and_validate(POST, power_engine, effect_id, vector_id, modality_id):
     params_formset = get_params_formset(POST)
     if params_formset.is_valid():
-        power_engine.validate_new_param_forms(effect, vector, modality, params_formset)
+        power_engine.validate_new_param_forms(effect_id, vector_id, modality_id, params_formset)
         params = []
         for form in params_formset:
             if not form.cleaned_data["level"]:
@@ -222,7 +222,7 @@ def _get_field_roll_instances(sys_field_roll_formset):
     return instances
 
 
-def _get_field_instances_and_validate(POST, power_engine, effect, vector, modality):
+def _get_field_instances_and_validate(POST, power_engine, effect_id, vector_id, modality_id):
     sys_field_text_formset = get_sys_field_text_formset(POST)
     sys_field_weapon_formset = get_sys_field_weapon_formset(POST)
     sys_field_roll_formset = get_sys_field_roll_formset(POST)
@@ -230,7 +230,7 @@ def _get_field_instances_and_validate(POST, power_engine, effect, vector, modali
         print(sys_field_roll_formset.cleaned_data)
         print(sys_field_roll_formset.data)
         power_engine.validate_new_field_forms(
-            effect, vector, modality, sys_field_text_formset, sys_field_weapon_formset, sys_field_roll_formset)
+            effect_id, vector_id, modality_id, sys_field_text_formset, sys_field_weapon_formset, sys_field_roll_formset)
         field_instances = []
         field_instances.extend(_get_field_text_instances(sys_field_text_formset))
         field_instances.extend(_get_field_weapon_instances(sys_field_weapon_formset))

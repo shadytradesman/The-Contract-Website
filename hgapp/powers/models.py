@@ -283,7 +283,7 @@ class Enhancement(Modifier):
             sub_list = [x.to_blob() for x in substitutions]
         enh_blob = {
             "substitutions": sub_list,
-            "group": self.group.pk if self.group else None,
+            "group": self.group_id if self.group else None,
         }
         field_blob.update(enh_blob)
         return field_blob
@@ -576,7 +576,7 @@ class Base_Power(models.Model):
             'gift_credit': self.num_free_enhancements,
             'required_status': self.required_status,
             'icon_url': self.icon.url if self.icon else "",
-            'category': self.category.pk if self.category else None,
+            'category': self.category_id if self.category else None,
             'substitutions': [x.to_blob() for x in self.basepowerfieldsubstitution_set.all()],
             'allowed_vectors': list(self.allowed_vectors.values_list('pk', flat=True)),
             'allowed_modalities': list(self.allowed_modalities.values_list('pk', flat=True)),
@@ -610,8 +610,8 @@ class VectorCostCredit(models.Model):
 
     def to_blob(self):
         return {
-            "vector": self.relevant_vector.pk,
-            "effect": self.relevant_effect.pk,
+            "vector": self.relevant_vector_id,
+            "effect": self.relevant_effect_id,
             "credit": self.gift_credit,
         }
 
@@ -701,7 +701,7 @@ class Power_Param(models.Model):
     def to_blob(self):
         return {
             "id": self.pk,
-            "param_id": self.relevant_parameter.pk,
+            "param_id": self.relevant_parameter_id,
             "levels": self.get_levels(),
             "eratta": self.eratta,
             "default_level": self.default,
@@ -1041,9 +1041,9 @@ class Power(models.Model):
 
     def to_edit_blob(self):
         return {
-            "effect_pk": self.base.pk,
-            "vector_pk": self.vector.pk,
-            "modality_pk": self.modality.pk,
+            "effect_pk": self.base_id,
+            "vector_pk": self.vector_id,
+            "modality_pk": self.modality_id,
             "name": self.name,
             "flavor_text": self.flavor_text,
             "description": self.description,
@@ -1327,6 +1327,15 @@ class SystemFieldInstance(models.Model):
     class Meta:
         abstract = True
 
+    def is_weapon(self):
+        return False
+
+    def is_text(self):
+        return False
+
+    def is_roll(self):
+        return False
+
 
 class SystemFieldTextInstance(SystemFieldInstance):
     relevant_field = models.ForeignKey(SystemFieldText, on_delete=models.CASCADE)
@@ -1342,9 +1351,12 @@ class SystemFieldTextInstance(SystemFieldInstance):
 
     def to_blob(self):
         return {
-            "field_id": self.relevant_field.pk,
+            "field_id": self.relevant_field_id,
             "value": self.value
         }
+
+    def is_text(self):
+        return True
 
 
 class SystemFieldRollInstance(SystemFieldInstance):
@@ -1355,9 +1367,12 @@ class SystemFieldRollInstance(SystemFieldInstance):
     class Meta:
         unique_together = (("relevant_field", "relevant_power"))
 
+    def is_roll(self):
+        return True
+
     def to_blob(self):
         return {
-            "field_id": self.relevant_field.pk,
+            "field_id": self.relevant_field_id,
             "roll_attribute": self._get_roll_initial_attribute(self.roll),
             "roll_ability": self._get_roll_initial_ability(self.roll),
         }
@@ -1391,10 +1406,13 @@ class SystemFieldWeaponInstance(SystemFieldInstance):
     relevant_field = models.ForeignKey(SystemFieldWeapon, on_delete=models.CASCADE)
     weapon = models.ForeignKey(Weapon, on_delete=models.CASCADE)
 
+    def is_weapon(self):
+        return True
+
     def to_blob(self):
         return {
-            "field_id": self.relevant_field.pk,
-            "weapon_id": self.weapon.pk,
+            "field_id": self.relevant_field_id,
+            "weapon_id": self.weapon_id,
         }
 
 
@@ -1418,7 +1436,7 @@ class Enhancement_Instance(models.Model):
 
     def to_blob(self):
         return {
-            "enhancement_slug": self.relevant_enhancement.pk,
+            "enhancement_slug": self.relevant_enhancement_id,
             "detail": self.detail,
         }
 
@@ -1448,7 +1466,7 @@ class Drawback_Instance(models.Model):
 
     def to_blob(self):
         return {
-            "drawback_slug": self.relevant_drawback.pk,
+            "drawback_slug": self.relevant_drawback_id,
             "detail": self.detail,
         }
 
@@ -1470,7 +1488,7 @@ class Parameter_Value(models.Model):
 
     def to_blob(self):
         return {
-            "power_param_pk": self.relevant_power_param.pk,
+            "power_param_pk": self.relevant_power_param_id,
             "value": self.value,
         }
 

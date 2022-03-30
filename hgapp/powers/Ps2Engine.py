@@ -18,10 +18,10 @@ class PowerEngine:
     def get_json_power_blob(self):
         return json.dumps(self.blob)
 
-    def validate_components(self, effect, vector, modality):
-        effect = self.blob[PowerSystem.EFFECTS][effect.pk]
-        vector = self.blob[PowerSystem.VECTORS][vector.pk]
-        modality = self.blob[PowerSystem.MODALITIES][modality.pk]
+    def validate_components(self, effect_id, vector_id, modality_id):
+        effect = self.blob[PowerSystem.EFFECTS][effect_id]
+        vector = self.blob[PowerSystem.VECTORS][vector_id]
+        modality = self.blob[PowerSystem.MODALITIES][modality_id]
         # An Effect is only available on a given modality if it appears in this mapping.
         if not effect["slug"] in self.blob[PowerSystem.EFFECTS_BY_MODALITY][modality["slug"]]:
             raise ValueError("INVALID GIFT. Modality {} and Effect {} are incompatible".format(modality, effect))
@@ -32,12 +32,12 @@ class PowerEngine:
         if not vector["slug"] in self.blob[PowerSystem.VECTORS_BY_MODALITY][modality["slug"]]:
             raise ValueError("INVALID GIFT. Vector {} and Modality {} are incompatible".format(vector, modality))
 
-    def validate_new_mod_forms(self, effect, vector, modality, modifier_forms):
+    def validate_new_mod_forms(self, effect_id, vector_id, modality_id, modifier_forms):
         # Currently validates details text, modifier multiplicity count, and blacklist/component availability
         # TODO: validate required enhancements and drawbacks
         # TODO: validate mutual exclusivity (or maybe do this in system text rendering?)
         # TODO: validate min num required enhancements and drawbacks
-        components = self._components_from_model(effect, vector, modality)
+        components = self.components_from_model(effect_id, vector_id, modality_id)
         allowed_enhancement_slugs = PowerEngine._get_allowed_modifiers_for_components(components, PowerSystem.ENHANCEMENTS)
         allowed_drawback_slugs = PowerEngine._get_allowed_modifiers_for_components(components, PowerSystem.DRAWBACKS)
         enhancements = self.blob[PowerSystem.ENHANCEMENTS]
@@ -80,8 +80,8 @@ class PowerEngine:
                     modifier,
                     form.cleaned_data))
 
-    def validate_new_param_forms(self, model_effect, model_vector, model_modality, param_formset):
-        components = self._components_from_model(model_effect, model_vector, model_modality)
+    def validate_new_param_forms(self, model_effect_id, model_vector_id, model_modality_id, param_formset):
+        components = self.components_from_model(model_effect_id, model_vector_id, model_modality_id)
         allowed_power_params = PowerEngine._get_allowed_params_for_components(components)
         allowed_power_param_by_slug = {x["id"]: x for x in allowed_power_params}
         for form in param_formset:
@@ -105,8 +105,8 @@ class PowerEngine:
         if len(allowed_power_param_by_slug) > 0:
             raise ValueError("parameter not submitted in form: {}".format(allowed_power_param_by_slug))
 
-    def validate_new_field_forms(self, model_effect, model_vector, model_modality, text_forms, weap_forms, roll_forms):
-        components = self._components_from_model(model_effect, model_vector, model_modality)
+    def validate_new_field_forms(self, model_effect_id, model_vector_id, model_modality_id, text_forms, weap_forms, roll_forms):
+        components = self.components_from_model(model_effect_id, model_vector_id, model_modality_id)
         text_field_ids = set()
         weapon_field_ids = set()
         roll_field_ids = set()
@@ -130,9 +130,9 @@ class PowerEngine:
             if field_id not in roll_field_ids:
                 raise ValueError("field not expected: {}".format(form.cleaned_data))
 
-    def should_display_vector(self, effect, modality):
-        effect = self.blob[PowerSystem.EFFECTS][effect.pk]
-        modality = self.blob[PowerSystem.MODALITIES][modality.pk]
+    def should_display_vector(self, effect_id, modality_id):
+        effect = self.blob[PowerSystem.EFFECTS][effect_id]
+        modality = self.blob[PowerSystem.MODALITIES][modality_id]
         avail_vec = set(self.blob[PowerSystem.VECTORS_BY_EFFECT][effect["slug"]])
         avail_vec = avail_vec.intersection(set(self.blob[PowerSystem.VECTORS_BY_MODALITY][modality["slug"]]))
         return len(avail_vec) > 1
@@ -155,10 +155,10 @@ class PowerEngine:
         return allowed_modifiers
 
 
-    def _components_from_model(self, effect, vector, modality):
-        effect = self.blob[PowerSystem.EFFECTS][effect.pk]
-        vector = self.blob[PowerSystem.VECTORS][vector.pk]
-        modality = self.blob[PowerSystem.MODALITIES][modality.pk]
+    def components_from_model(self, effect_id, vector_id, modality_id):
+        effect = self.blob[PowerSystem.EFFECTS][effect_id]
+        vector = self.blob[PowerSystem.VECTORS][vector_id]
+        modality = self.blob[PowerSystem.MODALITIES][modality_id]
         components = [effect, vector, modality]
         return components
 
@@ -184,7 +184,7 @@ class SystemTextRenderer:
         replacements.update(self._get_replacements_for_modifiers(modifier_instances))
         replacements.update(self._get_replacements_for_components(power))
         replacements.update(self._get_replacements_for_parameters(param_instances))
-        replacements.update(self._get_replacements_for_fields(field_instances))
+        replacements.update(self._get_replacements_for_fields(power, field_instances))
         return self._collapse_substitutionss(replacements)
 
     # This method must remain functionally equal to ps2_create_script.js # addReplacementsForModifiers
@@ -230,10 +230,10 @@ class SystemTextRenderer:
 
     def _get_mod_and_type(self, modifier_inst):
         if hasattr(modifier_inst, "relevant_enhancement"):
-            modifier = self.system.blob[PowerSystem.ENHANCEMENTS][modifier_inst.relevant_enhancement.pk]
+            modifier = self.system.blob[PowerSystem.ENHANCEMENTS][modifier_inst.relevant_enhancement_id]
             mod_type = "enh^"
         elif hasattr(modifier_inst, "relevant_drawback"):
-            modifier = self.system.blob[PowerSystem.DRAWBACKS][modifier_inst.relevant_drawback.pk]
+            modifier = self.system.blob[PowerSystem.DRAWBACKS][modifier_inst.relevant_drawback_id]
             mod_type = "drawb^"
         else:
             raise ValueError("Unexpected modifier type" + modifier_inst)
@@ -247,9 +247,9 @@ class SystemTextRenderer:
     def _get_replacements_for_components(self, power):
         replacement_map = defaultdict(list)
         components = [
-            self.system.blob[PowerSystem.MODALITIES][power.modality.pk],
-            self.system.blob[PowerSystem.EFFECTS][power.base.pk],
-            self.system.blob[PowerSystem.VECTORS][power.vector.pk],
+            self.system.blob[PowerSystem.MODALITIES][power.modality_id],
+            self.system.blob[PowerSystem.EFFECTS][power.base_id],
+            self.system.blob[PowerSystem.VECTORS][power.vector_id],
         ]
         for component in components:
             for sub in component["substitutions"]:
@@ -265,7 +265,7 @@ class SystemTextRenderer:
         for param in param_instances:
             pow_param = param.relevant_power_param
             selection = pow_param.get_value_for_level(param.value)
-            param_pk = pow_param.relevant_parameter.pk
+            param_pk = pow_param.relevant_parameter_id
             subs = self.system.blob[PowerSystem.PARAMETERS][param_pk]["substitutions"]
             for sub in subs:
                 marker = sub["marker"]
@@ -274,3 +274,55 @@ class SystemTextRenderer:
                     replacement = replacement.replace("$", selection)
                 replacements[marker].append(Substitution(sub["mode"], replacement))
         return replacements
+
+    def _get_replacements_for_fields(self, power, field_instances):
+        replacements = defaultdict(list)
+        #self.system.components_from_model(power.)
+
+        for field in field_instances:
+            if field.is_weapon():
+                pass
+            else:
+                pass
+                #relevant_field
+        """
+
+          this.systemFields.forEach(field => {
+              if (field.isWeapon) {
+                weaponReplacements = powerBlob["weapon_replacements_by_pk"][this.fieldWeaponInput[field.id]];
+                weaponReplacements.forEach(repl => {
+                    replacements[repl.marker] = [{
+                        replacement: repl.replacement,
+                        mode: repl.mode,
+                    }]
+                })
+              } else {
+                if (!(field.marker in replacements)) {
+                    replacements[field.marker] = [];
+                }
+                let sub = "";
+                if (field.isText) {
+                    sub = this.fieldTextInput[field.id];
+                }
+                if (field.isRoll) {
+                    const choices = this.fieldRollInput[field.id];
+                    sub = choices[0][1];
+                    if (choices.length > 1) {
+                        sub = sub + " + " + choices[1][1];
+                    }
+                }
+                let replacement = field.replacement;
+                if (replacement.includes("$")) {
+                    replacement = field.isRoll ? replacement.replace("$", sub) : subUserInputForDollarSign(replacement, sub);
+                }
+                if (field.isRoll) {
+                    replacement = markRollText(replacement);
+                }
+                replacements[field.marker].push({
+                    replacement: replacement,
+                    mode: "ADDITIVE",
+                });
+              }
+          })
+        """
+        pass
