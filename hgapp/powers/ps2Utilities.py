@@ -98,6 +98,14 @@ def _populate_power_system_and_errata(power_engine, power, modifier_instances, p
     renderer.populate_rendered_fields(power, modifier_instances, param_instances, field_instances)
 
 
+def _calculate_req_status(power_engine, power, modifier_instances, param_instances):
+    return power_engine.calculate_req_status(power.base_id,
+                                             power.vector_id,
+                                             power.modality_id,
+                                             modifier_instances,
+                                             param_instances)
+
+
 def _create_new_power_and_save(power_form, request, SigArtifactForm):
     power_engine = PowerEngine()
 
@@ -122,6 +130,7 @@ def _create_new_power_and_save(power_form, request, SigArtifactForm):
     power.enhancement_names = [enh.relevant_enhancement.name for enh in modifier_instances if hasattr(enh, "relevant_enhancement")]
     power.drawback_names = [mod.relevant_drawback.name for mod in modifier_instances if hasattr(mod, "relevant_drawback")]
     power.shouldDisplayVector = power_engine.should_display_vector(power.base_id, power.modality_id)
+    power.required_status = _calculate_req_status(power_engine, power, modifier_instances, param_instances)
     # At this point, we can be sure the power is valid, so we save everything to the DB and hook up our instances.
     power.save()
     for mod in modifier_instances:

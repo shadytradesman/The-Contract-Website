@@ -5,10 +5,18 @@ from django.urls import reverse
 from django.db.models import Prefetch
 from .models import PowerSystem, EPHEMERAL, UNIQUE, ADDITIVE, SUB_JOINING_AND, SUB_JOINING_OR, SUB_ALL, \
     SYS_LEGACY_POWERS, EFFECT, VECTOR, MODALITY, Base_Power, Enhancement, Drawback, Parameter, \
-    Base_Power_Category, VectorCostCredit, ADDITIVE, EnhancementGroup, CREATION_NEW, SYS_PS2, Power, Power_Full, \
-    Enhancement_Instance, Drawback_Instance, Parameter_Value, Power_Param, SystemFieldText, SystemFieldTextInstance, \
-    SystemFieldWeapon, SystemFieldWeaponInstance, SystemFieldRoll, SystemFieldRollInstance, CRAFTING_SIGNATURE
+    Base_Power_Category, VectorCostCredit, ADDITIVE
 
+from characters.models import STATUS_SEASONED, STATUS_VETERAN
+
+
+def merge_status(current_status, incoming_status):
+    if not current_status:
+        return incoming_status
+    if incoming_status == STATUS_SEASONED and current_status != STATUS_VETERAN:
+        return STATUS_SEASONED
+    if incoming_status == STATUS_VETERAN:
+        return STATUS_VETERAN
 
 class PowerEngine:
 
@@ -17,6 +25,22 @@ class PowerEngine:
 
     def get_json_power_blob(self):
         return json.dumps(self.blob)
+
+    def calculate_req_status(self, effect_id, vector_id, modality_id, modifier_instances, param_instances):
+        current_status = None
+        components = self.components_from_model(effect_id, vector_id, modality_id)
+        for component in components:
+            current_status = merge_status(current_status, component["required_status"][0])
+        for mod_inst in modifier_instances:
+            mod, type = self.get_mod_and_type_for_inst(mod_inst)
+            current_status = merge_status(current_status, mod["required_status"][0])
+        for param_inst in param_instances:
+            pow_param = param_inst.relevant_power_param
+            if param_inst.value >= pow_param.veteran:
+                current_status = merge_status(current_status, STATUS_VETERAN)
+            elif param_inst.value >= pow_param.seasoned:
+                current_status = merge_status(current_status, STATUS_SEASONED)
+        return current_status
 
     def validate_components(self, effect_id, vector_id, modality_id):
         effect = self.blob[PowerSystem.EFFECTS][effect_id]
@@ -136,6 +160,17 @@ class PowerEngine:
         avail_vec = set(self.blob[PowerSystem.VECTORS_BY_EFFECT][effect["slug"]])
         avail_vec = avail_vec.intersection(set(self.blob[PowerSystem.VECTORS_BY_MODALITY][modality["slug"]]))
         return len(avail_vec) > 1
+
+    def get_mod_and_type_for_inst(self, modifier_inst):
+        if hasattr(modifier_inst, "relevant_enhancement"):
+            modifier = self.blob[PowerSystem.ENHANCEMENTS][modifier_inst.relevant_enhancement_id]
+            mod_type = "enh^"
+        elif hasattr(modifier_inst, "relevant_drawback"):
+            modifier = self.blob[PowerSystem.DRAWBACKS][modifier_inst.relevant_drawback_id]
+            mod_type = "drawb^"
+        else:
+            raise ValueError("Unexpected modifier type" + modifier_inst)
+        return modifier, mod_type
 
     @staticmethod
     def _get_allowed_params_for_components(components):
@@ -320,11 +355,11 @@ class SystemTextRenderer:
         # This replicates the detailsByModifiers map in the FE
         details_by_mod = defaultdict(list)
         for modifier_inst in modifier_instances:
-            modifier, mod_type = self._get_mod_and_type(modifier_inst)
+            modifier, mod_type = self.system.get_mod_and_type_for_inst(modifier_inst)
             details_by_mod[mod_type + modifier["slug"]].append(modifier_inst.detail)
 
         for modifier_inst in modifier_instances:
-            modifier, mod_type = self._get_mod_and_type(modifier_inst)
+            modifier, mod_type = self.system.get_mod_and_type_for_inst(modifier_inst)
             mod_joining_strategy = modifier["joining_strategy"]
             mod_detail = modifier_inst.detail
             for sub in modifier["substitutions"]:
@@ -351,16 +386,6 @@ class SystemTextRenderer:
                     modifier_replacements[marker].append(new_sub)
         return modifier_replacements
 
-    def _get_mod_and_type(self, modifier_inst):
-        if hasattr(modifier_inst, "relevant_enhancement"):
-            modifier = self.system.blob[PowerSystem.ENHANCEMENTS][modifier_inst.relevant_enhancement_id]
-            mod_type = "enh^"
-        elif hasattr(modifier_inst, "relevant_drawback"):
-            modifier = self.system.blob[PowerSystem.DRAWBACKS][modifier_inst.relevant_drawback_id]
-            mod_type = "drawb^"
-        else:
-            raise ValueError("Unexpected modifier type" + modifier_inst)
-        return modifier, mod_type
 
     @staticmethod
     def _sub_user_input_for_dollar(replacement_text, user_input):

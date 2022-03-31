@@ -4,10 +4,10 @@
         </span>
     </span>
 </div>
-{% if power.required_status %}
+{% if power.required_status == "SEASONED" or power.required_status == "VETERAN" %}
     <div class="pull-right text-muted"  data-toggle="tooltip" title="Seasoned = 10+ Victories. Veteran = 25+ Victories"
          style="margin-right: 3px;">
-        <i>Requires <b>{{power.required_status}}</b></i>
+        <i>Requires <b>{{power.get_required_status_display}}</b></i>
     </div>
 {% endif %}
 <div>

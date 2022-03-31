@@ -21,12 +21,17 @@ import hashlib
 
 logger = logging.getLogger("app." + __name__)
 
+STATUS_ANY = 'ANY'
+STATUS_NEWBIE = 'NEWBIE'
+STATUS_NOVICE = 'NOVICE'
+STATUS_SEASONED = 'SEASONED'
+STATUS_VETERAN = 'VETERAN'
 HIGH_ROLLER_STATUS = (
-    ('ANY', 'Any'),
-    ('NEWBIE', 'Newbie'),
-    ('NOVICE', 'Novice'),
-    ('SEASONED', 'Seasoned'),
-    ('VETERAN', 'Veteran'),
+    (STATUS_ANY, 'Any'),
+    (STATUS_NEWBIE, 'Newbie'),
+    (STATUS_NOVICE, 'Novice'),
+    (STATUS_SEASONED, 'Seasoned'),
+    (STATUS_VETERAN, 'Veteran'),
 )
 
 NO_PARRY_INFO = "NO_INFO"
