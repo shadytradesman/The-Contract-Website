@@ -7,7 +7,7 @@ from .models import PowerSystem, EPHEMERAL, UNIQUE, ADDITIVE, SUB_JOINING_AND, S
     SYS_LEGACY_POWERS, EFFECT, VECTOR, MODALITY, Base_Power, Enhancement, Drawback, Parameter, \
     Base_Power_Category, VectorCostCredit, ADDITIVE
 
-from characters.models import STATUS_SEASONED, STATUS_VETERAN
+from characters.models import STATUS_SEASONED, STATUS_VETERAN, STATUS_ANY
 
 
 def merge_status(current_status, incoming_status):
@@ -40,7 +40,7 @@ class PowerEngine:
                 current_status = merge_status(current_status, STATUS_VETERAN)
             elif param_inst.value >= pow_param.seasoned:
                 current_status = merge_status(current_status, STATUS_SEASONED)
-        return current_status
+        return current_status if current_status else STATUS_ANY
 
     def validate_components(self, effect_id, vector_id, modality_id):
         effect = self.blob[PowerSystem.EFFECTS][effect_id]
