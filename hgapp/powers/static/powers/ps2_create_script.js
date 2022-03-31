@@ -154,7 +154,8 @@ function componentToVue(component, type) {
         type: component.type,
         giftCredit: component["gift_credit"],
         visibility: component.default_description_prompt,
-        requiredStatus: component.required_status,
+        requiredStatus: component.required_status[0],
+        requiredStatusLabel: component.required_status[0] === "ANY" ? false : component.required_status[1],
     }
 }
 const filterDisplayByVecSlug = {
@@ -753,6 +754,7 @@ const ComponentRendering = {
       drawbacksCost: 0,
       giftCostTooltip: " ",
       requiredStatus: null,
+      requiredStatusReason: null,
       giftName: null,
       giftDescription: null,
       giftExtendedDescription: null,
@@ -1037,6 +1039,12 @@ const ComponentRendering = {
       changeEffectFilter() {
           this.updateEffectCategoryDisplay();
       },
+      clickEffectFilter(filter) {
+          if (this.selectedEffectFilter && filter.target.getAttribute("id") === this.selectedEffectFilter.id) {
+              this.setEffectFilterToAll();
+              this.updateEffectCategoryDisplay();
+          }
+      },
       getCostForEffect(effectSlug, effectGiftCredit) {
         // A cost is only displayed for an Effect if there is only one Vector for the Effect and the combined cost is non-zero.
         const allowedVectors = this.getAvailableVectorsForEffectAndModality(effectSlug, this.selectedModality.slug)
@@ -1101,6 +1109,9 @@ const ComponentRendering = {
           }
 
           this.effectFilters = newEffectFilters.concat(allAvailableVectors.map(vecSlug => vectorSlugToEffectFilter(vecSlug, this.selectedModality.slug)));
+          this.setEffectFilterToAll();
+      },
+      setEffectFilterToAll() {
           let allFilter = {
               id: "effect-filter-ALL",
               value: "ALL",
@@ -1238,41 +1249,44 @@ const ComponentRendering = {
               setFormInputPrefixValues();
           });
       },
-      updateRequiredStatus() {
-        let requiredStatus = null;
-        function mergeStatuses(currentStatus, requiredStatus) {
+      mergeStatuses(currentStatus, requiredStatus, reason) {
             if (null == requiredStatus || requiredStatus[0] === "ANY") {
                 return currentStatus;
             }
             if (requiredStatus[0] === "VETERAN") {
+                this.requiredStatusReason = reason;
                 return requiredStatus;
             }
             if (requiredStatus[0] === "SEASONED" && (null === currentStatus || currentStatus[0] === "ANY")) {
+                this.requiredStatusReason = reason;
                 return requiredStatus;
             }
             return currentStatus;
-        }
+      },
+      updateRequiredStatus() {
+        let requiredStatus = null;
+        this.requiredStatusReason = null;
         let selectedEnhancements = this.getSelectedAndActiveEnhancements();
         let countByGroups = {};
         let active_groups = this.enhancements.filter(enh => null != enh.group)
             .map(enh => powerBlob["enhancement_group_by_pk"][enh.group]).filter(onlyUnique);
 
         selectedEnhancements.forEach(enh => {
-            requiredStatus = mergeStatuses(requiredStatus, enh.requiredStatus);
+            requiredStatus = this.mergeStatuses(requiredStatus, enh.requiredStatus, enh.displayName);
         });
         this.getSelectedComponents().forEach(comp => {
-            requiredStatus = mergeStatuses(requiredStatus, comp.requiredStatus);
+            requiredStatus = this.mergeStatuses(requiredStatus, comp["required_status"], comp.name);
         });
         this.parameters.forEach(param => {
-            requiredStatus = mergeStatuses(requiredStatus, requiredStatusOfParam(param, this.parameterSelections[param.id]));
+            requiredStatus = this.mergeStatuses(requiredStatus, requiredStatusOfParam(param, this.parameterSelections[param.id]), param.name);
         });
         active_groups.forEach(group => {
             const numSelectedOfGroup = selectedEnhancements.filter(enh => enh["group"] === group.pk).length;
             if (group.veteran_threshold && numSelectedOfGroup >= group.veteran_threshold) {
-                requiredStatus = mergeStatuses(requiredStatus, ["VETERAN", "Veteran"]);
+                requiredStatus = this.mergeStatuses(requiredStatus, ["VETERAN", "Veteran"], group.label);
             }
             if (group.seasoned_threshold && numSelectedOfGroup >= group.seasoned_threshold) {
-                requiredStatus = mergeStatuses(requiredStatus, ["SEASONED", "Seasoned"]);
+                requiredStatus = this.mergeStatuses(requiredStatus, ["SEASONED", "Seasoned"], group.label);
             }
         });
 

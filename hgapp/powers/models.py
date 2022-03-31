@@ -574,7 +574,7 @@ class Base_Power(models.Model):
             'eratta': self.eratta,
             'type': self.base_type,
             'gift_credit': self.num_free_enhancements,
-            'required_status': self.required_status,
+            "required_status": [self.required_status, self.get_required_status_display()],
             'icon_url': self.icon.url if self.icon else "",
             'category': self.category_id if self.category else None,
             'substitutions': [x.to_blob() for x in self.basepowerfieldsubstitution_set.all()],

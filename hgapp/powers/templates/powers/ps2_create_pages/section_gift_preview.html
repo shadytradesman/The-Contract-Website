@@ -32,7 +32,12 @@
                 </span>
             </span>
         </div>
-        <div v-if="requiredStatus" class="pull-right text-muted"  data-toggle="tooltip" title="Seasoned = 10+ Victories. Veteran = 25+ Victories"
+        <div v-if="requiredStatus"
+             class="pull-right text-muted"
+             data-toggle="tooltip"
+             data-html="true"
+             v-bind:data-title="'Reason: ' + requiredStatusReason + '<br>Seasoned = 10+ Victories.<br>Veteran = 25+ Victories'"
+             v-bind:data-original-title="'Reason: ' +requiredStatusReason + '<br>Seasoned = 10+ Victories.<br>Veteran = 25+ Victories'"
             style="margin-right: 3px; font-size: 14px;">
             <i>Requires <b>{requiredStatus}</b></i>
         </div>
@@ -93,9 +98,9 @@
             </span>
         </div>
         <span>
-                <i>
-                    <div class="text-muted" v-html="renderedDescription"> </div>
-                </i>
+            <i>
+                <div class="text-muted" v-html="renderedDescription"> </div>
+            </i>
         </span>
     </div>
     <div class="panel-body" style="padding-top: 5px;">

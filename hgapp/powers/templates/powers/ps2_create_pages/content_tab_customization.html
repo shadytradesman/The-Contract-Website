@@ -152,7 +152,7 @@
         </select>
         <div v-if="param.id in disabledParameters">
             <div v-for="reason in disabledParameters[param.id]">
-                <small style="color: red;">
+                <small class="text-danger" style="padding-left: 5px;">
                     { reason }
                 </small>
             </div>

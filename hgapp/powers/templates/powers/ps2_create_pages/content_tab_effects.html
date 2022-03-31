@@ -19,6 +19,7 @@
                    v-bind:value="effectFilter"
                    v-model="selectedEffectFilter"
                    @change="changeEffectFilter"
+                   @click="clickEffectFilter"
                    style="display:none;">
             {effectFilter.display}
         </label>
@@ -64,6 +65,9 @@
                                             <b>{ component.summary } </b>
                                             <i>
                                             <span class="text-muted" v-html="getCostForEffect(component.slug, component.giftCredit)">
+                                            </span>
+                                            <span v-if="component.requiredStatusLabel" class="text-muted">
+                                                    (Requires <b>{component.requiredStatusLabel}</b>)
                                             </span>
                                             </i>
                                         </small>
