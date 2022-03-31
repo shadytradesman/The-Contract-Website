@@ -15,9 +15,7 @@
                     <i class="fa fa-plus-square fa-2x"></i>
                 </a>
             {% endif %}
-            <a href="{% url 'powers:powers_view_power_full' power_full.id %}">
-                {{latest_revision.name}}
-            </a>
+            <a href="{% url 'powers:powers_view_power_full' power_full.id %}">{{latest_revision.name}}</a>
             <small>
                 <i>
                     <div style="margin-left: 0px; display: inline-block">
@@ -42,14 +40,23 @@
                 {% endif %}
             </small>
         </div>
-        <div class="text-muted">
-            {{ latest_revision.gift_summary|safe }}
-        </div>
         <div class="collapse collapse-power-{{power_full.id}} in"
              role="tabpanel"
-             aria-labelledby="collapse-power-{{power_full.id}}-heading">
-            <small class="visible-xs-block visible-sm-block text-center"><i>Tap to show system</i></small>
-            <small class="visible-md-block visible-lg-block text-center"><i>Click to show system</i></small>
+             aria-labelledby="collapse-power-{{power_full.id}}-heading"
+        >
+            <div style="display: flex; justify-content:space-between; flex-wrap: wrap;">
+
+                <div class="text-muted" style="display: inline-block;">
+                    {{ latest_revision.gift_summary|safe }}
+                </div>
+                <div class="hidden-xs" style="text-align: right; flex: 1;">
+                    <small class="visible-sm-inline-block text-center"><i>(Tap to show system)</i></small>
+                    <small class="visible-md-inline-block visible-lg-inline-block text-center"><i>(Click to show system)</i></small>
+                </div>
+                <div class="visible-xs-block text-center" style="flex-basis: 100%">
+                    <small ><i>(Tap to show system)</i></small>
+                </div>
+            </div>
         </div>
     </div>
     <div
@@ -59,11 +66,52 @@
         style="padding-top: 0px; padding-bottom: 0px; background-color: #2c323d; ">
         <div  style="padding-top: 5px; padding-bottom: 5px;">
             <span class="css-system-text-user-input">
-                <p><i>{{latest_revision.description|linebreaks}}</i></p>
+                <i>{{latest_revision.description|linebreaks}}</i>
+                {% if latest_revision.extended_description %}
+                    <div style="position: relative; bottom: 8px;">
+                        <a id="collapse-ext-desc-{{latest_revision.id}}-heading"
+                           role="button" data-toggle="collapse"
+                           data-target=".collapse-ext-desc-{{latest_revision.id}}"
+                           aria-expanded="false"
+                           aria-controls="collapse-ext-desc-{{latest_revision.id}}">
+                            <div class="collapse collapse-ext-desc-{{latest_revision.id}} in"
+                                 role="tabpanel"
+                                 aria-labelledby="collapse-ext-desc-{{latest_revision.id}}-heading">
+                                    <i><small>Extend Description</small></i>
+                            </div>
+                        </a>
+                        <div
+                                class="panel-collapse collapse collapse-ext-desc-{{latest_revision.id}} css-system-text-user-input text-muted"
+                                role="tabpanel"
+                                aria-labelledby="collapse-ext-desc-{{latest_revision.id}}-heading" >
+                            <i>{{ latest_revision.extended_description |linebreaks}}</i>
+                        </div>
+                    </div>
+                {% endif %}
             </span>
-            <hr style="width: 50%;">
+            <hr style="width: 50%; margin-top: 3px; margin-bottom: 8px;">
             <span class="js-render-power-keywords">
                 {{latest_revision.system|safe}}
+            {% if latest_revision.errata %}
+                <div style="position: relative; bottom: 8px; margin-bottom: -5px;">
+                    <a id="collapse-errata-{{latest_revision.id}}-heading"
+                       role="button" data-toggle="collapse"
+                       data-target=".collapse-errata-{{latest_revision.id}}"
+                       aria-expanded="false"
+                       aria-controls="collapse-errata-{{latest_revision.id}}">
+                        <i><small>
+                            <i class="fa fa-question-circle fa-lg"></i>
+                            Toggle Extended System
+                        </small></i>
+                    </a>
+                    <div
+                            class="panel-collapse collapse collapse-errata-{{latest_revision.id}} css-extended-system"
+                            role="tabpanel"
+                            aria-labelledby="collapse-errata-{{latest_revision.id}}-heading">
+                        {{latest_revision.errata|safe}}
+                    </div>
+                </div>
+            {% endif %}
             </span>
 
         </div>

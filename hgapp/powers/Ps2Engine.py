@@ -180,6 +180,12 @@ class ReplacementCandidate:
         self.start = start
         self.end = end
 
+    def __repr__(self):
+        return "replacement_type: {}, markers: {}, start-end: {}-{}".format(self.replacement_type,
+                                                                            self.markers,
+                                                                            self.start,
+                                                                            self.end)
+
 
 # The code in this class MUST STAY IN SYNC with the FE code in ps2_create_script.js.
 class SystemTextRenderer:
@@ -266,11 +272,11 @@ class SystemTextRenderer:
                     else:
                         # this avoids the case where we have four+ ends in a row ala ]]]]
                         i += 1
-            if start and not default_content_start_index and cur_char == '|' and paren_depth == 1:
+            if start is not None and not default_content_start_index and cur_char == '|' and paren_depth == 1:
                 default_content_start_index = i
             i += 1
 
-        if start != 0 and not start:
+        if start is None:
             # no candidate found
             return None
 
@@ -302,10 +308,7 @@ class SystemTextRenderer:
         replacements = self._add_replacements_for_components(replacements, power)
         replacements = self._add_replacements_for_parameters(replacements, param_instances)
         replacements = self._add_replacements_for_fields(replacements, power, field_instances)
-        print("after all", replacements)
-        print(" ")
         replacements = self._collapse_substitutionss(replacements)
-        print("after collapse", replacements)
         return replacements
 
     # This method must remain functionally equal to ps2_create_script.js # addReplacementsForModifiers

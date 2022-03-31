@@ -305,12 +305,13 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Caching
 if DEBUG:
+    pass
     # Comment this CACHES block out to test caching during development.
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
-        }
-    }
+    # CACHES = {
+    #     'default': {
+    #         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+    #     }
+    # }
 else:
     CACHES = {
         'default': {
