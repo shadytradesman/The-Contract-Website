@@ -154,7 +154,6 @@ class PowerEngine:
         allowed_modifiers = selected_mod_slugs.difference(blacklisted_mod_slugs)
         return allowed_modifiers
 
-
     def components_from_model(self, effect_id, vector_id, modality_id):
         effect = self.blob[PowerSystem.EFFECTS][effect_id]
         vector = self.blob[PowerSystem.VECTORS][vector_id]
@@ -168,13 +167,130 @@ class Substitution:
         self.mode = mode
         self.replacement = replacement
 
+    def __repr__(self):
+        return "mode: {}, replacement: {}".format(self.mode, self.replacement)
+
+
+class ReplacementCandidate:
+    def __init__(self, replacement_type, should_capitalize, markers, default_value, start, end):
+        self.replacement_type = replacement_type
+        self.should_capitalize = should_capitalize
+        self.markers = markers
+        self.default_value = default_value
+        self.start = start
+        self.end = end
+
 
 # The code in this class MUST STAY IN SYNC with the FE code in ps2_create_script.js.
 class SystemTextRenderer:
+    paren_end_by_start = {
+        '(': ')',
+        '@': '%',
+        '[': ']',
+        '{': '}',
+        '#': '+',
+        ';': '/',
+    }
+    paren_join_string = {
+        '(': ', ',
+        '@': ', ',
+        '[': ' ',
+        '{': '</p><p>',
+        '+': '',
+        ';': "</li><li>",
+    }
 
-    def __init__(self, power, modifier_instances, param_instances, field_instances):
-        self.system = PowerEngine()
-        self.replacement_map = self._build_replacement_map(power, modifier_instances, param_instances, field_instances)
+    def __init__(self, engine):
+        self.system = engine
+
+    def populate_rendered_fields(self, power, modifier_instances, param_instances, field_instances):
+        vector = self.system.blob[PowerSystem.VECTORS][power.vector_id]
+        effect = self.system.blob[PowerSystem.EFFECTS][power.base_id]
+        modality = self.system.blob[PowerSystem.MODALITIES][power.modality_id]
+        unrendered_system = "<p>" + vector["system_text"] + "</p><p>" + effect["system_text"] + "</p>"
+        unrendered_description = modality["system_text"]
+        replacement_map = self._build_replacement_map(power, modifier_instances, param_instances, field_instances)
+        power.system = SystemTextRenderer._perform_system_text_replacements(unrendered_system, replacement_map)
+        power.gift_summary = SystemTextRenderer._perform_system_text_replacements(unrendered_description, replacement_map)
+        power.errata = SystemTextRenderer._perform_system_text_replacements("{{gift-errata}}", replacement_map)
+
+    @staticmethod
+    def _perform_system_text_replacements(unrendered_system, replacement_map):
+        system_text = unrendered_system
+        to_replace = SystemTextRenderer._find_replacement_candidate(system_text)
+        replacement_count = 0
+        while to_replace:
+            system_text = SystemTextRenderer._replace_in_system_text(system_text, replacement_map, to_replace)
+            to_replace = SystemTextRenderer._find_replacement_candidate(system_text)
+            replacement_count += 1
+            if replacement_count > 1000:
+                raise ValueError("Over 1000 replacements. . . infinite loop?")
+        return system_text
+
+
+    @staticmethod
+    def _find_replacement_candidate(system_text):
+        marker_starts = ['(', '[', '{', '@', '#', ';']
+        end_marker = None
+        paren_depth = 0
+        start = None
+        end = None
+        default_content_start_index = None
+        capitalize = False
+
+        # this little construction emulates a traditional for loop
+        i = 0
+        while i < len(system_text):
+            cur_char = system_text[i]
+            if i > 0 and system_text[i-1] == cur_char:
+                if cur_char in marker_starts:
+                    # two start markers
+                    if not start:
+                        start = i - 1
+                        marker_starts = [cur_char]
+                        end_marker = SystemTextRenderer.paren_end_by_start[cur_char]
+                    paren_depth = paren_depth + 1
+                    # this avoids the case where we have four+ starts in a row ala [[[[
+                    i += 1
+                elif end_marker and cur_char == end_marker:
+                    # two end markers
+                    paren_depth -= 1
+                    if paren_depth == 0:
+                        end = i
+                        if marker_starts[0] in ['(', '@'] and i+1 < len(system_text):
+                            # if ending a joining list, check for capitalization flag that appears immediately afterwards.
+                            if system_text[i+1] == "^":
+                                capitalize = True
+                                end = i+1 # to also replace ^
+                        break
+                    else:
+                        # this avoids the case where we have four+ ends in a row ala ]]]]
+                        i += 1
+            if start and not default_content_start_index and cur_char == '|' and paren_depth == 1:
+                default_content_start_index = i
+            i += 1
+
+        if start != 0 and not start:
+            # no candidate found
+            return None
+
+        if not end:
+            raise ValueError("Unmatched start symbols found in system text" + system_text)
+
+        # Capitalization increases end by 1
+        end_paren_index = end - 2 if capitalize else end - 1
+        marker_end = end_paren_index if not default_content_start_index else default_content_start_index
+        marker_section = system_text[start+2 : marker_end]
+        marker_section = marker_section.strip()
+        markers = marker_section.split(',')
+        if marker_starts[0] not in ['(', '@', '#'] and len(markers) > 1:
+            raise ValueError("too many marker strings for non-list sub starting at: " + start + "for text " + system_text)
+        default_value = None
+        if default_content_start_index:
+            default_value = system_text[default_content_start_index + 1 : end - 1]
+            default_value = default_value.strip()
+        return ReplacementCandidate(marker_starts[0], capitalize, markers, default_value, start, end)
+
 
     # This method must remain functionally equal to ps2_create_script.js # buildReplacementMap
     # This is to ensure consistent server-side rendering of user-created powers.
@@ -182,17 +298,20 @@ class SystemTextRenderer:
         # A map of marker string to list of replacements
         replacements = defaultdict(list)
         replacements["gift-name"].append(Substitution(UNIQUE, power.name))
-        replacements.update(self._get_replacements_for_modifiers(modifier_instances))
-        replacements.update(self._get_replacements_for_components(power))
-        replacements.update(self._get_replacements_for_parameters(param_instances))
-        replacements.update(self._get_replacements_for_fields(power, field_instances))
-        return self._collapse_substitutionss(replacements)
+        replacements = self._add_replacements_for_modifiers(replacements, modifier_instances)
+        replacements = self._add_replacements_for_components(replacements, power)
+        replacements = self._add_replacements_for_parameters(replacements, param_instances)
+        replacements = self._add_replacements_for_fields(replacements, power, field_instances)
+        print("after all", replacements)
+        print(" ")
+        replacements = self._collapse_substitutionss(replacements)
+        print("after collapse", replacements)
+        return replacements
 
     # This method must remain functionally equal to ps2_create_script.js # addReplacementsForModifiers
     # This is to ensure consistent server-side rendering of user-created powers.
     # DO NOT REFACTOR THIS METHOD WITHOUT CHANGING THE ASSOCIATED METHOD IN THE FE
-    def _get_replacements_for_modifiers(self, modifier_instances):
-        modifier_replacements = defaultdict(list)
+    def _add_replacements_for_modifiers(self, modifier_replacements, modifier_instances):
         # Key is triple of mod type, slug, and marker
         num_included_for_mod_marker = Counter()
         # This replicates the detailsByModifiers map in the FE
@@ -248,8 +367,7 @@ class SystemTextRenderer:
     # This method must remain functionally equal to ps2_create_script.js # addReplacementsForComponents
     # This is to ensure consistent server-side rendering of user-created powers.
     # DO NOT REFACTOR THIS METHOD WITHOUT CHANGING THE ASSOCIATED METHOD IN THE FE
-    def _get_replacements_for_components(self, power):
-        replacement_map = defaultdict(list)
+    def _add_replacements_for_components(self, replacement_map, power):
         components = [
             self.system.blob[PowerSystem.MODALITIES][power.modality_id],
             self.system.blob[PowerSystem.EFFECTS][power.base_id],
@@ -266,8 +384,7 @@ class SystemTextRenderer:
     # This method must remain functionally equal to ps2_create_script.js # addReplacementsForParameters
     # This is to ensure consistent server-side rendering of user-created powers.
     # DO NOT REFACTOR THIS METHOD WITHOUT CHANGING THE ASSOCIATED METHOD IN THE FE
-    def _get_replacements_for_parameters(self, param_instances):
-        replacements = defaultdict(list)
+    def _add_replacements_for_parameters(self, replacements, param_instances):
         # param_instances already does not include disabled parameters (we lean on the FE for this)
         for param in param_instances:
             pow_param = param.relevant_power_param
@@ -285,19 +402,18 @@ class SystemTextRenderer:
     # This method must remain functionally equal to ps2_create_script.js # addReplacementsForFields
     # This is to ensure consistent server-side rendering of user-created powers.
     # DO NOT REFACTOR THIS METHOD WITHOUT CHANGING THE ASSOCIATED METHOD IN THE FE
-    def _get_replacements_for_fields(self, power, field_instances):
+    def _add_replacements_for_fields(self, replacements, power, field_instances):
         # First we need to find the relevant fields in the power blob
         components = self.system.components_from_model(power.base_id, power.vector_id, power.modality_id)
         text_field_by_id = {}
         roll_field_by_id = {}
         for component in components:
             if "text_fields" in component:
-                text_field_by_id = {x["id"]: x for x in component["text_fields"]}
+                text_field_by_id.update({x["id"]: x for x in component["text_fields"]})
             if "roll_fields" in component:
-                roll_field_by_id = {x["id"]: x for x in component["roll_fields"]}
+                roll_field_by_id.update({x["id"]: x for x in component["roll_fields"]})
 
         # Now we do what the FE does
-        replacements = defaultdict(list)
         for field in field_instances:
             if field.is_weapon():
                 weap_replacements = self.system.blob[PowerSystem.WEAP_REPLACEMENTS_BY_PK][field.weapon_id]
@@ -358,3 +474,45 @@ class SystemTextRenderer:
             if len(cleaned_replacements[marker]) == 0:
                 cleaned_replacements[marker] = [""]
         return cleaned_replacements
+
+    @staticmethod
+    def _replace_in_system_text(system_text, replacement_map, to_replace):
+        markers = to_replace.markers
+        replacements = None
+        for marker in markers:
+            if marker in replacement_map:
+                if not replacements:
+                    replacements = []
+                replacements.extend(replacement_map[marker])
+        replacement_text = SystemTextRenderer._get_replacement_text(replacements, to_replace)
+        return system_text[0: to_replace.start] + replacement_text + system_text[to_replace.end + 1:]
+
+    @staticmethod
+    def _get_replacement_text(replacements, to_replace):
+        if not replacements:
+            if to_replace.default_value:
+                return to_replace.default_value
+            else:
+                return ""
+        if to_replace.replacement_type == '#':
+            return str(sum(replacements))
+        replacements = [x for x in replacements if len(x) > 0]
+        if len(replacements) == 0:
+            return ""
+        if to_replace.replacement_type == '{':
+            replacements[0] = "</p><p>" + replacements[0]
+        if to_replace.replacement_type == ';':
+            replacements[0] = "<ul class=\"css-power-system-list\"><li>" + replacements[0]
+            replacements[-1] = replacements[-1] + "</li></ul>"
+        if len(replacements[0]) > 0 and to_replace.should_capitalize:
+            replacements[0] = replacements[0][0].upper() + replacements[0][1:]
+        if len(replacements) == 1:
+            return replacements[0]
+        if to_replace.replacement_type == '(':
+            replacements[-1] = "and " + replacements[-1]
+        if to_replace.replacement_type == '@':
+            replacements[-1] = "or " + replacements[-1]
+        join_string = SystemTextRenderer.paren_join_string[to_replace.replacement_type]
+        if to_replace.replacement_type in ["@", "("] and len(replacements) == 2:
+            join_string = " "
+        return join_string.join(replacements)

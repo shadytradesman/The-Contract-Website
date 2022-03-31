@@ -1245,7 +1245,7 @@ class Roll(models.Model):
 
     def render_ps2_html_for_current_contractor(self):
         if self.parry_type != NO_PARRY_INFO:
-            return self.get_defense_text()
+            return self.get_defense_text_ps2()
         html_output = "{}" \
                       "<span>" \
                       "<span class=\"js-roll-value\" style=\"display:none;\">" \
@@ -1264,20 +1264,16 @@ class Roll(models.Model):
                     self.is_mind,
                     self.is_body)
         roll_text = mark_safe(html_output)
-        if self.speed != NO_SPEED_INFO:
-            roll_text = "{} as {}".format(roll_text, self.get_speed_display())
         return roll_text
 
     def render_value_for_ps2(self):
         if self.parry_type != NO_PARRY_INFO:
-            return self.get_defense_text()
+            return self.get_defense_text_ps2()
         first_word = "Mind" if self.is_mind else "Body" if self.is_body else self.attribute.name
         if self.ability:
             roll_text = "{} + {}".format(first_word, self.ability.name)
         else:
             roll_text = first_word
-        if self.speed != NO_SPEED_INFO:
-            roll_text = "{} as {}".format(roll_text, self.get_speed_display())
         return roll_text
 
     def render_html_for_current_contractor(self):
@@ -1321,11 +1317,20 @@ class Roll(models.Model):
             roll_text = "{} as {}".format(roll_text, self.get_speed_display())
         return roll_text
 
+    def get_defense_text_ps2(self):
+        if self.parry_type == DODGE_ONLY:
+            roll_text = "to Dodge"
+        else:
+            roll_text = "to Dodge or Defend"
+        if self.speed != NO_SPEED_INFO:
+            roll_text = "{} as {}".format(roll_text, self.get_speed_display())
+        return roll_text
+
     def get_defense_text(self):
         if self.parry_type == DODGE_ONLY:
             roll_text = "to dodge"
         else:
-            roll_text = "to dodge or parry (as for {})".format(self.get_parry_type_display())
+            roll_text = "to dodge or Defend (as for {})".format(self.get_parry_type_display())
         if self.speed != NO_SPEED_INFO:
             roll_text = "{} as {}".format(roll_text, self.get_speed_display())
         return roll_text

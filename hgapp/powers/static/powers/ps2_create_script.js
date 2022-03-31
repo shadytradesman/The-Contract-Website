@@ -479,14 +479,6 @@ function addReplacementsForModifiers(replacements, selectedModifiers, detailsByM
 
 
 
-const parenJoinString = {
-    '(': ', ',
-    '@': ', ',
-    '[': ' ',
-    '{': '</p><p>',
-    '+': '',
-    ';': "</li><li>",
-}
 function collapseSubstitutions(replacements) {
     // normalizes lists of substitutions so that they follow the semantics associated with the modes:
     // EPHEMERAL, UNIQUE, and ADDITIVE.
@@ -565,6 +557,23 @@ function replaceInSystemText(systemText, replacementMap, toReplace) {
     return systemText.slice(0, toReplace.start) + replacementText + systemText.slice(toReplace.end + 1);
 }
 
+const parenJoinString = {
+    '(': ', ',
+    '@': ', ',
+    '[': ' ',
+    '{': '</p><p>',
+    '+': '',
+    ';': "</li><li>",
+}
+
+const parenEndByStart = {
+    '(': ')',
+    '@': '%',
+    '[': ']',
+    '{': '}',
+    '#': '+',
+    ';': '/',
+}
 function getReplacementText(replacements, toReplace) {
     if (replacements === null) {
         // no replacements exist in replacement map at all.
@@ -608,14 +617,6 @@ function getReplacementText(replacements, toReplace) {
     return replacements.join(joinString);
 }
 
-const parenEndByStart = {
-    '(': ')',
-    '@': '%',
-    '[': ']',
-    '{': '}',
-    '#': '+',
-    ';': '/',
-}
 function findReplacementCandidate(systemText) {
     // Finds the first pair of opening parenthesis, indicating a replacement substring.
     // Proceeds to the matching closure of the parens, skipping any nested replacements
@@ -623,7 +624,6 @@ function findReplacementCandidate(systemText) {
     let markerStarts = ['(', '[', '{', '@', '#', ';'];
     let endMarker = null;
     let parenDepth = 0;
-    let parenType = null;
     let start = null;
     let end = null;
     let defaultContentStartIndex = null;

@@ -14,7 +14,7 @@ from .formsPs2 import PowerForm, get_modifiers_formset, get_params_formset, get_
     get_sys_field_weapon_formset, get_sys_field_roll_formset, make_select_signature_artifact_form
 from .powerDifferenceUtils import get_roll_from_form_and_system, get_power_creation_reason, \
     get_power_creation_reason_expanded_text
-from .Ps2Engine import PowerEngine
+from .Ps2Engine import PowerEngine, SystemTextRenderer
 
 logger = logging.getLogger("app." + __name__)
 
@@ -94,10 +94,8 @@ def save_gift(request, power_full=None, character=None):
 
 
 def _populate_power_system_and_errata(power_engine, power, modifier_instances, param_instances, field_instances):
-    # TODO: do the system text rendering even though it's annoying and hard.
-    power.system = "Server-side system text rendering incoming."
-    power.errata = "Server-side errata text rendering incoming."
-    power.rendered_description = "Sever-side rendering incoming."
+    renderer = SystemTextRenderer(power_engine)
+    renderer.populate_rendered_fields(power, modifier_instances, param_instances, field_instances)
 
 
 def _create_new_power_and_save(power_form, request, SigArtifactForm):
@@ -227,8 +225,6 @@ def _get_field_instances_and_validate(POST, power_engine, effect_id, vector_id, 
     sys_field_weapon_formset = get_sys_field_weapon_formset(POST)
     sys_field_roll_formset = get_sys_field_roll_formset(POST)
     if sys_field_text_formset.is_valid() and sys_field_weapon_formset.is_valid() and sys_field_roll_formset.is_valid():
-        print(sys_field_roll_formset.cleaned_data)
-        print(sys_field_roll_formset.data)
         power_engine.validate_new_field_forms(
             effect_id, vector_id, modality_id, sys_field_text_formset, sys_field_weapon_formset, sys_field_roll_formset)
         field_instances = []
