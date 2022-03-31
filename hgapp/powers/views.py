@@ -230,6 +230,7 @@ def delete_power(request, power_id):
         return render(request, 'powers/delete_power.html', context)
 
 
+@method_decorator(login_required(login_url='account_login'), name='dispatch')
 class ViewPower(View):
     template_name = None
     power = None
@@ -255,6 +256,10 @@ class ViewPower(View):
     def __check_permissions(self):
         if not self.power.player_can_view(self.request.user):
             raise PermissionDenied("This Power has been deleted or you're not allowed to view it")
+        #TODO: remove early access when appropriate.
+        if not (self.request.user.is_superuser or self.request.user.profile.ps2_user or self.request.user.profile.early_access_user):
+            raise PermissionDenied("This Power has been deleted or you're not allowed to view it")
+
 
     def __get_context_data(self):
         attribute_val_by_id = None
