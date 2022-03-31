@@ -154,7 +154,8 @@ function componentToVue(component, type) {
         type: component.type,
         giftCredit: component["gift_credit"],
         visibility: component.default_description_prompt,
-        requiredStatus: component.required_status,
+        requiredStatus: component.required_status[0],
+        requiredStatusLabel: component.required_status[0] === "ANY" ? false : component.required_status[1],
     }
 }
 const filterDisplayByVecSlug = {
@@ -443,29 +444,20 @@ function addReplacementsForModifiers(replacements, selectedModifiers, detailsByM
               var replacement = sub["replacement"];
               let numIncludedForSlug = includedModSlugs.filter(includedSlug => includedSlug === mod["slug"] + sub["marker"]).length;
               if (replacement.includes("$")) {
-                  let substitution = "";
+                  let dollarSub = "";
                   if (mod["joining_strategy"] != "ALL") {
-                      var subStrings = mod["slug"] in detailsByModifiers ? detailsByModifiers[mod["slug"]] : [""];
-                      subStrings = subStrings.filter(sub => !(sub.length === 0)).map(uncleanedString => {
-                          let subString = uncleanedString;
-                          subString = subString.replace("((", "(");
-                          subString = subString.replace("[[", "[");
-                          subString = subString.replace("{{", "{");
-                          subString = subString.replace("))", ")");
-                          subString = subString.replace("]]", "]");
-                          subString = subString.replace("}}", "}");
-                          return subString;
-                      })
-                      let joiningString = subStrings.length > 2 ? ", " : " ";
-                      if (subStrings.length > 1) {
+                      var allDetails = mod["slug"] in detailsByModifiers ? detailsByModifiers[mod["slug"]] : [""];
+                      allDetails = allDetails.filter(sub => !(sub.length === 0));
+                      let joiningString = allDetails.length > 2 ? ", " : " ";
+                      if (allDetails.length > 1) {
                           let joiningWord = mod["joining_strategy"] === "OR" ? "or " : "and ";
-                          subStrings[subStrings.length - 1] = joiningWord + subStrings[subStrings.length - 1];
+                          allDetails[allDetails.length - 1] = joiningWord + allDetails[allDetails.length - 1];
                       }
-                      substitution = subStrings.join(joiningString);
+                      dollarSub = allDetails.join(joiningString);
                   } else {
-                      substitution = detailsByModifiers[mod["slug"]][numIncludedForSlug];
+                      dollarSub = detailsByModifiers[mod["slug"]][numIncludedForSlug];
                   }
-                  replacement = subUserInputForDollarSign(replacement, substitution);
+                  replacement = subUserInputForDollarSign(replacement, dollarSub);
               }
               const newSub = {
                   mode: sub["mode"],
@@ -488,14 +480,6 @@ function addReplacementsForModifiers(replacements, selectedModifiers, detailsByM
 
 
 
-const parenJoinString = {
-    '(': ', ',
-    '@': ', ',
-    '[': ' ',
-    '{': '</p><p>',
-    '+': '',
-    ';': "</li><li>",
-}
 function collapseSubstitutions(replacements) {
     // normalizes lists of substitutions so that they follow the semantics associated with the modes:
     // EPHEMERAL, UNIQUE, and ADDITIVE.
@@ -574,6 +558,23 @@ function replaceInSystemText(systemText, replacementMap, toReplace) {
     return systemText.slice(0, toReplace.start) + replacementText + systemText.slice(toReplace.end + 1);
 }
 
+const parenJoinString = {
+    '(': ', ',
+    '@': ', ',
+    '[': ' ',
+    '{': '</p><p>',
+    '+': '',
+    ';': "</li><li>",
+}
+
+const parenEndByStart = {
+    '(': ')',
+    '@': '%',
+    '[': ']',
+    '{': '}',
+    '#': '+',
+    ';': '/',
+}
 function getReplacementText(replacements, toReplace) {
     if (replacements === null) {
         // no replacements exist in replacement map at all.
@@ -617,14 +618,6 @@ function getReplacementText(replacements, toReplace) {
     return replacements.join(joinString);
 }
 
-const parenEndByStart = {
-    '(': ')',
-    '@': '%',
-    '[': ']',
-    '{': '}',
-    '#': '+',
-    ';': '/',
-}
 function findReplacementCandidate(systemText) {
     // Finds the first pair of opening parenthesis, indicating a replacement substring.
     // Proceeds to the matching closure of the parens, skipping any nested replacements
@@ -632,7 +625,6 @@ function findReplacementCandidate(systemText) {
     let markerStarts = ['(', '[', '{', '@', '#', ';'];
     let endMarker = null;
     let parenDepth = 0;
-    let parenType = null;
     let start = null;
     let end = null;
     let defaultContentStartIndex = null;
@@ -762,8 +754,10 @@ const ComponentRendering = {
       drawbacksCost: 0,
       giftCostTooltip: " ",
       requiredStatus: null,
+      requiredStatusReason: null,
       giftName: null,
       giftDescription: null,
+      giftExtendedDescription: null,
       giftTagline: "",
       giftPreviewModalFirstShow: true,
       enhancementList: "",
@@ -823,6 +817,7 @@ const ComponentRendering = {
         this.giftName = powerEditBlob["name"];
         this.giftTagline = powerEditBlob["flavor_text"];
         this.giftDescription = powerEditBlob["description"];
+        this.giftExtendedDescription = powerEditBlob["extended_description"];
         let selectedModality = this.modalities.find(comp => comp.slug === powerEditBlob["modality_pk"]);
         if (!selectedModality) {
             return;
@@ -1044,6 +1039,12 @@ const ComponentRendering = {
       changeEffectFilter() {
           this.updateEffectCategoryDisplay();
       },
+      clickEffectFilter(filter) {
+          if (this.selectedEffectFilter && filter.target.getAttribute("id") === this.selectedEffectFilter.id) {
+              this.setEffectFilterToAll();
+              this.updateEffectCategoryDisplay();
+          }
+      },
       getCostForEffect(effectSlug, effectGiftCredit) {
         // A cost is only displayed for an Effect if there is only one Vector for the Effect and the combined cost is non-zero.
         const allowedVectors = this.getAvailableVectorsForEffectAndModality(effectSlug, this.selectedModality.slug)
@@ -1108,6 +1109,9 @@ const ComponentRendering = {
           }
 
           this.effectFilters = newEffectFilters.concat(allAvailableVectors.map(vecSlug => vectorSlugToEffectFilter(vecSlug, this.selectedModality.slug)));
+          this.setEffectFilterToAll();
+      },
+      setEffectFilterToAll() {
           let allFilter = {
               id: "effect-filter-ALL",
               value: "ALL",
@@ -1245,41 +1249,44 @@ const ComponentRendering = {
               setFormInputPrefixValues();
           });
       },
-      updateRequiredStatus() {
-        let requiredStatus = null;
-        function mergeStatuses(currentStatus, requiredStatus) {
+      mergeStatuses(currentStatus, requiredStatus, reason) {
             if (null == requiredStatus || requiredStatus[0] === "ANY") {
                 return currentStatus;
             }
             if (requiredStatus[0] === "VETERAN") {
+                this.requiredStatusReason = reason;
                 return requiredStatus;
             }
             if (requiredStatus[0] === "SEASONED" && (null === currentStatus || currentStatus[0] === "ANY")) {
+                this.requiredStatusReason = reason;
                 return requiredStatus;
             }
             return currentStatus;
-        }
+      },
+      updateRequiredStatus() {
+        let requiredStatus = null;
+        this.requiredStatusReason = null;
         let selectedEnhancements = this.getSelectedAndActiveEnhancements();
         let countByGroups = {};
         let active_groups = this.enhancements.filter(enh => null != enh.group)
             .map(enh => powerBlob["enhancement_group_by_pk"][enh.group]).filter(onlyUnique);
 
         selectedEnhancements.forEach(enh => {
-            requiredStatus = mergeStatuses(requiredStatus, enh.requiredStatus);
+            requiredStatus = this.mergeStatuses(requiredStatus, enh.requiredStatus, enh.displayName);
         });
         this.getSelectedComponents().forEach(comp => {
-            requiredStatus = mergeStatuses(requiredStatus, comp.requiredStatus);
+            requiredStatus = this.mergeStatuses(requiredStatus, comp["required_status"], comp.name);
         });
         this.parameters.forEach(param => {
-            requiredStatus = mergeStatuses(requiredStatus, requiredStatusOfParam(param, this.parameterSelections[param.id]));
+            requiredStatus = this.mergeStatuses(requiredStatus, requiredStatusOfParam(param, this.parameterSelections[param.id]), param.name);
         });
         active_groups.forEach(group => {
             const numSelectedOfGroup = selectedEnhancements.filter(enh => enh["group"] === group.pk).length;
             if (group.veteran_threshold && numSelectedOfGroup >= group.veteran_threshold) {
-                requiredStatus = mergeStatuses(requiredStatus, ["VETERAN", "Veteran"]);
+                requiredStatus = this.mergeStatuses(requiredStatus, ["VETERAN", "Veteran"], group.label);
             }
             if (group.seasoned_threshold && numSelectedOfGroup >= group.seasoned_threshold) {
-                requiredStatus = mergeStatuses(requiredStatus, ["SEASONED", "Seasoned"]);
+                requiredStatus = this.mergeStatuses(requiredStatus, ["SEASONED", "Seasoned"], group.label);
             }
         });
 

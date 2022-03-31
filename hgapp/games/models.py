@@ -3,16 +3,14 @@ import logging
 from django.db import models
 from django.db.models import Count
 from django.conf import settings
-import json
 from characters.models import Character, HIGH_ROLLER_STATUS, Character_Death, ExperienceReward, AssetDetails, EXP_GM, \
     EXP_LOSS_V2, EXP_WIN_V2, EXP_LOSS_RINGER_V2, EXP_WIN_RINGER_V2, EXP_LOSS_IN_WORLD_V2, EXP_WIN_IN_WORLD_V2, EXP_MVP,\
-    EXP_WIN_V1, EXP_LOSS_V1
-from powers.models import Power
+    EXP_WIN_V1, EXP_LOSS_V1, Artifact
+from powers.models import Power, Power_Full
 from cells.models import Cell
 from django.utils import timezone
 from bs4 import BeautifulSoup
 from .games_constants import EXP_V1_V2_GAME_ID
-import datetime
 from guardian.shortcuts import assign_perm
 from postman.api import pm_write
 from django.urls import reverse
@@ -457,7 +455,7 @@ class Game(models.Model):
 
 
 class Game_Attendance(models.Model):
-    #set to null when ringer.
+    # set to null when ringer.
     attending_character = models.ForeignKey(Character,
                                             null=True,
                                             blank=True,

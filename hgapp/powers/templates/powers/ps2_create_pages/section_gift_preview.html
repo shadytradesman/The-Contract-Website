@@ -13,11 +13,6 @@
             <span v-if="giftName === null" class="hidden-xs">
                 Gift Preview
             </span>
-            <span v-if="giftName === null">
-                <small>
-                <div class="text-muted" v-html="renderedDescription"> </div>
-                </small>
-            </span>
             <small>
                 <i>
                     <span v-if="giftTagline.length > 0" v-text="giftTagline" style="margin-left: 10px;">
@@ -37,7 +32,12 @@
                 </span>
             </span>
         </div>
-        <div v-if="requiredStatus" class="pull-right text-muted"  data-toggle="tooltip" title="Seasoned = 10+ Victories. Veteran = 25+ Victories"
+        <div v-if="requiredStatus"
+             class="pull-right text-muted"
+             data-toggle="tooltip"
+             data-html="true"
+             v-bind:data-title="'Reason: ' + requiredStatusReason + '<br>Seasoned = 10+ Victories.<br>Veteran = 25+ Victories'"
+             v-bind:data-original-title="'Reason: ' +requiredStatusReason + '<br>Seasoned = 10+ Victories.<br>Veteran = 25+ Victories'"
             style="margin-right: 3px; font-size: 14px;">
             <i>Requires <b>{requiredStatus}</b></i>
         </div>
@@ -97,9 +97,30 @@
                 </span>
             </span>
         </div>
+        <span>
+            <i>
+                <div class="text-muted" v-html="renderedDescription"> </div>
+            </i>
+        </span>
     </div>
     <div class="panel-body" style="padding-top: 5px;">
         <div v-if="giftDescription" v-text="giftDescription" class="css-system-text-user-input" style="margin-top: 5px; margin-bottom: 5px;">
+        </div>
+        <div v-if="giftExtendedDescription">
+            <a id="collapse-ext-desc-{{preview_id}}-heading"
+                role="button" data-toggle="collapse"
+                data-target=".collapse-ext-desc-{{preview_id}}"
+                aria-expanded="false"
+                aria-controls="collapse-ext-desc-{{preview_id}}">
+                <i><small>Extended Description</small></i>
+            </a>
+            <div
+                    class="panel-collapse collapse collapse-ext-desc-{{preview_id}} css-system-text-user-input"
+                    role="tabpanel"
+                    aria-labelledby="collapse-ext-desc-{{preview_id}}-heading"
+                    v-text="giftExtendedDescription"
+            >
+            </div>
         </div>
         <div v-if="giftDescription" style="margin: auto; width: 50%;">
             <hr style="margin-top: 10px; margin-bottom: 10px;">
@@ -107,14 +128,23 @@
         <div id="rendered-system" v-html="renderedSystem" class="js-render-power-keywords">
         </div>
         <div v-if="giftErrata">
-                <span data-toggle="tooltip"
-                      data-html="true"
-                      data-placement="top"
-                      v-bind:data-title="giftErrata"
-                      v-bind:data-original-title="giftErrata"
-                      class="has-popover css-extended-system">
+            <a id="collapse-errata-{{preview_id}}-heading"
+               role="button" data-toggle="collapse"
+               data-target=".collapse-errata-{{preview_id}}"
+               aria-expanded="false"
+               aria-controls="collapse-errata-{{preview_id}}">
+                <i><small>
                     <i class="fa fa-question-circle fa-lg"></i>
-            </span>
+                    Extended System
+                </small></i>
+            </a>
+            <div
+                    class="panel-collapse collapse collapse-errata-{{preview_id}}"
+                    role="tabpanel"
+                    aria-labelledby="collapse-errata-{{preview_id}}-heading"
+                    v-html="giftErrata"
+            >
+            </div>
         </div>
     </div>
 </div>

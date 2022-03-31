@@ -16,7 +16,8 @@ from django.middleware.csrf import rotate_token
 
 from characters.models import Character, BasicStats, Character_Death, Graveyard_Header, Attribute, Ability, \
     CharacterTutorial, Asset, Liability, BattleScar, Trauma, TraumaRevision, Injury, Source, ExperienceReward
-from powers.models import Power_Full
+from powers.models import Power_Full, SYS_LEGACY_POWERS, SYS_PS2, CRAFTING_NONE, CRAFTING_SIGNATURE, CRAFTING_ARTIFACT, \
+    CRAFTING_CONSUMABLE
 from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, get_ability_form, \
     AssetForm, LiabilityForm, BattleScarForm, TraumaForm, InjuryForm, SourceValForm, make_allocate_gm_exp_form, EquipmentForm,\
     DeleteCharacterForm, BioForm, make_world_element_form, get_default_scar_choice_field
@@ -187,11 +188,17 @@ def view_character(request, character_id, secret_key = None):
     else:
         secret_key = ""
     user_can_edit = (request.user.is_authenticated and character.player_can_edit(request.user)) or secret_key_valid
+    early_access = request.user and request.user.profile.early_access_user
     if not character.stats_snapshot:
         context={"character": character,
                  "user_can_edit": user_can_edit}
         return render(request, 'characters/legacy_character.html', context)
 
+    legacy_powers = character.power_full_set.filter(dice_system=SYS_LEGACY_POWERS).all()
+    new_powers = character.power_full_set.filter(dice_system=SYS_PS2, crafting_type=CRAFTING_NONE).all()
+    crafting_artifact_gifts = character.power_full_set.filter(dice_system=SYS_PS2, crafting_type=CRAFTING_ARTIFACT).all()
+    crafting_consumable_gifts = character.power_full_set.filter(dice_system=SYS_PS2, crafting_type=CRAFTING_CONSUMABLE).all()
+    signature_item_gifts = character.power_full_set.filter(dice_system=SYS_PS2, crafting_type=CRAFTING_SIGNATURE).all()
     completed_games = [(x.relevant_game.end_time, "game", x) for x in character.completed_games()] # completed_games() does ordering
     character_edit_history = [(x.created_time, "edit", x) for x in
                               character.contractstats_set.filter(is_snapshot=False).order_by("created_time").all()[1:]]
@@ -278,6 +285,7 @@ def view_character(request, character_id, secret_key = None):
     context = {
         'character': character,
         'user_can_edit': user_can_edit,
+        'early_access': early_access,
         'health_display': character.get_health_display(),
         'ability_value_by_name': ability_value_by_name,
         'ability_value_by_id': ability_value_by_id,
@@ -311,6 +319,11 @@ def view_character(request, character_id, secret_key = None):
         'assets': assets,
         'liabilities': liabilities,
         'weapons_by_type': get_weapons_by_type(),
+        'legacy_powers': legacy_powers,
+        'new_powers': new_powers,
+        'crafting_artifact_gifts': crafting_artifact_gifts,
+        'crafting_consumable_gifts': crafting_consumable_gifts,
+        'signature_item_gifts': signature_item_gifts,
     }
     return render(request, 'characters/view_pages/view_character.html', context)
 

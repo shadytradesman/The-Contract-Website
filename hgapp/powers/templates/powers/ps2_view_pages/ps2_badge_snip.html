@@ -1,0 +1,207 @@
+<div
+        class="panel panel-default css-ps2-power-badge"
+        style="margin-bottom: 10px;">
+    <div
+            id="collapse-power-{{power_full.id}}-heading"
+            role="button" data-toggle="collapse"
+            data-target=".collapse-power-{{power_full.id}}"
+            aria-expanded="false"
+            aria-controls="collapse-power-{{power_full.id}}"
+            class="panel-heading"
+            style="background-color: #353e4b; padding-bottom: 5px;">
+        <h4 style="font-size: 20px; margin-top: 0px; margin-bottom: 5px;">
+            {% if user_can_edit and available_gift %}
+                <a href="{% url 'powers:powers_edit_ps2' power_full.id %}" class="btn btn-success btn-xs">
+                    <i class="fa fa-plus-square fa-2x"></i>
+                </a>
+            {% endif %}
+            <a href="{% url 'powers:powers_view_power_full' power_full.id %}">{{latest_revision.name}}</a>
+            <small>
+                <i>
+                    <div style="margin-left: 0px; display: inline-block">
+                        {{latest_revision.flavor_text}}
+                    </div>
+                </i>
+            </small>
+        </h4>
+        {% with latest_revision as power %}
+            {% include "powers/ps2_view_pages/components_snippet.html" %}
+        {% endwith %}
+        <div>
+            <small>
+                {% if power_full.character and not power_full.at_least_one_gift_assigned %}
+                <span class="text-danger">
+                    No Gifts assigned!
+                </span>
+                {% elif power_full.character and power_full.get_gift_cost > power_full.reward_list|length %}
+                    <span class="text-danger">
+                        {{power_full.reward_list|length}} Rewards assigned
+                    </span>
+                {% endif %}
+            </small>
+        </div>
+        <div class="collapse collapse-power-{{power_full.id}} in"
+             role="tabpanel"
+             aria-labelledby="collapse-power-{{power_full.id}}-heading"
+        >
+            <div style="display: flex; justify-content:space-between; flex-wrap: wrap;">
+
+                <div class="text-muted" style="display: inline-block;">
+                    {{ latest_revision.gift_summary|safe }}
+                </div>
+                <div class="hidden-xs" style="text-align: right; flex: 1;">
+                    <small class="visible-sm-inline-block text-center"><i>(Tap to show system)</i></small>
+                    <small class="visible-md-inline-block visible-lg-inline-block text-center"><i>(Click to show system)</i></small>
+                </div>
+                <div class="visible-xs-block text-center" style="flex-basis: 100%">
+                    <small ><i>(Tap to show system)</i></small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div
+        class="panel-collapse panel-body collapse collapse-power-{{power_full.id}}"
+        role="tabpanel"
+        aria-labelledby="collapse-power-{{power_full.id}}-heading"
+        style="padding-top: 0px; padding-bottom: 0px; background-color: #2c323d; ">
+        <div  style="padding-top: 5px; padding-bottom: 5px;">
+            <span class="css-system-text-user-input">
+                <i>{{latest_revision.description|linebreaks}}</i>
+                {% if latest_revision.extended_description %}
+                    <div style="position: relative; bottom: 8px;">
+                        <a id="collapse-ext-desc-{{latest_revision.id}}-heading"
+                           role="button" data-toggle="collapse"
+                           data-target=".collapse-ext-desc-{{latest_revision.id}}"
+                           aria-expanded="false"
+                           aria-controls="collapse-ext-desc-{{latest_revision.id}}">
+                            <div class="collapse collapse-ext-desc-{{latest_revision.id}} in"
+                                 role="tabpanel"
+                                 aria-labelledby="collapse-ext-desc-{{latest_revision.id}}-heading">
+                                    <i><small>Extend Description</small></i>
+                            </div>
+                        </a>
+                        <div
+                                class="panel-collapse collapse collapse-ext-desc-{{latest_revision.id}} css-system-text-user-input text-muted"
+                                role="tabpanel"
+                                aria-labelledby="collapse-ext-desc-{{latest_revision.id}}-heading" >
+                            <i>{{ latest_revision.extended_description |linebreaks}}</i>
+                        </div>
+                    </div>
+                {% endif %}
+            </span>
+            <hr style="width: 50%; margin-top: 3px; margin-bottom: 8px;">
+            <span class="js-render-power-keywords">
+                {{latest_revision.system|safe}}
+            {% if latest_revision.errata %}
+                <div style="position: relative; bottom: 8px; margin-bottom: -5px;">
+                    <a id="collapse-errata-{{latest_revision.id}}-heading"
+                       role="button" data-toggle="collapse"
+                       data-target=".collapse-errata-{{latest_revision.id}}"
+                       aria-expanded="false"
+                       aria-controls="collapse-errata-{{latest_revision.id}}">
+                        <i><small>
+                            <i class="fa fa-question-circle fa-lg"></i>
+                            Toggle Extended System
+                        </small></i>
+                    </a>
+                    <div
+                            class="panel-collapse collapse collapse-errata-{{latest_revision.id}} css-extended-system"
+                            role="tabpanel"
+                            aria-labelledby="collapse-errata-{{latest_revision.id}}-heading">
+                        {{latest_revision.errata|safe}}
+                    </div>
+                </div>
+            {% endif %}
+            </span>
+
+        </div>
+    </div>
+</div>
+
+
+
+<!--<div class="ps2-power-badge"-->
+<!--     id="collapse-power-{{power_full.id}}-heading"-->
+<!--     role="button" data-toggle="collapse"-->
+<!--     data-target=".collapse-power-{{power_full.id}}"-->
+<!--     aria-expanded="false"-->
+<!--     aria-controls="collapse-power-{{power_full.id}}"-->
+<!--     style="margin-bottom: 5px;">-->
+
+
+
+
+
+
+
+<!--    <div class="panel-collapse collapse collapse-power-{{power_full.id}}"-->
+<!--         role="tabpanel"-->
+<!--         aria-labelledby="collapse-power-{{power_full.id}}-heading">-->
+<!--        <div class="js-render-power-keywords">-->
+<!--            {{latest_revision.render_system}}-->
+<!--        </div>-->
+<!--        {% if latest_revision.enhancement_instance_set.all %}-->
+<!--        <div>-->
+<!--            <b>Enhancements</b>-->
+<!--            <ul>-->
+<!--                {% for instance in latest_revision.enhancement_instance_set.all %}-->
+<!--                <li>-->
+<!--                    <b>{{instance.relevant_enhancement.name}}:</b> {{instance.relevant_enhancement.description}}-->
+<!--                    {% if instance.relevant_enhancement.eratta%}-->
+<!--                    <span data-toggle="tooltip"-->
+<!--                          title="{{instance.relevant_enhancement.eratta}}"-->
+<!--                          data-placement="top">-->
+<!--                            <i class="fa fa-question-circle fa-1x"></i>-->
+<!--                        </span>-->
+<!--                    {% endif %}-->
+<!--                    {% if instance.detail%}-->
+<!--                    <ul><li>-->
+<!--                        {{instance.relevant_enhancement.detail_field_label}}: {{instance.detail}}-->
+<!--                    </li></ul>-->
+<!--                    {% endif %}-->
+<!--                </li>-->
+<!--                {% endfor %}-->
+<!--            </ul>-->
+<!--        </div>-->
+<!--        {% endif %}-->
+<!--        {% if latest_revision.drawback_instance_set.all %}-->
+<!--        <div>-->
+<!--            <b>Drawbacks</b>-->
+<!--            <ul>-->
+<!--                {% for instance in latest_revision.drawback_instance_set.all %}-->
+<!--                <li>-->
+<!--                    <b>{{instance.relevant_drawback.name}}:</b> {{instance.relevant_drawback.description}}-->
+<!--                    {% if instance.relevant_drawback.eratta%}-->
+<!--                    <span data-toggle="tooltip"-->
+<!--                          title="{{instance.relevant_drawback.eratta}}"-->
+<!--                          data-placement="top">-->
+<!--                            <i class="fa fa-question-circle fa-1x"></i>-->
+<!--                        </span>-->
+<!--                    {% endif %}-->
+<!--                    {% if instance.detail%}-->
+<!--                    <ul><li>-->
+<!--                        {{instance.relevant_drawback.detail_field_label}}: {{instance.detail}}-->
+<!--                    </li></ul>-->
+<!--                    {% endif %}-->
+<!--                </li>-->
+<!--                {% endfor %}-->
+<!--            </ul>-->
+<!--        </div>-->
+<!--        {% endif %}-->
+<!--        {% if power_full.example_description %}-->
+<!--        <small style="font-style: italic; color: #808080;">Stock Power Tip: {{power_full.example_description|safe}}</small>-->
+<!--        {% endif %}-->
+<!--    </div>-->
+<!--    {% if power_full.tags.all %}-->
+<!--    <a href="{% url 'powers:powers_create_power_from_existing' latest_revision.id %}"-->
+<!--       class="btn btn-default btn-xs">-->
+<!--        Customize-->
+<!--    </a>-->
+<!--    {% endif %}-->
+<!--    <div class="collapse collapse-power-{{power_full.id}} in"-->
+<!--         role="tabpanel"-->
+<!--         aria-labelledby="collapse-power-{{power_full.id}}-heading">-->
+<!--        <small class="visible-xs-block visible-sm-block text-center"><i>Tap to show system</i></small>-->
+<!--        <small class="visible-md-block visible-lg-block text-center"><i>Click to show system</i></small>-->
+<!--    </div>-->
+<!--</div>-->

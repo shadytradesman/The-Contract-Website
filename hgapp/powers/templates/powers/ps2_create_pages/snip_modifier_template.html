@@ -29,7 +29,11 @@
             </span>)
         </span>
         <span v-if="modifier.requiredStatusLabel" class="css-modifier-text">
-            Requires <b>{ modifier.requiredStatusLabel }</b> status.
+            <div>
+                <i>
+                    Requires <b>{ modifier.requiredStatusLabel }</b> status.
+                </i>
+            </div>
         </span>
         <div v-if="modifier.detailLabel && selected{{vue_model_name}}.includes(modifier)" class="form-inline" style="margin-top: 5px;">
             <b style="padding-right: 10px;">{modifier.detailLabel}:</b>

@@ -117,6 +117,7 @@ INSTALLED_APPS = [
     'info.apps.InfoConfig',
     'journals.apps.JournalsConfig',
     'guide.apps.GuideConfig',
+    'crafting.apps.CraftingConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -304,12 +305,13 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Caching
 if DEBUG:
+    pass
     # Comment this CACHES block out to test caching during development.
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
-        }
-    }
+    # CACHES = {
+    #     'default': {
+    #         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+    #     }
+    # }
 else:
     CACHES = {
         'default': {

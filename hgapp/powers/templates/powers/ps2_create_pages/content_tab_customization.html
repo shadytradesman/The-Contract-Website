@@ -57,43 +57,66 @@
             </label>
         </div>
     </div>
-    <div v-for="(field, fieldIndex) in systemFields"
-         :key="field.id"
-         class="css-customization-field">
-        <h5 style="margin-bottom: 5px;">
-            {field.name}
-        </h5>
-        <div v-if="field.isText">
-            <span class="js-data-prefix-container" v-bind:data-prefix="fieldIndex">
-                {{ sys_field_text_formset.empty_form }}
-            </span>
-        </div>
-        <div v-if="field.isRoll" class="form-inline">
-            <select v-model="fieldRollInput[field.id][0]" class="form-control" @change="changeParam">
-                <option v-for="value in field.attributeChoices" :value="value">{value[1]}</option>
-            </select>
-            <span v-if="field.abilityChoices.length > 0" style="padding-left: 10px;">
+    <div class="css-customization-field">
+        <span v-for="(field, fieldIndex) in systemFields.filter(field=> field.isText)"
+             :key="field.id">
+            <h5 style="margin-bottom: 5px;">
+                {field.name}
+            </h5>
+            <div>
+                <span class="js-data-prefix-container" v-bind:data-prefix="fieldIndex">
+                    {{ sys_field_text_formset.empty_form }}
+                </span>
+            </div>
+            <div v-if="field.eratta">
+                <small>
+                    { field.eratta }
+                </small>
+            </div>
+        </span>
+        <span v-for="(field, fieldIndex) in systemFields.filter(field => field.isRoll)"
+             :key="field.id">
+            <h5 style="margin-bottom: 5px;">
+                {field.name}
+            </h5>
+            <div class="form-inline">
+                <select v-model="fieldRollInput[field.id][0]" class="form-control" @change="changeParam">
+                    <option v-for="value in field.attributeChoices" :value="value">{value[1]}</option>
+                </select>
+                <span v-if="field.abilityChoices.length > 0" style="padding-left: 10px;">
                 <select v-model="fieldRollInput[field.id][1]" class="form-control" @change="changeParam">
                     <option v-for="value in field.abilityChoices" :value="value">{value[1]}</option>
                 </select>
             </span>
-            <span class="js-data-prefix-container" v-bind:data-prefix="fieldIndex">
+                <span class="js-data-prefix-container" v-bind:data-prefix="fieldIndex">
                 {{ sys_field_roll_formset.empty_form }}
             </span>
-        </div>
-        <div v-if="field.isWeapon" class="form-inline">
-            <select v-model="fieldWeaponInput[field.id]" class="form-control" @change="changeParam">
-                <option v-for="value in field.weaponChoices" :value="value[0]">{value[1]}</option>
-            </select>
-            <span class="js-data-prefix-container" v-bind:data-prefix="fieldIndex">
+            </div>
+            <div v-if="field.eratta">
+                <small>
+                    { field.eratta }
+                </small>
+            </div>
+        </span>
+        <span v-for="(field, fieldIndex) in systemFields.filter(field => field.isWeapon)"
+             :key="field.id">
+            <h5 style="margin-bottom: 5px;">
+                {field.name}
+            </h5>
+            <div class="form-inline">
+                <select v-model="fieldWeaponInput[field.id]" class="form-control" @change="changeParam">
+                    <option v-for="value in field.weaponChoices" :value="value[0]">{value[1]}</option>
+                </select>
+                <span class="js-data-prefix-container" v-bind:data-prefix="fieldIndex">
                 {{ sys_field_weapon_formset.empty_form }}
             </span>
-        </div>
-        <div v-if="field.eratta">
-            <small>
-                { field.eratta }
-            </small>
-        </div>
+            </div>
+            <div v-if="field.eratta">
+                <small>
+                    { field.eratta }
+                </small>
+            </div>
+        </span>
     </div>
     <div v-for="(param, p_index) in parameters"
          :key="param.id"
@@ -129,7 +152,7 @@
         </select>
         <div v-if="param.id in disabledParameters">
             <div v-for="reason in disabledParameters[param.id]">
-                <small style="color: red;">
+                <small class="text-danger" style="padding-left: 5px;">
                     { reason }
                 </small>
             </div>
@@ -182,9 +205,27 @@
 </div>
 <div id="sec-customize-flavor">
     <h2 class="text-center">Customize Flavor and Finish</h2>
-    {{power_form.name|bootstrap}}
-    {{power_form.tagline|bootstrap}}
+    <div class="row">
+        <div class="col-md-6">
+            {{power_form.name|bootstrap}}
+        </div>
+        <div class="col-md-6">
+            {{power_form.tagline|bootstrap}}
+        </div>
+    </div>
+    <div v-if="selectedModality.slug === 'signature-item-mod'" class="row">
+        <div class="col-md-6">
+            {{sig_item_artifact_form.selected_artifact|bootstrap}}
+        </div>
+        <div class="col-md-6">
+            {{sig_item_artifact_form.item_name|bootstrap}}
+        </div>
+        <div class="col-xs-12">
+            {{sig_item_artifact_form.item_description|bootstrap}}
+        </div>
+    </div>
     {{power_form.description|bootstrap}}
+    {{power_form.extended_description|bootstrap}}
     {% if request.user.is_superuser %}
         {{power_form.tags|bootstrap}}
         {{power_form.example_description|bootstrap}}

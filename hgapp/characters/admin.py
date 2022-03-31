@@ -1,6 +1,5 @@
 from django.contrib import admin
 
-# Register your models here.
 from characters.models import Character, Graveyard_Header, Character_Death, Attribute, Ability, Asset, Liability, \
     CharacterTutorial, ContractStats, Limit, LiabilityDetails, AssetDetails, AttributeValue, AbilityValue, ExperienceReward, \
     TraumaRevision, Condition, Circumstance, Artifact, Roll, StockBattleScar, Weapon

@@ -69,6 +69,17 @@ CREATION_REASON = (
     (CREATION_ADJUSTMENT, 'Adjustment'),
 )
 
+CRAFTING_NONE = 'NONCRAFTABLE'
+CRAFTING_SIGNATURE = 'SIGNATURE ITEM'
+CRAFTING_ARTIFACT = 'ARTIFACT_CRAFTING'
+CRAFTING_CONSUMABLE = 'CONSUMABLE_CRAFTING'
+CRAFTING_TYPE = (
+    (CRAFTING_NONE, "Not craftable"),
+    (CRAFTING_SIGNATURE, "Signature Item"),
+    (CRAFTING_ARTIFACT, "Artifact Crafting"),
+    (CRAFTING_CONSUMABLE, "Consumable Crafting"),
+)
+
 SYS_ALL = 'ALL'
 SYS_LEGACY_POWERS = 'HOUSEGAMES15'
 SYS_PS2 = 'PS2'
@@ -272,7 +283,7 @@ class Enhancement(Modifier):
             sub_list = [x.to_blob() for x in substitutions]
         enh_blob = {
             "substitutions": sub_list,
-            "group": self.group.pk if self.group else None,
+            "group": self.group_id if self.group else None,
         }
         field_blob.update(enh_blob)
         return field_blob
@@ -525,6 +536,7 @@ class Base_Power(models.Model):
     parameters = models.ManyToManyField(Parameter,
                                         through="Power_Param",
                                         through_fields=('relevant_base_power', 'relevant_parameter'))
+    crafting_type = models.CharField(choices=CRAFTING_TYPE, default=CRAFTING_NONE, max_length=45)
 
     class Meta:
         verbose_name = "Gift Component"
@@ -562,9 +574,9 @@ class Base_Power(models.Model):
             'eratta': self.eratta,
             'type': self.base_type,
             'gift_credit': self.num_free_enhancements,
-            'required_status': self.required_status,
+            "required_status": [self.required_status, self.get_required_status_display()],
             'icon_url': self.icon.url if self.icon else "",
-            'category': self.category.pk if self.category else None,
+            'category': self.category_id if self.category else None,
             'substitutions': [x.to_blob() for x in self.basepowerfieldsubstitution_set.all()],
             'allowed_vectors': list(self.allowed_vectors.values_list('pk', flat=True)),
             'allowed_modalities': list(self.allowed_modalities.values_list('pk', flat=True)),
@@ -598,8 +610,8 @@ class VectorCostCredit(models.Model):
 
     def to_blob(self):
         return {
-            "vector": self.relevant_vector.pk,
-            "effect": self.relevant_effect.pk,
+            "vector": self.relevant_vector_id,
+            "effect": self.relevant_effect_id,
             "credit": self.gift_credit,
         }
 
@@ -689,7 +701,7 @@ class Power_Param(models.Model):
     def to_blob(self):
         return {
             "id": self.pk,
-            "param_id": self.relevant_parameter.pk,
+            "param_id": self.relevant_parameter_id,
             "levels": self.get_levels(),
             "eratta": self.eratta,
             "default_level": self.default,
@@ -752,6 +764,7 @@ class Power_Param(models.Model):
 # Power full is essentially a "Gift" object
 class Power_Full(models.Model):
     dice_system = models.CharField(choices=DICE_SYSTEM, max_length=55)
+    crafting_type = models.CharField(choices=CRAFTING_TYPE, default=CRAFTING_NONE, max_length=45)
     private = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
     pub_date = models.DateTimeField('date published', auto_now_add=True)
@@ -767,6 +780,9 @@ class Power_Full(models.Model):
                                    on_delete=models.CASCADE,
                                    blank=True,
                                    null=True)
+    artifacts = models.ManyToManyField(Artifact,
+                                       through="ArtifactPowerFull",
+                                       through_fields=('relevant_power_full', 'relevant_artifact'))
 
     # Denormalized fields with Power revisions. Do not use these?
     base = models.ForeignKey(Base_Power, on_delete=models.PROTECT)
@@ -860,6 +876,9 @@ class Power_Full(models.Model):
     def lock_edits(self):
         remove_perm('powers.edit_power_full', self.owner)
 
+    def is_ps2(self):
+        return self.dice_system == SYS_PS2
+
     def default_perms_history_to_player(self, player):
         assign_perm('view_power_full', player, self)
         assign_perm('edit_power_full', player, self)
@@ -902,7 +921,10 @@ class Power_Full(models.Model):
 class Power(models.Model):
     name = models.CharField(max_length=150)
     flavor_text = models.TextField(max_length=2000) # tagline
-    description = models.TextField(max_length=2500)
+    description = models.TextField("visual description", max_length=2500)
+    extended_description = models.TextField(max_length=8000, blank=True)
+    gift_summary = models.TextField("gift summary", max_length=2500, default="") #rendered "you possess a power to eat chips" etc.
+    warnings = JSONField("Gift Warnings", default=list)
     dice_system = models.CharField(choices=DICE_SYSTEM, max_length=55)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL,
                                    on_delete=models.CASCADE,
@@ -911,15 +933,14 @@ class Power(models.Model):
     pub_date = models.DateTimeField('date published', auto_now_add=True)
 
     gift_cost = models.IntegerField(null=True) # denormalized, access with get_gift_cost()
+    required_status = models.CharField(choices=HIGH_ROLLER_STATUS,
+                                       max_length=25,
+                                       blank=True)
 
     # Crafting
     artifacts = models.ManyToManyField(Artifact,
                                        through="ArtifactPower",
                                        through_fields=('relevant_power', 'relevant_artifact'))
-    required_status = models.CharField(choices=HIGH_ROLLER_STATUS,
-                                       max_length=25,
-                                       blank=True)
-
     # Structure and system
     system = models.TextField(max_length=54000,
                               blank=True,
@@ -941,7 +962,7 @@ class Power(models.Model):
                                               through_fields=('relevant_power', 'relevant_power_param'))
     enhancement_names = JSONField("Enhancement Names", default=list)
     drawback_names = JSONField("Drawback Names", default=list)
-    shouldDisplayVector = models.BooleanField(default=False)
+    shouldDisplayVector = models.BooleanField(default=False) # I can't believe I used camel case here.
 
     # note: Access system field instances through reverse lookups
 
@@ -1020,12 +1041,13 @@ class Power(models.Model):
 
     def to_edit_blob(self):
         return {
-            "effect_pk": self.base.pk,
-            "vector_pk": self.vector.pk,
-            "modality_pk": self.modality.pk,
+            "effect_pk": self.base_id,
+            "vector_pk": self.vector_id,
+            "modality_pk": self.modality_id,
             "name": self.name,
             "flavor_text": self.flavor_text,
             "description": self.description,
+            "extended_description": self.extended_description,
 
             "enhancements": [x.to_blob() for x in self.enhancement_instance_set.all()],
             "drawbacks": [x.to_blob() for x in self.drawback_instance_set.all()],
@@ -1156,12 +1178,25 @@ class Power(models.Model):
         if self.creation_reason == CREATION_REASON[3][0]:
             return "adjusting"
 
+
 class ArtifactPower(models.Model):
     relevant_artifact = models.ForeignKey(Artifact, on_delete=models.PROTECT)
     relevant_power = models.ForeignKey(Power, on_delete=models.CASCADE)
-    detail = models.CharField(max_length=1500,
-                              null=True,
-                              blank=True)
+
+    class Meta:
+        unique_together = (
+            ("relevant_artifact", "relevant_power"),
+        )
+
+
+class ArtifactPowerFull(models.Model):
+    relevant_artifact = models.ForeignKey(Artifact, on_delete=models.PROTECT)
+    relevant_power_full = models.ForeignKey(Power_Full, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = (
+            ("relevant_artifact", "relevant_power_full"),
+        )
 
 class SystemField(models.Model):
     base_power_system = models.ForeignKey(Base_Power_System, on_delete=models.CASCADE)
@@ -1292,6 +1327,15 @@ class SystemFieldInstance(models.Model):
     class Meta:
         abstract = True
 
+    def is_weapon(self):
+        return False
+
+    def is_text(self):
+        return False
+
+    def is_roll(self):
+        return False
+
 
 class SystemFieldTextInstance(SystemFieldInstance):
     relevant_field = models.ForeignKey(SystemFieldText, on_delete=models.CASCADE)
@@ -1307,9 +1351,12 @@ class SystemFieldTextInstance(SystemFieldInstance):
 
     def to_blob(self):
         return {
-            "field_id": self.relevant_field.pk,
+            "field_id": self.relevant_field_id,
             "value": self.value
         }
+
+    def is_text(self):
+        return True
 
 
 class SystemFieldRollInstance(SystemFieldInstance):
@@ -1320,9 +1367,12 @@ class SystemFieldRollInstance(SystemFieldInstance):
     class Meta:
         unique_together = (("relevant_field", "relevant_power"))
 
+    def is_roll(self):
+        return True
+
     def to_blob(self):
         return {
-            "field_id": self.relevant_field.pk,
+            "field_id": self.relevant_field_id,
             "roll_attribute": self._get_roll_initial_attribute(self.roll),
             "roll_ability": self._get_roll_initial_ability(self.roll),
         }
@@ -1356,10 +1406,13 @@ class SystemFieldWeaponInstance(SystemFieldInstance):
     relevant_field = models.ForeignKey(SystemFieldWeapon, on_delete=models.CASCADE)
     weapon = models.ForeignKey(Weapon, on_delete=models.CASCADE)
 
+    def is_weapon(self):
+        return True
+
     def to_blob(self):
         return {
-            "field_id": self.relevant_field.pk,
-            "weapon_id": self.weapon.pk,
+            "field_id": self.relevant_field_id,
+            "weapon_id": self.weapon_id,
         }
 
 
@@ -1383,7 +1436,7 @@ class Enhancement_Instance(models.Model):
 
     def to_blob(self):
         return {
-            "enhancement_slug": self.relevant_enhancement.pk,
+            "enhancement_slug": self.relevant_enhancement_id,
             "detail": self.detail,
         }
 
@@ -1413,7 +1466,7 @@ class Drawback_Instance(models.Model):
 
     def to_blob(self):
         return {
-            "drawback_slug": self.relevant_drawback.pk,
+            "drawback_slug": self.relevant_drawback_id,
             "detail": self.detail,
         }
 
@@ -1435,7 +1488,7 @@ class Parameter_Value(models.Model):
 
     def to_blob(self):
         return {
-            "power_param_pk": self.relevant_power_param.pk,
+            "power_param_pk": self.relevant_power_param_id,
             "value": self.value,
         }
 
@@ -1460,6 +1513,23 @@ class PowerTutorial(models.Model):
 class PowerSystem(models.Model):
     json_media = models.FileField(blank=True)
     revision = models.UUIDField(default=uuid.uuid4)
+
+    # Power blob keys.
+    # DO NOT CHANGE THESE WITHOUT UPDATING THE POWER SYSTEM FRONT END AS THESE VALUES ARE HARD CODED THERE.
+    # This goes for all blob keys throughout the power models.
+    DRAWBACKS = "drawbacks"
+    ENHANCEMENTS = "enhancements"
+    ENHANCEMENT_GROUP_BY_PK = 'enhancement_group_by_pk'
+    WEAP_REPLACEMENTS_BY_PK = 'weapon_replacements_by_pk'
+    EFFECT_VECTOR_GIFT_CREDIT = 'effect_vector_gift_credit'
+    VECTORS_BY_MODALITY = 'vectors_by_modality'
+    VECTORS_BY_EFFECT = 'vectors_by_effect'
+    EFFECTS_BY_MODALITY = 'effects_by_modality'
+    COMPONENT_CATEGORIES = 'component_categories'
+    PARAMETERS = 'parameters'
+    MODALITIES = 'modalities'
+    EFFECTS = 'effects'
+    VECTORS = 'vectors'
 
     @staticmethod
     def get_singleton():
@@ -1511,39 +1581,34 @@ class PowerSystem(models.Model):
             vectors_by_modality[modality["slug"]] = [x for x in modality["allowed_vectors"]]
         return {
             # Components by ID (slug)
-            'vectors': vectors,
-            'effects': effects,
-            'modalities': modalities,
+            PowerSystem.VECTORS: vectors,
+            PowerSystem.EFFECTS: effects,
+            PowerSystem.MODALITIES: modalities,
 
             # Enhancements and Drawbacks by ID (slug)
-            'enhancements': PowerSystem._generate_modifier_blob(Enhancement),
-            'drawbacks': PowerSystem._generate_modifier_blob(Drawback),
+            PowerSystem.ENHANCEMENTS: PowerSystem._generate_modifier_blob(Enhancement),
+            PowerSystem.DRAWBACKS: PowerSystem._generate_modifier_blob(Drawback),
 
             # The parameters dictionary only contains the parameter's name and substitution.
             # The level info is on the gift components
-            'parameters': PowerSystem._generate_param_blob(),
+            PowerSystem.PARAMETERS: PowerSystem._generate_param_blob(),
 
-            'component_categories': PowerSystem._generate_component_category_blob(),
+            PowerSystem.COMPONENT_CATEGORIES: PowerSystem._generate_component_category_blob(),
 
             # An Effect is only available on a given modality if it appears in this mapping.
-            'effects_by_modality': effects_by_modality,
+            PowerSystem.EFFECTS_BY_MODALITY: effects_by_modality,
 
             # A Vector is only available on a given Modality + Effect if it appears in both mappings.
-            'vectors_by_effect': vectors_by_effect,
-            'vectors_by_modality': vectors_by_modality,
+            PowerSystem.VECTORS_BY_EFFECT: vectors_by_effect,
+            PowerSystem.VECTORS_BY_MODALITY: vectors_by_modality,
 
-            'effect_vector_gift_credit': PowerSystem._generate_effect_vector_gift_credits_blob(),
+            PowerSystem.EFFECT_VECTOR_GIFT_CREDIT: PowerSystem._generate_effect_vector_gift_credits_blob(),
 
             # Weapon choice system fields use a Weapon's pk as the non-display value. Stats in this blob by pk.
-            'weapon_replacements_by_pk': PowerSystem._generate_weapons_blob(),
+            PowerSystem.WEAP_REPLACEMENTS_BY_PK: PowerSystem._generate_weapons_blob(),
 
-            'enhancement_group_by_pk': PowerSystem._generate_enhancement_groups_blob()
+            PowerSystem.ENHANCEMENT_GROUP_BY_PK: PowerSystem._generate_enhancement_groups_blob()
         }
-
-        # generate the json blob for the fe and for backend form validation.
-        # TODO: cache this in a wrapping method
-        # Cache in per-component caches so it doesn't have to be regenerated as much?
-        # TODO: invalidate cache when any relevant model (enhancement, base power) is saved.
 
     @staticmethod
     def _generate_component_blob(base_type):

@@ -62,89 +62,62 @@
             </div>
         </div>
         <div class="panel-body">
-                <i class="text-muted">{{ power.description|safe }}</i>
+                <i class="text-muted">{{ power.description|linebreaks}}</i>
+            {% if power.extended_description %}
+                <div>
+                    <a id="collapse-ext-desc-{{power.id}}-heading"
+                       role="button" data-toggle="collapse"
+                       data-target=".collapse-ext-desc-{{power.id}}"
+                       aria-expanded="false"
+                       aria-controls="collapse-ext-desc-{{power.id}}">
+                        <i><small>Extended Description</small></i>
+                    </a>
+                    <div
+                            class="panel-collapse collapse collapse-ext-desc-{{power.id}} css-system-text-user-input text-muted"
+                            role="tabpanel"
+                            aria-labelledby="collapse-ext-desc-{{power.id}}-heading" >
+                        <i>{{ power.extended_description |linebreaks}}</i>
+                    </div>
+                </div>
+            {% endif %}
             <hr style="width: 50%;">
             {{ power.system|safe }}
             {% if power.errata %}
                 <div>
-                    <span data-toggle="tooltip"
-                          data-html="true"
-                          data-placement="top"
-                          data-title="{{power.errata|safe}}"
-                          class="css-extended-system">
-                        <i class="fa fa-question-circle fa-lg"></i>
-                    </span>
+                    <a id="collapse-errata-{{power.id}}-heading"
+                       role="button" data-toggle="collapse"
+                       data-target=".collapse-errata-{{power.id}}"
+                       aria-expanded="false"
+                       aria-controls="collapse-errata-{{power.id}}">
+                        <i><small>
+                            <i class="fa fa-question-circle fa-lg"></i>
+                            View Extended System
+                        </small></i>
+                    </a>
+                    <div
+                            class="panel-collapse collapse collapse-errata-{{power.id}} css-extended-system"
+                            role="tabpanel"
+                            aria-labelledby="collapse-errata-{{power.id}}-heading">
+                        {{power.errata|safe}}
+                    </div>
                 </div>
             {% endif %}
-            <div class="row hidden">
-                {% if power.enhancement_instance_set.all %}
-                    <div class="col-sm-6">
-                        <h3 class="text-center">Enhancements</h3>
-                        <ul>
-                            {% for enhancement_inst in power.enhancement_instance_set.all %}
-                                <li
-                                    {% if enhancement_inst.relevant_enhancement.eratta %}
-                                        data-toggle="tooltip"
-                                        data-html="true"
-                                        title='{{enhancement_inst.relevant_enhancement.eratta|linebreaks}}'
-                                    {% endif %}
-                                >
-
-                                    <b>{{ enhancement_inst.relevant_enhancement.name }} </b>
-                                    <span class="js-render-power-keywords">
-                                        ({{ enhancement_inst.relevant_enhancement.description }})
-                                    </span>
-
-                                    {% if enhancement_inst.detail %}
-                                        <ul ><li class="list-unstyled">
-                                            <p><b>{{ enhancement_inst.relevant_enhancement.detail_field_label }} - </b> {{ enhancement_inst.detail }}</p>
-                                        </li></ul>
-                                    {% endif %}
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                {% endif %}
-                {% if power.drawback_instance_set.all %}
-                    <div class="col-sm-6">
-                        <h3 class="text-center">Drawbacks</h3>
-                        <ul>
-                            {% for drawback_inst in power.drawback_instance_set.all %}
-                                <li
-                                    {% if drawback_inst.relevant_drawback.eratta %}
-                                        data-toggle="tooltip"
-                                        data-html="true"
-                                        title='{{drawback_inst.relevant_drawback.eratta|linebreaks}}'
-                                    {% endif %}
-                                >
-                                    <b>{{ drawback_inst.relevant_drawback.name }} </b>
-                                    <span class="js-render-power-keywords">
-                                        ({{ drawback_inst.relevant_drawback.description }})
-                                    </span>
-
-                                    {% if drawback_inst.detail %}
-                                        <ul ><li class="list-unstyled">
-                                            <b>{{ drawback_inst.relevant_drawback.detail_field_label }} - </b> {{ drawback_inst.detail }}
-                                        </li></ul>
-                                    {% endif %}
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                {% endif %}
-            {% if power.parameter_value_set.all %}
-                <div class="text-center col-sm-6">
-                    <h3 >Parameters</h3>
-                    {% for param_value in power.parameter_value_set.all %}
-                        <span style="display: inline-block; width: 25px;"></span>
-                        <b>{{ param_value.relevant_power_param.relevant_parameter.name }}: </b>
-                        {{ param_value.value }} ( {{ param_value.level_description}} )
-                        <span style="display: inline-block; width: 25px;"></span>
-                    {% endfor %}
+            {% if power_full %}
+                <hr>
+                <a id="collapse-history-{{power.id}}-heading"
+                       role="button" data-toggle="collapse"
+                       data-target=".collapse-history-{{power.id}}"
+                       aria-expanded="false"
+                       aria-controls="collapse-history-{{power.id}}">
+                    <h5>View Edit History</h5>
+                </a>
+                <div
+                            class="panel-collapse collapse collapse-history-{{power.id}} {% if power.id != power_list.0.id %}in{% endif %}"
+                            role="tabpanel"
+                            aria-labelledby="collapse-history-{{power.id}}-heading">
+                    {% include "powers/power_view_history_snippet.html" %}
                 </div>
             {% endif %}
-            </div>
-            {% include "powers/power_view_history_snippet.html" %}
         </div>
     </div>
 </div>

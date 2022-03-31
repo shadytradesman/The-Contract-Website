@@ -61,6 +61,7 @@
 
 .css-mod-selected {
     background-color: #3f4757;
+    color: white;
 }
 
 .css-mod-disabled {
@@ -73,7 +74,7 @@
 }
 
 .css-cat-MOD_EFFECT {
-    border-color: #635e2b;
+    border-color: #534e1b;
 }
 
 .css-cat-MOD_EFFECT.css-mod-selected, .css-cat-MOD_EFFECT.css-mod-enabled:hover{
@@ -81,7 +82,7 @@
 }
 
 .css-cat-MOD_GIFT {
-    border-color: #2c5c46;
+    border-color: #1c4c36;
 }
 
 .css-cat-MOD_GIFT.css-mod-selected, .css-cat-MOD_GIFT.css-mod-enabled:hover{
@@ -311,23 +312,6 @@
     overflow: auto;
     max-height: 90vh;
 }
-
-.css-system-text-user-input {
-    font-style: italic;
-    color: #c3c2b6;
-}
-
-.css-system-text-roll {
-    font-weight: bold;
-}
-
-.css-extended-system {
-    padding-left: 2px;
-    text-align: left;
-    position: relative;
-    bottom: 6px;
-}
-
 /* GIFT CREDIT / COST */
 
 .css-component-gift-credit {

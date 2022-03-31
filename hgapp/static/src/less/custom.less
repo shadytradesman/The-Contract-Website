@@ -21,6 +21,7 @@ body {
 @input-color: @text-color;
 @input-border: @dark-border;
 @input-border-focus: @border-color;
+@input-bg-disabled: lighten(@panel-bg, 3.5%);
 
 @label-color: @subtitle-color;
 
@@ -91,6 +92,10 @@ body {
 
 @legend-color: @text-color;
 @legend-border-color: @border-color;
+
+.form-control[disabled] {
+    color: @text-muted;
+}
 
 .help-block {
     color: @subtitle-color;
@@ -741,3 +746,27 @@ ul.dropdown-menu ul {
 .css-ability-val-6 {
     color: #FFFFFF;
 }
+
+
+/*
+****************
+**** POWER SYSTEM V2 STYLING
+*****************
+*/
+
+.css-system-text-user-input {
+    font-style: italic;
+    color: #c3c2b6;
+}
+
+.css-system-text-roll {
+    font-weight: bold;
+}
+
+.css-extended-system {
+    padding-left: 2px;
+    text-align: left;
+    position: relative;
+    bottom: 6px;
+}
+

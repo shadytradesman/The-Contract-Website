@@ -46,11 +46,12 @@ class EditPower(View):
             raise PermissionDenied("You are not authorized to create a new power in this system.")
 
     def __get_context_data(self):
-        return get_edit_context(existing_power_full=self.existing_power, is_edit=self.power_to_edit)
+        return get_edit_context(existing_power_full=self.existing_power,
+                                is_edit=self.power_to_edit,
+                                existing_char=self.character)
 
 
 class CreatePower(EditPower):
-
     def dispatch(self, *args, **kwargs):
         if 'character_id' in self.kwargs:
             self.character = get_object_or_404(Character, id=self.kwargs['character_id'])

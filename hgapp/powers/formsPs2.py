@@ -2,7 +2,8 @@ from django import forms
 from django.forms import formset_factory
 
 from .models import PowerTag, Base_Power, EFFECT, MODALITY, VECTOR
-from characters.models import Weapon
+from characters.models import Weapon, Artifact
+from hgapp.utilities import get_object_or_none
 
 
 class PowerForm(forms.Form):
@@ -19,14 +20,21 @@ class PowerForm(forms.Form):
                               widget=forms.TextInput(attrs={
                                   "v-model": "giftTagline",
                               }))
-    description = forms.CharField(label='Description',
+    description = forms.CharField(label='Visual Description',
                                   widget=forms.Textarea(attrs={
                                      "v-model": "giftDescription",
                                   }),
-                                  max_length=2500,
+                                  max_length=2000,
                                   required=True,
-                                  help_text="Describe what the Gift looks like when it is used, how it works, "
+                                  help_text="Describe what this Gift looks like when it is used "
                                             "and its impact on the owner, target, and environment.")
+    extended_description = forms.CharField(label='Extended Description',
+                                  widget=forms.Textarea(attrs={
+                                      "v-model": "giftExtendedDescription",
+                                  }),
+                                  max_length=8000,
+                                  required=False,
+                                  help_text="(Optional) Wax poetic about this Gift's background, metaphysics, etc.")
 
     # admin only fields
     tags = forms.ModelMultipleChoiceField(queryset=PowerTag.objects.order_by("tag").all(),
@@ -56,6 +64,33 @@ class PowerForm(forms.Form):
                                     }))
 
 
+def make_select_signature_artifact_form(existing_character=None, existing_power=None):
+    class SelectArtifactForm(forms.Form):
+        initial_artifact = None
+        if existing_character:
+            queryset = existing_character.artifact_set.filter(
+                cell__isnull=True,
+                crafting_character=existing_character,
+                is_signature=True)
+            if existing_power and hasattr(existing_power, "artifacts_set"):
+                initial_artifact = get_object_or_none(existing_power.artifacts_set.filter(is_signature=True))
+        else:
+            queryset = Artifact.objects.none()
+            initial_artifact = None
+        selected_artifact = forms.ModelChoiceField(queryset=queryset,
+                                                   initial=initial_artifact,
+                                                   required=False,
+                                                   empty_label="Create New Item",
+                                                   label="Add to existing Signature Item?")
+        item_name = forms.CharField(required=True,
+                                    max_length=450,
+                                    help_text="The name of the signature item")
+        item_description = forms.CharField(required=True,
+                                           max_length=5000,
+                                           help_text="A physical description of the signature item")
+    return SelectArtifactForm
+
+
 class ModifierForm(forms.Form):
     # input fields
     details = forms.CharField(required=False, max_length=1200)
@@ -72,10 +107,10 @@ class ModifierForm(forms.Form):
 
 class ParameterForm(forms.Form):
     level = forms.IntegerField(
-        required=True,
+        required=False,
         widget=forms.HiddenInput(attrs={
             'v-bind:value': 'selectedLevelOfParam(param)',
-
+            'v-bind:disabled': 'param.id in this.disabledParameters',
         }), )
     power_param_id = forms.IntegerField(
         label=None,

@@ -21,12 +21,17 @@ import hashlib
 
 logger = logging.getLogger("app." + __name__)
 
+STATUS_ANY = 'ANY'
+STATUS_NEWBIE = 'NEWBIE'
+STATUS_NOVICE = 'NOVICE'
+STATUS_SEASONED = 'SEASONED'
+STATUS_VETERAN = 'VETERAN'
 HIGH_ROLLER_STATUS = (
-    ('ANY', 'Any'),
-    ('NEWBIE', 'Newbie'),
-    ('NOVICE', 'Novice'),
-    ('SEASONED', 'Seasoned'),
-    ('VETERAN', 'Veteran'),
+    (STATUS_ANY, 'Any'),
+    (STATUS_NEWBIE, 'Newbie'),
+    (STATUS_NOVICE, 'Novice'),
+    (STATUS_SEASONED, 'Seasoned'),
+    (STATUS_VETERAN, 'Veteran'),
 )
 
 NO_PARRY_INFO = "NO_INFO"
@@ -149,6 +154,17 @@ WEAPON_TYPE = (
     (WEAPON_THROWN, "Thrown"),
     (WEAPON_PROJECTILE, "Projectile"),
     (WEAPON_OTHER, "Other")
+)
+
+ART_AVAILABLE = "AVAILABLE"
+ART_LOST = "LOST"
+ART_DESTROYED = "DESTROYED"
+ART_BROKEN = "BROKEN"
+ARTIFACT_STATUS = (
+    (ART_AVAILABLE, 'Available'),
+    (ART_LOST, 'Lost'),
+    (ART_DESTROYED, 'Destroyed'),
+    (ART_BROKEN, 'Needs repair'),
 )
 
 EQUIPMENT_DEFAULT = """
@@ -558,6 +574,12 @@ class Character(models.Model):
     def completed_games_rev_sort(self):
         return self.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).order_by("-relevant_game__end_time").all()
 
+    def get_current_downtime_attendance(self):
+        try:
+            return self.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).order_by("-relevant_game__end_time").all()[0]
+        except:
+            return None
+
     def assigned_coin(self):
         coins = self.reward_set.filter(is_void=False, is_charon_coin=True).all()
         return coins[0] if coins else None
@@ -762,6 +784,14 @@ class Character(models.Model):
             return 6
         else:
             return 5
+
+    def to_create_power_blob(self):
+        return {
+            "name": self.name,
+            "avail_gifts": "do this",
+            "avail_improvements": "do this",
+            "status": self.status,
+        }
 
     # WARNING: this is an expensive call
     def regen_stats_snapshot(self):
@@ -1004,15 +1034,20 @@ class BattleScar(models.Model):
 
 
 class WorldElement(models.Model):
-    character = models.ForeignKey(Character,
-                                  on_delete=models.CASCADE)
+    # owning character
+    # null for sig items without owners
+    character = models.ForeignKey(Character, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=500)
-    description = models.CharField(max_length=1000)
-    system = models.CharField(max_length=1000)
+    description = models.CharField(max_length=5000)
+    system = models.CharField(max_length=1000, blank=True)
+
+    # when cell is null, element is created by gift system
     cell = models.ForeignKey(Cell,
                              blank=True,
                              null=True,
                              on_delete=models.CASCADE)
+
+
     def __str__(self):
         return self.name
 
@@ -1025,8 +1060,19 @@ class Condition(WorldElement):
 class Circumstance(WorldElement):
     pass
 
+
 class Artifact(WorldElement):
-    pass
+    # Signature Items created
+    crafting_character = models.ForeignKey(Character, related_name="creator", on_delete=models.CASCADE, null=True)
+    creating_player = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                        on_delete=models.CASCADE,
+                                        null=True)
+    is_consumable = models.BooleanField(default=False)
+    is_signature = models.BooleanField(default=False)
+    quantity = models.PositiveIntegerField(default=1)
+    location = models.CharField(max_length=1000, default="", blank=True)
+    availability = models.CharField(choices=ARTIFACT_STATUS, max_length=55, default=ART_AVAILABLE)
+
 
 class Injury(models.Model):
     character = models.ForeignKey(Character,
@@ -1034,6 +1080,7 @@ class Injury(models.Model):
     description = models.CharField(max_length=500)
     is_stabilized = models.BooleanField(default=False)
     severity = models.PositiveIntegerField(default=1)
+
 
 class BasicStats(models.Model):
     stats = models.CharField(max_length=10000)
@@ -1201,6 +1248,38 @@ class Roll(models.Model):
             roll = main_component
         return roll
 
+    def render_ps2_html_for_current_contractor(self):
+        if self.parry_type != NO_PARRY_INFO:
+            return self.get_defense_text_ps2()
+        html_output = "{}" \
+                      "<span>" \
+                      "<span class=\"js-roll-value\" style=\"display:none;\">" \
+                      " (<span class=\"js-roll-num-dice\" " \
+                      "data-attr-id=\"{}\" " \
+                      "data-ability-id=\"{}\" " \
+                      "data-is-mind=\"{}\" " \
+                      "data-is-body=\"{}\">" \
+                      "</span>" \
+                      "<span class=\"js-roll-penalty\" style=\"color:#fb7e48;\"></span>" \
+                      " dice)</span>" \
+                      "</span>" \
+            .format(self.get_main_roll_component(),
+                    self.attribute_id if hasattr(self, "attribute") and self.attribute else " ",
+                    self.ability_id if hasattr(self, "ability") and self.ability else " ",
+                    self.is_mind,
+                    self.is_body)
+        roll_text = mark_safe(html_output)
+        return roll_text
+
+    def render_value_for_ps2(self):
+        if self.parry_type != NO_PARRY_INFO:
+            return self.get_defense_text_ps2()
+        first_word = "Mind" if self.is_mind else "Body" if self.is_body else self.attribute.name
+        if self.ability:
+            roll_text = "{} + {}".format(first_word, self.ability.name)
+        else:
+            roll_text = first_word
+        return roll_text
 
     def render_html_for_current_contractor(self):
         if self.parry_type != NO_PARRY_INFO:
@@ -1219,8 +1298,8 @@ class Roll(models.Model):
             " Difficulty <span class=\"js-roll-difficulty\" data-difficulty=\"{}\">{}</span>" \
         "</span>" \
         .format(self.get_main_roll_component(),
-                self.attribute.id if hasattr(self, "attribute") and self.attribute else " ",
-                self.ability.id if hasattr(self, "ability") and self.ability else " ",
+                self.attribute_id if hasattr(self, "attribute") and self.attribute else " ",
+                self.ability_id if hasattr(self, "ability") and self.ability else " ",
                 self.is_mind,
                 self.is_body,
                 self.difficulty,
@@ -1243,11 +1322,20 @@ class Roll(models.Model):
             roll_text = "{} as {}".format(roll_text, self.get_speed_display())
         return roll_text
 
+    def get_defense_text_ps2(self):
+        if self.parry_type == DODGE_ONLY:
+            roll_text = "to Dodge"
+        else:
+            roll_text = "to Dodge or Defend"
+        if self.speed != NO_SPEED_INFO:
+            roll_text = "{} as {}".format(roll_text, self.get_speed_display())
+        return roll_text
+
     def get_defense_text(self):
         if self.parry_type == DODGE_ONLY:
             roll_text = "to dodge"
         else:
-            roll_text = "to dodge or parry (as for {})".format(self.get_parry_type_display())
+            roll_text = "to dodge or Defend (as for {})".format(self.get_parry_type_display())
         if self.speed != NO_SPEED_INFO:
             roll_text = "{} as {}".format(roll_text, self.get_speed_display())
         return roll_text
