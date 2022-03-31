@@ -54,9 +54,16 @@
 						{% include "powers/ps2_create_pages/section_gift_preview.html" %}
 					{% endwith %}
 					<div class="text-center">
-						<a @click="randomGift" href="#">
+						<h5>
+							<a @click="randomGift" href="#">
 								Generate Random Gift
-						</a>
+							</a>
+							<div>
+								<small>
+									(Note: a Gift's cost ensures it is not too strong, not that it is useful. Random Gifts are often underwhelming.)
+								</small>
+							</div>
+						</h5>
 					</div>
 					<div class="modal-footer" v-if="giftPreviewModalFirstShow">
 						<div class="text-center">
