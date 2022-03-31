@@ -188,7 +188,7 @@ def _get_param_instances_and_validate(POST, power_engine, effect_id, vector_id, 
         power_engine.validate_new_param_forms(effect_id, vector_id, modality_id, params_formset)
         params = []
         for form in params_formset:
-            if not form.cleaned_data["level"]:
+            if "level" not in form.cleaned_data or form.cleaned_data["level"] is None:
                 # Disabled param
                 continue
             power_param = get_object_or_404(Power_Param, pk=form.cleaned_data["power_param_id"])
