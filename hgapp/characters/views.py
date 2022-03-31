@@ -188,7 +188,7 @@ def view_character(request, character_id, secret_key = None):
     else:
         secret_key = ""
     user_can_edit = (request.user.is_authenticated and character.player_can_edit(request.user)) or secret_key_valid
-    early_access = request.user and request.user.profile.early_access_user
+    early_access = request.user and hasattr(request.user, "profile") and request.user.profile.early_access_user
     if not character.stats_snapshot:
         context={"character": character,
                  "user_can_edit": user_can_edit}
