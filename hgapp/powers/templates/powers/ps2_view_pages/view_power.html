@@ -49,6 +49,15 @@
                 <small><i>{{ power.flavor_text}}</i></small>
             </h2>
             {% include "powers/ps2_view_pages/components_snippet.html" %}
+            <div class="text-danger">
+                <small>
+                    {% if power_full.character and not power_full.at_least_one_gift_assigned %}
+                        No Gifts assigned!
+                    {% elif power_full.character and power_full.get_gift_cost > power_full.reward_count %}
+                        {{power_full.reward_count }} Rewards assigned
+                    {% endif %}
+                </small>
+            </div>
             <div>
                 {%if power.private %}
                     <i class="fa fa-user-secret fa-2x" data-toggle="tooltip" data-title="Power is private because it is assigned to a private character."></i>

@@ -4,8 +4,7 @@ from django.urls import reverse
 
 from django.db.models import Prefetch
 from .models import PowerSystem, EPHEMERAL, UNIQUE, ADDITIVE, SUB_JOINING_AND, SUB_JOINING_OR, SUB_ALL, \
-    SYS_LEGACY_POWERS, EFFECT, VECTOR, MODALITY, Base_Power, Enhancement, Drawback, Parameter, \
-    Base_Power_Category, VectorCostCredit, ADDITIVE
+    ADDITIVE
 
 from characters.models import STATUS_SEASONED, STATUS_VETERAN, STATUS_ANY
 
@@ -27,12 +26,21 @@ class PowerEngine:
         return json.dumps(self.blob)
 
     def calculate_req_status(self, effect_id, vector_id, modality_id, modifier_instances, param_instances):
+        # TODO: Enhancement group status requirements
         current_status = None
         components = self.components_from_model(effect_id, vector_id, modality_id)
+        """
+        
+        let active_groups = this.enhancements.filter(enh => null != enh.group)
+            .map(enh => powerBlob["enhancement_group_by_pk"][enh.group]).filter(onlyUnique);
+        """
+        active_groups = Counter()
         for component in components:
             current_status = merge_status(current_status, component["required_status"][0])
         for mod_inst in modifier_instances:
-            mod, type = self.get_mod_and_type_for_inst(mod_inst)
+            mod, mod_type = self.get_mod_and_type_for_inst(mod_inst)
+            if mod_type == "enh^" and mod["group"]:
+                active_groups[mod["group"]] += 1
             current_status = merge_status(current_status, mod["required_status"][0])
         for param_inst in param_instances:
             pow_param = param_inst.relevant_power_param
@@ -40,7 +48,14 @@ class PowerEngine:
                 current_status = merge_status(current_status, STATUS_VETERAN)
             elif param_inst.value >= pow_param.seasoned:
                 current_status = merge_status(current_status, STATUS_SEASONED)
+        for group in active_groups:
+            count = active_groups[group]
+            if count >= self.blob[PowerSystem.ENHANCEMENT_GROUP_BY_PK][group]["seasoned_threshold"]:
+                current_status = merge_status(current_status, STATUS_SEASONED)
+            if count >= self.blob[PowerSystem.ENHANCEMENT_GROUP_BY_PK][group]["veteran_threshold"]:
+                current_status = merge_status(current_status, STATUS_VETERAN)
         return current_status if current_status else STATUS_ANY
+
 
     def validate_components(self, effect_id, vector_id, modality_id):
         effect = self.blob[PowerSystem.EFFECTS][effect_id]

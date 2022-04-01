@@ -9,7 +9,8 @@ from django.core.cache import cache
 from django.core.files.base import ContentFile
 
 from characters.models import Character, HIGH_ROLLER_STATUS, Attribute, Roll, NO_PARRY_INFO, NO_SPEED_INFO, DODGE_ONLY, \
-    ATTACK_PARRY_TYPE, ROLL_SPEED, THROWN, Attribute, Ability, Weapon, WEAPON_MELEE, WEAPON_TYPE, Artifact
+    ATTACK_PARRY_TYPE, ROLL_SPEED, THROWN, Attribute, Ability, Weapon, WEAPON_MELEE, WEAPON_TYPE, Artifact, STATUS_SEASONED, \
+    STATUS_VETERAN
 from guardian.shortcuts import assign_perm, remove_perm
 from django.utils.html import mark_safe, escape, linebreaks
 from django.db.utils import IntegrityError
@@ -897,6 +898,15 @@ class Power_Full(models.Model):
     def latest_archive_txt(self):
         return self.latest_revision().archive_txt()
 
+    def reward_count(self, include_gifts=True):
+        count = 0
+        for power in self.power_set.all():
+            if include_gifts:
+                count += power.relevant_power.filter(is_void=False).count()
+            else:
+                count += power.relevant_power.filter(is_void=False, is_improvement=True).count()
+        return count
+
     def reward_list(self):
         rewards = []
         for power in self.power_set.order_by("-pub_date").all():
@@ -905,10 +915,7 @@ class Power_Full(models.Model):
         return rewards
 
     def at_least_one_gift_assigned(self):
-        for reward in self.reward_list():
-            if not reward.is_improvement:
-                return True
-        return False
+        return self.reward_count(include_gifts=False) > 0
 
     def __str__(self):
         if self.owner:
@@ -998,6 +1005,13 @@ class Power(models.Model):
 
     def __str__(self):
         return self.name + " (" + self.description + ")"
+
+    def passes_status_check(self, status):
+        if self.required_status == STATUS_SEASONED:
+            return status == STATUS_SEASONED or status == STATUS_VETERAN
+        if self.required_status == STATUS_VETERAN:
+            return status == STATUS_VETERAN
+        return True
 
     def get_enhancement_list(self):
         return "<b>Enhancements:</b><br>{}".format("<br>".join(self.enhancement_names))

@@ -275,7 +275,12 @@ class ViewPower(View):
         else:
             power_full = None
             power_list = None
+        character = power_full.character if power_full.character else None
+        show_status_warning = False
+        if character:
+            show_status_warning = not self.power.passes_status_check(character.status)
         context = {}
+        context['show_status_warning'] = show_status_warning
         context['power'] = self.power
         context['power_list'] = power_list
         context['power_full'] = power_full

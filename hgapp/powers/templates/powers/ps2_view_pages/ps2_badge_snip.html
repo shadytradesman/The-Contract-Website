@@ -1,17 +1,12 @@
-<div
-        class="panel panel-default css-ps2-power-badge"
+<div class="panel panel-default css-ps2-power-badge"
         style="margin-bottom: 10px;">
     <div
-            id="collapse-power-{{power_full.id}}-heading"
-            role="button" data-toggle="collapse"
-            data-target=".collapse-power-{{power_full.id}}"
-            aria-expanded="false"
-            aria-controls="collapse-power-{{power_full.id}}"
             class="panel-heading"
             style="background-color: #353e4b; padding-bottom: 5px;">
         <h4 style="font-size: 20px; margin-top: 0px; margin-bottom: 5px;">
             {% if user_can_edit and available_gift %}
-                <a href="{% url 'powers:powers_edit_ps2' power_full.id %}" class="btn btn-success btn-xs">
+                <a href="{% url 'powers:powers_edit_ps2' power_full.id %}"
+                   class="btn btn-success btn-xs" >
                     <i class="fa fa-plus-square fa-2x"></i>
                 </a>
             {% endif %}
@@ -24,39 +19,41 @@
                 </i>
             </small>
         </h4>
-        {% with latest_revision as power %}
-            {% include "powers/ps2_view_pages/components_snippet.html" %}
-        {% endwith %}
-        <div>
-            <small>
-                {% if power_full.character and not power_full.at_least_one_gift_assigned %}
-                <span class="text-danger">
+        <div id="collapse-power-{{power_full.id}}-heading"
+             role="button" data-toggle="collapse"
+             data-target=".collapse-power-{{power_full.id}}"
+             aria-expanded="false"
+             aria-controls="collapse-power-{{power_full.id}}">
+            {% with latest_revision as power %}
+                {% include "powers/ps2_view_pages/components_snippet.html" %}
+            {% endwith %}
+            <div class="text-danger">
+                <small>
+                    {% if power_full.character and not power_full.at_least_one_gift_assigned %}
                     No Gifts assigned!
-                </span>
-                {% elif power_full.character and power_full.get_gift_cost > power_full.reward_list|length %}
-                    <span class="text-danger">
-                        {{power_full.reward_list|length}} Rewards assigned
-                    </span>
-                {% endif %}
-            </small>
-        </div>
-        <div class="collapse collapse-power-{{power_full.id}} in"
-             role="tabpanel"
-             aria-labelledby="collapse-power-{{power_full.id}}-heading"
-        >
-            <div style="display: flex; justify-content:space-between; flex-wrap: wrap;">
+                    {% elif power_full.character and power_full.get_gift_cost > power_full.reward_count %}
+                    {{power_full.reward_count }} Rewards assigned
+                    {% endif %}
+                </small>
+            </div>
+            <div class="collapse collapse-power-{{power_full.id}} in"
+                 role="tabpanel"
+                 aria-labelledby="collapse-power-{{power_full.id}}-heading" >
+                <div style="display: flex; justify-content:space-between; flex-wrap: wrap;">
 
-                <div class="text-muted" style="display: inline-block;">
-                    {{ latest_revision.gift_summary|safe }}
-                </div>
-                <div class="hidden-xs" style="text-align: right; flex: 1;">
-                    <small class="visible-sm-inline-block text-center"><i>(Tap to show system)</i></small>
-                    <small class="visible-md-inline-block visible-lg-inline-block text-center"><i>(Click to show system)</i></small>
-                </div>
-                <div class="visible-xs-block text-center" style="flex-basis: 100%">
-                    <small ><i>(Tap to show system)</i></small>
+                    <div class="text-muted" style="display: inline-block;">
+                        {{ latest_revision.gift_summary|safe }}
+                    </div>
+                    <div class="hidden-xs" style="text-align: right; flex: 1;">
+                        <small class="visible-sm-inline-block text-center"><i>(Tap to show system)</i></small>
+                        <small class="visible-md-inline-block visible-lg-inline-block text-center"><i>(Click to show system)</i></small>
+                    </div>
+                    <div class="visible-xs-block text-center" style="flex-basis: 100%">
+                        <small ><i>(Tap to show system)</i></small>
+                    </div>
                 </div>
             </div>
+
         </div>
     </div>
     <div
