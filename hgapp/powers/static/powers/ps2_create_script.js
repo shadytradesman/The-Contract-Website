@@ -750,6 +750,8 @@ const ComponentRendering = {
       giftErrata: "",
       activeUniqueReplacementsByMarker: {},
       giftCost: 0,
+      previousGiftCost: null,
+      costDifference: null,
       enhancementsCost: 0,
       drawbacksCost: 0,
       giftCostTooltip: " ",
@@ -818,6 +820,7 @@ const ComponentRendering = {
         this.giftTagline = powerEditBlob["flavor_text"];
         this.giftDescription = powerEditBlob["description"];
         this.giftExtendedDescription = powerEditBlob["extended_description"];
+        this.previousGiftCost = powerEditBlob["current_cost"];
         let selectedModality = this.modalities.find(comp => comp.slug === powerEditBlob["modality_pk"]);
         if (!selectedModality) {
             return;
@@ -825,14 +828,22 @@ const ComponentRendering = {
         this.selectedModality = selectedModality;
         this.giftPreviewModalFirstShow = false;
         this.changeModality();
+        console.log("modality selected");
+        console.log("effect: " + powerEditBlob["effect_pk"]);
         let selectedEffect = this.effects.find(comp => comp.slug === powerEditBlob["effect_pk"]);
+        console.log(selectedEffect);
         if (!selectedEffect) {
             return;
         }
+        console.log("effect selected");
         this.selectedEffect = selectedEffect;
         this.changeEffect();
         if (this.vectors.length > 1) {
-            let selectedVector = this.vectors.find(comp => comp.slug === powerEditBlob["vector_pk"]);
+            if (null === powerEditBlob["vector_pk"]) {
+                let selectedVector = this.vectors[0];
+            } else {
+                let selectedVector = this.vectors.find(comp => comp.slug === powerEditBlob["vector_pk"]);
+            }
             if (!selectedVector) {
                 return;
             }
@@ -1248,6 +1259,12 @@ const ComponentRendering = {
               activateTooltips();
               setFormInputPrefixValues();
           });
+          if (null != this.previousGiftCost) {
+            let costDiff = this.giftCost - this.previousGiftCost;
+            let prefix = costDiff >= 0 ? "+ " : " ";
+            this.costDifference = prefix + costDiff;
+          }
+
       },
       mergeStatuses(currentStatus, requiredStatus, reason) {
             if (null == requiredStatus || requiredStatus[0] === "ANY") {
@@ -1519,7 +1536,6 @@ $(function() {
             powerBlob = data;
             mountedApp.modalities = Object.values(powerBlob.modalities).map(comp => componentToVue(comp, "mod"));
             if ((document.getElementById('powerEditBlob').textContent.length > 2)) {
-                console.log(document.getElementById('powerEditBlob').textContent.length)
                 const powerEditBlob = JSON.parse(JSON.parse(document.getElementById('powerEditBlob').textContent));
                 mountedApp.setStateForEdit(powerEditBlob);
             }

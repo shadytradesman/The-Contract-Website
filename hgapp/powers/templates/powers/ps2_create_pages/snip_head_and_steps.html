@@ -1,10 +1,22 @@
 <div class="panel panel-default">
     <div class="css-creating-gift-header visible-xs-block text-center" >
-        <h1 style="margin-top: 10px; margin-bottom: 10px;">Creating a Gift</h1>
+        <h1 style="margin-top: 10px; margin-bottom: 10px;">
+            {% if current_power %}
+                Editing Gift {% if current_power %}<small><small><div style="padding-top: 5px;">{{ current_power.name }}</div></small></small>{% endif %}
+            {% else %}
+                Creating a Gift {% if character %}<small><small><div style="padding-top: 5px;">For {{character.name}}</div></small></small>{% endif %}
+            {% endif %}
+        </h1>
     </div>
     <div class="panel-heading" style="display: flex; align-items: stretch; padding: 0px;">
         <div class="css-creating-gift-header hidden-xs" style="flex: 0 1 auto;">
-            <h1 style="margin-top: 10px; margin-bottom: 10px; margin-right: 30px; padding-left: 20px;">Creating a Gift</h1>
+            <h1 style="margin-top: 10px; margin-bottom 0px; margin-right: 30px; padding-left: 20px;">
+                {% if current_power %}
+                    Editing Gift {% if current_power %}<small><small><div style="padding-top: 5px;">{{ current_power.name }}</div></small></small>{% endif %}
+                {% else %}
+                    Creating a Gift {% if character %}<small><small><div style="padding-top: 5px;">For {{character.name}}</div></small></small>{% endif %}
+                {% endif %}
+            </h1>
         </div>
             <div class="css-step-container">
                 <div class="css-step-contents"

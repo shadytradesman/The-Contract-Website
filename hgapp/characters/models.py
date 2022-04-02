@@ -786,10 +786,17 @@ class Character(models.Model):
             return 5
 
     def to_create_power_blob(self):
+        unspent_gifts = []
+        unspent_improvements = []
+        for reward in self.unspent_rewards().all():
+            if reward.is_improvement:
+                unspent_improvements.append("{} from {}".format(reward.type_text(), reward.reason_text()))
+            else:
+                unspent_gifts.append("{} from {}".format(reward.type_text(), reward.reason_text()))
         return {
             "name": self.name,
-            "avail_gifts": "do this",
-            "avail_improvements": "do this",
+            "avail_gifts": "unspent_gifts",
+            "avail_improvements": "unspent_improvements",
             "status": self.status,
         }
 

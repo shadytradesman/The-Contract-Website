@@ -1054,14 +1054,27 @@ class Power(models.Model):
             parent.save()
 
     def to_edit_blob(self):
+        if self.dice_system == SYS_LEGACY_POWERS:
+            if self.drawback_instance_set.filter(
+                    relevant_drawback__slug__in=("unique-focus", "unique-focus-no-prereq")).count():
+                modality_id = "signature-item-mod"
+            else:
+                modality_id = "power"
+            vector_id = None
+            effect_pk = self.base_id
+        else:
+            effect_pk = self.base_id
+            vector_id = self.vector_id
+            modality_id = self.modality_id
         return {
-            "effect_pk": self.base_id,
-            "vector_pk": self.vector_id,
-            "modality_pk": self.modality_id,
+            "effect_pk": effect_pk,
+            "vector_pk": vector_id,
+            "modality_pk": modality_id,
             "name": self.name,
             "flavor_text": self.flavor_text,
             "description": self.description,
             "extended_description": self.extended_description,
+            "current_cost": self.get_gift_cost(),
 
             "enhancements": [x.to_blob() for x in self.enhancement_instance_set.all()],
             "drawbacks": [x.to_blob() for x in self.drawback_instance_set.all()],

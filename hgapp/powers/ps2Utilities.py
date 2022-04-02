@@ -41,6 +41,10 @@ def get_edit_context(existing_power_full=None, is_edit=False, existing_char=None
         'sys_field_weapon_formset': sys_field_weapon_formset,
         'sys_field_roll_formset': sys_field_roll_formset,
         'cat_colors': [(cat.container_class(), cat.color) for cat in categories],
+        'current_power': existing_power_full.latest_revision() if existing_power_full else None,
+        'power_full': existing_power_full if existing_power_full else None,
+        'is_upgrade': existing_power_full.latest_revision().dice_system == SYS_LEGACY_POWERS if existing_power_full else False,
+        'character': existing_char if existing_char else None,
     }
     form_url = reverse("powers:powers_create_ps2")
     if existing_power_full:

@@ -76,7 +76,7 @@ class Profile(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE)
-    about = models.TextField(max_length=10000)
+    about = models.TextField(max_length=10000, blank=True)
     confirmed_agreements = models.BooleanField(default=False)
     able_to_port = models.BooleanField(default=False)
     ps2_user = models.BooleanField(default=False)

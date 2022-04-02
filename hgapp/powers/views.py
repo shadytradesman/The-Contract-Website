@@ -90,6 +90,8 @@ def create(request, character_id=None):
     character=None
     if character_id:
         character = get_object_or_404(Character, pk=character_id)
+        if request.user.is_authenticated and request.user.profile.ps2_user:
+            return HttpResponseRedirect(reverse('powers:powers_create_ps2_for_char', args=(character_id,)))
     show_tutorial = (not request.user.is_authenticated) or (not request.user.power_full_set.exists())
     tutorial = get_object_or_404(PowerTutorial)
     context = {
@@ -190,6 +192,8 @@ def create_power_from_existing(request, power_id):
         return render(request, 'powers/create_power_pages/createpower.html', context)
 
 def edit_power(request, power_id):
+    if request.user.is_authenticated and request.user.profile.ps2_user:
+        return HttpResponseRedirect(reverse('powers:powers_edit_ps2', args=(power_id,)))
     power_full = get_object_or_404(Power_Full, pk=power_id)
     if not power_full.player_can_edit(request.user):
         raise PermissionDenied("This Power has been deleted, or you're not allowed to view it")

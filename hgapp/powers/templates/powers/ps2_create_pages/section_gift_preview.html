@@ -1,4 +1,5 @@
 {% load static %}
+{% load power_tags %}
 
 <div class="panel panel-default css-gift-preview" style="margin-bottom: 0px;">
     <div class="panel-heading">
@@ -27,8 +28,9 @@
                       v-bind:data-title="giftCostTooltip"
                       data-toggle="tooltip"
                       class="has-popover"><b>Cost:
-                        <span v-html="giftCost"></span>
-                    </b>
+                        <span v-html="giftCost"></span></b>
+                        <span v-if="previousGiftCost && previousGiftCost - giftCost != 0 "> ({previousGiftCost} {costDifference})</span>
+
                 </span>
             </span>
         </div>
@@ -147,4 +149,10 @@
             </div>
         </div>
     </div>
+    {% if is_upgrade %}
+    <div>
+        <h4 class="text-center">Upgrading From. . .</h4>
+        {% power_badge power_full %}
+    </div>
+    {% endif %}
 </div>
