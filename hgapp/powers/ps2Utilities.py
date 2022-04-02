@@ -14,6 +14,7 @@ from .formsPs2 import PowerForm, get_modifiers_formset, get_params_formset, get_
     get_sys_field_weapon_formset, get_sys_field_roll_formset, make_select_signature_artifact_form
 from .powerDifferenceUtils import get_roll_from_form_and_system, get_power_creation_reason, \
     get_power_creation_reason_expanded_text
+from .createPowerFormUtilities import refund_or_assign_rewards
 from .Ps2Engine import PowerEngine, SystemTextRenderer
 
 logger = logging.getLogger("app." + __name__)
@@ -32,7 +33,7 @@ def get_edit_context(existing_power_full=None, is_edit=False, existing_char=None
     categories = Base_Power_Category.objects.all()
     context = {
         'power_blob_url': PowerSystem.get_singleton().get_json_url(),
-        'character_blob': existing_char.to_create_power_blob() if existing_char else None,
+        'character_blob': json.dumps(existing_char.to_create_power_blob()) if existing_char else None,
         'modifier_formset': modifiers_formset,
         'params_formset': params_formset,
         'power_form': power_form,
@@ -91,6 +92,7 @@ def save_gift(request, power_full=None, character=None):
         new_power.save()
         if character:
             character.reset_attribute_bonuses()
+            refund_or_assign_rewards(new_power, old_power=previous_rev)
         return new_power
     else:
         logger.error("Invalid Power form. errors: {}".format(power_form.errors))
@@ -167,10 +169,12 @@ def _get_power_from_form_and_validate(power_form, power_engine, user=None):
 def _get_modifier_instances_and_validate(POST, power_engine, effect_id, vector_id, modality_id):
     modifiers_formset = get_modifiers_formset(POST)
     if modifiers_formset.is_valid():
+        print(modifiers_formset.cleaned_data)
         selected_modifier_forms = [x for x in modifiers_formset if "is_selected" in x.cleaned_data and x.cleaned_data["is_selected"]]
         power_engine.validate_new_mod_forms(effect_id, vector_id, modality_id, selected_modifier_forms)
         modifiers = []
         for form in selected_modifier_forms:
+            print(form.cleaned_data)
             details = form.cleaned_data["details"] if "details" in form.cleaned_data else None
             if form.cleaned_data["is_enhancement"]:
                 enhancement = get_object_or_404(Enhancement, pk=form.cleaned_data["mod_slug"])
@@ -293,7 +297,7 @@ def _handle_sig_artifact(request, SignatureArtifactForm, power_full, new_power, 
         new_artifact = None
 
     # Now update relations
-    if previous_rev:
+    if previous_rev and previous_rev.dice_system == SYS_PS2:
         if previous_rev.modality.crafting_type == CRAFTING_SIGNATURE:
             old_artifact = previous_rev.artifacts_set.filter(is_signature=True).get()
             previous_rev.artifacts.remove(old_artifact) # unlink old rev from old artifact

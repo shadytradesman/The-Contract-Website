@@ -10,7 +10,7 @@ function activateTooltips() {
 function setFormInputPrefixValues() {
     $(".js-data-prefix-container").each(function(){
         let prefixNum = $(this).attr("data-prefix");
-        $(this).children("input").each(function() {
+        $(this).find("input").each(function() {
             let currName = $(this).attr("name");
             let currId = $(this).attr("id");
             $(this).attr("name", currName.replace(/__prefix__/g, prefixNum));
@@ -141,6 +141,7 @@ function replaceSubstring(match) {
 }
 
 let powerBlob = null;
+let characterBlob = null;
 var unrenderedSystemText = "";
 
 function componentToVue(component, type) {
@@ -206,7 +207,7 @@ function modifierToVue(modifier, type) {
 }
 
 function modifierToVueWithId(modifier, type, idNum) {
-    let domNameBase = "modifiers-" + idNum;
+    let domNameBase = "modifs-" + idNum;
     let idBase = "id_" + domNameBase;
     return {
         id: idBase,
@@ -714,7 +715,7 @@ function randomFromList(list) {
 }
 
 
-let modCounter = 1; // used when creating unique ids for modifiers
+let modCounter = 0; // used when creating unique ids for modifiers
 const ComponentRendering = {
   delimiters: ['{', '}'],
   data() {
@@ -839,10 +840,11 @@ const ComponentRendering = {
         this.selectedEffect = selectedEffect;
         this.changeEffect();
         if (this.vectors.length > 1) {
+            let selectedVector = null;
             if (null === powerEditBlob["vector_pk"]) {
-                let selectedVector = this.vectors[0];
+                selectedVector = this.vectors[0];
             } else {
-                let selectedVector = this.vectors.find(comp => comp.slug === powerEditBlob["vector_pk"]);
+                selectedVector = this.vectors.find(comp => comp.slug === powerEditBlob["vector_pk"]);
             }
             if (!selectedVector) {
                 return;
@@ -1528,12 +1530,16 @@ const ComponentRendering = {
 const app = Vue.createApp(ComponentRendering);
 
 
+
 const mountedApp = app.mount('#vue-app');
 $(function() {
     fetch(powerBlobUrl)
         .then(response => response.json())
         .then(data => {
             powerBlob = data;
+            if ((document.getElementById('characterBlob').textContent.length > 2)) {
+                characterBlob = JSON.parse(JSON.parse(document.getElementById('characterBlob').textContent));
+            }
             mountedApp.modalities = Object.values(powerBlob.modalities).map(comp => componentToVue(comp, "mod"));
             if ((document.getElementById('powerEditBlob').textContent.length > 2)) {
                 const powerEditBlob = JSON.parse(JSON.parse(document.getElementById('powerEditBlob').textContent));

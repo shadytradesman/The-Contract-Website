@@ -793,10 +793,10 @@ class Character(models.Model):
                 unspent_improvements.append("{} from {}".format(reward.type_text(), reward.reason_text()))
             else:
                 unspent_gifts.append("{} from {}".format(reward.type_text(), reward.reason_text()))
+        unspent_gifts.extend(unspent_improvements)
         return {
             "name": self.name,
-            "avail_gifts": "unspent_gifts",
-            "avail_improvements": "unspent_improvements",
+            "avail_rewards": unspent_gifts,
             "status": self.status,
         }
 

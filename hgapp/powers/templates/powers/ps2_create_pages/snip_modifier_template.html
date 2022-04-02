@@ -14,9 +14,13 @@
            @change="{{vue_on_click}}"
            :disabled="modifier.slug in disabled{{vue_model_name}}"
            style="display:none;">
-    <span class="js-data-prefix-container" v-bind:data-prefix="modifier.idNum">
+    <span class="js-data-prefix-container" v-bind:data-prefix="modifier.isEnhancement ? modIndex : modIndex + enhancements.length">
+        {{modifier_formset.empty_form.is_selected}}
         {{modifier_formset.empty_form.mod_slug}}
         {{modifier_formset.empty_form.is_enhancement}}
+        <div v-if="modifier.detailLabel && selected{{vue_model_name}}.includes(modifier)">
+            {{modifier_formset.empty_form.details}}
+        </div>
     </span>
     <span>
         <b><span v-if="modifier.group">{groupLabelFromId(modifier.group)}: </span>{ modifier.displayName }</b>
@@ -40,6 +44,7 @@
             <input type="text"
                    required
                    v-model="modifier.details"
+                   maxlength="1200"
                    class="form-control"
                    @input="changeParam"
                    :disabled="modifier.slug in disabled{{vue_model_name}}"

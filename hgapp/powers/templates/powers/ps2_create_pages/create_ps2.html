@@ -19,6 +19,7 @@
 		const powerBlobUrl = "{{power_blob_url}}";
 	</script>
 	{{power_edit_blob|json_script:"powerEditBlob"}}
+	{{character_blob|json_script:"characterBlob"}}
 	<script src="{% static 'powers/ps2_create_script.js' %}"></script>
 {% endblock %}
 

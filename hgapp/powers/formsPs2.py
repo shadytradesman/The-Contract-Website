@@ -93,9 +93,13 @@ def make_select_signature_artifact_form(existing_character=None, existing_power=
 
 class ModifierForm(forms.Form):
     # input fields
-    details = forms.CharField(required=False, max_length=1200)
-    is_selected = forms.BooleanField(required=False)
-
+    details = forms.CharField(required=False, max_length=1200, widget=forms.HiddenInput(attrs={
+        'v-bind:value': 'modifier.details',
+      }),)
+    is_selected = forms.BooleanField(required=False, label=None, widget=forms.HiddenInput(attrs={
+        'v-bind:checked': '(modifier.isEnhancement?selectedEnhancements:selectedDrawbacks).map(enh => enh.id).includes(modifier.id)',
+        'v-bind:value': '(modifier.isEnhancement?selectedEnhancements:selectedDrawbacks).map(enh => enh.id).includes(modifier.id)',
+    }),)
     # metadata fields
     mod_slug = forms.CharField(required=True, label=None, widget=forms.HiddenInput(attrs={
         'v-bind:value': 'modifier.slug',

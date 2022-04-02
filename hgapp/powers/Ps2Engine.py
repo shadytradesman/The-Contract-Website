@@ -358,9 +358,7 @@ class SystemTextRenderer:
         replacements = self._add_replacements_for_components(replacements, power)
         replacements = self._add_replacements_for_parameters(replacements, param_instances)
         replacements = self._add_replacements_for_fields(replacements, power, field_instances)
-        print("PRE_COLLAPSE", replacements)
         replacements = self._collapse_substitutionss(replacements)
-        print("POST_COLLAPSE", replacements)
         return replacements
 
     # This method must remain functionally equal to ps2_create_script.js # addReplacementsForModifiers

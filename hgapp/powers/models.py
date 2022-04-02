@@ -1066,6 +1066,10 @@ class Power(models.Model):
             effect_pk = self.base_id
             vector_id = self.vector_id
             modality_id = self.modality_id
+
+        spent_rewards = []
+        for reward in self.parent_power.reward_list():
+            spent_rewards.append("{} from {}".format(reward.type_text(), reward.reason_text()))
         return {
             "effect_pk": effect_pk,
             "vector_pk": vector_id,
@@ -1083,6 +1087,7 @@ class Power(models.Model):
             "text_fields": [x.to_blob() for x in self.systemfieldtextinstance_set.all()] if hasattr(self, 'systemfieldtextinstance_set') else None,
             "roll_fields": [x.to_blob() for x in self.systemfieldrollinstance_set.all()] if hasattr(self, 'systemfieldrollinstance_set') else None,
             "weapon_fields": [x.to_blob() for x in self.systemfieldweaponinstance_set.all()] if hasattr(self, 'systemfieldweaponinstance_set') else None,
+            "spent_rewards": spent_rewards,
         }
 
     def get_gift_cost(self):

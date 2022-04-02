@@ -172,7 +172,7 @@
             </small>
         </div>
         <div id="js-enhancements-container" v-if="enhancements.length > 0">
-            <div v-for="modifier in enhancements"
+            <div v-for="(modifier, modIndex) in enhancements"
                  :key="modifier.id" >
                 {% with 'Enhancements' as vue_model_name %}
                 {% with 'clickEnhancement' as vue_on_click %}
@@ -192,7 +192,7 @@
             </small>
         </div>
         <div id="js-drawbacks-container" v-if="drawbacks.length > 0">
-            <div v-for="modifier in drawbacks"
+            <div v-for="(modifier, modIndex) in drawbacks"
                  :key="modifier.id">
                 {% with 'Drawbacks' as vue_model_name %}
                 {% with 'clickDrawback' as vue_on_click %}
@@ -233,6 +233,16 @@
     {{power_form.effect}}
     {{power_form.vector}}
     {{power_form.modality}}
+    <div v-if="warnings.length > 0">
+        <h3>Gift incomplete:</h3>
+        <div class="alert alert-warning">
+            <ul>
+                <li v-for="warning in warnings">
+                    <span v-text="warning"></span>
+                </li>
+            </ul>
+        </div>
+    </div>
     <div v-if="warnings.length > 0">
         <h3>Gift incomplete:</h3>
         <div class="alert alert-warning">
