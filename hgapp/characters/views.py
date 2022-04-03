@@ -349,7 +349,7 @@ def choose_powers(request, character_id):
     assigned_powers = character.power_full_set.exclude(crafting_type=CRAFTING_SIGNATURE).all()
     unassigned_powers = request.user.power_full_set.filter(character=None, is_deleted=False).exclude(crafting_type=CRAFTING_SIGNATURE).order_by('-pub_date').all()
     assigned_items = character.get_signature_items()
-    unassigned_items = character.player.artifact_set.filter(cell=None, is_signature=True).all()
+    unassigned_items = character.player.artifact_set.filter(cell=None, is_signature=True, crafting_character__isnull=True).all()
     context = {
         'character': character,
         'assigned_powers': assigned_powers,
@@ -358,6 +358,7 @@ def choose_powers(request, character_id):
         'unassigned_items': unassigned_items,
     }
     return render(request, 'characters/choose_powers.html', context)
+
 
 def toggle_item(request, character_id, sig_artifact_id):
     character = get_object_or_404(Character, id=character_id)

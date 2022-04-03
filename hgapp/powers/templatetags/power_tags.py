@@ -24,7 +24,12 @@ def power_badge(power_full):
 @register.inclusion_tag('powers/ps2_view_pages/heading_snip.html')
 def power_heading(power_full):
     latest_revision = power_full.latest_revision()
+    character = power_full.character if power_full.character else None
+    show_status_warning = False
+    if character:
+        show_status_warning = not latest_revision.passes_status_check(character.status)
     return {
         'power_full': power_full,
         'latest_revision': latest_revision,
+        'show_status_warning': show_status_warning,
     }

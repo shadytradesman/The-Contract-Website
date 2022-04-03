@@ -769,6 +769,7 @@ const ComponentRendering = {
       enhancementList: "",
       drawbackList: "",
       warnings: [],
+      selectedItem: "",
     }
   },
   methods: {
@@ -834,6 +835,9 @@ const ComponentRendering = {
         this.changeModality();
         console.log("modality selected");
         console.log("effect: " + powerEditBlob["effect_pk"]);
+        if (this.selectedModality.slug === "signature-item-mod") {
+            this.selectedItem = powerEditBlob["current_artifact"];
+        }
         let selectedEffect = this.effects.find(comp => comp.slug === powerEditBlob["effect_pk"]);
         console.log(selectedEffect);
         if (!selectedEffect) {

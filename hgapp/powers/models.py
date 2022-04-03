@@ -1070,6 +1070,10 @@ class Power(models.Model):
         spent_rewards = []
         for reward in self.parent_power.reward_list():
             spent_rewards.append("{} from {}".format(reward.type_text(), reward.reason_text()))
+        initial_artifact = None
+        if self.parent_power.crafting_type == CRAFTING_SIGNATURE:
+             initial_artifact = get_object_or_none(self.parent_power.artifactpowerfull_set.filter(relevant_artifact__is_signature=True))
+             initial_artifact = initial_artifact.relevant_artifact.pk if initial_artifact else None
         return {
             "effect_pk": effect_pk,
             "vector_pk": vector_id,
@@ -1088,6 +1092,8 @@ class Power(models.Model):
             "roll_fields": [x.to_blob() for x in self.systemfieldrollinstance_set.all()] if hasattr(self, 'systemfieldrollinstance_set') else None,
             "weapon_fields": [x.to_blob() for x in self.systemfieldweaponinstance_set.all()] if hasattr(self, 'systemfieldweaponinstance_set') else None,
             "spent_rewards": spent_rewards,
+
+            "current_artifact": initial_artifact,
         }
 
     def get_gift_cost(self):

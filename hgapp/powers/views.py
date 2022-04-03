@@ -202,7 +202,7 @@ def edit_power(request, power_id):
     if request.method == 'POST':
         with transaction.atomic():
             new_power = create_power_for_new_edit(base_power, request, power_full)
-            if (new_power):
+            if new_power:
                 refund_or_assign_rewards(new_power, extant_power)
                 return HttpResponseRedirect(reverse('powers:powers_view_power', args=(new_power.id,)))
             else:

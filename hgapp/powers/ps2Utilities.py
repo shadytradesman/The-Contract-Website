@@ -288,9 +288,11 @@ def _handle_sig_artifact(request, SignatureArtifactForm, power_full, new_power, 
         new_artifact = sig_artifact_form.cleaned_data["selected_artifact"]
         print(new_artifact)
         if not new_artifact:
+            form_name = sig_artifact_form.cleaned_data["item_name"]
+            form_desc = sig_artifact_form.cleaned_data["item_description"]
             new_artifact = Artifact(
-                name=sig_artifact_form.cleaned_data["item_name"],
-                description=sig_artifact_form.cleaned_data["item_description"],
+                name=form_name if form_name else power_full.name,
+                description=form_desc if form_desc else "",
                 crafting_character=power_full.character,
                 character=power_full.character,
                 creating_player=request.user,

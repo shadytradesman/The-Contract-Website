@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import formset_factory
 
-from .models import PowerTag, Base_Power, EFFECT, MODALITY, VECTOR
+from .models import PowerTag, Base_Power, EFFECT, MODALITY, VECTOR, CRAFTING_SIGNATURE
 from characters.models import Weapon, Artifact
 from hgapp.utilities import get_object_or_none
 
@@ -72,8 +72,10 @@ def make_select_signature_artifact_form(existing_character=None, existing_power=
                 cell__isnull=True,
                 crafting_character=existing_character,
                 is_signature=True)
-            if existing_power and hasattr(existing_power, "artifacts_set"):
-                initial_artifact = get_object_or_none(existing_power.artifacts_set.filter(is_signature=True))
+            print("blah")
+            if existing_power and existing_power.crafting_type == CRAFTING_SIGNATURE:
+                print("YEAH!")
+                initial_artifact = get_object_or_none(existing_power.artifactpowerfull_set.filter(relevant_artifact__is_signature=True))
         else:
             queryset = Artifact.objects.none()
             initial_artifact = None
@@ -81,11 +83,15 @@ def make_select_signature_artifact_form(existing_character=None, existing_power=
                                                    initial=initial_artifact,
                                                    required=False,
                                                    empty_label="Create New Item",
-                                                   label="Add to existing Signature Item?")
-        item_name = forms.CharField(required=True,
+                                                   label="Add to existing Signature Item?",
+                                                   widget=forms.Select(attrs={
+                                                       'v-model': 'selectedItem',
+                                                   })
+                                                   )
+        item_name = forms.CharField(required=False,
                                     max_length=450,
                                     help_text="The name of the signature item")
-        item_description = forms.CharField(required=True,
+        item_description = forms.CharField(required=False,
                                            max_length=5000,
                                            help_text="A physical description of the signature item")
     return SelectArtifactForm
