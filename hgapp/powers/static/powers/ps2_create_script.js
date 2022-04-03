@@ -142,6 +142,7 @@ function replaceSubstring(match) {
 
 let powerBlob = null;
 let characterBlob = null;
+let powerEditBlob = null;
 var unrenderedSystemText = "";
 
 function componentToVue(component, type) {
@@ -751,6 +752,8 @@ const ComponentRendering = {
       giftErrata: "",
       activeUniqueReplacementsByMarker: {},
       giftCost: 0,
+      giftInfoList: [],
+      giftInfoHeader: "",
       previousGiftCost: null,
       costDifference: null,
       enhancementsCost: 0,
@@ -1266,7 +1269,38 @@ const ComponentRendering = {
             let prefix = costDiff >= 0 ? "+ " : " ";
             this.costDifference = prefix + costDiff;
           }
+          this.updateGiftText();
+      },
+      updateGiftText() {
+        if (null != characterBlob) {
+            let spentRewards = null != powerEditBlob ? powerEditBlob["spent_rewards"] : [];
+            let numInvested = spentRewards.length;
+            let unpaidCost = this.giftCost - numInvested;
+            if (unpaidCost > characterBlob["avail_rewards"].length) {
+                // warn for insufficient Gifts
+            }
+            let availRewards = characterBlob["avail_rewards"];
+            if (unpaidCost > 0) {
+                this.giftInfoHeader = "";
+                if (availRewards.length >= unpaidCost) {
+                    this.giftInfoHeader = "Saving will spend the following Rewards";
+                    this.giftInfoList = availRewards.slice(0, unpaidCost);
+                }
+                // add warning for insufficient gifts
+            }
+            if (unpaidCost == 0) {
+                this.giftInfoHeader = "Saving will not affect " + characterBlob["name"] + "'s Rewards";
+                this.giftInfoList = [];
+            }
+            if (unpaidCost < 0) {
+                if (numInvested > 0) {
+                    this.giftInfoHeader = "Saving will refund the following Rewards"
+                    this.giftInfoList = spentRewards.slice(0, -unpaidCost);
+                }
+            }
 
+
+        }
       },
       mergeStatuses(currentStatus, requiredStatus, reason) {
             if (null == requiredStatus || requiredStatus[0] === "ANY") {
@@ -1339,6 +1373,15 @@ const ComponentRendering = {
                 new_warnings.push("This Gift requires at least " + group.min_required + " " + group.label + " Enhancement");
             }
         });
+
+        if (null != characterBlob) {
+            let spentRewards = null != powerEditBlob ? powerEditBlob["spent_rewards"] : [];
+            let numInvested = spentRewards.length;
+            let unpaidCost = this.giftCost - numInvested;
+            if (unpaidCost > characterBlob["avail_rewards"].length) {
+                new_warnings.push("You do not have sufficient Rewards available to purchase this Gift.");
+            }
+        }
 
         this.warnings = new_warnings;
       },
@@ -1542,7 +1585,7 @@ $(function() {
             }
             mountedApp.modalities = Object.values(powerBlob.modalities).map(comp => componentToVue(comp, "mod"));
             if ((document.getElementById('powerEditBlob').textContent.length > 2)) {
-                const powerEditBlob = JSON.parse(JSON.parse(document.getElementById('powerEditBlob').textContent));
+                powerEditBlob = JSON.parse(JSON.parse(document.getElementById('powerEditBlob').textContent));
                 mountedApp.setStateForEdit(powerEditBlob);
             }
             mountedApp.$nextTick(function () {

@@ -204,7 +204,7 @@ def create_new_power_and_parent(base_power, request, character=None):
 def refund_or_assign_rewards(new_power, old_power=None):
     og_point_value = 0
     if old_power:
-        og_point_value = old_power.reward_count()
+        og_point_value = old_power.parent_power.reward_count()
     delta = new_power.get_gift_cost() - og_point_value
     print(delta)
     if delta == 0:

@@ -96,7 +96,8 @@
 									 v-bind:data-title="giftCostTooltip"
 									 class="has-popover">
 	             		        Cost:
-	             		       <span v-html="giftCost"></span>
+	             		       <b><span v-html="giftCost"></span></b>
+                        		<span v-if="previousGiftCost && previousGiftCost - giftCost != 0 "> ({previousGiftCost} {costDifference})</span>
 	             		   </span>
 						</div>
 					</span>

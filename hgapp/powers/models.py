@@ -898,13 +898,13 @@ class Power_Full(models.Model):
     def latest_archive_txt(self):
         return self.latest_revision().archive_txt()
 
-    def reward_count(self, include_gifts=True):
+    def reward_count(self, include_improvements=True):
         count = 0
         for power in self.power_set.all():
-            if include_gifts:
+            if include_improvements:
                 count += power.relevant_power.filter(is_void=False).count()
             else:
-                count += power.relevant_power.filter(is_void=False, is_improvement=True).count()
+                count += power.relevant_power.filter(is_void=False, is_gift=True).count()
         return count
 
     def reward_list(self):
@@ -915,7 +915,7 @@ class Power_Full(models.Model):
         return rewards
 
     def at_least_one_gift_assigned(self):
-        return self.reward_count(include_gifts=False) > 0
+        return self.reward_count(include_gifts=True) > 0
 
     def __str__(self):
         if self.owner:

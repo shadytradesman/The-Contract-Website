@@ -233,19 +233,19 @@
     {{power_form.effect}}
     {{power_form.vector}}
     {{power_form.modality}}
-    <div v-if="warnings.length > 0">
-        <h3>Gift incomplete:</h3>
-        <div class="alert alert-warning">
+    <div v-if="giftInfoHeader.length > 0">
+        <div class="alert alert-info">
+            <h4 class="text-center" v-text="giftInfoHeader" style="margin-top: 0px; margin-bottom: 0px;"></h4>
             <ul>
-                <li v-for="warning in warnings">
-                    <span v-text="warning"></span>
+                <li v-for="gift in giftInfoList">
+                    <span v-text="gift"></span>
                 </li>
             </ul>
         </div>
     </div>
     <div v-if="warnings.length > 0">
-        <h3>Gift incomplete:</h3>
         <div class="alert alert-warning">
+            <h3 class="text-center" style="margin-top: 0px;">Gift incomplete</h3>
             <ul>
                 <li v-for="warning in warnings">
                     <span v-text="warning"></span>
