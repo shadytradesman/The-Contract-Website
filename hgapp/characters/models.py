@@ -672,6 +672,33 @@ class Character(models.Model):
     def num_unspent_improvements(self):
         return self.reward_set.filter(is_void=False).filter(relevant_power=None).filter(is_improvement=True).count()
 
+    def reward_cost_for_item(self, sig_item):
+        unspent_gifts = self.unspent_gifts()
+        num_unspent_gifts = self.num_unspent_gifts()
+        unspent_improvements = self.unspent_improvements()
+        gifts_to_spend = []
+        improvements_to_spend = []
+
+        gifts_required = sig_item.power_full_set.count()
+        gifts_to_spend.extend(unspent_gifts[0:gifts_required])
+
+        improvements_required = - gifts_required
+        for power in sig_item.power_full_set.all():
+            improvements_required += power.get_gift_cost()
+        improvements_to_spend.extend(unspent_improvements[0:max(improvements_required, 0)])
+
+        num_needed_improvements = improvements_required - len(improvements_to_spend)
+        if num_needed_improvements > 0:
+            if len(gifts_to_spend) < num_unspent_gifts:
+                gifts_to_spend.extend(unspent_gifts[gifts_required:num_needed_improvements])
+        return {
+            "rewards_to_spend": gifts_to_spend + improvements_to_spend,
+            "gift_deficit": gifts_required - len(gifts_to_spend),
+            "improvement_deficit": (improvements_required + gifts_required) - (len(gifts_to_spend) + len(improvements_to_spend)),
+            "item_cost": improvements_required + gifts_required,
+        }
+
+
     def reward_cost_for_power(self, power_full):
         rewards_to_be_spent = []
         unspent_gifts = self.unspent_gifts()
@@ -696,6 +723,9 @@ class Character(models.Model):
 
     def get_powers_for_render(self):
         return self.power_full_set.all()
+
+    def get_signature_items(self):
+        return self.artifact_set.filter(cell=None, is_signature=True).all()
 
     def __str__(self):
         string = self.name + " ["
@@ -1079,6 +1109,12 @@ class Artifact(WorldElement):
     quantity = models.PositiveIntegerField(default=1)
     location = models.CharField(max_length=1000, default="", blank=True)
     availability = models.CharField(choices=ARTIFACT_STATUS, max_length=55, default=ART_AVAILABLE)
+
+    def get_assigned_rewards(self):
+        rewards = []
+        for power in self.power_full_set.all():
+            rewards.extend(power.reward_list())
+        return rewards
 
 
 class Injury(models.Model):

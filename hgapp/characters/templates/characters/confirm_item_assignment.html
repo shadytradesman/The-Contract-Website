@@ -4,36 +4,38 @@
 {% load bootstrap %}
 {% load games_tags %}
 
-{% block head_title %}Assigning Power{% endblock %}
+{% block head_title %}Assigning Item{% endblock %}
 
 {% block body_class %}home{% endblock %}
 
 {% block body_base %}
 <div class="container">
      <div class="text-center">
-        {% if power_full.character.id != character.id %}
-            <h1>Assign {{power_full.name}} to {{character.name}}?</h1>
+        {% if item.character and item.character.id == character.id %}
+            <h1>Remove {{item.name}} from {{character.name}}?</h1>
         {% else %}
-            <h1>Remove {{power_full.name}} from {{character.name}}?</h1>
+            <h1>Assign {{item.name}} to {{character.name}}?</h1>
         {% endif %}
      </div>
     <div class="panel panel-defaul text-center">
         <div class="panel-body">
-            {% if power_full.character.id != character.id %}
-                {% if insufficient_gifts %}
+            {% if not item.character or item.character.id != character.id %}
+                {% if gift_deficit > 0 %}
                     <div class="row">
                         <div class="col-md-8 col-md-offset-2 alert alert-danger" role="alert">
-                            <h4>{{character.name}} does not have any unspent Gifts.</h4>
-                            <p>All powers cost at least one Gift. Gifts are only obtained by playing a Contractor in a Contract and winning.</p>
-                            <p>You can still assign this Power, but it will put your Contractor in bad standing.</p>
+                            <h4>{{character.name}} does not have enough unspent Gifts.</h4>
+                            <p>All Items cost at least one Gift credit. Gift credits are only obtained by playing a
+                                Contractor in a Contract and winning.</p>
+                            <p>You can still assign this Item, but it will put your Contractor in bad standing.</p>
                         </div>
                     </div>
-                {% elif reward_deficit > 0 %}
+                {% elif improvement_deficit > 0 %}
                     <div class="row">
                         <div class="col-md-8 col-md-offset-2 alert alert-danger" role="alert">
-                            <h4>{{character.name}} does not have a sufficient number of Gifts and Improvements to grant this Power.</h4>
-                            <p>{{power_full.name}} has a cost of {{power_full.get_gift_cost}}, and {{character.name}} can only afford {{rewards_to_spend|length}}.</p>
-                            <p>You require <b>{{reward_deficit}}</b> more Gift{{reward_deficit|pluralize}} or Improvement{{reward_deficit|pluralize}}.</br>
+                            <h4>{{character.name}} does not have a sufficient number of Gifts and Improvements to take this item.</h4>
+                            <p>{{item.name}} has a cost of {{item_cost}}, and {{character.name}} can only afford {{rewards_to_spend|length}}.</p>
+                            <p>You require <b>{{gift_deficit}}</b> more Gift{{gift_deficit|pluralize}} and
+                                <b>{{improvement_deficit}}</b> Improvement{{reward_deficit|pluralize}}.</br>
                             <b>You can still assign this Power, but it will put your Contractor in bad standing.</b></p>
                         </div>
                     </div>
@@ -49,28 +51,28 @@
                     </ul>
                 {% endif %}
             {% else %}
-                {% if power_full.reward_list|length > 0 %}
+                {% if item.get_assigned_rewards|length > 0 %}
                     <h4>
                         Removing this power will refund the following Gifts and Improvements
                     </h4>
                     <ul class="list-unstyled">
-                        {% for reward in power_full.reward_list %}
+                        {% for reward in item.get_assigned_rewards %}
                             <li>{% render_reward reward %}</li>
                         {% endfor %}
                     </ul>
                 {% endif %}
             {% endif %}
             <div class="text-center">
-                <form action="{% url 'characters:characters_power_toggle' character.id power_full.id %}" method="post">
+                <form action="{% url 'characters:characters_item_toggle' character.id item.id %}" method="post">
                 {{ assignment_form.about.errors }}
                 {{ assignment_form.non_field_errors }}
                 {% csrf_token %}
                     <input class="btn btn-primary" type="submit"
                            value=
-                           {% if power_full.character.id != character.id %}
-                                "Assign Power"
+                           {% if item.character and item.character.id == character.id %}
+                                "Refund Item"
                            {% else %}
-                                "Refund Power"
+                                "Assign Item"
                            {% endif %}
                     />
                 </form>

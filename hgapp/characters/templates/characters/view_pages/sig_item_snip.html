@@ -1,0 +1,17 @@
+{% load power_tags %}
+
+<div class="css-signature-item">
+            <span class="css-world-element-name">
+                <h4 class="text-center" style="margin-top: 0px; padding-left: 5px; font-size: 22px;">
+                    {{item.name}}
+                </h4>
+            </span>
+  <div style="padding-left: 5px; padding-bottom: 5px;">
+    <i class="css-system-text-user-input">{{item.description}}</i>
+  </div>
+  {% for power in item.power_full_set.all %}
+    <span class="css-world-element-name">
+        {% power_badge power %}
+    </span>
+  {% endfor %}
+</div>

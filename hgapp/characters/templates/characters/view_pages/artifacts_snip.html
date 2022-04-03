@@ -1,20 +1,9 @@
-{% load power_tags %}
-
 {% if signature_items %}
-    <h3 class="text-center" data-toggle="tooltip" title='{{tutorial.artifacts|safe}}'>
+    <h3 class="text-center" data-toggle="tooltip" >
         Signature Items
     </h3>
     {% for item in signature_items %}
-        <div class="css-world-entity-value">
-            <span class="css-world-element-name">
-                {{artifact.name}}
-            </span>
-            {% for power in item.power_full_set %}
-                <span class="css-world-element-name">
-                    {% power_badge power_full %}
-                </span>
-            {% endfor %}
-        </div>
+        {% include "characters/view_pages/sig_item_snip.html" %}
     {% endfor %}
 {% endif %}
 

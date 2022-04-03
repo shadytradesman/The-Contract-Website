@@ -15,7 +15,7 @@ from django.middleware.csrf import rotate_token
 
 
 from characters.models import Character, BasicStats, Character_Death, Graveyard_Header, Attribute, Ability, \
-    CharacterTutorial, Asset, Liability, BattleScar, Trauma, TraumaRevision, Injury, Source, ExperienceReward
+    CharacterTutorial, Asset, Liability, BattleScar, Trauma, TraumaRevision, Injury, Source, ExperienceReward, Artifact
 from powers.models import Power_Full, SYS_LEGACY_POWERS, SYS_PS2, CRAFTING_NONE, CRAFTING_SIGNATURE, CRAFTING_ARTIFACT, \
     CRAFTING_CONSUMABLE
 from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, get_ability_form, \
@@ -264,6 +264,7 @@ def view_character(request, character_id, secret_key = None):
     artifacts = get_world_element_default_dict(world_element_cell_choices)
     signature_items = []
     for artifact in character.artifact_set.all():
+        print(artifact)
         if hasattr(artifact, "cell") and artifact.cell:
             artifacts[artifact.cell].append(artifact)
         else:
@@ -345,23 +346,65 @@ def choose_powers(request, character_id):
     character = get_object_or_404(Character, id=character_id)
     if request.user.is_anonymous or not character.player_can_edit(request.user):
         raise PermissionDenied("You do not have permission to edit this Character")
-    assigned_powers = character.power_full_set.all()
-    unassigned_powers = request.user.power_full_set.filter(character=None, is_deleted=False).order_by('-pub_date').all()
+    assigned_powers = character.power_full_set.exclude(crafting_type=CRAFTING_SIGNATURE).all()
+    unassigned_powers = request.user.power_full_set.filter(character=None, is_deleted=False).exclude(crafting_type=CRAFTING_SIGNATURE).order_by('-pub_date').all()
+    assigned_items = character.get_signature_items()
+    unassigned_items = character.player.artifact_set.filter(cell=None, is_signature=True).all()
     context = {
         'character': character,
         'assigned_powers': assigned_powers,
         'unassigned_powers': unassigned_powers,
+        'assigned_items': assigned_items,
+        'unassigned_items': unassigned_items,
     }
     return render(request, 'characters/choose_powers.html', context)
 
-def view_character_contacts(request, character_id):
+def toggle_item(request, character_id, sig_artifact_id):
     character = get_object_or_404(Character, id=character_id)
-    contacts = get_character_contacts(character)
-    context = {
-        'character': character,
-        'contacts': dict(contacts),
-    }
-    return render(request, 'characters/view_character_contacts.html', context)
+    sig_item = get_object_or_404(Artifact, id=sig_artifact_id)
+    if not (character.player_can_edit(request.user)):
+        raise PermissionDenied("You do not have permission to edit this Character")
+    if not sig_item.is_signature:
+        raise PermissionDenied("This isn't a signature item")
+    for power in sig_item.power_full_set.all():
+        if not power.player_can_edit(request.user):
+            raise PermissionDenied("You do not have permission to edit a Gift on this item")
+    if request.method == 'POST':
+        assignment_form = ConfirmAssignmentForm(request.POST)
+        if assignment_form.is_valid():
+            with transaction.atomic():
+                if sig_item.character == character:
+                    # Unassign the item
+                    sig_item.character = None
+                    sig_item.crafting_character = None
+                    sig_item.save()
+                    for power in sig_item.power_full_set.all():
+                        power.set_self_and_children_privacy(is_private=False)
+                    for reward in sig_item.get_assigned_rewards():
+                        reward.refund_keeping_character_assignment()
+                elif not sig_item.character:
+                    # Assign the item
+                    sig_item.character = character
+                    sig_item.crafting_character = character
+                    sig_item.save()
+                    for power_full in sig_item.power_full_set.all():
+                        rewards_to_be_spent = character.reward_cost_for_power(power_full)
+                        for reward in rewards_to_be_spent:
+                            reward.assign_to_power(power_full.latest_revision())
+                character.reset_attribute_bonuses()
+            return HttpResponseRedirect(reverse('characters:characters_power_picker', args=(character.id,)))
+    else:
+        rewards_to_be_spent = character.reward_cost_for_item(sig_item)
+        context = {
+            'character': character,
+            'item': sig_item,
+            'assignment_form': ConfirmAssignmentForm(),
+            'rewards_to_spend': rewards_to_be_spent["rewards_to_spend"],
+            'gift_deficit': rewards_to_be_spent["gift_deficit"],
+            'improvement_deficit': rewards_to_be_spent["improvement_deficit"],
+            'item_cost': rewards_to_be_spent["item_cost"],
+        }
+        return render(request, 'characters/confirm_item_assignment.html', context)
 
 
 def toggle_power(request, character_id, power_full_id):
@@ -398,9 +441,7 @@ def toggle_power(request, character_id, power_full_id):
     else:
         rewards_to_be_spent = character.reward_cost_for_power(power_full)
         reward_deficit = power_full.get_gift_cost() - len(rewards_to_be_spent)
-        insufficient_gifts = False
-        if character.num_unspent_gifts() == 0:
-            insufficient_gifts = True
+        insufficient_gifts = character.num_unspent_gifts() == 0
         context = {
             'character': character,
             'power_full': power_full,
@@ -410,6 +451,16 @@ def toggle_power(request, character_id, power_full_id):
             'rewards_to_spend': rewards_to_be_spent,
         }
         return render(request, 'characters/confirm_power_assignment.html', context)
+
+def view_character_contacts(request, character_id):
+    character = get_object_or_404(Character, id=character_id)
+    contacts = get_character_contacts(character)
+    context = {
+        'character': character,
+        'contacts': dict(contacts),
+    }
+    return render(request, 'characters/view_character_contacts.html', context)
+
 
 def spend_reward(request, character_id):
     character = get_object_or_404(Character, id=character_id)

@@ -47,6 +47,10 @@ urlpatterns = [
     # ex: .com/characters/edit/c/112/p/21
     url(r'^edit/c/(?P<character_id>[\d]+)/p/(?P<power_full_id>[\d]+)$', views.toggle_power, name='characters_power_toggle'),
 
+    # ex: .com/characters/edit/c/112/i/21
+    url(r'^edit/c/(?P<character_id>[\d]+)/i/(?P<sig_artifact_id>[\d]+)$', views.toggle_item,
+        name='characters_item_toggle'),
+
     # ex: .com/characters/claim/c/112/6db20aef104038d363eca31985142c08daa82be57e29e53ad3c8171b9d46083f
     url(r'^claim/c/(?P<character_id>[\d]+)/(?P<secret_key>[\da-z]*)$', views.claim_character, name='characters_claim'),
 

@@ -1,0 +1,21 @@
+<div class="panel panel-default css-ps2-power-badge"
+     style="margin-bottom: 10px;">
+    <div
+            class="panel-heading"
+            style="background-color: #353e4b; padding-bottom: 5px;">
+        <h4 style="font-size: 20px; margin-top: 0px; margin-bottom: 5px;">
+            {% if user_can_edit and available_gift %}
+            <a href="{% url 'powers:powers_edit_ps2' power_full.id %}"
+               class="btn btn-success btn-xs" >
+                <i class="fa fa-plus-square fa-2x"></i>
+            </a>
+            {% endif %}
+            <a href="{% url 'powers:powers_view_power_full' power_full.id %}">{{latest_revision.name}}</a>
+        </h4>
+        <div>
+            {% with latest_revision as power %}
+            {% include "powers/ps2_view_pages/components_snippet.html" %}
+            {% endwith %}
+        </div>
+    </div>
+</div>

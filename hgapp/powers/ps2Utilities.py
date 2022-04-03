@@ -289,9 +289,10 @@ def _handle_sig_artifact(request, SignatureArtifactForm, power_full, new_power, 
         print(new_artifact)
         if not new_artifact:
             new_artifact = Artifact(
-                name=power_full.name,
-                description=".",
+                name=sig_artifact_form.cleaned_data["item_name"],
+                description=sig_artifact_form.cleaned_data["item_description"],
                 crafting_character=power_full.character,
+                character=power_full.character,
                 creating_player=request.user,
                 is_signature=True,
             )

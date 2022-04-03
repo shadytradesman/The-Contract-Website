@@ -20,3 +20,11 @@ def power_badge(power_full):
         'character': character,
         'show_status_warning': show_status_warning,
     }
+
+@register.inclusion_tag('powers/ps2_view_pages/heading_snip.html')
+def power_heading(power_full):
+    latest_revision = power_full.latest_revision()
+    return {
+        'power_full': power_full,
+        'latest_revision': latest_revision,
+    }
