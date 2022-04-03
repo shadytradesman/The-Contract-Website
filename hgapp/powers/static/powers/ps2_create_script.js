@@ -1276,17 +1276,12 @@ const ComponentRendering = {
             let spentRewards = null != powerEditBlob ? powerEditBlob["spent_rewards"] : [];
             let numInvested = spentRewards.length;
             let unpaidCost = this.giftCost - numInvested;
-            if (unpaidCost > characterBlob["avail_rewards"].length) {
-                // warn for insufficient Gifts
-            }
             let availRewards = characterBlob["avail_rewards"];
             if (unpaidCost > 0) {
-                this.giftInfoHeader = "";
-                if (availRewards.length >= unpaidCost) {
+                if (availRewards.length > 0) {
                     this.giftInfoHeader = "Saving will spend the following Rewards";
                     this.giftInfoList = availRewards.slice(0, unpaidCost);
                 }
-                // add warning for insufficient gifts
             }
             if (unpaidCost == 0) {
                 this.giftInfoHeader = "Saving will not affect " + characterBlob["name"] + "'s Rewards";
@@ -1298,8 +1293,6 @@ const ComponentRendering = {
                     this.giftInfoList = spentRewards.slice(0, -unpaidCost);
                 }
             }
-
-
         }
       },
       mergeStatuses(currentStatus, requiredStatus, reason) {

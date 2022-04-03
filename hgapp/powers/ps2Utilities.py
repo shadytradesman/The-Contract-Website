@@ -283,29 +283,35 @@ def _create_new_power_full(power_form, new_power, character=None):
 def _handle_sig_artifact(request, SignatureArtifactForm, power_full, new_power, previous_rev=None):
     # First get the new artifact if there is one
     sig_artifact_form = SignatureArtifactForm(request.POST)
+    sig_artifact_form.is_valid()
     if new_power.modality.crafting_type == CRAFTING_SIGNATURE:
         new_artifact = sig_artifact_form.cleaned_data["selected_artifact"]
+        print(new_artifact)
         if not new_artifact:
-            new_artifact = Artifact.create(
+            new_artifact = Artifact(
                 name=power_full.name,
                 description=".",
                 crafting_character=power_full.character,
                 creating_player=request.user,
                 is_signature=True,
             )
+            new_artifact.save()
+            print(new_artifact)
     else:
         new_artifact = None
 
     # Now update relations
     if previous_rev and previous_rev.dice_system == SYS_PS2:
         if previous_rev.modality.crafting_type == CRAFTING_SIGNATURE:
-            old_artifact = previous_rev.artifacts_set.filter(is_signature=True).get()
+            print("here")
+            old_artifact = previous_rev.artifactpower_set.filter(relevant_artifact__is_signature=True).get().relevant_artifact
             previous_rev.artifacts.remove(old_artifact) # unlink old rev from old artifact
             if old_artifact != new_artifact or new_power.modality.crafting_type != CRAFTING_SIGNATURE:
                 power_full.artifacts.remove(old_artifact) # unlink power_full from old artifact
                 if old_artifact.power_full_set.filter(crafting_type=CRAFTING_SIGNATURE).count() == 0:
                     old_artifact.delete()
     if new_power.modality.crafting_type == CRAFTING_SIGNATURE:
+        print(new_artifact)
         new_power.artifacts.add(new_artifact) # link new rev with artifact
         power_full.artifacts.add(new_artifact) # it's okay to duplicitively add to a django many-to-many
 

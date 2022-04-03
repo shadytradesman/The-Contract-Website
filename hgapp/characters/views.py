@@ -262,8 +262,13 @@ def view_character(request, character_id, secret_key = None):
         default_scar_field = get_default_scar_choice_field()
 
     artifacts = get_world_element_default_dict(world_element_cell_choices)
+    signature_items = []
     for artifact in character.artifact_set.all():
-        artifacts[artifact.cell].append(artifact)
+        if hasattr(artifact, "cell") and artifact.cell:
+            artifacts[artifact.cell].append(artifact)
+        else:
+            signature_items.append(artifact)
+    print(signature_items)
     artifacts = dict(artifacts)
 
     circumstances = get_world_element_default_dict(world_element_cell_choices)
@@ -324,6 +329,7 @@ def view_character(request, character_id, secret_key = None):
         'crafting_artifact_gifts': crafting_artifact_gifts,
         'crafting_consumable_gifts': crafting_consumable_gifts,
         'signature_item_gifts': signature_item_gifts,
+        'signature_items': signature_items,
     }
     return render(request, 'characters/view_pages/view_character.html', context)
 
