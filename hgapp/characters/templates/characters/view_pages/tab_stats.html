@@ -153,7 +153,7 @@
                                 {{condition.system}}
                             </span>
                         </div>
-                        {% if user_can_edit %}
+                        {% if condition_form %}
                             <form class="js-edit-world-element-form"
                                   data-edit-world-element-url="{% url 'characters:edit_world_element' condition.id 'condition' secret_key %}"
                                   style="display:none;">
@@ -273,7 +273,7 @@
                                         {{circumstance.system}}
                                     </span>
                                 </div>
-                                {% if user_can_edit %}
+                                {% if condition_form %}
                                     <form class="js-edit-world-element-form"
                                           data-edit-world-element-url="{% url 'characters:edit_world_element' circumstance.id 'circumstance' secret_key %}"
                                           style="display:none;">

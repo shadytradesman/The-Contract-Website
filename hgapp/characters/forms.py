@@ -395,7 +395,7 @@ def make_world_element_form(cell_choices=None, initial_cell=None, for_new=True):
                                  label="System (optional)",
                                  required=False,
                                  widget=forms.TextInput(attrs={'class': 'form-control'}))
-        cell = forms.ModelChoiceField(label="World",
+        cell = forms.ModelChoiceField(label="Playgroup",
                                       queryset=cell_choices,
                                       widget=forms.Select(attrs={'class': 'form-control'}),
                                       initial=initial_cell if initial_cell else cell_choices.first(),

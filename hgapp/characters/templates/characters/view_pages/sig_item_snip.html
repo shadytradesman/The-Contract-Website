@@ -20,7 +20,8 @@
       </h4>
     <i class="css-system-text-user-input css-world-element-description">{{item.description}}</i>
   </div>
-    {% if user_can_edit %}
+    {% if condition_form and user_can_edit %}
+
     <form class="js-edit-world-element-form"
           data-edit-world-element-url="{% url 'characters:edit_world_element' item.id 'artifact' secret_key %}"
           style="display:none;">
