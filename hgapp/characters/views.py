@@ -756,10 +756,16 @@ def edit_world_element(request, element_id, element, secret_key=None):
         if form.is_valid():
             ext_element.name = form.cleaned_data['name']
             ext_element.description = form.cleaned_data['description']
-            ext_element.system = form.cleaned_data['system']
+            if not hasattr(ext_element, "is_signature") and not ext_element.is_signature:
+                ext_element.system = form.cleaned_data['system']
             with transaction.atomic():
                 ext_element.save()
             ser_instance = serializers.serialize('json', [ext_element, ])
-            return JsonResponse({"instance": ser_instance, "id": ext_element.id, "cellId": ext_element.cell.id}, status=200)
+            print("returning")
+            responseMap = {"instance": ser_instance,
+                           "id": ext_element.id,
+                           "cellId": ext_element.cell.id if ext_element.cell else None}
+            return JsonResponse(responseMap, status=200)
+        print(form.errors)
         return JsonResponse({}, status=200)
     return JsonResponse({"error": ""}, status=400)
