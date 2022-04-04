@@ -399,6 +399,6 @@ def make_world_element_form(cell_choices=None, initial_cell=None):
                                       queryset=cell_choices,
                                       widget=forms.Select(attrs={'class': 'form-control'}),
                                       initial=initial_cell if initial_cell else cell_choices.first(),
-                                      required=True,
+                                      required=False, #check when creating new, as user created should always have cell
                                       )
     return WorldElementForm

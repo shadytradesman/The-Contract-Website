@@ -1,5 +1,6 @@
 {% extends "site_base.html" %}
 {% load static %}
+{% load bootstrap %}
 {% load i18n %}
 {% load account_tags %}
 
@@ -29,18 +30,38 @@
 
 {% block body_base %}
 <script type="text/html" id="world-entity-template">
-    <div class="css-world-entity-value">
+    <div>
+        <span class="pull-left css-world-element-edit">
+            <button class="btn btn-xs btn-default js-edit-world-element-button"
+                    style="margin-right: 5px;">
+                <i class="fa fa-edit fa-1x"></i>
+            </button>
+        </span>
         <span class="pull-left css-world-element-delete">
             <form class="js-delete-world-element-form" data-del-world-element-url=__delUrl__>
                 {% csrf_token %}
                 <input type="submit" class="btn btn-xs btn-danger" value="X" />
             </form>
         </span>
-        <span class="css-world-element-name">
-            __world_entity_name__
-        </span>
-        <span class="css-world-element-description">__world_entity_description__</span>
-        <span class="css-world-element-system">__world_entity_system__</span>
+        <div class="css-world-entity-value">
+            <span class="css-world-element-name">
+                __world_entity_name__
+            </span>
+            <span class="css-world-element-description">__world_entity_description__</span>
+            <span class="css-world-element-system">__world_entity_system__</span>
+        </div>
+        <form class="js-edit-world-element-form"
+              data-edit-world-element-url="__editUrl__"
+              style="display:none;">
+            <div id="edit-artifact-__world_entity_" style="margin-bottom: 10px;">
+                {{condition_form.name|bootstrap}}
+                {{condition_form.description|bootstrap}}
+                {{condition_form.system|bootstrap}}
+                <div class="text-center">
+                    <input type="submit" class="btn btn-primary" value="Save" />
+                </div>
+            </div>
+        </form>
     </div>
 </script>
 <div class="container">

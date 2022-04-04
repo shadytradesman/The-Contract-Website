@@ -64,21 +64,29 @@ class PowerForm(forms.Form):
                                     }))
 
 
-def make_select_signature_artifact_form(existing_character=None, existing_power=None):
+def make_select_signature_artifact_form(existing_character=None, existing_power=None, user=None):
     class SelectArtifactForm(forms.Form):
         initial_artifact = None
+        if existing_power and existing_power.crafting_type == CRAFTING_SIGNATURE:
+            initial_artifact = get_object_or_none(
+                existing_power.artifactpowerfull_set.filter(relevant_artifact__is_signature=True))
         if existing_character:
             queryset = existing_character.artifact_set.filter(
                 cell__isnull=True,
                 crafting_character=existing_character,
                 is_signature=True)
-            print("blah")
-            if existing_power and existing_power.crafting_type == CRAFTING_SIGNATURE:
-                print("YEAH!")
-                initial_artifact = get_object_or_none(existing_power.artifactpowerfull_set.filter(relevant_artifact__is_signature=True))
+        elif existing_power and existing_power.owner:
+            queryset = existing_power.owner.artifact_set.filter(
+                cell__isnull=True,
+                crafting_character__isnull=True,
+                is_signature=True)
+        elif user and user.is_authenticated:
+            queryset = user.artifact_set.filter(
+                cell__isnull=True,
+                crafting_character__isnull=True,
+                is_signature=True)
         else:
             queryset = Artifact.objects.none()
-            initial_artifact = None
         selected_artifact = forms.ModelChoiceField(queryset=queryset,
                                                    initial=initial_artifact,
                                                    required=False,
@@ -86,14 +94,13 @@ def make_select_signature_artifact_form(existing_character=None, existing_power=
                                                    label="Add to existing Signature Item?",
                                                    widget=forms.Select(attrs={
                                                        'v-model': 'selectedItem',
-                                                   })
-                                                   )
+                                                   }))
         item_name = forms.CharField(required=False,
                                     max_length=450,
                                     help_text="The name of the signature item")
         item_description = forms.CharField(required=False,
                                            max_length=5000,
-                                           help_text="A physical description of the signature item")
+                                           help_text="(Optional) A physical description of the signature item")
     return SelectArtifactForm
 
 

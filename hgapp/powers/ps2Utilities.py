@@ -20,7 +20,7 @@ from .Ps2Engine import PowerEngine, SystemTextRenderer
 logger = logging.getLogger("app." + __name__)
 
 
-def get_edit_context(existing_power_full=None, is_edit=False, existing_char=None):
+def get_edit_context(existing_power_full=None, is_edit=False, existing_char=None, user=None):
     modifiers_formset = get_modifiers_formset()
     params_formset = get_params_formset()
     sys_field_text_formset = get_sys_field_text_formset()
@@ -29,7 +29,8 @@ def get_edit_context(existing_power_full=None, is_edit=False, existing_char=None
     power_form = PowerForm()
     sig_item_artifact_form = make_select_signature_artifact_form(
         existing_character=existing_char,
-        existing_power=existing_power_full)()
+        existing_power=existing_power_full,
+        user=user,)()
     categories = Base_Power_Category.objects.all()
     context = {
         'power_blob_url': PowerSystem.get_singleton().get_json_url(),
@@ -66,7 +67,8 @@ def save_gift(request, power_full=None, character=None):
     if power_form.is_valid():
         SignatureArtifactForm = make_select_signature_artifact_form(
             existing_character=character,
-            existing_power=power_full)
+            existing_power=power_full,
+            user=request.user,)
         new_power = _create_new_power_and_save(power_form=power_form, request=request, SigArtifactForm=SignatureArtifactForm)
         _populate_power_change_log(new_power, power_full)
 
@@ -169,12 +171,10 @@ def _get_power_from_form_and_validate(power_form, power_engine, user=None):
 def _get_modifier_instances_and_validate(POST, power_engine, effect_id, vector_id, modality_id):
     modifiers_formset = get_modifiers_formset(POST)
     if modifiers_formset.is_valid():
-        print(modifiers_formset.cleaned_data)
         selected_modifier_forms = [x for x in modifiers_formset if "is_selected" in x.cleaned_data and x.cleaned_data["is_selected"]]
         power_engine.validate_new_mod_forms(effect_id, vector_id, modality_id, selected_modifier_forms)
         modifiers = []
         for form in selected_modifier_forms:
-            print(form.cleaned_data)
             details = form.cleaned_data["details"] if "details" in form.cleaned_data else None
             if form.cleaned_data["is_enhancement"]:
                 enhancement = get_object_or_404(Enhancement, pk=form.cleaned_data["mod_slug"])

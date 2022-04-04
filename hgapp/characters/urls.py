@@ -114,4 +114,10 @@ urlpatterns = [
     url(r'^post/ajax/c/(?P<element_id>[\d\w]+)/del-world-element/(?P<element>[\w]+)/(?P<secret_key>[\da-z]*)$',
         views.delete_world_element,
         name="delete_world_element"),
+    url(r'^post/ajax/c/(?P<element_id>[\d\w]+)/edit-world-element/(?P<element>[\w]+)/$',
+        views.edit_world_element,
+        name="edit_world_element"),
+    url(r'^post/ajax/c/(?P<element_id>[\d\w]+)/edit-world-element/(?P<element>[\w]+)/(?P<secret_key>[\da-z]*)$',
+        views.edit_world_element,
+        name="edit_world_element"),
 ]

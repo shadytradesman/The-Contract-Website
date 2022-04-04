@@ -630,6 +630,7 @@ $(".js-world-element-form").submit(function (e) {
     e.preventDefault();
     var serializedData = $(this).serialize();
     var delUrl = $(this).attr("data-delete-world-element-url");
+    var editUrl = $(this).attr("data-edit-world-element-url");
     var elementContainer = $(this).closest(".js-world-element-container");
     var form = $(this);
 
@@ -639,15 +640,16 @@ $(".js-world-element-form").submit(function (e) {
         data: serializedData,
         success: function (response) {
             form.trigger('reset');
-            //$("#id_description").focus();
             var instance = JSON.parse(response["instance"]);
             var fields = instance[0]["fields"];
             delUrl = delUrl.replace(/worldElementIdJs/g, JSON.parse(response["id"]));
+            editUrl = editUrl.replace(/worldElementIdJs/g, JSON.parse(response["id"]));
             var tmplMarkup = $('#world-entity-template').html();
             var compiledTmpl = tmplMarkup.replace(/__world_entity_description__/g, fields["description"||""]);
             var compiledTmpl = compiledTmpl.replace(/__world_entity_name__/g, fields["name"||""]);
             var compiledTmpl = compiledTmpl.replace(/__world_entity_system__/g, fields["system"||""]);
             var compiledTmpl = compiledTmpl.replace(/__delUrl__/g, delUrl);
+            var compiledTmpl = compiledTmpl.replace(/__editUrl__/g, editUrl);
             var newContentContainer = elementContainer.find(".js-world-element-content-" + response["cellId"]);
             newContentContainer.append(compiledTmpl);
             newContentContainer.prev().show();
@@ -671,6 +673,49 @@ $(".js-world-element-container").on("submit",".js-delete-world-element-form", fu
         data: serializedData,
         success: function (response) {
             worldElement.parent().parent().remove();
+        },
+        error: function (response) {
+            console.log(response);
+            alert(response["responseJSON"]["error"]);
+        }
+    })
+})
+
+// edit world element form expand
+$(document).on("click", ".js-edit-world-element-button", function(){
+    $(this).parent().hide();
+    $(this).parent().nextAll(".css-world-element-delete").first().hide();
+    let valElement = $(this).parent().nextAll(".css-world-entity-value").first();
+    let formElement = $(this).parent().nextAll(".js-edit-world-element-form").first();
+    valElement.hide();
+    formElement.show();
+    formElement.find("#id_name").val(valElement.find(".css-world-element-name").text().trim());
+    formElement.find("#id_description").val(valElement.find(".css-world-element-description").text().trim());
+    formElement.find("#id_system").val(valElement.find(".css-world-element-system").text().trim());
+});
+
+
+// edit world element form submit
+$(".js-world-element-container").on("submit",".js-edit-world-element-form", function (e) {
+    e.preventDefault();
+    var serializedData = $(this).serialize();
+    var worldElement = $(this);
+    $.ajax({
+        type: 'POST',
+        url: $(this).attr("data-edit-world-element-url"),
+        data: serializedData,
+        success: function (response) {
+            worldElement.prevAll(".css-world-element-delete").first().show();
+            worldElement.prevAll(".css-world-element-edit").first().show();
+            let valElement = worldElement.prevAll(".css-world-entity-value").first();
+            let formElement = worldElement;
+            valElement.show();
+            formElement.hide();
+            var instance = JSON.parse(response["instance"]);
+            var fields = instance[0]["fields"];
+            valElement.find(".css-world-element-name").text(fields["name"||""])
+            valElement.find(".css-world-element-description").text(fields["description"||""])
+            valElement.find(".css-world-element-system").text(fields["system"||""])
         },
         error: function (response) {
             console.log(response);

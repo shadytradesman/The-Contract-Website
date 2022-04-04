@@ -48,7 +48,8 @@ class EditPower(View):
     def __get_context_data(self):
         return get_edit_context(existing_power_full=self.existing_power,
                                 is_edit=self.power_to_edit,
-                                existing_char=self.character)
+                                existing_char=self.character,
+                                user=self.request.user)
 
 
 class CreatePower(EditPower):

@@ -1,6 +1,7 @@
 {% load bootstrap %}
 <form class="js-world-element-form"
       data-new-world-element-url="{% url 'characters:post_world_element' character.id element secret_key %}"
+      data-edit-world-element-url="{% url 'characters:edit_world_element' 'worldElementIdJs' element  secret_key %}"
       data-delete-world-element-url="{% url 'characters:delete_world_element' 'worldElementIdJs' element secret_key %}">
     {% csrf_token %}
     <div class="form-inline">
