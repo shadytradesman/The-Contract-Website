@@ -752,16 +752,15 @@ def edit_world_element(request, element_id, element, secret_key=None):
         __check_edit_perms(request, character, secret_key)
         world_element_cell_choices = character.world_element_cell_choices()
         world_element_initial_cell = character.world_element_initial_cell()
-        form = make_world_element_form(world_element_cell_choices, world_element_initial_cell)(request.POST)
+        form = make_world_element_form(world_element_cell_choices, world_element_initial_cell, for_new=False)(request.POST)
         if form.is_valid():
             ext_element.name = form.cleaned_data['name']
             ext_element.description = form.cleaned_data['description']
-            if not hasattr(ext_element, "is_signature") and not ext_element.is_signature:
+            if not hasattr(ext_element, "is_signature") or not ext_element.is_signature:
                 ext_element.system = form.cleaned_data['system']
             with transaction.atomic():
                 ext_element.save()
             ser_instance = serializers.serialize('json', [ext_element, ])
-            print("returning")
             responseMap = {"instance": ser_instance,
                            "id": ext_element.id,
                            "cellId": ext_element.cell.id if ext_element.cell else None}

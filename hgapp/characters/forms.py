@@ -380,7 +380,7 @@ def make_character_ported_form(character=None):
 class DeleteCharacterForm(forms.Form):
     pass
 
-def make_world_element_form(cell_choices=None, initial_cell=None):
+def make_world_element_form(cell_choices=None, initial_cell=None, for_new=True):
     if not cell_choices:
         return None
 
@@ -399,6 +399,6 @@ def make_world_element_form(cell_choices=None, initial_cell=None):
                                       queryset=cell_choices,
                                       widget=forms.Select(attrs={'class': 'form-control'}),
                                       initial=initial_cell if initial_cell else cell_choices.first(),
-                                      required=False, #check when creating new, as user created should always have cell
+                                      required=for_new,
                                       )
     return WorldElementForm
