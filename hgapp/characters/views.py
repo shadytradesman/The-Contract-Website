@@ -743,20 +743,17 @@ def delete_world_element(request, element_id, element, secret_key = None):
 
 
 def edit_world_element(request, element_id, element, secret_key=None):
-    print("edit world element")
     if request.is_ajax and request.method == "POST":
         WorldElement = get_world_element_class_from_url_string(element)
         if not WorldElement:
             return JsonResponse({"error": "Invalid world element"}, status=400)
         ext_element = get_object_or_404(WorldElement, id=element_id)
-        print("elem")
         character = ext_element.character
         __check_edit_perms(request, character, secret_key)
         world_element_cell_choices = character.world_element_cell_choices()
         world_element_initial_cell = character.world_element_initial_cell()
         form = make_world_element_form(world_element_cell_choices, world_element_initial_cell)(request.POST)
         if form.is_valid():
-            print("form balid")
             ext_element.name = form.cleaned_data['name']
             ext_element.description = form.cleaned_data['description']
             ext_element.system = form.cleaned_data['system']
@@ -764,6 +761,5 @@ def edit_world_element(request, element_id, element, secret_key=None):
                 ext_element.save()
             ser_instance = serializers.serialize('json', [ext_element, ])
             return JsonResponse({"instance": ser_instance, "id": ext_element.id, "cellId": ext_element.cell.id}, status=200)
-        print(form.errors)
         return JsonResponse({}, status=200)
     return JsonResponse({"error": ""}, status=400)

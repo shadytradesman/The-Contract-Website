@@ -1,5 +1,6 @@
 {% load static %}
 {% load games_tags %}
+{% load bootstrap %}
 {% load markdown_deux_tags %}
 
 
@@ -123,8 +124,16 @@
                     </span>
                 <div class="js-world-element-content-{{cell.id}}">
                     {% for condition in conditions %}
-                    <div class="css-world-entity-value">
+                    <div>
                         {% if user_can_edit %}
+                            <span class="pull-left css-world-element-edit">
+                                <button class="btn btn-xs btn-default js-edit-world-element-button"
+                                        data-id="{{artifact.id}}"
+                                        data-element-type="artifact"
+                                        style="margin-right: 5px;">
+                                    <i class="fa fa-edit fa-1x"></i>
+                                </button>
+                            </span>
                             <span class="pull-left css-world-element-delete">
                                 <form class="js-delete-world-element-form"
                                       data-del-world-element-url="{% url 'characters:delete_world_element' condition.id 'condition' secret_key %}">
@@ -133,15 +142,31 @@
                                 </form>
                             </span>
                         {% endif %}
-                        <span class="css-world-element-name">
-                            {{condition.name}}
-                        </span>
-                        <span class="css-world-element-description">
-                            {{condition.description}}
-                        </span>
-                        <span class="css-world-element-system">
-                            {{condition.system}}
-                        </span>
+                        <div class="css-world-entity-value">
+                            <span class="css-world-element-name">
+                                {{condition.name}}
+                            </span>
+                                <span class="css-world-element-description">
+                                {{condition.description}}
+                            </span>
+                                <span class="css-world-element-system">
+                                {{condition.system}}
+                            </span>
+                        </div>
+                        {% if user_can_edit %}
+                            <form class="js-edit-world-element-form"
+                                  data-edit-world-element-url="{% url 'characters:edit_world_element' condition.id 'condition' secret_key %}"
+                                  style="display:none;">
+                                <div style="margin-bottom: 10px;">
+                                    {{condition_form.name|bootstrap}}
+                                    {{condition_form.description|bootstrap}}
+                                    {{condition_form.system|bootstrap}}
+                                    <div class="text-center">
+                                        <input type="submit" class="btn btn-primary" value="Save" />
+                                    </div>
+                                </div>
+                            </form>
+                        {% endif %}
                     </div>
                     {% endfor %}
                 </div>
@@ -221,8 +246,14 @@
                          {% endif %}
                     >
                         {% for circumstance in circumstances %}
-                            <div class="css-world-entity-value">
+                            <div >
                                 {% if user_can_edit %}
+                                    <span class="pull-left css-world-element-edit">
+                                        <button class="btn btn-xs btn-default js-edit-world-element-button"
+                                            style="margin-right: 5px;">
+                                            <i class="fa fa-edit fa-1x"></i>
+                                        </button>
+                                    </span>
                                     <span class="pull-left css-world-element-delete">
                                         <form class="js-delete-world-element-form"
                                               data-del-world-element-url="{% url 'characters:delete_world_element' circumstance.id 'circumstance' secret_key %}">
@@ -231,15 +262,31 @@
                                         </form>
                                     </span>
                                 {% endif %}
-                                <span class="css-world-element-name">
-                                    {{circumstance.name}}
-                                </span>
-                                <span class="css-world-element-description">
-                                    {{circumstance.description}}
-                                </span>
-                                <span class="css-world-element-system">
-                                    {{circumstance.system}}
-                                </span>
+                                <div class="css-world-entity-value">
+                                    <span class="css-world-element-name">
+                                        {{circumstance.name}}
+                                    </span>
+                                        <span class="css-world-element-description">
+                                        {{circumstance.description}}
+                                    </span>
+                                        <span class="css-world-element-system">
+                                        {{circumstance.system}}
+                                    </span>
+                                </div>
+                                {% if user_can_edit %}
+                                    <form class="js-edit-world-element-form"
+                                          data-edit-world-element-url="{% url 'characters:edit_world_element' circumstance.id 'circumstance' secret_key %}"
+                                          style="display:none;">
+                                        <div id="edit-artifact-__world_entity_" style="margin-bottom: 10px;">
+                                            {{condition_form.name|bootstrap}}
+                                            {{condition_form.description|bootstrap}}
+                                            {{condition_form.system|bootstrap}}
+                                            <div class="text-center">
+                                                <input type="submit" class="btn btn-primary" value="Save" />
+                                            </div>
+                                        </div>
+                                    </form>
+                                {% endif %}
                             </div>
                         {% endfor %}
                     </div>
