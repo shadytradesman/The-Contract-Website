@@ -91,7 +91,7 @@ def make_select_signature_artifact_form(existing_character=None, existing_power=
                                                    initial=initial_artifact,
                                                    required=False,
                                                    empty_label="Create New Item",
-                                                   label="Add to existing Signature Item?",
+                                                   label="Attach to existing Signature Item?",
                                                    widget=forms.Select(attrs={
                                                        'v-model': 'selectedItem',
                                                    }))

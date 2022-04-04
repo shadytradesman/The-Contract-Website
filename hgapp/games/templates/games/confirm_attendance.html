@@ -2,6 +2,7 @@
 
 
 {% load account_tags %}
+{% load static %}
 {% load i18n %}
 {% load bootstrap %}
 
@@ -9,6 +10,9 @@
     {{ form.media }}
 {% endblock %}
 
+{% block extra_scripts %}
+    <script src="{% static 'games/end_game.js' %}"></script>
+{% endblock %}
 {% block head_title %}
     RSVP?
 {% endblock %}
@@ -49,11 +53,11 @@
         <br>
         <div class="row">
             <div class="col-md-2 col-md-offset-4">
-                <form action="{% url 'games:games_confirm_attendance' attendance.id 'y' %}" method="post">
+                <form action="{% url 'games:games_confirm_attendance' attendance.id 'y' %}" method="post" onsubmit="setFormSubmitting()">
                 {{ form.non_field_errors }}
                 {% csrf_token %}
                 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-                <input class="btn btn-primary" type="submit" value="It's True" />
+                <input id="js-end-game-button" class="btn btn-primary" type="submit" value="It's True" />
                 </form>
             </div>
             <div class="col-md-2 col-md-offset-1">

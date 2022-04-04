@@ -1,4 +1,5 @@
 <script>
+  var setFormSubmitting = function() {$("#js-archive-submit-button").prop('disabled', true);};
   $(document).ready(function(){
 
     var wasRingerLast = [];

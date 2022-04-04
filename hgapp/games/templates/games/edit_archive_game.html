@@ -53,7 +53,8 @@
                     {% else %}
                         "{% url 'games:games_edit_ex_game_add_players' cell_id=cell.id gm_user_id=gm_user_id players=players%}"
                     {% endif %}
-                  method="post">
+                  method="post"
+                  onsubmit="setFormSubmitting()">
                 {% csrf_token %}
                 {{ general_form.about.errors }}
                 {{ general_form.management_form }}
@@ -95,7 +96,7 @@
                             and you will be unable to delete it.
                         </div>
                     {% endif %}
-                    <input class="btn btn-primary" type="submit"
+                    <input id="js-archive-submit-button" class="btn btn-primary" type="submit"
                            {% if game %}
                              value="Submit Edits"
                            {% else %}
