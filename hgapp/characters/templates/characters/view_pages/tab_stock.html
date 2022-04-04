@@ -9,7 +9,7 @@
                 Powers
             {% endif %}
         </h3>
-        {% if new_powers %}
+        {% if new_powers and early_access %}
             <h4>Powers</h4>
             {% for power_full in new_powers %}
                 <div>
@@ -17,7 +17,7 @@
                 </div>
             {% endfor %}
         {% endif %}
-        {% if crafting_artifact_gifts %}
+        {% if crafting_artifact_gifts and early_access %}
             <h4>Artifact Crafting</h4>
             {% for power_full in crafting_artifact_gifts %}
             <div>
@@ -25,7 +25,7 @@
             </div>
             {% endfor %}
         {% endif %}
-        {% if crafting_consumable_gifts %}
+        {% if crafting_consumable_gifts and early_access %}
             <h4>Consumable Crafting</h4>
             {% for power_full in crafting_consumable_gifts %}
             <div>

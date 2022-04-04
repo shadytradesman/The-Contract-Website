@@ -54,9 +54,11 @@
               data-edit-world-element-url="__editUrl__"
               style="display:none;">
             <div id="edit-artifact-__world_entity_" style="margin-bottom: 10px;">
-                {{condition_form.name|bootstrap}}
-                {{condition_form.description|bootstrap}}
-                {{condition_form.system|bootstrap}}
+                {% if user_can_edit  %}
+                    {{condition_form.name|bootstrap}}
+                    {{condition_form.description|bootstrap}}
+                    {{condition_form.system|bootstrap}}
+                {% endif %}
                 <div class="text-center">
                     <input type="submit" class="btn btn-primary" value="Save" />
                 </div>
