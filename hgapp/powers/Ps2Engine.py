@@ -442,6 +442,7 @@ class SystemTextRenderer:
                     if "$" in replacement:
                         replacement = replacement.replace("$", selection)
                     replacements[marker].append(Substitution(sub["mode"], replacement))
+                replacements[param_pk + "-param-level"].append(Substitution(ADDITIVE, str(param.value)))
         return replacements
 
     # This method must remain functionally equal to ps2_create_script.js # addReplacementsForFields

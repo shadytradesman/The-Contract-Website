@@ -1526,6 +1526,10 @@ const ComponentRendering = {
                         replacements[marker] = [newSub];
                     }
                 });
+                replacements[parameter.id + "-param-level"] = [{
+                    mode: "ADDITIVE",
+                    replacement: selectedLevelOfParam(parameter, selection).toString(),
+                }];
               }
           });
       },
