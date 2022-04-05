@@ -649,7 +649,7 @@ function findReplacementCandidate(systemText) {
                 parenDepth = parenDepth - 1;
                 if (parenDepth === 0) {
                     end = i;
-                    if (['(', '@'].includes(markerStarts[0]) && i + 1 < systemText.length) {
+                    if (i + 1 < systemText.length) {
                         // if ending a joining list, check for capitalization flag that appears immediately afterwards.
                         if (systemText[i+1] == '^') {
                             capitalize = true;

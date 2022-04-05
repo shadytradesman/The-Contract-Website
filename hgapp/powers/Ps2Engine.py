@@ -313,8 +313,8 @@ class SystemTextRenderer:
                     paren_depth -= 1
                     if paren_depth == 0:
                         end = i
-                        if marker_starts[0] in ['(', '@'] and i+1 < len(system_text):
-                            # if ending a joining list, check for capitalization flag that appears immediately afterwards.
+                        if i+1 < len(system_text):
+                            # if check for capitalization flag that appears immediately afterwards.
                             if system_text[i+1] == "^":
                                 capitalize = True
                                 end = i+1 # to also replace ^
