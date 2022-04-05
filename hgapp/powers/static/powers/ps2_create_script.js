@@ -761,6 +761,7 @@ const ComponentRendering = {
       giftCostTooltip: " ",
       requiredStatus: null,
       requiredStatusReason: null,
+      requiredStatusSatisfied: true,
       giftName: null,
       giftDescription: null,
       giftExtendedDescription: null,
@@ -1315,6 +1316,7 @@ const ComponentRendering = {
       },
       updateRequiredStatus() {
         let requiredStatus = null;
+        this.requiredStatusSatisfied = true;
         this.requiredStatusReason = null;
         let selectedEnhancements = this.getSelectedAndActiveEnhancements();
         let countByGroups = {};
@@ -1339,8 +1341,18 @@ const ComponentRendering = {
                 requiredStatus = this.mergeStatuses(requiredStatus, ["SEASONED", "Seasoned"], group.label);
             }
         });
+        if (null != characterBlob && null != requiredStatus) {
+            let char_status = characterBlob["status"];
+            if (requiredStatus[0] == "SEASONED" && char_status != "SEASONED" && char_status != "VETERAN") {
+                this.requiredStatusSatisfied = false;
+            }
+            if (requiredStatus[0] == "VETERAN" && char_status != "VETERAN") {
+                this.requiredStatusSatisfied = false;
+            }
+        }
 
         this.requiredStatus = requiredStatus == null || requiredStatus[0] == "ANY" ? null : requiredStatus[1];
+
       },
       additionalCostOfEffectAndVector(effectSlug, vectorSlug) {
           let cost =0;

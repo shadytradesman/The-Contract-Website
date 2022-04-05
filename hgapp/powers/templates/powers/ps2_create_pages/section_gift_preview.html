@@ -38,6 +38,7 @@
              class="pull-right text-muted"
              data-toggle="tooltip"
              data-html="true"
+             :class="{'text-danger': !requiredStatusSatisfied}"
              v-bind:data-title="'Reason: ' + requiredStatusReason + '<br>Seasoned = 10+ Victories.<br>Veteran = 25+ Victories'"
              v-bind:data-original-title="'Reason: ' +requiredStatusReason + '<br>Seasoned = 10+ Victories.<br>Veteran = 25+ Victories'"
             style="margin-right: 3px; font-size: 14px;">
