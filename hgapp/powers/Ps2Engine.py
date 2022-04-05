@@ -433,14 +433,15 @@ class SystemTextRenderer:
             pow_param = param.relevant_power_param
             selection = pow_param.get_value_for_level(param.value)
             param_pk = pow_param.relevant_parameter_id
-            subs = self.system.blob[PowerSystem.PARAMETERS][param_pk]["substitutions"]
-            print(subs)
-            for sub in subs:
-                marker = sub["marker"]
-                replacement = sub["replacement"]
-                if "$" in replacement:
-                    replacement = replacement.replace("$", selection)
-                replacements[marker].append(Substitution(sub["mode"], replacement))
+            blob_param = self.system.blob[PowerSystem.PARAMETERS][param_pk]
+            subs = blob_param["substitutions"]
+            if blob_param["render_lvl_zero"] or param.value > 0:
+                for sub in subs:
+                    marker = sub["marker"]
+                    replacement = sub["replacement"]
+                    if "$" in replacement:
+                        replacement = replacement.replace("$", selection)
+                    replacements[marker].append(Substitution(sub["mode"], replacement))
         return replacements
 
     # This method must remain functionally equal to ps2_create_script.js # addReplacementsForFields

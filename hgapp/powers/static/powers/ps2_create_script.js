@@ -1508,22 +1508,25 @@ const ComponentRendering = {
       addReplacementsForParameters(replacements) {
           this.parameters.filter(param => !(param.id in this.disabledParameters)).forEach(parameter => {
               const selection = this.parameterSelections[parameter.id];
-              powerBlob["parameters"][parameter.id]["substitutions"].forEach(sub => {
-                  const marker = sub["marker"];
-                  var replacement = sub["replacement"];
-                  if (replacement.includes("$")) {
-                      replacement = replacement.replace("$", selection);
-                  }
-                  const newSub = {
-                      mode: sub["mode"],
-                      replacement: replacement,
-                  }
-                  if (marker in replacements ) {
-                      replacements[marker].push(newSub);
-                  } else {
-                      replacements[marker] = [newSub];
-                  }
-              });
+              let blobParam = powerBlob["parameters"][parameter.id];
+              if (blobParam["render_lvl_zero"] || selectedLevelOfParam(parameter, selection) > 0) {
+                blobParam["substitutions"].forEach(sub => {
+                    const marker = sub["marker"];
+                    var replacement = sub["replacement"];
+                    if (replacement.includes("$")) {
+                        replacement = replacement.replace("$", selection);
+                    }
+                    const newSub = {
+                        mode: sub["mode"],
+                        replacement: replacement,
+                    }
+                    if (marker in replacements ) {
+                        replacements[marker].push(newSub);
+                    } else {
+                        replacements[marker] = [newSub];
+                    }
+                });
+              }
           });
       },
       addReplacementsForFields(replacements) {

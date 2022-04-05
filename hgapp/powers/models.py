@@ -335,6 +335,7 @@ class Parameter(models.Model):
     substitutions = models.ManyToManyField(FieldSubstitutionMarker,
                                            through=ParameterFieldSubstitution,
                                            through_fields=('relevant_parameter', 'relevant_marker'))
+    render_level_zero_sub = models.BooleanField(default=True)
     attribute_bonus = models.ForeignKey(Attribute,
                                         blank=True,
                                         null=True,
@@ -426,6 +427,7 @@ class Parameter(models.Model):
         # If no substitutions, add a "default" substitution.
         field_blob = {
             "name": self.name,
+            "render_lvl_zero": self.render_level_zero_sub,
         }
         if self.substitutions.count() == 0:
             default_sub = {
