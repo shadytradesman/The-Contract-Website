@@ -6,6 +6,17 @@ register = template.Library()
 def player_can_edit_power(power, player):
     return power.parent_power.player_can_edit(player)
 
+@register.inclusion_tag('powers/power_badge_snippet.html')
+def discovery_power_badge(power_full):
+    latest_revision = power_full.latest_revision()
+    character = power_full.character if power_full.character else None
+    return {
+        'discovery_page': True,
+        'power_full': power_full,
+        'latest_revision': latest_revision,
+        'character': character,
+        'show_status_warning': False,
+    }
 
 @register.inclusion_tag('powers/power_badge_snippet.html')
 def power_badge(power_full):
@@ -15,6 +26,7 @@ def power_badge(power_full):
     if character:
         show_status_warning = not latest_revision.passes_status_check(character.status)
     return {
+        'discovery_page': False,
         'power_full': power_full,
         'latest_revision': latest_revision,
         'character': character,
@@ -29,6 +41,7 @@ def power_heading(power_full):
     if character:
         show_status_warning = not latest_revision.passes_status_check(character.status)
     return {
+        'discovery_page': False,
         'power_full': power_full,
         'latest_revision': latest_revision,
         'show_status_warning': show_status_warning,

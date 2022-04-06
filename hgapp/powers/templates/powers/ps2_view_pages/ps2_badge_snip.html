@@ -4,7 +4,7 @@
             class="panel-heading"
             style="background-color: #353e4b; padding-bottom: 5px;">
         <h4 style="font-size: 20px; margin-top: 0px; margin-bottom: 5px;">
-            {% if user_can_edit and available_gift %}
+            {% if user_can_edit and available_gift and not discovery_page %}
                 <a href="{% url 'powers:powers_edit_ps2' power_full.id %}"
                    class="btn btn-success btn-xs" >
                     <i class="fa fa-plus-square fa-2x"></i>
@@ -19,6 +19,16 @@
                 </i>
             </small>
         </h4>
+        {% if discovery_page and power_full.character %}
+        <div style="margin-top: -5px;">
+            <small>
+                {% if power_full.character %}
+                Used by <a href="{% url 'characters:characters_view' power_full.character.id %}">
+                <b>{{ power_full.character.name }}</b>, the {{  power_full.character.concept_summary }}</a>
+                {% endif %}
+            </small>
+        </div>
+        {% endif %}
         <div id="collapse-power-{{power_full.id}}-heading"
              role="button" data-toggle="collapse"
              data-target=".collapse-power-{{power_full.id}}"
@@ -27,15 +37,17 @@
             {% with latest_revision as power %}
                 {% include "powers/ps2_view_pages/components_snippet.html" %}
             {% endwith %}
-            <div class="text-danger">
-                <small>
-                    {% if power_full.character and not power_full.at_least_one_gift_assigned %}
-                        No Gifts assigned!
-                    {% elif power_full.character and power_full.get_gift_cost > power_full.reward_count %}
-                        {{power_full.reward_count }} Reward{{ power_full.reward_count| pluralize}} assigned
-                    {% endif %}
-                </small>
-            </div>
+            {% if not discovery_page %}
+                <div class="text-danger">
+                    <small>
+                        {% if power_full.character and not power_full.at_least_one_gift_assigned %}
+                            No Gifts assigned!
+                        {% elif power_full.character and power_full.get_gift_cost > power_full.reward_count %}
+                            {{power_full.reward_count }} Reward{{ power_full.reward_count| pluralize}} assigned
+                        {% endif %}
+                    </small>
+                </div>
+            {% endif %}
             <div class="collapse collapse-power-{{power_full.id}} in"
                  role="tabpanel"
                  aria-labelledby="collapse-power-{{power_full.id}}-heading" >

@@ -1,4 +1,5 @@
 from collections import defaultdict
+import random
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
@@ -284,7 +285,32 @@ class ViewPower(View):
         show_status_warning = False
         if character:
             show_status_warning = not self.power.passes_status_check(character.status)
+
+        related_gifts = []
+        stock_gifts = []
+        related_component = None
+        if self.power.dice_system == SYS_PS2:
+            related_gift_query = Power_Full.objects.filter(dice_system=SYS_PS2, character__isnull=False, character__private=False)
+            stock_gift_query = Power_Full.objects.filter(dice_system=SYS_PS2, tags__in=["example"])
+            component = random.choice(["Effect", "Vector", "Modality"])
+            if component == "Effect":
+                related_gift_query = related_gift_query.filter(base=self.power.base_id)
+                stock_gift_query = stock_gift_query.filter(base=self.power.base_id)
+                related_component = self.power.base
+            if component == "Vector":
+                related_gift_query = related_gift_query.filter(latest_rev__vector=self.power.vector_id)
+                stock_gift_query = stock_gift_query.filter(latest_rev__vector=self.power.vector_id)
+                related_component = self.power.vector
+            if component == "Modality":
+                related_gift_query = related_gift_query.filter(latest_rev__modality=self.power.modality_id)
+                stock_gift_query = stock_gift_query.filter(latest_rev__vector=self.power.vector_id)
+                related_component = self.power.modality
+            related_gifts = related_gift_query.order_by('?')[:5]
+            stock_gifts = stock_gift_query.order_by('?')[:5]
         context = {}
+        context['related_gifts'] = related_gifts
+        context['stock_gifts'] = stock_gifts
+        context['related_component'] = related_component
         context['show_status_warning'] = show_status_warning
         context['power'] = self.power
         context['power_list'] = power_list

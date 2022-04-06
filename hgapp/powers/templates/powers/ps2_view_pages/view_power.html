@@ -22,112 +22,146 @@
 {% endblock %}
 
 <div class="container">
-    <div class="text-center" style="padding-top: 10px; padding-bottom: 10px;">
-        <ul class="nav nav-pills nav-justified  css-power-view-buttons">
-            {% if request.user.is_authenticated %}
-            {% player_can_edit_power power request.user as can_edit %}
-            {% if can_edit %}
-            <li>
-                <a href="{% url 'powers:powers_edit_ps2' power.parent_power.id %}" class="btn btn-primary">Edit Power</a>
-            </li>
-            {% endif %}
-            {% if request.user == power.parent_power.owner %}
-            <li>
-                <a href="{% url 'powers:powers_delete_power' power.parent_power.id %}" class="btn btn-default">Delete Power</a>
-            </li>
-            {% endif %}
-            {% endif %}
-            <li>
-                <a href="{% url 'powers:powers_create_from_existing_ps2' power.parent_power.id %}" class="btn btn-default">Copy and Edit New</a>
-            </li>
-        </ul>
-    </div>
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h2 style="margin-bottom: 5px; margin-top: 0px;">
-                {{ power.name }}
-                <small><i>{{ power.flavor_text}}</i></small>
-            </h2>
-            {% include "powers/ps2_view_pages/components_snippet.html" %}
-            <div class="text-danger">
-                <small>
-                    {% if power_full.character and not power_full.at_least_one_gift_assigned %}
-                        No Gifts assigned!
-                    {% elif power_full.character and power_full.get_gift_cost > power_full.reward_count %}
-                        {{power_full.reward_count }} Reward{{ power_full.reward_count| pluralize}} assigned
+    <div class="row">
+        <div class="col-xs-12 col-lg-8 col-lg-offset-2">
+            <div class="text-center" style="padding-top: 10px; padding-bottom: 10px;">
+                <ul class="nav nav-pills nav-justified  css-power-view-buttons">
+                    {% if request.user.is_authenticated %}
+                    {% player_can_edit_power power request.user as can_edit %}
+                    {% if can_edit %}
+                    <li>
+                        <a href="{% url 'powers:powers_edit_ps2' power.parent_power.id %}" class="btn btn-primary">Edit Power</a>
+                    </li>
                     {% endif %}
-                </small>
+                    {% if request.user == power.parent_power.owner %}
+                    <li>
+                        <a href="{% url 'powers:powers_delete_power' power.parent_power.id %}" class="btn btn-default">Delete Power</a>
+                    </li>
+                    {% endif %}
+                    {% endif %}
+                    <li>
+                        <a href="{% url 'powers:powers_create_from_existing_ps2' power.parent_power.id %}" class="btn btn-default">Copy and Edit New</a>
+                    </li>
+                </ul>
             </div>
-            <div>
-                {%if power.private %}
-                    <i class="fa fa-user-secret fa-2x" data-toggle="tooltip" data-title="Power is private because it is assigned to a private character."></i>
-                {% endif %}
-                {% if power.parent_power.character %}
-                    Used by <a href="{% url 'characters:characters_view' power.parent_power.character.id %}">{{ power.parent_power.character.name }}</a>,
-                {% endif %}
-                {% if power.parent_power.owner %}
-                    Created by <a href="{% url 'profiles:profiles_view_profile' power.parent_power.owner.id %}">{% user_display power.parent_power.owner %}</a>.
-                {% endif %}
-            </div>
-        </div>
-        <div class="panel-body">
-                <i class="text-muted">{{ power.description|linebreaks}}</i>
-            {% if power.extended_description %}
-                <div>
-                    <a id="collapse-ext-desc-{{power.id}}-heading"
-                       role="button" data-toggle="collapse"
-                       data-target=".collapse-ext-desc-{{power.id}}"
-                       aria-expanded="false"
-                       aria-controls="collapse-ext-desc-{{power.id}}">
-                        <i><small>Extended Description</small></i>
-                    </a>
-                    <div
-                            class="panel-collapse collapse collapse-ext-desc-{{power.id}} css-system-text-user-input text-muted"
-                            role="tabpanel"
-                            aria-labelledby="collapse-ext-desc-{{power.id}}-heading" >
-                        <i>{{ power.extended_description |linebreaks}}</i>
+
+
+            <div class="panel panel-default ">
+                <div class="panel-heading">
+                    <h2 style="margin-bottom: 5px; margin-top: 0px;">
+                        {{ power.name }}
+                        <small><i>{{ power.flavor_text}}</i></small>
+                    </h2>
+                    {% include "powers/ps2_view_pages/components_snippet.html" %}
+                    <div class="text-danger">
+                        <small>
+                            {% if power_full.character and not power_full.at_least_one_gift_assigned %}
+                                No Gifts assigned!
+                            {% elif power_full.character and power_full.get_gift_cost > power_full.reward_count %}
+                                {{power_full.reward_count }} Reward{{ power_full.reward_count| pluralize}} assigned
+                            {% endif %}
+                        </small>
+                    </div>
+                    <div>
+                        {%if power.private %}
+                            <i class="fa fa-user-secret fa-2x" data-toggle="tooltip" data-title="Power is private because it is assigned to a private character."></i>
+                        {% endif %}
+                        {% if power.parent_power.character %}
+                            Used by <a href="{% url 'characters:characters_view' power.parent_power.character.id %}">{{ power.parent_power.character.name }}</a>,
+                        {% endif %}
+                        {% if power.parent_power.owner %}
+                            Created by <a href="{% url 'profiles:profiles_view_profile' power.parent_power.owner.id %}">{% user_display power.parent_power.owner %}</a>.
+                        {% endif %}
                     </div>
                 </div>
-            {% endif %}
-            <hr style="width: 50%;">
-            {{ power.system|safe }}
-            {% if power.errata %}
-                <div>
-                    <a id="collapse-errata-{{power.id}}-heading"
-                       role="button" data-toggle="collapse"
-                       data-target=".collapse-errata-{{power.id}}"
-                       aria-expanded="false"
-                       aria-controls="collapse-errata-{{power.id}}">
-                        <i><small>
-                            <i class="fa fa-question-circle fa-lg"></i>
-                            View Extended System
-                        </small></i>
-                    </a>
-                    <div
-                            class="panel-collapse collapse collapse-errata-{{power.id}} css-extended-system"
-                            role="tabpanel"
-                            aria-labelledby="collapse-errata-{{power.id}}-heading">
-                        {{power.errata|safe}}
-                    </div>
+                <div class="panel-body">
+                        <i class="text-muted">{{ power.description|linebreaks}}</i>
+                    {% if power.extended_description %}
+                        <div>
+                            <a id="collapse-ext-desc-{{power.id}}-heading"
+                               role="button" data-toggle="collapse"
+                               data-target=".collapse-ext-desc-{{power.id}}"
+                               aria-expanded="false"
+                               aria-controls="collapse-ext-desc-{{power.id}}">
+                                <i><small>Extended Description</small></i>
+                            </a>
+                            <div
+                                    class="panel-collapse collapse collapse-ext-desc-{{power.id}} css-system-text-user-input text-muted"
+                                    role="tabpanel"
+                                    aria-labelledby="collapse-ext-desc-{{power.id}}-heading" >
+                                <i>{{ power.extended_description |linebreaks}}</i>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <hr style="width: 50%;">
+                    {{ power.system|safe }}
+                    {% if power.errata %}
+                        <div>
+                            <a id="collapse-errata-{{power.id}}-heading"
+                               role="button" data-toggle="collapse"
+                               data-target=".collapse-errata-{{power.id}}"
+                               aria-expanded="false"
+                               aria-controls="collapse-errata-{{power.id}}">
+                                <i><small>
+                                    <i class="fa fa-question-circle fa-lg"></i>
+                                    View Extended System
+                                </small></i>
+                            </a>
+                            <div
+                                    class="panel-collapse collapse collapse-errata-{{power.id}} css-extended-system"
+                                    role="tabpanel"
+                                    aria-labelledby="collapse-errata-{{power.id}}-heading">
+                                {{power.errata|safe}}
+                            </div>
+                        </div>
+                    {% endif %}
+                    {% if power_full %}
+                        <hr>
+                        <a id="collapse-history-{{power.id}}-heading"
+                               role="button" data-toggle="collapse"
+                               data-target=".collapse-history-{{power.id}}"
+                               aria-expanded="false"
+                               aria-controls="collapse-history-{{power.id}}">
+                            <h5>View Edit History</h5>
+                        </a>
+                        <div
+                                    class="panel-collapse collapse collapse-history-{{power.id}} {% if power.id != power_list.0.id %}in{% endif %}"
+                                    role="tabpanel"
+                                    aria-labelledby="collapse-history-{{power.id}}-heading">
+                            {% include "powers/power_view_history_snippet.html" %}
+                        </div>
+                    {% endif %}
                 </div>
-            {% endif %}
-            {% if power_full %}
-                <hr>
-                <a id="collapse-history-{{power.id}}-heading"
-                       role="button" data-toggle="collapse"
-                       data-target=".collapse-history-{{power.id}}"
-                       aria-expanded="false"
-                       aria-controls="collapse-history-{{power.id}}">
-                    <h5>View Edit History</h5>
-                </a>
-                <div
-                            class="panel-collapse collapse collapse-history-{{power.id}} {% if power.id != power_list.0.id %}in{% endif %}"
-                            role="tabpanel"
-                            aria-labelledby="collapse-history-{{power.id}}-heading">
-                    {% include "powers/power_view_history_snippet.html" %}
-                </div>
-            {% endif %}
+            </div>
         </div>
+    </div>
+    <div class="row">
+    {% if related_gifts %}
+        <div class="col-xs-12 col-md-6">
+            <h2 class="text-center" style="margin-top: 10px;">
+                Community
+                {% if related_component.icon %}<img src="{{related_component.icon.url}}" width="30" height="30" >{% endif %}{{related_component.name}} Gifts
+            </h2>
+            {% for power_full in related_gifts %}
+                {% if power_full.pk != power.parent_power.pk %}
+                    {% discovery_power_badge power_full %}
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+    {% if stock_gifts %}
+        <div class="col-xs-12 col-md-6">
+            <h2 class="text-center" style="margin-top: 10px;">
+                Stock
+                {% if related_component.icon %}<img src="{{related_component.icon.url}}" width="30" height="30" >{% endif %}{{related_component.name}} Gifts
+            </h2>
+            {% for power_full in stock_gifts %}
+                {% if power_full.pk != power.parent_power.pk %}
+                    {% discovery_power_badge power_full %}
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
     </div>
 </div>
 
