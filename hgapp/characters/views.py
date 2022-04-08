@@ -15,12 +15,13 @@ from django.middleware.csrf import rotate_token
 
 
 from characters.models import Character, BasicStats, Character_Death, Graveyard_Header, Attribute, Ability, \
-    CharacterTutorial, Asset, Liability, BattleScar, Trauma, TraumaRevision, Injury, Source, ExperienceReward, Artifact
+    CharacterTutorial, Asset, Liability, BattleScar, Trauma, TraumaRevision, Injury, Source, ExperienceReward, Artifact, \
+    LOST, DESTROYED
 from powers.models import Power_Full, SYS_LEGACY_POWERS, SYS_PS2, CRAFTING_NONE, CRAFTING_SIGNATURE, CRAFTING_ARTIFACT, \
     CRAFTING_CONSUMABLE
 from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, get_ability_form, \
     AssetForm, LiabilityForm, BattleScarForm, TraumaForm, InjuryForm, SourceValForm, make_allocate_gm_exp_form, EquipmentForm,\
-    DeleteCharacterForm, BioForm, make_world_element_form, get_default_scar_choice_field
+    DeleteCharacterForm, BioForm, make_world_element_form, get_default_scar_choice_field, make_artifact_status_form
 from characters.form_utilities import get_edit_context, character_from_post, update_character_from_post, \
     grant_trauma_to_character, delete_trauma_rev, get_world_element_class_from_url_string
 from characters.view_utilities import get_characters_next_journal_credit, get_world_element_default_dict, get_weapons_by_type
@@ -263,13 +264,15 @@ def view_character(request, character_id, secret_key = None):
 
     artifacts = get_world_element_default_dict(world_element_cell_choices)
     signature_items = []
+    lost_signature_items = []
     for artifact in character.artifact_set.all():
-        print(artifact)
         if hasattr(artifact, "cell") and artifact.cell:
             artifacts[artifact.cell].append(artifact)
         else:
-            signature_items.append(artifact)
-    print(signature_items)
+            if artifact.character == character:
+                signature_items.append(artifact)
+            else:
+                lost_signature_items.append(artifact)
     artifacts = dict(artifacts)
 
     circumstances = get_world_element_default_dict(world_element_cell_choices)
@@ -331,6 +334,7 @@ def view_character(request, character_id, secret_key = None):
         'crafting_consumable_gifts': crafting_consumable_gifts,
         'signature_item_gifts': signature_item_gifts,
         'signature_items': signature_items,
+        'lost_signature_items': lost_signature_items,
     }
     return render(request, 'characters/view_pages/view_character.html', context)
 
@@ -736,6 +740,8 @@ def delete_world_element(request, element_id, element, secret_key = None):
         ext_element = get_object_or_404(WorldElement, id=element_id)
         character = ext_element.character
         __check_edit_perms(request, character, secret_key)
+        if hasattr(ext_element, "is_signature") and ext_element.is_signature:
+            raise ValueError("Cannot delete signature items")
         with transaction.atomic():
             ext_element.delete()
         return JsonResponse({}, status=200)
@@ -754,15 +760,32 @@ def edit_world_element(request, element_id, element, secret_key=None):
         world_element_initial_cell = character.world_element_initial_cell()
         form = make_world_element_form(world_element_cell_choices, world_element_initial_cell, for_new=False)(request.POST)
         if form.is_valid():
-            ext_element.name = form.cleaned_data['name']
-            ext_element.description = form.cleaned_data['description']
-            if not hasattr(ext_element, "is_signature") or not ext_element.is_signature:
-                ext_element.system = form.cleaned_data['system']
             with transaction.atomic():
+                ext_element = WorldElement.objects.select_for_update().get(pk=ext_element.pk)
+                ext_element.name = form.cleaned_data['name']
+                ext_element.description = form.cleaned_data['description']
+                if not hasattr(ext_element, "is_signature") or not ext_element.is_signature:
+                    ext_element.system = form.cleaned_data['system']
+                grey_out = None
+                art_status = None
+                if hasattr(ext_element, "most_recent_status_change") and ext_element.cell is None:
+                    status_form = make_artifact_status_form(ext_element.most_recent_status_change)(request.POST)
+                    if status_form.is_valid():
+                        if "change_availability" in status_form.changed_data:
+                            ext_element.change_availability(
+                                status_type=status_form.cleaned_data["change_availability"],
+                                notes=status_form.cleaned_data["notes"] if "notes" in status_form.cleaned_data else ""
+                            )
+                            grey_out = status_form.cleaned_data["change_availability"] in [LOST, DESTROYED]
+                        else:
+                            grey_out = ext_element.most_recent_status_change and ext_element.most_recent_status_change in [LOST, DESTROYED]
+                    art_status = ext_element.most_recent_status_change
                 ext_element.save()
             ser_instance = serializers.serialize('json', [ext_element, ])
             responseMap = {"instance": ser_instance,
                            "id": ext_element.id,
+                           "grey_out": grey_out,
+                           "artifact_status": art_status,
                            "cellId": ext_element.cell.id if ext_element.cell else None}
             return JsonResponse(responseMap, status=200)
         print(form.errors)

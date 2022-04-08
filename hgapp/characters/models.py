@@ -156,15 +156,24 @@ WEAPON_TYPE = (
     (WEAPON_OTHER, "Other")
 )
 
-ART_AVAILABLE = "AVAILABLE"
-ART_LOST = "LOST"
-ART_DESTROYED = "DESTROYED"
-ART_BROKEN = "BROKEN"
-ARTIFACT_STATUS = (
-    (ART_AVAILABLE, 'Available'),
-    (ART_LOST, 'Lost'),
-    (ART_DESTROYED, 'Destroyed'),
-    (ART_BROKEN, 'Needs repair'),
+GIVEN = "GIVEN"
+STOLEN = "STOLEN"
+LOOTED = "LOOTED"
+ARTIFACT_TRANSFER_TYPE = (
+    (GIVEN, 'given to'),
+    (STOLEN, 'stolen by'),
+    (LOOTED, 'looted by'),
+)
+
+LOST = "LOST"
+DESTROYED = "DESTROYED"
+RECOVERED = "RECOVERED"
+REPAIRED = "REPAIRED"
+ARTIFACT_STATUS_CHANGE_TYPE = (
+    (LOST, 'lost'),
+    (RECOVERED, 'recovered'),
+    (DESTROYED, "destroyed"),
+    (REPAIRED, "repaired"),
 )
 
 EQUIPMENT_DEFAULT = """
@@ -1099,7 +1108,7 @@ class Circumstance(WorldElement):
 
 
 class Artifact(WorldElement):
-    # Signature Items created
+    # Signature Items creator
     crafting_character = models.ForeignKey(Character, related_name="creator", on_delete=models.CASCADE, null=True)
     creating_player = models.ForeignKey(settings.AUTH_USER_MODEL,
                                         on_delete=models.CASCADE,
@@ -1108,13 +1117,86 @@ class Artifact(WorldElement):
     is_signature = models.BooleanField(default=False)
     quantity = models.PositiveIntegerField(default=1)
     location = models.CharField(max_length=1000, default="", blank=True)
-    availability = models.CharField(choices=ARTIFACT_STATUS, max_length=55, default=ART_AVAILABLE)
+    most_recent_status_change = models.CharField(choices=ARTIFACT_STATUS_CHANGE_TYPE, max_length=55, blank=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['crafting_character']),
+            models.Index(fields=['creating_player']),
+            models.Index(fields=['character']),
+        ]
 
     def get_assigned_rewards(self):
         rewards = []
         for power in self.power_full_set.all():
             rewards.extend(power.reward_list())
         return rewards
+
+    def get_latest_transfer(self):
+        return self.artifactstatuschange_set.order_by("-created_time").first()
+
+    def get_all_transfers(self):
+        return self.artifact_.order_by("-created_time").all()
+
+    def change_availability(self, status_type, notes=""):
+        if status_type == self.most_recent_status_change:
+            raise ValueError("Cannot change status type to current type")
+        if not self.most_recent_status_change or self.most_recent_status_change in [RECOVERED, REPAIRED]:
+            if status_type in [RECOVERED, REPAIRED]:
+                raise ValueError("Cannot recover / repair an available artifact.")
+        self.most_recent_status_change = status_type
+        ArtifactStatusChange.objects.create(
+            relevant_artifact=self,
+            notes=notes,
+            status_change_type=status_type)
+        self.save()
+
+    def transfer_to_character(self, transfer_type, to_character, notes=""):
+        if self.character == to_character:
+            raise ValueError("Cannot transfer an artifact to the character that possesses it.")
+
+        if transfer_type in [GIVEN, STOLEN, LOOTED]:
+            ArtifactStatusChange.objects.create(
+                from_character=self.character,
+                to_character=to_character,
+                relevant_artifact=self,
+                notes=notes,
+                transfer_type=transfer_type)
+            self.character = to_character
+            self.save()
+        else:
+            ArtifactStatusChange.create(
+                from_character=self.character,
+                to_character=None,
+                relevant_artifact=self,
+                notes=notes,
+                transfer_type=transfer_type)
+
+
+class ArtifactStatusChange(models.Model):
+    relevant_artifact = models.ForeignKey(Artifact, on_delete=models.CASCADE)
+    created_time = models.DateTimeField(auto_now_add=True)
+    notes = models.CharField(max_length=5000, blank=True)
+    status_change_type = models.CharField(choices=ARTIFACT_STATUS_CHANGE_TYPE, max_length=55)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['relevant_artifact', 'created_time']),
+        ]
+
+
+class ArtifactTransferEvent(models.Model):
+    from_character = models.ForeignKey(Character, related_name="from_artifact_status", on_delete=models.CASCADE, null=True)
+    to_character = models.ForeignKey(Character, related_name="to_artifact_status", on_delete=models.CASCADE, null=True)
+    relevant_artifact = models.ForeignKey(Artifact, on_delete=models.CASCADE)
+    created_time = models.DateTimeField(auto_now_add=True)
+    notes = models.CharField(max_length=5000, blank=True)
+    transfer_type = models.CharField(choices=ARTIFACT_TRANSFER_TYPE, max_length=55)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['relevant_artifact', 'created_time']),
+        ]
 
 
 class Injury(models.Model):

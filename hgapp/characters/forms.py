@@ -4,7 +4,9 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.validators import MaxValueValidator, MinValueValidator
 from overrides.widgets import CustomStylePagedown
 
-from characters.models import Character, BasicStats, Character_Death, BattleScar, PORT_STATUS, StockBattleScar
+from games.game_utilities import get_character_contacts
+from characters.models import Character, BasicStats, Character_Death, BattleScar, PORT_STATUS, StockBattleScar, GIVEN,\
+    STOLEN, LOOTED, LOST, DESTROYED, RECOVERED, REPAIRED
 from cells.models import Cell
 
 ATTRIBUTE_VALUES = {
@@ -380,10 +382,8 @@ def make_character_ported_form(character=None):
 class DeleteCharacterForm(forms.Form):
     pass
 
-def make_world_element_form(cell_choices=None, initial_cell=None, for_new=True):
-    if not cell_choices:
-        return None
 
+def make_world_element_form(cell_choices=None, initial_cell=None, for_new=True):
     class WorldElementForm(forms.Form):
         name = forms.CharField(max_length=500,
                                       label=None,
@@ -398,7 +398,61 @@ def make_world_element_form(cell_choices=None, initial_cell=None, for_new=True):
         cell = forms.ModelChoiceField(label="Playgroup",
                                       queryset=cell_choices,
                                       widget=forms.Select(attrs={'class': 'form-control'}),
-                                      initial=initial_cell if initial_cell else cell_choices.first(),
+                                      initial=initial_cell if initial_cell else cell_choices.first() if cell_choices else None,
                                       required=for_new,
                                       )
     return WorldElementForm
+
+
+def make_artifact_status_form(current_status=None):
+    if current_status == LOST:
+        choices = (
+                  ('', "No change"),
+                  (RECOVERED, "Recovered"),
+              )
+    elif current_status == DESTROYED:
+        choices = (
+              ('', "No change"),
+              (REPAIRED, "Repaired"),
+          )
+    else:
+        choices = (
+                     ('', 'No change'),
+                     (LOST, "Lost"),
+                     (DESTROYED, "Destroyed"),
+                  )
+
+    class ArtifactStatusForm(forms.Form):
+        change_availability = forms.ChoiceField(
+            choices=choices,
+            required=False,
+            widget=forms.Select(attrs={'class': 'js-item-availability-change'}),
+            label="Change Availability",)
+        notes = forms.CharField(max_length=1000,
+                                label="Availability Change Notes",
+                                required=False)
+    return ArtifactStatusForm
+
+
+def make_transfer_artifact_form(character, cell=None):
+    character_options = get_character_contacts(character)
+    character_options = set(character_options.keys())
+    if cell:
+        character_options.udpate(cell.character_set)
+
+    class TransferArtifactForm(forms.Form):
+        transfer_type = forms.ChoiceField(
+            choices=(
+                (GIVEN, "Given"),
+                (STOLEN, "Stolen"),
+                (LOOTED, "Looted"),),
+            required=True,)
+        to_character = forms.ModelChoiceField(label="Contractor",
+                                      queryset=Character.objects.filter(id__in=[x.pk for x in character_options]),
+                                      widget=forms.Select(attrs={'class': 'form-control'}),
+                                      required=True)
+        notes = forms.CharField(max_length=1000,
+                               label="Notes",
+                               required=False)
+
+    return TransferArtifactForm

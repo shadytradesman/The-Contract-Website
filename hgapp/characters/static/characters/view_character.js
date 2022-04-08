@@ -716,6 +716,32 @@ $(".js-world-element-container").on("submit",".js-edit-world-element-form", func
             valElement.find(".css-world-element-name").text(fields["name"||""])
             valElement.find(".css-world-element-description").text(fields["description"||""])
             valElement.find(".css-world-element-system").text(fields["system"||""])
+            let greyOut = response["grey_out"];
+            let artifactStatus = response["artifact_status"];
+            if (null != greyOut) {
+                if (greyOut) {
+                    valElement.parent().addClass("css-sig-item-greyed-out");
+                } else {
+                    valElement.parent().removeClass("css-sig-item-greyed-out");
+                }
+            }
+            if (null!= artifactStatus) {
+                let statusSelector = valElement.parent().find(".js-item-availability-change");
+                statusSelector.find('option').remove();
+                statusSelector.append('<option value="">No change</option>');
+                if (artifactStatus === "LOST") {
+                    statusSelector.append('<option value="RECOVERED">Recovered</option>');
+                    valElement.find(".css-reason-unavail").text("Currently Lost.");
+                } else if (artifactStatus === "DESTROYED") {
+                    statusSelector.append('<option value="REPAIRED">Repaired</option>');
+                    valElement.find(".css-reason-unavail").text("Currently Destroyed.");
+                }
+                else {
+                    statusSelector.append('<option value="DESTROYED">Destroyed</option>');
+                    statusSelector.append('<option value="LOST">Lost</option>');
+                    valElement.find(".css-reason-unavail").text("");
+                }
+            }
         },
         error: function (response) {
             console.log(response);
@@ -723,3 +749,16 @@ $(".js-world-element-container").on("submit",".js-edit-world-element-form", func
         }
     })
 })
+
+
+$(function(){
+    function handleAvailabilityChange() {
+        const status = $(this).val();
+        if (status === "") {
+            $(this).parent().parent().parent().next().hide();
+        } else {
+            $(this).parent().parent().parent().next().show();
+        }
+    }
+    $(".js-item-availability-change").change(handleAvailabilityChange);
+});
