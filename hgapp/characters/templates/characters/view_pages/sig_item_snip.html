@@ -20,9 +20,15 @@
         </span>
     {% endif %}
   <div class="css-world-entity-value" style="padding-left: 5px; padding-bottom: 5px;">
+      {% if render_link %}
+        <a href="{% url 'characters:characters_artifact_view' item.id %}">
+      {% endif %}
       <h4 class="text-center css-world-element-name" style="{%if user_can_edit %}padding-left: 50px;padding-right: 55px;{%endif%} margin-top: 0px; font-size: 22px; margin-bottom: 0px;">
           {{item.name}}
       </h4>
+      {% if render_link %}
+        </a>
+      {% endif %}
       <div class="text-center text-muted">
           <small>
               {{status_blurb|safe}}

@@ -10,6 +10,8 @@ register = template.Library()
 def render_sig_item(context, artifact, user, viewing_character=None):
     latest_transfer = artifact.get_latest_transfer()
     can_edit = artifact.character.player_can_edit(user)
+    edit_form = None
+    status_form = None
     if can_edit:
         edit_form = make_world_element_form(for_new=False)()
         make_transfer_artifact_form(artifact.character, context["cell"] if "cell" in context else None)
@@ -34,6 +36,7 @@ def render_sig_item(context, artifact, user, viewing_character=None):
     reason_unavail = None
     if artifact.most_recent_status_change and artifact.most_recent_status_change not in [RECOVERED, REPAIRED]:
         reason_unavail = 'Currently {}.'.format(artifact.get_most_recent_status_change_display())
+    render_link = viewing_character is not None
     return {
         "item": artifact,
         "user_can_edit": can_edit,
@@ -42,5 +45,6 @@ def render_sig_item(context, artifact, user, viewing_character=None):
         "reason_unavail": reason_unavail,
         "edit_form": edit_form,
         "status_form": status_form,
+        "render_link": render_link,
     }
 

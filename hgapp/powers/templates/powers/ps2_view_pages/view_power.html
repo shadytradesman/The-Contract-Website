@@ -7,7 +7,6 @@
 
 {% block body_class %}home{% endblock %}
 
-{% block body_base %}
 
 {% load account_tags %}
 {% load power_tags %}
@@ -21,6 +20,7 @@
     {% endif %}
 {% endblock %}
 
+{% block body_base %}
 <div class="container">
     <div class="row">
         <div class="col-xs-12 col-lg-8 col-lg-offset-2">
@@ -71,6 +71,11 @@
                         {% endif %}
                         {% if power.parent_power.owner %}
                             Created by <a href="{% url 'profiles:profiles_view_profile' power.parent_power.owner.id %}">{% user_display power.parent_power.owner %}</a>.
+                        {% endif %}
+                        {% if sig_artifacts %}
+                        <div>
+                            On Signature Item {% for artifact in sig_artifacts %}<a href="{% url 'characters:characters_artifact_view' artifact.id %}">{{artifact.name}}</a>{% endfor %}.
+                        </div>
                         {% endif %}
                     </div>
                 </div>

@@ -1,0 +1,39 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+
+
+{% block head_title %}Viewing Artifact{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+
+{% load account_tags %}
+{% load power_tags %}
+{% load static %}
+{% load character_tags %}
+
+{% block extra_scripts %}
+  {% if artifact.character %}
+    {{attribute_value_by_id|json_script:"attributeValueById"}}
+    {{ability_value_by_id|json_script:"abilityValueById"}}
+    <script src="{% static 'characters/roll_values.js' %}"></script>
+  <script src="{% static 'characters/world_elements.js' %}"></script>
+  {% endif %}
+{% endblock %}
+
+{% block body_base %}
+<div class="container">
+  <h1 class="text-center">Viewing Artifact</h1>
+  <div class="row">
+    <div class="col-xs-12 col-sm-8 col-sm-offset-2">
+      {% if artifact.is_signature %}
+      {% render_sig_item artifact request.user %}
+      {% elif artifact.is_consumable %}
+      {% else %}
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}

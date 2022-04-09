@@ -289,7 +289,10 @@ class ViewPower(View):
         related_gifts = []
         stock_gifts = []
         related_component = None
+        sig_artifacts = None
         if self.power.dice_system == SYS_PS2:
+            if power_full:
+                sig_artifacts = power_full.artifacts.filter(is_signature=True).all()
             related_gift_query = Power_Full.objects.filter(dice_system=SYS_PS2, character__isnull=False, character__private=False)
             stock_gift_query = Power_Full.objects.filter(dice_system=SYS_PS2, tags__in=["example"])
             component = random.choice(["Effect", "Vector", "Modality"])
@@ -317,6 +320,7 @@ class ViewPower(View):
         context['power_full'] = power_full
         context['ability_value_by_id'] = ability_val_by_id
         context['attribute_value_by_id'] = attribute_val_by_id
+        context['sig_artifacts'] = sig_artifacts
         return context
 
 

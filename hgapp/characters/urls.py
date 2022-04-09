@@ -23,6 +23,9 @@ urlpatterns = [
     # ex: .com/characters/create/world/123
     url(r'^create/world/(?P<cell_id>[\d]+)$', views.create_character, name='characters_create_world'),
 
+    # ex: .com/characters/view/a/110
+    url(r'^view/a/(?P<artifact_id>[\d]+)/$', views.view_artifact, name='characters_artifact_view'),
+
     # ex: .com/characters/graveyard/
     url(r'^graveyard/$', views.graveyard, name='characters_graveyard'),
 

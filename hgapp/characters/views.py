@@ -174,6 +174,31 @@ def graveyard(request):
     }
     return render(request, 'characters/graveyard.html', context)
 
+def view_artifact(request, artifact_id):
+    artifact = get_object_or_404(Artifact, id=artifact_id)
+    characters = [artifact.character] if artifact.character else []
+
+    if artifact.crafting_character:
+        characters.append(artifact.crafting_character)
+    if characters and not [x for x in characters if x.player_can_view(request.user)]:
+        raise PermissionDenied("You do not have permission to view this item")
+    attribute_val_by_id = None
+    ability_val_by_id = None
+
+    if request.user.is_anonymous or not (request.user.is_superuser or request.user.profile.ps2_user or request.user.profile.early_access_user):
+        raise PermissionDenied("You are not authorized to create a new power in this system.")
+
+    if artifact.character:
+        attribute_val_by_id = artifact.character.get_attribute_values_by_id()
+        ability_val_by_id = artifact.character.get_ability_values_by_id()
+    context = {
+        "artifact": artifact,
+        "attribute_val_by_id": attribute_val_by_id,
+        "ability_val_by_id": ability_val_by_id,
+    }
+    return render(request, 'characters/view_artifact.html', context)
+
+
 
 def view_character(request, character_id, secret_key = None):
     character = get_object_or_404(Character, id=character_id)
