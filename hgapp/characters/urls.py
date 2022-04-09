@@ -62,6 +62,7 @@ urlpatterns = [
     ######
     url(r'^get/ajax/item-timeline/(?P<artifact_id>[\d]+)/$', views.item_timeline, name="item_timeline"),
 
+    url(r'^post/ajax/transfer/a/(?P<artifact_id>[\d]+)/$', views.transfer_artifact, name="transfer_artifact"),
 
     url(r'^post/ajax/c/(?P<character_id>[\d]+)/scar/$', views.post_scar, name="post_scar"),
     url(r'^post/ajax/c/(?P<character_id>[\d]+)/scar/(?P<secret_key>[\da-z]*)$', views.post_scar, name="post_scar"),

@@ -436,20 +436,24 @@ def make_artifact_status_form(current_status=None):
 
 def make_transfer_artifact_form(character, cell=None):
     character_options = get_character_contacts(character)
-    character_options = set(character_options.keys())
-    if cell:
-        character_options.udpate(cell.character_set)
+    character_options = set([x.pk for x in character_options.keys()])
+    if character.cell:
+        character_options.update(cell.character_set.values_list('id', flat=True))
+    if character in character_options:
+        character_options.remove(character.pk)
 
     class TransferArtifactForm(forms.Form):
         transfer_type = forms.ChoiceField(
+            label="This item was",
             choices=(
-                (GIVEN, "Given"),
-                (STOLEN, "Stolen"),
-                (LOOTED, "Looted"),),
+                (GIVEN, "Given to"),
+                (STOLEN, "Stolen by"),
+                (LOOTED, "Looted by"),),
             required=True,)
         to_character = forms.ModelChoiceField(label="Contractor",
-                                      queryset=Character.objects.filter(id__in=[x.pk for x in character_options]),
+                                      queryset=Character.objects.filter(id__in=[x for x in character_options]).order_by("name"),
                                       widget=forms.Select(attrs={'class': 'form-control'}),
+                                              empty_label=None,
                                       required=True)
         notes = forms.CharField(max_length=1000,
                                label="Notes",

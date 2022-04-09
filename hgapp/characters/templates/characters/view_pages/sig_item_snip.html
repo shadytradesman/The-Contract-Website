@@ -11,13 +11,15 @@
                 <i class="fa fa-edit fa-1x"></i>
             </button>
         </span>
+        {% if transfer_form %}
         <span class="pull-right">
-            <button class="btn btn-xs btn-default js-transfer-item-button"
+            <button class="btn btn-xs btn-default js-transfer-artifact-button"
                     data-id="{{item.id}}"
                     style="margin-right: 5px; margin-left: 2px;">
                 <span class="glyphicon glyphicon-transfer" aria-hidden="true"></span>
             </button>
         </span>
+        {% endif %}
     {% endif %}
   <div class="css-world-entity-value" style="padding-left: 5px; padding-bottom: 5px;">
       {% if render_link %}
@@ -37,10 +39,37 @@
       </div>
     <i class="css-system-text-user-input css-world-element-description">{{item.description}}</i>
   </div>
+    {% if transfer_form and user_can_edit %}
+        <form class="js-transfer-artifact-form"
+              action="{% url 'characters:transfer_artifact' item.id %}"
+              method="post"
+              style="display:none;">
+            {% csrf_token %}
+            <h4 class="text-center">Transfer Item</h4>
+            <div id="transfer-artifact-{{item.id}}" style="margin-bottom: 10px;">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-6">
+                        {{ transfer_form.transfer_type|bootstrap}}
+                    </div>
+                    <div class="col-xs-12 col-sm-6">
+                        {{ transfer_form.to_character|bootstrap}}
+                    </div>
+                </div>
+                {{ transfer_form.notes|bootstrap}}
+                <div class="text-center">
+                    <input type="submit" class="btn btn-primary" value="Transfer Item" />
+                    <div>
+                        <small>Warning: Once you transfer this item, it will be controlled by the other Contractor.</small>
+                    </div>
+                </div>
+            </div>
+        </form>
+    {% endif %}
     {% if edit_form and user_can_edit %}
         <form class="js-edit-world-element-form"
               data-edit-world-element-url="{% url 'characters:edit_world_element' item.id 'artifact' secret_key %}"
               style="display:none;">
+            {% csrf_token %}
             <div id="edit-artifact-{{item.id}}" style="margin-bottom: 10px;">
                 {{edit_form.name|bootstrap}}
                 {{edit_form.description|bootstrap}}

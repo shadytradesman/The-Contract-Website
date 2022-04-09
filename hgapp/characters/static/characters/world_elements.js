@@ -135,3 +135,11 @@ $(function(){
     }
     $(".js-item-availability-change").change(handleAvailabilityChange);
 });
+
+
+// transfer artifact expand
+$(document).on("click", ".js-transfer-artifact-button", function(){
+    $(this).parent().hide();
+    let formElement = $(this).parent().nextAll(".js-transfer-artifact-form").first();
+    formElement.show();
+});

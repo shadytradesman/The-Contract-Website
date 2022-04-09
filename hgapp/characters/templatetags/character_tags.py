@@ -12,9 +12,10 @@ def render_sig_item(context, artifact, user, viewing_character=None):
     can_edit = artifact.character.player_can_edit(user)
     edit_form = None
     status_form = None
+    transfer_form = None
     if can_edit:
         edit_form = make_world_element_form(for_new=False)()
-        make_transfer_artifact_form(artifact.character, context["cell"] if "cell" in context else None)
+        transfer_form = make_transfer_artifact_form(artifact.character, artifact.character.cell)
         status_form = make_artifact_status_form(artifact.most_recent_status_change)
     is_lost_or_destroyed = artifact.most_recent_status_change and artifact.most_recent_status_change in [LOST, DESTROYED]
     is_held_by_creator = artifact.character == artifact.crafting_character
@@ -27,10 +28,10 @@ def render_sig_item(context, artifact, user, viewing_character=None):
             artifact.crafting_character.name,)
     else:
         # if not held by creator, it should have a transfer.
-        status_blurb = 'Created by <a href="{}">{}</a>, {} by <a href="{}">{}</a>.'.format(
+        status_blurb = 'Created by <a href="{}">{}</a>, {} <a href="{}">{}</a>.'.format(
             reverse('characters:characters_view', args=(artifact.crafting_character.id,)),
             artifact.crafting_character.name,
-            latest_transfer.get_transfer_type_dispaly(),
+            latest_transfer.get_transfer_type_display(),
             reverse('characters:characters_view', args=(artifact.character.id,)),
             artifact.character.name)
     reason_unavail = None
@@ -45,6 +46,7 @@ def render_sig_item(context, artifact, user, viewing_character=None):
         "reason_unavail": reason_unavail,
         "edit_form": edit_form,
         "status_form": status_form,
+        "transfer_form": transfer_form,
         "render_link": render_link,
     }
 

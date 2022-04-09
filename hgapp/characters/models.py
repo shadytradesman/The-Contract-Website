@@ -1133,7 +1133,7 @@ class Artifact(WorldElement):
         return rewards
 
     def get_latest_transfer(self):
-        return self.artifactstatuschange_set.order_by("-created_time").first()
+        return self.artifacttransferevent_set.order_by("-created_time").first()
 
     def get_all_transfers(self):
         return self.artifact_.order_by("-created_time").all()
@@ -1154,23 +1154,14 @@ class Artifact(WorldElement):
     def transfer_to_character(self, transfer_type, to_character, notes=""):
         if self.character == to_character:
             raise ValueError("Cannot transfer an artifact to the character that possesses it.")
-
-        if transfer_type in [GIVEN, STOLEN, LOOTED]:
-            ArtifactStatusChange.objects.create(
-                from_character=self.character,
-                to_character=to_character,
-                relevant_artifact=self,
-                notes=notes,
-                transfer_type=transfer_type)
-            self.character = to_character
-            self.save()
-        else:
-            ArtifactStatusChange.create(
-                from_character=self.character,
-                to_character=None,
-                relevant_artifact=self,
-                notes=notes,
-                transfer_type=transfer_type)
+        ArtifactTransferEvent.objects.create(
+            from_character=self.character,
+            to_character=to_character,
+            relevant_artifact=self,
+            notes=notes,
+            transfer_type=transfer_type)
+        self.character = to_character
+        self.save()
 
 
 class ArtifactStatusChange(models.Model):
@@ -1205,6 +1196,13 @@ class ArtifactTransferEvent(models.Model):
         indexes = [
             models.Index(fields=['relevant_artifact', 'created_time']),
         ]
+
+    def get_timeline_string(self):
+        time = self.created_time.strftime("%d %b %Y")
+        line = "{} - <b>{}</b> {}".format(time, self.get_transfer_type_display(), self.to_character.name)
+        if self.notes:
+            line = line + '<i class="text-muted" style="padding-left: 5px;">({})</i>'.format(self.notes)
+        return line
 
 
 class Injury(models.Model):
