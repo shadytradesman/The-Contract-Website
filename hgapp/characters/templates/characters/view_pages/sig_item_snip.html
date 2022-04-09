@@ -59,4 +59,15 @@
         {% power_badge power %}
     </span>
   {% endfor %}
+    <div id="hx-timeline-item{{item.id}}">
+        <button
+                class="btn btn-default btn-xs"
+                hx-get="{% url 'characters:item_timeline' item.id %}"
+                hx-trigger="click"
+                hx-target="#hx-timeline-item{{item.id}}"
+                hx-swap="outerHTML">
+            History
+        </button>
+
+    </div>
 </div>

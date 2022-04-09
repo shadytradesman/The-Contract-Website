@@ -170,10 +170,10 @@ DESTROYED = "DESTROYED"
 RECOVERED = "RECOVERED"
 REPAIRED = "REPAIRED"
 ARTIFACT_STATUS_CHANGE_TYPE = (
-    (LOST, 'lost'),
-    (RECOVERED, 'recovered'),
-    (DESTROYED, "destroyed"),
-    (REPAIRED, "repaired"),
+    (LOST, 'Lost'),
+    (RECOVERED, 'Recovered'),
+    (DESTROYED, "Destroyed"),
+    (REPAIRED, "Repaired"),
 )
 
 EQUIPMENT_DEFAULT = """
@@ -1183,6 +1183,14 @@ class ArtifactStatusChange(models.Model):
         indexes = [
             models.Index(fields=['relevant_artifact', 'created_time']),
         ]
+
+    def get_timeline_string(self):
+        time = self.created_time.strftime("%d %b %Y")
+        line = "{} - <b>{}</b> ".format(time, self.get_status_change_type_display())
+        if self.notes:
+            line = line + '<i class="text-muted" style="padding-left: 5px;">({})</i>'.format(self.notes)
+        return line
+
 
 
 class ArtifactTransferEvent(models.Model):

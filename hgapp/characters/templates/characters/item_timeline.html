@@ -1,0 +1,8 @@
+<b>Timeline</b>
+<ul style="list-style-type: square;">
+    {% for event in events %}
+        <li>
+            {{event.get_timeline_string|safe}}
+        </li>
+    {% endfor %}
+</ul>

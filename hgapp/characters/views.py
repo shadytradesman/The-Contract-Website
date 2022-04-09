@@ -181,8 +181,6 @@ def view_character(request, character_id, secret_key = None):
         return HttpResponseRedirect(reverse('characters:characters_view', args=(character_id,)))
     if not character.player_can_view(request.user):
         raise PermissionDenied("You do not have permission to view this Character")
-    if request.user.is_authenticated and not request.user.profile.confirmed_agreements:
-            return HttpResponseRedirect(reverse('profiles:profiles_terms'))
     secret_key_valid = False
     if secret_key:
         secret_key_valid = character.is_editable_with_key(secret_key)
@@ -530,6 +528,20 @@ def claim_character(request, character_id, secret_key = None):
 #####
 # View Character AJAX
 ####
+
+def item_timeline(request, artifact_id):
+    artifact = get_object_or_404(Artifact, id=artifact_id)
+    if artifact.character and not artifact.character.player_can_view(request.user):
+        raise PermissionDenied("You do not have permission to view this artifact")
+    status_changes = artifact.artifactstatuschange_set.order_by("-created_time")
+    transfers = artifact.artifacttransferevent_set.order_by("-created_time")
+
+    events = list(merge(status_changes, transfers))
+    context = {
+        "events": events,
+    }
+    return render(request, 'characters/item_timeline.html', context)
+
 
 def post_scar(request, character_id, secret_key = None):
     if request.is_ajax and request.method == "POST":
