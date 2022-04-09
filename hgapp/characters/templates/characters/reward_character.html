@@ -37,7 +37,11 @@
         {% if character.num_unspent_rewards > 0 %}
             <ul class="list-unstyled text-center">
                 {% for reward in character.unspent_rewards %}
-                    <li>{% render_reward reward %}</li>
+                    <li>
+                        <div class="thumbnail" style="margin-bottom: 10px;">
+                            {% render_reward reward %}
+                        </div>
+                    </li>
                 {% endfor %}
             </ul>
         {% endif %}

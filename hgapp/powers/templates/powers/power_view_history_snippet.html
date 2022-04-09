@@ -30,7 +30,9 @@
       Revision purchased with:
       <div class="small">
         {% for reward in curr_power.relevant_power.all %}
-        {% render_reward  reward %}
+          <div class="thumbnail" style="margin-bottom: 10px;">
+            {% render_reward  reward %}
+          </div>
         {% endfor %}
       </div>
     </div>

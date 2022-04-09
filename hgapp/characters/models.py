@@ -660,8 +660,14 @@ class Character(models.Model):
     def num_active_rewards(self):
         return self.reward_set.filter(is_void=False).count()
 
+    def spent_rewards_rev_sort(self):
+        return self.reward_set.exclude(relevant_power=None).order_by("-assigned_on").all()
+
     def spent_rewards(self):
         return self.reward_set.exclude(relevant_power=None).order_by("assigned_on", "awarded_on").all()
+
+    def num_spent_rewards(self):
+        return self.reward_set.exclude(relevant_power=None).count()
 
     def unspent_rewards(self):
         return self.reward_set.filter(is_void=False).filter(relevant_power=None).order_by("is_improvement", "-awarded_on").all()

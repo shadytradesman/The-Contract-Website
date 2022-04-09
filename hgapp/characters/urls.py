@@ -61,6 +61,7 @@ urlpatterns = [
     # AJAX endpoints for character view page
     ######
     url(r'^get/ajax/item-timeline/(?P<artifact_id>[\d]+)/$', views.item_timeline, name="item_timeline"),
+    url(r'^get/ajax/timeline/(?P<character_id>[\d]+)/$', views.character_timeline, name="character_timeline"),
 
     url(r'^post/ajax/transfer/a/(?P<artifact_id>[\d]+)/$', views.transfer_artifact, name="transfer_artifact"),
 

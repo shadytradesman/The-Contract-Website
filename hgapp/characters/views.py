@@ -201,8 +201,7 @@ def view_artifact(request, artifact_id):
     return render(request, 'characters/view_artifact.html', context)
 
 
-
-def view_character(request, character_id, secret_key = None):
+def view_character(request, character_id, secret_key=None):
     character = get_object_or_404(Character, id=character_id)
     if character.player and secret_key:
         return HttpResponseRedirect(reverse('characters:characters_view', args=(character_id,)))
@@ -225,19 +224,6 @@ def view_character(request, character_id, secret_key = None):
     crafting_artifact_gifts = character.power_full_set.filter(dice_system=SYS_PS2, crafting_type=CRAFTING_ARTIFACT).all()
     crafting_consumable_gifts = character.power_full_set.filter(dice_system=SYS_PS2, crafting_type=CRAFTING_CONSUMABLE).all()
     signature_item_gifts = character.power_full_set.filter(dice_system=SYS_PS2, crafting_type=CRAFTING_SIGNATURE).all()
-    completed_games = [(x.relevant_game.end_time, "game", x) for x in character.completed_games()] # completed_games() does ordering
-    character_edit_history = [(x.created_time, "edit", x) for x in
-                              character.contractstats_set.filter(is_snapshot=False).order_by("created_time").all()[1:]]
-    exp_rewards = [(x.created_time, "exp_reward", x) for x in character.experiencereward_set.filter(is_void=False).order_by("created_time").all()]
-    events_by_date = list(merge(completed_games, character_edit_history, exp_rewards))
-    timeline = defaultdict(list)
-    for event in events_by_date:
-        if event[1] == "edit":
-            phrases = event[2].get_change_phrases()
-            if len(phrases):
-                timeline[event[0].strftime("%d %b %Y")].append((event[1], phrases))
-        else:
-            timeline[event[0].strftime("%d %b %Y")].append((event[1], event[2]))
 
     char_ability_values = character.get_abilities()
     ability_value_by_id = {}
@@ -325,7 +311,6 @@ def view_character(request, character_id, secret_key = None):
         'ability_value_by_id': ability_value_by_id,
         'attributes': attributes,
         'attribute_value_by_id': attribute_value_by_id,
-        'timeline': dict(timeline),
         'tutorial': get_object_or_404(CharacterTutorial),
         'battle_scar_form': BattleScarForm(),
         'default_scar_field': default_scar_field,
@@ -568,6 +553,31 @@ def item_timeline(request, artifact_id):
         "events": events,
     }
     return render(request, 'characters/item_timeline.html', context)
+
+
+def character_timeline(request, character_id):
+    character = get_object_or_404(Character, id=character_id)
+    if not character.player_can_view(request.user):
+        raise PermissionDenied("You do not have permission to view this Character")
+
+    assigned_rewards = [(x.assigned_on, "reward", x) for x in character.spent_rewards_rev_sort()]
+    completed_games = [(x.relevant_game.end_time, "game", x) for x in character.completed_games_rev_sort()]
+    character_edit_history = [(x.created_time, "edit", x) for x in
+                              character.contractstats_set.filter(is_snapshot=False).order_by("-created_time").all()[:1]]
+    exp_rewards = [(x.created_time, "exp_reward", x) for x in character.experiencereward_set.filter(is_void=False).order_by("-created_time").all()]
+    events_by_date = list(merge(assigned_rewards, completed_games, character_edit_history, exp_rewards, reverse=True))
+    timeline = defaultdict(list)
+    for event in events_by_date:
+        if event[1] == "edit":
+            phrases = event[2].get_change_phrases()
+            if len(phrases):
+                timeline[event[0].strftime("%d %b %Y")].append((event[1], phrases))
+        else:
+            timeline[event[0].strftime("%d %b %Y")].append((event[1], event[2]))
+    context = {
+        'timeline': dict(timeline),
+    }
+    return render(request, 'characters/character_timeline.html', context)
 
 
 def transfer_artifact(request, artifact_id):

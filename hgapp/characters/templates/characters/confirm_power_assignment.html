@@ -44,7 +44,11 @@
                     </h4>
                     <ul class="list-unstyled">
                         {% for reward in rewards_to_spend %}
-                            <li>{% render_reward reward %}</li>
+                            <li>
+                                <div class="thumbnail" style="margin-bottom: 10px;">
+                                    {% render_reward reward %}
+                                </div>
+                            </li>
                         {% endfor %}
                     </ul>
                 {% endif %}
@@ -55,7 +59,11 @@
                     </h4>
                     <ul class="list-unstyled">
                         {% for reward in power_full.reward_list %}
-                            <li>{% render_reward reward %}</li>
+                            <li>
+                                <div class="thumbnail" style="margin-bottom: 10px;">
+                                    {% render_reward reward %}
+                                </div>
+                            </li>
                         {% endfor %}
                     </ul>
                 {% endif %}

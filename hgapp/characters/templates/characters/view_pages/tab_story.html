@@ -90,98 +90,50 @@
     {% endif %}
 {% endif %}
 <hr>
-<h3 data-toggle="tooltip" title='{{tutorial.character_timeline}}'>
-    Timeline
-</h3>
-<p>
-    <b>{{ character.number_of_victories }}</b> Victories - <b>{{ character.number_of_losses }}</b> Losses
-    <br>
-    {% if unspent_experience < 0 %}
-<h4 class="text-danger">{{character.name}} has overspent Experience</h4>
-{% endif %}
-<b>Remaining: </b>{{unspent_experience}} Exp.
-(<b>Earned: </b> {{exp_earned}} - <b>Spent: </b> {{exp_cost}})
-</p>
-{% for date, event_list in timeline.items %}
-<h4>{{ date }}</h4>
-<ul>
-    {% for event in event_list %}
-    {% if event.0 == "game"%}
-        {% with event.1 as attendance %}
-            {% include "games/game_attendance_badge_snippet.html" %}
-        {% endwith %}
-    {% elif event.0 == "exp_reward" %}
-        <li class="css-timeline-item css-timeline-exp">
-            <b>{{event.1.get_history_blurb.0}}</b>
-            {{event.1.get_history_blurb.1}}
-        </li>
-    {% else %}
-        {% for phrase in event.1 %}
-            <li class="css-timeline-item css-timeline-exp">
-                <b>{{phrase.0}} Exp:</b> {{phrase.1}}
-            </li>
+{% if character.void_deaths %}
+<div class="container text-danger">
+    <h2>Voided Deaths</h2>
+    <h4>You should probably know about these. . .</h4>
+    <ul>
+        {% for death in character.void_deaths %}
+        <div class="container">
+            <li>{{death.date_of_death}} - {{death.cause_of_death }}</li>
+        </div>
         {% endfor %}
-    {% endif %}
-    {% endfor %}
-</ul>
-{% empty %}
-<h4>{{character.name}} Has never edited their stats or attended a Contract</h4>
-{% endfor %}
-{% if character.basic_stats.advancement_history %}
-<h3>Advancement History</h3>
-<p>{{character.basic_stats.advancement_history |linebreaks}}</p>
+    </ul>
+</div>
 {% endif %}
-<h2>Gifts and Improvements</h2>
+<div class="text-center">
+    <h3  data-toggle="tooltip" title='{{tutorial.character_timeline}}' style="margin-bottom: 5px;">
+        Contractor Timeline
+    </h3>
+    <p>
+        <b>{{ character.number_of_victories }}</b> Victories - <b>{{ character.number_of_losses }}</b> Losses
+        <br>
+        {% if unspent_experience < 0 %}
+    <h4 class="text-danger">{{character.name}} has overspent Experience</h4>
+    {% endif %}
+    <b>Remaining: </b>{{unspent_experience}} Exp.
+    (<b>Earned: </b> {{exp_earned}} - <b>Spent: </b> {{exp_cost}})
+    </p>
+</div>
+
 {% if character.num_unspent_rewards > 0 %}
-<h4>Character has {{character.num_unspent_rewards}} unspent rewards</h4>
+<h4>{{character.name}} has {{character.num_unspent_rewards}} unspent Reward{{character.num_unspent_rewards|pluralize}}</h4>
 <ul >
     {% for reward in character.unspent_rewards %}
     <li>{% render_reward reward %}</li>
     {% endfor %}
 </ul>
+
 {% endif %}
-{% if character.spent_rewards %}
-<h4>Gift / Reward History</h4>
-<ul >
-    {% for reward in character.spent_rewards %}
-    <li>{% render_reward reward %}</li>
-    {% endfor %}
-</ul>
-{% endif %}
-{% if character.wish_list %}
-<div class="container">
-    <h3>Wish List</h3>
-    <div class="container">
-        <p>{{character.wish_list | linebreaks}}</p>
-    </div>
+<div id="hx-timeline-char">
+    <button
+            class="btn btn-primary btn-lg"
+            hx-get="{% url 'characters:character_timeline' character.id %}"
+            hx-trigger="click"
+            hx-target="#hx-timeline-char"
+            hx-swap="outerHTML">
+        Load Full Timeline
+    </button>
 </div>
-{% endif %}
-{% if character.to_do_list %}
-<div class="container">
-    <h3>To-Do List</h3>
-    <div class="container">
-        <p>{{character.to_do_list | linebreaks}}</p>
-    </div>
-</div>
-{% endif %}
-{% if character.notes %}
-<div class="container">
-    <h3>Other Notes</h3>
-    <div class="container">
-        <p>{{character.notes | markdown | linebreaks}}</p>
-    </div>
-</div>
-{% endif %}
-{% if character.void_deaths %}
-    <div class="container text-danger">
-        <h2>Voided Deaths</h2>
-        <h4>You should probably know about these. . .</h4>
-        <ul>
-            {% for death in character.void_deaths %}
-            <div class="container">
-                <li>{{death.date_of_death}} - {{death.cause_of_death }}</li>
-            </div>
-            {% endfor %}
-        </ul>
-    </div>
-{% endif %}

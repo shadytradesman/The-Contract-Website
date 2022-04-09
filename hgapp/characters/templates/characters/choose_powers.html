@@ -27,7 +27,7 @@
                             {{ character.name}} does not have any unspent Gifts or Improvements.
                             <br>
                             You may still assign Powers to them, but it will put them in bad standing.
-                            {% if character.spent_rewards|length > 0 %}
+                            {% if character.num_spent_rewards > 0 %}
                                 <br>
                                 Unassigning Powers will refund any Gifts and Improvements spent on that Power.
                             {% endif %}
