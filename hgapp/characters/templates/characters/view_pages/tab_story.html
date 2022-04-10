@@ -128,12 +128,18 @@
 
 {% endif %}
 <div id="hx-timeline-char">
-    <button
-            class="btn btn-primary btn-lg"
-            hx-get="{% url 'characters:character_timeline' character.id %}"
-            hx-trigger="click"
-            hx-target="#hx-timeline-char"
-            hx-swap="outerHTML">
-        Load Full Timeline
-    </button>
+    <div class="text-center" style="margin-top: 20px;">
+        <button
+                class="btn btn-primary btn-lg"
+                hx-get="{% url 'characters:character_timeline' character.id %}"
+                hx-trigger="click"
+                hx-target="#hx-timeline-char"
+                hx-swap="outerHTML">
+            Load Full Timeline
+        </button>
+        <div>
+            <small>An itemized record of every Contract, Gift, Improvement, and Experience change</small>
+        </div>
+
+    </div>
 </div>
