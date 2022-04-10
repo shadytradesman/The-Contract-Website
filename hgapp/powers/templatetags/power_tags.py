@@ -19,14 +19,15 @@ def discovery_power_badge(power_full):
     }
 
 @register.inclusion_tag('powers/power_badge_snippet.html')
-def power_badge(power_full):
+def power_badge(power_full, force_show_warnings=False):
     latest_revision = power_full.latest_revision()
     character = power_full.character if power_full.character else None
-    show_status_warning = False
+    show_status_warning = force_show_warnings
     if character:
         show_status_warning = not latest_revision.passes_status_check(character.status)
     return {
         'discovery_page': False,
+        'force_show_warnings': force_show_warnings,
         'power_full': power_full,
         'latest_revision': latest_revision,
         'character': character,

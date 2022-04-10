@@ -91,7 +91,7 @@
     {% endif %}
   {% for power in item.power_full_set.all %}
     <span class="css-world-element-name">
-        {% power_badge power %}
+        {% power_badge power True %}
     </span>
   {% endfor %}
     <div id="hx-timeline-item{{item.id}}">

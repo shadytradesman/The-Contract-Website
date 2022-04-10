@@ -362,7 +362,7 @@ def choose_powers(request, character_id):
         raise PermissionDenied("You do not have permission to edit this Character")
     assigned_powers = character.power_full_set.exclude(crafting_type=CRAFTING_SIGNATURE).all()
     unassigned_powers = request.user.power_full_set.filter(character=None, is_deleted=False).exclude(crafting_type=CRAFTING_SIGNATURE).order_by('-pub_date').all()
-    assigned_items = character.get_signature_items()
+    assigned_items = character.get_signature_items_crafted()
     unassigned_items = character.player.artifact_set.filter(cell=None, is_signature=True, crafting_character__isnull=True).all()
     context = {
         'character': character,
@@ -388,21 +388,29 @@ def toggle_item(request, character_id, sig_artifact_id):
         assignment_form = ConfirmAssignmentForm(request.POST)
         if assignment_form.is_valid():
             with transaction.atomic():
-                if sig_item.character == character:
+                if sig_item.crafting_character == character:
                     # Unassign the item
-                    sig_item.character = None
+                    if sig_item.character == character:
+                        sig_item.character = None
                     sig_item.crafting_character = None
                     sig_item.save()
                     for power in sig_item.power_full_set.all():
+                        if power.character == character:
+                            # Unassign the power
+                            power.character = None
+                        power.save()
                         power.set_self_and_children_privacy(is_private=False)
                     for reward in sig_item.get_assigned_rewards():
                         reward.refund_keeping_character_assignment()
-                elif not sig_item.character:
+                elif not sig_item.crafting_character:
                     # Assign the item
-                    sig_item.character = character
+                    if not sig_item.character:
+                        sig_item.character = character
                     sig_item.crafting_character = character
                     sig_item.save()
                     for power_full in sig_item.power_full_set.all():
+                        power_full.character = character
+                        power_full.save()
                         rewards_to_be_spent = character.reward_cost_for_power(power_full)
                         for reward in rewards_to_be_spent:
                             reward.assign_to_power(power_full.latest_revision())

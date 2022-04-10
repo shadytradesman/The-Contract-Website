@@ -40,10 +40,12 @@
             {% if not discovery_page %}
                 <div class="text-danger">
                     <small>
-                        {% if power_full.character and not power_full.at_least_one_gift_assigned %}
-                            No Gifts assigned!
-                        {% elif power_full.character and power_full.get_gift_cost > power_full.reward_count %}
-                            {{power_full.reward_count }} Reward{{ power_full.reward_count| pluralize}} assigned
+                        {% if power_full.character or force_show_warnings %}
+                            {% if not power_full.at_least_one_gift_assigned %}
+                                No Gifts assigned!
+                            {% elif power_full.get_gift_cost > power_full.reward_count %}
+                                {{power_full.reward_count }} Reward{{ power_full.reward_count| pluralize}} assigned
+                            {% endif %}
                         {% endif %}
                     </small>
                 </div>

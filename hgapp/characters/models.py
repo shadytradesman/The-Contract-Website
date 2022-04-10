@@ -443,7 +443,7 @@ class Character(models.Model):
     def get_power_cost_total(self):
         total = 0
         for power in self.power_full_set.all():
-            total = total + power.get_gift_cost()
+            total = total + max(1, power.get_gift_cost())
         return total
 
     def world_element_cell_choices(self):
@@ -741,6 +741,9 @@ class Character(models.Model):
 
     def get_signature_items(self):
         return self.artifact_set.filter(cell=None, is_signature=True).all()
+
+    def get_signature_items_crafted(self):
+        return self.creator.filter(cell=None, is_signature=True).all()
 
     def __str__(self):
         string = self.name + " ["
@@ -1092,6 +1095,9 @@ class WorldElement(models.Model):
     name = models.CharField(max_length=500)
     description = models.CharField(max_length=5000)
     system = models.CharField(max_length=1000, blank=True)
+    created_time = models.DateTimeField(auto_now_add=True, null=True) #null because added in migration
+    is_deleted = models.BooleanField(default=False)
+    deleted_date = models.DateTimeField(null=True)
 
     # when cell is null, element is created by gift system
     cell = models.ForeignKey(Cell,
@@ -1205,7 +1211,7 @@ class ArtifactTransferEvent(models.Model):
 
     def get_timeline_string(self):
         time = self.created_time.strftime("%d %b %Y")
-        line = "{} - <b>{}</b> {}".format(time, self.get_transfer_type_display(), self.to_character.name)
+        line = "{} - <b>{}</b> {} (from {})".format(time, self.get_transfer_type_display(), self.to_character.name, self.from_character.name)
         if self.notes:
             line = line + '<i class="text-muted" style="padding-left: 5px;">({})</i>'.format(self.notes)
         return line

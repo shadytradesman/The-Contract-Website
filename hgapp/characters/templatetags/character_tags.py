@@ -26,12 +26,18 @@ def render_sig_item(context, artifact, user, viewing_character=None):
         status_blurb = 'Created and held by <a href="{}">{}</a>.'.format(
             reverse('characters:characters_view', args=(artifact.crafting_character.id,)),
             artifact.crafting_character.name,)
-    else:
+    elif artifact.crafting_character:
         # if not held by creator, it should have a transfer.
         status_blurb = 'Created by <a href="{}">{}</a>, {} <a href="{}">{}</a>.'.format(
             reverse('characters:characters_view', args=(artifact.crafting_character.id,)),
             artifact.crafting_character.name,
             latest_transfer.get_transfer_type_display(),
+            reverse('characters:characters_view', args=(artifact.character.id,)),
+            artifact.character.name)
+    else:
+        status_blurb = 'Created by <a href="{}">{}</a> and orphaned. Held by <a href="{}">{}</a>'.format(
+            reverse('profiles:profiles_view_profile', args=(artifact.creating_player.id,)),
+            artifact.creating_player.username,
             reverse('characters:characters_view', args=(artifact.character.id,)),
             artifact.character.name)
     reason_unavail = None

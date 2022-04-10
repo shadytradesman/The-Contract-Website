@@ -15,7 +15,7 @@
 <div class="container">
     <div class="text-center">
         <h1>
-            Add/Remove Powers for <a href="{% url 'characters:characters_view' character.id %}">{{ character.name }}</a>
+            Add/Remove Gifts for <a href="{% url 'characters:characters_view' character.id %}">{{ character.name }}</a>
         </h1>
     </div>
     <div class="panel panel-default">
@@ -70,7 +70,14 @@
                             <div class="col-xs-8 col-sm-9" >
                                 <div class="css-signature-item">
                                     <h4 style="margin-top: 0px;">
-                                        {{item.name}}
+                                        <a href="{% url 'characters:characters_artifact_view' item.id %}">
+                                            {{item.name}}
+                                        </a>
+                                        {% if item.character != character %}
+                                            <small>
+                                                Currently in {{item.character.name}}'s possession.
+                                            </small>
+                                        {% endif %}
                                     </h4>
                                     {% for power in item.power_full_set.all %}
                                         <span class="css-world-element-name">
