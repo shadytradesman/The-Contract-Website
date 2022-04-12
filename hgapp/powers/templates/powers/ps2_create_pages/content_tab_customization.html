@@ -217,10 +217,10 @@
         <div class="col-md-6">
             {{sig_item_artifact_form.selected_artifact|bootstrap}}
         </div>
-        <div class="col-md-6" v-if="selectedItem.length === 0">
+        <div class="col-md-6" v-if="!selectedItem">
             {{sig_item_artifact_form.item_name|bootstrap}}
         </div>
-        <div class="col-xs-12" v-if="selectedItem.length === 0">
+        <div class="col-xs-12" v-if="!selectedItem">
             {{sig_item_artifact_form.item_description|bootstrap}}
         </div>
     </div>

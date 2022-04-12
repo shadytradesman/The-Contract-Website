@@ -1,0 +1,25 @@
+/* Hide HTML5 Up and Down arrows. */
+input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+.consumable-value-input {
+    width: 35px !important;
+    padding: 5px !important;
+    text-align:center;
+    font-size:16px;
+    display: inline !important;
+}
+
+.css-exp-cost {
+    color: #a94442;
+}
+
+.css-exp-credit {
+    color: #499773;
+}

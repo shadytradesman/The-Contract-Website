@@ -860,6 +860,7 @@ const ComponentRendering = {
             this.selectedVector = selectedVector;
         }
         this.clickVector();
+        console.log("Vector assigned");
 
         this.selectedEnhancements =  [];
         this.selectedDrawbacks = [];
@@ -879,6 +880,7 @@ const ComponentRendering = {
                 this.calculateRestrictedElements();
             }
         });
+        console.log("Enhancements assigned");
 
         powerEditBlob["drawbacks"].forEach(mod => {
             let availDrawbacks = this.drawbacks.filter(drawback =>
@@ -894,6 +896,7 @@ const ComponentRendering = {
                 this.calculateRestrictedElements();
             }
         });
+        console.log("Drawbacks assigned");
 
         powerEditBlob["text_fields"].forEach(editField => {
             this.systemFields.forEach(sysField => {
@@ -903,6 +906,8 @@ const ComponentRendering = {
             });
         });
 
+        console.log("Text fields assigned");
+
         powerEditBlob["weapon_fields"].forEach(editField => {
             this.systemFields.forEach(sysField => {
                 if (sysField.isWeapon && sysField.pk === editField["field_id"]) {
@@ -910,6 +915,7 @@ const ComponentRendering = {
                 }
             });
         });
+        console.log("Weapon fields assigned");
 
         powerEditBlob["roll_fields"].forEach(editField => {
             this.systemFields.forEach(sysField => {
@@ -921,6 +927,7 @@ const ComponentRendering = {
                 }
             });
         });
+        console.log("roll fields assigned");
 
         powerEditBlob["parameters"].forEach(editParam => {
             this.parameters.forEach(param => {
@@ -929,6 +936,7 @@ const ComponentRendering = {
                 }
             });
         });
+        console.log("parameters assigned");
 
         this.updateManagementForms();
         this.reRenderSystemText();
@@ -936,6 +944,7 @@ const ComponentRendering = {
         this.updateRequiredStatus();
         this.populateWarnings();
         this.openCustomizationTab();
+        console.log("Edit power completed");
       },
       populateErrata() {
 
@@ -1587,10 +1596,8 @@ const ComponentRendering = {
   }
 }
 const app = Vue.createApp(ComponentRendering);
-
-
-
 const mountedApp = app.mount('#vue-app');
+
 $(function() {
     fetch(powerBlobUrl)
         .then(response => response.json())

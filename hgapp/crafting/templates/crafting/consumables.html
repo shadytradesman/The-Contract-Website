@@ -1,0 +1,35 @@
+{% load power_tags %}
+
+<div class="panel-heading">
+    <h3 style="margin-top: 5px; margin-bottom: 5px;">Consumables</h3>
+</div>
+<div class="panel-body">
+    {% for form, power in consumable_forms %}
+    <div style="display: flex;">
+        <div style="margin-right: 15px;">
+            <div class="text-center">
+                <b>Quantity</b>
+            </div>
+            <div>
+                <span
+                        class="consumable-form form-inline"
+                        data-initial-val="{{form.initial.num_crafted}}"
+                        data-max-value="{{20}}"
+                        data-power-id="{{power.pk}}"
+                        data-min-value="0">
+                    {{form.num_crafted}}
+                </span>
+                {{form.power_full_id}}
+                <div class="text-center">
+                    <small>
+                        <div v-if="consumableInitialQuantities[{{power.pk}}] != consumableQuantities[{{power.pk}}]" v-html="consumableExpCost[{{power.pk}}]"></div>
+                    </small>
+                </div>
+            </div>
+        </div>
+        <div style="flex: 1;">
+            {% power_badge power %}
+        </div>
+    </div>
+    {% endfor %}
+</div>

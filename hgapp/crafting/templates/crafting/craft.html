@@ -11,7 +11,9 @@
 {% endblock %}
 
 {% block extra_scripts %}
-    <script src="{% static 'powers/vue.global.prod.js' %}"></script>
+<!--    <script src="https://unpkg.com/vue@3.2.26/dist/vue.global.prod.js"></script>-->
+    <script src="{% static 'crafting/vue.global.prod.js' %}"></script>
+    {{page_data|json_script:"pageData"}}
     <script src="{% static 'crafting/crafting.js' %}"></script>
 {% endblock %}
 
@@ -24,27 +26,43 @@
     <div class="text-center">
         <h1>{{character.name}} is crafting</h1>
     </div>
-    <div class="panel panel-default">
-        <div class="panel-body">
-            <form action="{% url 'crafting:crafting_craft' character.id %}" method="post" >
-                {% csrf_token %}
-                {{ artifact_formset.management_form }}
-                {% for form in artifact_formset %}
-                    {{form|bootstrap}}
-                {% endfor %}
-                {% for form in consumable_forms %}
-                    {{form|bootstrap}}
-                {% endfor %}
-
-                <div class="text-center">
-                    <input id="form-submit"
-                           {% if not request.user.is_superuser %} disabled {% endif %}
-                           class="btn btn-primary btn-md"
-                           type="submit"
-                           value="Craft Items" />
+    <form action="{% url 'crafting:crafting_craft' character.id %}" method="post" >
+        {% csrf_token %}
+        <div id="vue-app" class="panel panel-default" style="padding-bottom:15px;">
+            {% if consumable_forms %}
+                {% include 'crafting/consumables.html' %}
+            {% endif %}
+            {% if artifact_formset %}
+                <div class="panel-heading">
+                    <h3 style="margin-top: 5px; margin-bottom: 5px;">Artifact Crafting</h3>
                 </div>
-            </form>
+                <div class="panel-body">
+                </div>
+            {% endif %}
+            <div v-if="Object.entries(consumableNumWouldBeCrafted).length > 0" class="row">
+                <div class="col-xs-12 col-md-8 col-md-offset-2">
+                    <div class="alert alert-info">
+                        <h4 class="text-center" style="margin-top: 0px;">Submitting will craft</h4>
+                        <ul>
+                            <li v-for="(quantity, powerName) in consumableNumWouldBeCrafted">
+                                <b>{powerName}:</b> {quantity}
+                            </li>
+                        </ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="text-center">
+                <input id="form-submit"
+                       {% if not request.user.is_superuser %} disabled {% endif %}
+                       class="btn btn-primary btn-md"
+                       type="submit"
+                       value="Craft Items" />
+                <b>
+                    <div v-html="totalExpCost"></div>
+                </b>
+            </div>
         </div>
-    </div>
+    </form>
 </div>
 {% endblock %}

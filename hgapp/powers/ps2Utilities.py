@@ -83,6 +83,7 @@ def save_gift(request, power_full=None, character=None):
             previous_rev = None
         else:
             previous_rev = power_full.latest_rev
+            power_full.dice_system = SYS_PS2
             power_full.crafting_type = new_power.modality.crafting_type
         _handle_sig_artifact(request, SignatureArtifactForm, power_full, new_power, previous_rev)
         if request.user.is_superuser:

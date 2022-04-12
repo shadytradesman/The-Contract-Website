@@ -663,6 +663,9 @@ class Character(models.Model):
     def spent_rewards_rev_sort(self):
         return self.reward_set.exclude(relevant_power=None).order_by("-assigned_on").all()
 
+    def rewards_spent_since_date(self, date):
+        return self.reward_set.exclude(relevant_power=None, assigned_on__isnull=True).filter(assigned_on__gt=date)
+
     def spent_rewards(self):
         return self.reward_set.exclude(relevant_power=None).order_by("assigned_on", "awarded_on").all()
 

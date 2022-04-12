@@ -808,6 +808,14 @@ class Power_Full(models.Model):
         ]
         verbose_name = "Gift"
 
+    def to_crafting_blob(self):
+        return {
+            "name": self.name,
+            "gift_cost": self.get_gift_cost(),
+            "crafting_type": self.crafting_type,
+        }
+        pass
+
     def delete(self):
         self.character = None
         for reward in self.reward_list():

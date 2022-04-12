@@ -1,4 +1,5 @@
-from collections import defaultdict
+from collections import defaultdict, Counter
+import json
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.forms import formset_factory
@@ -12,8 +13,9 @@ from django.db import transaction
 from characters.models import Artifact, Character
 from powers.models import Power, Power_Full, CRAFTING_ARTIFACT, CRAFTING_CONSUMABLE
 
-from .models import NUM_FREE_CONSUMABLES_PER_DOWNTIME, CraftingEvent, CraftedArtifact
-from .forms import ConsumableCraftingForm, ArtifactCraftingForm
+from .models import NUM_FREE_CONSUMABLES_PER_DOWNTIME, CraftingEvent, CraftedArtifact, \
+    NUM_FREE_CONSUMABLES_PER_REWARD, NUM_FREE_ARTIFACTS_PER_DOWNTIME, NUM_FREE_ARTIFACTS_PER_REWARD
+from .forms import make_consumable_crafting_form, make_artifact_crafting_form
 
 
 @method_decorator(login_required(login_url='account_login'), name='dispatch')
@@ -21,6 +23,11 @@ class Craft(View):
     template_name = 'crafting/craft.html'
     character = None
     attendance = None
+    crafting_events = None
+    prev_crafted_consumables = None
+    prev_crafted_free_consumables = None
+    event_by_power_full = None
+    free_crafts_by_power_full = None
 
     def dispatch(self, *args, **kwargs):
         self.character = get_object_or_404(Character, pk=self.kwargs["character_id"])
@@ -30,6 +37,7 @@ class Craft(View):
         if self.attendance:
             if not self.attendance.is_confirmed:
                 return HttpResponseRedirect(reverse('games:games_confirm_attendance', args=(self.attendance.pk,)))
+        self.crafting_events = self.__get_crafting_events()
         return super().dispatch(*args, **kwargs)
 
     def get(self, request, *args, **kwargs):
@@ -37,65 +45,122 @@ class Craft(View):
 
     def post(self, request, *args, **kwargs):
         with transaction.atomic():
-            pass
-            # = save_gift(request, power_full=self.power_to_edit, character=self.character)
-        return HttpResponseRedirect(reverse('characters:view_character', args=(self.character.pk,)))
+            self.character = Character.objects.select_for_update().get(id=self.character.pk)
+            page_data, consumable_forms = self.__get_page_data_and_forms(request.POST)
+            consumable_forms = [x[0] for x in consumable_forms] # strip the powers out
+            for form in consumable_forms:
+                if not form.is_valid():
+                    raise ValueError("Invalid consumable form")
+            self.__save_consumable_forms(consumable_forms)
+        return HttpResponseRedirect(reverse('characters:characters_view', args=(self.character.pk,)))
 
-    def __get_context_data(self, POST=None):
-        crafting_events = self.__get_crafting_events()
-        event_by_power_full = {ev.relevant_power.pk: ev for ev in crafting_events}
-        power_fulls = self.character.power_full_set.all()
-
-        artifact_formset_initial = []
-        consumable_forms = []
-        consumable_details_by_power = defaultdict(list)
-
-        for power in power_fulls:
-            if power.crafting_type == CRAFTING_ARTIFACT:
-                if power.pk in event_by_power_full:
-                    artifact_formset_initial.append({
-                        "power_full_id": power.pk,
-                        "artifact_id": event_by_power_full[power.pk].pk,
-                        "refund": False,
-                        "upgrade": True,
-                    })
-            if power.crafting_type == CRAFTING_CONSUMABLE:
-                if power.pk in event_by_power_full:
-                    crafted_artifacts = event_by_power_full[power.pk].craftedartifact_set()
-                    quantity_made = 0
-                    for artifact in crafted_artifacts:
-                        quantity_made = quantity_made + artifact.quantity
-                        consumable_details_by_power[power.pk].append({
-                            "owner": artifact.relevant_artifact.character.name,
-                            "name": artifact.relevant_artifact.name,
-                            "quantity": artifact.quantity,
-                            "free_quantity": artifact.quantity_free,
-                        })
-                    consumable_forms.append(ConsumableCraftingForm(POST, initial={
-                        "power_full_id": power.pk,
-                        "num_crafted": quantity_made,
-                    }))
-                else:
-                    consumable_forms.append(ConsumableCraftingForm(POST, initial={
-                        "power_full_id": power.pk,
-                        "num_crafted": NUM_FREE_CONSUMABLES_PER_DOWNTIME,
-                    }))
-
-        ArtifactCraftingFormset = formset_factory(ArtifactCraftingForm, extra=0)
-        artifact_formset = ArtifactCraftingFormset(POST, initial=artifact_formset_initial)
-
-        # artifacts, details
+    def __get_context_data(self):
+        page_data, consumable_forms = self.__get_page_data_and_forms()
         return {
-            "artifact_formset": artifact_formset,
             "consumable_forms": consumable_forms,
-            "consumable_details_by_power": dict(consumable_details_by_power),
+            "page_data": json.dumps(page_data),
             "character": self.character,
         }
 
+    def __save_consumable_forms(self, consumable_forms):
+        for form in consumable_forms:
+            crafted_quant = form.cleaned_data["num_crafted"]
+            power_id = form.cleaned_data["power_full_id"]
+            power = get_object_or_404(Power_Full, power_id)
+            prev_quantity = self.prev_crafted_consumables[power_id]
+            newly_crafted = crafted_quant - prev_quantity
+            if power_id in self.event_by_power_full:
+                # update an existing event
+                if newly_crafted < 0:
+                    self.event_by_power_full[power_id].refund_crafted_consumables(
+                        number_to_refund=-newly_crafted,
+                        exp_cost_per=power.get_gift_cost())
+                if newly_crafted > 0:
+                    number_free = max(self.free_crafts_by_power_full[power.pk] - prev_quantity, newly_crafted)
+                    self.event_by_power_full[power_id].craft_new_consumables(
+                        number_newly_crafted=newly_crafted,
+                        exp_cost_per=power.get_gift_cost(),
+                        number_free=number_free,
+                    )
+            else:
+                # No existing event
+                if newly_crafted < 0:
+                    raise ValueError("wanted to refund consumables, but no consumables to refund.")
+                if newly_crafted > 0:
+                    pass
+                    # create new crafting event for consumables
+
+
+
+
+    def __get_page_data_and_forms(self, POST=None):
+        self.prev_crafted_consumables = Counter()
+        self.prev_crafted_free_consumables = Counter()
+        self.event_by_power_full = {ev.relevant_power_id: ev for ev in self.crafting_events}
+        self.free_crafts_by_power_full = Counter()
+
+        consumable_forms = []
+        consumable_details_by_power = defaultdict(list)
+        initial_consumable_counts = {}
+
+        power_fulls = self.character.power_full_set.all()
+
+        # free crafting from rewards
+        latest_end_game = self.attendance.relevant_game.end_time
+        free_crafting_rewards = self.character.rewards_spent_since_date(latest_end_game) \
+            .filter(relevant_power__parent_power__crafting_type__in=[CRAFTING_CONSUMABLE, CRAFTING_ARTIFACT]).all()
+        for reward in free_crafting_rewards:
+            power = reward.relevant_power
+            if power.parent_power.crafting_type == CRAFTING_CONSUMABLE:
+                self.free_crafts_by_power_full[power.parent_power.pk] += NUM_FREE_CONSUMABLES_PER_REWARD
+            if power.parent_power.crafting_type == CRAFTING_ARTIFACT:
+                self.free_crafts_by_power_full[power.parent_power.pk] += NUM_FREE_ARTIFACTS_PER_REWARD
+
+        for power in power_fulls:
+            print(power.crafting_type)
+            if power.crafting_type == CRAFTING_CONSUMABLE:
+                self.free_crafts_by_power_full[power.pk] += NUM_FREE_CONSUMABLES_PER_DOWNTIME
+                print("Consumable crafting")
+                if power.pk in self.event_by_power_full:
+                    crafted_artifacts = self.event_by_power_full[power.pk].craftedartifact_set()
+                    for artifact_craft in crafted_artifacts:
+                        self.prev_crafted_consumables[power.pk] += artifact_craft.quantity
+                        self.prev_crafted_free_consumables[power.pk] += artifact_craft.quantity_free
+                        consumable_details_by_power[power.pk].append({
+                            "owner": artifact_craft.relevant_artifact.character.name,
+                            "name": artifact_craft.relevant_artifact.name,
+                            "quantity": artifact_craft.quantity,
+                            "free_quantity": artifact_craft.quantity_free,
+                        })
+                initial_craft_quantity = max(self.prev_crafted_consumables[power.pk],
+                                             self.free_crafts_by_power_full[power.pk])
+                initial_consumable_counts[power.pk] = initial_craft_quantity
+                consumable_form = make_consumable_crafting_form(power)(POST, initial={
+                    "power_full_id": power.pk,
+                    "num_crafted": initial_craft_quantity,
+                })
+                consumable_forms.append([consumable_form, power])
+            if power.crafting_type == CRAFTING_ARTIFACT:
+                self.free_crafts_by_power_full[power.pk] += NUM_FREE_ARTIFACTS_PER_DOWNTIME
+
+        page_data = {
+            "prev_crafted_consumables": self.prev_crafted_consumables,
+            "initial_consumable_counts": initial_consumable_counts,
+            "free_crafts_by_power_full": self.free_crafts_by_power_full,
+            "consumable_details_by_power": dict(consumable_details_by_power),
+            "power_by_pk": {p.pk: p.to_crafting_blob() for p in power_fulls},
+        }
+        return page_data, consumable_forms
+
     def __get_crafting_events(self):
         if self.attendance:
-            return CraftingEvent.objects.filter(relevant_attendance=self.attendance).all()
+            return CraftingEvent.objects.filter(relevant_attendance=self.attendance)\
+                .prefetch_related("craftedartifact_set") \
+                .prefetch_related("relevant_power_full")\
+                .all()
         else:
-            return CraftingEvent.objects.filter(relevant_character=self.character, is_pre_imbue=True).all()
+            return CraftingEvent.objects.filter(relevant_character=self.character, is_pre_imbue=True) \
+                .prefetch_related("relevant_power_full")\
+                .all()
 
 
