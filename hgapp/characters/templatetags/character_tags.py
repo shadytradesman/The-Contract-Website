@@ -6,8 +6,26 @@ from django.urls import reverse
 
 register = template.Library()
 
-@register.inclusion_tag('characters/view_pages/sig_item_snip.html', takes_context=True)
-def render_sig_item(context, artifact, user, viewing_character=None):
+@register.inclusion_tag('characters/view_pages/consumable_item_snip.html')
+def render_consumable(artifact, user):
+    if not artifact.is_consumable:
+        raise ValueError("attempting to display non-consumable artifact as consumable")
+    can_use = artifact.character.player_can_edit(user)
+    #get form for using
+    return {
+        "artifact": artifact,
+        "user": user,
+        "can_use": can_use,
+    }
+
+
+
+
+@register.inclusion_tag('characters/view_pages/sig_item_snip.html')
+def render_sig_item(artifact, user, viewing_character=None):
+    if not artifact.is_signature:
+        # TODO: May re-use most of this for crafted artifacts
+        raise ValueError("attempting to display non-signature artifact as signature")
     latest_transfer = artifact.get_latest_transfer()
     can_edit = artifact.character.player_can_edit(user)
     edit_form = None

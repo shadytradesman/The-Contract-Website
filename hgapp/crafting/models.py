@@ -82,7 +82,7 @@ class CraftingEvent(models.Model):
             crafted_artifact.save()
         self.save()
 
-    def craft_new_consumables(self, number_newly_crafted, new_number_free, exp_cost_per):
+    def craft_new_consumables(self, number_newly_crafted, new_number_free, exp_cost_per, power_full):
         paid_crafted = number_newly_crafted - new_number_free
         crafted_artifacts = self.craftedartifact_set.prefetch_related("relevant_artifact").all()
         crafter_held_crafted_artifact = None
@@ -113,6 +113,10 @@ class CraftingEvent(models.Model):
                 quantity=paid_crafted + new_number_free,
                 quantity_free=new_number_free,
                 exp_spent=paid_crafted * exp_cost_per,)
+            power_full.artifacts.add(new_artifact)
+            power_full.latest_rev.artifacts.add(new_artifact)
+            power_full.latest_rev.save()
+            power_full.save()
         self.total_exp_spent += (paid_crafted * exp_cost_per)
         self.save()
 

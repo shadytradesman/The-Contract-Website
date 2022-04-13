@@ -82,7 +82,8 @@ class Craft(View):
                     self.event_by_power_full[power_id].craft_new_consumables(
                         number_newly_crafted=newly_crafted,
                         exp_cost_per=power.get_gift_cost(),
-                        new_number_free=number_free,)
+                        new_number_free=number_free,
+                        power_full=power)
             else:
                 # No existing event
                 if newly_crafted < 0:
@@ -96,7 +97,8 @@ class Craft(View):
                     crafting_event.craft_new_consumables(
                         number_newly_crafted=newly_crafted,
                         exp_cost_per=power.get_gift_cost(),
-                        number_free=number_free)
+                        new_number_free=number_free,
+                        power_full=power)
 
     def __get_page_data_and_forms(self, POST=None):
         self.prev_crafted_consumables = Counter()

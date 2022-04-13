@@ -223,7 +223,6 @@ def view_character(request, character_id, secret_key=None):
     new_powers = character.power_full_set.filter(dice_system=SYS_PS2, crafting_type=CRAFTING_NONE).all()
     crafting_artifact_gifts = character.power_full_set.filter(dice_system=SYS_PS2, crafting_type=CRAFTING_ARTIFACT).all()
     crafting_consumable_gifts = character.power_full_set.filter(dice_system=SYS_PS2, crafting_type=CRAFTING_CONSUMABLE).all()
-    signature_item_gifts = character.power_full_set.filter(dice_system=SYS_PS2, crafting_type=CRAFTING_SIGNATURE).all()
 
     char_ability_values = character.get_abilities()
     ability_value_by_id = {}
@@ -276,12 +275,18 @@ def view_character(request, character_id, secret_key=None):
     artifacts = get_world_element_default_dict(world_element_cell_choices)
     signature_items = []
     lost_signature_items = []
+    consumables = []
+    crafted_artifacts = []
     for artifact in character.artifact_set.all():
         if hasattr(artifact, "cell") and artifact.cell:
             artifacts[artifact.cell].append(artifact)
-        else:
+        elif artifact.is_signature:
             signature_items.append(artifact)
-    for artifact in Artifact.objects.filter(crafting_character = character, is_signature=True).all():
+        elif artifact.is_consumable:
+            consumables.append(artifact)
+        else:
+            crafted_artifacts.append(artifact)
+    for artifact in Artifact.objects.filter(crafting_character=character, is_signature=True).all():
         if artifact.character is not None and artifact.character != character:
             lost_signature_items.append(artifact)
     artifacts = dict(artifacts)
@@ -342,8 +347,8 @@ def view_character(request, character_id, secret_key=None):
         'new_powers': new_powers,
         'crafting_artifact_gifts': crafting_artifact_gifts,
         'crafting_consumable_gifts': crafting_consumable_gifts,
-        'signature_item_gifts': signature_item_gifts,
         'signature_items': signature_items,
+        'consumables': consumables,
         'lost_signature_items': lost_signature_items,
     }
     return render(request, 'characters/view_pages/view_character.html', context)
