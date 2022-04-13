@@ -5,7 +5,7 @@ import logging
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.utils.datetime_safe import datetime
 from django.utils import timezone
 from guardian.shortcuts import assign_perm, remove_perm
@@ -272,6 +272,7 @@ PORTED_EXP_ADJUSTMENT = {
     VETERAN_PORTED: 180,
 }
 
+
 def random_string():
     return hashlib.sha224(bytes(random.randint(1, 99999999))).hexdigest()
 
@@ -509,7 +510,6 @@ class Character(models.Model):
 
     def _update_loss_count(self):
         self.num_losses = get_queryset_size(self.game_attendance_set.filter(is_confirmed=True, outcome="LOSS"))
-
 
     def number_completed_games_in_home_cell(self):
         if not hasattr(self, "cell") or not self.cell:
@@ -828,7 +828,8 @@ class Character(models.Model):
         return int(total_exp) + PORTED_EXP_ADJUSTMENT[self.ported]
 
     def exp_cost(self):
-        return self.stats_snapshot.exp_cost
+        crafting_cost = self.craftingevent_set.aggregate(Sum('total_exp_spent'))['total_exp_spent__sum']
+        return self.stats_snapshot.exp_cost + crafting_cost
 
     def ability_maximum(self):
         if self.status == HIGH_ROLLER_STATUS[3][0] or self.status == HIGH_ROLLER_STATUS[4][0] or self.ported != NOT_PORTED:
@@ -1100,7 +1101,7 @@ class WorldElement(models.Model):
     system = models.CharField(max_length=1000, blank=True)
     created_time = models.DateTimeField(auto_now_add=True, null=True) #null because added in migration
     is_deleted = models.BooleanField(default=False)
-    deleted_date = models.DateTimeField(null=True)
+    deleted_date = models.DateTimeField(null=True, blank=True)
 
     # when cell is null, element is created by gift system
     cell = models.ForeignKey(Cell,

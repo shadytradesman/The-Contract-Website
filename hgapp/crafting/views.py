@@ -2,7 +2,6 @@ from collections import defaultdict, Counter
 import json
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django.forms import formset_factory
 from django.views import View
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, get_object_or_404
@@ -66,9 +65,13 @@ class Craft(View):
         for form in consumable_forms:
             crafted_quant = form.cleaned_data["num_crafted"]
             power_id = form.cleaned_data["power_full_id"]
-            power = get_object_or_404(Power_Full, power_id)
+            power = get_object_or_404(Power_Full, pk=power_id)
             prev_quantity = self.prev_crafted_consumables[power_id]
             newly_crafted = crafted_quant - prev_quantity
+            number_free = max(min(self.free_crafts_by_power_full[power.pk] - prev_quantity, newly_crafted), 0)
+            print("MAP: ")
+            print(self.event_by_power_full)
+            print(power_id)
             if power_id in self.event_by_power_full:
                 # update an existing event
                 if newly_crafted < 0:
@@ -76,27 +79,29 @@ class Craft(View):
                         number_to_refund=-newly_crafted,
                         exp_cost_per=power.get_gift_cost())
                 if newly_crafted > 0:
-                    number_free = max(self.free_crafts_by_power_full[power.pk] - prev_quantity, newly_crafted)
                     self.event_by_power_full[power_id].craft_new_consumables(
                         number_newly_crafted=newly_crafted,
                         exp_cost_per=power.get_gift_cost(),
-                        number_free=number_free,
-                    )
+                        new_number_free=number_free,)
             else:
                 # No existing event
                 if newly_crafted < 0:
                     raise ValueError("wanted to refund consumables, but no consumables to refund.")
                 if newly_crafted > 0:
-                    pass
-                    # create new crafting event for consumables
-
-
-
+                    crafting_event = CraftingEvent.objects.create(
+                        relevant_attendance=self.attendance,
+                        relevant_character=self.character,
+                        relevant_power=power.latest_rev,
+                        relevant_power_full=power)
+                    crafting_event.craft_new_consumables(
+                        number_newly_crafted=newly_crafted,
+                        exp_cost_per=power.get_gift_cost(),
+                        number_free=number_free)
 
     def __get_page_data_and_forms(self, POST=None):
         self.prev_crafted_consumables = Counter()
         self.prev_crafted_free_consumables = Counter()
-        self.event_by_power_full = {ev.relevant_power_id: ev for ev in self.crafting_events}
+        self.event_by_power_full = {ev.relevant_power_full_id: ev for ev in self.crafting_events}
         self.free_crafts_by_power_full = Counter()
 
         consumable_forms = []
@@ -117,12 +122,10 @@ class Craft(View):
                 self.free_crafts_by_power_full[power.parent_power.pk] += NUM_FREE_ARTIFACTS_PER_REWARD
 
         for power in power_fulls:
-            print(power.crafting_type)
             if power.crafting_type == CRAFTING_CONSUMABLE:
                 self.free_crafts_by_power_full[power.pk] += NUM_FREE_CONSUMABLES_PER_DOWNTIME
-                print("Consumable crafting")
                 if power.pk in self.event_by_power_full:
-                    crafted_artifacts = self.event_by_power_full[power.pk].craftedartifact_set()
+                    crafted_artifacts = self.event_by_power_full[power.pk].craftedartifact_set.all()
                     for artifact_craft in crafted_artifacts:
                         self.prev_crafted_consumables[power.pk] += artifact_craft.quantity
                         self.prev_crafted_free_consumables[power.pk] += artifact_craft.quantity_free

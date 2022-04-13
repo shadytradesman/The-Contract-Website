@@ -43,15 +43,6 @@ class CraftingEvent(models.Model):
             models.Index(fields=['relevant_character']),
         ]
 
-    def change_quantity_crafted(self, number_newly_crafted, exp_cost_per):
-        # number newly crafted can be negative, meaning that the consumables are to be refunded.
-        if number_newly_crafted == 0:
-            return
-        if number_newly_crafted < 0:
-            self.__refund_crafted_consumables(-number_newly_crafted, exp_cost_per)
-        if number_newly_crafted > 0:
-            self.__craft_new_consumables(number_newly_crafted, exp_cost_per)
-
     def refund_crafted_consumables(self, number_to_refund, exp_cost_per):
         remaining_to_refund = number_to_refund
         crafted_artifacts = self.craftedartifact_set.prefetch_related("relevant_artifact").all()
@@ -60,7 +51,7 @@ class CraftingEvent(models.Model):
         for crafted_artifact in crafted_artifacts:
             if remaining_to_refund == 0:
                 break
-            num_refunded = min(crafted_artifact.quantity, remaining_to_refund)
+            num_refunded = min(crafted_artifact.quantity - crafted_artifact.quantity_free, remaining_to_refund)
             crafted_artifact.quantity -= num_refunded
             num_refunded_by_crafted_artifact_id[crafted_artifact.pk] += num_refunded
             remaining_to_refund -= num_refunded
@@ -73,6 +64,7 @@ class CraftingEvent(models.Model):
             num_refunded = min(crafted_artifact.quantity_free, remaining_to_refund)
             num_refunded_by_crafted_artifact_id[crafted_artifact.pk] += num_refunded
             crafted_artifact.quantity_free -= num_refunded
+            crafted_artifact.quantity -= num_refunded
             remaining_to_refund -= num_refunded
         # correctness checking
         if remaining_to_refund != 0:
@@ -90,7 +82,8 @@ class CraftingEvent(models.Model):
             crafted_artifact.save()
         self.save()
 
-    def craft_new_consumables(self, number_newly_crafted, number_free, exp_cost_per):
+    def craft_new_consumables(self, number_newly_crafted, new_number_free, exp_cost_per):
+        paid_crafted = number_newly_crafted - new_number_free
         crafted_artifacts = self.craftedartifact_set.prefetch_related("relevant_artifact").all()
         crafter_held_crafted_artifact = None
         for crafted_artifact in crafted_artifacts:
@@ -98,13 +91,30 @@ class CraftingEvent(models.Model):
                 crafter_held_crafted_artifact = crafted_artifact
                 break
         if crafter_held_crafted_artifact:
-            crafter_held_crafted_artifact.quantity_free
-            # add to existing
-            pass
-        else:
-            pass
-            # make one that we hold
+            crafter_held_crafted_artifact.quantity_free += new_number_free
+            crafter_held_crafted_artifact.quantity += paid_crafted + new_number_free
+            crafter_held_crafted_artifact.exp_spent += (paid_crafted * exp_cost_per)
+            crafter_held_crafted_artifact.save()
 
+            crafter_held_crafted_artifact.relevant_artifact.quantity += number_newly_crafted
+            crafter_held_crafted_artifact.relevant_artifact.save()
+        else:
+            new_artifact = Artifact.objects.create(
+                name=self.relevant_power.name,
+                description=self.relevant_power.description,
+                crafting_character=self.relevant_character,
+                character=self.relevant_character,
+                creating_player=self.relevant_character.player,
+                is_consumable=True,
+                quantity=number_newly_crafted,)
+            CraftedArtifact.objects.create(
+                relevant_artifact=new_artifact,
+                relevant_crafting=self,
+                quantity=paid_crafted + new_number_free,
+                quantity_free=new_number_free,
+                exp_spent=paid_crafted * exp_cost_per,)
+        self.total_exp_spent += (paid_crafted * exp_cost_per)
+        self.save()
 
 
 # Exists so we can figure out which artifacts were crafted in an event. Useful when changing attendances of characters.
@@ -112,8 +122,8 @@ class CraftingEvent(models.Model):
 class CraftedArtifact(models.Model):
     relevant_artifact = models.ForeignKey(Artifact, on_delete=models.CASCADE)
     relevant_crafting = models.ForeignKey(CraftingEvent, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField(default=1)
-    quantity_free = models.PositiveIntegerField(default=0)  # Free crafted items are voided when gifts are changed.
+    quantity = models.PositiveIntegerField(default=1) # actual number
+    quantity_free = models.PositiveIntegerField(default=0)  # number of quantity that were free. this <= quantity
     is_refundable = models.BooleanField(default=True)
     exp_spent = models.PositiveIntegerField(default=0)  # For easy Exp calculations?
 
@@ -127,3 +137,7 @@ class CraftedArtifact(models.Model):
             models.Index(fields=['is_refundable']),
         ]
 
+    def save(self, *args, **kwargs):
+        if self.quantity_free > self.quantity:
+            raise ValueError("A consumable crafted cannot have more free than quantity")
+        super().save(*args, **kwargs)

@@ -48,7 +48,18 @@
                                 <b>{powerName}:</b> {quantity}
                             </li>
                         </ul>
-
+                    </div>
+                </div>
+            </div>
+            <div v-if="Object.entries(consumableNumWouldBeRefunded).length > 0" class="row">
+                <div class="col-xs-12 col-md-8 col-md-offset-2">
+                    <div class="alert alert-info">
+                        <h4 class="text-center" style="margin-top: 0px;">Submitting will remove</h4>
+                        <ul>
+                            <li v-for="(quantity, powerName) in consumableNumWouldBeRefunded">
+                                <b>{powerName}:</b> {-quantity}
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>

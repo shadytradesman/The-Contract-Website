@@ -1,4 +1,5 @@
 let pageData = JSON.parse(JSON.parse(document.getElementById('pageData').textContent));
+console.log(pageData);
 
 function displayCost(cost) {
     let prefix =  cost >= 0 ? "-" : "+";
@@ -17,6 +18,7 @@ const CraftingRendering = {
       consumableExpCost: {},
       consumableNumFree: {},
       consumableNumWouldBeCrafted: {},
+      consumableNumWouldBeRefunded: {},
       totalExpCost: "",
     }
   },
@@ -52,13 +54,11 @@ const CraftingRendering = {
         for (const [powerId, numCrafted] of Object.entries(this.consumableQuantities)) {
             this.consumableExpCost[powerId] = 0;
             this.consumableNumWouldBeCrafted = {};
+            this.consumableNumWouldBeRefunded = {};
             let numPaidConsumables = Math.max(numCrafted - this.consumableNumFree[powerId], 0);
-            let diffFromInitial = numCrafted - this.consumableInitialQuantities[powerId];
-            let numEffectiveDiff = Math.min(Math.abs(diffFromInitial), numPaidConsumables);
-            let expDiff = numEffectiveDiff * Math.max(0, pageData["power_by_pk"][powerId]["gift_cost"]);
-            if (diffFromInitial < 0) {
-                expDiff = expDiff * -1;
-            }
+            let numInitialPaidConsumables = Math.max(this.consumableInitialQuantities[powerId] - this.consumableNumFree[powerId], 0);
+            let expMultiple = Math.max(0, pageData["power_by_pk"][powerId]["gift_cost"]);
+            let expDiff = (numPaidConsumables - numInitialPaidConsumables) * expMultiple
             totalCost += expDiff;
             this.consumableExpCost[powerId] = displayCost(expDiff);
 
@@ -67,8 +67,11 @@ const CraftingRendering = {
                 prevCrafted = 0;
             }
             let toCraftQuantity = numCrafted - prevCrafted;
-            if (toCraftQuantity != 0) {
+            if (toCraftQuantity > 0) {
                 this.consumableNumWouldBeCrafted[pageData["power_by_pk"][powerId]["name"]] = toCraftQuantity;
+            }
+            if (toCraftQuantity < 0) {
+                this.consumableNumWouldBeRefunded[pageData["power_by_pk"][powerId]["name"]] = toCraftQuantity;
             }
         }
         this.totalExpCost = displayCost(totalCost);
