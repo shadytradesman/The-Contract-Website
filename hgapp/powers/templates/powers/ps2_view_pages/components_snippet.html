@@ -1,34 +1,31 @@
-<div class="pull-right">
-    <span style="border-radius: 3px; padding: 3px; background-color: #20252d;">
-        <span data-html="true" class="has-popover"><b>Cost: {{power.get_gift_cost}}</b>
+<div style="height: 25px; margin-top: -5px; margin-bottom: 5px;">
+    <span
+            data-title="{{power.get_gift_cost}}"
+            data-original-title="Gift cost: {{power.get_gift_cost}}"
+            data-toggle="tooltip"
+            class="has-popover"
+            style="border-radius: 3px; background-color: #20252d;display:inline-block; height: 25px; position:relative; top: 3px;" >
+        <span style="font-size: 18px; height: 25px; display: inline-block;  padding: 5px;"><b style="position:relative; bottom: 5px;">{{power.get_gift_cost}}</b>
         </span>
     </span>
-</div>
-{% if power.required_status == "SEASONED" or power.required_status == "VETERAN" %}
-    <div class="pull-right {% if show_status_warning %} text-danger {% else %} text-muted {% endif %}"
-         data-toggle="tooltip"
-         title="Seasoned = 10+ Victories. Veteran = 25+ Victories"
-         style="margin-right: 3px;">
-        <i>Requires <b>{{power.get_required_status_display}}</b></i>
-    </div>
-{% endif %}
-<div>
     <span
             data-title="{{power.modality.name}}"
             data-original-title="{{power.modality.name}}"
             data-toggle="tooltip"
-            class="has-popover" >
+            class="has-popover"
+            style=" height: 25px; display: inline-block;">
         {% if power.modality.icon %}
-            <img src="{{power.modality.icon.url}}" width="25" height="25" >
+            <img src="{{power.modality.icon.url}}" width="25px" height="25px" style="vertical-align: text-bottom;">
         {% endif %}
     </span>
     <span
         data-title="{{power.base.name}}"
         data-original-title="{{power.base.name}}"
         data-toggle="tooltip"
-        class="has-popover">
+        class="has-popover"
+        style=" height: 25px; display: inline-block;">
         {% if power.base.icon %}
-            <img src="{{power.base.icon.url}}" width="25" height="25" >
+            <img src="{{power.base.icon.url}}" width="25px" height="25px" style="vertical-align: text-bottom;" >
         {% endif %}
     </span>
     {% if power.shouldDisplayVector %}
@@ -36,9 +33,10 @@
             data-title="{{power.vector.name}}"
             data-original-title="{{power.vector.name}}"
             data-toggle="tooltip"
-            class="has-popover">
+            class="has-popover"
+            style=" height: 25px; display: inline-block;">
             {% if power.vector.icon %}
-                <img src="{{power.vector.icon.url}}" width="25" height="25" >
+                <img src="{{power.vector.icon.url}}" width="25px" height="25px" style="vertical-align: text-bottom;">
             {% endif %}
         </span>
     {% endif %}
@@ -49,7 +47,8 @@
             data-title="{{power.get_enhancement_list|safe}}"
             data-original-title="{{power.get_enhancement_list|safe}}"
             data-placement="bottom"
-            data-toggle="tooltip">
+            data-toggle="tooltip"
+            style=" height: 25px; display: inline-block; position: relative; bottom: 5px;">
                 <span style="position:relative; left: 1px; top: 3px; font-size: 18px; line-height: 1;">
                     {{ power.get_num_enhancements }}
                 </span>
@@ -64,12 +63,21 @@
             data-title="{{power.get_drawback_list|safe}}"
             data-original-title="{{power.get_drawback_list|safe}}"
             data-placement="bottom"
-            data-toggle="tooltip">
+            data-toggle="tooltip"
+            style=" height: 25px; display: inline-block;  position: relative; bottom: 5px;">
                 <span style="position:relative; left: 1px; top: 3px; font-size: 18px; line-height: 1;">
                     {{ power.get_num_drawbacks }}
                 </span>
                 <span class="glyphicon glyphicon-menu-down">
                 </span>
             </span>
+    {% endif %}
+    {% if power.required_status == "SEASONED" or power.required_status == "VETERAN" %}
+    <div class="{% if show_status_warning %} text-danger {% else %} text-muted {% endif %}"
+         data-toggle="tooltip"
+         title="Seasoned = 10+ Victories. Veteran = 25+ Victories"
+         style="display: inline-block; margin-left: 3px; position: relative; bottom: 3px;">
+        <i>Requires <b>{{power.get_required_status_display}}</b></i>
+    </div>
     {% endif %}
 </div>

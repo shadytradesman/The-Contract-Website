@@ -11,11 +11,13 @@ def render_consumable(artifact, user):
     if not artifact.is_consumable:
         raise ValueError("attempting to display non-consumable artifact as consumable")
     can_use = artifact.character.player_can_edit(user)
+    power = artifact.power_set.first()
     #get form for using
     return {
         "artifact": artifact,
         "user": user,
         "can_use": can_use,
+        "power": power,
     }
 
 

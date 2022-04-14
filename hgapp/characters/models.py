@@ -829,7 +829,7 @@ class Character(models.Model):
 
     def exp_cost(self):
         crafting_cost = self.craftingevent_set.aggregate(Sum('total_exp_spent'))['total_exp_spent__sum']
-        return self.stats_snapshot.exp_cost + crafting_cost
+        return self.stats_snapshot.exp_cost + crafting_cost if crafting_cost else self.stats_snapshot.exp_cost
 
     def ability_maximum(self):
         if self.status == HIGH_ROLLER_STATUS[3][0] or self.status == HIGH_ROLLER_STATUS[4][0] or self.ported != NOT_PORTED:

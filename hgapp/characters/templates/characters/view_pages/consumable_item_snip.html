@@ -1,3 +1,38 @@
 {% load power_tags %}
-<div class="css-consumable-item">
+<div  style="display: flex;  align-items: stretch; max-width: 100%;">
+    <div class="css-consumable-item" style="display: inline-block;flex:1; padding: 0px;">
+        {% power_rev_badge power True %}
+    </div>
+    <div class="css-consumable-item" style="display: inline-block; margin-left: 5px; ">
+        <div data-title="Consumable quantity: {{artifact.quantity}}"
+            data-toggle="tooltip"
+             class="text-center">
+            <span style="border: 1px solid white; border-radius: 3px; padding: 5px; ">
+                {% if power.modality.icon %}
+                    <img src="{{power.modality.icon.url}}" width="15px" height="15px" style="vertical-align: text-top;">
+                {% endif %}
+                <span style="font-size: 16px;">
+                    {{artifact.quantity}}
+                </span>
+            </span>
+        </div>
+        <div class="text-center" style="margin-top: 10px;">
+            <button class="btn btn-sm btn-default js-transfer-artifact-button"
+                    data-id="{{item.id}}"
+                    data-title="Transfer/Trade"
+                    data-toggle="tooltip"
+                    style="">
+                <span class="glyphicon glyphicon-transfer" aria-hidden="true"></span>
+            </button>
+        </div>
+        <div class="text-center"  style="margin-top: 5px;">
+            <button class="btn btn-sm btn-default js-transfer-artifact-button"
+                    data-id="{{item.id}}"
+                    data-title="Transfer/Trade"
+                    data-toggle="tooltip"
+                    style="">
+                <span class="glyphicon glyphicon-transfer" aria-hidden="true"></span>
+            </button>
+        </div>
+    </div>
 </div>
