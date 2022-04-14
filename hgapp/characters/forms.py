@@ -460,3 +460,6 @@ def make_transfer_artifact_form(character, cell=None):
                                required=False)
 
     return TransferArtifactForm
+
+class UseConsumableForm(forms.Form):
+    pass

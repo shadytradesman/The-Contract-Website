@@ -21,8 +21,9 @@
                 </i>
             </small>
         </h3>
-        <div class="pull-right">
-            <span style="border-radius: 3px; padding: 4px; background-color: #20252d; font-size: 14px;">
+        <div>
+            <div class="" style="display: inline-block;">
+            <span style="border-radius: 3px; padding: 4px; background-color: #20252d; font-size: 14px; margin-right: 3px;">
                 <span data-html="true"
                       v-bind:data-original-title="giftCostTooltip"
                       v-bind:data-title="giftCostTooltip"
@@ -33,18 +34,7 @@
 
                 </span>
             </span>
-        </div>
-        <div v-if="requiredStatus"
-             class="pull-right text-muted"
-             data-toggle="tooltip"
-             data-html="true"
-             :class="{'text-danger': !requiredStatusSatisfied}"
-             v-bind:data-title="'Reason: ' + requiredStatusReason + '<br>Seasoned = 10+ Victories.<br>Veteran = 25+ Victories'"
-             v-bind:data-original-title="'Reason: ' +requiredStatusReason + '<br>Seasoned = 10+ Victories.<br>Veteran = 25+ Victories'"
-            style="margin-right: 3px; font-size: 14px;">
-            <i>Requires <b>{requiredStatus}</b></i>
-        </div>
-        <div>
+            </div>
             <span
                     v-if="selectedModality"
                     v-bind:data-title="selectedModality.displayName"
@@ -99,6 +89,16 @@
                 <span class="glyphicon glyphicon-menu-down">
                 </span>
             </span>
+            <div v-if="requiredStatus"
+                 class="text-muted"
+                 data-toggle="tooltip"
+                 data-html="true"
+                 :class="{'text-danger': !requiredStatusSatisfied}"
+                 v-bind:data-title="'Reason: ' + requiredStatusReason + '<br>Seasoned = 10+ Victories.<br>Veteran = 25+ Victories'"
+                 v-bind:data-original-title="'Reason: ' +requiredStatusReason + '<br>Seasoned = 10+ Victories.<br>Veteran = 25+ Victories'"
+                 style="margin-left: 3px; font-size: 14px; display: inline-block;">
+                <i>Requires <b>{requiredStatus}</b></i>
+            </div>
         </div>
         <span>
             <i>

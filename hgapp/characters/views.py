@@ -593,6 +593,23 @@ def character_timeline(request, character_id):
     return render(request, 'characters/character_timeline.html', context)
 
 
+def use_consumable(request, artifact_id):
+    if request.method == "POST":
+        artifact = get_object_or_404(Artifact, id=artifact_id)
+        if not artifact.character:
+            raise ValueError("Artifact has no character and cannot be transferred")
+        __check_edit_perms(request, artifact.character)
+        form = make_transfer_artifact_form(artifact.character, artifact.character.cell)(request.POST)
+        if form.is_valid():
+            with transaction.atomic():
+                artifact = Artifact.objects.select_for_update().get(pk=artifact_id)
+                artifact.transfer_to_character(
+                    transfer_type=form.cleaned_data["transfer_type"],
+                    to_character=form.cleaned_data["to_character"],
+                    notes=form.cleaned_data["notes"] if "notes" in form.cleaned_data else "",)
+    return HttpResponseRedirect(reverse('characters:characters_artifact_view', args=(artifact_id,)))
+
+
 def transfer_artifact(request, artifact_id):
     if request.method == "POST":
         artifact = get_object_or_404(Artifact, id=artifact_id)

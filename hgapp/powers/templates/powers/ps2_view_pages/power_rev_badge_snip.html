@@ -1,6 +1,12 @@
 <div
-        class="panel-heading"
-        style="background-color: #353e4b; padding-bottom: 5px;">
+        class="panel-heading power-badge"
+        style="background-color: #353e4b; padding: 10px;"
+    id="collapse-power-{{latest_revision.id}}-heading"
+         role="button" data-toggle="collapse"
+         data-target=".collapse-power-{{latest_revision.id}}"
+         aria-expanded="false"
+         aria-controls="collapse-power-{{latest_revision.id}}">
+    <div >
     <h4 style="font-size: 20px; margin-top: 0px; margin-bottom: 5px;">
         {% if user_can_edit and available_gift and not discovery_page %}
         <a href="{% url 'powers:powers_edit_ps2' power_full.id %}"
@@ -27,22 +33,17 @@
         </small>
     </div>
     {% endif %}
-    <div id="collapse-power-{{latest_revision.id}}-heading"
-         role="button" data-toggle="collapse"
-         data-target=".collapse-power-{{latest_revision.id}}"
-         aria-expanded="false"
-         aria-controls="collapse-power-{{latest_revision.id}}">
         {% with latest_revision as power %}
-        {% include "powers/ps2_view_pages/components_snippet.html" %}
+            {% include "powers/ps2_view_pages/components_snippet.html" %}
         {% endwith %}
         {% if not discovery_page %}
         <div class="text-danger">
             <small>
                 {% if power_full.character or force_show_warnings %}
                 {% if not power_full.at_least_one_gift_assigned %}
-                No Gifts assigned!
+                    No Gifts assigned!
                 {% elif power_full.get_gift_cost > power_full.reward_count %}
-                {{power_full.reward_count }} Reward{{ power_full.reward_count| pluralize}} assigned
+                    Only {{power_full.reward_count }} Reward{{ power_full.reward_count| pluralize}} assigned
                 {% endif %}
                 {% endif %}
             </small>
@@ -56,7 +57,7 @@
                 <div class="text-muted" style="display: inline-block;">
                     {{ latest_revision.gift_summary|safe }}
                 </div>
-                <div class="hidden-xs" style="text-align: right; flex: 1;">
+                <div class="hidden-xs" style="text-align: left; flex: 1;">
                     <small class="visible-sm-inline-block text-center"><i>(Tap to show system)</i></small>
                     <small class="visible-md-inline-block visible-lg-inline-block text-center"><i>(Click to show system)</i></small>
                 </div>
@@ -65,7 +66,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 <div
