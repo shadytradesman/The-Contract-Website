@@ -22,7 +22,7 @@ from powers.models import Power_Full, SYS_LEGACY_POWERS, SYS_PS2, CRAFTING_NONE,
 from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, get_ability_form, \
     AssetForm, LiabilityForm, BattleScarForm, TraumaForm, InjuryForm, SourceValForm, make_allocate_gm_exp_form, EquipmentForm,\
     DeleteCharacterForm, BioForm, make_world_element_form, get_default_scar_choice_field, make_artifact_status_form, \
-    make_transfer_artifact_form
+    make_transfer_artifact_form, make_consumable_use_form
 from characters.form_utilities import get_edit_context, character_from_post, update_character_from_post, \
     grant_trauma_to_character, delete_trauma_rev, get_world_element_class_from_url_string
 from characters.view_utilities import get_characters_next_journal_credit, get_world_element_default_dict, get_weapons_by_type
@@ -599,15 +599,15 @@ def use_consumable(request, artifact_id):
         if not artifact.character:
             raise ValueError("Artifact has no character and cannot be transferred")
         __check_edit_perms(request, artifact.character)
-        form = make_transfer_artifact_form(artifact.character, artifact.character.cell)(request.POST)
+        form = make_consumable_use_form(artifact)(request.POST)
         if form.is_valid():
             with transaction.atomic():
                 artifact = Artifact.objects.select_for_update().get(pk=artifact_id)
-                artifact.transfer_to_character(
-                    transfer_type=form.cleaned_data["transfer_type"],
-                    to_character=form.cleaned_data["to_character"],
-                    notes=form.cleaned_data["notes"] if "notes" in form.cleaned_data else "",)
-    return HttpResponseRedirect(reverse('characters:characters_artifact_view', args=(artifact_id,)))
+                artifact.quantity = form.cleaned_data["new_quantity"]
+                artifact.save()
+            return JsonResponse({"new_quantity": form.cleaned_data["new_quantity"]}, status=200)
+        print(form.errors)
+    return JsonResponse({"error": ""}, status=400)
 
 
 def transfer_artifact(request, artifact_id):
@@ -623,7 +623,8 @@ def transfer_artifact(request, artifact_id):
                 artifact.transfer_to_character(
                     transfer_type=form.cleaned_data["transfer_type"],
                     to_character=form.cleaned_data["to_character"],
-                    notes=form.cleaned_data["notes"] if "notes" in form.cleaned_data else "",)
+                    notes=form.cleaned_data["notes"] if "notes" in form.cleaned_data else "",
+                    quantity=form.cleaned_data["quantity"] if artifact.is_consumable else 1)
     return HttpResponseRedirect(reverse('characters:characters_artifact_view', args=(artifact_id,)))
 
 

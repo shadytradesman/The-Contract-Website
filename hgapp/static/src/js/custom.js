@@ -5,6 +5,39 @@ $(document).ready(function(){
     });
 });
 
+/* Consumable action menus */
+function resetPopoverContents() {
+    $('.js-popover-button').each(function(){
+        let content = $(this).parent().nextAll(".js-popover-content").first().html()
+        $(this).popover({
+            "content": content,
+            "html": true,
+            "sanitize": false
+        });
+    })
+}
+$(resetPopoverContents());
+
+$('.js-popover-button').on('inserted.bs.popover', function () {
+    let remQuantity = $(this).attr("data-rem-quantity");
+    $(this).parent().find("span[class^='js-consumable-minus-quantity']").text(remQuantity);
+})
+
+$(document).on("click", ".js-popover-button", function(e) {
+    e.stopPropagation();
+    $('.js-popover-button').filter((i, p) => {
+        return $(p).attr("data-title") != $(e.target).attr("data-title");
+        }).popover('hide');
+    $(e.target).popover('toggle');
+});
+$(document).on("click", ".js-popover-button >span", function(e) {
+    e.stopPropagation();
+    $('.js-popover-button').filter((i, p) => {
+        return $(p).attr("data-title") != $(e.target).parent().attr("data-title");
+        }).popover('hide');
+    $(e.target).parent().popover('toggle');
+});
+
 /* Power badge stuff */
 $(document).on("click", ".power-badge a", function(e) {
    e.stopPropagation();

@@ -143,3 +143,38 @@ $(document).on("click", ".js-transfer-artifact-button", function(){
     let formElement = $(this).parent().nextAll(".js-transfer-artifact-form").first();
     formElement.show();
 });
+
+// use consumable submit
+$(".css-consumable-item").on("submit",".js-use-consumable-form", function (e) {
+    e.preventDefault();
+    let form = $(this);
+    let popover = form.parent().parent().parent().children(".js-popover-button");
+    $(".js-consumable-use-submit").disabled=true;
+    let artId = $(this).attr("data-artifact-id");
+    let newQuantity = parseInt(popover.attr("data-rem-quantity"));
+    console.log(newQuantity);
+    $(this).children("input[name='new_quantity']").val(newQuantity);
+    console.log($(this));
+    var serializedData = $(this).serialize();
+    $.ajax({
+        type: 'POST',
+        url: $(this).attr("data-url"),
+        data: serializedData,
+        success: function (response) {
+            let resultingQuantity = response["new_quantity"];
+            $(".js-consumable-quantity-"+artId).text(resultingQuantity);
+            $(".js-consumable-minus-quantity-"+artId).text(resultingQuantity-1);
+            popover.popover('hide');
+            $(".js-consumable-use-submit").disabled=false;
+            popover.attr("data-rem-quantity", resultingQuantity-1);
+            if (resultingQuantity === 0) {
+                popover.parent().parent().hide();
+            }
+        },
+        error: function (response) {
+            console.log(response);
+            alert(response["responseJSON"]["error"]);
+        }
+    })
+})
+

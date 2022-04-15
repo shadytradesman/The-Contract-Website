@@ -434,7 +434,7 @@ def make_artifact_status_form(current_status=None):
     return ArtifactStatusForm
 
 
-def make_transfer_artifact_form(character, cell=None):
+def make_transfer_artifact_form(character, cell=None, max_quantity=0):
     character_options = get_character_contacts(character)
     character_options = set([x.pk for x in character_options.keys()])
     if character.cell:
@@ -444,7 +444,7 @@ def make_transfer_artifact_form(character, cell=None):
 
     class TransferArtifactForm(forms.Form):
         transfer_type = forms.ChoiceField(
-            label="This item was",
+            label="These consumables were" if max_quantity > 1 else "This item was",
             choices=(
                 (GIVEN, "Given to"),
                 (STOLEN, "Stolen by"),
@@ -455,11 +455,28 @@ def make_transfer_artifact_form(character, cell=None):
                                       widget=forms.Select(attrs={'class': 'form-control'}),
                                               empty_label=None,
                                       required=True)
-        notes = forms.CharField(max_length=1000,
-                               label="Notes",
-                               required=False)
+        quantity = forms.IntegerField(
+            label="Quantity (max {})".format(max_quantity),
+            initial=1,
+            max_value=max_quantity,
+            min_value=1,
+            validators=[MaxValueValidator(max_quantity), MinValueValidator(0)],
+            required=max_quantity != 0,
+            widget=forms.NumberInput(attrs={'class': "form-inline"}) if max_quantity != 0 else forms.HiddenInput())
+        notes = forms.CharField(
+            max_length=1000,
+            label="Notes (optional)",
+            required=False)
 
     return TransferArtifactForm
 
-class UseConsumableForm(forms.Form):
-    pass
+
+def make_consumable_use_form(artifact):
+    class UseConsumableForm(forms.Form):
+        new_quantity = forms.IntegerField(
+            initial=artifact.quantity-1,
+            validators=[MaxValueValidator(artifact.quantity-1), MinValueValidator(artifact.quantity-1)],
+            required=True,
+            widget=forms.HiddenInput())
+
+    return UseConsumableForm

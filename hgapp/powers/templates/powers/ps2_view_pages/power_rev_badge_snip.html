@@ -1,7 +1,7 @@
 <div
         class="panel-heading power-badge"
         style="background-color: #353e4b; padding: 10px;"
-    id="collapse-power-{{latest_revision.id}}-heading"
+        id="collapse-power-{{latest_revision.id}}-heading"
          role="button" data-toggle="collapse"
          data-target=".collapse-power-{{latest_revision.id}}"
          aria-expanded="false"
@@ -43,7 +43,7 @@
                 {% if not power_full.at_least_one_gift_assigned %}
                     No Gifts assigned!
                 {% elif power_full.get_gift_cost > power_full.reward_count %}
-                    Only {{power_full.reward_count }} Reward{{ power_full.reward_count| pluralize}} assigned
+                    Insufficient Rewards assigned! ({{power_full.reward_count }} assigned, {{power_full.get_gift_cost}} required)
                 {% endif %}
                 {% endif %}
             </small>
@@ -52,16 +52,16 @@
         <div class="collapse collapse-power-{{latest_revision.id}} in"
              role="tabpanel"
              aria-labelledby="collapse-power-{{latest_revision.id}}-heading" >
-            <div style="display: flex; justify-content:space-between; flex-wrap: wrap;">
+            <div style="">
 
                 <div class="text-muted" style="display: inline-block;">
                     {{ latest_revision.gift_summary|safe }}
                 </div>
-                <div class="hidden-xs" style="text-align: left; flex: 1;">
+                <div class="hidden-xs" style="display: inline-block;text-align: left; width: 120px;">
                     <small class="visible-sm-inline-block text-center"><i>(Tap to show system)</i></small>
-                    <small class="visible-md-inline-block visible-lg-inline-block text-center"><i>(Click to show system)</i></small>
+                    <small class="visible-md-inline-block visible-lg-inline-block"><i>(Click to show system)</i></small>
                 </div>
-                <div class="visible-xs-block text-center" style="flex-basis: 100%">
+                <div class="visible-xs-block text-center" >
                     <small ><i>(Tap to show system)</i></small>
                 </div>
             </div>

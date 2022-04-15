@@ -1142,6 +1142,9 @@ class Artifact(WorldElement):
             models.Index(fields=['character']),
         ]
 
+    def after_use_quantity(self):
+        return self.quantity - 1
+
     def get_assigned_rewards(self):
         rewards = []
         for power in self.power_full_set.all():
@@ -1167,7 +1170,13 @@ class Artifact(WorldElement):
             status_change_type=status_type)
         self.save()
 
-    def transfer_to_character(self, transfer_type, to_character, notes=""):
+    def transfer_to_character(self, transfer_type, to_character, notes="", quantity=1):
+        if self.is_deleted:
+            raise ValueError("Cannot transfer deleted artifact")
+        if quantity > self.quantity:
+            raise ValueError("Cannot transfer more than you have.")
+        if quantity == 0:
+            return
         if self.character == to_character:
             raise ValueError("Cannot transfer an artifact to the character that possesses it.")
         ArtifactTransferEvent.objects.create(
@@ -1175,9 +1184,37 @@ class Artifact(WorldElement):
             to_character=to_character,
             relevant_artifact=self,
             notes=notes,
-            transfer_type=transfer_type)
-        self.character = to_character
+            transfer_type=transfer_type,
+            quantity=quantity)
+        if self.is_consumable:
+            self.__transfer_consumables_to_character(transfer_type, to_character, notes, quantity)
+        else:
+            self.character = to_character
         self.save()
+
+    def __transfer_consumables_to_character(self, transfer_type, to_character, notes, quantity):
+        new_stack = Artifact.objects.create(
+            character=to_character,
+            name=self.name,
+            description=self.description,
+            system=self.system,
+            crafting_character=self.crafting_character,
+            creating_player=self.creating_player,
+            is_consumable=True,
+            quantity=quantity
+        )
+        self.quantity -= quantity
+        # create another transfer event for the new artifact stack.
+        ArtifactTransferEvent.objects.create(
+            from_character=self.character,
+            to_character=to_character,
+            relevant_artifact=new_stack,
+            notes=notes,
+            transfer_type=transfer_type,
+            quantity=quantity)
+
+        # if our stack now has none
+        # update craftingevents
 
 
 class ArtifactStatusChange(models.Model):
@@ -1185,6 +1222,7 @@ class ArtifactStatusChange(models.Model):
     created_time = models.DateTimeField(auto_now_add=True)
     notes = models.CharField(max_length=5000, blank=True)
     status_change_type = models.CharField(choices=ARTIFACT_STATUS_CHANGE_TYPE, max_length=55)
+    quantity = models.PositiveIntegerField(default=1)
 
     class Meta:
         indexes = [

@@ -38,6 +38,9 @@ body {
 @panel-default-border: transparent;
 @panel-footer-bg: lighten(@panel-bg, 5.5%);
 
+@popover-bg: lighten(@panel-bg, 5.5%);
+@popover-max-width: 500px;
+
 @thumbnail-border: @dark-border;
 @thumbnail-bg: lighten(@panel-bg, 10%);
 
@@ -158,8 +161,12 @@ textarea {
 
 .css-consumable-item {
     padding: 10px;
-    background-color: #353e4b;
     margin-bottom: 10px;
+    background-color: #222a35;
+}
+
+.css-consumable-item .btn-sm {
+    line-height: 1;
 }
 
 .css-signature-item {

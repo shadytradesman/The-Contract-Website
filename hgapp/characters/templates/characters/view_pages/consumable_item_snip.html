@@ -1,40 +1,71 @@
 {% load power_tags %}
+{% load bootstrap %}
 <div  style="display: flex;  align-items: stretch; max-width: 100%;">
     <div class="css-consumable-item" style="display: inline-block; margin-right: 5px; border: 1px solid #453e4b;">
-        <div data-title="Consumable quantity: {{artifact.quantity}}"
+        <div data-title="Consumable quantity"
             data-toggle="tooltip"
              class="text-center">
             <span style="border: 1px solid #454e5b; border-radius: 3px; padding: 5px; background-color: #453e4b;">
                 {% if power.modality.icon %}
                     <img src="{{power.modality.icon.url}}" width="15px" height="15px" style="vertical-align: text-top;">
                 {% endif %}
-                <span style="font-size: 16px;">
+                <span class="js-consumable-quantity-{{artifact.id}}" style="font-size: 16px;">
                     {{artifact.quantity}}
                 </span>
             </span>
         </div>
-        {% if can_use %}
-            <div class="text-center"  style="margin-top: 10px;">
-                <button class="btn btn-sm btn-default js-transfer-artifact-button"
-                        data-id="{{item.id}}"
-                        data-title="Use Consumable"
-                        data-toggle="tooltip"
-                        style="">
-                    <span class="glyphicon glyphicon-transfer" aria-hidden="true"></span>
-                </button>
-            </div>
-            <div class="text-center" style="margin-top: 5px;">
-                <button class="btn btn-sm btn-default js-transfer-artifact-button"
-                        data-id="{{item.id}}"
-                        data-title="Transfer/Trade"
-                        data-toggle="tooltip"
-                        style="">
-                    <span class="glyphicon glyphicon-transfer" aria-hidden="true"></span>
-                </button>
+        {% if can_use and use_form and artifact.quantity %}
+            <div>
+                <div class="text-center"  style="margin-top: 10px;">
+                    <a tabindex="0" class="btn btn-sm btn-default js-popover-button" role="button" data-toggle="popover" data-trigger="manual" data-title="Use Consumable?" data-content="" data-rem-quantity="{{artifact.after_use_quantity}}">
+                        <span class="glyphicon glyphicon-certificate" aria-hidden="true" data-title="Use Consumable" data-toggle="tooltip"></span>
+                    </a>
+                </div>
+                <div class="js-popover-content" style="display: none;">
+                    <form class="js-use-consumable-form"
+                          data-artifact-id="{{artifact.id}}"
+                          data-url="{% url 'characters:use_consumable' artifact.id %}">
+                        {% csrf_token %}
+                        {{use_form|bootstrap}}
+                        <div class="text-center" style="margin-bottom: 5px;">
+                            You will have
+                            <b>
+                                <span class="js-consumable-minus-quantity-{{artifact.id}}">
+                                    {{artifact.after_use_quantity}}
+                                </span>
+                            </b>
+                            remaining.
+                            <div class="text-muted">
+                                <small>
+                                    <i>
+                                        (This action cannot be undone)
+                                    </i>
+                                </small>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <input type="submit" class="btn btn-sm btn-default js-consumable-use-submit" value="Use Consumable" />
+                        </div>
+                    </form>
+                </div>
+                <div class="text-center">
+                    <a style="margin-top: 5px;" tabindex="0" data-trigger="manual" class="btn btn-sm btn-default js-popover-button" role="button" data-toggle="popover" data-title="Give Consumables" >
+                        <span class="glyphicon glyphicon-transfer" aria-hidden="true" data-title="Transfer/Trade" data-toggle="tooltip"></span>
+                    </a>
+                </div>
+                <div class="js-popover-content" style="display:none;">
+                    <form class="js-transfer-artifact-form"
+                          action="{% url 'characters:transfer_artifact' artifact.id %}"
+                          method="post" >
+                        {% csrf_token %}
+                        {{transfer_form|bootstrap}}
+                        <input type="submit" class="btn btn-primary" value="Transfer" />
+                    </form>
+                </div>
             </div>
         {% endif %}
     </div>
-    <div class="css-consumable-item" style="display: inline-block;flex:1; padding: 0px;">
+    <div class="panel panel-default css-ps2-power-badge " style="display: inline-block;flex:1; padding: 0px; margin-bottom: 8px;">
         {% power_rev_badge power True %}
     </div>
 </div>

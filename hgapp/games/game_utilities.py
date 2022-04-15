@@ -1,9 +1,23 @@
 from collections import defaultdict
+from django.core.cache import cache
 
 from games.models import Game_Attendance
 
 
+# Get the contractor's contacts. Returns a mapping from contractor to a list of tuples of games they were encountered on
 def get_character_contacts(character):
+    cache_key = "contractor_contacts" + str(character.pk)
+    sentinel = object()
+    cache_contents = cache.get(cache_key, sentinel)
+    if cache_contents is sentinel:
+        contacts = __inner_get_character_contacts(character)
+        cache.set(cache_key, contacts, timeout=30)
+        return contacts
+    else:
+        return cache.get(cache_key)
+
+
+def __inner_get_character_contacts(character):
     game_ids = character.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).order_by("relevant_game__end_time").values_list('relevant_game__id', flat=True).all()
     game_number = {}
     for i, game_id in enumerate(game_ids):

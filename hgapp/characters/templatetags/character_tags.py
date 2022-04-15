@@ -1,6 +1,7 @@
 from django import template
 
-from characters.forms import make_world_element_form, make_transfer_artifact_form, make_artifact_status_form
+from characters.forms import make_world_element_form, make_transfer_artifact_form, make_artifact_status_form, \
+    make_consumable_use_form
 from characters.models import LOST, DESTROYED, RECOVERED, REPAIRED
 from django.urls import reverse
 
@@ -12,15 +13,19 @@ def render_consumable(artifact, user):
         raise ValueError("attempting to display non-consumable artifact as consumable")
     can_use = artifact.character.player_can_edit(user)
     power = artifact.power_set.first()
-    #get form for using
+    use_form = None
+    transfer_form = None
+    if can_use:
+        use_form = make_consumable_use_form(artifact)
+        transfer_form = make_transfer_artifact_form(artifact.character, artifact.character.cell, artifact.quantity)
     return {
         "artifact": artifact,
         "user": user,
         "can_use": can_use,
+        "use_form": use_form,
+        "transfer_form": transfer_form,
         "power": power,
     }
-
-
 
 
 @register.inclusion_tag('characters/view_pages/sig_item_snip.html')
