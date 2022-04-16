@@ -1196,7 +1196,7 @@ class Artifact(WorldElement):
 
     def __transfer_consumables_to_character(self, transfer_type, to_character, notes, quantity):
         power = self.power_set.first()
-        target_artifacts = to_character.artifact_set.filter(is_consumable=True, crafting_character=self.crafting_character).all()
+        target_artifacts = to_character.artifact_set.filter(is_consumable=True, crafting_character=self.crafting_character, is_deleted=False).all()
         new_stack = None
         for art in target_artifacts:
             if art.power_set.first() == power:

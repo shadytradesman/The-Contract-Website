@@ -277,7 +277,7 @@ def view_character(request, character_id, secret_key=None):
     lost_signature_items = []
     consumables = []
     crafted_artifacts = []
-    for artifact in character.artifact_set.all():
+    for artifact in character.artifact_set.exclude(is_deleted=True).all():
         if hasattr(artifact, "cell") and artifact.cell:
             artifacts[artifact.cell].append(artifact)
         elif artifact.is_signature:
@@ -286,18 +286,18 @@ def view_character(request, character_id, secret_key=None):
             consumables.append(artifact)
         else:
             crafted_artifacts.append(artifact)
-    for artifact in Artifact.objects.filter(crafting_character=character, is_signature=True).all():
+    for artifact in Artifact.objects.filter(crafting_character=character, is_signature=True, is_deleted=False).all():
         if artifact.character is not None and artifact.character != character:
             lost_signature_items.append(artifact)
     artifacts = dict(artifacts)
 
     circumstances = get_world_element_default_dict(world_element_cell_choices)
-    for circumstance in character.circumstance_set.all():
+    for circumstance in character.circumstance_set.exclude(is_deleted=True).all():
         circumstances[circumstance.cell].append(circumstance)
     circumstances = dict(circumstances)
 
     conditions = get_world_element_default_dict(world_element_cell_choices)
-    for condition in character.condition_set.all():
+    for condition in character.condition_set.exclude(is_deleted=True).all():
         conditions[condition.cell].append(condition)
     conditions = dict(conditions)
 
@@ -849,7 +849,9 @@ def delete_world_element(request, element_id, element, secret_key = None):
         if hasattr(ext_element, "is_signature") and ext_element.is_signature:
             raise ValueError("Cannot delete signature items")
         with transaction.atomic():
-            ext_element.delete()
+            ext_element.is_deleted = True
+            ext_element.deleted_date = timezone.now()
+            ext_element.save()
         return JsonResponse({}, status=200)
     return JsonResponse({"error": ""}, status=400)
 

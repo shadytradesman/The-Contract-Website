@@ -83,7 +83,7 @@ class CraftingEvent(models.Model):
 
     def craft_new_consumables(self, number_newly_crafted, new_number_free, exp_cost_per, power_full):
         paid_crafted = number_newly_crafted - new_number_free
-        crafted_artifacts = self.craftedartifact_set.prefetch_related("relevant_artifact").all()
+        crafted_artifacts = self.craftedartifact_set.filter(relevant_artifact__is_deleted=False).prefetch_related("relevant_artifact").all()
         crafter_held_crafted_artifact = None
         for crafted_artifact in crafted_artifacts:
             if crafted_artifact.relevant_artifact.character == self.relevant_character:

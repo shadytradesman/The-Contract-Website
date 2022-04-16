@@ -1,6 +1,6 @@
 {% load power_tags %}
 {% load bootstrap %}
-<div  style="display: flex;  align-items: stretch; max-width: 100%;">
+<div class="js-world-element-delete" style="display: flex;  align-items: stretch; max-width: 100%;">
     <div class="css-consumable-item" style="display: inline-block; margin-right: 5px; border: 1px solid #453e4b;">
         <div data-title="Consumable quantity"
             data-toggle="tooltip"
@@ -64,8 +64,19 @@
                 </div>
             </div>
         {% endif %}
+        {% if can_use  %}
+        <div class="js-consumable-delete-container js-world-element-container text-center"  style="margin-top: 10px; {% if artifact.quantity != 0 %}display: none;{% endif %}" data-title="Clear from sheet" data-toggle="tooltip">
+            <span class="css-world-element-delete">
+                <form class="js-delete-world-element-form"
+                      data-del-world-element-url="{% url 'characters:delete_world_element' artifact.id 'artifact' secret_key %}">
+                    {% csrf_token %}
+                    <input type="submit" class="btn btn-xs btn-danger" value="X" />
+                </form>
+            </span>
+        </div>
+        {% endif %}
     </div>
-    <div class="panel panel-default css-ps2-power-badge " style="display: inline-block;flex:1; padding: 0px; margin-bottom: 8px;">
+    <div class="panel panel-default css-ps2-power-badge {% if artifact.quantity == 0 %}css-sig-item-greyed-out{%endif%} " style="display: inline-block;flex:1; padding: 0px; margin-bottom: 8px;">
         {% power_rev_badge power True crafter_blurb %}
     </div>
 </div>

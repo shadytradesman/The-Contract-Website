@@ -45,6 +45,7 @@ $(".js-world-element-container").on("submit",".js-delete-world-element-form", fu
         url: $(this).attr("data-del-world-element-url"),
         data: serializedData,
         success: function (response) {
+            worldElement.closest(".js-world-element-delete").remove();
             worldElement.parent().parent().remove();
         },
         error: function (response) {
@@ -169,6 +170,8 @@ $(".css-consumable-item").on("submit",".js-use-consumable-form", function (e) {
             popover.attr("data-rem-quantity", resultingQuantity-1);
             if (resultingQuantity === 0) {
                 popover.parent().parent().hide();
+                popover.closest(".js-world-element-delete").addClass("css-sig-item-greyed-out");
+                popover.parent().parent().parent().find(".js-consumable-delete-container").show();
             }
         },
         error: function (response) {
