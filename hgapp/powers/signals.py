@@ -1,6 +1,6 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from guardian.shortcuts import assign_perm, remove_perm
+from guardian.shortcuts import assign_perm
 from django.contrib.auth.models import User
 
 from powers.models import Power, Power_Full, Base_Power

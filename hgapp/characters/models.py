@@ -14,7 +14,7 @@ from django.db import transaction
 
 from hgapp.utilities import get_queryset_size, get_object_or_none
 from cells.models import Cell
-from characters.signals import GrantAssetGift, VoidAssetGifts, AlterPortedRewards
+from characters.signals import GrantAssetGift, VoidAssetGifts, AlterPortedRewards, transfer_consumables
 
 import random
 import hashlib
@@ -1171,6 +1171,8 @@ class Artifact(WorldElement):
         self.save()
 
     def transfer_to_character(self, transfer_type, to_character, notes="", quantity=1):
+        if self.cell:
+            raise ValueError("Cannot transfer non-gift artifacts")
         if self.is_deleted:
             raise ValueError("Cannot transfer deleted artifact")
         if quantity > self.quantity:
@@ -1193,16 +1195,25 @@ class Artifact(WorldElement):
         self.save()
 
     def __transfer_consumables_to_character(self, transfer_type, to_character, notes, quantity):
-        new_stack = Artifact.objects.create(
-            character=to_character,
-            name=self.name,
-            description=self.description,
-            system=self.system,
-            crafting_character=self.crafting_character,
-            creating_player=self.creating_player,
-            is_consumable=True,
-            quantity=quantity
-        )
+        power = self.power_set.first()
+        target_artifacts = to_character.artifact_set.filter(is_consumable=True, crafting_character=self.crafting_character).all()
+        new_stack = None
+        for art in target_artifacts:
+            if art.power_set.first() == power:
+                new_stack = art
+                new_stack.quantity += quantity
+                new_stack.save()
+        if new_stack is None:
+            new_stack = Artifact.objects.create(
+                character=to_character,
+                name=self.name,
+                description=self.description,
+                system=self.system,
+                crafting_character=self.crafting_character,
+                creating_player=self.creating_player,
+                is_consumable=True,
+                quantity=quantity
+            )
         self.quantity -= quantity
         # create another transfer event for the new artifact stack.
         ArtifactTransferEvent.objects.create(
@@ -1212,9 +1223,11 @@ class Artifact(WorldElement):
             notes=notes,
             transfer_type=transfer_type,
             quantity=quantity)
-
-        # if our stack now has none
-        # update craftingevents
+        transfer_consumables.send(sender=self.__class__,
+                                         original_artifact=self,
+                                         new_artifact=new_stack,
+                                         quantity=quantity,
+                                         power=power)
 
 
 class ArtifactStatusChange(models.Model):
@@ -1245,6 +1258,7 @@ class ArtifactTransferEvent(models.Model):
     created_time = models.DateTimeField(auto_now_add=True)
     notes = models.CharField(max_length=5000, blank=True)
     transfer_type = models.CharField(choices=ARTIFACT_TRANSFER_TYPE, max_length=55)
+    quantity = models.PositiveIntegerField(default=1)
 
     class Meta:
         indexes = [

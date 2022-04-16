@@ -55,7 +55,6 @@ class CraftingEvent(models.Model):
             crafted_artifact.quantity -= num_refunded
             num_refunded_by_crafted_artifact_id[crafted_artifact.pk] += num_refunded
             remaining_to_refund -= num_refunded
-            crafted_artifact.exp_spent -= num_refunded * exp_cost_per
             self.total_exp_spent -= num_refunded * exp_cost_per
         # now refund free ones
         for crafted_artifact in crafted_artifacts:
@@ -93,7 +92,6 @@ class CraftingEvent(models.Model):
         if crafter_held_crafted_artifact:
             crafter_held_crafted_artifact.quantity_free += new_number_free
             crafter_held_crafted_artifact.quantity += paid_crafted + new_number_free
-            crafter_held_crafted_artifact.exp_spent += (paid_crafted * exp_cost_per)
             crafter_held_crafted_artifact.save()
 
             crafter_held_crafted_artifact.relevant_artifact.quantity += number_newly_crafted
@@ -111,8 +109,7 @@ class CraftingEvent(models.Model):
                 relevant_artifact=new_artifact,
                 relevant_crafting=self,
                 quantity=paid_crafted + new_number_free,
-                quantity_free=new_number_free,
-                exp_spent=paid_crafted * exp_cost_per,)
+                quantity_free=new_number_free, )
             power_full.artifacts.add(new_artifact)
             power_full.latest_rev.artifacts.add(new_artifact)
             power_full.latest_rev.save()
@@ -129,7 +126,6 @@ class CraftedArtifact(models.Model):
     quantity = models.PositiveIntegerField(default=1) # actual number
     quantity_free = models.PositiveIntegerField(default=0)  # number of quantity that were free. this <= quantity
     is_refundable = models.BooleanField(default=True)
-    exp_spent = models.PositiveIntegerField(default=0)  # For easy Exp calculations?
 
     class Meta:
         unique_together = (
