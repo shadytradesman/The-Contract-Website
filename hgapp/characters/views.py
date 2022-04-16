@@ -611,12 +611,15 @@ def use_consumable(request, artifact_id):
 
 
 def transfer_artifact(request, artifact_id):
+    artifact = get_object_or_404(Artifact, id=artifact_id)
     if request.method == "POST":
-        artifact = get_object_or_404(Artifact, id=artifact_id)
         if not artifact.character:
             raise ValueError("Artifact has no character and cannot be transferred")
         __check_edit_perms(request, artifact.character)
-        form = make_transfer_artifact_form(artifact.character, artifact.character.cell)(request.POST)
+        max_quantity = 1
+        if artifact.is_consumable:
+            max_quantity = artifact.quantity
+        form = make_transfer_artifact_form(artifact.character, artifact.character.cell, max_quantity)(request.POST)
         if form.is_valid():
             with transaction.atomic():
                 artifact = Artifact.objects.select_for_update().get(pk=artifact_id)
@@ -625,7 +628,13 @@ def transfer_artifact(request, artifact_id):
                     to_character=form.cleaned_data["to_character"],
                     notes=form.cleaned_data["notes"] if "notes" in form.cleaned_data else "",
                     quantity=form.cleaned_data["quantity"] if artifact.is_consumable else 1)
-    return HttpResponseRedirect(reverse('characters:characters_artifact_view', args=(artifact_id,)))
+        else:
+            print(form.errors)
+            raise ValueError("Invalid artifact transfer form")
+    if artifact.is_signature:
+        return HttpResponseRedirect(reverse('characters:characters_artifact_view', args=(artifact_id,)))
+    else:
+        return HttpResponseRedirect(reverse('characters:characters_view', args=(artifact.character_id,)))
 
 
 def post_scar(request, character_id, secret_key = None):

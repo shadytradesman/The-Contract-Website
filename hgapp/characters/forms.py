@@ -438,8 +438,8 @@ def make_transfer_artifact_form(character, cell=None, max_quantity=0):
     character_options = get_character_contacts(character)
     character_options = set([x.pk for x in character_options.keys()])
     if character.cell:
-        character_options.update(cell.character_set.values_list('id', flat=True))
-    if character in character_options:
+        character_options.update(cell.character_set.exclude(player=character.player).values_list('id', flat=True))
+    if character.pk in character_options:
         character_options.remove(character.pk)
 
     class TransferArtifactForm(forms.Form):

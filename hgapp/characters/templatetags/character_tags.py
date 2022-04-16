@@ -18,6 +18,10 @@ def render_consumable(artifact, user):
     if can_use:
         use_form = make_consumable_use_form(artifact)
         transfer_form = make_transfer_artifact_form(artifact.character, artifact.character.cell, artifact.quantity)
+    crafter_blurb = 'Crafted by <a href="{}">{}</a>'.format(
+        reverse('characters:characters_view', args=(artifact.crafting_character.id,)),
+        artifact.crafting_character.name)
+
     return {
         "artifact": artifact,
         "user": user,
@@ -25,6 +29,7 @@ def render_consumable(artifact, user):
         "use_form": use_form,
         "transfer_form": transfer_form,
         "power": power,
+        "crafter_blurb": crafter_blurb,
     }
 
 

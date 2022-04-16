@@ -19,7 +19,7 @@ def discovery_power_badge(power_full):
     }
 
 @register.inclusion_tag('powers/ps2_view_pages/power_rev_badge_snip.html')
-def power_rev_badge(power, force_show_warnings=False):
+def power_rev_badge(power, force_show_warnings=False, crafter_blurb=None):
     power_full = power.parent_power
     character = power_full.character if power_full.character else None
     show_status_warning = force_show_warnings
@@ -32,6 +32,7 @@ def power_rev_badge(power, force_show_warnings=False):
         'latest_revision': power,
         'character': character,
         'show_status_warning': show_status_warning,
+        'crafter_blurb': crafter_blurb,
     }
 
 @register.inclusion_tag('powers/power_badge_snippet.html')

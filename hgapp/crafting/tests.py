@@ -350,9 +350,6 @@ class CraftingModelTests(TestCase):
         self.assertEquals(new_artifact.quantity, 0)
         self.assertEquals(self.char_full.unspent_experience(), original_exp - 18)
 
-
-
-
     def test_basic_consumable_crafting_after_game(self):
         power = create_power(effect=self.base_effect, vector=self.base_vector, modality=self.base_modality, character=self.char_full)
         attendance = self.send_contractor_on_game(self.char_full)
@@ -465,3 +462,7 @@ class CraftingModelTests(TestCase):
         new_artifact2 = self.char2.artifact_set.first()
         self.assertEquals(new_artifact.quantity, 0)
         self.assertEquals(new_artifact2.quantity, 0)
+
+
+    #TODO: Add tests for multiple games behavior, transfering / refunding stacks of artifacts that were produced in different events
+    #TODO: Add tests for power refund, revision, etc.

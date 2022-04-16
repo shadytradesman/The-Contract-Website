@@ -36,6 +36,13 @@
         {% with latest_revision as power %}
             {% include "powers/ps2_view_pages/components_snippet.html" %}
         {% endwith %}
+        {% if crafter_blurb %}
+        <div>
+            <small>
+                {{crafter_blurb|safe}}
+            </small>
+        </div>
+        {% endif %}
         {% if not discovery_page %}
         <div class="text-danger">
             <small>
