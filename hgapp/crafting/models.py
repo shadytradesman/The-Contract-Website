@@ -1,10 +1,11 @@
 from collections import Counter
 
 from django.db import models
+from django.db.models import Q, Sum
 
 from characters.models import Artifact, Character
 from games.models import Game_Attendance
-from powers.models import Power, Power_Full
+from powers.models import Power, Power_Full, CRAFTING_CONSUMABLE
 
 # Crafting Constants
 NUM_FREE_CONSUMABLES_PER_DOWNTIME = 1
@@ -42,6 +43,12 @@ class CraftingEvent(models.Model):
             models.Index(fields=['relevant_attendance']),
             models.Index(fields=['relevant_character']),
         ]
+
+    def refund_all(self):
+        if self.relevant_power_full.crafting_type == CRAFTING_CONSUMABLE:
+            num_to_refund = self.craftedartifact_set.aggregate(Sum('quantity'))['quantity__sum']
+            self.refund_crafted_consumables(number_to_refund=num_to_refund, exp_cost_per=self.relevant_power.get_gift_cost())
+        self.artifacts.clear()
 
     def refund_crafted_consumables(self, number_to_refund, exp_cost_per):
         remaining_to_refund = number_to_refund

@@ -584,10 +584,7 @@ class Character(models.Model):
         return self.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).order_by("-relevant_game__end_time").all()
 
     def get_current_downtime_attendance(self):
-        try:
-            return self.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).order_by("-relevant_game__end_time").all()[0]
-        except:
-            return None
+        return self.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).order_by("-relevant_game__end_time").first()
 
     def assigned_coin(self):
         coins = self.reward_set.filter(is_void=False, is_charon_coin=True).all()
@@ -1131,6 +1128,7 @@ class Artifact(WorldElement):
                                         null=True)
     is_consumable = models.BooleanField(default=False)
     is_signature = models.BooleanField(default=False)
+    since_revised = models.BooleanField(default=False) # gift has seen major revision since crafting.
     quantity = models.PositiveIntegerField(default=1)
     location = models.CharField(max_length=1000, default="", blank=True)
     most_recent_status_change = models.CharField(choices=ARTIFACT_STATUS_CHANGE_TYPE, max_length=55, blank=True)
@@ -1212,6 +1210,7 @@ class Artifact(WorldElement):
                 crafting_character=self.crafting_character,
                 creating_player=self.creating_player,
                 is_consumable=True,
+                since_revised=self.since_revised,
                 quantity=quantity
             )
         self.quantity -= quantity

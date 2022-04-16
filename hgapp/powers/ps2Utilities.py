@@ -9,9 +9,10 @@ from .models import SYS_LEGACY_POWERS, EFFECT, VECTOR, MODALITY, Base_Power, Enh
     Base_Power_Category, VectorCostCredit, ADDITIVE, EnhancementGroup, CREATION_NEW, SYS_PS2, Power, Power_Full, \
     Enhancement_Instance, Drawback_Instance, Parameter_Value, Power_Param, SystemFieldText, SystemFieldTextInstance, \
     SystemFieldWeapon, SystemFieldWeaponInstance, SystemFieldRoll, SystemFieldRollInstance, PowerSystem, \
-    CRAFTING_SIGNATURE
+    CRAFTING_SIGNATURE, CREATION_REVISION, CREATION_MAJOR_REVISION, CREATION_ADJUSTMENT, CREATION_IMPROVEMENT
 from .formsPs2 import PowerForm, get_modifiers_formset, get_params_formset, get_sys_field_text_formset, \
     get_sys_field_weapon_formset, get_sys_field_roll_formset, make_select_signature_artifact_form
+from .signals import gift_revision, gift_major_revision, gift_adjustment
 from .powerDifferenceUtils import get_roll_from_form_and_system, get_power_creation_reason, \
     get_power_creation_reason_expanded_text
 from .createPowerFormUtilities import refund_or_assign_rewards
@@ -96,6 +97,8 @@ def save_gift(request, power_full=None, character=None):
         if character:
             character.reset_attribute_bonuses()
             refund_or_assign_rewards(new_power, old_power=previous_rev)
+            if previous_rev:
+                _handle_crafting(previous_rev, new_power, power_full)
         return new_power
     else:
         logger.error("Invalid Power form. errors: {}".format(power_form.errors))
@@ -152,6 +155,15 @@ def _create_new_power_and_save(power_form, request, SigArtifactForm):
         field.relevant_power = power
         field.save()
     return power
+
+
+def _handle_crafting(old_power, new_power, power_full):
+    if new_power.creation_reason in [CREATION_ADJUSTMENT, CREATION_IMPROVEMENT]:
+        gift_adjustment.send(sender=Power.__class__, old_power=old_power, new_power=new_power, power_full=power_full)
+    if new_power.creation_reason == CREATION_REVISION:
+        gift_revision.send(sender=Power.__class__, old_power=old_power, new_power=new_power, power_full=power_full)
+    if new_power.creation_reason == CREATION_MAJOR_REVISION:
+        gift_major_revision.send(sender=Power.__class__, old_power=old_power, new_power=new_power, power_full=power_full)
 
 
 def _get_power_from_form_and_validate(power_form, power_engine, user=None):
@@ -261,6 +273,15 @@ def _get_field_instances_and_validate(POST, power_engine, effect_id, vector_id, 
 def _populate_power_change_log(new_power, power_full):
     if power_full:
         new_power.creation_reason = get_power_creation_reason(new_power, power_full.latest_revision())
+        if new_power.creation_reason == CREATION_REVISION and power_full.character:
+            current_attendance = power_full.character.get_current_downtime_attendance()
+            if current_attendance:
+                this_downtime_start = current_attendance.relevant_game.end_time
+                latest_old_power = power_full.power_set.exclude(pub_date__gt=this_downtime_start).order_by("-pub_date").first()
+                reason = get_power_creation_reason(new_power, latest_old_power)
+                if reason == CREATION_REVISION:
+                    # Revision even outside of current downtime counts as a major revision
+                    new_power.creation_reason = CREATION_MAJOR_REVISION
         new_power.creation_reason_expanded_text = get_power_creation_reason_expanded_text(
             new_power, power_full.latest_revision())
     else:

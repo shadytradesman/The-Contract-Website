@@ -1,4 +1,4 @@
-from .models import CREATION_NEW, CREATION_REVISION, CREATION_ADJUSTMENT, CREATION_IMPROVEMENT, BODY_, MIND_, PARRY_
+from .models import CREATION_NEW, CREATION_REVISION, CREATION_ADJUSTMENT, CREATION_IMPROVEMENT, CREATION_MAJOR_REVISION, CREATION_UPGRADE_TO_PS2, BODY_, MIND_, PARRY_, SYS_PS2, SYS_LEGACY_POWERS
 from django.shortcuts import get_object_or_404
 from characters.models import Roll, Attribute, Ability, NO_PARRY_INFO, REACTION, THROWN
 
@@ -25,16 +25,20 @@ def get_roll_from_form_and_system(form, system_field):
                              difficulty = difficulty,
                              speed=system_field.speed)
 
+
 def get_power_creation_reason(new_power, old_power):
     if old_power is None:
-        # new
         return CREATION_NEW
+    if new_power.dice_system == SYS_PS2 and old_power.dice_system == SYS_LEGACY_POWERS:
+        return CREATION_UPGRADE_TO_PS2
+
     new_points = new_power.get_gift_cost()
     old_points = old_power.get_gift_cost()
-
     if new_points > old_points:
         return CREATION_IMPROVEMENT
+
     if new_points < old_points \
+            or _get_changed_components(new_power, old_power) \
             or _get_param_difference_text(new_power, old_power) \
             or _get_added_enhancements(new_power, old_power) \
             or _get_removed_enhancements(new_power, old_power) \
@@ -46,9 +50,11 @@ def get_power_creation_reason(new_power, old_power):
 
 def get_power_creation_reason_expanded_text(new_power, old_power):
     edit_text = ""
+    if new_power.creation_reason == CREATION_UPGRADE_TO_PS2:
+        edit_text = "Upgraded from old powers system"
     if new_power.creation_reason == CREATION_ADJUSTMENT:
         edit_text = "Text field change"
-    if new_power.creation_reason == CREATION_REVISION or new_power.creation_reason == CREATION_IMPROVEMENT:
+    if new_power.creation_reason in [CREATION_REVISION, CREATION_IMPROVEMENT, CREATION_MAJOR_REVISION]:
         added_enhancements = _get_added_enhancements(new_power, old_power)
         if len(added_enhancements) > 0:
             edit_text = edit_text + "Added Enhancement"
@@ -93,6 +99,15 @@ def get_power_creation_reason_expanded_text(new_power, old_power):
     if edit_text[-2] == ',':
         edit_text = edit_text[:-2]
     return edit_text[:1500]
+
+
+def _get_changed_components(new_power, old_power):
+    if new_power.dice_system == SYS_PS2 and old_power.dice_system == SYS_PS2:
+        return (new_power.base != old_power.base) \
+               or (new_power.vector != old_power.vector) \
+               or (new_power.modality != old_power.modality)
+    else:
+        return False
 
 
 def _get_added_enhancements(new_power, old_power):

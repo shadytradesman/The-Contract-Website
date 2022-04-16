@@ -75,6 +75,14 @@
             </span>
         </div>
         {% endif %}
+        {% if artifact.since_revised %}
+            <div class="text-center text-danger"
+                 data-title="The Gift that created this Artifact has undergone a major revision since crafting and seeing play."
+                 data-toggle="tooltip"
+                style="margin-top: 5px;">
+                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            </div>
+        {% endif %}
     </div>
     <div class="panel panel-default css-ps2-power-badge {% if artifact.quantity == 0 %}css-sig-item-greyed-out{%endif%} " style="display: inline-block;flex:1; padding: 0px; margin-bottom: 8px;">
         {% power_rev_badge power True crafter_blurb %}

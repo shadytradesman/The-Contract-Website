@@ -1,5 +1,5 @@
 from django.db.models.signals import post_save
-from django.dispatch import receiver
+from django.dispatch import receiver, Signal
 from guardian.shortcuts import assign_perm
 from django.contrib.auth.models import User
 
@@ -32,3 +32,8 @@ def secret_upgrade_task(sender, instance, created, **kwargs):
             power.save()
         for power_full in Power_Full.objects.all():
             power_full.save()
+
+
+gift_revision = Signal(providing_args=['old_power', 'new_power', 'power_full'])
+gift_major_revision = Signal(providing_args=['old_power', 'new_power', 'power_full'])
+gift_adjustment = Signal(providing_args=['old_power', 'new_power', 'power_full'])
