@@ -4,15 +4,14 @@
 
 <div class="row">
     <div class="col-md-6">
-        <h3 class="text-center" data-toggle="tooltip" title='{{tutorial.powers_view}}'>
-            {% if early_access %}
-                Gifts
-            {% else %}
-                Powers
-            {% endif %}
-        </h3>
+        {% if early_access %}
+        {% else %}
+            <h3 class="text-center" data-toggle="tooltip" title='{{tutorial.powers_view}}'>
+                    Powers
+            </h3>
+        {% endif %}
         {% if new_powers and early_access %}
-            <h4>Powers</h4>
+            <h3 class="text-center">Powers</h3>
             {% for power_full in new_powers %}
                 <div>
                     {% power_badge power_full %}
@@ -20,7 +19,7 @@
             {% endfor %}
         {% endif %}
         {% if crafting_artifact_gifts and early_access %}
-            <h4>Artifact Crafting</h4>
+            <h3 class="text-center">Artifact Crafting</h3>
             {% for power_full in crafting_artifact_gifts %}
             <div>
                 {% power_badge power_full %}
@@ -28,7 +27,7 @@
             {% endfor %}
         {% endif %}
         {% if crafting_consumable_gifts and early_access %}
-            <h4>Consumable Crafting</h4>
+            <h3 class="text-center">Consumable Crafting</h3>
             {% for power_full in crafting_consumable_gifts %}
             <div>
                 {% power_badge power_full %}
@@ -37,7 +36,7 @@
         {% endif %}
         {% if lost_signature_items and early_access %}
             <h3 class="text-center" data-toggle="tooltip" >
-                Lost Signature Items
+                Lost Legendary Artifacts
             </h3>
             {% for item in lost_signature_items %}
                 {% render_sig_item item request.user character %}

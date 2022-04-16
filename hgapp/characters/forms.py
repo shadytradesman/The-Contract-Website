@@ -442,6 +442,7 @@ def make_transfer_artifact_form(character, cell=None, max_quantity=0):
     if character.pk in character_options:
         character_options.remove(character.pk)
 
+
     class TransferArtifactForm(forms.Form):
         transfer_type = forms.ChoiceField(
             label="These consumables were" if max_quantity > 1 else "This item was",

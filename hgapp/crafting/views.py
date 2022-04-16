@@ -1,5 +1,5 @@
 from collections import defaultdict, Counter
-import json
+import json, datetime
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views import View
@@ -11,6 +11,7 @@ from django.db import transaction
 
 from characters.models import Artifact, Character
 from powers.models import Power, Power_Full, CRAFTING_ARTIFACT, CRAFTING_CONSUMABLE
+from django.utils import timezone
 
 from .models import NUM_FREE_CONSUMABLES_PER_DOWNTIME, CraftingEvent, CraftedArtifact, \
     NUM_FREE_CONSUMABLES_PER_REWARD, NUM_FREE_ARTIFACTS_PER_DOWNTIME, NUM_FREE_ARTIFACTS_PER_REWARD
@@ -113,9 +114,13 @@ class Craft(View):
         power_fulls = self.character.power_full_set.all()
 
         # free crafting from rewards
-        latest_end_game = self.attendance.relevant_game.end_time
-        free_crafting_rewards = self.character.rewards_spent_since_date(latest_end_game) \
-            .filter(relevant_power__parent_power__crafting_type__in=[CRAFTING_CONSUMABLE, CRAFTING_ARTIFACT]).all()
+        latest_end_game = self.attendance.relevant_game.end_time if self.attendance else None
+        if latest_end_game:
+            free_crafting_rewards = self.character.rewards_spent_since_date(latest_end_game) \
+                .filter(relevant_power__parent_power__crafting_type__in=[CRAFTING_CONSUMABLE, CRAFTING_ARTIFACT]).all()
+        else:
+            free_crafting_rewards = self.character.spent_rewards()\
+                .filter(relevant_power__parent_power__crafting_type__in=[CRAFTING_CONSUMABLE, CRAFTING_ARTIFACT]).all()
         for reward in free_crafting_rewards:
             power = reward.relevant_power
             if power.parent_power.crafting_type == CRAFTING_CONSUMABLE:
@@ -164,7 +169,7 @@ class Craft(View):
                 .prefetch_related("relevant_power_full")\
                 .all()
         else:
-            return CraftingEvent.objects.filter(relevant_character=self.character, is_pre_imbue=True) \
+            return CraftingEvent.objects.filter(relevant_character=self.character, relevant_attendance__isnull=True) \
                 .prefetch_related("relevant_power_full")\
                 .all()
 
