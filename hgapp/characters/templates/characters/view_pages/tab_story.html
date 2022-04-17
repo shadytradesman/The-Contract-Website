@@ -44,9 +44,9 @@
     <a href="{% url 'journals:journal_read' character.id %}">
         <h3>
             {% if journal_cover %}
-                {{journal_cover.title}}
+                Journal: {{journal_cover.title}}
             {% else %}
-                journal
+                Journal
             {% endif %}
         </h3>
     </a>
@@ -74,7 +74,7 @@
         {% endif %}
     {% endif %}
     {% if latest_journals %}
-        Latest {{ latest_journals|length }} of {{num_journal_entries}} entries
+        <i>Latest {{ latest_journals|length }} of {{num_journal_entries}} entries</i>
         {% for journal in latest_journals %}
             <div class="thumbnail expandable-outer js-expandable-collapsed" role="button" >
                 <a href="{% url 'journals:journal_read_id' journal.id %}">

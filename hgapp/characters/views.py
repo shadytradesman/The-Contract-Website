@@ -1,4 +1,5 @@
 from random import randint
+from datetime import timedelta
 
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404
@@ -568,6 +569,34 @@ def item_timeline(request, artifact_id):
     return render(request, 'characters/item_timeline.html', context)
 
 
+class CraftingTimelineBlock:
+    crafting_events = None
+    total_exp_spent = None
+    total_crafted = None
+    power_quantity = None
+
+    def __init__(self, crafting_events):
+        self.crafting_events = crafting_events
+        self.total_exp_spent = 0
+        self.total_crafted = 0
+        self.power_quantity = []
+        print("event block with num events: " + str(len(crafting_events)))
+        for event in crafting_events:
+            print("Looking at event: " + str(event.pk))
+            self.total_exp_spent += event.total_exp_spent
+            total_made = 0
+            total_free = 0
+            for artifact_crafting in event.craftedartifact_set.all():
+                total_made += artifact_crafting.quantity
+                total_free += artifact_crafting.quantity_free
+            self.total_crafted += total_made
+            self.power_quantity.append({
+                "power": event.relevant_power,
+                "quantity": total_made,
+                "quantity_free": total_free
+            })
+
+
 def character_timeline(request, character_id):
     character = get_object_or_404(Character, id=character_id)
     if not character.player_can_view(request.user):
@@ -575,10 +604,33 @@ def character_timeline(request, character_id):
 
     assigned_rewards = [(x.assigned_on, "reward", x) for x in character.spent_rewards_rev_sort()]
     completed_games = [(x.relevant_game.end_time, "game", x) for x in character.completed_games_rev_sort()]
+
+    craftings = character.craftingevent_set.order_by("-relevant_attendance__relevant_game__end_time").all()
+    crafting_tuples = []
+    if craftings:
+        current_crafting_list = []
+        last_attendance_examined = craftings[0].relevant_attendance
+        for crafting in craftings:
+            if last_attendance_examined != crafting.relevant_attendance:
+                crafting_tuples.append(
+                    (last_attendance_examined.relevant_game.end_time + timedelta(seconds=6),
+                     "crafting",
+                     CraftingTimelineBlock(current_crafting_list))
+                )
+                current_crafting_list = []
+                last_attendance_examined = crafting.relevant_attendance
+            current_crafting_list.append(crafting)
+        crafting_tuples.append(
+            (
+                last_attendance_examined.relevant_game.end_time + timedelta(seconds=6),
+                "crafting",
+                CraftingTimelineBlock(current_crafting_list))
+        )
+
     character_edit_history = [(x.created_time, "edit", x) for x in
                               character.contractstats_set.filter(is_snapshot=False).order_by("-created_time").all()[:1]]
-    exp_rewards = [(x.created_time, "exp_reward", x) for x in character.experiencereward_set.filter(is_void=False).order_by("-created_time").all()]
-    events_by_date = list(merge(assigned_rewards, completed_games, character_edit_history, exp_rewards, reverse=True))
+    exp_rewards = [(x.created_time + timedelta(seconds=2), "exp_reward", x) for x in character.experiencereward_set.filter(is_void=False).order_by("-created_time").all()]
+    events_by_date = list(merge(assigned_rewards, completed_games, character_edit_history, exp_rewards, crafting_tuples, reverse=True))
     timeline = defaultdict(list)
     for event in events_by_date:
         if event[1] == "edit":

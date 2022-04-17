@@ -1,5 +1,5 @@
 {% if reward.is_void %}
-    <strike>
+    <strike class="text-muted">
 {% endif %}
 <b>
     {{ reward.type_text }}
@@ -24,5 +24,5 @@ from
         : Unspent
 {% endif %}
 {% if reward.is_void %}
-    </strike> &nbsp;&nbsp; Refunded
+    </strike> &nbsp;&nbsp; <i>(since refunded)</i>
 {% endif %}

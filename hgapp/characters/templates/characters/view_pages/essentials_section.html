@@ -1,44 +1,40 @@
 {% load markdown_deux_tags %}
 
-<div class="text-center char-essentials" >
-    <div class ="row">
-        <div class="col-xs-12">
-            <h5>
-                <b>{{character.name}}</b> is a <b>{{character.concept_summary}}</b> who will risk {{character.get_pronoun_display}} life to <b>{{character.ambition}}</b>.
-            </h5>
-            <p>
-                {{character.pres_tense_to_be}} <b>{{character.age}}</b> years old, and often appears as <b>{{character.appearance}}</b>.
-            </p>
-            {% if character.cell %}
-                <p>
-                    {{character.name}} lives in
-                    <a href="{% url 'cells:cells_view_cell' character.cell.id %}">{{ character.cell.setting_name }}</a>,
-                    a world {{ character.cell.setting_sheet_blurb}}.
-                </p>
+<div class="text-center char-essentials">
+    <h5 style="margin-top: 0px;">
+        <b>{{character.name}}</b> is a <b>{{character.concept_summary}}</b> who will risk {{character.get_pronoun_display}} life to <b>{{character.ambition}}</b>.
+    </h5>
+    <p>
+        {{character.pres_tense_to_be}} <b>{{character.age}}</b> years old, and often appears as <b>{{character.appearance}}</b>.
+    </p>
+    {% if character.cell %}
+        <p style="margin-bottom: 5px;">
+            {{character.name}} lives in
+            <a href="{% url 'cells:cells_view_cell' character.cell.id %}">{{ character.cell.setting_name }}</a>,
+            a world {{ character.cell.setting_sheet_blurb}}.
+        </p>
+    {% endif %}
+    {% if num_journal_entries %}
+        <p style="margin-bottom: 5px;">
+            {{character.pronoun_possessive_capitalized}}
+            {% if journal_cover %}
+                journal,
             {% endif %}
-            {% if num_journal_entries %}
-                <p>
-                    {{character.pronoun_possessive_capitalized}}
-                    {% if journal_cover %}
-                        journal,
-                    {% endif %}
-                    <a class="js-journal-link" href="{% url 'journals:journal_read' character.id %}">
-                        {% if journal_cover %}
-                            {{journal_cover.title}},
-                        {% else %}
-                            journal
-                        {% endif %}
-                    </a>
-                    has {{num_journal_entries}} {% if num_journal_entries > 1 %} entries{% else %} entry{%endif%}.
-                </p>
-            {% elif user_can_edit and next_entry %}
-                <a class="btn btn-sm btn-success js-journal-link"
-                   href="{% url 'journals:journal_write_next' character.id %}">
-                    Earn Experience and Improvements
-                    <br class="visible-xs-block">
-                    for {{character.name}} by writing in {{character.get_pronoun_display}} journal!
-                </a>
-            {% endif %}
-        </div>
-    </div>
+            <a class="js-journal-link" href="{% url 'journals:journal_read' character.id %}">
+                {% if journal_cover %}
+                    {{journal_cover.title}},
+                {% else %}
+                    journal
+                {% endif %}
+            </a>
+            has {{num_journal_entries}} {% if num_journal_entries > 1 %} entries{% else %} entry{%endif%}.
+        </p>
+    {% elif user_can_edit and next_entry %}
+        <a class="btn btn-sm btn-success js-journal-link"
+           href="{% url 'journals:journal_write_next' character.id %}">
+            Earn Experience and Improvements
+            <br class="visible-xs-block">
+            for {{character.name}} by writing in {{character.get_pronoun_display}} journal!
+        </a>
+    {% endif %}
 </div>

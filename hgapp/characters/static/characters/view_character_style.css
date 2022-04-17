@@ -17,6 +17,7 @@ h1 {
     border-radius: 4px;
     border-width: 1px;
     border-style: solid;
+    padding: 10px;
     background-color: #353e4b;
 }
 
@@ -157,6 +158,11 @@ input[type="number"] {
     background-color: #353e4b;
     border: 1px solid #ddd;
     border-radius: 4px;
+}
+
+.css-timeline-crafting {
+    background-color: #453e4b;
+    border-color: gray;
 }
 
 .css-timeline-exp {

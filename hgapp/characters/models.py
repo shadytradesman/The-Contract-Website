@@ -10,6 +10,7 @@ from django.utils.datetime_safe import datetime
 from django.utils import timezone
 from guardian.shortcuts import assign_perm, remove_perm
 from django.utils.safestring import mark_safe
+from django.urls import reverse
 from django.db import transaction
 
 from hgapp.utilities import get_queryset_size, get_object_or_none
@@ -1326,7 +1327,10 @@ class ExperienceReward(models.Model):
         if self.type == EXP_GM:
             return "{} {}".format(reason, self.game.scenario.title)
         if self.type == EXP_JOURNAL:
-            return mark_safe(reason)
+            return mark_safe("<a href={}>{}: {}</a>".format(
+                reverse("journals:journal_read_id", args=(self.journal.pk,)),
+                reason,
+                self.journal.title))
         if hasattr(self, 'game_attendance'):
             attendance = self.game_attendance
             return "{} {}".format(reason, attendance.relevant_game.scenario.title)
