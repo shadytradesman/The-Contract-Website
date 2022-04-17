@@ -6,6 +6,14 @@
             <li><a href="{% url 'characters:characters_edit' character.id secret_key %}" class="btn btn-default">
                 Edit Contractor
             </a></li>
+            {% if character.crafting_avail and request.user.is_superuser%}
+                <li>
+                    <a href="{% url 'crafting:crafting_craft' character.id %}"
+                       class="btn {% if character.highlight_crafting %}btn-success {% else %}btn-default{% endif %}">
+                        Craft
+                    </a>
+                </li>
+            {% endif %}
             {% if request.user == character.player %}
                 <li><a href="{% url 'characters:characters_delete' character.id %}" class="btn btn-default">
                     Delete Contractor
@@ -16,7 +24,7 @@
                     Assign Powers
                 </a></li>
                 <li><a href="{% url 'characters:characters_archive' character.id %}" class="btn btn-default">
-                    Download Contractor as plain text
+                    Archive
                 </a></li>
                 {% if character.is_dead %}
                     <li><a href="{%url 'characters:characters_obituary' character.id %}" class="btn btn-default">
@@ -24,7 +32,7 @@
                     </a></li>
                 {% else %}
                     <li><a href="{%url 'characters:characters_obituary' character.id %}" class="btn btn-default">
-                        Declare Contractor Death
+                        Kill Contractor
                     </a></li>
                 {% endif %}
             {%endif %}

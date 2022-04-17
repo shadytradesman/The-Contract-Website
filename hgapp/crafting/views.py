@@ -52,6 +52,9 @@ class Craft(View):
                 if not form.is_valid():
                     raise ValueError("Invalid consumable form")
             self.__save_consumable_forms(consumable_forms)
+            self.character.highlight_crafting = False
+            self.character.save()
+
         return HttpResponseRedirect(reverse('characters:characters_view', args=(self.character.pk,)))
 
     def __get_context_data(self):
@@ -77,12 +80,10 @@ class Craft(View):
                 # update an existing event
                 if newly_crafted < 0:
                     self.event_by_power_full[power_id].refund_crafted_consumables(
-                        number_to_refund=-newly_crafted,
-                        exp_cost_per=power.get_gift_cost())
+                        number_to_refund=-newly_crafted)
                 if newly_crafted > 0:
                     self.event_by_power_full[power_id].craft_new_consumables(
                         number_newly_crafted=newly_crafted,
-                        exp_cost_per=power.get_gift_cost(),
                         new_number_free=number_free,
                         power_full=power)
             else:
@@ -97,7 +98,6 @@ class Craft(View):
                         relevant_power_full=power)
                     crafting_event.craft_new_consumables(
                         number_newly_crafted=newly_crafted,
-                        exp_cost_per=power.get_gift_cost(),
                         new_number_free=number_free,
                         power_full=power)
 
@@ -117,10 +117,10 @@ class Craft(View):
         latest_end_game = self.attendance.relevant_game.end_time if self.attendance else None
         if latest_end_game:
             free_crafting_rewards = self.character.rewards_spent_since_date(latest_end_game) \
-                .filter(relevant_power__parent_power__crafting_type__in=[CRAFTING_CONSUMABLE, CRAFTING_ARTIFACT]).all()
+                .filter(is_void=False, relevant_power__parent_power__crafting_type__in=[CRAFTING_CONSUMABLE, CRAFTING_ARTIFACT]).all()
         else:
             free_crafting_rewards = self.character.spent_rewards()\
-                .filter(relevant_power__parent_power__crafting_type__in=[CRAFTING_CONSUMABLE, CRAFTING_ARTIFACT]).all()
+                .filter(is_void=False, relevant_power__parent_power__crafting_type__in=[CRAFTING_CONSUMABLE, CRAFTING_ARTIFACT]).all()
         for reward in free_crafting_rewards:
             power = reward.relevant_power
             if power.parent_power.crafting_type == CRAFTING_CONSUMABLE:

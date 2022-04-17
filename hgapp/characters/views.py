@@ -20,6 +20,7 @@ from characters.models import Character, BasicStats, Character_Death, Graveyard_
     LOST, DESTROYED
 from powers.models import Power_Full, SYS_LEGACY_POWERS, SYS_PS2, CRAFTING_NONE, CRAFTING_SIGNATURE, CRAFTING_ARTIFACT, \
     CRAFTING_CONSUMABLE
+from powers.signals import gift_major_revision
 from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, get_ability_form, \
     AssetForm, LiabilityForm, BattleScarForm, TraumaForm, InjuryForm, SourceValForm, make_allocate_gm_exp_form, EquipmentForm,\
     DeleteCharacterForm, BioForm, make_world_element_form, get_default_scar_choice_field, make_artifact_status_form, \
@@ -359,7 +360,7 @@ def archive_character(request, character_id):
     character = get_object_or_404(Character, id=character_id)
     if not character.player_can_view(request.user):
         raise PermissionDenied("You do not have permission to view this Character")
-    return HttpResponse(character.archive_txt(), content_type='text/plain')
+    return HttpResponse(character.archive_txt(), content_type='text/plain; charset=UTF-8')
 
 
 def choose_powers(request, character_id):
@@ -446,6 +447,10 @@ def toggle_power(request, character_id, power_full_id):
         if assignment_form.is_valid():
             with transaction.atomic():
                 if power_full.character == character:
+                    gift_major_revision.send(sender=Character.__class__,
+                                             old_power="we don't use this",
+                                             new_power=power_full.latest_rev,
+                                             power_full=power_full)
                     # Unassign the power
                     power_full.character = None
                     power_full.save()
@@ -462,6 +467,10 @@ def toggle_power(request, character_id, power_full_id):
                     rewards_to_be_spent = character.reward_cost_for_power(power_full)
                     for reward in rewards_to_be_spent:
                         reward.assign_to_power(power_full.latest_revision())
+                    if power_full.crafting_type in [CRAFTING_ARTIFACT, CRAFTING_CONSUMABLE]:
+                        character.crafting_avail = True
+                        character.highlight_crafting = True
+                        character.save()
                 character.reset_attribute_bonuses()
             return HttpResponseRedirect(reverse('characters:characters_power_picker', args=(character.id,)))
         else:
@@ -668,7 +677,7 @@ def transfer_artifact(request, artifact_id):
         if not artifact.character:
             raise ValueError("Artifact has no character and cannot be transferred")
         __check_edit_perms(request, artifact.character)
-        max_quantity = 1
+        max_quantity = 0
         if artifact.is_consumable:
             max_quantity = artifact.quantity
         form = make_transfer_artifact_form(artifact.character, artifact.character.cell, max_quantity)(request.POST)

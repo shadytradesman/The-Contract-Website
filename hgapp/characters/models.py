@@ -311,6 +311,11 @@ class Character(models.Model):
                                max_length=50,
                                default=NOT_PORTED)
 
+    # true if contractor has ever had a crafting gift. Shows crafting button.
+    crafting_avail = models.BooleanField(default=False)
+    # true when crafting button should be highlighted on sheet.
+    highlight_crafting = models.BooleanField(default=False)
+
     # Optional fields
     cell = models.ForeignKey(Cell,
                               blank=True,

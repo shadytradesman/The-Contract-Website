@@ -209,7 +209,10 @@ def create_archival_game(request, general_form, cell, outcome_formset):
             if 'attending_character' in form.cleaned_data \
                     and not form.cleaned_data['attending_character'] is None:
                 if hasattr(form.cleaned_data['attending_character'], 'cell'):
-                    attendance.attending_character = form.cleaned_data['attending_character']
+                    character = form.cleaned_data['attending_character']
+                    attendance.attending_character = character
+                    character.highlight_crafting = True
+                    character.save()
                     if not form.cleaned_data['attending_character'].cell == cell:
                         attendance.is_confirmed = False
                 else:

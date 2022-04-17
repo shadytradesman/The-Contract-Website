@@ -44,13 +44,16 @@ class CraftingEvent(models.Model):
             models.Index(fields=['relevant_character']),
         ]
 
+    def get_exp_cost_per_consumable(self):
+        return 2
+
     def refund_all(self):
         if self.relevant_power_full.crafting_type == CRAFTING_CONSUMABLE:
             num_to_refund = self.craftedartifact_set.aggregate(Sum('quantity'))['quantity__sum']
-            self.refund_crafted_consumables(number_to_refund=num_to_refund, exp_cost_per=self.relevant_power.get_gift_cost())
+            self.refund_crafted_consumables(number_to_refund=num_to_refund)
         self.artifacts.clear()
 
-    def refund_crafted_consumables(self, number_to_refund, exp_cost_per):
+    def refund_crafted_consumables(self, number_to_refund):
         remaining_to_refund = number_to_refund
         crafted_artifacts = self.craftedartifact_set.prefetch_related("relevant_artifact").all()
         num_refunded_by_crafted_artifact_id = Counter()
@@ -62,7 +65,7 @@ class CraftingEvent(models.Model):
             crafted_artifact.quantity -= num_refunded
             num_refunded_by_crafted_artifact_id[crafted_artifact.pk] += num_refunded
             remaining_to_refund -= num_refunded
-            self.total_exp_spent -= num_refunded * exp_cost_per
+            self.total_exp_spent -= num_refunded * self.get_exp_cost_per_consumable()
         # now refund free ones
         for crafted_artifact in crafted_artifacts:
             if remaining_to_refund == 0:
@@ -88,7 +91,7 @@ class CraftingEvent(models.Model):
             crafted_artifact.save()
         self.save()
 
-    def craft_new_consumables(self, number_newly_crafted, new_number_free, exp_cost_per, power_full):
+    def craft_new_consumables(self, number_newly_crafted, new_number_free, power_full):
         paid_crafted = number_newly_crafted - new_number_free
         crafted_artifacts = self.craftedartifact_set.filter(relevant_artifact__is_deleted=False).prefetch_related("relevant_artifact").all()
         crafter_held_crafted_artifact = None
@@ -121,7 +124,7 @@ class CraftingEvent(models.Model):
             power_full.latest_rev.artifacts.add(new_artifact)
             power_full.latest_rev.save()
             power_full.save()
-        self.total_exp_spent += (paid_crafted * exp_cost_per)
+        self.total_exp_spent += (paid_crafted * self.get_exp_cost_per_consumable())
         self.save()
 
 

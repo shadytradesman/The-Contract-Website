@@ -67,6 +67,15 @@
                         {% endfor %}
                     </ul>
                 {% endif %}
+            {% if power_full.is_crafting %}
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2 alert alert-danger" role="alert">
+                    <h4>Refunding this Gift wil affect items you have previously crafted.</h4>
+                    <p>All items crafted this downtime will be refunded. All items crafted previously will be marked
+                        that the Gift has undergone a major revision.</p>
+                </div>
+            </div>
+            {% endif %}
             {% endif %}
             <div class="text-center">
                 <form action="{% url 'characters:characters_power_toggle' character.id power_full.id %}" method="post">

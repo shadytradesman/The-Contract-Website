@@ -15,7 +15,7 @@
             class="has-popover"
             style=" height: 25px; display: inline-block;">
         {% if power.modality.icon %}
-            <img src="{{power.modality.icon.url}}" width="25px" height="25px" style="vertical-align: text-bottom;">
+            <img src="{{power.modality.icon.url}}" width="25" height="25" style="vertical-align: text-bottom;">
         {% endif %}
     </span>
     <span
@@ -25,7 +25,7 @@
         class="has-popover"
         style=" height: 25px; display: inline-block;">
         {% if power.base.icon %}
-            <img src="{{power.base.icon.url}}" width="25px" height="25px" style="vertical-align: text-bottom;" >
+            <img src="{{power.base.icon.url}}" width="25" height="25" style="vertical-align: text-bottom;" >
         {% endif %}
     </span>
     {% if power.shouldDisplayVector %}
@@ -36,12 +36,12 @@
             class="has-popover"
             style=" height: 25px; display: inline-block;">
             {% if power.vector.icon %}
-                <img src="{{power.vector.icon.url}}" width="25px" height="25px" style="vertical-align: text-bottom;">
+                <img src="{{power.vector.icon.url}}" width="25" height="25" style="vertical-align: text-bottom;">
             {% endif %}
         </span>
     {% endif %}
     {% if power.get_num_enhancements %}
-    <span
+        <span
             data-html="true"
             aria-hidden="true"
             data-title="{{power.get_enhancement_list|safe}}"
@@ -54,7 +54,7 @@
                 </span>
                 <span class="glyphicon glyphicon-menu-up">
                 </span>
-            </span>
+        </span>
     {% endif %}
     {% if power.get_num_drawbacks %}
         <span

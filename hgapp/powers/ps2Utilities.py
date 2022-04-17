@@ -9,7 +9,8 @@ from .models import SYS_LEGACY_POWERS, EFFECT, VECTOR, MODALITY, Base_Power, Enh
     Base_Power_Category, VectorCostCredit, ADDITIVE, EnhancementGroup, CREATION_NEW, SYS_PS2, Power, Power_Full, \
     Enhancement_Instance, Drawback_Instance, Parameter_Value, Power_Param, SystemFieldText, SystemFieldTextInstance, \
     SystemFieldWeapon, SystemFieldWeaponInstance, SystemFieldRoll, SystemFieldRollInstance, PowerSystem, \
-    CRAFTING_SIGNATURE, CREATION_REVISION, CREATION_MAJOR_REVISION, CREATION_ADJUSTMENT, CREATION_IMPROVEMENT
+    CRAFTING_SIGNATURE, CREATION_REVISION, CREATION_MAJOR_REVISION, CREATION_ADJUSTMENT, CREATION_IMPROVEMENT, \
+    CRAFTING_CONSUMABLE, CRAFTING_ARTIFACT
 from .formsPs2 import PowerForm, get_modifiers_formset, get_params_formset, get_sys_field_text_formset, \
     get_sys_field_weapon_formset, get_sys_field_roll_formset, make_select_signature_artifact_form
 from .signals import gift_revision, gift_major_revision, gift_adjustment
@@ -158,6 +159,10 @@ def _create_new_power_and_save(power_form, request, SigArtifactForm):
 
 
 def _handle_crafting(old_power, new_power, power_full):
+    if power_full.crafting_type in [CRAFTING_CONSUMABLE, CRAFTING_ARTIFACT]:
+        power_full.character.highlight_crafting = True
+        power_full.character.crafting_avail = True
+        power_full.character.save()
     if new_power.creation_reason in CREATION_ADJUSTMENT:
         gift_adjustment.send(sender=Power.__class__, old_power=old_power, new_power=new_power, power_full=power_full)
     if new_power.creation_reason in [CREATION_REVISION, CREATION_IMPROVEMENT]:
