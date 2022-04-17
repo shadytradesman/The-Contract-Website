@@ -771,6 +771,7 @@ const ComponentRendering = {
       drawbackList: "",
       warnings: [],
       selectedItem: "",
+      hasCrafted: false,
     }
   },
   methods: {
@@ -827,6 +828,7 @@ const ComponentRendering = {
         this.giftDescription = powerEditBlob["description"];
         this.giftExtendedDescription = powerEditBlob["extended_description"];
         this.previousGiftCost = powerEditBlob["current_cost"];
+        this.hasCrafted = powerEditBlob["has_crafted"];
         let selectedModality = this.modalities.find(comp => comp.slug === powerEditBlob["modality_pk"]);
         if (!selectedModality) {
             return;
@@ -1287,6 +1289,8 @@ const ComponentRendering = {
       },
       updateGiftText() {
         if (null != characterBlob) {
+            this.giftInfoList = [];
+            this.giftInfoHeader = "";
             let spentRewards = null != powerEditBlob ? powerEditBlob["spent_rewards"] : [];
             let numInvested = spentRewards.length;
             let unpaidCost = this.giftCost - numInvested;

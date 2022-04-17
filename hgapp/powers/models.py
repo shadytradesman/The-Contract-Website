@@ -1076,10 +1076,12 @@ class Power(models.Model):
                 modality_id = "power"
             vector_id = None
             effect_pk = self.base_id
+            has_crafted = False
         else:
             effect_pk = self.base_id
             vector_id = self.vector_id
             modality_id = self.modality_id
+            has_crafted = self.modality.crafting_type in [CRAFTING_CONSUMABLE, CRAFTING_ARTIFACT] and self.parent_power.artifacts.count()
 
         spent_rewards = []
         for reward in self.parent_power.reward_list():
@@ -1108,6 +1110,7 @@ class Power(models.Model):
             "spent_rewards": spent_rewards,
 
             "current_artifact": initial_artifact,
+            "has_crafted": has_crafted,
         }
 
     def get_gift_cost(self):

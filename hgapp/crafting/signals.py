@@ -8,7 +8,7 @@ from .models import CraftedArtifact
 
 @receiver(gift_adjustment)
 def handle_gift_adjustment(sender, **kwargs):
-    # update things that have been crafted this downtime
+    # update things that have been crafted this downtime. No improvements
     power_full = kwargs["power_full"]
     old_power = kwargs["old_power"]
     new_power = kwargs["new_power"]

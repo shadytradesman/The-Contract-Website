@@ -158,9 +158,9 @@ def _create_new_power_and_save(power_form, request, SigArtifactForm):
 
 
 def _handle_crafting(old_power, new_power, power_full):
-    if new_power.creation_reason in [CREATION_ADJUSTMENT, CREATION_IMPROVEMENT]:
+    if new_power.creation_reason in CREATION_ADJUSTMENT:
         gift_adjustment.send(sender=Power.__class__, old_power=old_power, new_power=new_power, power_full=power_full)
-    if new_power.creation_reason == CREATION_REVISION:
+    if new_power.creation_reason in [CREATION_REVISION, CREATION_IMPROVEMENT]:
         gift_revision.send(sender=Power.__class__, old_power=old_power, new_power=new_power, power_full=power_full)
     if new_power.creation_reason == CREATION_MAJOR_REVISION:
         gift_major_revision.send(sender=Power.__class__, old_power=old_power, new_power=new_power, power_full=power_full)
