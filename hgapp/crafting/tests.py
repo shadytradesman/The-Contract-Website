@@ -6,11 +6,13 @@ from characters.models import Character, ContractStats, Asset, Liability, AssetD
     Trauma, NOT_PORTED, SEASONED_PORTED, VETERAN_PORTED, PORTED_GIFT_ADJUSTMENT, PORTED_IMPROVEMENT_ADJUSTMENT, \
     PORTED_EXP_ADJUSTMENT, EXP_NEW_CHAR, Artifact, GIVEN
 from powers.models import Base_Power, Base_Power_Category, PowerTutorial, Power, EFFECT, VECTOR, MODALITY, SYS_PS2, \
-    SYS_ALL, SYS_LEGACY_POWERS, CREATION_NEW, CRAFTING_CONSUMABLE, CRAFTING_NONE, Power_Full, PowerSystem
+    SYS_ALL, SYS_LEGACY_POWERS, CREATION_NEW, CRAFTING_CONSUMABLE, CRAFTING_NONE, Power_Full, PowerSystem, \
+    CREATION_ADJUSTMENT
 from django.db import transaction
 from games.models import Reward, Scenario, Game, Game_Attendance, GAME_STATUS, WIN, Game_Invite
 from cells.models import Cell
 from profiles.signals import make_profile_for_new_user
+from .signals import handle_gift_adjustment, handle_gift_revision, handle_gift_major_revision
 from django.utils import timezone
 
 
@@ -32,6 +34,27 @@ def create_base_power(power_slug, category=None, public=True, type=EFFECT, craft
         base_type=type,
         crafting_type=crafting_type,
     )
+
+def edit_power(existing_power, revision_type=CREATION_ADJUSTMENT):
+    power = Power.objects.create(
+        name="name",
+        flavor_text="flavor",
+        description="description",
+        dice_system=existing_power.dice_system,
+        base=existing_power.base,
+        vector=existing_power.vector,
+        modality=existing_power.modality,
+        creation_reason=revision_type,)
+    power.character=existing_power.character
+    power.created_by=existing_power.character.player
+    power.save()
+    parent_power = existing_power.parent_power
+    parent_power.latest_rev = power
+    parent_power.save()
+    power.parent_power = parent_power
+    power.save()
+    return power
+
 
 def create_power(system=SYS_PS2, effect=None, vector=None, modality=None, character=None):
     power = Power.objects.create(
@@ -274,14 +297,13 @@ class CraftingModelTests(TestCase):
 
         crafting_event.craft_new_consumables(
             number_newly_crafted=3,
-            exp_cost_per=1,
             new_number_free=1,
             power_full=power.parent_power)
-        self.assertEquals(crafting_event.total_exp_spent, 2)
+        self.assertEquals(crafting_event.total_exp_spent, 4)
         self.assertEquals(self.char_full.artifact_set.count(), 1)
         new_artifact = self.char_full.artifact_set.first()
         self.assertEquals(new_artifact.quantity, 3)
-        self.assertEquals(self.char_full.unspent_experience(), original_exp - 2)
+        self.assertEquals(self.char_full.unspent_experience(), original_exp - 4)
         self.assertTrue(new_artifact.is_consumable)
         self.assertFalse(new_artifact.is_signature)
         self.assertEquals(new_artifact.character, power.character)
@@ -291,14 +313,13 @@ class CraftingModelTests(TestCase):
 
         crafting_event.craft_new_consumables(
             number_newly_crafted=1,
-            exp_cost_per=1,
             new_number_free=0,
             power_full=power.parent_power)
-        self.assertEquals(crafting_event.total_exp_spent, 3)
+        self.assertEquals(crafting_event.total_exp_spent, 6)
         self.assertEquals(self.char_full.artifact_set.count(), 1)
         new_artifact = self.char_full.artifact_set.first()
         self.assertEquals(new_artifact.quantity, 4)
-        self.assertEquals(self.char_full.unspent_experience(), original_exp - 3)
+        self.assertEquals(self.char_full.unspent_experience(), original_exp - 6)
 
         power2 = create_power(effect=self.base_effect, vector=self.base_vector, modality=self.base_modality, character=self.char_full)
         crafting_event2 = CraftingEvent.objects.create(
@@ -307,27 +328,25 @@ class CraftingModelTests(TestCase):
             relevant_power_full=power2.parent_power)
         crafting_event2.craft_new_consumables(
             number_newly_crafted=10,
-            exp_cost_per=2,
             new_number_free=1,
             power_full=power2.parent_power)
         self.assertEquals(crafting_event2.total_exp_spent, 18)
         self.assertEquals(self.char_full.artifact_set.count(), 2)
         new_artifact2 = crafting_event2.artifacts.first()
         self.assertEquals(new_artifact2.quantity, 10)
-        self.assertEquals(self.char_full.unspent_experience(), original_exp - 3 - 18)
+        self.assertEquals(self.char_full.unspent_experience(), original_exp - 6 - 18)
 
         crafting_event2.craft_new_consumables(
             number_newly_crafted=3,
-            exp_cost_per=2,
             new_number_free=3,
             power_full=power2.parent_power)
         self.assertEquals(crafting_event2.total_exp_spent, 18)
         self.assertEquals(self.char_full.artifact_set.count(), 2)
         new_artifact2 = crafting_event2.artifacts.first()
         self.assertEquals(new_artifact2.quantity, 13)
-        self.assertEquals(self.char_full.unspent_experience(), original_exp - 3 - 18)
+        self.assertEquals(self.char_full.unspent_experience(), original_exp - 6 - 18)
 
-        crafting_event.refund_crafted_consumables(number_to_refund=3, exp_cost_per=1)
+        crafting_event.refund_crafted_consumables(number_to_refund=3)
         # now there is only one crafted and it is free
         self.assertEquals(crafting_event.total_exp_spent, 0)
         self.assertEquals(self.char_full.artifact_set.count(), 2)
@@ -338,12 +357,12 @@ class CraftingModelTests(TestCase):
         # Too many to refund
         with transaction.atomic():
             with self.assertRaises(ValueError):
-                crafting_event.refund_crafted_consumables(number_to_refund=3, exp_cost_per=1)
+                crafting_event.refund_crafted_consumables(number_to_refund=3)
 
         new_artifact.quantity = 0 #used a consumable
         new_artifact.save()
         # we can still refund even if a consumable has been used.
-        crafting_event.refund_crafted_consumables(number_to_refund=1, exp_cost_per=1)
+        crafting_event.refund_crafted_consumables(number_to_refund=1)
         self.assertEquals(crafting_event.total_exp_spent, 0)
         self.assertEquals(self.char_full.artifact_set.count(), 2)
         new_artifact = crafting_event.artifacts.first()
@@ -363,14 +382,13 @@ class CraftingModelTests(TestCase):
 
         crafting_event.craft_new_consumables(
             number_newly_crafted=3,
-            exp_cost_per=1,
             new_number_free=1,
             power_full=power.parent_power)
-        self.assertEquals(crafting_event.total_exp_spent, 2)
+        self.assertEquals(crafting_event.total_exp_spent, 4)
         self.assertEquals(self.char_full.artifact_set.count(), 1)
         new_artifact = self.char_full.artifact_set.first()
         self.assertEquals(new_artifact.quantity, 3)
-        self.assertEquals(self.char_full.unspent_experience(), original_exp - 2)
+        self.assertEquals(self.char_full.unspent_experience(), original_exp - 4)
 
     def test_transfer_consumables(self):
         power = create_power(effect=self.base_effect, vector=self.base_vector, modality=self.base_modality, character=self.char_full)
@@ -386,7 +404,6 @@ class CraftingModelTests(TestCase):
 
         crafting_event.craft_new_consumables(
             number_newly_crafted=3,
-            exp_cost_per=1,
             new_number_free=1,
             power_full=power.parent_power)
         new_artifact = self.char_full.artifact_set.first()
@@ -401,11 +418,11 @@ class CraftingModelTests(TestCase):
             with self.assertRaises(ValueError):
                 new_artifact.transfer_to_character(transfer_type=GIVEN, to_character=self.char_full, notes="", quantity=1)
 
-        self.assertEquals(crafting_event.total_exp_spent, 2)
+        self.assertEquals(crafting_event.total_exp_spent, 4)
         self.assertEquals(self.char_full.artifact_set.count(), 1)
         self.assertEquals(self.char2.artifact_set.count(), 0)
         self.assertEquals(new_artifact.quantity, 3)
-        self.assertEquals(self.char_full.unspent_experience(), original_exp - 2)
+        self.assertEquals(self.char_full.unspent_experience(), original_exp - 4)
 
         new_artifact.transfer_to_character(transfer_type=GIVEN, to_character=self.char2, notes="", quantity=1)
         self.assertEquals(self.char_full.artifact_set.count(), 1)
@@ -413,7 +430,7 @@ class CraftingModelTests(TestCase):
         self.assertEquals(self.char2.unspent_experience(), original_exp2)
         new_artifact = self.char_full.artifact_set.first()
         self.assertEquals(new_artifact.quantity, 2)
-        self.assertEquals(self.char_full.unspent_experience(), original_exp - 2)
+        self.assertEquals(self.char_full.unspent_experience(), original_exp - 4)
 
         new_artifact2 = self.char2.artifact_set.first()
         self.assertEquals(new_artifact2.quantity, 1)
@@ -438,7 +455,7 @@ class CraftingModelTests(TestCase):
         new_artifact = self.char_full.artifact_set.first()
         new_artifact2 = self.char2.artifact_set.first()
         self.assertEquals(new_artifact.quantity, 3)
-        self.assertEquals(self.char_full.unspent_experience(), original_exp - 2)
+        self.assertEquals(self.char_full.unspent_experience(), original_exp - 4)
         self.assertEquals(new_artifact2.quantity, 0)
         self.assertTrue(new_artifact2.is_consumable)
         self.assertFalse(new_artifact2.is_signature)
@@ -451,18 +468,177 @@ class CraftingModelTests(TestCase):
         self.assertEquals(new_artifact.quantity, 2)
         self.assertEquals(new_artifact2.quantity, 1)
 
-        crafting_event.refund_crafted_consumables(number_to_refund=2, exp_cost_per=1)
+        crafting_event.refund_crafted_consumables(number_to_refund=2)
         new_artifact = self.char_full.artifact_set.first()
         new_artifact2 = self.char2.artifact_set.first()
         self.assertEquals(new_artifact.quantity, 0)
         self.assertEquals(new_artifact2.quantity, 1)
 
-        crafting_event.refund_crafted_consumables(number_to_refund=1, exp_cost_per=1)
+        crafting_event.refund_crafted_consumables(number_to_refund=1)
         new_artifact = self.char_full.artifact_set.first()
         new_artifact2 = self.char2.artifact_set.first()
         self.assertEquals(new_artifact.quantity, 0)
         self.assertEquals(new_artifact2.quantity, 0)
 
+    def test_transfer_and_refund_consumables_from_different_events(self):
+        power = create_power(effect=self.base_effect, vector=self.base_vector, modality=self.base_modality, character=self.char_full)
+        original_exp = self.char_full.unspent_experience()
+        crafting_event = CraftingEvent.objects.create(
+            relevant_character=self.char_full,
+            relevant_power=power,
+            relevant_power_full=power.parent_power)
 
-    #TODO: Add tests for multiple games behavior, transfering / refunding stacks of artifacts that were produced in different events
-    #TODO: Add tests for power refund, revision, etc.
+        crafting_event.craft_new_consumables(
+            number_newly_crafted=3,
+            new_number_free=1,
+            power_full=power.parent_power)
+        self.assertEquals(crafting_event.total_exp_spent, 4)
+        self.assertEquals(self.char_full.artifact_set.count(), 1)
+        new_artifact = self.char_full.artifact_set.first()
+        self.assertEquals(new_artifact.quantity, 3)
+        self.assertEquals(self.char_full.unspent_experience(), original_exp - 4)
+
+        new_artifact.transfer_to_character(transfer_type=GIVEN, to_character=self.char2, notes="", quantity=1)
+        self.assertEquals(self.char_full.artifact_set.count(), 1)
+        self.assertEquals(self.char2.artifact_set.count(), 1)
+        new_artifact = self.char_full.artifact_set.first()
+        new_artifact2 = self.char2.artifact_set.first()
+        self.assertEquals(new_artifact.quantity, 2)
+        self.assertEquals(new_artifact2.quantity, 1)
+
+        attendance = self.send_contractor_on_game(self.char_full)
+        after_game_exp = original_exp + 5 #victory
+
+        crafting_event2 = CraftingEvent.objects.create(
+            relevant_attendance=attendance,
+            relevant_character=self.char_full,
+            relevant_power=power,
+            relevant_power_full=power.parent_power)
+
+        crafting_event2.craft_new_consumables(
+            number_newly_crafted=3,
+            new_number_free=1,
+            power_full=power.parent_power)
+        self.assertEquals(crafting_event2.total_exp_spent, 4)
+        self.assertEquals(self.char_full.artifact_set.count(), 1)
+        new_artifact = self.char_full.artifact_set.first()
+        self.assertEquals(new_artifact.quantity, 5)
+        self.assertEquals(self.char_full.unspent_experience(), after_game_exp - 8)
+
+        new_artifact.transfer_to_character(transfer_type=GIVEN, to_character=self.char2, notes="", quantity=3)
+        self.assertEquals(self.char_full.artifact_set.count(), 1)
+        self.assertEquals(self.char2.artifact_set.count(), 1)
+        new_artifact = self.char_full.artifact_set.first()
+        new_artifact2 = self.char2.artifact_set.first()
+        self.assertEquals(new_artifact.quantity, 2)
+        self.assertEquals(new_artifact2.quantity, 4)
+
+        new_artifact2.transfer_to_character(transfer_type=GIVEN, to_character=self.char_full, notes="", quantity=2)
+        self.assertEquals(self.char_full.artifact_set.count(), 1)
+        self.assertEquals(self.char2.artifact_set.count(), 1)
+        new_artifact = self.char_full.artifact_set.first()
+        new_artifact2 = self.char2.artifact_set.first()
+        self.assertEquals(new_artifact.quantity, 4)
+        self.assertEquals(new_artifact2.quantity, 2)
+
+        crafting_event2.refund_crafted_consumables(number_to_refund=3) # refund ones we hold first. Traded ones we could refund
+        new_artifact = self.char_full.artifact_set.first()
+        new_artifact2 = self.char2.artifact_set.first()
+        self.assertEquals(new_artifact.quantity, 1)
+        self.assertEquals(new_artifact2.quantity, 2)
+
+    def test_power_adjustment_updates_consumables(self):
+        power = create_power(effect=self.base_effect, vector=self.base_vector, modality=self.base_modality, character=self.char_full)
+        crafting_event = CraftingEvent.objects.create(
+            relevant_character=self.char_full,
+            relevant_power=power,
+            relevant_power_full=power.parent_power)
+        crafting_event.craft_new_consumables(
+            number_newly_crafted=3,
+            new_number_free=1,
+            power_full=power.parent_power)
+        self.assertEquals(self.char_full.artifact_set.count(), 1)
+        new_artifact = self.char_full.artifact_set.first()
+        self.assertEquals(new_artifact.quantity, 3)
+
+        power2 = edit_power(power)
+        handle_gift_adjustment(sender=None, power_full=power2.parent_power, old_power=power, new_power=power2)
+        new_artifact = self.char_full.artifact_set.first()
+        self.assertEquals(new_artifact.quantity, 3)
+        new_artifact_power = new_artifact.power_set.first()
+        self.assertEquals(new_artifact_power, power2)
+        crafting_event.refresh_from_db()
+        self.assertEquals(crafting_event.relevant_power, power2)
+
+        attendance = self.send_contractor_on_game(self.char_full)
+        crafting_event2 = CraftingEvent.objects.create(
+            relevant_attendance=attendance,
+            relevant_character=self.char_full,
+            relevant_power=power2,
+            relevant_power_full=power2.parent_power)
+        crafting_event2.craft_new_consumables(
+            number_newly_crafted=3,
+            new_number_free=1,
+            power_full=power2.parent_power)
+        new_artifact = self.char_full.artifact_set.first()
+        self.assertEquals(new_artifact.quantity, 6)
+        new_artifact_power = new_artifact.power_set.first()
+        self.assertEquals(new_artifact_power, power2)
+
+        power3 = edit_power(power2)
+        handle_gift_adjustment(sender=None, power_full=power3.parent_power, old_power=power2, new_power=power3)
+        new_artifact = self.char_full.artifact_set.first()
+        self.assertEquals(new_artifact.quantity, 6)
+        new_artifact_power = new_artifact.power_set.first()
+        self.assertEquals(new_artifact_power, power3)
+
+        attendance2 = self.send_contractor_on_game(self.char_full)
+        crafting_event3 = CraftingEvent.objects.create(
+            relevant_attendance=attendance2,
+            relevant_character=self.char_full,
+            relevant_power=power3,
+            relevant_power_full=power3.parent_power)
+        crafting_event3.craft_new_consumables(
+            number_newly_crafted=3,
+            new_number_free=1,
+            power_full=power3.parent_power)
+        power4 = edit_power(power3)
+        handle_gift_revision(sender=None, power_full=power4.parent_power, old_power=power3, new_power=power4)
+        crafting_event3.refresh_from_db()
+        self.assertEquals(crafting_event3.total_exp_spent, 0)
+        self.assertEquals(crafting_event3.relevant_power, power4)
+        new_artifact2 = crafting_event3.artifacts.first()
+        self.assertIsNone(new_artifact2)
+        # check original
+        new_artifact.refresh_from_db()
+        self.assertEquals(new_artifact.quantity, 6)
+        new_artifact_power = new_artifact.power_set.first()
+        self.assertEquals(new_artifact_power, power3)
+
+        crafting_event3.craft_new_consumables(
+            number_newly_crafted=3,
+            new_number_free=1,
+            power_full=power4.parent_power)
+        new_artifact2 = crafting_event3.artifacts.first()
+        self.assertEquals(new_artifact2.quantity, 3)
+        new_artifact_power2 = new_artifact2.power_set.first()
+        self.assertEquals(new_artifact_power2, power4)
+
+        new_artifact.refresh_from_db()
+        self.assertEquals(new_artifact.quantity, 6)
+        new_artifact_power = new_artifact.power_set.first()
+        self.assertEquals(new_artifact_power, power3)
+
+        power5 = edit_power(power4)
+        handle_gift_adjustment(sender=None, power_full=power5.parent_power, old_power=power4, new_power=power5)
+        new_artifact2 = crafting_event3.artifacts.first()
+        self.assertEquals(new_artifact2.quantity, 3)
+        self.assertFalse(new_artifact2.since_revised, False)
+        new_artifact_power2 = new_artifact2.power_set.first()
+        self.assertEquals(new_artifact_power2, power5)
+
+        new_artifact.refresh_from_db()
+        self.assertEquals(new_artifact.quantity, 6)
+        self.assertFalse(new_artifact.since_revised, False)
+        new_artifact_power = new_artifact.power_set.first()
+        self.assertEquals(new_artifact_power, power3)

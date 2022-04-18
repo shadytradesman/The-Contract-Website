@@ -156,23 +156,35 @@ class CraftingEvent(models.Model):
             crafter_held_crafted_artifact.relevant_artifact.quantity += number_newly_crafted
             crafter_held_crafted_artifact.relevant_artifact.save()
         else:
-            new_artifact = Artifact.objects.create(
-                name=self.relevant_power.name,
-                description=self.relevant_power.description,
-                crafting_character=self.relevant_character,
-                character=self.relevant_character,
-                creating_player=self.relevant_character.player,
-                is_consumable=True,
-                quantity=number_newly_crafted,)
+            # new artifactCrafting
+            existing_artifacts = self.relevant_character.artifact_set.filter(is_consumable=True, is_deleted=False).all()
+            new_artifact = None
+            for art in existing_artifacts:
+                power = art.power_set.first()
+                if power == self.relevant_power:
+                    new_artifact = art
+                    break
+            if new_artifact:
+                new_artifact.quantity += number_newly_crafted
+                new_artifact.save()
+            else:
+                new_artifact = Artifact.objects.create(
+                    name=self.relevant_power.name,
+                    description=self.relevant_power.description,
+                    crafting_character=self.relevant_character,
+                    character=self.relevant_character,
+                    creating_player=self.relevant_character.player,
+                    is_consumable=True,
+                    quantity=number_newly_crafted,)
+                power_full.artifacts.add(new_artifact)
+                power_full.latest_rev.artifacts.add(new_artifact)
+                power_full.latest_rev.save()
+                power_full.save()
             CraftedArtifact.objects.create(
                 relevant_artifact=new_artifact,
                 relevant_crafting=self,
                 quantity=paid_crafted + new_number_free,
                 quantity_free=new_number_free, )
-            power_full.artifacts.add(new_artifact)
-            power_full.latest_rev.artifacts.add(new_artifact)
-            power_full.latest_rev.save()
-            power_full.save()
         self.total_exp_spent += (paid_crafted * self.get_exp_cost_per_consumable())
         self.save()
 

@@ -1,35 +1,12 @@
 {% load bootstrap %}
 {% load character_tags %}
 
-{% if signature_items and early_access %}
-    <h3 class="text-center" data-toggle="tooltip" >
-        Legendary Artifacts
-    </h3>
-    {% for item in signature_items %}
-        {% render_sig_item item request.user character %}
-    {% endfor %}
-{% endif %}
-
-{% if crafted_artifacts and early_access %}
-    <h3 class="text-center" data-toggle="tooltip" >
-        Crafted Artifacts
-    </h3>
-    {% for item in crafted_artifacts %}
-        {% render_sig_item item request.user character %}
-    {% endfor %}
-{% endif %}
-
-{% if consumables and early_access %}
-    <h3 class="text-center" data-toggle="tooltip" >
-        Consumables
-    </h3>
-    {% for consumable in consumables %}
-        {% render_consumable consumable request.user %}
-    {% endfor %}
-{% endif %}
-
-<h3 class="text-center" data-toggle="tooltip" title='{{tutorial.artifacts|safe}}'>
-  Artifacts
+<h3 class="text-center" data-toggle="tooltip" title='{{tutorial.artifacts|safe}}' style="margin-top: 15px;">
+    {% if early_access %}
+        Trophies
+    {% else %}
+        Artifacts
+    {% endif %}
 </h3>
 {% if not artifacts_by_cell %}
     <div class="row">

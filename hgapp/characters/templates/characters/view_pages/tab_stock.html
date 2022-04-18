@@ -18,20 +18,12 @@
                 </div>
             {% endfor %}
         {% endif %}
-        {% if crafting_artifact_gifts and early_access %}
-            <h3 class="text-center">Artifact Crafting</h3>
-            {% for power_full in crafting_artifact_gifts %}
-            <div>
-                {% power_badge power_full %}
-            </div>
-            {% endfor %}
-        {% endif %}
-        {% if crafting_consumable_gifts and early_access %}
-            <h3 class="text-center">Consumable Crafting</h3>
-            {% for power_full in crafting_consumable_gifts %}
-            <div>
-                {% power_badge power_full %}
-            </div>
+        {% if signature_items and early_access %}
+            <h3 class="text-center" data-toggle="tooltip" >
+                Legendary Artifacts
+            </h3>
+            {% for item in signature_items %}
+                {% render_sig_item item request.user character %}
             {% endfor %}
         {% endif %}
         {% if lost_signature_items and early_access %}
@@ -56,7 +48,24 @@
         {% endif %}
     </div>
     <div class="col-md-6">
-        {% include "characters/view_pages/artifacts_snip.html" %}
+        {% if crafted_artifacts and early_access %}
+            <h3 class="text-center" data-toggle="tooltip" >
+                Crafted Artifacts
+            </h3>
+            {% for item in crafted_artifacts %}
+                {% render_sig_item item request.user character %}
+            {% endfor %}
+        {% endif %}
+
+        {% if consumables and early_access %}
+            <h3 class="text-center" data-toggle="tooltip" >
+                Consumables
+            </h3>
+            {% for consumable in consumables %}
+                {% render_consumable consumable request.user %}
+            {% endfor %}
+        {% endif %}
+
         <hr>
         <h3 class="text-center" data-toggle="tooltip" title='{{tutorial.equipment|safe}}'>
             Equipment
@@ -88,5 +97,29 @@
             {% endif %}
         </div>
         {% include "characters/view_pages/weapon_reference.html" %}
+        {% include "characters/view_pages/artifacts_snip.html" %}
+    </div>
+</div>
+<hr style="width: 75%;">
+<div class="row">
+    <div class="col-xs-12 col-md-6">
+        {% if crafting_artifact_gifts and early_access %}
+            <h3 class="text-center">Artifact Crafting Gifts</h3>
+            {% for power_full in crafting_artifact_gifts %}
+                <div>
+                    {% power_badge power_full %}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+    <div class="col-xs-12 col-md-6">
+        {% if crafting_consumable_gifts and early_access %}
+            <h3 class="text-center">Consumable Crafting Gifts</h3>
+            {% for power_full in crafting_consumable_gifts %}
+                <div>
+                    {% power_badge power_full %}
+                </div>
+            {% endfor %}
+        {% endif %}
     </div>
 </div>
