@@ -94,18 +94,17 @@ class CraftingEvent(models.Model):
             crafted_artifact.save()
         self.save()
 
-    def set_crafted_artifacts(self, artifacts, new_number_free):
+    def set_crafted_artifacts(self, artifacts, allowed_number_free):
         existing_artifacts = self.craftedartifact_set.filter(relevant_artifact__is_deleted=False).all()
         craftings_by_art_id = {x.relevant_artifact_id: x for x in existing_artifacts}
         new_art_ids = set([x.pk for x in artifacts])
         artifacts_to_refund = set([x.relevant_artifact_id for x in existing_artifacts if x.relevant_artifact_id not in new_art_ids])
-        artifacts_by_id = {x.pk: x for x in artifacts}
         existing_artifacts_by_id = {x.relevant_artifact_id : x.relevant_artifact for x in existing_artifacts}
-        additional_free = 0
-        print("ART By IDS")
-        print(artifacts_by_id)
-        print("new ART ids ")
-        print(new_art_ids)
+        current_num_free = 0
+        for artifact in existing_artifacts:
+            if artifact.quantity_free > 0:
+                current_num_free += 1
+        num_free_refunded = 0
         for art_id in artifacts_to_refund:
             crafting = craftings_by_art_id[art_id]
             artifact = existing_artifacts_by_id[art_id]
@@ -114,14 +113,20 @@ class CraftingEvent(models.Model):
             if crafting.quantity_free == 0:
                 self.total_exp_spent -= self.get_exp_cost_per_artifact()
             else:
-                additional_free += 0
+                num_free_refunded += 1
             crafting.delete()
             artifact.refresh_from_db()
             if artifact.power_full_set.count() == 0:
                 artifact.delete()
-        num_avail_free = new_number_free + additional_free
+        num_avail_free = allowed_number_free - current_num_free + num_free_refunded
         for artifact in artifacts:
+            if artifact.character != self.relevant_character:
+                raise ValueError("cannot craft artifact held by someone else.")
+            if artifact.crafting_character != self.relevant_character:
+                raise ValueError("cannot craft artifact crafted by someone else.")
             if artifact.pk not in craftings_by_art_id:
+                if artifact.power_full_set.filter(id=self.relevant_power_full_id).first() is not None:
+                    raise ValueError("cannot craft the same power_full onto an artifact twice.")
                 quant_free = 0
                 if num_avail_free > 0:
                     quant_free = 1
@@ -138,6 +143,14 @@ class CraftingEvent(models.Model):
                 power_full.save()
                 if quant_free == 0:
                     self.total_exp_spent += self.get_exp_cost_per_artifact()
+            else:
+                # adjust free craftings if necessary
+                crafting = craftings_by_art_id[artifact.pk]
+                if crafting.quantity_free == 0 and num_avail_free > 0:
+                    crafting.quantity_free = 1
+                    crafting.save()
+                    self.total_exp_spent -= self.get_exp_cost_per_artifact()
+                    num_avail_free -= 1
         self.save()
 
     def craft_new_consumables(self, number_newly_crafted, new_number_free, power_full):

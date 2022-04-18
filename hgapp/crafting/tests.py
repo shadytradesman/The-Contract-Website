@@ -64,6 +64,7 @@ def create_power(system=SYS_PS2, effect=None, vector=None, modality=None, charac
         dice_system=system,
         base=effect,
         vector=vector,
+        gift_cost=3,
         modality=modality,
         creation_reason=CREATION_NEW,)
     if character:
@@ -642,3 +643,118 @@ class CraftingModelTests(TestCase):
         self.assertFalse(new_artifact.since_revised, False)
         new_artifact_power = new_artifact.power_set.first()
         self.assertEquals(new_artifact_power, power3)
+
+        power6 = edit_power(power5)
+        handle_gift_major_revision(sender=None, power_full=power6.parent_power, old_power=power5, new_power=power6)
+
+        crafting_event3.refresh_from_db()
+        self.assertEquals(crafting_event3.total_exp_spent, 0)
+        self.assertEquals(crafting_event3.relevant_power, power6)
+        new_artifact2 = crafting_event3.artifacts.first()
+        self.assertIsNone(new_artifact2)
+        # check original
+        new_artifact.refresh_from_db()
+        self.assertEquals(new_artifact.quantity, 6)
+        self.assertTrue(new_artifact.since_revised)
+        new_artifact_power = new_artifact.power_set.first()
+        self.assertEquals(new_artifact_power, power3)
+
+    def test_artifact_crafting(self):
+        power = create_power(effect=self.base_effect, vector=self.base_vector, modality=self.base_modality,
+                         character=self.char_full)
+        power_gift_cost = 3
+        crafting_event = CraftingEvent.objects.create(
+            relevant_character=self.char_full,
+            relevant_power=power,
+            relevant_power_full=power.parent_power)
+        art1 = Artifact.objects.create(
+            character=self.char_full,
+            crafting_character=self.char_full,
+            name="name",
+            description="descr",
+            is_crafted_artifact=True,
+            creating_player=self.char_full.player)
+        crafting_event.set_crafted_artifacts(
+            artifacts=[art1],
+            allowed_number_free=1)
+        self.assertEquals(crafting_event.total_exp_spent, 0 * power_gift_cost)
+        self.assertEquals(self.char_full.artifact_set.count(), 1)
+        new_artifact = self.char_full.artifact_set.first()
+        self.assertEquals(new_artifact.quantity, 1)
+        self.assertEquals(new_artifact, art1)
+        self.assertIsNone(new_artifact.cell)
+
+        art2 = Artifact.objects.create(
+            character=self.char_full,
+            crafting_character=self.char_full,
+            name="name",
+            description="descr",
+            is_crafted_artifact=True,
+            creating_player=self.char_full.player)
+        crafting_event.set_crafted_artifacts(
+            artifacts=[art1, art2],
+            allowed_number_free=1)
+
+        self.assertEquals(crafting_event.total_exp_spent, 1 * power_gift_cost)
+        self.assertEquals(self.char_full.artifact_set.count(), 2)
+
+        crafting_event.set_crafted_artifacts(
+            artifacts=[art2],
+            allowed_number_free=1)
+        crafting_event.refresh_from_db()
+        self.assertEquals(crafting_event.total_exp_spent, 0 * power_gift_cost)
+        self.assertEquals(self.char_full.artifact_set.count(), 1)
+        new_artifact = self.char_full.artifact_set.first()
+        self.assertEquals(art2, new_artifact)
+
+    def test_artifact_crafting_errors(self):
+        power = create_power(effect=self.base_effect, vector=self.base_vector, modality=self.base_modality,
+                             character=self.char_full)
+        crafting_event = CraftingEvent.objects.create(
+            relevant_character=self.char_full,
+            relevant_power=power,
+            relevant_power_full=power.parent_power)
+        art1 = Artifact.objects.create(
+            character=self.char2,
+            crafting_character=self.char_full,
+            name="name",
+            description="descr",
+            is_crafted_artifact=True,
+            creating_player=self.char_full.player)
+
+        # Can't craft on an artifact held by someone else.
+        with transaction.atomic():
+            with self.assertRaises(ValueError):
+                crafting_event.set_crafted_artifacts(artifacts=[art1], allowed_number_free=1)
+
+        art1.character = self.char_full
+        art1.crafting_character = self.char2
+        art1.save()
+        # Can't craft on an artifact originally crafted by someone else.
+        with transaction.atomic():
+            with self.assertRaises(ValueError):
+                crafting_event.set_crafted_artifacts(artifacts=[art1], allowed_number_free=1)
+
+        art1.crafting_character = self.char_full
+        art1.save()
+        crafting_event.set_crafted_artifacts(artifacts=[art1], allowed_number_free=1)
+
+        attendance = self.send_contractor_on_game(self.char_full)
+        crafting_event2 = CraftingEvent.objects.create(
+            relevant_attendance=attendance,
+            relevant_character=self.char_full,
+            relevant_power=power,
+            relevant_power_full=power.parent_power)
+
+        # Can't craft the same power onto an object twice
+        with transaction.atomic():
+            with self.assertRaises(ValueError):
+                crafting_event2.set_crafted_artifacts(artifacts=[art1], allowed_number_free=1)
+
+        power2 = edit_power(power)
+        handle_gift_adjustment(sender=None, power_full=power2.parent_power, old_power=power, new_power=power2)
+
+        # Can't craft the same power_full onto an object twice
+        with transaction.atomic():
+            with self.assertRaises(ValueError):
+                crafting_event2.set_crafted_artifacts(artifacts=[art1], allowed_number_free=1)

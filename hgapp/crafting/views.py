@@ -100,11 +100,9 @@ class Craft(View):
                 artifacts_by_power_id[power.pk].append(artifact_by_id[artifact_id])
         for power_id in artifacts_by_power_id:
             artifacts = artifacts_by_power_id[power_id]
-            prev_quantity = self.prev_crafted_consumables[power_id]
-            newly_crafted = len(artifacts) - prev_quantity
-            new_number_free = max(min(self.free_crafts_by_power_full[power_id] - prev_quantity, newly_crafted), 0)
+            allowed_num_free = self.free_crafts_by_power_full[power_id]
             if power_id in self.event_by_power_full:
-                self.event_by_power_full[power_id].set_crafted_artifacts(artifacts, new_number_free)
+                self.event_by_power_full[power_id].set_crafted_artifacts(artifacts, allowed_num_free)
             else:
                 power_full = get_object_or_404(Power_Full, pk=power_id)
                 crafting_event = CraftingEvent.objects.create(
@@ -112,7 +110,7 @@ class Craft(View):
                     relevant_character=self.character,
                     relevant_power=power_full.latest_rev,
                     relevant_power_full=power_full)
-                crafting_event.set_crafted_artifacts(artifacts, new_number_free)
+                crafting_event.set_crafted_artifacts(artifacts, allowed_num_free)
 
     def __create_artifact_map(self, new_artifact_formset, artifact_gift_selector_formset):
         artifact_by_id = {}
@@ -231,11 +229,6 @@ class Craft(View):
                 consumable_forms.append([consumable_form, power])
             if power.crafting_type == CRAFTING_ARTIFACT:
                 self.free_crafts_by_power_full[power.pk] += NUM_FREE_ARTIFACTS_PER_DOWNTIME
-                if power.pk in self.event_by_power_full:
-                    crafted_artifacts = self.event_by_power_full[power.pk].craftedartifact_set.all()
-                    for artifact_craft in crafted_artifacts:
-                        self.prev_crafted_consumables[power.pk] += artifact_craft.quantity
-                        self.prev_crafted_free_consumables[power.pk] += artifact_craft.quantity_free
                 self.artifact_power_full_choices.append({
                     "pk": power.pk,
                     "name": power.name,
