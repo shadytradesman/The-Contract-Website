@@ -10,6 +10,15 @@
     {% endfor %}
 {% endif %}
 
+{% if crafted_artifacts and early_access %}
+    <h3 class="text-center" data-toggle="tooltip" >
+        Crafted Artifacts
+    </h3>
+    {% for item in crafted_artifacts %}
+        {% render_sig_item item request.user character %}
+    {% endfor %}
+{% endif %}
+
 {% if consumables and early_access %}
     <h3 class="text-center" data-toggle="tooltip" >
         Consumables

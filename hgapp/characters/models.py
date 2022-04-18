@@ -1134,6 +1134,7 @@ class Artifact(WorldElement):
                                         null=True)
     is_consumable = models.BooleanField(default=False)
     is_signature = models.BooleanField(default=False)
+    is_crafted_artifact = models.BooleanField(default=False)
     since_revised = models.BooleanField(default=False) # gift has seen major revision since crafting.
     quantity = models.PositiveIntegerField(default=1)
     location = models.CharField(max_length=1000, default="", blank=True)

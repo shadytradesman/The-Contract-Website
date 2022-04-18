@@ -47,6 +47,9 @@ class CraftingEvent(models.Model):
     def get_exp_cost_per_consumable(self):
         return 2
 
+    def get_exp_cost_per_artifact(self):
+        return self.relevant_power.get_gift_cost()
+
     def refund_all(self):
         if self.relevant_power_full.crafting_type == CRAFTING_CONSUMABLE:
             num_to_refund = self.craftedartifact_set.aggregate(Sum('quantity'))['quantity__sum']
@@ -89,6 +92,48 @@ class CraftingEvent(models.Model):
                 crafted_artifact.relevant_artifact.quantity = max(0, curr_quantity - num_refunded)
                 crafted_artifact.relevant_artifact.save()
             crafted_artifact.save()
+        self.save()
+
+    def set_crafted_artifacts(self, artifacts, new_number_free):
+        existing_artifacts = self.craftedartifact_set.filter(relevant_artifact__is_deleted=False).all()
+        craftings_by_art_id = {x.relevant_artifact_id: x for x in existing_artifacts}
+        new_art_ids = set([x.pk for x in artifacts])
+        artifacts_to_refund = set([x.relevant_artifact_id for x in existing_artifacts if x.relevant_artifact_id not in new_art_ids])
+        artifacts_by_id = {}
+        additional_free = 0
+        for art_id in artifacts_to_refund:
+            crafting = craftings_by_art_id[art_id]
+            artifact = artifacts_by_id[art_id]
+            self.relevant_power.artifacts.remove(artifact)
+            self.relevant_power_full.artifacts.remove(artifact)
+            if crafting.quantity_free == 0:
+                self.total_exp_spent -= self.get_exp_cost_per_artifact()
+            else:
+                additional_free += 0
+            crafting.delete()
+            artifact.refresh_from_db()
+            if artifact.power_full_set.count() == 0:
+                artifact.delete()
+        num_avail_free = new_number_free + additional_free
+        for artifact in artifacts:
+            artifacts_by_id[artifact.pk] = artifact
+            if artifact.pk not in craftings_by_art_id:
+                quant_free = 0
+                if num_avail_free > 0:
+                    quant_free = 1
+                    num_avail_free -= 1
+                CraftedArtifact.objects.create(
+                    relevant_artifact=artifact,
+                    relevant_crafting=self,
+                    quantity=1,
+                    quantity_free=quant_free,)
+                power_full = self.relevant_power_full
+                power_full.artifacts.add(artifact)
+                power_full.latest_rev.artifacts.add(artifact)
+                power_full.latest_rev.save()
+                power_full.save()
+                if quant_free == 0:
+                    self.total_exp_spent += self.get_exp_cost_per_artifact()
         self.save()
 
     def craft_new_consumables(self, number_newly_crafted, new_number_free, power_full):

@@ -3,6 +3,7 @@ import json, datetime
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views import View
+from django.forms import formset_factory
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
@@ -15,7 +16,7 @@ from django.utils import timezone
 
 from .models import NUM_FREE_CONSUMABLES_PER_DOWNTIME, CraftingEvent, CraftedArtifact, \
     NUM_FREE_CONSUMABLES_PER_REWARD, NUM_FREE_ARTIFACTS_PER_DOWNTIME, NUM_FREE_ARTIFACTS_PER_REWARD
-from .forms import make_consumable_crafting_form, make_artifact_crafting_form
+from .forms import make_consumable_crafting_form, NewArtifactForm, make_artifact_gift_selector_form
 
 
 @method_decorator(login_required(login_url='account_login'), name='dispatch')
@@ -46,11 +47,26 @@ class Craft(View):
     def post(self, request, *args, **kwargs):
         with transaction.atomic():
             self.character = Character.objects.select_for_update().get(id=self.character.pk)
-            page_data, consumable_forms = self.__get_page_data_and_forms(request.POST)
+            page_data, consumable_forms, new_artifact_formset, artifact_gift_selector_formset = \
+                self.__get_page_data_and_forms(request.POST)
             consumable_forms = [x[0] for x in consumable_forms] # strip the powers out
+
             for form in consumable_forms:
                 if not form.is_valid():
                     raise ValueError("Invalid consumable form")
+            if new_artifact_formset:
+                print("see new artifact formset")
+                for form in new_artifact_formset:
+                    if not form.is_valid():
+                        print(form.errors)
+                        raise ValueError("Invalid new artifact form")
+                    print(form.cleaned_data)
+                for form in artifact_gift_selector_formset:
+                    if not form.is_valid():
+                        print(form.errors)
+                        raise ValueError("Invalid artifact gift form")
+                    print(form.cleaned_data)
+                self.__save_artifact_forms(new_artifact_formset, artifact_gift_selector_formset)
             self.__save_consumable_forms(consumable_forms)
             self.character.highlight_crafting = False
             self.character.save()
@@ -58,12 +74,77 @@ class Craft(View):
         return HttpResponseRedirect(reverse('characters:characters_view', args=(self.character.pk,)))
 
     def __get_context_data(self):
-        page_data, consumable_forms = self.__get_page_data_and_forms()
+        page_data, consumable_forms, new_artifact_formset, artifact_gift_selector_formset = self.__get_page_data_and_forms()
         return {
             "consumable_forms": consumable_forms,
+            "new_artifact_formset": new_artifact_formset,
+            "artifact_gift_selector_formset": artifact_gift_selector_formset,
             "page_data": json.dumps(page_data),
             "character": self.character,
         }
+
+    def __save_artifact_forms(self, new_artifact_formset, artifact_gift_selector_formset):
+        artifact_by_id = self.__create_artifact_map(new_artifact_formset, artifact_gift_selector_formset)
+        print("Art by ID")
+        print(artifact_by_id)
+        artifacts_by_power_id = {}
+        for choice in self.artifact_power_full_choices:
+            artifacts_by_power_id[choice["pk"]] = []
+        for form in artifact_gift_selector_formset:
+            print(form.cleaned_data)
+            power_fulls = form.cleaned_data["selected_gifts"]
+            artifact_id = form.cleaned_data["artifact_id"]
+            for power in power_fulls:
+                if power.pk not in artifacts_by_power_id:
+                    raise ValueError("Invalid power in artifact form")
+                artifacts_by_power_id[power.pk].append(artifact_by_id[artifact_id])
+        for power_id in artifacts_by_power_id:
+            artifacts = artifacts_by_power_id[power_id]
+            prev_quantity = self.prev_crafted_consumables[power_id]
+            newly_crafted = len(artifacts) - prev_quantity
+            new_number_free = max(min(self.free_crafts_by_power_full[power_id] - prev_quantity, newly_crafted), 0)
+            if power_id in self.event_by_power_full:
+                self.event_by_power_full[power_id].set_crafted_artifacts(artifacts, new_number_free)
+            else:
+                power_full = get_object_or_404(Power_Full, pk=power_id)
+                crafting_event = CraftingEvent.objects.create(
+                    relevant_attendance=self.attendance,
+                    relevant_character=self.character,
+                    relevant_power=power_full.latest_rev,
+                    relevant_power_full=power_full)
+                crafting_event.set_crafted_artifacts(artifacts, new_number_free)
+
+    def __create_artifact_map(self, new_artifact_formset, artifact_gift_selector_formset):
+        artifact_by_id = {}
+        new_artifacts = set()
+        for form in artifact_gift_selector_formset:
+            print("gift selector")
+            print(form.cleaned_data)
+            art_id = form.cleaned_data["artifact_id"]
+            if art_id < 0:
+                if art_id in new_artifacts:
+                    raise ValueError("duplicate new artifacts by id")
+                new_artifacts.add(art_id)
+            else:
+                if art_id in artifact_by_id:
+                    raise ValueError("duplicate existing artifacts by id")
+                art = get_object_or_404(Artifact, pk=art_id, character=self.character)
+                artifact_by_id[art_id] = art
+        for form in new_artifact_formset:
+            print("new artifact")
+            print(form.cleaned_data)
+            art_id = form.cleaned_data["artifact_id"]
+            if art_id not in new_artifacts:
+                raise ValueError("new artifact not referenced in gift forms")
+            art = Artifact.objects.create(
+                character=self.character,
+                crafting_character=self.character,
+                name=form.cleaned_data["name"],
+                description=form.cleaned_data["description"],
+                is_crafted_artifact=True,
+                creating_player=self.character.player)
+            artifact_by_id[art_id] = art
+        return artifact_by_id
 
     def __save_consumable_forms(self, consumable_forms):
         for form in consumable_forms:
@@ -73,9 +154,6 @@ class Craft(View):
             prev_quantity = self.prev_crafted_consumables[power_id]
             newly_crafted = crafted_quant - prev_quantity
             number_free = max(min(self.free_crafts_by_power_full[power.pk] - prev_quantity, newly_crafted), 0)
-            print("MAP: ")
-            print(self.event_by_power_full)
-            print(power_id)
             if power_id in self.event_by_power_full:
                 # update an existing event
                 if newly_crafted < 0:
@@ -106,6 +184,7 @@ class Craft(View):
         self.prev_crafted_free_consumables = Counter()
         self.event_by_power_full = {ev.relevant_power_full_id: ev for ev in self.crafting_events}
         self.free_crafts_by_power_full = Counter()
+        self.artifact_power_full_choices = []
 
         consumable_forms = []
         consumable_details_by_power = defaultdict(list)
@@ -152,6 +231,22 @@ class Craft(View):
                 consumable_forms.append([consumable_form, power])
             if power.crafting_type == CRAFTING_ARTIFACT:
                 self.free_crafts_by_power_full[power.pk] += NUM_FREE_ARTIFACTS_PER_DOWNTIME
+                if power.pk in self.event_by_power_full:
+                    crafted_artifacts = self.event_by_power_full[power.pk].craftedartifact_set.all()
+                    for artifact_craft in crafted_artifacts:
+                        self.prev_crafted_consumables[power.pk] += artifact_craft.quantity
+                        self.prev_crafted_free_consumables[power.pk] += artifact_craft.quantity_free
+                self.artifact_power_full_choices.append({
+                    "pk": power.pk,
+                    "name": power.name,
+                })
+
+        new_artifact_formset = None
+        artifact_gift_selector_formset = None
+        if self.artifact_power_full_choices:
+            print(POST)
+            new_artifact_formset = formset_factory(NewArtifactForm, extra=0)(POST, prefix="new_artifact")
+            artifact_gift_selector_formset = formset_factory(make_artifact_gift_selector_form(self.character), extra=0)(POST, prefix="gift_selector")
 
         page_data = {
             "prev_crafted_consumables": self.prev_crafted_consumables,
@@ -159,8 +254,9 @@ class Craft(View):
             "free_crafts_by_power_full": self.free_crafts_by_power_full,
             "consumable_details_by_power": dict(consumable_details_by_power),
             "power_by_pk": {p.pk: p.to_crafting_blob() for p in power_fulls},
+            "artifact_power_choices": self.artifact_power_full_choices,
         }
-        return page_data, consumable_forms
+        return page_data, consumable_forms, new_artifact_formset, artifact_gift_selector_formset
 
     def __get_crafting_events(self):
         if self.attendance:

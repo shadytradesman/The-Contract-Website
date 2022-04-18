@@ -16,6 +16,10 @@ function setFormInputPrefixValues() {
             $(this).attr("name", currName.replace(/__prefix__/g, prefixNum));
             $(this).attr("id", currId.replace(/__prefix__/g, prefixNum));
         })
+        $(this).find("label").each(function() {
+            let currFor = $(this).attr("for");
+            $(this).attr("for", currFor.replace(/__prefix__/g, prefixNum));
+        })
     })
 }
 

@@ -1,5 +1,6 @@
 from django import forms
 from django.core.validators import MinValueValidator, MaxValueValidator
+from powers.models import CRAFTING_ARTIFACT
 
 
 def make_consumable_crafting_form(power_full):
@@ -14,30 +15,33 @@ def make_consumable_crafting_form(power_full):
     return ConsumableCraftingForm
 
 
-def make_artifact_crafting_form(character):
-    artifact_choices = character.artifact_set.filter(cell__isnull=True,
-                                                     is_signature=False,
-                                                     is_consumable=False,
-                                                     crafting_character=character).all()
+class NewArtifactForm(forms.Form):
+    name = forms.CharField(max_length=300,
+                                   required=True,
+                                   widget=forms.TextInput(attrs={
+                                       'class': 'form-control',
+                                       'v-model': 'artifact.name',
+                                   }))
+    description = forms.CharField(max_length=1000,
+                                          required=True,
+                                          widget=forms.TextInput(attrs={
+                                              'class': 'form-control',
+                                              'v-model': 'artifact.description',
+                                          }))
+    # negative number for new artifact
+    artifact_id = forms.IntegerField(label=None, widget=forms.HiddenInput(attrs={
+            'v-model': 'artifact.id'
+        }), required=True)
+
+
+def make_artifact_gift_selector_form(character):
+    queryset = character.power_full_set.filter(crafting_type=CRAFTING_ARTIFACT).all()
 
     class ArtifactCraftingForm(forms.Form):
-        power_full_id = forms.IntegerField(label=None, widget=forms.HiddenInput(), required=True)
-        artifact_id = forms.IntegerField(label=None, widget=forms.HiddenInput(), required=True)
-        artifact = forms.ModelChoiceField(queryset=artifact_choices,
-                                      empty_label="Create new Artifact",
-                                      required=False,)
-        new_art_name = forms.CharField(max_length=300,
-                               required=False,
-                               widget=forms.TextInput(attrs={'class': 'form-control'}))
-        new_art_description = forms.CharField(max_length=1000,
-                                       required=False,
-                                       widget=forms.TextInput(attrs={'class': 'form-control'}))
-        refund = forms.BooleanField(label="Refund",
-                                    required=False,
-                                    help_text="Refund this crafting?")
-        upgrade = forms.BooleanField(label="Refund",
-                                     required=False,
-                                     initial=True,
-                                     help_text="Upgrade this Artifact?")
+        selected_gifts = forms.ModelMultipleChoiceField(queryset=queryset, widget=forms.CheckboxSelectMultiple(), required=False)
+        # negative number for new artifact
+        artifact_id = forms.IntegerField(label=None, widget=forms.HiddenInput(attrs={
+                'v-model': 'artifact.id'
+            }), required=True)
 
     return ArtifactCraftingForm

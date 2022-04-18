@@ -1,0 +1,48 @@
+
+{{new_artifact_formset.management_form}}
+{{artifact_gift_selector_formset.management_form}}
+<div class="panel-heading">
+  <h3 style="margin-top: 5px; margin-bottom: 5px; display: inline-block;">Artifacts</h3>
+  <a @click="newArtifact" class="btn btn-default btn-sm" style="display: inline-block; margin-left: 15px; margin-bottom: 8px;">Craft New Artifact</a>
+</div>
+<div class="panel-body">
+  <div v-for="artifact in artifacts" style="background-color: rgb(53, 62, 75); padding: 10px; margin-bottom: 10px;">
+    <div v-if="artifact.isPreExisting">
+      <h4 style="margin-top: 0px;">
+        {artifact.name}
+        <div>
+          <small>
+            {artifact.description}
+          </small>
+        </div>
+      </h4>
+    </div>
+    <div v-if="!artifact.isPreExisting">
+      <h4 style="margin-top: 0px;">
+        <div v-text="artifact.name" ></div>
+        <div  style="margin-top: 5px;">
+          <small >
+            <div v-text="artifact.description"></div>
+          </small>
+        </div>
+      </h4>
+      <span class="js-data-prefix-container" v-bind:data-prefix="artifact.number">
+        {{new_artifact_formset.empty_form}}
+        {{artifact_gift_selector_formset.empty_form.artifact_id}}
+      </span>
+    </div>
+    <div style="margin-top: 10px;">
+      <div style="margin-bottom: 5px;">
+        <b >Select Gifts to craft into Artifact:</b>
+      </div>
+      <ul class="list-unstyled" style="padding-left: 10px;">
+        <li v-for="giftOption in artifact.giftOptions">
+          <label v-bind:for="giftOption.name">
+            <input type="checkbox" v-bind:name="artifact.giftOptionsName" v-bind:id="giftOption.name" v-bind:value="giftOption.value">
+            {giftOption.label}
+          </label>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

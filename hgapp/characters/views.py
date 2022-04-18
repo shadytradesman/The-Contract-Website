@@ -180,6 +180,8 @@ def graveyard(request):
 
 def view_artifact(request, artifact_id):
     artifact = get_object_or_404(Artifact, id=artifact_id)
+    if not (artifact.is_crafted_artifact or artifact.is_signature):
+        raise ValueError("Tried to view non-signature non-crafted artifact")
     characters = [artifact.character] if artifact.character else []
 
     if artifact.crafting_character:
@@ -351,6 +353,7 @@ def view_character(request, character_id, secret_key=None):
         'crafting_consumable_gifts': crafting_consumable_gifts,
         'signature_items': signature_items,
         'consumables': consumables,
+        'crafted_artifacts': crafted_artifacts,
         'lost_signature_items': lost_signature_items,
     }
     return render(request, 'characters/view_pages/view_character.html', context)

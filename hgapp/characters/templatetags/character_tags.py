@@ -35,9 +35,9 @@ def render_consumable(artifact, user):
 
 @register.inclusion_tag('characters/view_pages/sig_item_snip.html')
 def render_sig_item(artifact, user, viewing_character=None):
-    if not artifact.is_signature:
-        # TODO: May re-use most of this for crafted artifacts
+    if not (artifact.is_signature or artifact.is_crafted_artifact):
         raise ValueError("attempting to display non-signature artifact as signature")
+    print(artifact.name)
     latest_transfer = artifact.get_latest_transfer()
     can_edit = artifact.character.player_can_edit(user)
     edit_form = None

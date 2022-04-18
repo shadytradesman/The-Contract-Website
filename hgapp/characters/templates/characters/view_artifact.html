@@ -24,13 +24,19 @@
 
 {% block body_base %}
 <div class="container">
-  <h1 class="text-center">Viewing Artifact</h1>
+  <h1 class="text-center">
+    {% if artifact.is_signature %}
+      Legendary Artifact
+    {% elif artifact.is_crafted_artifact %}
+      Crafted Artifact
+    {% endif %}
+  </h1>
   <div class="row">
     <div class="col-xs-12 col-sm-8 col-sm-offset-2">
       {% if artifact.is_signature %}
-      {% render_sig_item artifact request.user %}
-      {% elif artifact.is_consumable %}
-      {% else %}
+        {% render_sig_item artifact request.user %}
+      {% elif artifact.is_crafted_artifact %}
+        {% render_sig_item artifact request.user %}
       {% endif %}
     </div>
   </div>
