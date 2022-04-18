@@ -6,7 +6,7 @@ from overrides.widgets import CustomStylePagedown
 
 from games.game_utilities import get_character_contacts
 from characters.models import Character, BasicStats, Character_Death, BattleScar, PORT_STATUS, StockBattleScar, GIVEN,\
-    STOLEN, LOOTED, LOST, DESTROYED, RECOVERED, REPAIRED
+    STOLEN, LOOTED, LOST, DESTROYED, RECOVERED, REPAIRED, AT_HOME
 from cells.models import Cell
 
 ATTRIBUTE_VALUES = {
@@ -405,7 +405,7 @@ def make_world_element_form(cell_choices=None, initial_cell=None, for_new=True):
 
 
 def make_artifact_status_form(current_status=None):
-    if current_status == LOST:
+    if current_status in [LOST, AT_HOME]:
         choices = (
                   ('', "No change"),
                   (RECOVERED, "Recovered"),
@@ -420,7 +420,8 @@ def make_artifact_status_form(current_status=None):
                      ('', 'No change'),
                      (LOST, "Lost"),
                      (DESTROYED, "Destroyed"),
-                  )
+                     (AT_HOME, "Left at home"),
+        )
 
     class ArtifactStatusForm(forms.Form):
         change_availability = forms.ChoiceField(

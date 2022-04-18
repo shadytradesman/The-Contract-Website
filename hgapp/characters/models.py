@@ -170,11 +170,13 @@ LOST = "LOST"
 DESTROYED = "DESTROYED"
 RECOVERED = "RECOVERED"
 REPAIRED = "REPAIRED"
+AT_HOME = "ATHOME"
 ARTIFACT_STATUS_CHANGE_TYPE = (
     (LOST, 'Lost'),
     (RECOVERED, 'Recovered'),
     (DESTROYED, "Destroyed"),
     (REPAIRED, "Repaired"),
+    (AT_HOME, "At home")
 )
 
 EQUIPMENT_DEFAULT = """

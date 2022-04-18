@@ -2,7 +2,7 @@ from django import template
 
 from characters.forms import make_world_element_form, make_transfer_artifact_form, make_artifact_status_form, \
     make_consumable_use_form
-from characters.models import LOST, DESTROYED, RECOVERED, REPAIRED
+from characters.models import LOST, DESTROYED, RECOVERED, REPAIRED, AT_HOME
 from django.urls import reverse
 
 register = template.Library()
@@ -47,7 +47,7 @@ def render_sig_item(artifact, user, viewing_character=None):
         edit_form = make_world_element_form(for_new=False)()
         transfer_form = make_transfer_artifact_form(artifact.character, artifact.character.cell)
         status_form = make_artifact_status_form(artifact.most_recent_status_change)
-    is_lost_or_destroyed = artifact.most_recent_status_change and artifact.most_recent_status_change in [LOST, DESTROYED]
+    is_lost_or_destroyed = artifact.most_recent_status_change and artifact.most_recent_status_change in [LOST, AT_HOME, DESTROYED]
     is_held_by_creator = artifact.character == artifact.crafting_character
     is_greyed_out = False
     if viewing_character:

@@ -99,11 +99,16 @@ class CraftingEvent(models.Model):
         craftings_by_art_id = {x.relevant_artifact_id: x for x in existing_artifacts}
         new_art_ids = set([x.pk for x in artifacts])
         artifacts_to_refund = set([x.relevant_artifact_id for x in existing_artifacts if x.relevant_artifact_id not in new_art_ids])
-        artifacts_by_id = {}
+        artifacts_by_id = {x.pk: x for x in artifacts}
+        existing_artifacts_by_id = {x.relevant_artifact_id : x.relevant_artifact for x in existing_artifacts}
         additional_free = 0
+        print("ART By IDS")
+        print(artifacts_by_id)
+        print("new ART ids ")
+        print(new_art_ids)
         for art_id in artifacts_to_refund:
             crafting = craftings_by_art_id[art_id]
-            artifact = artifacts_by_id[art_id]
+            artifact = existing_artifacts_by_id[art_id]
             self.relevant_power.artifacts.remove(artifact)
             self.relevant_power_full.artifacts.remove(artifact)
             if crafting.quantity_free == 0:
@@ -116,7 +121,6 @@ class CraftingEvent(models.Model):
                 artifact.delete()
         num_avail_free = new_number_free + additional_free
         for artifact in artifacts:
-            artifacts_by_id[artifact.pk] = artifact
             if artifact.pk not in craftings_by_art_id:
                 quant_free = 0
                 if num_avail_free > 0:
