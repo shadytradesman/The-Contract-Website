@@ -22,12 +22,14 @@ class NewArtifactForm(forms.Form):
                                    widget=forms.TextInput(attrs={
                                        'class': 'form-control',
                                        'v-model': 'artifact.name',
+                                       'required': '',
                                    }))
     description = forms.CharField(max_length=1000,
                                           required=True,
                                           widget=forms.TextInput(attrs={
                                               'class': 'form-control',
                                               'v-model': 'artifact.description',
+                                              'required': '',
                                           }))
     # negative number for new artifact
     artifact_id = forms.IntegerField(label=None, widget=forms.HiddenInput(attrs={

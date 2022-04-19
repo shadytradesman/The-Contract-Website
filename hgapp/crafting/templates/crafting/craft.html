@@ -35,39 +35,41 @@
             {% if new_artifact_formset %}
                 {% include 'crafting/artifacts.html' %}
             {% endif %}
-            <div v-if="Object.entries(consumableNumWouldBeCrafted).length > 0" class="row">
-                <div class="col-xs-12 col-md-8 col-md-offset-2">
-                    <div class="alert alert-info">
-                        <h4 class="text-center" style="margin-top: 0px;">Submitting will craft</h4>
-                        <ul>
-                            <li v-for="(quantity, powerName) in consumableNumWouldBeCrafted">
-                                <b>{quantity}</b> {powerName}
-                            </li>
-                        </ul>
+            <div class="panel panel-body">
+                <div v-if="Object.entries(consumableNumWouldBeCrafted).length > 0" class="row">
+                    <div class="col-xs-12 col-md-8 col-md-offset-2">
+                        <div class="alert alert-info">
+                            <h4 class="text-center" style="margin-top: 0px;">Submitting will craft</h4>
+                            <ul>
+                                <li v-for="(quantity, powerName) in consumableNumWouldBeCrafted">
+                                    <b>{quantity}</b> {powerName}
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div v-if="Object.entries(consumableNumWouldBeRefunded).length > 0" class="row">
-                <div class="col-xs-12 col-md-8 col-md-offset-2">
-                    <div class="alert alert-info">
-                        <h4 class="text-center" style="margin-top: 0px;">Submitting will remove</h4>
-                        <ul>
-                            <li v-for="(quantity, powerName) in consumableNumWouldBeRefunded">
-                                <b>{-quantity}</b> {powerName}
-                            </li>
-                        </ul>
+                <div v-if="Object.entries(consumableNumWouldBeRefunded).length > 0" class="row">
+                    <div class="col-xs-12 col-md-8 col-md-offset-2">
+                        <div class="alert alert-info">
+                            <h4 class="text-center" style="margin-top: 0px;">Submitting will remove</h4>
+                            <ul>
+                                <li v-for="(quantity, powerName) in consumableNumWouldBeRefunded">
+                                    <b>{-quantity}</b> {powerName}
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="text-center">
-                <input id="form-submit"
-                       {% if not request.user.is_superuser %} disabled {% endif %}
-                       class="btn btn-primary btn-md"
-                       type="submit"
-                       value="Craft Items" />
-                <b>
-                    <div v-html="totalExpCost"></div>
-                </b>
+                <div class="text-center">
+                    <input id="form-submit"
+                           {% if not request.user.is_superuser %} disabled {% endif %}
+                           class="btn btn-primary btn-md"
+                           type="submit"
+                           value="Craft Items" />
+                    <b>
+                        <div v-html="totalExpCost"></div>
+                    </b>
+                </div>
             </div>
         </div>
     </form>

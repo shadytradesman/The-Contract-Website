@@ -662,7 +662,7 @@ class CraftingModelTests(TestCase):
     def test_artifact_crafting(self):
         power = create_power(effect=self.base_effect, vector=self.base_vector, modality=self.base_modality,
                          character=self.char_full)
-        power_gift_cost = 3
+        art_craft_cost = 3 + 1 # gift cost + 1
         crafting_event = CraftingEvent.objects.create(
             relevant_character=self.char_full,
             relevant_power=power,
@@ -677,7 +677,7 @@ class CraftingModelTests(TestCase):
         crafting_event.set_crafted_artifacts(
             artifacts=[art1],
             allowed_number_free=1)
-        self.assertEquals(crafting_event.total_exp_spent, 0 * power_gift_cost)
+        self.assertEquals(crafting_event.total_exp_spent, 0 * art_craft_cost)
         self.assertEquals(self.char_full.artifact_set.count(), 1)
         new_artifact = self.char_full.artifact_set.first()
         self.assertEquals(new_artifact.quantity, 1)
@@ -695,14 +695,14 @@ class CraftingModelTests(TestCase):
             artifacts=[art1, art2],
             allowed_number_free=1)
 
-        self.assertEquals(crafting_event.total_exp_spent, 1 * power_gift_cost)
+        self.assertEquals(crafting_event.total_exp_spent, 1 * art_craft_cost)
         self.assertEquals(self.char_full.artifact_set.count(), 2)
 
         crafting_event.set_crafted_artifacts(
             artifacts=[art2],
             allowed_number_free=1)
         crafting_event.refresh_from_db()
-        self.assertEquals(crafting_event.total_exp_spent, 0 * power_gift_cost)
+        self.assertEquals(crafting_event.total_exp_spent, 0 * art_craft_cost)
         self.assertEquals(self.char_full.artifact_set.count(), 1)
         new_artifact = self.char_full.artifact_set.first()
         self.assertEquals(art2, new_artifact)

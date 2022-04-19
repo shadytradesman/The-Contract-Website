@@ -59,7 +59,7 @@ function createArtifact(isPreExisting, name, description, number, id, nonRefunda
         .map(choice => {
             let powerId = choice["pk"];
             let powerName = choice["name"];
-            let cost = pageData["power_by_pk"][powerId]["gift_cost"];
+            let cost = pageData["power_by_pk"][powerId]["gift_cost"] + 1;
             return createGiftOption(powerName, powerId, cost, giftOptionsName, optionNumber++, refundablePowerIds.includes(choice["pk"]));
         });
     nonRefundablePowerFulls = nonRefundablePowerIds
@@ -93,6 +93,7 @@ const CraftingRendering = {
       artifactPowerChoices: [],
       numNewArtifacts: 0,
       checkedGiftOptions: {},
+      unavailArtifacts: []
     }
   },
   methods: {
@@ -107,6 +108,7 @@ const CraftingRendering = {
         for (const [powerId, initial] of Object.entries(pageData["initial_consumable_counts"])) {
             this.consumableInitialQuantities[powerId] = initial;
         }
+        this.unavailArtifacts = pageData["artifacts_out_of_pos"];
         this.artifacts = pageData["existing_artifacts"]
                 .map(art => createArtifactFromExisting(
                     art["name"],
@@ -120,7 +122,11 @@ const CraftingRendering = {
             }
         }))
 
+        this.updateManagementForms();
         this.recalculateExpCosts();
+        this.$nextTick(function () {
+            setFormInputPrefixValues();
+        });
       },
       incConsumable(powerId) {
         if ( this.consumableQuantities[powerId] < 20) {
@@ -183,9 +189,6 @@ const CraftingRendering = {
                 }
             })
         });
-
-
-
         this.totalExpCost = displayCost(totalCost);
       },
       newArtifact() {

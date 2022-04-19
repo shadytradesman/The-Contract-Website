@@ -584,27 +584,39 @@ def item_timeline(request, artifact_id):
 class CraftingTimelineBlock:
     crafting_events = None
     total_exp_spent = None
-    total_crafted = None
+    total_crafted_consumables = None
     power_quantity = None
 
     def __init__(self, crafting_events):
         self.crafting_events = crafting_events
-        self.total_exp_spent = 0
-        self.total_crafted = 0
+        self.total_exp_spent_consumables = 0
+        self.total_exp_spent_artifacts = 0
+        self.total_crafted_consumables = 0
         self.power_quantity = []
+        self.powers_by_artifact = defaultdict(list)
+        self.total_art_effects_crafted = 0
+        self.total_art_effects_free = 0
         for event in crafting_events:
-            self.total_exp_spent += event.total_exp_spent
-            total_made = 0
-            total_free = 0
-            for artifact_crafting in event.craftedartifact_set.all():
-                total_made += artifact_crafting.quantity
-                total_free += artifact_crafting.quantity_free
-            self.total_crafted += total_made
-            self.power_quantity.append({
-                "power": event.relevant_power,
-                "quantity": total_made,
-                "quantity_free": total_free
-            })
+            if event.relevant_power.modality.crafting_type == CRAFTING_CONSUMABLE:
+                self.total_exp_spent_consumables += event.total_exp_spent
+                total_made = 0
+                total_free = 0
+                for artifact_crafting in event.craftedartifact_set.all():
+                    total_made += artifact_crafting.quantity
+                    total_free += artifact_crafting.quantity_free
+                self.total_crafted_consumables += total_made
+                self.power_quantity.append({
+                    "power": event.relevant_power,
+                    "quantity": total_made,
+                    "quantity_free": total_free
+                })
+            if event.relevant_power.modality.crafting_type == CRAFTING_ARTIFACT:
+                self.total_exp_spent_artifacts += event.total_exp_spent
+                for artifact_crafting in event.craftedartifact_set.all():
+                    self.powers_by_artifact[artifact_crafting.relevant_artifact].append((event.relevant_power, artifact_crafting.quantity_free > 0))
+                    self.total_art_effects_crafted += artifact_crafting.quantity
+                    self.total_art_effects_free += artifact_crafting.quantity_free
+        self.powers_by_artifact = dict(self.powers_by_artifact)
 
 
 def character_timeline(request, character_id):
@@ -677,11 +689,12 @@ def transfer_artifact(request, artifact_id):
     if request.method == "POST":
         if not artifact.character:
             raise ValueError("Artifact has no character and cannot be transferred")
-        __check_edit_perms(request, artifact.character)
+        start_char = artifact.character
+        __check_edit_perms(request, start_char)
         max_quantity = 0
         if artifact.is_consumable:
             max_quantity = artifact.quantity
-        form = make_transfer_artifact_form(artifact.character, artifact.character.cell, max_quantity)(request.POST)
+        form = make_transfer_artifact_form(start_char, start_char.cell, max_quantity)(request.POST)
         if form.is_valid():
             with transaction.atomic():
                 artifact = Artifact.objects.select_for_update().get(pk=artifact_id)
@@ -691,12 +704,12 @@ def transfer_artifact(request, artifact_id):
                     notes=form.cleaned_data["notes"] if "notes" in form.cleaned_data else "",
                     quantity=form.cleaned_data["quantity"] if artifact.is_consumable else 1)
         else:
-            print(form.errors)
             raise ValueError("Invalid artifact transfer form")
+            print(form.errors)
     if artifact.is_signature:
         return HttpResponseRedirect(reverse('characters:characters_artifact_view', args=(artifact_id,)))
     else:
-        return HttpResponseRedirect(reverse('characters:characters_view', args=(artifact.character_id,)))
+        return HttpResponseRedirect(reverse('characters:characters_view', args=(start_char.pk,)))
 
 
 def post_scar(request, character_id, secret_key = None):

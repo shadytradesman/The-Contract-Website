@@ -6,6 +6,22 @@
   <a @click="newArtifact" class="btn btn-default btn-sm" style="display: inline-block; margin-left: 15px; margin-bottom: 8px;">Craft New Artifact</a>
 </div>
 <div class="panel-body">
+  <div v-if="unavailArtifacts.length > 0">
+    <div class="alert alert-info">
+      <h5 style="margin-top: 0px;">You have crafted Artifacts this Downtime that are no longer in your possession</h5>
+      <ul>
+        <li v-for="artifact in unavailArtifacts">
+          <a v-bind:href="artifact.art_url">{artifact.name}</a>
+          <small class="text-muted"><i> (held by
+            <a v-bind:href="artifact.holder_url">{artifact.holder}</a>)
+          </i></small>
+        </li>
+      </ul>
+      <div style="margin-top: 5px;">
+        You can only edit Artifacts you created that are currently in your possession.
+      </div>
+    </div>
+  </div>
   <div v-for="artifact in artifacts" style="background-color: rgb(53, 62, 75); padding: 10px; margin-bottom: 10px;">
     <div v-if="artifact.isPreExisting">
       <h4 style="margin-top: 0px;">
@@ -42,12 +58,14 @@
       </h4>
       <span class="js-data-prefix-container" v-bind:data-prefix="artifact.number">
         {{new_artifact_formset.empty_form}}
-        {{artifact_gift_selector_formset.empty_form.artifact_id}}
       </span>
     </div>
+    <span class="js-data-prefix-container" v-bind:data-prefix="artifact.number">
+        {{artifact_gift_selector_formset.empty_form.artifact_id}}
+    </span>
     <div style="margin-top: 10px;">
       <div style="margin-bottom: 5px;">
-        <b >Select Gifts to craft into Artifact:</b>
+        <b >Select Effects to craft into Artifact:</b>
       </div>
       <ul class="list-unstyled" style="padding-left: 10px;">
         <li v-for="giftOption in artifact.giftOptions">

@@ -48,7 +48,7 @@ class CraftingEvent(models.Model):
         return 2
 
     def get_exp_cost_per_artifact(self):
-        return self.relevant_power.get_gift_cost()
+        return self.relevant_power.get_gift_cost() + 1
 
     def refund_all(self):
         if self.relevant_power_full.crafting_type == CRAFTING_CONSUMABLE:
@@ -120,11 +120,11 @@ class CraftingEvent(models.Model):
                 artifact.delete()
         num_avail_free = allowed_number_free - current_num_free + num_free_refunded
         for artifact in artifacts:
-            if artifact.character != self.relevant_character:
-                raise ValueError("cannot craft artifact held by someone else.")
             if artifact.crafting_character != self.relevant_character:
                 raise ValueError("cannot craft artifact crafted by someone else.")
             if artifact.pk not in craftings_by_art_id:
+                if artifact.character != self.relevant_character:
+                    raise ValueError("cannot craft artifact held by someone else.")
                 if artifact.power_full_set.filter(id=self.relevant_power_full_id).first() is not None:
                     raise ValueError("cannot craft the same power_full onto an artifact twice.")
                 quant_free = 0

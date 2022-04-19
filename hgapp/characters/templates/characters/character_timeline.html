@@ -21,13 +21,35 @@
         </li>
       {% elif event.0 == "crafting" %}
         <li class="css-timeline-item css-timeline-crafting">
-          Crafted <b>{{event.1.total_crafted}}</b> items for <b>{{event.1.total_exp_spent}}</b> Experience
-          {% if event.1.power_quantity %}
+          {% if event.1.total_crafted_consumables %}
+            Crafted <b>{{event.1.total_crafted_consumables}}</b> consumable{{event.1.total_crafted_consumables|pluralize}} for <b>{{event.1.total_exp_spent_consumables}}</b> Experience
+            {% if event.1.power_quantity %}
+              <ul>
+                {% for pq in event.1.power_quantity %}
+                  <li><b>{{pq.quantity}} </b>
+                    <a href="{% url 'powers:powers_view_power' pq.power.id %}">{{pq.power.name}}</a>
+                    <i class="text-muted">({{pq.quantity_free}} free)</i></li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          {% endif %}
+          {% if event.1.total_art_effects_crafted %}
+            Crafted <b>{{event.1.total_art_effects_crafted }}</b> Effect{{event.1.total_art_effects_crafted|pluralize}} onto Artifacts for <b>{{event.1.total_exp_spent_artifacts}}</b> Experience
             <ul>
-              {% for pq in event.1.power_quantity %}
-                <li><b>{{pq.quantity}} </b>
-                  <a href="{% url 'powers:powers_view_power' pq.power.id %}">{{pq.power.name}}</a>
-                  <i class="text-muted">({{pq.quantity_free}} free)</i></li>
+              {% for art, powers in event.1.powers_by_artifact.items %}
+                <li>
+                  <a href="{% url 'characters:characters_artifact_view' art.pk %}">{{art.name}}</a>
+                  <ul>
+                    {% for pow in powers %}
+                      <li>
+                        {{pow.0.name}}
+                        {% if pow.1 %}
+                          <i class="text-muted">(free)</i></li>
+                        {% endif %}
+                      </li>
+                    {% endfor %}
+                  </ul>
+                </li>
               {% endfor %}
             </ul>
           {% endif %}
