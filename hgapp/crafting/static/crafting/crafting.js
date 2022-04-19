@@ -1,36 +1,6 @@
 let pageData = JSON.parse(JSON.parse(document.getElementById('pageData').textContent));
 console.log(pageData);
 
-function displayCost(cost) {
-    let prefix =  cost >= 0 ? "-" : "+";
-    let content = prefix + cost;
-    let cssClass = cost < 0 ? "css-exp-credit" : cost == 0 ? "text-muted" : "css-exp-cost";
-    return "<span class=\"" + cssClass +"\">" + content + " Exp</span>";
-};
-
-function createGiftOption(powerName, powerId, giftOptionsName, number) {
-    return {
-        "name": giftOptionsName + "_" + number,
-        "value": powerId,
-        "label": powerName
-    };
-}
-
-let artifactNumber = 0;
-
-function createArtifactFromExisting(name, description, id) {
-    let number = artifactNumber;
-    artifactNumber++;
-    return createArtifact(true, name, description, number, id, []);
-}
-
-function createNewArtifact() {
-    let number = artifactNumber;
-    artifactNumber++;
-    let idVal = -(number+1);
-    return createArtifact(false, "New Artifact", "", number, idVal, []);
-}
-
 // This method sets the __prefix__ values that appear in django "empty" formset forms so formsets
 // can have dynamically added and subtracted entries
 function setFormInputPrefixValues() {
@@ -49,24 +19,61 @@ function setFormInputPrefixValues() {
     })
 }
 
-function createArtifact(isPreExisting, name, description, number, id, existingAttachedPowerFulls) {
+function displayCost(cost) {
+    let prefix =  cost >= 0 ? "-" : "+";
+    let content = prefix + Math.abs(cost).toString();
+    let cssClass = cost < 0 ? "css-exp-credit" : cost == 0 ? "text-muted" : "css-exp-cost";
+    return "<span class=\"" + cssClass +"\">" + content + " Exp</span>";
+};
+
+function createGiftOption(powerName, powerId, cost, giftOptionsName, number, checked) {
+    return {
+        "name": giftOptionsName + "_" + number,
+        "value": powerId,
+        "label": powerName,
+        "cost": cost,
+        "currentCost": "",
+        "startChecked": checked,
+    };
+}
+
+let artifactNumber = 0;
+
+function createArtifactFromExisting(name, description, id, nonRefundablePowerIds, refundablePowerIds) {
+    let number = artifactNumber;
+    artifactNumber++;
+    return createArtifact(true, name, description, number, id, nonRefundablePowerIds, refundablePowerIds);
+}
+
+function createNewArtifact() {
+    let number = artifactNumber;
+    artifactNumber++;
+    let idVal = -(number+1);
+    return createArtifact(false, "New Artifact", "", number, idVal, [], []);
+}
+
+function createArtifact(isPreExisting, name, description, number, id, nonRefundablePowerIds, refundablePowerIds) {
     let giftOptionsName = "gift_selector-" + number + "-selected_gifts";
     let optionNumber = 0;
     let giftOptions = pageData["artifact_power_choices"]
-        .filter(choice => !existingAttachedPowerFulls.includes(choice["pk"]))
         .map(choice => {
             let powerId = choice["pk"];
             let powerName = choice["name"];
-            return createGiftOption(powerName, powerId, giftOptionsName, optionNumber++);
+            let cost = pageData["power_by_pk"][powerId]["gift_cost"];
+            return createGiftOption(powerName, powerId, cost, giftOptionsName, optionNumber++, refundablePowerIds.includes(choice["pk"]));
         });
+    nonRefundablePowerFulls = nonRefundablePowerIds
+            .filter(id=> pageData["power_by_pk"].includes(id))
+            .map(id=>pageData["power_by_pk"][id])
     return {
-        "isPreExisting": false,
+        "isPreExisting": isPreExisting,
         "number": number,
         "name": name,
         "description": description,
         "giftOptions": giftOptions,
         "giftOptionsName": giftOptionsName,
         "id": id, // for linking artifacts with forms.
+        "nonRefundablePowerFulls":nonRefundablePowerIds,
     };
 }
 
@@ -85,6 +92,7 @@ const CraftingRendering = {
       artifacts: [],
       artifactPowerChoices: [],
       numNewArtifacts: 0,
+      checkedGiftOptions: {},
     }
   },
   methods: {
@@ -99,7 +107,19 @@ const CraftingRendering = {
         for (const [powerId, initial] of Object.entries(pageData["initial_consumable_counts"])) {
             this.consumableInitialQuantities[powerId] = initial;
         }
-        pageData["artifact_power_choices"].map(choice => { })
+        this.artifacts = pageData["existing_artifacts"]
+                .map(art => createArtifactFromExisting(
+                    art["name"],
+                    art["description"],
+                    art["id"],
+                    art["nonrefundable_power_fulls"],
+                    art["refundable_power_fulls"]));
+        this.artifacts.forEach(art => art["giftOptions"].forEach(opt => {
+            if (opt["startChecked"]) {
+                this.checkedGiftOptions[opt["name"]] = true;
+            }
+        }))
+
         this.recalculateExpCosts();
       },
       incConsumable(powerId) {
@@ -116,6 +136,7 @@ const CraftingRendering = {
       },
       recalculateExpCosts() {
         let totalCost = 0;
+        // Consumables
         this.consumableNumWouldBeCrafted = {};
         this.consumableNumWouldBeRefunded = {};
         for (const [powerId, numCrafted] of Object.entries(this.consumableQuantities)) {
@@ -139,6 +160,32 @@ const CraftingRendering = {
                 this.consumableNumWouldBeRefunded[pageData["power_by_pk"][powerId]["name"]] = toCraftQuantity;
             }
         }
+
+        // Artifacts
+        this.artifacts.forEach(art => {
+            art["giftOptions"].forEach(opt => {
+                let currentlyChecked = this.checkedGiftOptions[opt["name"]];
+                let cost = parseInt(opt["cost"]);
+                if (opt["startChecked"]) {
+                    if (currentlyChecked) {
+                        opt["currentCost"] = "";
+                    } else {
+                        totalCost -= cost;
+                        opt["currentCost"] = displayCost(-cost);
+                    }
+                } else {
+                    if (currentlyChecked) {
+                        totalCost += cost;
+                        opt["currentCost"] = displayCost(cost);
+                    } else {
+                        opt["currentCost"] = "";
+                    }
+                }
+            })
+        });
+
+
+
         this.totalExpCost = displayCost(totalCost);
       },
       newArtifact() {

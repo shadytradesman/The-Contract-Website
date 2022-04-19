@@ -10,16 +10,30 @@
     <div v-if="artifact.isPreExisting">
       <h4 style="margin-top: 0px;">
         {artifact.name}
+        <small>
+          <div v-html="artifact.expCost">
+          </div>
+        </small>
         <div>
           <small>
             {artifact.description}
           </small>
         </div>
       </h4>
+      <div v-if="artifact.nonRefundablePowerFulls.length > 0">
+        <b>Effects previously crafted onto this Artifact:</b>
+        <ul>
+          <li v-for="power in artifact.nonRefundablePowerFulls">{power.name}</li>
+        </ul>
+      </div>
     </div>
     <div v-if="!artifact.isPreExisting">
       <h4 style="margin-top: 0px;">
         <div v-text="artifact.name" ></div>
+        <small>
+          <div v-html="artifact.expCost">
+          </div>
+        </small>
         <div  style="margin-top: 5px;">
           <small >
             <div v-text="artifact.description"></div>
@@ -38,9 +52,10 @@
       <ul class="list-unstyled" style="padding-left: 10px;">
         <li v-for="giftOption in artifact.giftOptions">
           <label v-bind:for="giftOption.name">
-            <input type="checkbox" v-bind:name="artifact.giftOptionsName" v-bind:id="giftOption.name" v-bind:value="giftOption.value">
+            <input type="checkbox" @change="recalculateExpCosts" v-bind:name="artifact.giftOptionsName" v-bind:id="giftOption.name" v-bind:value="giftOption.value" :checked="giftOption.startChecked" v-model="checkedGiftOptions[giftOption.name]">
             {giftOption.label}
           </label>
+          <span style="margin-left: 10px;" v-html="giftOption.currentCost"></span>
         </li>
       </ul>
     </div>

@@ -333,7 +333,6 @@ def _handle_sig_artifact(request, SignatureArtifactForm, power_full, new_power, 
     # Now update relations
     if previous_rev and previous_rev.dice_system == SYS_PS2:
         if previous_rev.modality.crafting_type == CRAFTING_SIGNATURE:
-            print("here")
             old_artifact = previous_rev.artifactpower_set.filter(relevant_artifact__is_signature=True).get().relevant_artifact
             previous_rev.artifacts.remove(old_artifact) # unlink old rev from old artifact
             if old_artifact != new_artifact or new_power.modality.crafting_type != CRAFTING_SIGNATURE:

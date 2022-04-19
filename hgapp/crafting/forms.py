@@ -10,6 +10,7 @@ def make_consumable_crafting_form(power_full):
                                          validators=[MinValueValidator(0), MaxValueValidator(20)],
                                          widget=forms.NumberInput(attrs={
                                              'class': 'consumable-value-input form-control',
+                                             '@change': 'recalculateExpCosts',
                                              'v-model': 'consumableQuantities[{}]'.format(power_full.pk),
                                          }))
     return ConsumableCraftingForm

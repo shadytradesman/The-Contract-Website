@@ -592,9 +592,7 @@ class CraftingTimelineBlock:
         self.total_exp_spent = 0
         self.total_crafted = 0
         self.power_quantity = []
-        print("event block with num events: " + str(len(crafting_events)))
         for event in crafting_events:
-            print("Looking at event: " + str(event.pk))
             self.total_exp_spent += event.total_exp_spent
             total_made = 0
             total_free = 0

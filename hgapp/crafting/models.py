@@ -154,6 +154,8 @@ class CraftingEvent(models.Model):
         self.save()
 
     def craft_new_consumables(self, number_newly_crafted, new_number_free, power_full):
+        print("Crafting new consumables")
+        print(self.relevant_power_full)
         paid_crafted = number_newly_crafted - new_number_free
         crafted_artifacts = self.craftedartifact_set.filter(relevant_artifact__is_deleted=False).prefetch_related("relevant_artifact").all()
         crafter_held_crafted_artifact = None

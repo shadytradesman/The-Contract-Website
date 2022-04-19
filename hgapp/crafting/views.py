@@ -115,10 +115,10 @@ class Craft(View):
     def __create_artifact_map(self, new_artifact_formset, artifact_gift_selector_formset):
         artifact_by_id = {}
         new_artifacts = set()
+        powers_by_art_id = {}
         for form in artifact_gift_selector_formset:
-            print("gift selector")
-            print(form.cleaned_data)
             art_id = form.cleaned_data["artifact_id"]
+            powers_by_art_id[art_id] = form.cleaned_data["selected_gifts"]
             if art_id < 0:
                 if art_id in new_artifacts:
                     raise ValueError("duplicate new artifacts by id")
@@ -129,11 +129,11 @@ class Craft(View):
                 art = get_object_or_404(Artifact, pk=art_id, character=self.character)
                 artifact_by_id[art_id] = art
         for form in new_artifact_formset:
-            print("new artifact")
-            print(form.cleaned_data)
             art_id = form.cleaned_data["artifact_id"]
             if art_id not in new_artifacts:
                 raise ValueError("new artifact not referenced in gift forms")
+            if not powers_by_art_id[art_id]:
+                continue
             art = Artifact.objects.create(
                 character=self.character,
                 crafting_character=self.character,
@@ -205,6 +205,7 @@ class Craft(View):
             if power.parent_power.crafting_type == CRAFTING_ARTIFACT:
                 self.free_crafts_by_power_full[power.parent_power.pk] += NUM_FREE_ARTIFACTS_PER_REWARD
 
+        refundable_power_fulls_by_artifact_id = defaultdict(list)
         for power in power_fulls:
             if power.crafting_type == CRAFTING_CONSUMABLE:
                 self.free_crafts_by_power_full[power.pk] += NUM_FREE_CONSUMABLES_PER_DOWNTIME
@@ -233,13 +234,30 @@ class Craft(View):
                     "pk": power.pk,
                     "name": power.name,
                 })
+                if power.pk in self.event_by_power_full:
+                    crafted_artifacts = self.event_by_power_full[power.pk].craftedartifact_set.all()
+                    for artifact_craft in crafted_artifacts:
+                        refundable_power_fulls_by_artifact_id[artifact_craft.relevant_artifact_id].append(power.pk)
 
         new_artifact_formset = None
         artifact_gift_selector_formset = None
         if self.artifact_power_full_choices:
-            print(POST)
             new_artifact_formset = formset_factory(NewArtifactForm, extra=0)(POST, prefix="new_artifact")
             artifact_gift_selector_formset = formset_factory(make_artifact_gift_selector_form(self.character), extra=0)(POST, prefix="gift_selector")
+
+        existing_artifacts = []
+        crafted_artifacts = self.character.artifact_set.filter(is_crafted_artifact=True, crafting_character=self.character, is_deleted=False).all()
+        for artifact in crafted_artifacts:
+            current_fulls = set(artifact.power_full_set.values_list('id', flat=True))
+            refundable_fulls = refundable_power_fulls_by_artifact_id[artifact.pk]
+            current_fulls.difference_update(refundable_fulls)
+            existing_artifacts.append({
+                "name": artifact.name,
+                "description": artifact.description,
+                "id": artifact.pk,
+                "nonrefundable_power_fulls": list(current_fulls),
+                "refundable_power_fulls": refundable_fulls,
+            })
 
         page_data = {
             "prev_crafted_consumables": self.prev_crafted_consumables,
@@ -248,6 +266,7 @@ class Craft(View):
             "consumable_details_by_power": dict(consumable_details_by_power),
             "power_by_pk": {p.pk: p.to_crafting_blob() for p in power_fulls},
             "artifact_power_choices": self.artifact_power_full_choices,
+            "existing_artifacts": existing_artifacts,
         }
         return page_data, consumable_forms, new_artifact_formset, artifact_gift_selector_formset
 
