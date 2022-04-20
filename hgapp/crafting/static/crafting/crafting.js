@@ -1,24 +1,6 @@
 let pageData = JSON.parse(JSON.parse(document.getElementById('pageData').textContent));
 console.log(pageData);
 
-// This method sets the __prefix__ values that appear in django "empty" formset forms so formsets
-// can have dynamically added and subtracted entries
-function setFormInputPrefixValues() {
-    $(".js-data-prefix-container").each(function(){
-        let prefixNum = $(this).attr("data-prefix");
-        $(this).find("input").each(function() {
-            let currName = $(this).attr("name");
-            let currId = $(this).attr("id");
-            $(this).attr("name", currName.replace(/__prefix__/g, prefixNum));
-            $(this).attr("id", currId.replace(/__prefix__/g, prefixNum));
-        })
-        $(this).find("label").each(function() {
-            let currFor = $(this).attr("for");
-            $(this).attr("for", currFor.replace(/__prefix__/g, prefixNum));
-        })
-    })
-}
-
 function displayCost(cost) {
     let prefix =  cost >= 0 ? "-" : "+";
     let content = prefix + Math.abs(cost).toString();
@@ -37,43 +19,53 @@ function createGiftOption(powerName, powerId, cost, giftOptionsName, number, che
     };
 }
 
-let artifactNumber = 0;
+let newArtifactNumber = -1;
+let artNum = 0;
+let giftSelectorNumber = 0;
 
 function createArtifactFromExisting(name, description, id, nonRefundablePowerIds, refundablePowerIds) {
-    let number = artifactNumber;
-    artifactNumber++;
+    let number = artNum;
+    artNum++;
     return createArtifact(true, name, description, number, id, nonRefundablePowerIds, refundablePowerIds);
 }
 
 function createNewArtifact() {
-    let number = artifactNumber;
-    artifactNumber++;
+    let number = artNum;
+    artNum++;
+    newArtifactNumber++;
     let idVal = -(number+1);
     return createArtifact(false, "New Artifact", "", number, idVal, [], []);
 }
 
 function createArtifact(isPreExisting, name, description, number, id, nonRefundablePowerIds, refundablePowerIds) {
-    let giftOptionsName = "gift_selector-" + number + "-selected_gifts";
+    let newArtForm = $("#empty_new_art_form").html();
+    let giftSelectForm = $("#empty_gift_selector_id_form").html();
+    let selectorNumber = giftSelectorNumber;
+    let giftOptionsName = "gift_selector-" + selectorNumber + "-selected_gifts";
+    giftSelectorNumber++;
     let optionNumber = 0;
+    nonRefundablePowerFulls = nonRefundablePowerIds.map(id=>pageData["power_by_pk"][id])
     let giftOptions = pageData["artifact_power_choices"]
+        .filter(choice => !nonRefundablePowerIds.includes(choice["pk"]))
         .map(choice => {
             let powerId = choice["pk"];
             let powerName = choice["name"];
             let cost = pageData["power_by_pk"][powerId]["gift_cost"] + 1;
             return createGiftOption(powerName, powerId, cost, giftOptionsName, optionNumber++, refundablePowerIds.includes(choice["pk"]));
         });
-    nonRefundablePowerFulls = nonRefundablePowerIds
-            .filter(id=> pageData["power_by_pk"].includes(id))
-            .map(id=>pageData["power_by_pk"][id])
     return {
         "isPreExisting": isPreExisting,
         "number": number,
+        "newArtNum": newArtifactNumber,
+        "giftSelectForm": giftSelectForm,
+        "newArtForm": newArtForm,
+        "selectorNumber": selectorNumber,
         "name": name,
         "description": description,
         "giftOptions": giftOptions,
         "giftOptionsName": giftOptionsName,
         "id": id, // for linking artifacts with forms.
-        "nonRefundablePowerFulls":nonRefundablePowerIds,
+        "nonRefundablePowerFulls": nonRefundablePowerFulls,
     };
 }
 
@@ -93,7 +85,7 @@ const CraftingRendering = {
       artifactPowerChoices: [],
       numNewArtifacts: 0,
       checkedGiftOptions: {},
-      unavailArtifacts: []
+      unavailArtifacts: [],
     }
   },
   methods: {
@@ -124,9 +116,6 @@ const CraftingRendering = {
 
         this.updateManagementForms();
         this.recalculateExpCosts();
-        this.$nextTick(function () {
-            setFormInputPrefixValues();
-        });
       },
       incConsumable(powerId) {
         if ( this.consumableQuantities[powerId] < 20) {
@@ -192,12 +181,9 @@ const CraftingRendering = {
         this.totalExpCost = displayCost(totalCost);
       },
       newArtifact() {
-        this.artifacts.push(createNewArtifact());
+        this.artifacts.unshift(createNewArtifact());
         this.numNewArtifacts ++;
         this.updateManagementForms();
-        this.$nextTick(function () {
-            setFormInputPrefixValues();
-        });
       },
       updateManagementForms() {
           $('#id_new_artifact-TOTAL_FORMS').attr('value', this.numNewArtifacts);

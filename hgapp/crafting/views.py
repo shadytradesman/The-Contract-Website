@@ -52,8 +52,10 @@ class Craft(View):
             consumable_forms = [x[0] for x in consumable_forms] # strip the powers out
             print(request.POST)
             for form in consumable_forms:
+                print("consumable form")
                 if not form.is_valid():
                     raise ValueError("Invalid consumable form")
+                print(form.cleaned_data)
             if new_artifact_formset:
                 print("see new artifact formset")
                 for form in new_artifact_formset:
@@ -70,8 +72,13 @@ class Craft(View):
                     print(form.cleaned_data)
                 self.__save_artifact_forms(new_artifact_formset, artifact_gift_selector_formset)
             self.__save_consumable_forms(consumable_forms)
+            self.character.refresh_from_db()
             self.character.highlight_crafting = False
             self.character.save()
+            arts = self.character.artifact_set.filter(cell__isnull=True, is_crafted_artifact=True, is_deleted=False).all()
+            for art in arts:
+                if art.power_full_set.count() == 0:
+                    art.delete()
 
         return HttpResponseRedirect(reverse('characters:characters_view', args=(self.character.pk,)))
 
@@ -163,6 +170,8 @@ class Craft(View):
             newly_crafted = crafted_quant - prev_quantity
             number_free = max(min(self.free_crafts_by_power_full[power.pk] - prev_quantity, newly_crafted), 0)
             if power_id in self.event_by_power_full:
+                print("update existing for ")
+                print(power_id)
                 # update an existing event
                 if newly_crafted < 0:
                     self.event_by_power_full[power_id].refund_crafted_consumables(
@@ -173,6 +182,8 @@ class Craft(View):
                         new_number_free=number_free,
                         power_full=power)
             else:
+                print("new crafting for")
+                print(power_id)
                 # No existing event
                 if newly_crafted < 0:
                     raise ValueError("wanted to refund consumables, but no consumables to refund.")
@@ -235,7 +246,7 @@ class Craft(View):
                 initial_craft_quantity = max(self.prev_crafted_consumables[power.pk],
                                              self.free_crafts_by_power_full[power.pk])
                 initial_consumable_counts[power.pk] = initial_craft_quantity
-                consumable_form = make_consumable_crafting_form(power)(POST, initial={
+                consumable_form = make_consumable_crafting_form(power)(POST, prefix=power.pk, initial={
                     "power_full_id": power.pk,
                     "num_crafted": initial_craft_quantity,
                 })

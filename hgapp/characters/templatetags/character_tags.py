@@ -76,6 +76,7 @@ def render_sig_item(artifact, user, viewing_character=None):
     render_link = viewing_character is not None
     return {
         "item": artifact,
+        "is_crafted": artifact.is_crafted_artifact,
         "user_can_edit": can_edit,
         "is_greyed_out": is_greyed_out,
         "status_blurb": status_blurb,

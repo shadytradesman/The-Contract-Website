@@ -89,11 +89,19 @@
             </div>
         </form>
     {% endif %}
-  {% for power in item.power_full_set.all %}
-    <span class="css-world-element-name">
-        {% power_badge power True %}
-    </span>
-  {% endfor %}
+    {% if is_crafted %}
+        {% for power in item.power_set.all %}
+            <span class="css-world-element-name">
+                    {% power_rev_badge power True %}
+                </span>
+        {% endfor %}
+    {% else %}
+        {% for power in item.power_full_set.all %}
+            <span class="css-world-element-name">
+                {% power_badge power True %}
+            </span>
+        {% endfor %}
+    {% endif %}
     <div id="hx-timeline-item{{item.id}}">
         <button
                 class="btn btn-default btn-xs"

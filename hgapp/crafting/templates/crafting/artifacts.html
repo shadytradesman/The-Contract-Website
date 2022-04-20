@@ -36,7 +36,7 @@
           </small>
         </div>
       </h4>
-      <div v-if="artifact.nonRefundablePowerFulls.length > 0">
+      <div class="text-muted" v-if="artifact.nonRefundablePowerFulls.length > 0">
         <b>Effects previously crafted onto this Artifact:</b>
         <ul>
           <li v-for="power in artifact.nonRefundablePowerFulls">{power.name}</li>
@@ -50,22 +50,42 @@
           <div v-html="artifact.expCost">
           </div>
         </small>
-        <div  style="margin-top: 5px;">
+        <div style="margin-top: 5px;">
           <small >
             <div v-text="artifact.description"></div>
           </small>
         </div>
       </h4>
-      <span class="js-data-prefix-container" v-bind:data-prefix="artifact.number">
-        {{new_artifact_formset.empty_form}}
-      </span>
+      {% with new_artifact_formset.prefix as prefix %}
+        <label v-bind:for="'id_' + '{{prefix}}-' + artifact.newArtNum + '-name'">Name:</label>
+        <input type="text"
+               v-bind:name="'{{prefix}}-' + artifact.newArtNum + '-name'"
+               class="form-control" required="" maxlength="300"
+               v-model="artifact.name"
+               v-bind:id="'id_' + '{{prefix}}-' + artifact.newArtNum + '-name'">
+        <label v-bind:for="'id_' + '{{prefix}}-' + artifact.newArtNum + '-description'">Description:</label>
+        <input type="text"
+               v-bind:name="'{{prefix}}-' + artifact.newArtNum + '-description'"
+               class="form-control" required="" maxlength="1000"
+               v-model="artifact.description"
+               v-bind:id="'id_' + '{{prefix}}-' + artifact.newArtNum + '-description'">
+        <input type="hidden"
+               v-model="artifact.id"
+               v-bind:name="'{{prefix}}-' + artifact.newArtNum + '-artifact_id'"
+               v-bind:id="'id_' + '{{prefix}}-' + artifact.newArtNum + '-artifact_id'" >
+      {% endwith %}
     </div>
-    <span class="js-data-prefix-container" v-bind:data-prefix="artifact.number">
-        {{artifact_gift_selector_formset.empty_form.artifact_id}}
-    </span>
-    <div style="margin-top: 10px;">
-      <div style="margin-bottom: 5px;">
+    <input type="hidden"
+           v-bind:name="'{{artifact_gift_selector_formset.prefix}}-'+artifact.number+'-artifact_id'"
+           v-bind:id="'id_' + '{{artifact_gift_selector_formset.prefix}}-' +artifact.number+'-artifact_id'"
+           v-model="artifact.id"
+    >
+    <div  style="margin-top: 10px;">
+      <div v-if="artifact.giftOptions.length > 0" style="margin-bottom: 5px;">
         <b >Select Effects to craft into Artifact:</b>
+      </div>
+      <div v-if="artifact.giftOptions.length == 0" style="margin-bottom: 5px;">
+        No Effects available to apply to this Artifact.
       </div>
       <ul class="list-unstyled" style="padding-left: 10px;">
         <li v-for="giftOption in artifact.giftOptions">

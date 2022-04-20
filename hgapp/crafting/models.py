@@ -101,11 +101,13 @@ class CraftingEvent(models.Model):
         artifacts_to_refund = set([x.relevant_artifact_id for x in existing_artifacts if x.relevant_artifact_id not in new_art_ids])
         existing_artifacts_by_id = {x.relevant_artifact_id : x.relevant_artifact for x in existing_artifacts}
         current_num_free = 0
+        print("Setting crafted")
         for artifact in existing_artifacts:
             if artifact.quantity_free > 0:
                 current_num_free += 1
         num_free_refunded = 0
         for art_id in artifacts_to_refund:
+            print("refunding " + str(art_id))
             crafting = craftings_by_art_id[art_id]
             artifact = existing_artifacts_by_id[art_id]
             self.relevant_power.artifacts.remove(artifact)
@@ -115,11 +117,9 @@ class CraftingEvent(models.Model):
             else:
                 num_free_refunded += 1
             crafting.delete()
-            artifact.refresh_from_db()
-            if artifact.power_full_set.count() == 0:
-                artifact.delete()
         num_avail_free = allowed_number_free - current_num_free + num_free_refunded
         for artifact in artifacts:
+            print("carftin " + str(artifact.pk))
             if artifact.crafting_character != self.relevant_character:
                 raise ValueError("cannot craft artifact crafted by someone else.")
             if artifact.pk not in craftings_by_art_id:
@@ -151,6 +151,7 @@ class CraftingEvent(models.Model):
                     crafting.save()
                     self.total_exp_spent -= self.get_exp_cost_per_artifact()
                     num_avail_free -= 1
+        print("done")
         self.save()
 
     def craft_new_consumables(self, number_newly_crafted, new_number_free, power_full):

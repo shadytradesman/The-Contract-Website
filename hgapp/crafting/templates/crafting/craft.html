@@ -22,9 +22,19 @@
 {% load account_tags %}
 
 {% block body_base %}
+<script type="text/html" id="empty_new_art_form">
+    {{new_artifact_formset.empty_form}}
+</script>
+<script type="text/html" id="empty_gift_selector_id_form">
+    {{artifact_gift_selector_formset.empty_form.artifact_id}}
+</script>
 <div class="container">
-    <div class="text-center">
+    {% include "crafting/tutorial_modal.html" %}
+    <div class="text-center" style="margin-bottom: 10px;">
         <h1>{{character.name}} is crafting</h1>
+        <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#tutorialModal">
+            Crafting Help
+        </button>
     </div>
     <form action="{% url 'crafting:crafting_craft' character.id %}" method="post" >
         {% csrf_token %}

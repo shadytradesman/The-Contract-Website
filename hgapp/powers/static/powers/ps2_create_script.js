@@ -18,7 +18,9 @@ function setFormInputPrefixValues() {
         })
         $(this).find("label").each(function() {
             let currFor = $(this).attr("for");
-            $(this).attr("for", currFor.replace(/__prefix__/g, prefixNum));
+            if (currFor) {
+                $(this).attr("for", currFor.replace(/__prefix__/g, prefixNum));
+            }
         })
     })
 }
@@ -223,6 +225,7 @@ function modifierToVueWithId(modifier, type, idNum) {
         detailsName: domNameBase + "-details",
         detailsId: idBase + "-details",
         details: "",
+        hiddenFormId: 0,
         slug: modifier.slug,
         displayName: modifier.name,
         eratta: modifier.eratta,
@@ -1118,6 +1121,13 @@ const ComponentRendering = {
         return selectedLevelOfParam(param, this.parameterSelections[param.id]);
       },
       updateManagementForms() {
+          let modHiddenFormCounter = 0;
+          this.enhancements.forEach(enh => {
+            enh.hiddenFormId = modHiddenFormCounter;
+            modHiddenFormCounter ++;});
+          this.drawbacks.forEach(drawb => {
+            drawb.hiddenFormId = modHiddenFormCounter;
+            modHiddenFormCounter ++;});
           $('#id_modifiers-TOTAL_FORMS').attr('value', this.enhancements.length + this.drawbacks.length + 1);
           $('#id_parameters-TOTAL_FORMS').attr('value', this.parameters.length);
           $('#id_sys_field_text-TOTAL_FORMS').attr('value', this.systemFields.filter(field => field.isText).length);

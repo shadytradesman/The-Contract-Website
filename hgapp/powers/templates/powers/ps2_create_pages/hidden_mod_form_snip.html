@@ -1,0 +1,25 @@
+<span class="js-data-prefix-container" data-prefix="8">
+    <input type="hidden"
+           v-bind:name="'modifiers-' + modifier.hiddenFormId + '-is_selected'"
+           v-bind:id="'id_modifiers-' + modifier.hiddenFormId + '-is_selected'"
+           v-bind:checked="(modifier.isEnhancement?selectedEnhancements:selectedDrawbacks).map(enh => enh.id).includes(modifier.id)"
+           v-bind:value="(modifier.isEnhancement?selectedEnhancements:selectedDrawbacks).map(enh => enh.id).includes(modifier.id)"
+    >
+    <input type="hidden"
+           v-bind:name="'modifiers-' + modifier.hiddenFormId + '-mod_slug'"
+           v-bind:id="'id_modifiers-' + modifier.hiddenFormId + '-mod_slug'"
+           v-bind:value="modifier.slug"
+    >
+    <input type="hidden"
+           v-bind:name="'modifiers-' + modifier.hiddenFormId + '-is_enhancement'"
+           v-bind:id="'id_modifiers-' + modifier.hiddenFormId + '-is_enhancement'"
+           v-bind:value="modifier.isEnhancement"
+       >
+    <div v-if="modifier.detailLabel && selected{{vue_model_name}}.includes(modifier)">
+        <input type="hidden"
+               v-bind:name="'modifiers-' + modifier.hiddenFormId + '-details'"
+               v-bind:id="'id_modifiers-' + modifier.hiddenFormId + '-details'"
+               v-bind:value="modifier.details"
+               >
+    </div>
+</span>
