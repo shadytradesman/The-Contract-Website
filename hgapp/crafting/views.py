@@ -261,6 +261,7 @@ class Craft(View):
                     crafted_artifacts = self.event_by_power_full[power.pk].craftedartifact_set.all()
                     for artifact_craft in crafted_artifacts:
                         refundable_power_fulls_by_artifact_id[artifact_craft.relevant_artifact_id].append(power.pk)
+                        self.prev_crafted_consumables[power.pk] += artifact_craft.quantity
 
         new_artifact_formset = None
         artifact_gift_selector_formset = None

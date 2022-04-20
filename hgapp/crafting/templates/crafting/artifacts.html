@@ -4,6 +4,14 @@
 <div class="panel-heading">
   <h3 style="margin-top: 5px; margin-bottom: 5px; display: inline-block;">Artifacts</h3>
   <a @click="newArtifact" class="btn btn-default btn-sm" style="display: inline-block; margin-left: 15px; margin-bottom: 8px;">Craft New Artifact</a>
+  <div v-if="freeArtCraftingGifts.length > 0">
+    The Rewards you've spent this Downtime have earned you free Artifact Crafting
+    <ul>
+      <li v-for="powerNum in freeArtCraftingGifts">
+        <b>{powerNum.power.name}:</b> {powerNum.numFree} free
+      </li>
+    </ul>
+  </div>
 </div>
 <div class="panel-body">
   <div v-if="unavailArtifacts.length > 0">

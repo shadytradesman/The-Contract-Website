@@ -86,6 +86,7 @@ const CraftingRendering = {
       numNewArtifacts: 0,
       checkedGiftOptions: {},
       unavailArtifacts: [],
+      freeArtCraftingGifts: []
     }
   },
   methods: {
@@ -96,6 +97,13 @@ const CraftingRendering = {
         }
         for (const [powerId, numFree] of Object.entries(pageData["free_crafts_by_power_full"])) {
             this.consumableNumFree[powerId] = numFree;
+            let power = pageData["power_by_pk"][powerId];
+            if (numFree > 0 && power["crafting_type"] == "ARTIFACT_CRAFTING") {
+                this.freeArtCraftingGifts.push({
+                    "power": power,
+                    "numFree": numFree
+                });
+            }
         }
         for (const [powerId, initial] of Object.entries(pageData["initial_consumable_counts"])) {
             this.consumableInitialQuantities[powerId] = initial;
@@ -157,10 +165,22 @@ const CraftingRendering = {
         }
 
         // Artifacts
+        let num_crafted_by_power_id = {};
         this.artifacts.forEach(art => {
             art["giftOptions"].forEach(opt => {
                 let currentlyChecked = this.checkedGiftOptions[opt["name"]];
                 let cost = parseInt(opt["cost"]);
+                if (currentlyChecked || opt["startChecked"]) {
+                    if ( !(opt["value"] in num_crafted_by_power_id)) {
+                        num_crafted_by_power_id[opt["value"]] = 0;
+                    }
+                    if (currentlyChecked) {
+                        num_crafted_by_power_id[opt["value"]] = num_crafted_by_power_id[opt["value"]] + 1;
+                    }
+                    if (num_crafted_by_power_id[opt["value"]] < pageData["free_crafts_by_power_full"][opt["value"]]) {
+                        cost = 0;
+                    }
+                }
                 if (opt["startChecked"]) {
                     if (currentlyChecked) {
                         opt["currentCost"] = "";
