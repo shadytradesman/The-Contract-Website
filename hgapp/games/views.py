@@ -285,6 +285,7 @@ def get_scenarios_by_cells(request):
 
 
 def edit_game(request, game_id):
+
     game = get_object_or_404(Game, id=game_id)
     initial_data = {
      'hook': game.hook,
@@ -301,7 +302,7 @@ def edit_game(request, game_id):
      'mediums': game.mediums.all(),
     }
     GameForm = make_game_form(user=request.user)
-    if not game.player_can_edit(request.user):
+    if request.user.is_anonymous or not game.player_can_edit(request.user):
         raise PermissionDenied("You don't have permission to edit this Game event.")
     if not game.is_scheduled():
         raise PermissionDenied("You cannot edit a Game event once it has started.")

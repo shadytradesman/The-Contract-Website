@@ -11,8 +11,7 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<!--    <script src="https://unpkg.com/vue@3.2.26/dist/vue.global.prod.js"></script>-->
-    <script src="{% static 'crafting/vue.global.prod.js' %}"></script>
+    <script src="https://unpkg.com/vue@3.2.26/dist/vue.global.prod.js"></script>
     {{page_data|json_script:"pageData"}}
     <script src="{% static 'crafting/crafting.js' %}"></script>
 {% endblock %}
