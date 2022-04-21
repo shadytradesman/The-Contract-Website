@@ -98,7 +98,7 @@
       <ul class="list-unstyled" style="padding-left: 10px;">
         <li v-for="giftOption in artifact.giftOptions">
           <label v-bind:for="giftOption.name">
-            <input type="checkbox" @change="recalculateExpCosts" v-bind:name="artifact.giftOptionsName" v-bind:id="giftOption.name" v-bind:value="giftOption.value" :checked="giftOption.startChecked" v-model="checkedGiftOptions[giftOption.name]">
+            <input type="checkbox" @change="recalculateExpCosts" v-bind:name="artifact.giftOptionsName" v-bind:id="giftOption.name" v-bind:value="giftOption.value" v-model="checkedGiftOptions[giftOption.name]">
             {giftOption.label}
           </label>
           <span style="margin-left: 10px;" v-html="giftOption.currentCost"></span>

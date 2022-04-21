@@ -50,26 +50,17 @@ class Craft(View):
             page_data, consumable_forms, new_artifact_formset, artifact_gift_selector_formset = \
                 self.__get_page_data_and_forms(request.POST)
             consumable_forms = [x[0] for x in consumable_forms] # strip the powers out
-            print(request.POST)
             for form in consumable_forms:
-                print("consumable form")
                 if not form.is_valid():
                     raise ValueError("Invalid consumable form")
-                print(form.cleaned_data)
             if new_artifact_formset:
-                print("see new artifact formset")
                 for form in new_artifact_formset:
                     if not form.is_valid():
-                        print(form.errors)
                         raise ValueError("Invalid new artifact form")
-                    print(form.cleaned_data)
             if artifact_gift_selector_formset:
-                print("Gift selector formset")
                 for form in artifact_gift_selector_formset:
                     if not form.is_valid():
-                        print(form.errors)
                         raise ValueError("Invalid artifact gift form")
-                    print(form.cleaned_data)
                 self.__save_artifact_forms(new_artifact_formset, artifact_gift_selector_formset)
             self.__save_consumable_forms(consumable_forms)
             self.character.refresh_from_db()
@@ -94,13 +85,10 @@ class Craft(View):
 
     def __save_artifact_forms(self, new_artifact_formset, artifact_gift_selector_formset):
         artifact_by_id = self.__create_artifact_map(new_artifact_formset, artifact_gift_selector_formset)
-        print("Art by ID")
-        print(artifact_by_id)
         artifacts_by_power_id = {}
         for choice in self.artifact_power_full_choices:
             artifacts_by_power_id[choice["pk"]] = []
         for form in artifact_gift_selector_formset:
-            print(form.cleaned_data)
             power_fulls = form.cleaned_data["selected_gifts"]
             artifact_id = form.cleaned_data["artifact_id"]
             for power in power_fulls:
@@ -127,8 +115,6 @@ class Craft(View):
         new_artifacts = set()
         powers_by_art_id = {}
         for form in artifact_gift_selector_formset:
-            print("gift selector form")
-            print(form.cleaned_data)
             art_id = form.cleaned_data["artifact_id"]
             powers_by_art_id[art_id] = form.cleaned_data["selected_gifts"]
             if art_id < 0:
@@ -141,13 +127,10 @@ class Craft(View):
                 art = get_object_or_404(Artifact, pk=art_id, character=self.character)
                 artifact_by_id[art_id] = art
         for form in new_artifact_formset:
-            print("new artifact form")
-            print(form.cleaned_data)
             art_id = form.cleaned_data["artifact_id"]
             if art_id not in new_artifacts:
                 raise ValueError("new artifact not referenced in gift forms")
             if art_id not in powers_by_art_id or not powers_by_art_id[art_id]:
-                print("continue point")
                 continue
             art = Artifact.objects.create(
                 character=self.character,
@@ -170,8 +153,6 @@ class Craft(View):
             newly_crafted = crafted_quant - prev_quantity
             number_free = max(min(self.free_crafts_by_power_full[power.pk] - prev_quantity, newly_crafted), 0)
             if power_id in self.event_by_power_full:
-                print("update existing for ")
-                print(power_id)
                 # update an existing event
                 if newly_crafted < 0:
                     self.event_by_power_full[power_id].refund_crafted_consumables(
@@ -182,8 +163,6 @@ class Craft(View):
                         new_number_free=number_free,
                         power_full=power)
             else:
-                print("new crafting for")
-                print(power_id)
                 # No existing event
                 if newly_crafted < 0:
                     raise ValueError("wanted to refund consumables, but no consumables to refund.")

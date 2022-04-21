@@ -2,7 +2,7 @@ let pageData = JSON.parse(JSON.parse(document.getElementById('pageData').textCon
 console.log(pageData);
 
 function displayCost(cost) {
-    let prefix =  cost >= 0 ? "-" : "+";
+    let prefix =  cost > 0 ? "-" : "+";
     let content = prefix + Math.abs(cost).toString();
     let cssClass = cost < 0 ? "css-exp-credit" : cost == 0 ? "text-muted" : "css-exp-cost";
     return "<span class=\"" + cssClass +"\">" + content + " Exp</span>";
@@ -80,6 +80,8 @@ const CraftingRendering = {
       consumableNumFree: {},
       consumableNumWouldBeCrafted: {},
       consumableNumWouldBeRefunded: {},
+      artifactsWouldBeCraftedWithPowers: {},
+      artifactsWouldBeRefundedWithPowers: {},
       totalExpCost: "",
       artifacts: [],
       artifactPowerChoices: [],
@@ -165,8 +167,12 @@ const CraftingRendering = {
         }
 
         // Artifacts
+        this.artifactsWouldBeRefundedWithPowers = {};
+        this.artifactsWouldBeCraftedWithPowers = {};
         let num_crafted_by_power_id = {};
-        this.artifacts.forEach(art => {
+        let freeDisplay = '<i><span class="text-muted">free</span></i>'
+        for (let i = this.artifacts.length -1; i >= 0; i--) {
+            art = this.artifacts[i];
             art["giftOptions"].forEach(opt => {
                 let currentlyChecked = this.checkedGiftOptions[opt["name"]];
                 let cost = parseInt(opt["cost"]);
@@ -174,30 +180,38 @@ const CraftingRendering = {
                     if ( !(opt["value"] in num_crafted_by_power_id)) {
                         num_crafted_by_power_id[opt["value"]] = 0;
                     }
-                    if (currentlyChecked) {
-                        num_crafted_by_power_id[opt["value"]] = num_crafted_by_power_id[opt["value"]] + 1;
-                    }
                     if (num_crafted_by_power_id[opt["value"]] < pageData["free_crafts_by_power_full"][opt["value"]]) {
                         cost = 0;
+                    }
+                    if (currentlyChecked) {
+                        num_crafted_by_power_id[opt["value"]] = num_crafted_by_power_id[opt["value"]] + 1;
                     }
                 }
                 if (opt["startChecked"]) {
                     if (currentlyChecked) {
-                        opt["currentCost"] = "";
+                        opt["currentCost"] = cost == 0 ? freeDisplay : "";
                     } else {
+                        if (!(art.id in this.artifactsWouldBeRefundedWithPowers)) {
+                            this.artifactsWouldBeRefundedWithPowers[art.id] = [];
+                        }
+                        this.artifactsWouldBeRefundedWithPowers[art.id].push(opt["label"]);
                         totalCost -= cost;
                         opt["currentCost"] = displayCost(-cost);
                     }
                 } else {
                     if (currentlyChecked) {
+                        if (!(art.id in this.artifactsWouldBeCraftedWithPowers)) {
+                            this.artifactsWouldBeCraftedWithPowers[art.id] = [];
+                        }
+                        this.artifactsWouldBeCraftedWithPowers[art.id].push(opt["label"]);
                         totalCost += cost;
-                        opt["currentCost"] = displayCost(cost);
+                        opt["currentCost"] = cost == 0 ? freeDisplay : displayCost(cost);
                     } else {
-                        opt["currentCost"] = "";
+                        opt["currentCost"] = cost == 0 ? freeDisplay : "";
                     }
                 }
             })
-        });
+        }
         this.totalExpCost = displayCost(totalCost);
       },
       newArtifact() {

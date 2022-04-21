@@ -46,27 +46,61 @@
                 {% include 'crafting/artifacts.html' %}
             {% endif %}
             <div class="panel panel-body">
-                <div v-if="Object.entries(consumableNumWouldBeCrafted).length > 0" class="row">
+                <div v-if="Object.entries(consumableNumWouldBeCrafted).length + Object.entries(artifactsWouldBeCraftedWithPowers).length > 0" class="row">
                     <div class="col-xs-12 col-md-8 col-md-offset-2">
                         <div class="alert alert-info">
                             <h4 class="text-center" style="margin-top: 0px;">Submitting will craft</h4>
-                            <ul>
-                                <li v-for="(quantity, powerName) in consumableNumWouldBeCrafted">
-                                    <b>{quantity}</b> {powerName}
-                                </li>
-                            </ul>
+                            <div v-if="Object.entries(consumableNumWouldBeCrafted).length > 0">
+                                <b>Consumables:</b>
+                                <ul>
+                                    <li v-for="(quantity, powerName) in consumableNumWouldBeCrafted">
+                                        <b>{quantity}</b> {powerName}
+                                    </li>
+                                </ul>
+                            </div>
+                            <div v-if="Object.entries(artifactsWouldBeCraftedWithPowers).length > 0">
+                                <b>Artifacts:</b>
+                                <ul>
+                                    <li v-for="(powers, art) in artifactsWouldBeCraftedWithPowers">
+                                        <b>{artifacts.filter(artif=> artif.id === parseInt(art))[0].name}</b>
+                                        <ul>
+                                            <li v-for="power in powers">
+                                                {power}
+                                            </li>
+                                        </ul>
+                                    </li>
+
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div v-if="Object.entries(consumableNumWouldBeRefunded).length > 0" class="row">
+                <div v-if="Object.entries(consumableNumWouldBeRefunded).length + Object.entries(artifactsWouldBeRefundedWithPowers).length > 0" class="row">
                     <div class="col-xs-12 col-md-8 col-md-offset-2">
                         <div class="alert alert-info">
                             <h4 class="text-center" style="margin-top: 0px;">Submitting will remove</h4>
-                            <ul>
-                                <li v-for="(quantity, powerName) in consumableNumWouldBeRefunded">
-                                    <b>{-quantity}</b> {powerName}
-                                </li>
-                            </ul>
+                            <div v-if="Object.entries(consumableNumWouldBeRefunded).length > 0">
+                                <b>Consumables:</b>
+                                <ul>
+                                    <li v-for="(quantity, powerName) in consumableNumWouldBeRefunded">
+                                        <b>{-quantity}</b> {powerName}
+                                    </li>
+                                </ul>
+                            </div>
+                            <div v-if="Object.entries(artifactsWouldBeRefundedWithPowers).length > 0">
+                                <b>Artifacts:</b>
+                                <ul>
+                                    <li v-for="(powers, art) in artifactsWouldBeRefundedWithPowers">
+                                        <b>{artifacts.filter(artif=> artif.id === parseInt(art))[0].name}</b>
+                                        <ul>
+                                            <li v-for="power in powers">
+                                                {power}
+                                            </li>
+                                        </ul>
+                                    </li>
+
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
