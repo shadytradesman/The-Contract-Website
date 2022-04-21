@@ -301,7 +301,7 @@ class SystemTextRenderer:
             if i > 0 and system_text[i-1] == cur_char:
                 if cur_char in marker_starts:
                     # two start markers
-                    if not start:
+                    if start is None:
                         start = i - 1
                         marker_starts = [cur_char]
                         end_marker = SystemTextRenderer.paren_end_by_start[cur_char]
@@ -331,7 +331,7 @@ class SystemTextRenderer:
             return None
 
         if not end:
-            raise ValueError("Unmatched start symbols found in system text" + system_text)
+            raise ValueError("Unmatched start symbols found in system text: " + system_text)
 
         # Capitalization increases end by 1
         end_paren_index = end - 2 if capitalize else end - 1
