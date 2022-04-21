@@ -77,7 +77,10 @@
          data-toggle="tooltip"
          title="Seasoned = 10+ Victories. Veteran = 25+ Victories"
          style="display: inline-block; margin-left: 3px; position: relative; bottom: 3px;">
-        <i>Requires <b>{{power.get_required_status_display}}</b></i>
+        {% if force_show_warnings %}
+            Creator
+        {% endif %}
+        <i> Requires <b>{{power.get_required_status_display}}</b></i>
     </div>
     {% endif %}
 </div>

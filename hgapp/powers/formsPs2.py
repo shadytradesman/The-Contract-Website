@@ -94,13 +94,21 @@ def make_select_signature_artifact_form(existing_character=None, existing_power=
                                                    label="Attach to existing Signature Item?",
                                                    widget=forms.Select(attrs={
                                                        'v-model': 'selectedItem',
+                                                       "@input": "changeSelectedItem",
                                                    }))
         item_name = forms.CharField(required=False,
                                     max_length=450,
-                                    help_text="The name of the signature item")
+                                    help_text="The name of the signature item",
+                                    widget=forms.TextInput(attrs={
+                                        'v-model': 'sigItemName',
+                                    }))
         item_description = forms.CharField(required=False,
                                            max_length=5000,
-                                           help_text="(Optional) A physical description of the signature item")
+                                           help_text="(Optional) A physical description of the signature item",
+                                           widget=forms.TextInput(attrs={
+                                               'v-model': 'sigItemDescription',
+                                           }))
+
     return SelectArtifactForm
 
 

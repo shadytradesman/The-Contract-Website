@@ -183,7 +183,7 @@ const CraftingRendering = {
                     if (num_crafted_by_power_id[opt["value"]] < pageData["free_crafts_by_power_full"][opt["value"]]) {
                         cost = 0;
                     }
-                    if (currentlyChecked) {
+                    if (currentlyChecked || (opt["startChecked"] && !currentlyChecked)) {
                         num_crafted_by_power_id[opt["value"]] = num_crafted_by_power_id[opt["value"]] + 1;
                     }
                 }

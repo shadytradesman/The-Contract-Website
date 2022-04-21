@@ -17,7 +17,7 @@ from django.middleware.csrf import rotate_token
 
 from characters.models import Character, BasicStats, Character_Death, Graveyard_Header, Attribute, Ability, \
     CharacterTutorial, Asset, Liability, BattleScar, Trauma, TraumaRevision, Injury, Source, ExperienceReward, Artifact, \
-    LOST, DESTROYED
+    LOST, DESTROYED, AT_HOME
 from powers.models import Power_Full, SYS_LEGACY_POWERS, SYS_PS2, CRAFTING_NONE, CRAFTING_SIGNATURE, CRAFTING_ARTIFACT, \
     CRAFTING_CONSUMABLE
 from powers.signals import gift_major_revision
@@ -280,7 +280,8 @@ def view_character(request, character_id, secret_key=None):
     signature_items = []
     lost_signature_items = []
     consumables = []
-    crafted_artifacts = []
+    avail_crafted_artifacts = []
+    unavail_crafted_artifacts = []
     for artifact in character.artifact_set.exclude(is_deleted=True).all():
         if hasattr(artifact, "cell") and artifact.cell:
             artifacts[artifact.cell].append(artifact)
@@ -288,8 +289,11 @@ def view_character(request, character_id, secret_key=None):
             signature_items.append(artifact)
         elif artifact.is_consumable:
             consumables.append(artifact)
-        else:
-            crafted_artifacts.append(artifact)
+        elif artifact.is_crafted_artifact:
+            if artifact.most_recent_status_change and artifact.most_recent_status_change in [LOST, AT_HOME, DESTROYED]:
+                unavail_crafted_artifacts.append(artifact)
+            else:
+                avail_crafted_artifacts.append(artifact)
     for artifact in Artifact.objects.filter(crafting_character=character, is_signature=True, is_deleted=False).all():
         if artifact.character is not None and artifact.character != character:
             lost_signature_items.append(artifact)
@@ -353,7 +357,8 @@ def view_character(request, character_id, secret_key=None):
         'crafting_consumable_gifts': crafting_consumable_gifts,
         'signature_items': signature_items,
         'consumables': consumables,
-        'crafted_artifacts': crafted_artifacts,
+        'avail_crafted_artifacts': avail_crafted_artifacts,
+        'unavail_crafted_artifacts': unavail_crafted_artifacts,
         'lost_signature_items': lost_signature_items,
     }
     return render(request, 'characters/view_pages/view_character.html', context)

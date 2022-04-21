@@ -6,9 +6,9 @@
     <div class="col-md-6">
         {% if early_access %}
         {% else %}
-            <h3 class="text-center" data-toggle="tooltip" title='{{tutorial.powers_view}}'>
+            <h4 class="text-center" data-toggle="tooltip" title='{{tutorial.powers_view}}'>
                     Powers
-            </h3>
+            </h4>
         {% endif %}
         {% if new_powers and early_access %}
             <h3 class="text-center">Powers</h3>
@@ -48,11 +48,11 @@
         {% endif %}
     </div>
     <div class="col-md-6">
-        {% if crafted_artifacts and early_access %}
+        {% if avail_crafted_artifacts and early_access %}
             <h3 class="text-center" data-toggle="tooltip" >
                 Crafted Artifacts
             </h3>
-            {% for item in crafted_artifacts %}
+            {% for item in avail_crafted_artifacts %}
                 {% render_sig_item item request.user character %}
             {% endfor %}
         {% endif %}
@@ -123,3 +123,16 @@
         {% endif %}
     </div>
 </div>
+<hr style="width: 75%;">
+{% if unavail_crafted_artifacts and early_access %}
+<h3 class="text-center" data-toggle="tooltip" >
+    Unavailable Artifacts
+</h3>
+<div class="row">
+{% for item in unavail_crafted_artifacts %}
+    <div class="col-xs-12 col-md-6">
+        {% render_sig_item item request.user character %}
+    </div>
+{% endfor %}
+</div>
+{% endif %}

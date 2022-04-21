@@ -1,7 +1,7 @@
 {% load power_tags %}
 {% load bootstrap %}
 
-<div class="css-signature-item js-world-element-container {% if is_greyed_out %}css-sig-item-greyed-out{% endif %}">
+<div class="css-item-display {% if item.is_crafted_artifact %}css-crafted-art{% else %}css-signature-item{% endif %} js-world-element-container {% if is_greyed_out %}css-sig-item-greyed-out{% endif %}">
     {% if user_can_edit  %}
         <span class="pull-right css-world-element-edit">
             <button class="btn btn-xs btn-default js-edit-world-element-button"
@@ -92,8 +92,12 @@
     {% if is_crafted %}
         {% for power in item.power_set.all %}
             <span class="css-world-element-name">
+                {% if is_greyed_out %}
+                    {% power_heading power %}
+                {% else %}
                     {% power_rev_badge power True %}
-                </span>
+                {% endif %}
+            </span>
         {% endfor %}
     {% else %}
         {% for power in item.power_full_set.all %}

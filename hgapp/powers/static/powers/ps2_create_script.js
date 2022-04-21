@@ -779,6 +779,8 @@ const ComponentRendering = {
       warnings: [],
       selectedItem: "",
       hasCrafted: false,
+      sigItemName: "",
+      sigItemDescription: ""
     }
   },
   methods: {
@@ -976,10 +978,12 @@ const ComponentRendering = {
       openModalityTab() {
           this.expandedTab = "modalities";
           this.tabHeader = "Select a Gift Type";
+          this.scrollToTop();
       },
       openEffectsTab() {
           this.expandedTab = "effects";
           this.tabHeader = "Select an Effect";
+          this.scrollToTop();
       },
       openCustomizationTab() {
           this.expandedTab = "customize";
@@ -989,6 +993,7 @@ const ComponentRendering = {
                 $('#giftPreviewModal').modal({});
             }
           });
+          this.scrollToTop();
       },
       clickModalityTab() {
           if (this.expandedTab === "modalities" && this.selectedModality) {
@@ -1151,7 +1156,7 @@ const ComponentRendering = {
             this.modalityEffectFilterPrompt = "My Power";
           }
           if (this.selectedModality.slug === "signature-item-mod") {
-            this.modalityEffectFilterPrompt = "My Signature Item";
+            this.modalityEffectFilterPrompt = "My Legendary Artifact";
           }
 
           this.effectFilters = newEffectFilters.concat(allAvailableVectors.map(vecSlug => vectorSlugToEffectFilter(vecSlug, this.selectedModality.slug)));
@@ -1506,7 +1511,7 @@ const ComponentRendering = {
           replacements = {}
           replacements["gift-name"] = [{
             mode: "UNIQUE",
-            replacement: this.giftName === null ? "signature item" : this.giftName
+            replacement: this.giftName === null ? "Artifact" : this.giftName
           }];
           addReplacementsForModifiers(replacements,
                                       this.getSelectedAndActiveEnhancements().map(mod => mod["slug"]).map(mod => powerBlob["enhancements"][mod]),
@@ -1571,6 +1576,15 @@ const ComponentRendering = {
                 }];
               }
           });
+      },
+      isSignatureItem() {
+        return this.selectedModality && this.selectedModality.slug === "signature-item-mod";
+      },
+      isCraftedArtifact() {
+        return this.selectedModality && this.selectedModality.slug === "craftable-artifact";
+      },
+      isCraftedConsumable() {
+        return this.selectedModality && this.selectedModality.slug === "craftable-consumable";
       },
       addReplacementsForFields(replacements) {
           this.systemFields.forEach(field => {

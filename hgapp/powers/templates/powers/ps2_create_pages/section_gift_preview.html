@@ -1,6 +1,27 @@
 {% load static %}
 {% load power_tags %}
-
+<div
+     :class="{
+     'css-item-display': isSignatureItem() || isCraftedArtifact() || isCraftedConsumable(),
+     'css-signature-item': isSignatureItem(),
+     'css-crafted-art': isCraftedArtifact()
+     }"
+>
+    <h3 style="margin-top: 5px; margin-bottom: 5px;" class="text-center">
+        <span v-if="isSignatureItem() && sigItemName && !selectedItem" v-text="sigItemName"></span>
+        <span v-if="isSignatureItem() && sigItemName.length == 0 || selectedItem">
+                Legendary Artifact
+        </span>
+    </h3>
+    <i>
+        <div v-text="sigItemDescription" class="css-system-text-user-input"></div>
+    </i>
+    <div v-if="isCraftedArtifact()" class="text-center">
+        <i class="text-muted">You will be able to craft this Effect onto Artifacts.</i>
+    </div>
+    <div v-if="isCraftedConsumable()" class="text-center">
+        <i class="text-muted">The Consumables you craft will look like this</i>
+    </div>
 <div class="panel panel-default css-gift-preview" style="margin-bottom: 0px;">
     <div class="panel-heading">
         <h3 class="" style="margin-top: 5px; margin-bottom: 5px"
@@ -31,7 +52,6 @@
                       class="has-popover"><b>Cost:
                         <span v-html="giftCost"></span></b>
                         <span v-if="previousGiftCost && previousGiftCost - giftCost != 0 "> ({previousGiftCost} {costDifference})</span>
-
                 </span>
             </span>
             </div>
@@ -157,3 +177,4 @@
     </div>
     {% endif %}
 </div>
+</div >
