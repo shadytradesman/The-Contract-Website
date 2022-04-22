@@ -1,3 +1,14 @@
+String.prototype.decodeHTML = function() {
+    var map = {"gt":">" /* , … */};
+    return this.replace(/&(#(?:x[0-9a-f]+|\d+)|[a-z]+);?/gi, function($0, $1) {
+        if ($1[0] === "#") {
+            return String.fromCharCode($1[1].toLowerCase() === "x" ? parseInt($1.substr(2), 16)  : parseInt($1.substr(1), 10));
+        } else {
+            return map.hasOwnProperty($1) ? map[$1] : $0;
+        }
+    });
+};
+
 function activateTooltips() {
     $('[data-toggle="tooltip"]').tooltip("enable");
     $('body').tooltip({
@@ -862,7 +873,7 @@ const ComponentRendering = {
         $("#giftPreviewModal").modal({});
       },
       setStateForEdit(powerEditBlob) {
-        this.giftName = powerEditBlob["name"];
+        this.giftName = powerEditBlob["name"].decodeHTML();
         this.giftTagline = powerEditBlob["flavor_text"];
         this.giftDescription = powerEditBlob["description"];
         this.giftExtendedDescription = powerEditBlob["extended_description"];
@@ -914,7 +925,7 @@ const ComponentRendering = {
             let selectedEnhancement = availEnhancements.find(enh => enh.slug === mod["enhancement_slug"]);
             if (selectedEnhancement) {
                 if (mod["detail"] != null) {
-                    selectedEnhancement.details = mod["detail"];
+                    selectedEnhancement.details = mod["detail"].decodeHTML();
                 }
                 this.selectedEnhancements.push(selectedEnhancement);
                 this.enhancements = handleModifierMultiplicity(selectedEnhancement.slug, selectedEnhancement.id, "enhancements", this.enhancements, this.getSelectedAndActiveEnhancements());
@@ -930,7 +941,7 @@ const ComponentRendering = {
             let selectedDrawback = availDrawbacks.find(drawback => drawback.slug === mod["drawback_slug"]);
             if (selectedDrawback) {
                 if (mod["detail"] != null) {
-                    selectedDrawback.details = mod["detail"];
+                    selectedDrawback.details = mod["detail"].decodeHTML();
                 }
                 this.selectedDrawbacks.push(selectedDrawback);
                 this.drawbacks = handleModifierMultiplicity(selectedDrawback.slug, selectedDrawback.id, "drawbacks", this.drawbacks, this.getSelectedAndActiveDrawbacks());
@@ -942,7 +953,7 @@ const ComponentRendering = {
         powerEditBlob["text_fields"].forEach(editField => {
             this.systemFields.forEach(sysField => {
                 if (sysField.isText && sysField.pk === editField["field_id"]) {
-                    this.fieldTextInput[sysField.id] = editField["value"];
+                    this.fieldTextInput[sysField.id] = editField["value"].decodeHTML();
                 }
             });
         });
