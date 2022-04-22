@@ -5,6 +5,19 @@
     <div class="visible-xs-block"></div>
     When you're satisfied, <a href="#sec-customize-flavor">finish by adding flavor.</a>
 </div>
+<div v-if="selectedEffect && selectedEffect.errata">
+    <div class="row">
+        <div class="col-xs-12 col-md-10 col-md-offset-1">
+            <div class="alert alert-info" >
+                <div style="display: inline-block;" >
+                    <div class="glyphicon glyphicon-info-sign" aria-hidden="true"
+                         style="font-size: 18px; display: inline-block; line-height: 0; position: relative; top: 3px"></div>
+                    {selectedEffect.errata}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="visible-xs-block text-center" style="padding: 10px;">
     <b>Click this button any time to preview your Gift:</b>
     <div class="css-gift-cost-cont" style="display: block; position: relative;">

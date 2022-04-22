@@ -170,6 +170,7 @@ function componentToVue(component, type) {
         displayName: component.name,
         summary: component.summary,
         description: component.description,
+        errata: component.system_errata,
         type: component.type,
         giftCredit: component["gift_credit"],
         visibility: component.default_description_prompt,
