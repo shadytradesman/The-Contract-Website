@@ -435,8 +435,38 @@ function buildModifierDetailsMap(vueModifiers) {
     return detailsMap;
 }
 
+const htmlReplaceMap = {
+    '(': '&#40;',
+    ')': '&#41;',
+    '[': '&#91;',
+    ']': '&#93;',
+    '&': '&#93;',
+    '%': '&#37;',
+    '|': '&#124;',
+    '{': '&#124;',
+    '}': '&#125;',
+    '$': '&#36;',
+    '+': '&#43;',
+    '#': '&#35;',
+}
+
+function cleanUserInputField(userInput){
+    let output = "";
+    for (let i = 0; i < userInput.length; i++) {
+        let char = userInput[i];
+        if (char in htmlReplaceMap) {
+            output += htmlReplaceMap[char];
+        }
+        else {
+            output += char;
+        }
+    }
+    return output;
+}
+
+
 function subUserInputForDollarSign(replacementText, userInput) {
-    userInput = '<span class="css-system-text-user-input">' + userInput + "</span>";
+    userInput = '<span class="css-system-text-user-input">' + cleanUserInputField(userInput) + "</span>";
     return replacementText.replace("$", userInput);
 }
 

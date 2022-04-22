@@ -637,10 +637,14 @@ def character_timeline(request, character_id):
     if craftings:
         current_crafting_list = []
         last_attendance_examined = craftings[0].relevant_attendance
+        if last_attendance_examined is not None:
+            craft_time = last_attendance_examined.relevant_game.end_time + timedelta(seconds=6)
+        else:
+            craft_time = character.pub_date + timedelta(seconds=6)
         for crafting in craftings:
             if last_attendance_examined != crafting.relevant_attendance:
                 crafting_tuples.append(
-                    (last_attendance_examined.relevant_game.end_time + timedelta(seconds=6),
+                    (craft_time,
                      "crafting",
                      CraftingTimelineBlock(current_crafting_list))
                 )
@@ -649,7 +653,7 @@ def character_timeline(request, character_id):
             current_crafting_list.append(crafting)
         crafting_tuples.append(
             (
-                last_attendance_examined.relevant_game.end_time + timedelta(seconds=6),
+                craft_time,
                 "crafting",
                 CraftingTimelineBlock(current_crafting_list))
         )

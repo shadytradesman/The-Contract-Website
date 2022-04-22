@@ -63,6 +63,10 @@ class PowerForm(forms.Form):
                                         'v-bind:value': 'selectedVector.slug',
                                     }))
 
+    def clean_name(self):
+        data = self.cleaned_data['name']
+        return clean_user_input_field(data)
+
 
 def make_select_signature_artifact_form(existing_character=None, existing_power=None, user=None):
     class SelectArtifactForm(forms.Form):
@@ -129,6 +133,10 @@ class ModifierForm(forms.Form):
         'v-bind:value': 'modifier.isEnhancement',
     }),) # if False, this modifier is a Drawback
 
+    def clean_details(self):
+        data = self.cleaned_data['details']
+        return clean_user_input_field(data)
+
 
 class ParameterForm(forms.Form):
     level = forms.IntegerField(
@@ -160,6 +168,10 @@ class SystemFieldTextForm(SystemField):
                                       "class": "form-control",
                                       "@input": "changeParam",
                                   }))
+
+    def clean_details_text(self):
+        data = self.cleaned_data['details_text']
+        return clean_user_input_field(data)
 
 
 class SystemFieldWeaponForm(SystemField):
@@ -204,3 +216,31 @@ def get_sys_field_weapon_formset(POST=None):
 
 def get_sys_field_roll_formset(POST=None):
     return formset_factory(SystemFieldRollForm, extra=0)(POST, prefix="sys_field_roll")
+
+
+html_replace_map = {
+    '(': '&#40;',
+    ')': '&#41;',
+    '[': '&#91;',
+    ']': '&#93;',
+    '&': '&#93;',
+    '%': '&#37;',
+    '|': '&#124;',
+    '{': '&#124;',
+    '}': '&#125;',
+    '$': '&#36;',
+    '+': '&#43;',
+    '#': '&#35;',
+}
+
+
+def clean_user_input_field(user_input):
+    # We do this so the user can't mess up system text rendering.
+    output = ""
+    for char in user_input:
+        if char in html_replace_map:
+            output += html_replace_map[char]
+        else:
+            output += char
+    return output
+

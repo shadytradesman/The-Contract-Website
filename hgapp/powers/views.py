@@ -39,6 +39,10 @@ class EditPower(View):
 
     def post(self, request, *args, **kwargs):
         with transaction.atomic():
+            if self.character:
+                self.character = Character.objects.select_for_update().get(pk=self.character.id)
+            if self.power_to_edit:
+                self.power_to_edit = Power_Full.objects.select_for_update().get(pk=self.power_to_edit.id)
             new_power_full = save_gift(request, power_full=self.power_to_edit, character=self.character)
         return HttpResponseRedirect(reverse('powers:powers_view_power', args=(new_power_full.id,)))
 

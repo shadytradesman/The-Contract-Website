@@ -14,7 +14,7 @@
             <i class="fa fa-plus-square fa-2x"></i>
         </a>
         {% endif %}
-        <a href="{% url 'powers:powers_view_power' latest_revision.id %}">{{latest_revision.name}}</a>
+        <a href="{% url 'powers:powers_view_power' latest_revision.id %}">{{latest_revision.name|safe}}</a>
         <small>
             <i>
                 <div style="margin-left: 5px; display: inline-block">
