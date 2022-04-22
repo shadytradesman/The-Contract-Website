@@ -127,7 +127,20 @@
         </span>
     </div>
     <div class="panel-body" style="padding-top: 5px;">
-        <div v-if="giftDescription" v-text="giftDescription" class="css-system-text-user-input" style="margin-top: 5px; margin-bottom: 5px;">
+        <div  v-if="giftDescription">
+            <span v-if="renderedVisual.length > 0"
+                  class="has-popover"
+                  v-bind:data-title="renderedVisual"
+                  data-html="True"
+                  data-toggle="tooltip">
+                <span class="glyphicon glyphicon-eye-open"
+                      style="margin-right: 6px;"
+                      aria-hidden="true"
+                ></span>
+            </span>
+            <span v-text="giftDescription" class="css-system-text-user-input" style="margin-top: 5px; margin-bottom: 5px;">
+            </span>
+
         </div>
         <div v-if="giftExtendedDescription">
             <a id="collapse-ext-desc-{{preview_id}}-heading"

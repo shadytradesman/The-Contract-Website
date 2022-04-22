@@ -17,12 +17,14 @@ class PowerForm(forms.Form):
     tagline = forms.CharField(label='Tagline',
                               max_length=100,
                               required=False,
+                              help_text="(Optional) Introduce the Gift in a flavorful way.",
                               widget=forms.TextInput(attrs={
                                   "v-model": "giftTagline",
                               }))
     description = forms.CharField(label='Visual Description',
                                   widget=forms.Textarea(attrs={
                                      "v-model": "giftDescription",
+                                     "class": "form-control",
                                   }),
                                   max_length=2000,
                                   required=True,
@@ -31,6 +33,7 @@ class PowerForm(forms.Form):
     extended_description = forms.CharField(label='Extended Description',
                                   widget=forms.Textarea(attrs={
                                       "v-model": "giftExtendedDescription",
+                                      "class": "form-control",
                                   }),
                                   max_length=8000,
                                   required=False,

@@ -114,7 +114,7 @@ class DrawbackInstanceTabular(admin.TabularInline):
 
 class SystemInline(admin.StackedInline):
     model = Base_Power_System
-    fields = ['system_fields', 'base_power', 'dice_system', 'system_text', 'eratta',]
+    fields = ['system_fields', 'base_power', 'dice_system', 'system_text', 'eratta', 'default_description_prompt']
     readonly_fields = ('system_fields',)
 
     # description functions like a model field's verbose_name

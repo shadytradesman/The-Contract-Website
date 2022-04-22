@@ -595,6 +595,7 @@ class Base_Power(models.Model):
             'blacklist_parameters': list(self.blacklist_parameters.values_list("pk", flat=True)),
             'system_text': system.system_text if system else None,
             'system_errata': system.eratta if system and system.eratta else None,
+            'system_visibility': system.default_description_prompt if system and system.default_description_prompt else None,
             'default_description_prompt': system.default_description_prompt if system else None,
             'text_fields': [x.to_blob() for x in text_fields] if text_fields else [],
             'roll_fields': [x.to_blob() for x in roll_fields] if roll_fields else [],

@@ -171,6 +171,7 @@ function componentToVue(component, type) {
         summary: component.summary,
         description: component.description,
         errata: component.system_errata,
+        visibility: component.system_visibility,
         type: component.type,
         giftCredit: component["gift_credit"],
         visibility: component.default_description_prompt,
@@ -822,7 +823,8 @@ const ComponentRendering = {
       selectedItem: "",
       hasCrafted: false,
       sigItemName: "",
-      sigItemDescription: ""
+      sigItemDescription: "",
+      renderedVisual: ""
     }
   },
   methods: {
@@ -1522,6 +1524,11 @@ const ComponentRendering = {
           let partiallyRenderedSystem = performSystemTextReplacements(this.unrenderedSystem, replacementMap);
           this.renderedSystem = replaceHoverText(partiallyRenderedSystem);
           this.giftErrata = performSystemTextReplacements("{{gift-errata}}", replacementMap);
+          if (this.selectedEffect && this.selectedEffect.visibility) {
+            this.renderedVisual = performSystemTextReplacements(this.selectedEffect.visibility, replacementMap);
+          } else {
+            this.renderedVisual = "";
+          }
           this.$nextTick(function () {
               activateTooltips();
           });
