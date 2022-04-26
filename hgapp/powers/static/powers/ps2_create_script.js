@@ -349,8 +349,10 @@ function handleModifierMultiplicity(modSlug, modId, modType, existingModifiers, 
 }
 
 function paramsFromComponents(components, modifier) {
-    powerParams = components.flatMap(component => component["parameters"]);
-    return powerParams.map(param => powerParamToVue(param));
+    let powerParams = components.flatMap(component => component["parameters"]);
+    let blacklistedParamSlugs = components.flatMap(component => component["blacklist_parameters"]);
+    let allowedParams = powerParams.filter(x => !blacklistedParamSlugs.includes(x["param_id"]));
+    return allowedParams.map(param => powerParamToVue(param));
 }
 
 function fieldsFromComponents(components, unrenderedSystemText) {

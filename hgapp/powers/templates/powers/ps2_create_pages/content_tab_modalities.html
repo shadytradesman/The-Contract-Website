@@ -34,9 +34,9 @@
                         { component.description }
                     </small>
                 </div>
-                <div class="text-right text-muted"
+                <div class="text-right text-muted has-popover"
                      data-toggle="tooltip"
-                     title="Gift Types add or subtract from a completed Gift's overall cost.">
+                     data-title="Gift Types add or subtract from a completed Gift's overall cost. All Gifts must cost a minimum of 1 Gift Credit.">
                     <small>
                         Gift Cost:
                         <span v-if="component.giftCredit > 0" class="css-component-gift-credit">-{component.giftCredit - 1}</span>
