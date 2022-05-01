@@ -7,6 +7,29 @@
          aria-expanded="false"
          aria-controls="collapse-power-{{latest_revision.id}}">
     <div >
+        {% if show_active_toggle %}
+        <div class="pull-right form-inline" style="margin-left: 5px;">
+            <form
+                    method="post"
+                    {% if art_id %}
+                        action="{% url 'powers:powers_toggle_active' latest_revision.id is_active art_id %}"
+                    {% else %}
+                        action="{% url 'powers:powers_toggle_active' latest_revision.id is_active %}"
+                    {% endif %}
+            >
+                {% csrf_token %}
+                <div class="btn-group" data-toggle="buttons">
+                    <button class="btn btn-xs btn-default {% if is_active %}active disabled{% endif %}" {% if is_active %}active disabled{% endif %}>
+                        On
+                    </button>
+                    <button class="btn btn-xs btn-default {% if not is_active %}disabled{% endif %}" {% if not is_active %}disabled{% endif %}>
+                        Off
+                    </button>
+                </div>
+            </form>
+            <div style="font-size: 10px" class="text-muted text-center">Stat Bonus</div>
+        </div>
+        {% endif %}
     <h4 style="font-size: 20px; margin-top: 0px; margin-bottom: 5px;">
         {% if user_can_edit and available_gift and not discovery_page %}
         <a href="{% url 'powers:powers_edit_ps2' power_full.id %}"

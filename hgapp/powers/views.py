@@ -12,7 +12,7 @@ from django.forms import formset_factory
 from django.db import transaction
 from django.db.models import Prefetch
 
-from characters.models import Character
+from characters.models import Character, Artifact
 from .createPowerFormUtilities import get_create_power_context_from_base, \
     get_create_power_context_from_power, get_edit_power_context_from_power, create_new_power_and_parent, \
     create_power_for_new_edit, refund_or_assign_rewards
@@ -365,3 +365,24 @@ class BasePowerDetailView(generic.DetailView):
         context['system_text'] = Base_Power_System.objects.filter(dice_system=DICE_SYSTEM[1][0]).get(base_power=self.base_power)
         context['base_power'] = self.base_power
         return context
+
+
+def toggle_active(request, power_id, is_currently_active, art_id=None):
+    power = get_object_or_404(Power, id=power_id)
+    if not power.player_can_edit(request.user):
+        raise PermissionDenied("This Power has been deleted, or you're not allowed to view it")
+    if art_id:
+        artifact = get_object_or_404(Artifact, id=art_id)
+        if artifact.character:
+            if not artifact.character.player_can_view(request.user):
+                raise PermissionDenied("This Artifact has been deleted, or you're not allowed to view it")
+    else:
+        artifact = None
+    if request.method == 'POST':
+        if DeletePowerForm(request.POST).is_valid():
+            with transaction.atomic():
+                power.set_is_active(is_currently_active == "False", artifact)
+    else:
+        raise ValueError("must be POST")
+    char = artifact.character if artifact else power.parent_power.character
+    return HttpResponseRedirect(reverse('characters:characters_view', args=(char.id,)))

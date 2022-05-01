@@ -19,6 +19,11 @@ urlpatterns = [
     # ex: .com/powers/edit-ps2/p/21
     path('create-ps2/p/<int:power_full_id>/', views.CreatePower.as_view(), name='powers_create_from_existing_ps2'),
 
+    # ex: .com/powers/toggle-active/p/21/off/
+    path('toggle-active/p/<int:power_id>/<is_currently_active>/', views.toggle_active, name='powers_toggle_active'),
+    # ex: .com/powers/toggle-active/p/21/off/a/21
+    path('toggle-active/p/<int:power_id>/<is_currently_active>/a/<int:art_id>/', views.toggle_active, name='powers_toggle_active'),
+
     ### SHARED
     # ex: .com/powers/bases_and_examples/
     url(r'^bases_and_examples/$', views.powers_and_examples, name='powers_and_examples'),

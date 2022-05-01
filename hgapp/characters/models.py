@@ -1064,11 +1064,12 @@ class Character(models.Model):
                                        value=value)
             new_bonus.save()
 
+    #TODO: Delete this after new powers update rollout
     def reset_attribute_bonuses(self):
         attributes = self.stats_snapshot.attributevalue_set.all()
         for attribute in attributes:
             self.set_bonus_for_attribute(attribute.relevant_attribute, 0)
-        powers = self.power_full_set.all()
+        powers = self.power_full_set.exclude(dice_system='PS2').all()
         bonus_by_attribute = {}
         for power in powers:
             bonuses = power.latest_revision().get_attribute_bonuses()
@@ -2109,6 +2110,8 @@ class CharacterTutorial(models.Model):
     sprint_roll = models.ForeignKey(Roll, on_delete=models.CASCADE, blank=True, null=True,
                                     related_name="char_sprint")
 
+
+# TODO: Potentially delete this after new powers update rollout
 class AttributeBonus(models.Model):
     character = models.ForeignKey('Character', on_delete=models.CASCADE)
     attribute = models.ForeignKey('Attribute', on_delete=models.CASCADE)

@@ -43,6 +43,10 @@ $(document).on("click", ".power-badge a", function(e) {
    e.stopPropagation();
 });
 
+$(document).on("click", ".power-badge .btn", function(e) {
+   e.stopPropagation();
+});
+
 $(document).on("click", '.power-badge [data-toggle="tooltip"]', function(e) {
    e.stopPropagation();
 });

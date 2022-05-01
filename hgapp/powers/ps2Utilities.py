@@ -10,7 +10,7 @@ from .models import SYS_LEGACY_POWERS, EFFECT, VECTOR, MODALITY, Base_Power, Enh
     Enhancement_Instance, Drawback_Instance, Parameter_Value, Power_Param, SystemFieldText, SystemFieldTextInstance, \
     SystemFieldWeapon, SystemFieldWeaponInstance, SystemFieldRoll, SystemFieldRollInstance, PowerSystem, \
     CRAFTING_SIGNATURE, CREATION_REVISION, CREATION_MAJOR_REVISION, CREATION_ADJUSTMENT, CREATION_IMPROVEMENT, \
-    CRAFTING_CONSUMABLE, CRAFTING_ARTIFACT
+    CRAFTING_CONSUMABLE, CRAFTING_ARTIFACT, ACTIVE, PASSIVE
 from .formsPs2 import PowerForm, get_modifiers_formset, get_params_formset, get_sys_field_text_formset, \
     get_sys_field_weapon_formset, get_sys_field_roll_formset, make_select_signature_artifact_form
 from .signals import gift_revision, gift_major_revision, gift_adjustment
@@ -179,6 +179,7 @@ def _get_power_from_form_and_validate(power_form, power_engine, user=None):
                   base=power_form.cleaned_data["effect"],
                   vector=power_form.cleaned_data["vector"],
                   modality=power_form.cleaned_data["modality"],
+                  activation_style=PASSIVE if power_form.cleaned_data["vector"].slug == "passive" else ACTIVE,
                   dice_system=SYS_PS2)
     if user and user.id:
         power.created_by = user
@@ -343,5 +344,9 @@ def _handle_sig_artifact(request, SignatureArtifactForm, power_full, new_power, 
         print(new_artifact)
         new_power.artifacts.add(new_artifact) # link new rev with artifact
         power_full.artifacts.add(new_artifact) # it's okay to duplicitively add to a django many-to-many
+
+    if new_power.activation_style == PASSIVE:
+        new_power.set_is_active(True, new_artifact)
+
 
 

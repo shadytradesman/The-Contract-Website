@@ -16,10 +16,11 @@ from django.utils.html import mark_safe, escape, linebreaks
 from django.db.utils import IntegrityError
 from hgapp.utilities import get_object_or_none
 
-
+PASSIVE = 'PASSIVE'
+ACTIVE = 'ACTIVE'
 ACTIVATION_STYLE = (
-    ('PASSIVE', 'Passive'),
-    ('ACTIVE', 'Active'),
+    (PASSIVE, 'Passive'),
+    (ACTIVE, 'Active'),
 )
 
 EFFECT = "EFFECT"
@@ -98,6 +99,10 @@ DICE_SYSTEM = (
 BODY_ = ("BODY", "Body")
 MIND_ = ("MIND", "Mind")
 PARRY_ = ("PARRY", "Dodge or Defend")
+
+# listed here for simplicity and performance
+EFFECTS_THAT_GIVE_STAT_BONUSES = {"alternate-form", "augmentation", "mythic-brawn", "mythic-charisma",
+                                  "mythic-dexterity", "mythic-intelligence", "mythic-perception"}
 
 
 class PowerTag(models.Model):
@@ -1181,6 +1186,7 @@ class Power(models.Model):
             remove_perm('view_private_power', player, self)
 
     def get_attribute_bonuses(self):
+        # This does not take into account whether or not the power is "active" ala the get_active_status() method
         bonuses = []
         params = self.parameter_value_set \
             .select_related('relevant_power_param__relevant_parameter')\
@@ -1238,6 +1244,45 @@ class Power(models.Model):
         if self.creation_reason == CREATION_REASON[3][0]:
             return "adjusting"
 
+    def show_status_toggle(self, artifact=None):
+        if self.base_id not in EFFECTS_THAT_GIVE_STAT_BONUSES:
+            return False
+        if self.modality.crafting_type != CRAFTING_NONE and artifact is None:
+            # sometimes we display badges that aren't attached to artifacts. They shouldn't be togglable
+            return False
+        return len(self.get_attribute_bonuses()) > 0
+
+    def set_is_active(self, is_active, artifact=None):
+        if self.base_id not in EFFECTS_THAT_GIVE_STAT_BONUSES:
+            raise ValueError("Trying to set active status for power that does not give bonuses.")
+        status = self._get_power_active_status(artifact)
+        if status is None:
+            PowerActiveStatus.objects.create(
+                relevant_power=self,
+                relevant_artifact=artifact,
+                is_active=is_active
+            )
+        else:
+            status.is_active = is_active
+            status.save()
+
+    def get_is_active(self, artifact=None):
+        if self.base_id not in EFFECTS_THAT_GIVE_STAT_BONUSES:
+            return False
+        status = self._get_power_active_status(artifact)
+        if status is None:
+            return False
+        else:
+            return status.is_active
+
+    def _get_power_active_status(self, artifact):
+        if self.modality.crafting_type != CRAFTING_NONE:
+            if artifact is None:
+                raise ValueError("Cannot query the active status of a crafted power without an associated artifact")
+            return get_object_or_none(PowerActiveStatus, relevant_power=self, relevant_artifact=artifact)
+        else:
+            return get_object_or_none(PowerActiveStatus, relevant_power=self)
+
 
 class ArtifactPower(models.Model):
     relevant_artifact = models.ForeignKey(Artifact, on_delete=models.PROTECT)
@@ -1247,6 +1292,26 @@ class ArtifactPower(models.Model):
         unique_together = (
             ("relevant_artifact", "relevant_power"),
         )
+
+
+class PowerActiveStatus(models.Model):
+    # determines whether or not a given Power is "active," meaning its bonuses should appear on the character sheet.
+    # must be present for any crafted artifact
+    relevant_artifact = models.ForeignKey(Artifact, on_delete=models.CASCADE, blank=True, null=True)
+    relevant_power = models.ForeignKey(Power, on_delete=models.CASCADE)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['relevant_power', 'relevant_artifact']),
+        ]
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            if self.relevant_power.modality.crafting_type != CRAFTING_NONE and self.relevant_artifact is None:
+                raise ValueError("If crafting power, an artifact must be present.")
+        super(PowerActiveStatus, self).save(*args, **kwargs)
+
 
 
 class ArtifactPowerFull(models.Model):
@@ -1553,7 +1618,10 @@ class Parameter_Value(models.Model):
         }
 
     def get_level_description(self):
-        return self.relevant_power_param.relevant_parameter.get_value_for_level(level=self.value)
+        if self.relevant_power.dice_system == SYS_PS2:
+            return self.relevant_power_param.get_value_for_level(level=self.value)
+        else:
+            return self.relevant_power_param.relevant_parameter.get_value_for_level(level=self.value)
 
     def archive_txt(self):
         output = "{}: level {} ({})\n"
