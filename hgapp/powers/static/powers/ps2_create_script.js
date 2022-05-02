@@ -1536,6 +1536,10 @@ const ComponentRendering = {
           }
           this.$nextTick(function () {
               activateTooltips();
+              $("#js-preview-gift-button").addClass("flashing");
+              setTimeout(function(){
+		        $("#js-preview-gift-button").removeClass("flashing");
+	          }, 100);
           });
           this.updateModifierList();
       },

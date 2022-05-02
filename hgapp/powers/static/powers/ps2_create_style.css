@@ -63,6 +63,7 @@
 
 .css-gift-preview-sidebar .affix {
     left: 0px;
+    padding-left: 30px;
 }
 
 .css-gift-preview-button {
@@ -70,10 +71,26 @@
     margin: auto;
 }
 
+
+#js-preview-gift-button {
+}
+
+#js-preview-gift-button.flashing {
+  animation: blink 0.20s 200 normal;
+}
+
+@keyframes blink {
+  from { background-color: #676a72; }
+  to { background-color: #373a42; }
+}
+
 @media (max-width: 992px) {
     .css-gift-preview-button .affix {
+
         visibility: visible;
         width: 100%;
+        left: 0px;
+
         top: 51px;
         text-align: center;
     }
@@ -108,24 +125,26 @@
     border-color: #534e1b;
 }
 
-.css-cat-MOD_EFFECT.css-mod-selected, .css-cat-MOD_EFFECT.css-mod-enabled:hover{
-    border-color: #a39e6b;
-}
-
 .css-cat-MOD_GIFT {
     border-color: #1c4c36;
-}
-
-.css-cat-MOD_GIFT.css-mod-selected, .css-cat-MOD_GIFT.css-mod-enabled:hover{
-    border-color: #508b72;
 }
 
 .css-cat-MOD_ACTIVATION {
     border-color: #504b62;
 }
 
-.css-cat-MOD_ACTIVATION.css-mod-selected, .css-cat-MOD_ACTIVATION.css-mod-enabled:hover{
-    border-color: #807b92;
+@media (min-width: 992px) {
+    .css-cat-MOD_EFFECT.css-mod-selected, .css-cat-MOD_EFFECT.css-mod-enabled:hover{
+        border-color: #a39e6b;
+    }
+
+    .css-cat-MOD_GIFT.css-mod-selected, .css-cat-MOD_GIFT.css-mod-enabled:hover{
+        border-color: #508b72;
+    }
+
+    .css-cat-MOD_ACTIVATION.css-mod-selected, .css-cat-MOD_ACTIVATION.css-mod-enabled:hover{
+        border-color: #807b92;
+    }
 }
 
 /* TOP WORKFLOW BAR */

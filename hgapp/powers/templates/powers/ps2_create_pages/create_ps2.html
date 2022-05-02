@@ -94,9 +94,9 @@
 			<div class="hidden-sm hidden-md hidden-lg css-gift-preview-button"
 					:class="{'css-hidden': expandedTab != 'customize'}" >
 				<div class="css-gift-cost-cont">
-					<span data-spy="affix" data-offset-top="290">
+					<span data-spy="affix" data-offset-top="310">
 						<div class="css-gift-cost">
-							<button class="btn btn-default" type="button" data-toggle="modal" data-target="#giftPreviewModal">
+							<button id="js-preview-gift-button" class="btn btn-default" type="button" data-toggle="modal" data-target="#giftPreviewModal">
 								Preview Gift
 							</button>
 	             		   <span    style="margin-top: 7px; margin-left: 10px;"
@@ -118,7 +118,7 @@
 					'col-sm-6': expandedTab === 'customize',
 					'css-hidden': expandedTab != 'customize'
 				}">
-				<div data-spy="affix" data-offset-top="80">
+				<div data-spy="affix" data-offset-top="100">
 					{% with 'sidebar_preview' as preview_id %}
 						{% include "powers/ps2_create_pages/section_gift_preview.html" %}
 					{% endwith %}
