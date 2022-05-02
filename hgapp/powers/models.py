@@ -244,7 +244,7 @@ class Modifier(models.Model):
         abstract = True
 
     def __str__(self):
-        return self.name + " [" + self.slug + "] (" + self.description + ")"
+        return self.name + " [" + self.slug + "] " + self.get_system_display() + " (" + self.description + ")"
 
     def save(self, *args, **kwargs):
         super(Modifier, self).save(*args, **kwargs)
