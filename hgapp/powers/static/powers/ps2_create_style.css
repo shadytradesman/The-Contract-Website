@@ -358,9 +358,11 @@
 
 /* SYSTEM TEXT STYLING */
 
-.css-gift-preview {
-    overflow: auto;
-    max-height: 90vh;
+@media (min-width: 600px) {
+    .css-gift-preview {
+        overflow: auto;
+        max-height: 90vh;
+    }
 }
 /* GIFT CREDIT / COST */
 
