@@ -19,15 +19,15 @@
             >
                 {% csrf_token %}
                 <div class="btn-group" data-toggle="buttons">
-                    <button class="btn btn-xs btn-default {% if is_active %}active disabled{% endif %}" {% if is_active %}active disabled{% endif %}>
+                    <button class="btn btn-xs btn-default {% if is_active %}active disabled {% endif %}" {% if is_active %}active disabled style="color:white;"{% endif %}>
                         On
                     </button>
-                    <button class="btn btn-xs btn-default {% if not is_active %}disabled{% endif %}" {% if not is_active %}disabled{% endif %}>
+                    <button class="btn btn-xs btn-default {% if not is_active %}active disabled{% endif %}" {% if not is_active %} active disabled{% endif %}>
                         Off
                     </button>
                 </div>
             </form>
-            <div style="font-size: 10px" class="text-muted text-center">Stat Bonus</div>
+            <div style="font-size: 10px; " class="{% if is_active %} text-success {% else %} text-muted {% endif %} text-center">Stat Bonus</div>
         </div>
         {% endif %}
     <h4 style="font-size: 20px; margin-top: 0px; margin-bottom: 5px;">
