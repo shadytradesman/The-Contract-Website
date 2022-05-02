@@ -190,9 +190,13 @@ class PowerEngine:
     @staticmethod
     def _get_allowed_params_for_components(components):
         params = []
+        blacklist = []
         for component in components:
             params.extend(component["parameters"])
-        return params
+            blacklist.extend(component["blacklist_parameters"])
+        print(params)
+        print(blacklist)
+        return [x for x in params if x["param_id"] not in blacklist]
 
     @staticmethod
     def _get_allowed_modifiers_for_components(components, modifier_type):

@@ -1254,7 +1254,7 @@ class Power(models.Model):
 
     def set_is_active(self, is_active, artifact=None):
         if self.base_id not in EFFECTS_THAT_GIVE_STAT_BONUSES:
-            raise ValueError("Trying to set active status for power that does not give bonuses.")
+            return
         status = self._get_power_active_status(artifact)
         if status is None:
             PowerActiveStatus.objects.create(
