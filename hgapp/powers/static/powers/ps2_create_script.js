@@ -16,6 +16,10 @@ function activateTooltips() {
         });
 }
 
+function removeSpacesBeforePeriods(inputText) {
+    return inputText.replaceAll(" .", ".");
+}
+
 // This method sets the __prefix__ values that appear in django "empty" formset forms so formsets
 // can have dynamically added and subtracted entries
 function setFormInputPrefixValues() {
@@ -84,7 +88,7 @@ const keywordHighlights = [
 	},
 	{
 	    "regex": regexFromKeyword("Object"),
-	    "tooltip": "Anything that is non-living, inanimate, and also free-standing, loose, or otherwise not currently a part of another structure or device.",
+	    "tooltip": "Anything that is non-living, inanimate, and is not a critical component of a larger structure or Device (i.e. a spark plug is not an Object unless it is removed from the engine).",
 	},
     {
         "regex": regexFromKeyword("Device"),
@@ -104,20 +108,28 @@ const keywordHighlights = [
     },
     {
         "regex": regexFromKeyword("Alien"),
-        "tooltip": "Something that is not of this world or not common to this world.",
+        "tooltip": "Something that is not of this world or is unknown to this world. For example, in a modern setting, anything that does not exist in real life, such as magic.",
+    },
+    {
+        "regex": regexFromKeyword("Non-Alien"),
+        "tooltip": "Something that is of this world or known by this world. For example, in a modern setting, anything that exists in real life.",
     },
 
     // Other
     {
         "regex": regexFromKeyword("Concentration"),
-        "tooltip": "While concentrating you can only take Free Actions and a single Quick Action per Round. Disrupting events (like taking damage) cause the effect to end."
+        "tooltip": "While concentrating you can only take Free Actions and a single Quick Action per Round. Disrupting events (like taking damage) cause the effect to end, and you cannot Concentrate again until the end of the next Round."
     },
     {
-        "regex": regexFromKeyword("Easily Contestable"),
+        "regex": regexFromKeyword("Resist"),
         "tooltip": "The target of this Effect must consent to its use or be unconscious, bound, or incapacitated."
     },
     {
-        "regex": new RegExp('[\\s](\\+[\\d]+ dice)[.,\\s]', 'gm'),
+        "regex": regexFromKeyword("Resisted"),
+        "tooltip": "The target of this Effect must consent to its use or be unconscious, bound, or incapacitated."
+    },
+    {
+        "regex": new RegExp('[\\s](\\+[\\d]+ dice)([.,\\s])', 'gm'),
         "tooltip": "Multiple bonuses to the same dice pool do not stack. Instead, the highest bonus is used."
     }
 ];
@@ -133,13 +145,13 @@ function updateHoverText() {
 }
 
 function regexFromKeyword(text) {
-    return new RegExp('[\\s](' + text + "s?)[.,\\s]", 'gm');
+    return new RegExp('[\\s](' + text + "s?)([.,\\s])", 'gm');
 }
 
 function replaceHoverText(text) {
     let modifiedText = text;
     keywordHighlights.forEach(keyword => {
-        let replacementString = ' <span class="css-keyword-with-tooltip" data-toggle="tooltip" title="' + keyword.tooltip + '">$1</span> '
+        let replacementString = ' <span class="css-keyword-with-tooltip" data-toggle="tooltip" title="' + keyword.tooltip + '">$1</span>$2 '
         modifiedText = modifiedText.replaceAll(keyword.regex, replacementString);
     });
     return modifiedText;
@@ -482,7 +494,7 @@ function cleanUserInputField(userInput){
 
 function subUserInputForDollarSign(replacementText, userInput) {
     userInput = '<span class="css-system-text-user-input">' + cleanUserInputField(userInput) + "</span>";
-    return replacementText.replace("$", userInput);
+    return replacementText.replaceAll("$", userInput);
 }
 
 function markRollText(rollReplacementText) {
@@ -594,7 +606,7 @@ function performSystemTextReplacements(unrenderedSystem, replacementMap) {
             throw "More than one thousand replacements in system text. . . infinite loop?"
         }
     }
-    return systemText;
+    return removeSpacesBeforePeriods(systemText);
 }
 
 function replaceInSystemText(systemText, replacementMap, toReplace) {
@@ -1028,16 +1040,19 @@ const ComponentRendering = {
           this.expandedTab = "modalities";
           this.tabHeader = "Select a Gift Type";
           this.scrollToTop();
+          window.location.hash = '#modalities';
       },
       openEffectsTab() {
           this.expandedTab = "effects";
           this.tabHeader = "Select an Effect";
           this.scrollToTop();
+          window.location.hash = '#effects';
       },
       openCustomizationTab() {
           this.expandedTab = "customize";
           this.tabHeader = "Customize System";
           this.scrollToTop();
+          window.location.hash = '#customization';
           this.$nextTick(function () {
             if (this.giftPreviewModalFirstShow && window.innerWidth <= 770) {
                 $('#giftPreviewModal').modal({});
@@ -1528,7 +1543,7 @@ const ComponentRendering = {
           this.renderedDescription = performSystemTextReplacements(this.unrenderedDescription, replacementMap);
           let partiallyRenderedSystem = performSystemTextReplacements(this.unrenderedSystem, replacementMap);
           this.renderedSystem = replaceHoverText(partiallyRenderedSystem);
-          this.giftErrata = performSystemTextReplacements("{{gift-errata}}", replacementMap);
+          this.giftErrata = performSystemTextReplacements(";;gift-errata//", replacementMap);
           if (this.selectedEffect && this.selectedEffect.visibility) {
             this.renderedVisual = performSystemTextReplacements(this.selectedEffect.visibility, replacementMap);
           } else {
@@ -1616,7 +1631,7 @@ const ComponentRendering = {
                     const marker = sub["marker"];
                     var replacement = sub["replacement"];
                     if (replacement.includes("$")) {
-                        replacement = replacement.replace("$", selection);
+                        replacement = replacement.replaceAll("$", selection);
                     }
                     const newSub = {
                         mode: sub["mode"],
@@ -1671,7 +1686,7 @@ const ComponentRendering = {
                 }
                 let replacement = field.replacement;
                 if (replacement.includes("$")) {
-                    replacement = field.isRoll ? replacement.replace("$", sub) : subUserInputForDollarSign(replacement, sub);
+                    replacement = field.isRoll ? replacement.replaceAll("$", sub) : subUserInputForDollarSign(replacement, sub);
                 }
                 if (field.isRoll) {
                     replacement = markRollText(replacement);
@@ -1710,5 +1725,21 @@ $(function() {
             });
             $('#vue-app').show();
             $('#loading-spinner').hide();
+            window.location.hash = '#modalities';
         });
+    window.onpopstate = function() {
+        switch(location.hash) {
+            case '#customization':
+                mountedApp.openCustomizationTab();
+                break
+            case '#effects':
+                mountedApp.openEffectsTab();
+                break
+            case '#modalities':
+                mountedApp.openModalityTab();
+                break
+            default:
+                history.back();
+        }
+    }
 });

@@ -285,7 +285,7 @@ class SystemTextRenderer:
             replacement_count += 1
             if replacement_count > 1000:
                 raise ValueError("Over 1000 replacements. . . infinite loop?")
-        return system_text
+        return system_text.replace(" .", ".")
 
 
     @staticmethod
