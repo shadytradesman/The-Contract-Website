@@ -1278,7 +1278,8 @@ class Power(models.Model):
     def _get_power_active_status(self, artifact):
         if self.modality.crafting_type != CRAFTING_NONE:
             if artifact is None:
-                raise ValueError("Cannot query the active status of a crafted power without an associated artifact")
+                return None
+                # raise ValueError("Cannot query the active status of a crafted power without an associated artifact")
             return get_object_or_none(PowerActiveStatus, relevant_power=self, relevant_artifact=artifact)
         else:
             return get_object_or_none(PowerActiveStatus, relevant_power=self)

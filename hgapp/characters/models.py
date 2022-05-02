@@ -1069,14 +1069,25 @@ class Character(models.Model):
         attributes = self.stats_snapshot.attributevalue_set.all()
         for attribute in attributes:
             self.set_bonus_for_attribute(attribute.relevant_attribute, 0)
-        powers = self.power_full_set.exclude(dice_system='PS2').all()
+        powers = self.power_full_set.all()
         bonus_by_attribute = {}
         for power in powers:
-            bonuses = power.latest_revision().get_attribute_bonuses()
-            for attr, bonus in bonuses:
-                curr_bonus = bonus_by_attribute.get(attr, 0)
-                if bonus > curr_bonus:
-                    bonus_by_attribute[attr] = bonus
+            if power.dice_system != 'PS2' or power.latest_revision().get_is_active():
+                bonuses = power.latest_revision().get_attribute_bonuses()
+                for attr, bonus in bonuses:
+                    curr_bonus = bonus_by_attribute.get(attr, 0)
+                    if bonus > curr_bonus:
+                        bonus_by_attribute[attr] = bonus
+        artifacts = self.artifact_set.filter(is_consumable=False, cell__isnull=True, is_deleted=False).all()
+        for artifact in artifacts:
+            artifact_powers = artifact.power_set.all()
+            for power in artifact_powers:
+                if power.get_is_active(artifact):
+                    bonuses = power.get_attribute_bonuses()
+                    for attr, bonus in bonuses:
+                        curr_bonus = bonus_by_attribute.get(attr, 0)
+                        if bonus > curr_bonus:
+                            bonus_by_attribute[attr] = bonus
         for attribute_value in attributes:
             attr = attribute_value.relevant_attribute
             if attr in bonus_by_attribute:

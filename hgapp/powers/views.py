@@ -371,9 +371,11 @@ def toggle_active(request, power_id, is_currently_active, art_id=None):
     power = get_object_or_404(Power, id=power_id)
     if not power.player_can_edit(request.user):
         raise PermissionDenied("This Power has been deleted, or you're not allowed to view it")
+    character = power.parent_power.character if power.parent_power.character else None
     if art_id:
         artifact = get_object_or_404(Artifact, id=art_id)
         if artifact.character:
+            character = artifact.character
             if not artifact.character.player_can_view(request.user):
                 raise PermissionDenied("This Artifact has been deleted, or you're not allowed to view it")
     else:
@@ -382,6 +384,7 @@ def toggle_active(request, power_id, is_currently_active, art_id=None):
         if DeletePowerForm(request.POST).is_valid():
             with transaction.atomic():
                 power.set_is_active(is_currently_active == "False", artifact)
+                character.reset_attribute_bonuses()
     else:
         raise ValueError("must be POST")
     char = artifact.character if artifact else power.parent_power.character

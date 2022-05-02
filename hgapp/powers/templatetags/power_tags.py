@@ -19,13 +19,13 @@ def discovery_power_badge(power_full):
     }
 
 @register.inclusion_tag('powers/power_badge_snippet.html')
-def power_rev_badge(power, force_show_warnings=False, crafter_blurb=None, artifact=None):
+def power_rev_badge(power, force_show_warnings=False, crafter_blurb=None, artifact=None, can_edit=False):
     power_full = power.parent_power
     character = power_full.character if power_full.character else None
     show_status_warning = force_show_warnings
     if character:
         show_status_warning = not power.passes_status_check(character.status)
-    show_active_toggle = power.show_status_toggle(artifact)
+    show_active_toggle = can_edit and power.show_status_toggle(artifact)
     is_active = show_active_toggle
     if show_active_toggle:
         is_active = power.get_is_active(artifact)
@@ -44,13 +44,13 @@ def power_rev_badge(power, force_show_warnings=False, crafter_blurb=None, artifa
     }
 
 @register.inclusion_tag('powers/power_badge_snippet.html')
-def power_badge(power_full, force_show_warnings=False, artifact=None):
+def power_badge(power_full, force_show_warnings=False, artifact=None, can_edit=False):
     latest_revision = power_full.latest_revision()
     character = power_full.character if power_full.character else None
     show_status_warning = force_show_warnings
     if character:
         show_status_warning = not latest_revision.passes_status_check(character.status)
-    show_active_toggle = latest_revision.show_status_toggle(artifact)
+    show_active_toggle = can_edit and latest_revision.show_status_toggle(artifact)
     is_active = show_active_toggle
     if show_active_toggle:
         is_active = latest_revision.get_is_active(artifact)

@@ -14,7 +14,7 @@
             <h3 class="text-center">Powers</h3>
             {% for power_full in new_powers %}
                 <div>
-                    {% power_badge power_full %}
+                    {% power_badge power_full False None user_can_edit %}
                 </div>
             {% endfor %}
         {% endif %}
