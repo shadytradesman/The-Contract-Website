@@ -853,6 +853,7 @@ const ComponentRendering = {
                 break;
             }
             let selectedEnhancement = randomFromList(availEnhancements);
+            selectedEnhancement.details = selectedEnhancement.detailLabel;
             this.selectedEnhancements.push(selectedEnhancement);
             this.enhancements = handleModifierMultiplicity(selectedEnhancement.slug, selectedEnhancement.id, "enhancements", this.enhancements, this.getSelectedAndActiveEnhancements());
             this.calculateRestrictedElements();
@@ -864,6 +865,7 @@ const ComponentRendering = {
                 break;
             }
             let selectedDrawback = randomFromList(availDrawbacks);
+            selectedDrawback.details = selectedDrawback.detailLabel;
             this.selectedDrawbacks.push(selectedDrawback);
             this.drawbacks = handleModifierMultiplicity(selectedDrawback.slug, selectedDrawback.id, "drawbacks", this.drawbacks, this.getSelectedAndActiveDrawbacks());
             this.calculateRestrictedElements();

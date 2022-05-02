@@ -27,7 +27,9 @@
                     </button>
                 </div>
             </form>
-            <div style="font-size: 10px; " class="{% if is_active %} text-success {% else %} text-muted {% endif %} text-center">Stat Bonus</div>
+            <div style="font-size: 10px; " class="{% if is_active %} text-success {% else %} text-muted {% endif %} text-center">
+                {% if is_active %}Stat Bonus+{% else %}Stat Bonus{% endif %}
+            </div>
         </div>
         {% endif %}
     <h4 style="font-size: 20px; margin-top: 0px; margin-bottom: 5px;">

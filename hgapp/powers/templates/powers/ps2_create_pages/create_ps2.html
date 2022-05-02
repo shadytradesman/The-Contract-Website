@@ -35,7 +35,7 @@
 	{{ sys_field_text_formset.management_form }}
 	{{ sys_field_weapon_formset.management_form }}
 	{{ sys_field_roll_formset.management_form }}
-	<div class="container-fluid" id="vue-app">
+	<div class="container-fluid" id="vue-app" >
 		<div class="modal fade" id="giftPreviewModal" tabindex="-1" role="dialog" aria-labelledby="giftPreviewModalLabel" >
 			<div class="modal-dialog modal-lg" role="document" style="top: 100px;">
 				<div class="modal-content" >
@@ -77,13 +77,13 @@
 				</div>
 			</div>
 		</div>
-		<div class="row">
+		<div class="row" style="margin-left: 0px; margin-right: 0px;" >
 			<div style="margin-bottom: 10px;"></div>
-			<div class="col-xs-12 css-gift-workflow">
+			<div class="col-xs-12 css-gift-workflow" >
 				{% include "powers/ps2_create_pages/snip_head_and_steps.html" %}
 			</div>
 			<div class="hidden-sm hidden-md hidden-lg css-gift-preview-button"
-					:class="{'css-hidden': expandedTab != 'customize'}">
+					:class="{'css-hidden': expandedTab != 'customize'}" >
 				<div class="css-gift-cost-cont">
 					<span data-spy="affix" data-offset-top="290">
 						<div class="css-gift-cost">
