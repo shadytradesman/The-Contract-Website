@@ -35,7 +35,16 @@
 	{{ sys_field_text_formset.management_form }}
 	{{ sys_field_weapon_formset.management_form }}
 	{{ sys_field_roll_formset.management_form }}
-	<div class="container-fluid" id="vue-app" >
+	<div id="loading-spinner" style="position:relative; margin:auto;">
+		<h1 class="text-center">
+    		<span class="glyphicon glyphicon-refresh spin"></span>
+			<div>
+				<small style="margin-top: 15px;">Loading...</small>
+			</div>
+    	</h1>
+	</div>
+	<div class="container-fluid" id="vue-app" style="display:none;">
+		<link v-for="effectImage in effectImageUrls" rel="preload" as="image" v-bind:href="effectImage" />
 		<div class="modal fade" id="giftPreviewModal" tabindex="-1" role="dialog" aria-labelledby="giftPreviewModalLabel" >
 			<div class="modal-dialog modal-lg" role="document" style="top: 100px;">
 				<div class="modal-content" >

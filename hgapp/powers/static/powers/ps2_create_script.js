@@ -791,6 +791,7 @@ const ComponentRendering = {
       drawbacks: [],
       selectedDrawbacks: [],
       disabledDrawbacks: {}, // map of disabled drawback slug to reason.
+      effectImageUrls: [],
       parameters: [],
       parameterSelections: {},
       disabledParameters: {},
@@ -1036,12 +1037,12 @@ const ComponentRendering = {
       openCustomizationTab() {
           this.expandedTab = "customize";
           this.tabHeader = "Customize System";
+          this.scrollToTop();
           this.$nextTick(function () {
             if (this.giftPreviewModalFirstShow && window.innerWidth <= 770) {
                 $('#giftPreviewModal').modal({});
             }
           });
-          this.scrollToTop();
       },
       clickModalityTab() {
           if (this.expandedTab === "modalities" && this.selectedModality) {
@@ -1692,6 +1693,7 @@ $(function() {
                 characterBlob = JSON.parse(JSON.parse(document.getElementById('characterBlob').textContent));
             }
             mountedApp.modalities = Object.values(powerBlob.modalities).map(comp => componentToVue(comp, "mod"));
+            mountedApp.effectImageUrls = Object.values(powerBlob.effects).map(comp => comp.icon_url);
             if ((document.getElementById('powerEditBlob').textContent.length > 2)) {
                 powerEditBlob = JSON.parse(JSON.parse(document.getElementById('powerEditBlob').textContent));
                 mountedApp.setStateForEdit(powerEditBlob);
@@ -1701,6 +1703,8 @@ $(function() {
             });
             $('#giftPreviewModal').on('hidden.bs.modal', function (e) {
               mountedApp.giftPreviewModalFirstShow = false;
-            })
+            });
+            $('#vue-app').show();
+            $('#loading-spinner').hide();
         });
 });
