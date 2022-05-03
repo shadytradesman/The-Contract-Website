@@ -12,6 +12,8 @@ from characters.models import STATUS_SEASONED, STATUS_VETERAN, STATUS_ANY
 def merge_status(current_status, incoming_status):
     if not current_status:
         return incoming_status
+    if incoming_status == STATUS_ANY:
+        return current_status
     if incoming_status == STATUS_SEASONED and current_status != STATUS_VETERAN:
         return STATUS_SEASONED
     if incoming_status == STATUS_VETERAN:
@@ -26,14 +28,8 @@ class PowerEngine:
         return json.dumps(self.blob)
 
     def calculate_req_status(self, effect_id, vector_id, modality_id, modifier_instances, param_instances):
-        # TODO: Enhancement group status requirements
         current_status = None
         components = self.components_from_model(effect_id, vector_id, modality_id)
-        """
-        
-        let active_groups = this.enhancements.filter(enh => null != enh.group)
-            .map(enh => powerBlob["enhancement_group_by_pk"][enh.group]).filter(onlyUnique);
-        """
         active_groups = Counter()
         for component in components:
             current_status = merge_status(current_status, component["required_status"][0])
@@ -41,6 +37,9 @@ class PowerEngine:
             mod, mod_type = self.get_mod_and_type_for_inst(mod_inst)
             if mod_type == "enh^" and mod["group"]:
                 active_groups[mod["group"]] += 1
+            print(mod)
+            print(mod["required_status"])
+            print(current_status)
             current_status = merge_status(current_status, mod["required_status"][0])
         for param_inst in param_instances:
             pow_param = param_inst.relevant_power_param
@@ -49,7 +48,7 @@ class PowerEngine:
             elif param_inst.value >= pow_param.seasoned:
                 current_status = merge_status(current_status, STATUS_SEASONED)
         for group in active_groups:
-            count = active_groups[group]
+            count = active_groups[group] if group in active_groups else 0
             if count >= self.blob[PowerSystem.ENHANCEMENT_GROUP_BY_PK][group]["seasoned_threshold"]:
                 current_status = merge_status(current_status, STATUS_SEASONED)
             if count >= self.blob[PowerSystem.ENHANCEMENT_GROUP_BY_PK][group]["veteran_threshold"]:
@@ -272,7 +271,9 @@ class SystemTextRenderer:
         replacement_map = self._build_replacement_map(power, modifier_instances, param_instances, field_instances)
         power.system = SystemTextRenderer._perform_system_text_replacements(unrendered_system, replacement_map)
         power.gift_summary = SystemTextRenderer._perform_system_text_replacements(unrendered_description, replacement_map)
-        power.errata = SystemTextRenderer._perform_system_text_replacements("{{gift-errata}}", replacement_map)
+        power.errata = SystemTextRenderer._perform_system_text_replacements(";;gift-errata//", replacement_map)
+        if "system_visibility" in effect:
+            power.visibility_requirements = SystemTextRenderer._perform_system_text_replacements(effect["system_visibility"], replacement_map)
 
     @staticmethod
     def _perform_system_text_replacements(unrendered_system, replacement_map):

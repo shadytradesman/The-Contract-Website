@@ -967,6 +967,9 @@ class Power(models.Model):
     required_status = models.CharField(choices=HIGH_ROLLER_STATUS,
                                        max_length=25,
                                        blank=True)
+    visibility_requirements = models.TextField(max_length=15000,
+                                                     blank=True,
+                                                     null=True)
 
     # Crafting
     artifacts = models.ManyToManyField(Artifact,
@@ -1008,9 +1011,6 @@ class Power(models.Model):
                                      null=True,
                                      on_delete=models.CASCADE)
 
-    # UNUSED FIELDS?
-    # Maybe someday this can be used with character sheet integrations for passive/active powers that may sometimes
-    # be on or off
     activation_style = models.CharField(choices=ACTIVATION_STYLE, max_length=25, default=ACTIVATION_STYLE[0][0])
 
     # FIELDS THAT SHOULD BE REMOVED

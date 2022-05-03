@@ -106,6 +106,18 @@
         aria-labelledby="collapse-power-{{latest_revision.id}}-heading"
         style="padding-top: 0px; padding-bottom: 0px; background-color: #2c323d; ">
     <div  style="padding-top: 5px; padding-bottom: 5px;">
+            {% if latest_revision.visibility_requirements %}
+                <span
+                      class="has-popover pull-left"
+                      data-title="{{latest_revision.visibility_requirements}}"
+                      data-html="True"
+                      data-toggle="tooltip">
+                    <span class="glyphicon glyphicon-eye-open"
+                          style="margin-right: 6px;"
+                          aria-hidden="true"
+                    ></span>
+                </span>
+            {% endif %}
             <span class="css-system-text-user-input">
                 <i>{{latest_revision.description|linebreaks}}</i>
                 {% if latest_revision.extended_description %}

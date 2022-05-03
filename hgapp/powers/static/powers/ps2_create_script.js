@@ -1725,7 +1725,9 @@ $(function() {
             });
             $('#vue-app').show();
             $('#loading-spinner').hide();
-            window.location.hash = '#modalities';
+            if (!(document.getElementById('powerEditBlob').textContent.length > 2)) {
+                window.location.hash = '#modalities';
+            }
         });
     window.onpopstate = function() {
         switch(location.hash) {

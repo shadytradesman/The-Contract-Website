@@ -51,10 +51,20 @@
                             <li>
                                 <a href="{% url 'powers:powers_edit_power' power.parent_power.id %}" class="btn btn-primary">Edit Power</a>
                             </li>
+                            {% if request.user.profile.early_access_user or request.user.is_superuser %}
+                                <li>
+                                    <a href="{% url 'powers:powers_edit_ps2' power.parent_power.id %}" class="btn btn-primary">Upgrade to new system</a>
+                                </li>
+                            {% endif %}
                         {% endif %}
                         {% if request.user == power.parent_power.owner %}
                             <li>
                                 <a href="{% url 'powers:powers_delete_power' power.parent_power.id %}" class="btn btn-default">Delete Power</a>
+                            </li>
+                        {% endif %}
+                        {% if request.user.profile.early_access_user or request.user.is_superuser %}
+                            <li>
+                                <a href="{% url 'powers:powers_create_from_existing_ps2' power.parent_power.id %}" class="btn btn-default">Upgrade copy to new system</a>
                             </li>
                         {% endif %}
                     {% endif %}

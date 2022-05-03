@@ -16,7 +16,7 @@ urlpatterns = [
     # ex: .com/powers/edit-ps2/p/21
     path('edit-ps2/p/<int:power_full_id>/', views.EditExistingPower.as_view(), name='powers_edit_ps2'),
 
-    # ex: .com/powers/edit-ps2/p/21
+    # ex: .com/powers/create-ps2/p/21
     path('create-ps2/p/<int:power_full_id>/', views.CreatePower.as_view(), name='powers_create_from_existing_ps2'),
 
     # ex: .com/powers/toggle-active/p/21/off/

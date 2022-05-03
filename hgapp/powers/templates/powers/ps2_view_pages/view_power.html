@@ -80,6 +80,17 @@
                     </div>
                 </div>
                 <div class="panel-body">
+                    {% if power.visibility_requirements %}
+                    <span class="has-popover pull-left"
+                            data-title="{{power.visibility_requirements}}"
+                            data-html="True"
+                            data-toggle="tooltip">
+                    <span class="glyphicon glyphicon-eye-open"
+                          style="margin-right: 6px;"
+                          aria-hidden="true"
+                    ></span>
+                </span>
+                    {% endif %}
                         <i class="text-muted">{{ power.description|linebreaks}}</i>
                     {% if power.extended_description %}
                         <div>
