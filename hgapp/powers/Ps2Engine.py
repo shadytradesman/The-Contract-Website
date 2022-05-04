@@ -37,9 +37,6 @@ class PowerEngine:
             mod, mod_type = self.get_mod_and_type_for_inst(mod_inst)
             if mod_type == "enh^" and mod["group"]:
                 active_groups[mod["group"]] += 1
-            print(mod)
-            print(mod["required_status"])
-            print(current_status)
             current_status = merge_status(current_status, mod["required_status"][0])
         for param_inst in param_instances:
             pow_param = param_inst.relevant_power_param
