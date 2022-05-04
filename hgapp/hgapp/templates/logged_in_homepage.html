@@ -3,6 +3,7 @@
 {% load i18n %}
 {% load static %}
 {% load account_tags %}
+{% load power_tags %}
 
 {% block head_title %}Home{% endblock %}
 
@@ -28,14 +29,28 @@
     </div>
     <div class="css-transparent-overlay-dark" style="padding-top: 5px; padding-left: 10px; padding-bottom: 10px;">
         {% if request.user.profile.ps2_user or request.user.is_superuser or request.user.profile.early_access_user %}
-        <div class="alert alert-info text-center" style="margin-top: 5px; margin-bottom: 5px; max-width: 800px; margin: auto;">
-            <h4  style="margin-top: 0px; margin-bottom: 0px; display: inline-block;">Early Access:</h4>
-            <span>
+        <div class="alert alert-info " style="margin-top: 5px; margin-bottom: 5px; max-width: 800px; margin: auto;">
+            <div class="text-center">
+                <h4  style="margin-top: 0px; margin-bottom: 0px; display: inline-block;">Early Access:</h4>
+                <span>
                 <a href="{% url 'powers:powers_create_ps2' %}">
                     <h4 style="margin-top: 0px; margin-bottom: 0px; display: inline-block;">Try the new Power Builder!</h4>
                 </a>
                 <h5 class="text-warning" style="margin-bottom: 0px;">The new Powers system is now fully unlocked for Early access users</h5>
             </span>
+            </div>
+            {% if ps2_powers %}
+            <div class="text-center">
+                Recent new-system Gifts
+            </div>
+            <div class="row" style="margin-top: 5px;">
+                {% for power in ps2_powers %}
+                <div class="col-xs-12 col-md-6">
+                    {% power_heading power.latest_rev %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
         </div>
         {% endif %}
         {% with latest_blog_post as post %}

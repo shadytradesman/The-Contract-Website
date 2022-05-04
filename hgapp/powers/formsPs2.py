@@ -28,8 +28,9 @@ class PowerForm(forms.Form):
                                   }),
                                   max_length=2000,
                                   required=True,
-                                  help_text="Describe what this Gift looks like when it is used "
-                                            "and its impact on the owner, target, and environment.")
+                                  help_text="A concise description of what this Gift looks like when it is "
+                                            "used. What do participants and observers experience? This will be "
+                                            "referenced by GMs at game-time to help them narrate.")
     extended_description = forms.CharField(label='Extended Description',
                                   widget=forms.Textarea(attrs={
                                       "v-model": "giftExtendedDescription",

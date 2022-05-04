@@ -241,10 +241,12 @@ function modifierToVue(modifier, type) {
 function modifierToVueWithId(modifier, type, idNum) {
     let domNameBase = "modifs-" + idNum;
     let idBase = "id_" + domNameBase;
+    const isEnhancement = type == "enhancements";
+    const colorMethod = isEnhancement ? markEnhancementText : markDrawbackText;
     return {
         id: idBase,
         idNum: idNum,
-        isEnhancement: type == "enhancements",
+        isEnhancement: isEnhancement,
         checkboxName: domNameBase + "-is_selected",
         checkboxId: idBase + "-is_selected",
         detailsName: domNameBase + "-details",
@@ -254,7 +256,7 @@ function modifierToVueWithId(modifier, type, idNum) {
         slug: modifier.slug,
         displayName: modifier.name,
         eratta: modifier.eratta,
-        description: replaceHoverText(modifier.description),
+        description: colorMethod(replaceHoverText(modifier.description)),
         detailLabel: modifier.detail_field_label === null ? false : modifier.detail_field_label,
         requiredStatusLabel: modifier.required_status[0] === "ANY" ? false : modifier.required_status[1],
         requiredStatus: modifier.required_status,
@@ -501,7 +503,15 @@ function markRollText(rollReplacementText) {
     return '<span class="css-system-text-roll">' + rollReplacementText + "</span>";
 }
 
-function addReplacementsForModifiers(replacements, selectedModifiers, detailsByModifiers) {
+function markEnhancementText(modifierReplacementText) {
+    return '<span class="css-system-text-enhancement">' + modifierReplacementText + "</span>";
+}
+
+function markDrawbackText(modifierReplacementText) {
+    return '<span class="css-system-text-drawback">' + modifierReplacementText + "</span>";
+}
+
+function addReplacementsForModifiers(replacements, selectedModifiers, detailsByModifiers, replacementFormatter) {
   let includedModSlugs = [];
   selectedModifiers
       .forEach(mod => {
@@ -527,7 +537,7 @@ function addReplacementsForModifiers(replacements, selectedModifiers, detailsByM
               }
               const newSub = {
                   mode: sub["mode"],
-                  replacement: replacement,
+                  replacement: replacementFormatter(replacement),
               }
               includedModSlugs.push(mod["slug"] + sub["marker"]);
               if (mod["joining_strategy"] == "ALL" || numIncludedForSlug == 0) {
@@ -1588,10 +1598,12 @@ const ComponentRendering = {
           }];
           addReplacementsForModifiers(replacements,
                                       this.getSelectedAndActiveEnhancements().map(mod => mod["slug"]).map(mod => powerBlob["enhancements"][mod]),
-                                      buildModifierDetailsMap(this.getSelectedAndActiveEnhancements()));
+                                      buildModifierDetailsMap(this.getSelectedAndActiveEnhancements()),
+                                      markEnhancementText);
           addReplacementsForModifiers(replacements,
                                       this.getSelectedAndActiveDrawbacks().map(mod => mod["slug"]).map(mod => powerBlob["drawbacks"][mod]),
-                                      buildModifierDetailsMap(this.getSelectedAndActiveDrawbacks()));
+                                      buildModifierDetailsMap(this.getSelectedAndActiveDrawbacks()),
+                                      markDrawbackText);
           this.addReplacementsForComponents(replacements);
           this.addReplacementsForParameters(replacements);
           this.addReplacementsForFields(replacements);

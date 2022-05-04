@@ -16,7 +16,7 @@ def merge_status(current_status, incoming_status):
         return current_status
     if incoming_status == STATUS_SEASONED and current_status != STATUS_VETERAN:
         return STATUS_SEASONED
-    if incoming_status == STATUS_VETERAN:
+    if incoming_status == STATUS_VETERAN or current_status == STATUS_VETERAN:
         return STATUS_VETERAN
 
 class PowerEngine:
@@ -37,7 +37,10 @@ class PowerEngine:
             mod, mod_type = self.get_mod_and_type_for_inst(mod_inst)
             if mod_type == "enh^" and mod["group"]:
                 active_groups[mod["group"]] += 1
+            print("merging statuses")
+            print(current_status,  mod["required_status"][0])
             current_status = merge_status(current_status, mod["required_status"][0])
+            print(current_status)
         for param_inst in param_instances:
             pow_param = param_inst.relevant_power_param
             if param_inst.value >= pow_param.veteran:
@@ -377,6 +380,7 @@ class SystemTextRenderer:
 
         for modifier_inst in modifier_instances:
             modifier, mod_type = self.system.get_mod_and_type_for_inst(modifier_inst)
+            replacement_formatter = SystemTextRenderer._mark_enhancement_text if mod_type == "enh^" else SystemTextRenderer._mark_drawback_text
             mod_joining_strategy = modifier["joining_strategy"]
             mod_detail = modifier_inst.detail
             for sub in modifier["substitutions"]:
@@ -395,7 +399,7 @@ class SystemTextRenderer:
                     else:
                         dollar_sub = mod_detail
                     replacement = SystemTextRenderer._sub_user_input_for_dollar(replacement, dollar_sub)
-                new_sub = Substitution(sub["mode"], replacement)
+                new_sub = Substitution(sub["mode"], replacement_formatter(replacement))
                 num_included_for_mod_marker[mod_type + modifier["slug"] + marker] += 1
                 if mod_joining_strategy == SUB_ALL or count_for_marker == 0:
                     if sub["mode"] == UNIQUE and count_for_marker == 1:
@@ -409,7 +413,17 @@ class SystemTextRenderer:
         user_input = '<span class="css-system-text-user-input">' + user_input + "</span>"
         return replacement_text.replace("$", user_input)
 
-    # This method must remain functionally equal to ps2_create_script.js # addReplacementsForComponents
+
+    @staticmethod
+    def _mark_enhancement_text(modifier_replacement_text):
+        return '<span class="css-system-text-enhancement">' + modifier_replacement_text + "</span>"
+
+    @staticmethod
+    def _mark_drawback_text(modifier_replacement_text):
+        return '<span class="css-system-text-drawback">' + modifier_replacement_text + "</span>"
+
+
+# This method must remain functionally equal to ps2_create_script.js # addReplacementsForComponents
     # This is to ensure consistent server-side rendering of user-created powers.
     # DO NOT REFACTOR THIS METHOD WITHOUT CHANGING THE ASSOCIATED METHOD IN THE FE
     def _add_replacements_for_components(self, replacement_map, power):
