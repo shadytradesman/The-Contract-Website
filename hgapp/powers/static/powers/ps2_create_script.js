@@ -504,10 +504,16 @@ function markRollText(rollReplacementText) {
 }
 
 function markEnhancementText(modifierReplacementText) {
+    if (modifierReplacementText.length == 0) {
+        return modifierReplacementText;
+    }
     return '<span class="css-system-text-enhancement">' + modifierReplacementText + "</span>";
 }
 
 function markDrawbackText(modifierReplacementText) {
+    if (modifierReplacementText.length == 0) {
+        return modifierReplacementText;
+    }
     return '<span class="css-system-text-drawback">' + modifierReplacementText + "</span>";
 }
 

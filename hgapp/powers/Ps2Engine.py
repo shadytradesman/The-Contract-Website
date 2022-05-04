@@ -416,10 +416,14 @@ class SystemTextRenderer:
 
     @staticmethod
     def _mark_enhancement_text(modifier_replacement_text):
+        if len(modifier_replacement_text) == 0:
+            return modifier_replacement_text
         return '<span class="css-system-text-enhancement">' + modifier_replacement_text + "</span>"
 
     @staticmethod
     def _mark_drawback_text(modifier_replacement_text):
+        if len(modifier_replacement_text) == 0:
+            return modifier_replacement_text
         return '<span class="css-system-text-drawback">' + modifier_replacement_text + "</span>"
 
 
