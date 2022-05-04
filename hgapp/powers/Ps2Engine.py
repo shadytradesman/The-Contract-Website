@@ -269,7 +269,7 @@ class SystemTextRenderer:
         power.system = SystemTextRenderer._perform_system_text_replacements(unrendered_system, replacement_map)
         power.gift_summary = SystemTextRenderer._perform_system_text_replacements(unrendered_description, replacement_map)
         power.errata = SystemTextRenderer._perform_system_text_replacements(";;gift-errata//", replacement_map)
-        if "system_visibility" in effect:
+        if "system_visibility" in effect and effect["system_visibility"]:
             power.visibility_requirements = SystemTextRenderer._perform_system_text_replacements(effect["system_visibility"], replacement_map)
 
     @staticmethod
