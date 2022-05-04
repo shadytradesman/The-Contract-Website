@@ -15,7 +15,7 @@ class PowerForm(forms.Form):
                                 "@input": "changeParam",
                            }))
     tagline = forms.CharField(label='Tagline',
-                              max_length=100,
+                              max_length=2000,
                               required=False,
                               help_text="(Optional) Introduce the Gift in a flavorful way.",
                               widget=forms.TextInput(attrs={
