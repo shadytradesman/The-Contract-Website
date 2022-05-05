@@ -342,8 +342,16 @@ function modifiersFromComponents(components, modifier, existing) {
     return sortVueModifiers(updatedModifiers);
 }
 
+function globalGroupLabelFromId(groupId) {
+    return powerBlob["enhancement_group_by_pk"][groupId]["label"];
+}
+
 function sortVueModifiers(modifiers) {
-    modifiers.sort((a,b) => a.displayName.localeCompare(b.displayName));
+    modifiers.sort((a,b) => {
+        let compareNameA = a.group == null ? a.displayName : globalGroupLabelFromId(a.group) + a.displayName;
+        let compareNameB = b.group == null ? b.displayName : globalGroupLabelFromId(b.group) + b.displayName;
+        return compareNameA.localeCompare(compareNameB);
+    });
     return modifiers;
 }
 
@@ -1258,7 +1266,7 @@ const ComponentRendering = {
           return allAvailableVectors.includes(this.selectedEffectFilter.value);
       },
       groupLabelFromId(groupId) {
-        return powerBlob["enhancement_group_by_pk"][groupId]["label"];
+        return globalGroupLabelFromId(groupId);
       },
       changeEffect(effect) {
           this.updateAvailableVectors();
