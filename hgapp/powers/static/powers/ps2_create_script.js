@@ -1174,7 +1174,7 @@ const ComponentRendering = {
         const allowedVectors = this.getAvailableVectorsForEffectAndModality(effectSlug, this.selectedModality.slug)
             .map(comp => componentToVue(powerBlob.vectors[comp], "vector"));
         let costs = allowedVectors.map(vector => {
-            let cost = this.additionalCostOfEffectAndVector(effectSlug, vector["slug"]);
+            let cost = this.additionalCostOfComponents(effectSlug, vector["slug"], this.selectedModality.slug);
             return cost - vector["giftCredit"] - effectGiftCredit;
         });
         if (costs.length > 1 ) {
@@ -1193,7 +1193,7 @@ const ComponentRendering = {
       getCostForVector(vectorSlug) {
         // the displayed cost for a vector is the combined cost of the effect and vector together.
         let credit = powerBlob.vectors[vectorSlug]["gift_credit"] + this.selectedEffect.giftCredit;
-        let cost = this.additionalCostOfEffectAndVector(this.selectedEffect["slug"], vectorSlug) - credit;
+        let cost = this.additionalCostOfComponents(this.selectedEffect["slug"], vectorSlug, this.selectedModality.slug) - credit;
         if (cost != 0) {
             return "(Gift Cost: " + displayCost(cost) + ")";
         }
@@ -1359,7 +1359,7 @@ const ComponentRendering = {
           this.getSelectedComponents().forEach(comp => {
               componentsCost = componentsCost - comp["gift_credit"];
           });
-          componentsCost = componentsCost + this.additionalCostOfEffectAndVector(this.selectedEffect["slug"], this.selectedVector.slug)
+          componentsCost = componentsCost + this.additionalCostOfComponents(this.selectedEffect["slug"], this.selectedVector.slug, this.selectedModality.slug)
 
           this.enhancementsCost = this.getSelectedAndActiveEnhancements().length
           this.drawbacksCost = - this.getSelectedAndActiveDrawbacks().length;
@@ -1466,10 +1466,11 @@ const ComponentRendering = {
         this.requiredStatus = requiredStatus == null || requiredStatus[0] == "ANY" ? null : requiredStatus[1];
 
       },
-      additionalCostOfEffectAndVector(effectSlug, vectorSlug) {
+      additionalCostOfComponents(effectSlug, vectorSlug, modalitySlug) {
           let cost =0;
           powerBlob["effect_vector_gift_credit"].filter(cred => cred["vector"] === vectorSlug
-                && cred["effect"] === effectSlug)
+                && cred["effect"] === effectSlug
+                && ((cred["modality"] === null) || (cred["modality"] == modalitySlug)))
                 .forEach(comp => {
                     cost= cost - comp["credit"];
                 });

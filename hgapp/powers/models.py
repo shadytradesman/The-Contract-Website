@@ -611,9 +611,10 @@ class Base_Power(models.Model):
 class VectorCostCredit(models.Model):
     relevant_vector = models.ForeignKey(Base_Power, on_delete=models.CASCADE, related_name="cost_vector")
     relevant_effect = models.ForeignKey(Base_Power, on_delete=models.CASCADE, related_name="cost_effect")
+    relevant_modality = models.ForeignKey(Base_Power, on_delete=models.CASCADE, related_name="cost_modality", null=True, blank=True)
     gift_credit = models.IntegerField("Gift Credit",
                                       help_text="The cost of any Gift using this combination of Effect and Vector is "
-                                                "reduced by this amount.")
+                                                "reduced by this amount. Modality optional.")
 
     def __str__(self):
         return ":".join([self.relevant_vector.name, self.relevant_effect.name, str(self.gift_credit)])
@@ -626,6 +627,7 @@ class VectorCostCredit(models.Model):
         return {
             "vector": self.relevant_vector_id,
             "effect": self.relevant_effect_id,
+            "modality": self.relevant_modality_id if self.relevant_modality else None,
             "credit": self.gift_credit,
         }
 
@@ -1170,9 +1172,12 @@ class Power(models.Model):
                 + total_parameter_cost
         if self.dice_system == SYS_PS2:
             cost_of_power = cost_of_power - self.vector.num_free_enhancements - self.modality.num_free_enhancements
-            extra_credit = get_object_or_none(VectorCostCredit, relevant_vector=self.vector, relevant_effect=self.base)
-            if extra_credit:
-                cost_of_power = cost_of_power - extra_credit.gift_credit
+            extra_credits = []
+            extra_credits.append(get_object_or_none(VectorCostCredit, relevant_vector=self.vector, relevant_effect=self.base, relevant_modality=self.modality))
+            extra_credits.append(get_object_or_none(VectorCostCredit, relevant_vector=self.vector, relevant_effect=self.base, relevant_modality__isnull=True))
+            for extra_credit in extra_credits:
+                if extra_credit is not None:
+                    cost_of_power = cost_of_power - extra_credit.gift_credit
         return cost_of_power
 
 

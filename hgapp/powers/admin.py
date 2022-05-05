@@ -48,8 +48,9 @@ class VectorCostCreditTabular(admin.TabularInline):
             kwargs["queryset"] = Base_Power.objects.filter(base_type=VECTOR)
         if db_field.name == "relevant_effect":
             kwargs["queryset"] = Base_Power.objects.filter(base_type=EFFECT)
+        if db_field.name == "relevant_modality":
+            kwargs["queryset"] = Base_Power.objects.filter(base_type=MODALITY)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
-        extra = 0
 
 
 class SystemFieldRollTabular(admin.TabularInline):
