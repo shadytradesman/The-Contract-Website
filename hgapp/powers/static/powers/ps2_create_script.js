@@ -872,6 +872,7 @@ const ComponentRendering = {
   },
   methods: {
       randomGift() {
+        this.parameterSelections = {};
         this.selectedModality = randomFromList(this.modalities);
         this.changeModality();
         this.selectedEffect = randomFromList(this.effects);
@@ -882,7 +883,10 @@ const ComponentRendering = {
         this.clickVector();
 
         let numEnhancements = Math.floor(Math.random() * 6);
-        let numDrawbacks = Math.floor(Math.random() * numEnhancements - 1); // drawbacks < enhancements
+        let numDrawbacks = Math.floor(Math.random() * (numEnhancements - 1)); // drawbacks < enhancements
+        if (this.giftCost+numEnhancements < 0) {
+            numDrawbacks = Math.max(0, numDrawbacks -1);
+        }
 
         this.selectedEnhancements =  [];
         this.selectedDrawbacks = [];
@@ -911,6 +915,27 @@ const ComponentRendering = {
             this.drawbacks = handleModifierMultiplicity(selectedDrawback.slug, selectedDrawback.id, "drawbacks", this.drawbacks, this.getSelectedAndActiveDrawbacks());
             this.calculateRestrictedElements();
         }
+
+
+        this.parameters.forEach(param => {
+            let def = param.defaultLevel;
+            if (param.id in this.disabledParameters) {
+                this.parameterSelections[param.id] = param.levels[def];
+                return;
+            }
+            if (this.giftCost <= 0) {
+                this.parameterSelections[param.id] = param.levels[def + 1];
+            } else {
+                let new_level = Math.floor(Math.random() * (Object.keys(param.levels).length - 1))
+                let cost = new_level - def;
+                if (this.giftCost + cost > 0 && this.giftCost + cost < 6) {
+                    this.parameterSelections[param.id] = param.levels[new_level];
+                } else {
+                    this.parameterSelections[param.id] = param.levels[def];
+                }
+            }
+            this.changeParam();
+        })
 
         this.updateManagementForms();
         this.reRenderSystemText();
@@ -1304,7 +1329,7 @@ const ComponentRendering = {
       clickVector(vector) {
           this.componentClick();
       },
-      changeParam(param) {
+      changeParam() {
           this.calculateRestrictedElements();
           this.reRenderSystemText();
           this.updateGiftCost();
