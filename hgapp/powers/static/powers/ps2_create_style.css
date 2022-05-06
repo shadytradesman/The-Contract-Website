@@ -85,6 +85,13 @@
 }
 
 @media (max-width: 992px) {
+    .container-fluid {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+}
+
+@media (max-width: 992px) {
     .css-gift-preview-button .affix {
 
         visibility: visible;

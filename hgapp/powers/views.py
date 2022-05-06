@@ -337,18 +337,26 @@ def power_full_view(request, power_full_id):
 
 
 def stock(request):
+    early_access = request.user.is_authenticated and request.user.profile and request.user.profile.early_access_user
     generic_categories = PremadeCategory.objects.filter(is_generic=True).all()
     generic_powers_by_category = {}
     for cat in generic_categories:
-        generic_powers_by_category[cat] = Power_Full.objects.filter(tags__slug__in=cat.tags.all()).all()
+        if early_access:
+            generic_powers_by_category[cat] = Power_Full.objects.filter(tags__slug__in=cat.tags.all()).all()
+        else:
+            generic_powers_by_category[cat] = Power_Full.objects.filter(tags__slug__in=cat.tags.all()).exclude(dice_system=SYS_PS2).all()
 
     example_categories = PremadeCategory.objects.filter(is_generic=False).all()
     example_powers_by_category = {}
     for cat in example_categories:
-        example_powers_by_category[cat] = Power_Full.objects.filter(tags__slug__in=cat.tags.all()).all()
+        if early_access:
+            example_powers_by_category[cat] = Power_Full.objects.filter(tags__slug__in=cat.tags.all()).all()
+        else:
+            example_powers_by_category[cat] = Power_Full.objects.filter(tags__slug__in=cat.tags.all()).exclude(dice_system=SYS_PS2).all()
     context = {
         "generic_powers_by_category": generic_powers_by_category,
         "example_powers_by_category": example_powers_by_category,
+        "is_early_access": early_access,
     }
     return render(request, 'powers/stock_powers.html', context)
 

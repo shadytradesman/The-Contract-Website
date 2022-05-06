@@ -76,10 +76,15 @@
 							</h5>
 						</div>
 					{% endif %}
-					<div class="modal-footer" v-if="giftPreviewModalFirstShow">
+					<div class="modal-footer" >
 						<div class="text-center">
 							<button type="button" class="btn btn-default" data-dismiss="modal">
-								Start Customizing
+								<div v-if="giftPreviewModalFirstShow">
+									Start Customizing
+								</div>
+								<div v-if="!giftPreviewModalFirstShow">
+									Continue Customizing
+								</div>
 							</button>
 						</div>
 					</div>
@@ -94,7 +99,7 @@
 			<div class="hidden-sm hidden-md hidden-lg css-gift-preview-button"
 					:class="{'css-hidden': expandedTab != 'customize'}" >
 				<div class="css-gift-cost-cont">
-					<span data-spy="affix" data-offset-top="310">
+					<span data-spy="affix" data-offset-top="305">
 						<div class="css-gift-cost">
 							<button id="js-preview-gift-button" class="btn btn-default" type="button" data-toggle="modal" data-target="#giftPreviewModal">
 								Preview Gift
