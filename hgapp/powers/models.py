@@ -836,6 +836,7 @@ class Power_Full(models.Model):
         self.character = None
         for reward in self.reward_list():
             reward.refund_keeping_character_assignment()
+        self.artifacts.clear()
         self.is_deleted = True
         self.save()
 
