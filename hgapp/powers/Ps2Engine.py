@@ -416,13 +416,13 @@ class SystemTextRenderer:
 
     @staticmethod
     def _mark_enhancement_text(modifier_replacement_text):
-        if len(modifier_replacement_text) == 0:
+        if len(modifier_replacement_text) == 0 or modifier_replacement_text.isdigit():
             return modifier_replacement_text
         return '<span class="css-system-text-enhancement">' + modifier_replacement_text + "</span>"
 
     @staticmethod
     def _mark_drawback_text(modifier_replacement_text):
-        if len(modifier_replacement_text) == 0:
+        if len(modifier_replacement_text) == 0 or modifier_replacement_text.isdigit():
             return modifier_replacement_text
         return '<span class="css-system-text-drawback">' + modifier_replacement_text + "</span>"
 
@@ -561,7 +561,7 @@ class SystemTextRenderer:
             else:
                 return ""
         if to_replace.replacement_type == '#':
-            return str(sum(replacements))
+            return str(sum([int(x) for x in replacements]))
         replacements = [x for x in replacements if len(x) > 0]
         if len(replacements) == 0:
             return ""

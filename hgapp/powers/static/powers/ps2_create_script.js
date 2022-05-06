@@ -512,14 +512,18 @@ function markRollText(rollReplacementText) {
 }
 
 function markEnhancementText(modifierReplacementText) {
-    if (modifierReplacementText.length == 0) {
+    let numText = Number(modifierReplacementText);
+    if (modifierReplacementText.length == 0 || Number.isInteger(numText)) {
+        // don't surround integers with tags otherwise addition replacement tags break
         return modifierReplacementText;
     }
     return '<span class="css-system-text-enhancement">' + modifierReplacementText + "</span>";
 }
 
 function markDrawbackText(modifierReplacementText) {
-    if (modifierReplacementText.length == 0) {
+    let numText = Number(modifierReplacementText);
+    if (modifierReplacementText.length == 0 || Number.isInteger(numText)) {
+        // don't surround integers with tags otherwise addition replacement tags break
         return modifierReplacementText;
     }
     return '<span class="css-system-text-drawback">' + modifierReplacementText + "</span>";
