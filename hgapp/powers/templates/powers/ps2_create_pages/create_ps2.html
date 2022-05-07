@@ -17,6 +17,11 @@
 	<script src="https://unpkg.com/vue@3.2.26/dist/vue.global.prod.js"></script>
  	<script type="text/javascript">
 		const powerBlobUrl = "{{power_blob_url}}";
+        {% if show_tutorial %}
+            showTutorial=true;
+        {% else %}
+            showTutorial=false;
+        {% endif %}
 	</script>
 	{{power_edit_blob|json_script:"powerEditBlob"}}
 	{{character_blob|json_script:"characterBlob"}}
@@ -28,6 +33,7 @@
 {% endblock %}
 
 {% block body_base %}
+{% include "powers/ps2_create_pages/tutorial/tutorial_modals.html" %}
 <form action="{{form_url}}" method="post">
 	{% csrf_token %}
 	{{ modifier_formset.management_form }}

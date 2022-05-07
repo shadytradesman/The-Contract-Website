@@ -1,5 +1,10 @@
 <div class="panel panel-default">
     <div class="panel-body">
+        <div v-if="expandedTab === 'modalities'" class="visible-md visible-lg" style="position: absolute;">
+            <button type="button" class="btn btn-default btn-xs " data-toggle="modal" data-target="#mainTutorialModal">
+                View Intro
+            </button>
+        </div>
         <h2 id="js-content-header" class="text-center css-tab-header" v-html="tabHeader"></h2>
         <div v-if="expandedTab === 'modalities'">
             {% include "powers/ps2_create_pages/content_tab_modalities.html" %}

@@ -1,5 +1,7 @@
 import json, logging
 from django.urls import reverse
+from django.templatetags.static import static
+
 
 from django.shortcuts import get_object_or_404
 
@@ -10,7 +12,7 @@ from .models import SYS_LEGACY_POWERS, EFFECT, VECTOR, MODALITY, Base_Power, Enh
     Enhancement_Instance, Drawback_Instance, Parameter_Value, Power_Param, SystemFieldText, SystemFieldTextInstance, \
     SystemFieldWeapon, SystemFieldWeaponInstance, SystemFieldRoll, SystemFieldRollInstance, PowerSystem, \
     CRAFTING_SIGNATURE, CREATION_REVISION, CREATION_MAJOR_REVISION, CREATION_ADJUSTMENT, CREATION_IMPROVEMENT, \
-    CRAFTING_CONSUMABLE, CRAFTING_ARTIFACT, ACTIVE, PASSIVE
+    CRAFTING_CONSUMABLE, CRAFTING_ARTIFACT, ACTIVE, PASSIVE, PowerTutorial
 from .formsPs2 import PowerForm, get_modifiers_formset, get_params_formset, get_sys_field_text_formset, \
     get_sys_field_weapon_formset, get_sys_field_roll_formset, make_select_signature_artifact_form
 from .signals import gift_revision, gift_major_revision, gift_adjustment
@@ -34,6 +36,7 @@ def get_edit_context(existing_power_full=None, is_edit=False, existing_char=None
         existing_power=existing_power_full,
         user=user,)()
     categories = Base_Power_Category.objects.all()
+    show_tutorial = (not user) or (not user.is_authenticated) or (not user.power_full_set.exists())
     context = {
         'power_blob_url': PowerSystem.get_singleton().get_json_url(),
         'character_blob': json.dumps(existing_char.to_create_power_blob()) if existing_char else None,
@@ -49,6 +52,12 @@ def get_edit_context(existing_power_full=None, is_edit=False, existing_char=None
         'power_full': existing_power_full if existing_power_full else None,
         'is_upgrade': existing_power_full.latest_revision().dice_system == SYS_LEGACY_POWERS if existing_power_full else False,
         'character': existing_char if existing_char else None,
+        'show_tutorial': show_tutorial,
+        'main_modal_art_url': static('overrides/art/time-lg-modal.jpg'),
+        'powers_modal_art_url': static('overrides/art/front-bamboo.jpg'),
+        'sig_item_modal_art_url': static('overrides/art/lady_lake_sm.jpg'),
+        'art_craft_modal_art_url': static('overrides/art/front-music.jpg'),
+        'consumable_craft_modal_art_url': static('overrides/art/ocean-lg-modal.jpg'),
     }
     form_url = reverse("powers:powers_create_ps2")
     if existing_power_full:

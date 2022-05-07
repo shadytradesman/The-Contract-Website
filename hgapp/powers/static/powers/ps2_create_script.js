@@ -1,3 +1,39 @@
+/* TUTORIAL MODALS */
+
+var cookieName = "default";
+
+function setCookie(name,value,days) {
+    var expires = "";
+    if (days) {
+        var date = new Date();
+        date.setTime(date.getTime() + (days*24*60*60*1000));
+        expires = "; expires=" + date.toUTCString();
+    }
+    document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+}
+function getCookie(name) {
+    var nameEQ = name + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0;i < ca.length;i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') c = c.substring(1,c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+    }
+    return null;
+}
+
+$(document).ready(function(){
+    var fullCookieName = "power2Tutorial"+cookieName;
+    var x = getCookie(fullCookieName);
+    if (showTutorial && !x) {
+        $('#tutorialModal').modal({});
+        setCookie(fullCookieName,'True',700);
+    }
+});
+
+
+/* html character decoding */
+
 String.prototype.decodeHTML = function() {
     var map = {"gt":">" /* , … */};
     return this.replace(/&(#(?:x[0-9a-f]+|\d+)|[a-z]+);?/gi, function($0, $1) {
@@ -218,7 +254,7 @@ const filterDisplayByVecSlug = {
         "craftable-artifact": "??",
     },
     "functional": {
-        "signature-item-mod": "is an enhanced version of a normal obj",
+        "signature-item-mod": "is an enhanced version of a normal object",
         "power": "??",
         "craftable-consumable": "???",
         "craftable-artifact": "are enhanced versions of normal objects",
