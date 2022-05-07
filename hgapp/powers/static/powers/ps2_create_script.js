@@ -56,6 +56,7 @@ function removeSpacesBeforePeriods(inputText) {
     return inputText.replaceAll(" .", ".");
 }
 
+const prefixReg = new RegExp('[\\d]+', 'gm');
 // This method sets the __prefix__ values that appear in django "empty" formset forms so formsets
 // can have dynamically added and subtracted entries
 function setFormInputPrefixValues() {
@@ -63,14 +64,22 @@ function setFormInputPrefixValues() {
         let prefixNum = $(this).attr("data-prefix");
         $(this).find("input").each(function() {
             let currName = $(this).attr("name");
+            let renderedName = currName.replace(/__prefix__/g, prefixNum);
+            renderedName = renderedName.replace(prefixReg, prefixNum);
+
             let currId = $(this).attr("id");
-            $(this).attr("name", currName.replace(/__prefix__/g, prefixNum));
-            $(this).attr("id", currId.replace(/__prefix__/g, prefixNum));
+            let renderedId = currId.replace(/__prefix__/g, prefixNum);
+            renderedId = renderedId.replace(prefixReg, prefixNum);
+
+            $(this).attr("name", renderedName);
+            $(this).attr("id", renderedId);
         })
         $(this).find("label").each(function() {
             let currFor = $(this).attr("for");
             if (currFor) {
-                $(this).attr("for", currFor.replace(/__prefix__/g, prefixNum));
+                let renderedFor = currFor.replace(/__prefix__/g, prefixNum);
+                renderedFor = renderedFor.replace(/__prefix__/g, prefixNum)
+                $(this).attr("for", renderedFor);
             }
         })
     })

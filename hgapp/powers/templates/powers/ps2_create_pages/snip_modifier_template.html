@@ -15,14 +15,6 @@
            :disabled="modifier.slug in disabled{{vue_model_name}}"
            style="display:none;">
     {% include "powers/ps2_create_pages/hidden_mod_form_snip.html" %}
-    <span class="js-data-prefix-container" v-bind:data-prefix="modifier.hiddenFormId">
-        {{modifier_formset.empty_form.is_selected}}
-        {{modifier_formset.empty_form.mod_slug}}
-        {{modifier_formset.empty_form.is_enhancement}}
-        <div v-if="modifier.detailLabel && selected{{vue_model_name}}.includes(modifier)">
-            {{modifier_formset.empty_form.details}}
-        </div>
-    </span>
     <span>
         <b><span v-if="modifier.group">{groupLabelFromId(modifier.group)}: </span>{ modifier.displayName }</b>
         <span class="css-modifier-text">
