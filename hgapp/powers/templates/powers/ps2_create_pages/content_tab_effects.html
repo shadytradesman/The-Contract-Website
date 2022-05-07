@@ -7,7 +7,8 @@
 </div>
 
 <div class="css-effect-filters" v-if="effectFilters.length > 1" style="margin-bottom: 15px; margin-top: 15px;">
-    <h4 style="margin-bottom: 0px; margin-left: 10px;"> {modalityEffectFilterPrompt} {selectedEffectFilter.display}</h4>
+    <h4 style="margin-bottom: 0px; margin-left: 10px; margin-top: 0px;">{modalityEffectFilterPrompt} {selectedEffectFilter.display}</h4>
+    <div class="text-muted" style="margin-left: 10px; display: inline-block;">Filter Effects:</div>
     <div  v-for="effectFilter in effectFilters" style="display: inline-block; margin-left: 5px; margin-right: 5px; margin-top: 5px;" >
         <label v-bind:for="effectFilter.id"
                class="css-component-radio css-effect-filter-radio"
