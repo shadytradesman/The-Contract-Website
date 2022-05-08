@@ -1,3 +1,616 @@
-<div class="text-center">
-    (Interactive Tutorial goes here)
+<div style="margin-top: 0px; height: 20px;">
+    <small>
+        <span v-for="crumb in breadCrumbs" :key="crumb">
+            <a class="" v-text="crumb[0]" @click="clickCrumb(crumb)"></a> /
+        </span>
+    </small>
 </div>
+
+
+<div v-if="shouldShowTutSection('ps2-flavorful-gifts')" >
+    <h3 class="text-center css-tut-header">
+        Creating Flavorful Gifts
+    </h3>
+    <div class="row">
+        <div class="col-xs-12 col-md-6">
+            <h4>Draw from your Contractor's Paradigm</h4>
+            <ul>
+                <li>The Harbingers' Gifts awaken your Contractor's potential. They are not the source of your Contractor's Power.</li>
+                <li>
+                    Where do your Contractor's special abilities come from?
+                    <ul>
+                        <li>Was their grandmother a witch?</li>
+                        <li>Are they a brilliant inventor?</li>
+                        <li>Were they cursed or enchanted by a powerful creature?</li>
+                        <li>Have they harnessed an ancient martial art or discipline?</li>
+                        <li>Are they unlocking the secrets of some incredible Artifact they've discovered?</li>
+                        <li>Are they a werewolf, vampire, or other non-human?</li>
+                        <li>Are they secretly an alien?</li>
+                        <li>Are they the chosen avatar of some nearly-forgotten god?</li>
+                    </ul>
+                </li>
+                <li>
+                    Your Contractor's Paradigm can inspire a variety of Gifts that do not need to be related to their profession.
+                </li>
+            </ul>
+        </div>
+        <div class="col-xs-12 col-md-6">
+            <h4>Draw from your Contractor's Profession</h4>
+            <ul>
+                <li>
+                    Contractors start as exceptional-- but mundane-- people, and people need to make a living.
+                    <ul>
+                        <li>Are they an olympic athlete?</li>
+                        <li>A successful international arms dealer?</li>
+                        <li>A garbage person?</li>
+                        <li>A drug dealer?</li>
+                        <li>A government spy?</li>
+                    </ul>
+                </li>
+
+                <li>
+                    What does the profession look like when taken to a supernatural level?
+                    <ul>
+                        <li>A musician may have the Power to influence the emotions of their audience.</li>
+                        <li>A stage magician may be able to pull more than a rabbit out of their hat.</li>
+                        <li>A journalist may have unusual ways to gather dirt on people.</li>
+                    </ul>
+                </li>
+                <li>
+                    A profession can inspire many Gifts beyond the mere mastery of an Ability.
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="text-center">
+        <b>
+            When all else fails, draw inspiration from other media: games, TV, books, comics, movies, and mythology.
+            <br>
+            And check out the <a href="/powers/stock" target="_blank">premade Stock Gifts</a>.
+        </b>
+
+    </div>
+</div>
+
+
+<div v-if="shouldShowTutSection('ps2-novice-gift-advice')" >
+    <h3 class="text-center css-tut-header">
+        Novice Gifts
+    </h3>
+    <div class="row">
+        <div class="col-xs-12 col-md-6">
+            <h4>What is "useful?"</h4>
+            <ul>
+                <li>
+                    The usefulness of a Gift depends on your opportunities to use it.
+                </li>
+                <li>
+                    <b>Finding Opportunities</b>
+                    <ul>
+                        <li>
+                            Sometimes a challenge is presented, and you have a tool for dealing with it.
+                        </li>
+                        <li>
+                            In general, Contractors are tasked with controlling critical situations.
+                            <ul>
+                                <li>
+                                    They will need to understand the situation.
+                                </li>
+                                <li>
+                                    They will need to exert control over the situation.
+                                </li>
+                                <li>
+                                    They will need to survive the situation.
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            That said, which challenges are presented depends on the sorts of Scenarios your Playgroup tends to run.
+                            <ul>
+                                <li>
+                                    If all you do is run fights, combat-based Gifts are going to be more relevant.
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <b>Creating Opportunities</b>
+                    <ul>
+                        <li>
+                            More advanced Players learn to apply their Gifts in situations where their use isn't obvious.
+                        </li>
+                        <li>
+                            Some of the most powerful Gifts are only useful if you proactively plan how to use them.
+                        </li>
+                        <li>
+                            For example, a Power to learn where someone sleeps would rarely resolve a Contract directly.
+                            However, using that information, you may be able to set a trap for the target, learn more about them,
+                            or kidnap their family to hold hostage.
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <div class="col-xs-12 col-md-6">
+            <h4>Suggested First Four Gifts</h4>
+            <ul>
+                <li>
+                    <b>The "Puzzle Piece" Gift</b>
+                    <ul>
+                        <li>
+                            If there is a situation where it would be bizarre if your Contractor failed, this Gift ensures that victory.
+                            <ul>
+                                <li>A chef's Power to make food everyone loves</li>
+                                <li>A beastmaster’s ability to control animals</li>
+                                <li>A driver’s ability to claim victory in a high-speed chase</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <b>A Combat Gift</b>
+                    <ul>
+                        <li>
+                            This is something your Contractor can use in combat AFTER the fighting has started.
+                        </li>
+                        <li>
+                            Contractors don't have to deal with violence by killing things, but if they don't have
+                            <i>some</i> way to deal with someone running at them with a knife, they will end up in
+                            <a href="{% url 'characters:characters_graveyard' %}">the Graveyard</a>.
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <b>An Info-Gathering Gift</b>
+                    <ul>
+                        <li>
+                            Something that provides unique and useful information.
+                        </li>
+                        <li>
+                            Awareness Effects such as Heightened Senses and Investigative Effects are good choices.
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <b>A Gift that Breaks Rules</b>
+                    <ul>
+                        <li>
+                            These Gifts help you create opportunities by breaking the "rules" standard humans abide by.
+                        </li>
+                        <li>
+                            Examples include mobility Gifts that allow reaching new area or influence Powers to
+                            control an interaction such as Disguise or Emotion Control.
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="text-center">
+        <b>
+            Remember: Drawbacks <i>always</i> limit the usefulness of a Gift.
+            <br>
+            The fewer Drawbacks a Gift has, the more often it will be relevant.
+        </b>
+    </div>
+</div>
+
+
+<div v-if="shouldShowTutSection('ps2-seasoned-gift-advice')" >
+    <h3 class="text-center css-tut-header">
+        Seasoned Gifts
+    </h3>
+    <div class="row">
+        <div class="col-xs-12 col-md-6">
+            <h4>Pick up a death-cheating Effect.</h4>
+            <ul>
+                <li>
+                    Seasoned status unlocks access to certain Effects and Enhancements that allow your Contractor to
+                    cheat death. For example:
+                    <ul>
+                        <li>
+                            The Inevitable Comeback Effect
+                        </li>
+                        <li>
+                            Permanent body-hopping on Possession Effects
+                        </li>
+                        <li>
+                            Healing the dead on Heal Injury
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    Your first priority should be to pick up at least one of these sorts of abilities.
+                </li>
+                <li>
+                    You have survived and claimed victory in 10 Contracts. You've earned it!
+                </li>
+            </ul>
+        </div>
+        <div class="col-xs-12 col-md-6">
+            <h4>Let's talk Synergy.</h4>
+            <ul>
+                <li>
+                    Novice Contractors can get away with having a bag of disconnected tricks.
+                </li>
+                <li>
+                    If you want your Contractor to properly scale up during Seasoned, you need to start considering how
+                    your Gifts work together.
+                </li>
+                <li>
+                    Use Gifts to minimize the drawbacks and limitations of other Gifts.
+                </li>
+                <li>
+                    Come up with potent combos that let you do crazy things.
+                </li>
+                <li>
+                    Don't just sit back and wait for opportunities to use your Gifts. Come up with
+                    strategies that you can proactively use in common situations.
+                </li>
+                <li>
+                    Address your blind spots. How have you been relying on your allies or equipment? If you have a single
+                    point of failure, you need to fix that.
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+<div v-if="shouldShowTutSection('ps2-veteran-gift-advice')" >
+    <h3 class="text-center css-tut-header">
+        Veteran Gifts
+    </h3>
+    <div class="row">
+        <div class="col-xs-12 col-md-6">
+            <h4>Veterans are independent</h4>
+            <ul>
+                <li>
+                    The defining feature of Veteran status is the ability to go on solo Contracts.
+                </li>
+                <li>
+                    To succeed as a Veteran, you must be fully self-sufficient.
+                </li>
+                <li>
+                    At the same time, politics more relevant for Veterans than anyone. A Contractor who will risk their
+                    ass to help you is worth more than any Gift.
+                </li>
+                <li>
+                    Do you lead an organization yet? Certain goals are only achievable with a lot of help.
+                </li>
+            </ul>
+        </div>
+        <div class="col-xs-12 col-md-6">
+            <h4>Gifts aren't about the Contracts anymore.</h4>
+            <ul>
+                <li>
+                    Remember all those years ago when a Harbinger convinced you to risk your life for power?
+                    Why did you say yes? Have you changed the world yet? What are you waiting for?
+                </li>
+                <li>
+                    At this point you need to start thinking bigger than how you're going to survive the next Contract.
+                </li>
+                <li>
+                    Downtimes are the main event for Veterans. Work with your Playgroups GMs to start shaping the setting
+                    in major ways.
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+<div v-if="shouldShowTutSection('ps2-trying-out-system')" >
+    <h3 class="text-center css-tut-header">
+        Welcome!
+    </h3>
+    <div class="row">
+        <div class="col-xs-12 col-md-6">
+            <h4>Start with inspiration</h4>
+            <ul>
+                <li>
+                    A good place to start is to try to recreate spells, items, and powers from other media.
+                </li>
+                <li>
+                    Start with a clear idea of the fantasy you're trying to achieve.
+                </li>
+                <li>
+                    Be careful when porting ideas from other games. The Gift Builder is opinionated on mechanics, and
+                    it is rarely possible to directly port something's mechanical role into The Contract.
+                </li>
+                <li>
+                    If you're confused about anything, the entire game is published for free on this website.
+                    Check out our <a href="/info/how-to-play">Guide for New Players</a>.
+                </li>
+            </ul>
+        </div>
+        <div class="col-xs-12 col-md-6">
+            <h4>Using the Gift Builder is its own skill.</h4>
+            <ul>
+                <li>
+                    The Gift Builder is a creative tool. There is often more than one way to build a given concept.
+                </li>
+                <li>
+                    Hop onto our <a href="https://discord.gg/xUZZegYNNy">Discord Server</a> and ask for help from the
+                    community.
+                </li>
+                <li>
+                    Sometimes a concept that seems singular is best represented by several Gifts.
+                    <ul>
+                        <li>
+                            For example, let's say you want to create a Power that gives your Contractor control over plants.
+                        </li>
+                        <li>
+                            A Restrict Effect will allow you to summon grasping roots and vines.
+                        </li>
+                        <li>
+                            An Advanced Movement Effect will allow you to pass through dense underbrush unhindered.
+                        </li>
+                        <li>
+                            An Injure Effect will allow you to injure your enemies with razor-sharp leaves.
+                        </li>
+                        <li>
+                            An Animate effect will let you bring trees to life to clobber your enemies.
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="text-center">
+        <b>Don't forget to share your creations with the world!</b>
+    </div>
+</div>
+
+
+<div v-if="shouldShowTutSection('ps2-npc-gifts')" >
+    <h3 class="text-center css-tut-header">
+        Gifts for NPCs
+    </h3>
+    <div class="row">
+        <div class="col-xs-12 col-md-6">
+        </div>
+        <div class="col-xs-12 col-md-6">
+        </div>
+    </div>
+</div>
+
+
+<div v-if="shouldShowTutSection('ps2-limitations-block')" >
+    <h3 class="text-center css-tut-header">
+        Can't make the Gift you want?
+    </h3>
+    <div class="row">
+        <div class="col-xs-12 col-md-6">
+        </div>
+        <div class="col-xs-12 col-md-6">
+        </div>
+    </div>
+</div>
+
+
+<div v-if="shouldShowTutSection('ps2-gift-rules')" >
+    <h3 class="text-center css-tut-header">
+        Power Builder Rules
+    </h3>
+    <div class="row">
+        <div class="col-xs-12 col-md-6">
+        </div>
+        <div class="col-xs-12 col-md-6">
+        </div>
+    </div>
+</div>
+
+
+<div v-if="shouldShowTutSection('ps2-contract-gifts')" >
+    <h3 class="text-center css-tut-header">
+        Gifts in The Contract
+    </h3>
+    <div class="row">
+        <div class="col-xs-12 col-md-6">
+        </div>
+        <div class="col-xs-12 col-md-6">
+        </div>
+    </div>
+</div>
+
+
+<div v-if="shouldShowTutSection('ps2-gift-philosophy')" >
+    <h3 class="text-center css-tut-header">
+        Designing the Gift Builder
+    </h3>
+    <div class="row">
+        <div class="col-xs-12 col-md-6">
+            <h4>Why is such an elaborate Gift Builder necessary?</h4>
+            <p>
+                The goal of any designer is to create an elegant solution to a problem.
+                While we hope the Gift Builder is dead-simple for Players to use, its design and construction is
+                necessarily complex to achieve our design goals.
+            </p>
+            <p>
+                Specifically, The Contract's goals necessitate a Gift system that simultaneously
+                <b>enables highly-custom character concepts</b> while <b>utilizing mechanically-specific systems</b>.
+            </p>
+                    <ul>
+                        <li>
+                            <b>Enable highly-custom character concepts.</b>
+                            <ul>
+                                <li>
+                                    Contractors must feel unique, and the Player must engage creatively in the
+                                    construction of their Contractor's kit and concept.
+                                </li>
+                                <li>
+                                    This invests Players in their characters, which is critical to telling a compelling
+                                    story.
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <b>Utilize mechanically-specific systems.</b>
+                            <ul>
+                                <li>
+                                    Vague, "squishy" systems work for some games, but The Contract requires a specific
+                                    "crunchy" system to achieve its goals.
+                                </li>
+                                <li>
+                                    <b>The Contract is a challenging game that feels fair.</b>
+                                    <ul>
+                                        <li>
+                                            A game is challenging if failure is defined, possible, and preventable with skill.
+                                        </li>
+                                        <li>
+                                            Failure that feels arbitrary or "unfair" is frustrating, at best.
+                                        </li>
+                                        <li>
+                                            "Crunchy" systems create a social contract of fair play between the GM and
+                                            Player that makes the game's outcome feel less arbitrary.
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <b>Your Contractor plays the same no matter who is GM.</b>
+                                    <ul>
+                                        <li>
+                                            As part of The Contract's goal to address the organizational and scheduling
+                                            challenges common in TTRPGs, Contractors must be playable no matter who is
+                                            acting as GM that day.
+                                        </li>
+                                        <li>
+                                            Specific systems minimize differences between how a Contractor's Gifts
+                                            behave under various GMs, which is critical because their lives are on the
+                                            line.
+                                        </li>
+                                        <li>
+                                            Essentially, this means strategic gameplay is steered away from creative
+                                            interpretation of resources ("what is 'a hammer' anyway?") towards creative
+                                            utilization of resources ("how can I use this hammer to solve the problem?")
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+            <p>
+                Only this Gift Builder empowers Players to create crunchy systems for any concept, and it does so
+                in a way that aligns with the other gameplay goals of The Contract. The necessary complexity of this
+                system is the reason why The Contract is published as a website instead of a book.
+                <ul>
+                    <li>
+                        Note: the Gift Builder is only used between game sessions, and it is the only aspect of
+                        The Contract's gameplay that requires using the website. At game-time, The Contract can play
+                        like a normal TTRPG.
+                    </li>
+                </ul>
+            </p>
+        </div>
+        <div class="col-xs-12 col-md-6">
+            <h4>
+                The Gift Builder's Systems
+            </h4>
+            The Gift Builder is opinionated about the sorts of systems it creates.
+            <ul>
+                <li>
+                    <b>Gifts break Contractors free of gritty realism.</b>
+                    <ul>
+                        <li>
+                            Contractors are not superheroes. Newbie Contractors get mugged, arrested, and kidnapped.
+                            They get in trouble for running their mouths. They lose track of their gear. They wear the wrong shoes.
+                        </li>
+                        <li>
+                            Gifts are the only thing that elevates Contractors above the mundane, and that makes them feel
+                            very special.
+                        </li>
+                        <li>
+                            Keeping the mundane, banal obstacles in-tact creates opportunities for strategy.
+                            <ul>
+                                <li>
+                                    If your western gunslinger is invited to a Contract
+                                    in the UK and doesn't have a way to bring their guns, well they're going to look pretty stupid
+                                    until they somehow obtain a gun.
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <b>The focus is on creative problem-solving, not min-maxing numbers.</b>
+                    <ul>
+                        <li>
+                            We use numerical systems in The Contract, but obtaining bigger numbers is not the focus.
+                        </li>
+                        <li>
+                            Dice modifiers are used sparingly. Instead, we think of balance in terms of
+                            capability and reliability.
+                        </li>
+                        <li>
+                            The Gift Builder tries to enforce that Drawbacks are never "free" and always have a real impact
+                            on a Gift's usefulness.
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <b>Minimize Dice rolls. Keep the action moving.</b>
+                    <ul>
+                        <li>
+                            Each play session of The Contract is a self-contained mission. Action needs to keep
+                            moving so that the game can resolve in a timely manner.
+                        </li>
+                        <li>
+                            Rolling dice is fun and great, but only when it matters. When dice rolls become
+                            tedious or pointless, they bog the game and story down.
+                        </li>
+                        <li>
+                            Extensive playtesting during our open Alpha release has allowed us to streamline
+                            many  systems in subtle ways that are not be immediately obvious.
+                            For example, we do not have "action economy bloat" that leads to one Player's turn in combat lasting
+                            an extremely long time.
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <b>Encourage interesting action and situations.</b>
+                    <ul>
+                        <li>
+                            Using a Gift, whether it succeeds or fails, should always lead to a more interesting situation.
+                        </li>
+                        <li>
+                            Many of the Gift Builder's systems either create interesting situations or encourage Players
+                            to apply interesting strategies in order to get the most from their Gifts.
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <b>Balance and Advancement for The Contract's format.</b>
+                    <ul>
+                        <li>
+                            A Gift's cost reflects its maximum potential usefulness on Contracts.
+                        </li>
+                        <li>
+                            The ability to cure cancer costs one Gift. Effective, reliable telekinesis costs many Gifts.
+                            This is because curing cancer is rarely relevant on Contracts but TK is often useful.
+                        </li>
+                        <li>
+                            Status requirements restrict classes of capabilities to Contractors with a certain number of
+                            Victories. This provides Scenario-writers with guidelines on which sorts of challenges
+                            Contractors of a particular status might be able to side-step.
+
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <div>
+
+        </div>
+    </div>
+</div>
+
+
+<h3 v-if="currentCrumb.length != 1" id="js-tutorial-interactive-header" class="text-center css-tut-header" v-text="currentCrumb[0]"> </h3>
+<div class="text-center" v-if="currentCrumb.length != 1">
+    <div v-for="[option, crumb] in Object.entries(currentCrumb[1])" class="btn btn-default" @click="clickCrumb(crumb)" style="margin-left: 5px; margin-right: 5px;">{option}</div>
+</div>
+
+
+

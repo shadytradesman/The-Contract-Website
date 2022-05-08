@@ -1,3 +1,28 @@
+const interactiveTutorial = ["Need help?", {
+    "I don't know what to make": ["Are you making this Gift for a specific Contractor?", {
+        "Yes": ["What's the trouble?", {
+            "I need ideas for flavorful Gifts": ["ps2-flavorful-gifts"],
+            "My Gifts don't feel useful": ["What Status is your Contractor?", {
+                "Novice (<10 Victories)": ["ps2-novice-gift-advice"],
+                "Seasoned (10-25 Victories)": ["ps2-seasoned-gift-advice"],
+                "Veteran (25+ Victories)": ["ps2-veteran-gift-advice"]
+            }]
+        }],
+        "No": ["Why are you making a Gift?", {
+            "Just trying out this system": ["ps2-trying-out-system"],
+            "I'm making a Gift for an NPC": ["ps2-npc-gifts"]
+            }]
+        }],
+    "I'm having trouble creating what I want": ["ps2-limitations-block"],
+    "I'm curious about this Gift Builder": ["What about the Gift Builder?", {
+        "How do I use it?": ["ps2-gift-rules"],
+        "What is its role in The Contract?": ["ps2-contract-gifts"],
+        "What is its design philosophy?": ["ps2-gift-philosophy"]
+    }]
+}];
+
+
+
 /* TUTORIAL MODALS */
 
 var cookieName = "default";
@@ -913,10 +938,34 @@ const ComponentRendering = {
       hasCrafted: false,
       sigItemName: "",
       sigItemDescription: "",
-      renderedVisual: ""
+      renderedVisual: "",
+      breadCrumbs: [],
+      currentCrumb: interactiveTutorial
     }
   },
   methods: {
+      clickCrumb(crumb) {
+        if (crumb.length == 1) {
+
+        }
+        let newBreadCrumbs = [];
+        let newCrumb = true;
+        for (let i = 0; i < this.breadCrumbs.length; i++) {
+            if (this.breadCrumbs[i][0] == crumb[0])  {
+                newCrumb = false;
+                break;
+            }
+            newBreadCrumbs.push(this.breadCrumbs[i]);
+        }
+        if (newCrumb) {
+            newBreadCrumbs.push(this.currentCrumb);
+        }
+        this.breadCrumbs = newBreadCrumbs;
+        this.currentCrumb = crumb;
+      },
+      shouldShowTutSection(section) {
+        return (this.currentCrumb.length == 1) && (this.currentCrumb[0] == section);
+      },
       randomGift() {
         this.parameterSelections = {};
         this.selectedModality = randomFromList(this.modalities);

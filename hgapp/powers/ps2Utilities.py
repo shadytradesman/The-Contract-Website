@@ -30,7 +30,15 @@ def get_edit_context(existing_power_full=None, is_edit=False, existing_char=None
     sys_field_text_formset = get_sys_field_text_formset()
     sys_field_weapon_formset = get_sys_field_weapon_formset()
     sys_field_roll_formset = get_sys_field_roll_formset()
-    power_form = PowerForm()
+    if existing_power_full and user and user.is_superuser:
+        power_form = PowerForm(
+            initial={
+                'tags': existing_power_full.tags.all(),
+                'example_description': existing_power_full.example_description,
+            })
+        pass
+    else:
+        power_form = PowerForm ()
     sig_item_artifact_form = make_select_signature_artifact_form(
         existing_character=existing_char,
         existing_power=existing_power_full,

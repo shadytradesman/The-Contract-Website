@@ -12,8 +12,7 @@
     <div  v-for="effectFilter in effectFilters" style="display: inline-block; margin-left: 5px; margin-right: 5px; margin-top: 5px;" >
         <label v-bind:for="effectFilter.id"
                class="css-component-radio css-effect-filter-radio"
-               :class="{'css-selected-filter': selectedEffectFilter && selectedEffectFilter.value === effectFilter.value}"
-        >
+               :class="{'css-selected-filter': selectedEffectFilter && selectedEffectFilter.value === effectFilter.value}" >
             <input type="radio"
                    v-bind:id="effectFilter.id"
                    name="effect-filter"
