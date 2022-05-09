@@ -21,7 +21,6 @@ from .models import Power, Base_Power_Category, Base_Power, Base_Power_System, D
 from .forms import DeletePowerForm
 from .ps2Utilities import get_edit_context, save_gift
 
-@method_decorator(login_required(login_url='account_login'), name='dispatch')
 class EditPower(View):
     template_name = 'powers/ps2_create_pages/create_ps2.html'
     existing_power = None
