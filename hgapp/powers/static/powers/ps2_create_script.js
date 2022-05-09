@@ -16,7 +16,6 @@ const interactiveTutorial = ["Need help?", {
     "I'm having trouble creating what I want": ["ps2-limitations-block"],
     "I'm curious about this Gift Builder": ["What about the Gift Builder?", {
         "How do I use it?": ["ps2-gift-rules"],
-        "What is its role in The Contract?": ["ps2-contract-gifts"],
         "What is its design philosophy?": ["ps2-gift-philosophy"]
     }]
 }];
@@ -945,9 +944,6 @@ const ComponentRendering = {
   },
   methods: {
       clickCrumb(crumb) {
-        if (crumb.length == 1) {
-
-        }
         let newBreadCrumbs = [];
         let newCrumb = true;
         for (let i = 0; i < this.breadCrumbs.length; i++) {

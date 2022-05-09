@@ -1,8 +1,8 @@
-<div style="margin-top: 0px; height: 20px;">
+<div style="margin-top: 0px; min-height: 20px;">
     <small>
-        <span v-for="crumb in breadCrumbs" :key="crumb">
+        <div v-for="crumb in breadCrumbs" :key="crumb" style="display: inline-block;">
             <a class="" v-text="crumb[0]" @click="clickCrumb(crumb)"></a> /
-        </span>
+        </div>
     </small>
 </div>
 
@@ -335,6 +335,7 @@
                     Hop onto our <a href="https://discord.gg/xUZZegYNNy">Discord Server</a> and ask for help from the
                     community.
                 </li>
+                <li>Check out the <a href="/powers/stock/">Stock Gifts</a> that the developers have made for inspiration.</li>
                 <li>
                     Sometimes a concept that seems singular is best represented by several Gifts.
                     <ul>
@@ -348,10 +349,10 @@
                             An Advanced Movement Effect will allow you to pass through dense underbrush unhindered.
                         </li>
                         <li>
-                            An Injure Effect will allow you to injure your enemies with razor-sharp leaves.
+                            An Injure Effect will allow you to fire razor-sharp leaves at your opponents.
                         </li>
                         <li>
-                            An Animate effect will let you bring trees to life to clobber your enemies.
+                            An Animate effect will let you bring trees to life to carry you around and smash walls.
                         </li>
                     </ul>
                 </li>
@@ -368,10 +369,94 @@
     <h3 class="text-center css-tut-header">
         Gifts for NPCs
     </h3>
+    <div><p>
+    </p></div>
     <div class="row">
         <div class="col-xs-12 col-md-6">
+            <h4>NPCs don't use the Gift system.</h4>
+            <ul>
+                <li>
+                    If you've read the <a href="/guide/gm-manual/#writing-scenarios">Scenario-writing guide,</a> you
+                    know that you do not have to use the Gift Builder to create systems for your NPCs, monsters, or
+                    supernatural creatures.
+                    <ul>
+                        <li>
+                            That said, it is filled with useful systems that you should feel free to re-use.
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    The Gift system is specifically balanced around Contractors, not NPCs.
+                    <ul>
+                        <li>
+                            There is no “threat level” comparison between NPCs using Gifts and Contractors who use
+                            Gifts, as the relative power levels are highly dependent on the Scenario and context of the
+                            encounter.
+                        </li>
+                    </ul>
+
+                </li>
+                <li>
+                    Consider the role you want your NPC to play in your Scenario.
+                    <ul>
+                        <li>
+                            The most compelling adversaries are not "boss monsters" that sit at the end of some dungeon waiting
+                            for the Contractors to burst in and fight them.
+                        </li>
+                        <li>
+                            Your NPC has their own goals and tactics that put them into conflict with the Contractors'
+                            objective. They do not need to be evil or hostile, and the conflict between their goals
+                            and the Contractors' may only be incidental, or even something that could be resolved with
+                            clever bargaining.
+                        </li>
+                    </ul>
+                </li>
+            </ul>
         </div>
         <div class="col-xs-12 col-md-6">
+            <h4>How do I balance an NPC's Powers?</h4>
+            <ul>
+                <li>
+                    Figure out a set of capabilities that are going to allow your NPC to fill their role in the Scenario.
+                    <ul>
+                        <li>
+                            <b>
+                                Context:</b> What does your NPC know about the situation? The Contractors?
+                                Can they spy on the Contractors to learn their plan before the Contractors can learn
+                                about them?
+                        </li>
+                        <li>
+                            <b>
+                                Rule-Breaking:
+                            </b>
+                            Given that your NPC has motivation and context, how can their abilities open up unique
+                            strategies? What traps can they set? Can they divide their enemies and pick them off one at
+                            a time? Can they access an area others can’t?
+                        </li>
+                        <li>
+                            <b>Combat Capabilities:</b>
+                            Rather than raw numbers, think about what sorts of combat situations you want your NPC to
+                            do well or poorly in. Can they fight a group of Contractors directly, or are they only deadly
+                            in 1v1s? Can they handle being surprised, or do they rely on the element of surprise themselves?
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    NPCs built for combat using the Gift system tend to be very “glass cannon."
+                </li>
+            </ul>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-md-8 col-md-offset-2" >
+                <b>
+                    Always remember, when running your NPCs and Scenarios, if a Contractor has a Gift that renders your
+                    big bad completely helpless or ruins your idea for a conflict,
+                    <span style="text-decoration:underline;">THE CONTRACTOR’S GIFT WORKS</span>.
+                    Never disable a Contractor’s Gifts because you didn’t expect them or they render your Scenario
+                    effortless.
+                </b>
+            </div>
+
         </div>
     </div>
 </div>
@@ -383,8 +468,108 @@
     </h3>
     <div class="row">
         <div class="col-xs-12 col-md-6">
+            <h4>Using the Gift Builder is its own skill.</h4>
+            <ul>
+                <li>
+                    The Gift Builder is a creative tool. There is often more than one way to build a given concept.
+                </li>
+                <li>
+                    Hop onto our <a href="https://discord.gg/xUZZegYNNy">Discord Server</a> and ask for help from the
+                    community.
+                </li>
+                <li>
+                    Check out the <a href="/powers/stock/">Stock Gifts</a> that the developers have made to see if
+                    there are any that match the mechanics you're after.
+                </li>
+            </ul>
+            <h4>Common Pitfalls</h4>
+            <ul>
+                <li>
+                    Sometimes the Effect you want isn't the one you expect.
+                    <ul>
+                        <li>
+                            For example if you’re looking for immunity to a particular type of damage, you don't want
+                            to use the Immunity Effect; you want to use the Armor Effect.
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    Sometimes a concept that seems singular is best represented by several Gifts.
+                    <ul>
+                        <li>
+                            For example, let's say you want to create a Power that gives your Contractor control over plants.
+                        </li>
+                        <li>
+                            A Restrict Effect will allow you to summon grasping roots and vines.
+                        </li>
+                        <li>
+                            An Advanced Movement Effect will allow you to pass through dense underbrush unhindered.
+                        </li>
+                        <li>
+                            An Injure Effect will allow you to fire razor-sharp leaves at your opponents.
+                        </li>
+                        <li>
+                            An Animate effect will let you bring trees to life to carry you around and smash walls.
+                        </li>
+                    </ul>
+                </li>
+            </ul>
         </div>
         <div class="col-xs-12 col-md-6">
+            <h4>
+                Limitations of the Gift Builder
+            </h4>
+            <ul>
+                <li>
+                    The Gift Builder aims to support any Gift <i>concept</i>. It does not support any Gift <i>system</i>.
+                    <ul>
+                        <li>
+                            The Gift Builder is opinionated on the systems it creates.
+                        </li>
+                        <li>
+                            It can be impossible to replicate the behavior or powers and abilities from other games.
+                        </li>
+                        <li>
+                            Instead, consider the fantasy and concept of what you're trying to create and create a
+                            re-imagined Contract version of it.
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    The Gift Builder is a work in progress.
+                    <ul>
+                        <li>
+                           Despite its vastness, the Gift Builder is not yet complete.
+                        </li>
+                        <li>
+                            There are several Effects that have yet to be added, including Weather Control, Bargains,
+                            and Companion Creatures.
+                        </li>
+                        <li>
+                            If you feel an Effect should be added, join our
+                            <a href="https://discord.gg/xUZZegYNNy">Discord Server</a> and let the developers know!
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    There are a few concepts the Gift Builder specifically does not support.
+                    <ul>
+                        <li>
+                            Some Gift concepts run counter to the design philosophies of the Gift Builder and are
+                            specifically omitted.
+                        </li>
+                        <li>
+                            In particular, highly flexible Effects (such as ironic curses that behave differently for
+                            each individual or "sphere magic" that gives vaguely-defined control over a broad concept)
+                            will never be implemented.
+                        </li>
+                        <li>
+                            Remember, each Playgroup can create its own rules, if desired. Just know that your Contractors'
+                            homebrew Gifts will NOT be portable if you bring them on a Contract in another Playgroup.
+                        </li>
+                    </ul>
+                </li>
+            </ul>
         </div>
     </div>
 </div>
@@ -392,12 +577,124 @@
 
 <div v-if="shouldShowTutSection('ps2-gift-rules')" >
     <h3 class="text-center css-tut-header">
-        Power Builder Rules
+        How do I use the Gift Builder?
     </h3>
     <div class="row">
+        <div class="col-xs-12 col-md-8 col-md-offset-2 text-center">
+            <p>
+                <b>
+                    The Gift Builder provides structured rules and advancement for any character concept.
+                </b>
+                <br>
+                All you have to do is describe any supernatural power, ability, or device, and it will provide a system
+                and a cost.
+            </p>
+        </div>
+    </div>
+    <div class="row">
         <div class="col-xs-12 col-md-6">
+            <h4>1. Select a Gift Type</h4>
+            <ul>
+                <li>
+                    A Gift's Type determines how it manifests. Is it an intrinsic superpower, a unique item, or the
+                    ability to craft extraordinary objects?
+                </li>
+                <li>
+                    Click the "Learn More" button beneath each Gift Type for more information.
+                </li>
+                <li>
+                    The Gift Types are listed right above this tutorial. Scroll up and select one when you're ready.
+                </li>
+            </ul>
+            <h4>2. Select an Effect</h4>
+            <ul>
+                <li>
+                    Effects determine the way your Gift behaves.
+                </li>
+                <li>
+                    Think of Effects as generic systems that support many different concepts and paradigms.
+                    <ul>
+                        <li>
+                            The Injure Effect could be used to create a laser blaster, a fireball spell, or a potent poison.
+                        </li>
+                        <li>
+                            The Levitation Effect could be used to create an anti-gravity belt or the ability to sprout wings.
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    Sometimes it isn't obvious which Effect you want. If your selected Effect doesn't match your concept well,
+                    go back and try another.
+                    <ul>
+                        <li>
+                            Our <a href="https://discord.gg/xUZZegYNNy">Discord Community</a> can be very helpful as well!
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <h4>3. Customize your Gift's System</h4>
+            <p>
+                Gifts have strictly-defined systems as well as a <b>Gift Cost</b> based on its overall power level.
+            </p>
+            <p>
+                First edit the system so that it matches your concept. Then, if you're going to give this Gift to a
+                Contractor, adjust your selections to bring its Gift Cost to 1.
+            </p>
+            <ul>
+                <li>
+                    <b>Fields and rolls</b> provide you with opportunities to customize your system and do not affect its
+                    Gift Cost.
+                </li>
+                <li>
+                    <b>Parameters</b> are drop-downs that adjust balance-sensitive aspects of your Gift's system such as
+                    its range or cooldown. They cost one Gift to increase and credit one Gift if decreased.
+                </li>
+                <li>
+                    <b>Enhancements and Drawbacks</b> are modifiers that change your Gift's behavior. Each Enhancement
+                    costs a Gift, and each Drawback credits a Gift.
+                    <ul>
+                        <li>
+                            Please note: while the Gift Builder tries to prevent you from taking Drawbacks that do not
+                            actually affect the power level of your gift, "double-dipping" is discouraged, and Playgroup
+                            Leaders have the right to veto any Gift if they feel it was created in bad faith.
+                        </li>
+                    </ul>
+                </li>
+            </ul>
         </div>
         <div class="col-xs-12 col-md-6">
+            <h4>4. Flavor your Gift with a Description</h4>
+            <ul>
+                <li>
+                    Your Gift's Description defines how your Gift looks and feels when used.
+                </li>
+                <li>
+                    Descriptions can have a real gameplay impact.
+                    <ul>
+                        <li>
+                            If you've flavored your Injure Power as a fireball, you may not want to use it at a gas station.
+                        </li>
+                        <li>
+                            Descriptions should not affect the capabilities of your Gift beyond the level of Enhancements or Drawbacks.
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    A Gift's System is guaranteed behavior. Anything you put in the description is subject to each
+                    GM's interpretation.
+                </li>
+            </ul>
+            <h4>5. Use your Gifts!</h4>
+            <ul>
+                <li>
+                    You know what's even more fun than creating Gifts? Using them!
+                </li>
+                <li>
+                    The Contract is incredibly easy to pick up and play. Join our
+                    <a href="https://discord.gg/xUZZegYNNy">Discord Community</a> and keep your eyes peeled for
+                    drop-in-friendly newbie sessions. The community runs several each week.
+                </li>
+            </ul>
         </div>
     </div>
 </div>
@@ -609,7 +906,7 @@
 
 <h3 v-if="currentCrumb.length != 1" id="js-tutorial-interactive-header" class="text-center css-tut-header" v-text="currentCrumb[0]"> </h3>
 <div class="text-center" v-if="currentCrumb.length != 1">
-    <div v-for="[option, crumb] in Object.entries(currentCrumb[1])" class="btn btn-default" @click="clickCrumb(crumb)" style="margin-left: 5px; margin-right: 5px;">{option}</div>
+    <a v-for="[option, crumb] in Object.entries(currentCrumb[1])" class="btn btn-default" @click="clickCrumb(crumb)" style="margin-left: 5px; margin-right: 5px;">{option}</a>
 </div>
 
 
