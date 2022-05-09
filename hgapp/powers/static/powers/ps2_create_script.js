@@ -764,7 +764,8 @@ function getReplacementText(replacements, toReplace) {
         replacements[replacements.length -1] = replacements[replacements.length -1] + "</li></ul>"
     }
     if (replacements[0].length > 0 && toReplace.capitalize) {
-        replacements[0] = replacements[0][0].toUpperCase() + replacements[0].slice(1);
+        let indexToCapitalize = replacements[0].indexOf(">") + 1;
+        replacements[0] = replacements[0].slice(0, indexToCapitalize) + replacements[0][indexToCapitalize].toUpperCase() + replacements[0].slice(indexToCapitalize + 1);
     }
     if (replacements.length === 1 ) {
         return replacements[0];

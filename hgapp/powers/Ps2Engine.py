@@ -571,7 +571,11 @@ class SystemTextRenderer:
             replacements[0] = "<ul class=\"css-power-system-list\"><li>" + replacements[0]
             replacements[-1] = replacements[-1] + "</li></ul>"
         if len(replacements[0]) > 0 and to_replace.should_capitalize:
-            replacements[0] = replacements[0][0].upper() + replacements[0][1:]
+            try:
+                index_to_cap = replacements[0].index(">") + 1
+            except:
+                index_to_cap = 0
+            replacements[0] = replacements[0][:index_to_cap] + replacements[0][index_to_cap].upper() + replacements[0][index_to_cap + 1:]
         if len(replacements) == 1:
             return replacements[0]
         if to_replace.replacement_type == '(':
