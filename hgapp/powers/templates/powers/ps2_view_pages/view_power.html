@@ -63,6 +63,9 @@
                         </small>
                     </div>
                     <div>
+                        <div class="text-muted" >
+                            {{ power.gift_summary|safe }}
+                        </div>
                         {%if power.private %}
                             <i class="fa fa-user-secret fa-2x" data-toggle="tooltip" data-title="Power is private because it is assigned to a private character."></i>
                         {% endif %}
@@ -110,8 +113,9 @@
                         </div>
                     {% endif %}
                     <hr style="width: 50%;">
-                    {{ power.system|safe }}
-                    {% if power.errata %}
+                    <div class="js-render-power-keywords">
+                        {{ power.system|safe }}
+                        {% if power.errata %}
                         <div>
                             <a id="collapse-errata-{{power.id}}-heading"
                                role="button" data-toggle="collapse"
@@ -127,10 +131,14 @@
                                     class="panel-collapse collapse collapse-errata-{{power.id}} css-extended-system"
                                     role="tabpanel"
                                     aria-labelledby="collapse-errata-{{power.id}}-heading">
-                                {{power.errata|safe}}
+                                <div style="padding-top: 10px;">
+                                    {{power.errata|safe}}
+                                </div>
                             </div>
                         </div>
-                    {% endif %}
+                        {% endif %}
+
+                    </div>
                     {% if power_full %}
                         <hr>
                         <a id="collapse-history-{{power.id}}-heading"
