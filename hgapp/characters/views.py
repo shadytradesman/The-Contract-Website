@@ -191,9 +191,6 @@ def view_artifact(request, artifact_id):
     attribute_val_by_id = None
     ability_val_by_id = None
 
-    if request.user.is_anonymous or not (request.user.is_superuser or request.user.profile.ps2_user or request.user.profile.early_access_user):
-        raise PermissionDenied("You are not authorized to create a new power in this system.")
-
     if artifact.character:
         attribute_val_by_id = artifact.character.get_attribute_values_by_id()
         ability_val_by_id = artifact.character.get_ability_values_by_id()

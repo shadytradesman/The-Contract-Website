@@ -6,7 +6,7 @@
             <li><a href="{% url 'characters:characters_edit' character.id secret_key %}" class="btn btn-default">
                 Edit Contractor
             </a></li>
-            {% if character.crafting_avail and request.user.profile and request.user.profile.early_access_user %}
+            {% if character.crafting_avail %}
                 <li>
                     <a href="{% url 'crafting:crafting_craft' character.id %}"
                        class="btn {% if character.highlight_crafting %}btn-success {% else %}btn-default{% endif %}">

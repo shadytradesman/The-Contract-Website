@@ -1054,7 +1054,7 @@ class Reward(models.Model):
             if power.parent_power.owner:
                 self.rewarded_character = power.parent_power.owner
             else:
-                print("cannot assign reward to power without owner. reward, power " + str(self.id)+ " " + str(power.id))
+                print("cannot assign reward to Gift without owner. reward, power " + str(self.id)+ " " + str(power.id))
                 return
         self.assigned_on = timezone.now()
         self.save()

@@ -2,7 +2,7 @@
 
 {% load i18n %}
 
-{% block head_title %}Viewing Power{% endblock %}
+{% block head_title %}Viewing Legacy Power{% endblock %}
 
 {% block body_class %}home{% endblock %}
 
@@ -25,7 +25,7 @@
     <div class="panel panel-default">
         <div class="panel-heading">
             <h2>
-                {{ power.name }}
+                Legacy Power: {{ power.name }}
                 <br>
                 <small><i>{{ power.flavor_text|linebreaks }}</i></small>
             </h2>
@@ -49,27 +49,17 @@
                         {% player_can_edit_power power request.user as can_edit %}
                         {% if can_edit %}
                             <li>
-                                <a href="{% url 'powers:powers_edit_power' power.parent_power.id %}" class="btn btn-primary">Edit Power</a>
+                                <a href="{% url 'powers:powers_edit_ps2' power.parent_power.id %}" class="btn btn-primary">Upgrade to new system</a>
                             </li>
-                            {% if request.user.profile.early_access_user or request.user.is_superuser %}
-                                <li>
-                                    <a href="{% url 'powers:powers_edit_ps2' power.parent_power.id %}" class="btn btn-primary">Upgrade to new system</a>
-                                </li>
-                            {% endif %}
                         {% endif %}
                         {% if request.user == power.parent_power.owner %}
                             <li>
                                 <a href="{% url 'powers:powers_delete_power' power.parent_power.id %}" class="btn btn-default">Delete Power</a>
                             </li>
                         {% endif %}
-                        {% if request.user.profile.early_access_user or request.user.is_superuser %}
-                            <li>
-                                <a href="{% url 'powers:powers_create_from_existing_ps2' power.parent_power.id %}" class="btn btn-default">Upgrade copy to new system</a>
-                            </li>
-                        {% endif %}
                     {% endif %}
                     <li>
-                        <a href="{% url 'powers:powers_create_power_from_existing' power.id %}" class="btn btn-default">Copy and Edit New</a>
+                        <a href="{% url 'powers:powers_create_from_existing_ps2' power.parent_power.id %}" class="btn btn-default">Copy and Edit New</a>
                     </li>
                 </ul>
             </div>

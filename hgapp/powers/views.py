@@ -47,8 +47,7 @@ class EditPower(View):
         return HttpResponseRedirect(reverse('powers:powers_view_power', args=(new_power_full.id,)))
 
     def __check_permissions(self):
-        if not (self.request.user.is_superuser or self.request.user.profile.ps2_user or self.request.user.profile.early_access_user):
-            raise PermissionDenied("You are not authorized to create a new power in this system.")
+        pass # Ps2 is released!
 
     def __get_context_data(self):
         return get_edit_context(existing_power_full=self.existing_power,
@@ -89,15 +88,15 @@ class EditExistingPower(EditPower):
 
 
 def create(request, character_id=None):
+    if character_id:
+        return HttpResponseRedirect(reverse('powers:powers_create_ps2_for_char', args=(character_id,)))
+    else:
+        return HttpResponseRedirect(reverse('powers:powers_create_ps2', ))
     category_list = Base_Power_Category.objects\
         .prefetch_related(Prefetch('base_power_set',queryset=Base_Power.objects.order_by('name')))\
         .order_by('name')
     category_list = [x for x in category_list if x.base_power_set.filter(is_public=True).count() > 0]
     character=None
-    if character_id:
-        character = get_object_or_404(Character, pk=character_id)
-        if request.user.is_authenticated and request.user.profile.ps2_user:
-            return HttpResponseRedirect(reverse('powers:powers_create_ps2_for_char', args=(character_id,)))
     show_tutorial = (not request.user.is_authenticated) or (not request.user.power_full_set.exists())
     tutorial = get_object_or_404(PowerTutorial)
     context = {
@@ -125,6 +124,7 @@ def powers_and_effects(request):
     return render(request, 'powers/powers_and_effects.html', context)
 
 def create_category(request, category_slug, character_id=None):
+    return HttpResponseRedirect(reverse('powers:powers_create_ps2', ))
     powers_list = Base_Power.objects.filter(category=category_slug, is_public=True)
     category = get_object_or_404(Base_Power_Category, pk=category_slug)
     character = None
@@ -142,6 +142,7 @@ def create_category(request, category_slug, character_id=None):
     return render(request, 'powers/choosebasecat.html', context)
 
 def create_all(request, character_id=None):
+    return HttpResponseRedirect(reverse('powers:powers_create_ps2', ))
     powers_list = Base_Power.objects.filter(is_public=True).order_by('name')
     character = None
     if character_id:
@@ -157,6 +158,10 @@ def create_all(request, character_id=None):
     return render(request, 'powers/choosebaseall.html', context)
 
 def create_power(request, base_power_slug, character_id=None):
+    if character_id:
+        return HttpResponseRedirect(reverse('powers:powers_create_ps2_for_char', args=(character_id,)))
+    else:
+        return HttpResponseRedirect(reverse('powers:powers_create_ps2', ))
     base_power = get_object_or_404(Base_Power, pk=base_power_slug)
     if base_power.base_type in [VECTOR, MODALITY] or base_power.base_power_system_set.exclude(dice_system=SYS_PS2).count() == 0:
         raise PermissionDenied("SHH! Pay no attention to the man behind the curtain")
@@ -182,6 +187,7 @@ def create_power(request, base_power_slug, character_id=None):
 
 def create_power_from_existing(request, power_id):
     extant_power = get_object_or_404(Power, pk=power_id)
+    return HttpResponseRedirect(reverse('powers:powers_create_from_existing_ps2', args=(extant_power.parent_id,)))
     base_power = get_object_or_404(Base_Power, pk=extant_power.base.slug)
     if request.method == 'POST':
         with transaction.atomic():
@@ -198,8 +204,7 @@ def create_power_from_existing(request, power_id):
         return render(request, 'powers/create_power_pages/createpower.html', context)
 
 def edit_power(request, power_id):
-    if request.user.is_authenticated and request.user.profile.ps2_user:
-        return HttpResponseRedirect(reverse('powers:powers_edit_ps2', args=(power_id,)))
+    return HttpResponseRedirect(reverse('powers:powers_edit_ps2', args=(power_id,)))
     power_full = get_object_or_404(Power_Full, pk=power_id)
     if not power_full.player_can_edit(request.user):
         raise PermissionDenied("This Power has been deleted, or you're not allowed to view it")
@@ -265,13 +270,6 @@ class ViewPower(View):
     def __check_permissions(self):
         if not self.power.player_can_view(self.request.user):
             raise PermissionDenied("This Power has been deleted or you're not allowed to view it")
-        #TODO: remove early access when appropriate.
-        if self.power.dice_system == SYS_PS2:
-            if not self.request.user.is_authenticated:
-                raise PermissionDenied("This Power has been deleted or you're not allowed to view it")
-            if not (self.request.user.is_superuser or self.request.user.profile.ps2_user or self.request.user.profile.early_access_user):
-                raise PermissionDenied("This Power has been deleted or you're not allowed to view it")
-
 
     def __get_context_data(self):
         attribute_val_by_id = None
@@ -337,26 +335,17 @@ def power_full_view(request, power_full_id):
 
 
 def stock(request):
-    early_access = request.user.is_authenticated and request.user.profile and request.user.profile.early_access_user
     generic_categories = PremadeCategory.objects.filter(is_generic=True).all()
     generic_powers_by_category = {}
     for cat in generic_categories:
-        if early_access:
-            generic_powers_by_category[cat] = Power_Full.objects.filter(tags__slug__in=cat.tags.all()).all()
-        else:
-            generic_powers_by_category[cat] = Power_Full.objects.filter(tags__slug__in=cat.tags.all()).exclude(dice_system=SYS_PS2).all()
-
+        generic_powers_by_category[cat] = Power_Full.objects.filter(tags__slug__in=cat.tags.all()).all()
     example_categories = PremadeCategory.objects.filter(is_generic=False).all()
     example_powers_by_category = {}
     for cat in example_categories:
-        if early_access:
-            example_powers_by_category[cat] = Power_Full.objects.filter(tags__slug__in=cat.tags.all()).all()
-        else:
-            example_powers_by_category[cat] = Power_Full.objects.filter(tags__slug__in=cat.tags.all()).exclude(dice_system=SYS_PS2).all()
+        example_powers_by_category[cat] = Power_Full.objects.filter(tags__slug__in=cat.tags.all()).all()
     context = {
         "generic_powers_by_category": generic_powers_by_category,
         "example_powers_by_category": example_powers_by_category,
-        "is_early_access": early_access,
     }
     return render(request, 'powers/stock_powers.html', context)
 

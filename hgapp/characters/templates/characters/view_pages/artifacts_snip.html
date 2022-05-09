@@ -2,11 +2,7 @@
 {% load character_tags %}
 
 <h3 class="text-center" data-toggle="tooltip" title='{{tutorial.artifacts|safe}}' style="margin-top: 15px;">
-    {% if early_access %}
-        Trophies
-    {% else %}
-        Artifacts
-    {% endif %}
+    Trophies
 </h3>
 {% if not artifacts_by_cell %}
     <div class="row">

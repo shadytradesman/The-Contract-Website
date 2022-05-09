@@ -57,12 +57,7 @@ def home(request):
         my_powers = request.user.power_full_set.filter(is_deleted=False).order_by('name').all()
         my_scenarios = request.user.scenario_creator.order_by("title").all()
         new_players = User.objects.order_by('-date_joined')[:6]
-        if request.user.profile and request.user.profile.early_access_user:
-            new_powers = Power_Full.objects.filter(private=False, is_deleted=False).order_by('-id')[:6]
-            ps2_powers = Power_Full.objects.filter(private=False, is_deleted=False, dice_system=SYS_PS2).order_by('-id')[:6]
-        else:
-            new_powers = Power_Full.objects.filter(private=False, is_deleted=False, dice_system=SYS_LEGACY_POWERS).order_by('-id')[:6]
-            ps2_powers = []
+        new_powers = Power_Full.objects.filter(private=False, is_deleted=False).order_by('-id')[:6]
         new_characters = Character.objects.filter(private=False, is_deleted=False).order_by('-id')[:6]
         latest_blog_post = Post.objects.current().select_related("section", "blog").first()
         upcoming_games_running = request.user.game_creator.filter(status=GAME_STATUS[0][0]).all()
@@ -85,7 +80,6 @@ def home(request):
             'my_scenarios': my_scenarios,
             'new_players': new_players,
             'new_powers': new_powers,
-            'ps2_powers': ps2_powers,
             'new_characters': new_characters,
             'upcoming_games_running': upcoming_games_running,
             'upcoming_games_invited': upcoming_games_invited,

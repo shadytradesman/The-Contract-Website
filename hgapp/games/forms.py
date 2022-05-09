@@ -222,7 +222,7 @@ def make_accept_invite_form(invitation):
                 queryset=queryset,
                 empty_label=None,
                 help_text="Declare which character you're attending with. Private "
-                           "Characters and their powers will be revealed to the "
+                           "Characters and their Gifts will be revealed to the "
                            "Contract creator if selected.",
                 required=True,)
     return AcceptInviteForm
