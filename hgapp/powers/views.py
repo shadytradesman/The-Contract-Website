@@ -186,7 +186,7 @@ def create_power(request, base_power_slug, character_id=None):
 
 def create_power_from_existing(request, power_id):
     extant_power = get_object_or_404(Power, pk=power_id)
-    return HttpResponseRedirect(reverse('powers:powers_create_from_existing_ps2', args=(extant_power.parent_id,)))
+    return HttpResponseRedirect(reverse('powers:powers_create_from_existing_ps2', args=(extant_power.parent_power_id,)))
     base_power = get_object_or_404(Base_Power, pk=extant_power.base.slug)
     if request.method == 'POST':
         with transaction.atomic():
