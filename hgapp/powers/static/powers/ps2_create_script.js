@@ -50,7 +50,7 @@ $(document).ready(function(){
     var fullCookieName = "power2Tutorial"+cookieName;
     var x = getCookie(fullCookieName);
     if (showTutorial && !x) {
-        $('#tutorialModal').modal({});
+        $('#mainTutorialModal').modal({});
         setCookie(fullCookieName,'True',700);
     }
 });
