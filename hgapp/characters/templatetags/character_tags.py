@@ -70,10 +70,12 @@ def render_sig_item(artifact, user, viewing_character=None):
             artifact.creating_player.username,
             reverse('characters:characters_view', args=(artifact.character.id,)),
             artifact.character.name)
-    else:
+    elif artifact.creating_player:
         status_blurb = 'Created by <a href="{}">{}</a> and orphaned.'.format(
             reverse('profiles:profiles_view_profile', args=(artifact.creating_player.id,)),
             artifact.creating_player.username)
+    else:
+        status_blurb = 'Created by an anonymous user.'.format()
     reason_unavail = None
     if artifact.most_recent_status_change and artifact.most_recent_status_change not in [RECOVERED, REPAIRED]:
         reason_unavail = 'Currently {}.'.format(artifact.get_most_recent_status_change_display())

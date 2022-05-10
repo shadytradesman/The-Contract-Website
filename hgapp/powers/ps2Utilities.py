@@ -340,7 +340,7 @@ def _handle_sig_artifact(request, SignatureArtifactForm, power_full, new_power, 
                 description=form_desc if form_desc else "",
                 crafting_character=power_full.character,
                 character=power_full.character,
-                creating_player=request.user,
+                creating_player=power_full.owner,
                 is_signature=True,
             )
             new_artifact.save()
