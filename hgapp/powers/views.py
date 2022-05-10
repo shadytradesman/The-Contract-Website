@@ -307,7 +307,7 @@ class ViewPower(View):
                 related_component = self.power.vector
             if component == "Modality":
                 related_gift_query = related_gift_query.filter(latest_rev__modality=self.power.modality_id)
-                stock_gift_query = stock_gift_query.filter(latest_rev__vector=self.power.vector_id)
+                stock_gift_query = stock_gift_query.filter(latest_rev__vector=self.power.modality_id)
                 related_component = self.power.modality
             related_gifts = related_gift_query.order_by('?')[:5]
             stock_gifts = stock_gift_query.order_by('?')[:5]
