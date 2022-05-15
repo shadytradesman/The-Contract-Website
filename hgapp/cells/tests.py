@@ -67,6 +67,28 @@ class CellModelTests(TestCase):
             self.assertTrue(user_role[0].has_perm(CELL_PERMISSIONS[5][0], self.cell) == default_edit_world(user_role[1][0]))
             self.assertTrue(user_role[0].has_perm(CELL_PERMISSIONS[6][0], self.cell) == default_manage_games(user_role[1][0]))
 
+    def test_banned_user_has_proper_perms(self):
+        self.cell.addPlayer(self.user2, role=ROLE[0])
+        self.cell.removePlayer(self.user2)
+        self.assertFalse(self.user2.has_perm(CELL_PERMISSIONS[1][0], self.cell))
+        self.assertFalse(self.user2.has_perm(CELL_PERMISSIONS[2][0], self.cell))
+        self.assertFalse(self.user2.has_perm(CELL_PERMISSIONS[3][0], self.cell))
+        self.assertFalse(self.user2.has_perm(CELL_PERMISSIONS[4][0], self.cell))
+        self.assertFalse(self.user2.has_perm(CELL_PERMISSIONS[5][0], self.cell))
+        self.assertFalse(self.user2.has_perm(CELL_PERMISSIONS[6][0], self.cell))
+
+        self.cell.addPlayer(self.user2, role=ROLE[0])
+        for perm in CELL_PERMISSIONS:
+            self.assertTrue(self.user2.has_perm(perm[0], self.cell))
+
+        self.cell.ban_player(self.user2, "they sucked")
+        self.assertFalse(self.user2.has_perm(CELL_PERMISSIONS[1][0], self.cell))
+        self.assertFalse(self.user2.has_perm(CELL_PERMISSIONS[2][0], self.cell))
+        self.assertFalse(self.user2.has_perm(CELL_PERMISSIONS[3][0], self.cell))
+        self.assertFalse(self.user2.has_perm(CELL_PERMISSIONS[4][0], self.cell))
+        self.assertFalse(self.user2.has_perm(CELL_PERMISSIONS[5][0], self.cell))
+        self.assertFalse(self.user2.has_perm(CELL_PERMISSIONS[6][0], self.cell))
+
     def test_cant_remove_only_leader(self):
         with self.assertRaises(ValueError):
             self.cell.removePlayer(self.user1)

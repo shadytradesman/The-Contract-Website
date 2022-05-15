@@ -1,0 +1,38 @@
+{% extends "site_base.html" %}
+
+
+{% block head_title %}You've Been Banned{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% block extra_styles %}
+{% endblock %}
+
+{% block extra_scripts %}
+{% endblock %}
+
+{% load account_tags %}
+{% load markdown_deux_tags %}
+
+{% block body_base %}
+
+<div class="container">
+    {{ form.about.errors }}
+    <div class="text-center">
+        <h1>You have been banned from {{cell.name}}</h1>
+
+    </div>
+    {% if reason %}
+    <div class="panel panel-default">
+        <div class="panel-body text-center">
+            <h3 style="margin-top: 0px;">Reason Given:</h3>
+            <p>
+                {{reason}}
+            </p>
+
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

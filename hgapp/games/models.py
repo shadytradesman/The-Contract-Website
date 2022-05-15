@@ -179,7 +179,8 @@ class Game(models.Model):
         if self.invitation_mode == INVITE_ONLY:
             return "This Game only allows those with an invitation to RSVP."
         if self.invitation_mode == WORLD_MEMBERS:
-            if not self.cell.get_player_membership(player):
+            membership = self.cell.get_player_membership(player)
+            if not membership or membership.is_banned:
                 return "This Game only allows those who are a member of its Playgroup to RSVP without an invite."
             else:
                 return None

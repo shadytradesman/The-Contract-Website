@@ -68,7 +68,7 @@ def home(request):
         avail_improvements = request.user.profile.get_avail_improvements()
         avail_charon_coins = request.user.profile.get_avail_charon_coins()
         avail_exp_rewards = request.user.profile.get_avail_exp_rewards()
-        cells = request.user.cell_set.all()
+        cells = request.user.cell_set.filter(cellmembership__is_banned=False).all()
         cell_ids = set(request.user.cell_set.values_list('id', flat=True).all())
         world_events = WorldEvent.objects.filter(parent_cell__id__in=cell_ids).order_by('-created_date').all()
         cell_invites = request.user.cellinvite_set.filter(membership=None).filter(is_declined=False).all()

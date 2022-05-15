@@ -459,7 +459,7 @@ class Character(models.Model):
         cell_choices = set()
         if not hasattr(self, "player") or not self.player:
             return cell_choices
-        queryset = self.player.cell_set.all()
+        queryset = self.player.cell_set.filter(cellmembership__is_banned=False).all()
         cell_choices.add(queryset)
         games_attended = self.game_set.all()
         cell_ids = set()

@@ -56,6 +56,9 @@ urlpatterns = [
     # ex: .com/cells/kick/c/123/p/4141
     url(r'^kick/c/(?P<cell_id>[\d]+)/u/(?P<user_id>[\d]+)/$', views.kick_player, name='cells_kick_player'),
 
+    # ex: .com/cells/kick/c/123/p/4141
+    url(r'^ban/c/(?P<cell_id>[\d]+)/u/(?P<user_id>[\d]+)/$', views.ban_player, name='cells_ban_player'),
+
     # ex: .com/cells/leave/c/123
     url(r'^leave/c/(?P<cell_id>[\d]+)/$', views.leave_cell, name='cells_leave_cell'),
 

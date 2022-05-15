@@ -77,11 +77,12 @@ def make_game_form(user):
                                help_text='Entice Players and provide information.')
         timezone = forms.ChoiceField(
             label= ("My Timezone"),
+            help_text= ("This will set your account's timezone settings, so always enter YOUR timezone."),
             choices=settings.ACCOUNT_TIMEZONES,
             required=False,
             initial=user.account.timezone
         )
-        all_cells = user.cell_set.all()
+        all_cells = user.cell_set.filter(cellmembership__is_banned=False).all()
         cell_ids = {cell.id for cell in all_cells if cell.player_can_run_games(user)}
         queryset = user.cell_set.filter(id__in=cell_ids).all()
         scenario = ScenarioModelChoiceField(queryset=user.scenario_set.filter(scenario_discovery__is_spoiled=True).order_by("title").all(),
@@ -131,7 +132,7 @@ def make_game_form(user):
                                       required=False,
                                       help_text="Optional. Specify a limit on how many Players can RSVP to this Contract.",
                                       widget=forms.NumberInput(attrs={'class': 'ability-value-input form-control'}))
-        allow_ringers = forms.BooleanField(initial=True,
+        allow_ringers = forms.BooleanField(initial=False,
                                            required=False,
                                            label='Allow Ringers',
                                            help_text="If checked, Players will be able to RSVP as an NPC Ringer. (Note: "

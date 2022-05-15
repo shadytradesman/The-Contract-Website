@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.utils import timezone
 from django.contrib.auth.models import Group
 from django.db import models
 from django.urls import reverse
@@ -165,22 +166,27 @@ class Cell(models.Model):
         return "cell-" + str(self.pk) + role
 
     def addPlayer(self, player, role):
-        if self.get_player_membership(player):
+        membership = self.get_player_membership(player)
+        if membership and not membership.is_banned:
             raise ValueError("player already in cell")
+        if membership and membership.is_banned:
+            membership.is_banned = False
+            membership.save()
+            return membership
         membership = CellMembership(
             relevant_cell=self,
             member_player=player,
             role = role[0],
         )
         membership.save()
-        invite = get_object_or_none(self.cellinvite_set.filter(invited_player = player))
+        invite = get_object_or_none(self.cellinvite_set.filter(invited_player=player))
         if invite:
             invite.membership = membership
             invite.save()
         return membership
 
     def removePlayer(self, player):
-        membership = get_object_or_none(self.cellmembership_set.filter(member_player = player))
+        membership = get_object_or_none(self.cellmembership_set.filter(member_player=player))
         if not membership:
             raise ValueError("player not in cell")
         if self.player_is_only_leader(player):
@@ -190,32 +196,47 @@ class Cell(models.Model):
         membership.remove_characters_from_cell()
         membership.delete()
 
+    def ban_player(self, player, reason):
+        membership = get_object_or_none(self.cellmembership_set.filter(member_player=player))
+        if not membership:
+            raise ValueError("player not in cell")
+        if self.player_is_only_leader(player):
+            raise ValueError("Cannot remove only leader")
+        membership = self.cellmembership_set.get(member_player=player)
+        membership.remove_user_from_all_groups()
+        membership.remove_characters_from_cell()
+        membership.is_banned = True
+        membership.reason_banned = reason
+        membership.date_banned = timezone.now()
+        membership.save()
+
     def player_is_only_leader(self, player):
-        membership = get_object_or_none(self.cellmembership_set.filter(member_player = player))
+        membership = get_object_or_none(self.cellmembership_set.filter(member_player = player, is_banned=False))
         if not membership:
             return False
-        return membership.role == ROLE[0][0] and get_queryset_size(self.cellmembership_set.filter(role=ROLE[0][0])) == 1
+        return membership.role == ROLE[0][0] and get_queryset_size(self.cellmembership_set.filter(role=ROLE[0][0], is_banned=False)) == 1
 
     def invitePlayer(self, player, text):
-        extant_invite = get_object_or_none(self.cellinvite_set.filter(invited_player = player))
+        extant_invite = get_object_or_none(self.cellinvite_set.filter(invited_player=player))
+        membership = get_object_or_none(self.cellmembership_set.filter(member_player=player))
+        if membership:
+            membership.delete()
         if extant_invite:
             if extant_invite.is_declined:
                 extant_invite.is_declined = False
                 extant_invite.save()
                 return extant_invite
-            else:
-                raise ValueError("Cannot invite someone already invited")
         else:
             invite = CellInvite(
-                relevant_cell = self,
-                invited_player = player,
-                invite_text = text,
+                relevant_cell=self,
+                invited_player=player,
+                invite_text=text,
             )
             invite.save()
             return invite
 
     def number_of_members(self):
-        return self.cellmembership_set.count()
+        return self.cellmembership_set.filter(is_banned=False).count()
 
     def completed_games(self):
         return self.completed_games_queryset().all()
@@ -329,6 +350,9 @@ class CellMembership(models.Model):
                             max_length=20)
     joined_date = models.DateTimeField('date created',
                                         auto_now_add=True)
+    is_banned = models.BooleanField(default=False)
+    reason_banned = models.CharField(max_length=2000, blank=True)
+    date_banned = models.DateTimeField('date banned', blank=True, null=True)
 
     def add_user_to_current_group(self):
         groupName = self.relevant_cell.getGroupName(self.role)
@@ -361,7 +385,8 @@ class CellMembership(models.Model):
                 raise ValueError("Cannot remove only leader")
             self.remove_user_from_all_groups()
             super(CellMembership, self).save(*args, **kwargs)
-        self.add_user_to_current_group()
+        if not self.is_banned:
+            self.add_user_to_current_group()
 
 
 class PermissionsSettings(models.Model):
@@ -468,7 +493,7 @@ class CellInvite(models.Model):
 
     def save(self, *args, **kwargs):
         if self.pk is None:
-            if self.relevant_cell.cellmembership_set.filter(member_player = self.invited_player):
+            if self.relevant_cell.cellmembership_set.filter(member_player=self.invited_player, is_banned=False):
                 raise ValueError("User is already in cell")
             super(CellInvite, self).save(*args, **kwargs)
         else:

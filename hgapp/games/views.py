@@ -40,7 +40,7 @@ from cells.models import Cell
 def enter_game(request):
     if not request.user.is_authenticated:
         raise PermissionDenied("You must be logged in to enter a Game")
-    cells = [cell for cell in request.user.cell_set.all() if cell.player_can_manage_games(request.user)]
+    cells = [cell for cell in request.user.cell_set.filter(cellmembership__is_banned=False).all() if cell.player_can_manage_games(request.user)]
     context = {
         'cells' : cells,
     }

@@ -114,9 +114,9 @@ def make_character_form(user, existing_character=None, supplied_cell=None):
     form = CharacterForm
     if user.is_authenticated:
         if existing_character:
-            queryset = existing_character.player.cell_set.all()
+            queryset = existing_character.player.cell_set.filter(cellmembership__is_banned=False).all()
         else:
-            queryset = user.cell_set.all()
+            queryset = user.cell_set.filter(cellmembership__is_banned=False).all()
         cell = forms.ModelChoiceField(queryset=queryset,
                                       widget=forms.Select(attrs={'class': 'form-control'}),
                                       empty_label="Nowhere",

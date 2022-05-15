@@ -57,7 +57,8 @@ class EditWorldForm(forms.Form):
 
 class CustomInviteForm(forms.Form):
     username = forms.CharField(label=None,
-                            max_length=200)
+                            max_length=200,
+                               help_text="Inviting a banned Player will un-ban them.")
     invite_text = forms.CharField(label='Message',
                             max_length=800,
                             widget=forms.Textarea,
@@ -97,7 +98,10 @@ class RsvpForm(forms.Form):
 
 
 class KickForm(forms.Form):
-    pass
+    reason_banned = forms.CharField(label='Reason Banned',
+                                    max_length=2000,
+                                    help_text='(optional)',
+                                    required=False)
 
 
 class PlayerRoleForm(forms.Form):
@@ -107,6 +111,7 @@ class PlayerRoleForm(forms.Form):
                             widget=forms.TextInput(attrs={'form': 'manage_form'}))
     role = forms.ChoiceField(choices=ROLE,
                              widget=forms.Select(attrs={'form': 'manage_form', 'class': 'form-control form-inline'}))
+
 
 class RolePermissionForm(forms.Form):
     # attrs must be set to allow forms with other submit target urls to exist within other forms in template.
@@ -119,6 +124,7 @@ class RolePermissionForm(forms.Form):
     can_manage_member_characters = forms.BooleanField(required=False)
     can_edit_world = forms.BooleanField(required=False)
     can_manage_games = forms.BooleanField(required=False)
+
 
 class EditWorldEventForm(forms.Form):
     headline = forms.CharField(label='Headline',

@@ -21,7 +21,7 @@ class ProfileView(generic.DetailView):
 
     def get_queryset(self):
         self.profile = get_object_or_404(Profile, pk=self.kwargs['pk'])
-        self.cells = self.profile.user.cell_set.all()
+        self.cells = self.profile.user.cell_set.filter(cellmembership__is_banned=False).all()
 
         characters = self.profile.user.character_set.filter(is_deleted=False)
         if self.profile.user != self.request.user:

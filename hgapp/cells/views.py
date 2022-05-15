@@ -233,6 +233,12 @@ def view_cell(request, cell_id):
             return HttpResponseRedirect(reverse('profiles:profiles_terms'))
         invite = get_object_or_none(cell.open_invitations().filter(invited_player=request.user))
         user_membership = cell.get_player_membership(request.user)
+        if user_membership and user_membership.is_banned:
+            context = {
+                "cell": cell,
+                "reason": user_membership.reason_banned,
+            }
+            return render(request, 'cells/view_cell_banned.html', context)
         can_manage_memberships = cell.player_can_manage_memberships(request.user)
         can_edit_world = cell.player_can_edit_world(request.user)
         can_edit_characters = cell.player_can_edit_characters(request.user)
@@ -466,7 +472,7 @@ def manage_members(request, cell_id):
     cell = get_object_or_404(Cell, id=cell_id)
     if not cell.player_can_manage_memberships(request.user):
         raise PermissionDenied("You don't have permission to manage the memberships of this Cell")
-    cell_members = cell.cellmembership_set.order_by("role").all()
+    cell_members = cell.cellmembership_set.filter(is_banned=False).order_by("role").all()
     MemberFormSet = formset_factory(PlayerRoleForm, extra=0)
     if request.method == 'POST':
         membership_formset = MemberFormSet(request.POST)
@@ -505,6 +511,26 @@ def manage_members(request, cell_id):
             'can_edit_perms': can_edit_perms,
         }
         return render(request, 'cells/manage_members.html', context)
+
+def ban_player(request, cell_id, user_id):
+    if not request.user.is_authenticated:
+        raise PermissionDenied("You must be logged in to manage your Cell")
+    cell = get_object_or_404(Cell, id=cell_id)
+    player = get_object_or_404(User, id=int(user_id))
+    if not cell.player_can_manage_memberships(request.user):
+        raise PermissionDenied("You don't have permission to manage the memberships of this Cell")
+    if request.method == 'POST':
+        form = KickForm(request.POST)
+        print(request.POST)
+        if form.is_valid():
+            print(form.cleaned_data)
+            with transaction.atomic():
+                cell.ban_player(player, form.cleaned_data["reason_banned"])
+        else:
+            print(form.errors)
+        return HttpResponseRedirect(reverse('cells:cells_manage_members', args=(cell.id,)))
+    else:
+        return HttpResponseRedirect(reverse('cells:cells_manage_members', args=(cell.id,)))
 
 def kick_player(request, cell_id, user_id):
     if not request.user.is_authenticated:
