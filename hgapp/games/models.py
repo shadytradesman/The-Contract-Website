@@ -162,26 +162,28 @@ class Game(models.Model):
 
     def reason_player_cannot_rsvp(self, player):
         if not player.is_authenticated or player.is_anonymous:
-            return "You must log in to accept this Game invite"
+            return "You must log in to accept this Contract invite."
         if self.gm == player:
-            return "GMs cannot RSVP to their own Games"
+            return "GMs cannot RSVP to their own Contracts."
         if player.is_superuser:
             return None
         if hasattr(self, "max_rsvp") and self.max_rsvp and self.get_attended_players().count() >= self.max_rsvp:
-            return "This Game is full"
+            return "This Contract is full."
         if self.invitation_mode == CLOSED or not self.is_scheduled():
-            return "This Game is closed for RSVPs."
+            return "This Contract is closed for RSVPs."
         if self.is_nsfw and not player.profile.view_adult_content:
-            return "This Game is marked for adults. Your content settings do not allow you to participate."
+            return "This Contract is marked for adults. Your content settings do not allow you to participate."
         player_invitation = get_object_or_none(player.game_invite_set.filter(relevant_game=self.id))
         if player_invitation:
             return None
         if self.invitation_mode == INVITE_ONLY:
-            return "This Game only allows those with an invitation to RSVP."
+            return "This Contract only allows those with an invitation to RSVP."
         if self.invitation_mode == WORLD_MEMBERS:
             membership = self.cell.get_player_membership(player)
-            if not membership or membership.is_banned:
-                return "This Game only allows those who are a member of its Playgroup to RSVP without an invite."
+            if not membership:
+                return "This Contract only allows those who are a member of its Playgroup to RSVP without an invite."
+            if membership and membership.is_banned:
+                return "You are banned from this Playgroup."
             else:
                 return None
         # ANYONE case

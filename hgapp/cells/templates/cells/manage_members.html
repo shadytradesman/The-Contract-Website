@@ -28,7 +28,6 @@
                 <h3>Members and Roles</h3>
             </div>
             <div class="panel-body">
-                {{kick_form}}
                 {% for form in formset %}
                     <form id="kick-{{form.initial.player_id}}"
                           action="{% url 'cells:cells_kick_player' cell_id=cell.id user_id=form.initial.player_id %}"
