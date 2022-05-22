@@ -37,6 +37,8 @@
           gtag('config', 'G-48E3C4RNYE');
         </script>
     {% endif %}
+    {% guidebook_search_blob request.user %}
+    <script src="https://unpkg.com/vue@3.2.26/dist/vue.global.prod.js"></script>
 {% endblock %}
 
 
@@ -58,7 +60,9 @@
     <li>
         <a href="/" class="btn btn-outline" style="padding-top: 5px; padding-bottom: 5px; padding-left: 10px; padding-right: 10px; margin-left: 5px;">
             <img src="{% static 'overrides/branding/homed10.png' %}" width="38" height="38" style="margin-top: 0px; margin-left: 5px; margin-right: 5px;">
-            <span style="position: relative; top: 0px;"> Home </span>
+            {% if request.user.is_authenticated %}
+                <span style="position: relative; top: 0px;"> Home </span>
+            {% endif %}
         </a>
     </li>
         {% if request.user.is_authenticated and not request.user.game_set.all %}

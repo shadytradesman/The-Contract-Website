@@ -1,5 +1,4 @@
 let pageData = JSON.parse(JSON.parse(document.getElementById('pageData').textContent));
-console.log(pageData);
 
 function displayCost(cost) {
     let prefix =  cost > 0 ? "-" : "+";

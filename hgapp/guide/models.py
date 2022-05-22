@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models import Q
+from django.urls import reverse
 from django.conf import settings
 from django.template import loader
 import re
@@ -18,6 +19,9 @@ class GuideBook(models.Model):
         if not is_admin:
             sections = sections.filter(is_hidden=False)
         return sections.order_by('position').all()
+
+    def get_url(self):
+        return reverse('guide:read_guidebook', args=(self.slug,))
 
 
 
@@ -65,6 +69,9 @@ class GuideSection(models.Model):
         rendered_content = self.__render_gm_tip(rendered_content)
         return rendered_content
 
+    def to_url(self):
+        guidebook_url = self.book.get_url()
+        return "{}#{}".format(guidebook_url, self.slug)
 
     # {{article-slug|link-text}} to link to that article
     def __render_section_links(self, content):

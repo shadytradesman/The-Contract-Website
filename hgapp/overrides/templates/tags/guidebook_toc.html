@@ -1,1 +1,26 @@
-{{nav_list|safe}}
+
+{% if request.user.is_authenticated and request.user.profile.early_access_user %}
+<div class="input-group css-guidebook-search" style="margin-bottom: 10px; padding-left: 5px; padding-right: 5px;">
+    <span class="input-group-addon" id="basic-addon1">
+        <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+    </span>
+    <input type="text"
+           class="form-control"
+           placeholder="Search Guide"
+           aria-describedby="basic-addon1"
+           v-model="searchBarValue"
+           @input="onSearch"
+    >
+  </div>
+{% endif %}
+  <ol v-if="articlesHit.length > 0 && searchBarValue.length > 0" class="nav nav-pills nav-stacked" style="list-style-type: none!important;">
+              <li v-for="article in articlesHit" role="presentation" style="padding-right: 10px;">
+                  <a v-bind:href="article.url" v-text="article.title"></a>
+              </li>
+  </ol>
+  <div v-if="searchBarValue.length == 0" >
+      {{nav_list|safe}}
+  </div>
+  <div v-if="searchBarValue.length != 0 && articlesHit.length == 0" class="text-center">
+      No search results
+  </div>

@@ -1,3 +1,6 @@
+import json
+from collections import defaultdict
+
 from django import template
 from django.urls import reverse
 
@@ -22,6 +25,29 @@ def gwynn_png(filename, hide_caption=None):
     }
 
 
+@register.inclusion_tag('tags/guidebook_search_blob.html')
+def guidebook_search_blob(user):
+    if user.is_authenticated and user.profile and user.profile.early_access_user:
+        sections = GuideSection.objects.filter(is_deleted=False, is_hidden=False).all()
+        section_by_tag = defaultdict(list)
+        for section in sections:
+            search_hit = {
+                "url": section.to_url(),
+                "title": section.title,
+            }
+            tags = section.tags if section.tags else []
+            tags.extend(section.title.split())
+            for tag in tags:
+                section_by_tag[tag.lower()].append(search_hit)
+        return {
+            'blob': json.dumps(dict(section_by_tag)),
+        }
+    else:
+        return {
+            'blob': None,
+        }
+
+
 @register.inclusion_tag('tags/guidebook_toc.html', takes_context=True)
 def guide_toc(context, guidebook=None):
     guidebooks = GuideBook.objects.order_by('position').all()
@@ -35,8 +61,9 @@ def guide_toc(context, guidebook=None):
     context["nav_list"] = nav_list
     return context
 
+
 def __get_nav_list(sections_by_book, active_book=None, logged_in=False):
-    nav_list = '<ul class="nav nav-pills nav-stacked {}">'.format("dropdown-menu" if not active_book else "")
+    nav_list = '<ul class="nav nav-pills nav-stacked {}">'.format("" if not active_book else "")
     for guidebook, sections in sections_by_book:
         guidebook_active = guidebook == active_book if active_book else False
         url = guidebook.redirect_url if hasattr(guidebook, "redirect_url") and guidebook.redirect_url \
