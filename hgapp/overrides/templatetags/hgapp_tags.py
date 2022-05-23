@@ -1,5 +1,6 @@
 import json
 from collections import defaultdict
+from django.core.cache import cache
 
 from django import template
 from django.urls import reverse
@@ -28,24 +29,35 @@ def gwynn_png(filename, hide_caption=None):
 @register.inclusion_tag('tags/guidebook_search_blob.html')
 def guidebook_search_blob(user):
     if user.is_authenticated and user.profile and user.profile.early_access_user:
-        sections = GuideSection.objects.filter(is_deleted=False, is_hidden=False).all()
-        section_by_tag = defaultdict(list)
-        for section in sections:
-            search_hit = {
-                "url": section.to_url(),
-                "title": section.title,
-            }
-            tags = section.tags if section.tags else []
-            tags.extend(section.title.split())
-            for tag in tags:
-                section_by_tag[tag.lower()].append(search_hit)
-        return {
-            'blob': json.dumps(dict(section_by_tag)),
-        }
+        sentinel = object()
+        cache_key = "guidebook search blob"
+        cache_contents = cache.get(cache_key, sentinel)
+        if cache_contents is sentinel:
+            index_blob = _get_guide_index_blob()
+            cache.set(cache_key, index_blob, timeout=600)
+            return index_blob
+        return cache_contents
     else:
         return {
             'blob': None,
         }
+
+
+def _get_guide_index_blob():
+    sections = GuideSection.objects.filter(is_deleted=False, is_hidden=False).all()
+    section_by_tag = defaultdict(list)
+    for section in sections:
+        search_hit = {
+            "url": section.to_url(),
+            "title": section.title,
+        }
+        tags = section.tags if section.tags else []
+        tags.extend(section.title.split())
+        for tag in tags:
+            section_by_tag[tag.lower()].append(search_hit)
+    return {
+        'blob': json.dumps(dict(section_by_tag)),
+    }
 
 
 @register.inclusion_tag('tags/guidebook_toc.html', takes_context=True)
