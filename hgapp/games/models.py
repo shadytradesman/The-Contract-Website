@@ -927,6 +927,8 @@ class Scenario_Discovery(models.Model):
     class Meta:
         unique_together = (("discovering_player", "relevant_scenario"))
 
+    def __str__(self):
+        return "{} {} {}".format(self.discovering_player.username, self.get_reason_display(), self.relevant_scenario)
     def spoil(self):
         self.is_spoiled = True
         self.save()
