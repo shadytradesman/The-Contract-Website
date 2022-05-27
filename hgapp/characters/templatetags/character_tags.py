@@ -37,7 +37,6 @@ def render_consumable(artifact, user):
 def render_sig_item(artifact, user, viewing_character=None):
     if not (artifact.is_signature or artifact.is_crafted_artifact):
         raise ValueError("attempting to display non-signature artifact as signature")
-    print(artifact.name)
     latest_transfer = artifact.get_latest_transfer()
     can_edit = artifact.character.player_can_edit(user) if artifact.character else False
     edit_form = None

@@ -28,7 +28,7 @@ def gwynn_png(filename, hide_caption=None):
 
 @register.inclusion_tag('tags/guidebook_search_blob.html')
 def guidebook_search_blob(user):
-    if user.is_authenticated and user.profile and user.profile.early_access_user:
+    if hasattr(user, "is_authenticated") and user.is_authenticated and user.profile and user.profile.early_access_user:
         sentinel = object()
         cache_key = "guidebook-search-blob"
         cache_contents = cache.get(cache_key, sentinel)
