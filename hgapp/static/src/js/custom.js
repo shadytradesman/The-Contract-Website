@@ -324,7 +324,6 @@ if (document.getElementById('guidebookSearchBlob')) {
 $(function(){
     for (const [key, value] of Object.entries(guidebookSectionByTag)) {
         trie.insert(key.toLowerCase());
-        console.log(key.toLowerCase());
     }
 });
 

@@ -566,6 +566,42 @@ $("#bio-form").submit(function (e) {
     })
 })
 
+
+// Notes form
+var notesValue = JSON.parse(document.getElementById('notes').textContent);
+$($("#js-notes-form").children("textarea").val(notesValue));
+$(document).on("click", "#js-edit-notes-button", function(){
+    $("#js-notes-text").css("display","none");
+    $("#js-edit-notes-button").css("display","none");
+    $("#js-notes-form").css("display","block");
+    $("#js-notes-expand-button").css("display","none");
+});
+
+$("#notes-form").submit(function (e) {
+    e.preventDefault();
+    var serializedData = $(this).serialize();
+    $.ajax({
+        type: 'POST',
+        url: $(this).attr("data-post-url"),
+        data: serializedData,
+        success: function (response) {
+            var instance = response["notes"];
+            var conv = new showdown.Converter();
+            $("#js-notes-form").children("textarea").val(instance);
+            // This is safe only because the only people to see this output are the ones who submitted it.
+            $("#js-notes-text").html(conv.makeHtml(instance));
+            $("#js-notes-text").css("display","block");
+            $("#js-edit-notes-button").css("display","inline-block");
+            $("#js-notes-form").css("display","none");
+            $("#js-notes-expand-button").css("display","inline-block");
+        },
+        error: function (response) {
+            console.log(response);
+            alert(response["responseJSON"]["error"]);
+        }
+    })
+})
+
 function copyToClipboard(elem) {
 	  // create hidden text element, if it doesn't already exist
     var targetId = "_hiddenCopyText_";

@@ -1,0 +1,46 @@
+{% load games_tags %}
+
+<div class="text-center">
+  <h3  data-toggle="tooltip" title='{{tutorial.character_timeline}}' style="margin-bottom: 5px;">
+    Contractor Timeline
+  </h3>
+  <div>
+    <b>{{ character.number_of_victories }}</b> Victories -
+    <b>{{ character.number_of_losses }}</b> Failure{{character.number_of_losses|pluralize}}
+    {% if request.user == character.player %}
+    - <b>{{ num_improvements }} </b> Improvement{{num_improvements|pluralize}}
+    {% endif %}
+
+  </div>
+  {% if character.number_of_victories %}
+  <div class="text-center">
+    <h5 style="margin-top: 5px; margin-bottom: 5px;">
+      <a href="{% url 'characters:characters_view_contacts' character.id %}">
+        View {{character.name}}'s Encountered Contractors
+      </a>
+    </h5>
+  </div>
+  {% endif %}
+  <div {% if unspent_experience < 0 %}class="text-danger"{% endif %}>
+    <b>Remaining: </b>{{unspent_experience}} Exp.
+    (<b>Earned: </b> {{exp_earned}} - <b>Spent: </b> {{exp_cost}})
+  </div>
+
+</div>
+
+<div id="hx-timeline-char">
+  <div class="text-center" style="margin-top: 10px;">
+    <button
+            class="btn btn-primary"
+            hx-get="{% url 'characters:character_timeline' character.id %}"
+            hx-trigger="click"
+            hx-target="#hx-timeline-char"
+            hx-swap="outerHTML">
+      Load Full Timeline
+    </button>
+    <div>
+      <small>An itemized record of every Contract, Gift, Improvement, and Experience changes</small>
+    </div>
+  </div>
+</div>
+

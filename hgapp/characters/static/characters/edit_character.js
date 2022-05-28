@@ -71,7 +71,6 @@ $(document).on('change','[class~=sec-ability-name]', function(ev){
     if (numEmptySecondaries > 1) {
         var sec = emptySecondaries[0];
         $(sec).siblings(".ability-form").children(".ability-value-input").val(0);
-        console.log($(sec).siblings(".ability-form").children(".ability-value-input"));
         updateAbilityExp($(sec).siblings(".ability-form"));
         updateExpTotals();
         $(sec.parentElement).hide();
@@ -109,8 +108,6 @@ $(document).on('change','[id$=-is_selected]', function(ev) {
     var allThisQuirksButtons = $('[class~=btn-'+ (isLiability ? "True" : "False") +'-'+ quirkId + ']');
     var emptyCheckboxes = allThisQuirksButtons
             .filter(function() {return !$(this).is(".active") && !$(this.parentElement).is(":hidden");});
-    console.log(allThisQuirksButtons)
-    console.log(emptyCheckboxes)
     var visibleCount =  allThisQuirksButtons
             .filter(function() {return !$(this.parentElement).is(":hidden");})
             .length;
@@ -147,8 +144,26 @@ $(document).on('change','[id$=-checked]', function(ev){
                             + "<p>Number currently selected: <b>" + numLimitsSelected + "</b></p>");
         warnDiv.css("display","block");
     }
+
 });
 
+// Liability warning
+$(document).on('change','input[id^=id_liability-]', function(ev){
+    let liabilities = $('input:checked[id^=id_liability-]');
+    let liabilityVal = 0;
+    liabilities.each(liab => {
+        liabilityVal += parseInt($(liabilities[liab]).next(".js-quirk-value").text());
+    });
+    var warnDiv = $('[class~=liability-warn]');
+    if (liabilityVal < 8) {
+        warnDiv.css("display","none");
+    } else {
+        warnDiv.html("<p>We recommend Contractors take a maximum of <b>7</b> points of Liabilities. Taking more "
+                            + "requires Playgroup Leader approval.</p>"
+                            + "<p>Currently Liability value: <b>" + liabilityVal + "</b></p>");
+        warnDiv.css("display","block");
+    }
+});
 //////////////////
 // EXPERIENCE MANAGEMENT
 //////////////////
@@ -225,20 +240,14 @@ function calculateAbilityChangeCost(oldValue, newValue) {
 }
 
 function updateAbilityExp(valueSpanElement) {
-    console.log("abilityxp");
-    console.log(valueSpanElement);
     var value = valueSpanElement.children(".ability-value-input").val();
     if (!value) {
-        console.log("nan out");
         return;
     }
-    console.log(value);
     var initial = valueSpanElement.attr("data-initial-val");
     initial = initial ? initial : 0;
-    console.log(initial);
     var cost = calculateAbilityChangeCost(initial, value);
     var expCostDiv = valueSpanElement.siblings(".css-experience-cost");
-    console.log(expCostDiv);
     var price = -cost;
     var priceText = price > 0 ? "+" + price : price;
     expCostDiv.children(".js-experience-cost-value").text(priceText);
@@ -252,15 +261,10 @@ function updateAbilityExp(valueSpanElement) {
 
 const EXP_COST_QUIRK_MULTIPLIER = parseInt(costs["EXP_COST_QUIRK_MULTIPLIER"]);
 function updateQuirkExp(quirkButtonDiv) {
-    console.log(quirkButtonDiv);
     var initialActive = quirkButtonDiv.attr("data-initial") == "True";
-    console.log("initialActive: " + initialActive);
     var active = $(quirkButtonDiv).hasClass("active");
-    console.log("active: " + active);
     var quirkValue = $(quirkButtonDiv).find(".js-quirk-value").text();
-    console.log("qvalue: " + quirkValue);
     var quirkIsLiability = $(quirkButtonDiv).attr("data-liability") == "True";
-    console.log("is liability: " + quirkIsLiability);
     var cost;
     if (active == initialActive) {
         cost = 0;
@@ -268,10 +272,8 @@ function updateQuirkExp(quirkButtonDiv) {
         expVal = EXP_COST_QUIRK_MULTIPLIER * quirkValue;
         cost = active == quirkIsLiability ? expVal : -expVal;
     }
-    console.log("cost: " + cost);
     var expCostDiv = quirkButtonDiv.find(".css-experience-cost")
     quirkButtonDiv.find(".js-experience-cost-value").text(cost);
-    console.log(expCostDiv);
     if (cost != 0) {
         expCostDiv.css("display","inline");
     } else {
@@ -303,20 +305,14 @@ function updateQuirkCatExpTotals() {
 }
 
 function updateSourceExp(valueSpanElement) {
-    console.log("source xp");
-    console.log(valueSpanElement);
     var value = valueSpanElement.children(".source-value-input").val();
     if (!value) {
-        console.log("nan out");
         return;
     }
-    console.log(value);
     var initial = valueSpanElement.attr("data-initial-val");
     initial = initial ? initial : 0;
-    console.log(initial);
     var cost = calculateSourceChangeCost(initial, value);
     var expCostDiv = valueSpanElement.siblings(".css-experience-cost");
-    console.log(expCostDiv);
     var price = -cost;
     var priceText = price > 0 ? "+" + price : price;
     expCostDiv.children(".js-experience-cost-value").text(priceText);

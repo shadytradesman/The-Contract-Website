@@ -21,6 +21,7 @@
     {{character.source_values|json_script:"sourceValues"}}
     {{character.equipment|json_script:"equipment"}}
     {{character.background|json_script:"bio"}}
+    {{character.notes|json_script:"notes"}}
     <script src="{% static 'characters/view_character.js' %}"></script>
     {{attribute_value_by_id|json_script:"attributeValueById"}}
     {{ability_value_by_id|json_script:"abilityValueById"}}

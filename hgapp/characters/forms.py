@@ -361,8 +361,10 @@ class EquipmentForm(forms.Form):
                                 label=None)
 
 class BioForm(forms.Form):
-    bio = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control'}),
-                                label=None)
+    bio = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control'}), label=None)
+
+class NotesForm(forms.Form):
+    notes = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control'}), label=None)
 
 def make_charon_coin_form(character=None):
     initial = character.assigned_coin() if character else False

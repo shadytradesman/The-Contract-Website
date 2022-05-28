@@ -24,7 +24,7 @@ from powers.signals import gift_major_revision
 from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, get_ability_form, \
     AssetForm, LiabilityForm, BattleScarForm, TraumaForm, InjuryForm, SourceValForm, make_allocate_gm_exp_form, EquipmentForm,\
     DeleteCharacterForm, BioForm, make_world_element_form, get_default_scar_choice_field, make_artifact_status_form, \
-    make_transfer_artifact_form, make_consumable_use_form
+    make_transfer_artifact_form, make_consumable_use_form, NotesForm
 from characters.form_utilities import get_edit_context, character_from_post, update_character_from_post, \
     grant_trauma_to_character, delete_trauma_rev, get_world_element_class_from_url_string
 from characters.view_utilities import get_characters_next_journal_credit, get_world_element_default_dict, get_weapons_by_type
@@ -331,6 +331,7 @@ def view_character(request, character_id, secret_key=None):
         'unspent_experience': unspent_experience,
         'equipment_form': equipment_form,
         'bio_form': bio_form,
+        'notes_form': NotesForm(),
         'secret_key': secret_key,
         'secret_key_valid': secret_key_valid,
         'num_journal_entries': num_journal_entries,
@@ -357,6 +358,7 @@ def view_character(request, character_id, secret_key=None):
         'avail_crafted_artifacts': avail_crafted_artifacts,
         'unavail_crafted_artifacts': unavail_crafted_artifacts,
         'lost_signature_items': lost_signature_items,
+        'num_improvements': character.num_improvements() if character.player == request.user else None,
     }
     return render(request, 'characters/view_pages/view_character.html', context)
 
@@ -891,6 +893,20 @@ def post_bio(request, character_id, secret_key = None):
 
     return JsonResponse({"error": ""}, status=400)
 
+def post_notes(request, character_id, secret_key = None):
+    if request.is_ajax and request.method == "POST":
+        character = get_object_or_404(Character, id=character_id)
+        form = NotesForm(request.POST)
+        __check_edit_perms(request, character, secret_key)
+        if form.is_valid() and request.user != character.player:
+            character.notes = form.cleaned_data['notes']
+            with transaction.atomic():
+                character.save()
+            return JsonResponse({"notes": form.cleaned_data['notes']}, status=200)
+        else:
+            return JsonResponse({"error": form.errors}, status=400)
+
+    return JsonResponse({"error": ""}, status=400)
 
 
 def post_world_element(request, character_id, element, secret_key = None):

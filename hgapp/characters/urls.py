@@ -81,6 +81,10 @@ urlpatterns = [
         name="post_bio"),
     url(r'^post/ajax/c/(?P<character_id>[\d]+)/bio/$', views.post_bio, name="post_bio"),
 
+    url(r'^post/ajax/c/(?P<character_id>[\d]+)/notes/(?P<secret_key>[\da-z]*)$', views.post_notes,
+        name="post_notes"),
+    url(r'^post/ajax/c/(?P<character_id>[\d]+)/notes/$', views.post_notes, name="post_notes"),
+
     url(r'^post/ajax/c/(?P<character_id>[\d]+)/trauma/(?P<secret_key>[\da-z]*)$', views.post_trauma, name="post_trauma"),
     url(r'^post/ajax/c/(?P<character_id>[\d]+)/trauma/$', views.post_trauma, name="post_trauma"),
 

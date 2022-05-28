@@ -1,15 +1,7 @@
-{% load games_tags %}
 {% load markdown_deux_tags %}
 
-{% if character.number_of_victories %}
-<div class="text-center">
-    <h4>
-        <a href="{% url 'characters:characters_view_contacts' character.id %}">
-            View {{character.name}}'s Encountered Contractors
-        </a>
-    </h4>
-</div>
-{% endif %}
+{% include "characters/view_pages/timeline_snip.html" %}
+
 {% if character.background or user_can_edit %}
     <h3>Biography</h3>
     <div class="thumbnail">
@@ -40,6 +32,43 @@
         {% endif %}
     </div>
 {% endif %}
+
+{% if user_can_edit and not request.user.is_anonymous and request.user != character.player %}
+    <h3 style="margin-bottom: 10px;">GM Notes</h3>
+    <div style="margin-left: 5px;">
+        <small>These notes are <b>hidden</b> from the Player who owns this Contractor.
+            Only other Players who can edit this Contractor can view these notes.</small>
+    </div>
+    <div class="thumbnail">
+        {% if character.notes or user_can_edit %}
+        <div class="css-notes-text">
+            <div id="js-notes-text">
+                {{character.notes | markdown}}
+            </div>
+        </div>
+        {% endif %}
+        {% if user_can_edit %}
+        <form id="notes-form"
+              data-post-url="{% url 'characters:post_notes' character.id secret_key %}">
+            <div id="js-notes-form" style="display:none;">
+                {{ notes_form.about.errors }}
+                {{ notes_form.non_field_errors }}
+                {% csrf_token %}
+                {{ notes_form.notes}}
+                <div style="margin-top: 5px; margin-bottom: 5px;">
+                    <input class="btn btn-sm btn-default" type="submit" value="Save">
+                    <small><a href="https://commonmark.org/help/">Markdown</a> enabled</small>
+                </div>
+            </div>
+        </form>
+        <div id="js-edit-notes-button" class="btn btn-default btn-xs">
+            <i class="fa fa-edit fa-2x"></i> Edit GM Notes
+        </div>
+        {% endif %}
+    </div>
+{% endif %}
+
+
 {% if num_journal_entries or user_can_edit %}
     <a href="{% url 'journals:journal_read' character.id %}">
         <h3>
@@ -103,42 +132,3 @@
     </ul>
 </div>
 {% endif %}
-<div class="text-center">
-    <h3  data-toggle="tooltip" title='{{tutorial.character_timeline}}' style="margin-bottom: 5px;">
-        Contractor Timeline
-    </h3>
-    <p>
-        <b>{{ character.number_of_victories }}</b> Victories - <b>{{ character.number_of_losses }}</b> Losses
-        <br>
-        {% if unspent_experience < 0 %}
-    <h4 class="text-danger">{{character.name}} has overspent Experience</h4>
-    {% endif %}
-    <b>Remaining: </b>{{unspent_experience}} Exp.
-    (<b>Earned: </b> {{exp_earned}} - <b>Spent: </b> {{exp_cost}})
-    </p>
-</div>
-
-{% if character.num_unspent_rewards > 0 %}
-<h4>{{character.name}} has {{character.num_unspent_rewards}} unspent Reward{{character.num_unspent_rewards|pluralize}}</h4>
-<ul >
-    {% for reward in character.unspent_rewards %}
-    <li>{% render_reward reward %}</li>
-    {% endfor %}
-</ul>
-
-{% endif %}
-<div id="hx-timeline-char">
-    <div class="text-center" style="margin-top: 20px;">
-        <button
-                class="btn btn-primary btn-lg"
-                hx-get="{% url 'characters:character_timeline' character.id %}"
-                hx-trigger="click"
-                hx-target="#hx-timeline-char"
-                hx-swap="outerHTML">
-            Load Full Timeline
-        </button>
-        <div>
-            <small>An itemized record of every Contract, Gift, Improvement, and Experience change</small>
-        </div>
-    </div>
-</div>

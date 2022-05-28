@@ -456,11 +456,9 @@ class Character(models.Model):
         return total
 
     def world_element_cell_choices(self):
-        cell_choices = set()
         if not hasattr(self, "player") or not self.player:
-            return cell_choices
+            return Cell.objects.none()
         queryset = self.player.cell_set.filter(cellmembership__is_banned=False).all()
-        cell_choices.add(queryset)
         games_attended = self.game_set.all()
         cell_ids = set()
         for cell in queryset:
@@ -695,6 +693,9 @@ class Character(models.Model):
     def num_unspent_improvements(self):
         return self.reward_set.filter(is_void=False).filter(relevant_power=None).filter(is_improvement=True).count()
 
+    def num_improvements(self):
+        return self.reward_set.filter(is_void=False).filter(is_improvement=True).count()
+
     def reward_cost_for_item(self, sig_item):
         unspent_gifts = self.unspent_gifts()
         num_unspent_gifts = self.num_unspent_gifts()
@@ -742,7 +743,7 @@ class Character(models.Model):
 
     def improvement_ok(self):
         ported_adjustment = PORTED_IMPROVEMENT_ADJUSTMENT[self.ported] + PORTED_GIFT_ADJUSTMENT[self.ported]
-        return self.number_of_victories() * 2 > (len(self.active_rewards()) - ported_adjustment)
+        return self.number_of_victories() * 2 >= (self.active_rewards().count() - ported_adjustment)
 
     def get_powers_for_render(self):
         return self.power_full_set.all()
@@ -1787,7 +1788,7 @@ class ContractStats(models.Model):
     def get_change_phrases(self):
         change_phrases = []
         for attribute in self.attributevalue_set.all():
-            if attribute.relevant_attribute.is_deprecated:
+            if attribute.relevant_attribute.is_deprecated or not attribute.previous_revision:
                 continue
             exp_cost = self.calc_attr_change_ex_cost(attribute.previous_revision.value, attribute.value)
             exp_phrase = self.get_exp_phrase(exp_cost)
