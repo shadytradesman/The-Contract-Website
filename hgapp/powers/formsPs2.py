@@ -67,10 +67,6 @@ class PowerForm(forms.Form):
                                         'v-bind:value': 'selectedVector.slug',
                                     }))
 
-    def clean_name(self):
-        data = self.cleaned_data['name']
-        return clean_user_input_field(data)
-
 
 def make_select_signature_artifact_form(existing_character=None, existing_power=None, user=None):
     class SelectArtifactForm(forms.Form):
@@ -98,21 +94,21 @@ def make_select_signature_artifact_form(existing_character=None, existing_power=
         selected_artifact = forms.ModelChoiceField(queryset=queryset,
                                                    initial=initial_artifact,
                                                    required=False,
-                                                   empty_label="Create New Item",
-                                                   label="Attach to existing Signature Item?",
+                                                   empty_label="Create New Artifact",
+                                                   label="Attach to existing Legendary Artifact?",
                                                    widget=forms.Select(attrs={
                                                        'v-model': 'selectedItem',
                                                        "@input": "changeSelectedItem",
                                                    }))
         item_name = forms.CharField(required=False,
                                     max_length=450,
-                                    help_text="The name of the signature item",
+                                    help_text="The name of the Legendary Artifact",
                                     widget=forms.TextInput(attrs={
                                         'v-model': 'sigItemName',
                                     }))
         item_description = forms.CharField(required=False,
                                            max_length=5000,
-                                           help_text="(Optional) A physical description of the signature item",
+                                           help_text="(Optional) A physical description of the Artifact",
                                            widget=forms.TextInput(attrs={
                                                'v-model': 'sigItemDescription',
                                            }))

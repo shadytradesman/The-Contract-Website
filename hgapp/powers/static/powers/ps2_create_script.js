@@ -20,8 +20,6 @@ const interactiveTutorial = ["Need help?", {
     }]
 }];
 
-
-
 /* TUTORIAL MODALS */
 
 var cookieName = "default";

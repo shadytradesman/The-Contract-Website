@@ -10,7 +10,7 @@
                 <i class="fa fa-plus-square fa-2x"></i>
             </a>
             {% endif %}
-            <a href="{% url 'powers:powers_view_power_full' power_full.id %}">{{latest_revision.name|safe}}</a>
+            <a href="{% url 'powers:powers_view_power_full' power_full.id %}">{{latest_revision.name}}</a>
         </h4>
         <div>
             {% with latest_revision as power %}

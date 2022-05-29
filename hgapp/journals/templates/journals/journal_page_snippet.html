@@ -137,7 +137,7 @@
         {% else %}
             {% if viewer_can_write %}
                 <div class="alert alert-success text-center">
-                    You have not written a journal for this Contract yet.
+                    You have not written a journal for {{ journal_page.game.scenario.title }} yet.
                     You will earn
                     {% if next_reward_improvement %}
                         <b>an Improvement</b>
