@@ -341,7 +341,6 @@ const guidebookSearchBar = {
         let tagHits = trie.find(this.searchBarValue.toLowerCase());
         let hitSlugs = new Set();
         for (let i = 0; i < tagHits.length; i++) {
-            console.log(tagHits[i]);
             let articles = guidebookSectionByTag[tagHits[i]];
             for (let j = 0; j < articles.length; j++) {
                 if (!hitSlugs.has(articles[j]["url"])) {
@@ -371,7 +370,6 @@ const guidebookSearchBar2 = {
         let tagHits = trie.find(this.searchBarValue.toLowerCase());
         let hitSlugs = new Set();
         for (let i = 0; i < tagHits.length; i++) {
-            console.log(tagHits[i]);
             let articles = guidebookSectionByTag[tagHits[i]];
             for (let j = 0; j < articles.length; j++) {
                 if (!hitSlugs.has(articles[j]["url"])) {

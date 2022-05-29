@@ -28,8 +28,6 @@
         {% include "_messages.html" %}
     </div>
     <div class="css-transparent-overlay-dark" style="padding-top: 5px; padding-left: 10px; padding-bottom: 10px;">
-        {% if request.user.profile.ps2_user or request.user.is_superuser or request.user.profile.early_access_user %}
-        {% endif %}
         {% with latest_blog_post as post %}
         <h4 class="css-blog-header" style="margin-bottom: 0px;">
             <a href="{%url 'pinax_blog:blog' %}">

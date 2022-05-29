@@ -863,7 +863,7 @@
                             <b>Murder:</b> killing another person outside of immediate self-defense.
                         </li>
                         <li>
-                            <b>Torture:</b> being tortured or enduring extended physical or emotional stress.
+                            <b>Anguish:</b> being tortured or enduring extended physical or emotional stress.
                         </li>
                         <li>
                             <b>Atrocities:</b> witnessing or participating in a humanitarian atrocity.
@@ -918,7 +918,7 @@
                     </ul>
                 </li>
                 <li>
-                    If you fail, you take one point of Mind damage and acquire a new Trauma.
+                    If you fail, you take one point of Mind damage or acquire a new Trauma.
                     <ul>
                         <li>
                             Traumas are long-lasting mental health issues such as phobias, delusions, and compulsions.
@@ -927,10 +927,14 @@
                             The specific Trauma you develop is based on the circumstances that led to its formation.
                         </li>
                         <li>
-                            When a Trauma is triggered, you must roll Mind, Difficulty 8 to maintain control.
+                            When a Trauma is triggered, you must roll Mind, Difficulty 8 to maintain self-control.
                             <ul>
                                 <li>
-                                    For example, someone with a phobia of the open ocean would need to succeed a Mind roll to board a ferry.
+                                    For example, someone with a phobia of the open ocean would need to succeed a Mind
+                                    roll to board a ferry.
+                                </li>
+                                <li>
+                                    Failing a self-control roll does not cause Mind damage or a new Trauma.
                                 </li>
                             </ul>
                         </li>
@@ -984,7 +988,7 @@
                     and suffer a lingering Battle Scar.
                 </li>
                 <li>
-                    Contractors gain access to Powers that make them resistant to death once they reach Seasoned Status.
+                    Contractors gain access to Gifts that make them resistant to death once they reach Seasoned Status.
                 </li>
             </ul>
         </div>
@@ -1076,56 +1080,111 @@
             <figcaption class="text-center"></figcaption>
         </figure>
         <div class="css-rules">
-            <div class="text-center">
-                <b>You won't need to create a Gift until after your first Victory, but here's a primer.</b>
+            <div class="">
+                <b>"Gifts are why we sign The Contract."</b>
             </div>
             <ul>
                 <li>
-                    Creating a custom Gift is easy:
-                    <ol>
-                        <li>
-                            Envision what you’d like your Contractor to do.
-                            <ul>
-                                <li>Get creative (or steal ideas).</li>
-                            </ul>
-                        </li>
-                        <li>
-                            Select an <b>Effect</b> that matches your Gift's concept.
-                            <ul>
-                                <li>Effects are starting templates for Gifts with defined systems. </li>
-                                <li>Examples include: Investigate Individual, Alternate Form, Disguise, and Injure. </li>
-                                <li>There are currently 93 Effects to choose from.</li>
-                            </ul>
-                        </li>
-                        <li>
-                            Customize the Effect with <b>Drawbacks</b>, <b>Enhancements</b>, and <b>Parameters</b>.
-                            <ul>
-                                <li>All Gifts have a Gift Cost. </li>
-                                <li>Taking an Enhancement or upgrading a Parameter expands the Gift's functionality but costs a Gift Credit.</li>
-                                <li>Taking Drawbacks or downgrading a Parameter reduces the Gift Cost but makes the Gift more situational or risky. </li>
-                            </ul>
-                        </li>
-                        <li>
-                            Flavor your Gift and describe its appearance.
-                            <ul>
-                                <li>At this point the Gift has a system but no identity. </li>
-                                <li>Does your Alternate Form Power turn you into a werewolf or a magical girl?</li>
-                                <li>Does your Restrict Power fire spiderwebs or summon ghostly chains?</li>
-                                <li>Your Gift's Description can have a big impact in-game, but it cannot change the Gift's System.</li>
-                            </ul>
-                        </li>
-                    </ol>
+                    Gifts unlock a Contractor's latent supernatural potential.
                 </li>
-                <li>Certain Effects, Enhancements, and Parameter levels are restricted to Seasoned or Veteran Contractors. </li>
+                <li>
+                    Player's create custom Gifts for their Contractors using The Contract's unique
+                     <a href="{% url 'powers:powers_create' %}"> Gift Builder</a>.
+                </li>
+                <li>
+                    Creating custom Gifts allows each Contractor to achieve their own, unique concept.
+                </li>
             </ul>
             <div class="text-center">
-                Still Curious? Try
-                <a href="{% url 'powers:powers_create' %}">
-                    creating a Gift
+                <h4>
+                    Gift Types
+                    <div>
+                        <small>
+                            <i>(Click any Gift Type to learn more)</i>
+                        </small>
+                    </div>
+                </h4>
+                <div class="row">
+                    <div class="col-xs-12 col-lg-6">
+                        <button type="button"  class="btn btn-default" style="width:100%" data-toggle="modal" data-target="#tutorialModalpower">
+                            <h4 class="css-component-header"  style="margin-top: 5px; margin-bottom: 5px;">
+                                {{ mod_power.name}}
+                            </h4>
+                            <img src="{{mod_power.icon.url}}" width="75" height="75"/>
+                            <h5 style="margin-top: 0px; margin-bottom: 5px;">
+                                {{ mod_power.summary }}
+                            </h5>
+                            <div class="text-muted">
+                                <small>
+                                    {{ mod_power.description }}
+                                </small>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="col-xs-12 col-lg-6">
+                        <button type="button"  class="btn btn-default" style="width:100%" data-toggle="modal" data-target="#tutorialModalsignature-item-mod">
+                            <h4 class="css-component-header"  style="margin-top: 5px; margin-bottom: 5px;">
+                                {{ mod_sig_item.name}}
+                            </h4>
+                            <img src="{{mod_sig_item.icon.url}}" width="75" height="75"/>
+                            <h5 style="margin-top: 0px; margin-bottom: 5px;">
+                                {{ mod_sig_item.summary }}
+                            </h5>
+                            <div class="text-muted">
+                                <small>
+                                    {{ mod_sig_item.description }}
+                                </small>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+                <div class="hidden-xs" style="margin-top: 5px;"></div>
+                <div class="row">
+                    <div class="col-xs-12 col-lg-6">
+                        <button type="button"  class="btn btn-default" style="width:100%" data-toggle="modal" data-target="#tutorialModalcraftable-consumable">
+                            <h4 class="css-component-header"  style="margin-top: 5px; margin-bottom: 5px;">
+                                {{ mod_consumable.name}}
+                            </h4>
+                            <img src="{{mod_consumable.icon.url}}" width="75" height="75"/>
+                            <h5 style="margin-top: 0px; margin-bottom: 5px;">
+                                {{ mod_consumable.summary }}
+                            </h5>
+                            <div class="text-muted">
+                                <small>
+                                    {{ mod_consumable.description }}
+                                </small>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="col-xs-12 col-lg-6">
+                        <button type="button"  class="btn btn-default" style="width:100%" data-toggle="modal" data-target="#tutorialModalcraftable-artifact">
+                            <h4 class="css-component-header"  style="margin-top: 5px; margin-bottom: 5px;">
+                                {{ mod_artifacts.name}}
+                            </h4>
+                            <img src="{{mod_artifacts.icon.url}}" width="75" height="75"/>
+                            <h5 style="margin-top: 0px; margin-bottom: 5px;">
+                                {{ mod_artifacts.summary }}
+                            </h5>
+                            <div class="text-muted">
+                                <small>
+                                    {{ mod_artifacts.description }}
+                                </small>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center" style="margin-top: 15px;">
+                Still Curious?
+
+            </div>
+            <div class="text-center">
+                <a class="btn btn-primary" href="{% url 'powers:powers_create' %}">
+                    Create a Gift
                 </a>
                 or check out the
-                <a href="{% url 'powers:powers_stock' %}">
-                    premade Stock Powers.
+                <a class="btn btn-default" href="{% url 'powers:powers_stock' %}">
+                    Stock Gifts.
                 </a>
             </div>
         </div>

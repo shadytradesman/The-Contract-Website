@@ -2,10 +2,12 @@ from django.shortcuts import render
 from .terms import EULA, TERMS, PRIVACY
 from django.shortcuts import get_object_or_404
 from heapq import merge
+from django.templatetags.static import static
 from info.models import FrontPageInfo, QuickStartInfo, ExampleAction
 from profiles.models import Profile
 from characters.models import CharacterTutorial, Ability, Character
 from characters.forms import InjuryForm
+from powers.models import Base_Power
 from info.models import FrontPageInfo
 from profiles.models import Profile
 from characters.models import CharacterTutorial, Ability, Character
@@ -109,5 +111,13 @@ def how_to_play(request):
         "first_action": first_action.json_serialize(),
         "tutorial": character_tutorial,
         "expand_step": expand_step,
+        'powers_modal_art_url': static('overrides/art/front-bamboo.jpg'),
+        'sig_item_modal_art_url': static('overrides/art/lady_lake_sm.jpg'),
+        'art_craft_modal_art_url': static('overrides/art/front-music.jpg'),
+        'consumable_craft_modal_art_url': static('overrides/art/ocean-lg-modal.jpg'),
+        'mod_power': get_object_or_404(Base_Power, slug='power'),
+        'mod_sig_item': get_object_or_404(Base_Power, slug='signature-item-mod'),
+        'mod_consumable': get_object_or_404(Base_Power, slug='craftable-consumable'),
+        'mod_artifacts': get_object_or_404(Base_Power, slug='craftable-artifact'),
     }
     return render(request, 'info/new_player_guide/quickstart.html', context)
