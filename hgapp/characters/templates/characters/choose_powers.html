@@ -2,7 +2,7 @@
 
 {% load i18n %}
 
-{% block head_title %}Viewing Character{% endblock %}
+{% block head_title %}Assigning Gifts{% endblock %}
 
 {% block body_class %}home{% endblock %}
 
@@ -24,12 +24,12 @@
                 <div class="row">
                     <div class="col-md-8 col-md-offset-2 alert alert-warning text-center" role="alert">
                         <p>
-                            {{ character.name}} does not have any unspent Gifts or Improvements.
+                            {{ character.name}} does not have any unspent Gift Credits or Improvements.
                             <br>
-                            You may still assign Powers to them, but it will put them in bad standing.
+                            You may still assign Gifts to them, but it will put them in bad standing.
                             {% if character.num_spent_rewards > 0 %}
                                 <br>
-                                Unassigning Powers will refund any Gifts and Improvements spent on that Power.
+                                Unassigning Gifts will refund any Gift Credits and Improvements spent on that Gift.
                             {% endif %}
                         </p>
                     </div>
@@ -38,11 +38,11 @@
                  <div class="row">
                     <div class="col-md-8 col-md-offset-2 alert alert-success text-center" role="alert">
                        <h4>
-                           {{ character.name}} has <b>{{character.num_unspent_gifts}}</b> Gift{{character.num_unspent_gifts|pluralize}}
+                           {{ character.name}} has <b>{{character.num_unspent_gifts}}</b> Gift Credit{{character.num_unspent_gifts|pluralize}}
                            {% if character.unspent_improvements|length > 0 %}
                                 and <b>{{character.unspent_improvements|length}}</b> Improvements
                            {% endif %}
-                           unassigned and ready to spend.
+                           ready to spend.
                        </h4>
                     </div>
                 </div>
@@ -51,10 +51,10 @@
                 <div class="row">
                     <div class="col-md-8 col-md-offset-2 alert alert-danger text-center" role="alert">
                         <p>
-                            Character's total Power cost does not match their number of spent Gifts and Improvements!
+                            Character's total Gift Cost does not match their spent Rewards!
                             <br>
-                            <b>Power Value: </b>{{character.get_power_cost_total}}
-                            <b>Spent Gifts and Improvements: </b> {{character.num_active_spent_rewards }}
+                            <b>Gift Value: </b>{{character.get_power_cost_total}}
+                            <b>Spent Rewards: </b> {{character.num_active_spent_rewards }}
                         </p>
                     </div>
                 </div>
@@ -68,7 +68,7 @@
                     {% for item in assigned_items %}
                         <div class="row">
                             <div class="col-xs-8 col-sm-9" >
-                                <div class="css-signature-item">
+                                <div class="css-signature-item" style="padding:10px;">
                                     <h4 style="margin-top: 0px;">
                                         <a href="{% url 'characters:characters_artifact_view' item.id %}">
                                             {{item.name}}
@@ -109,7 +109,7 @@
                             </a>
                         </div>
                         <div class="col-xs-8 col-sm-9 col-md-9 col-lg-9">
-                            <div class="css-signature-item">
+                            <div class="css-signature-item" style="padding:10px;">
                                 <h4 style="margin-top: 0px;">
                                     {{item.name}}
                                 </h4>
@@ -127,16 +127,14 @@
             <div class="double-columns">
                 <div>
                     <h3 class="text-center">
-                        {{character.name}}'s Powers
+                        {{character.name}}'s Gifts
                         <small>Total cost: {{character.get_power_cost_total}}</small>
                     </h3>
                     {% for power in assigned_powers %}
                     <div class="row">
                         <div class="col-xs-8 col-sm-9">
                             <a href="{% url 'powers:powers_view_power_full' power.id %}">
-                                <div class="thumbnail">
-                                    <b>{{ power.name }} - </b> {{power.get_gift_cost}} Gift {{power.base.name}} Power
-                                </div>
+                                {% power_heading power.latest_rev %}
                             </a>
                         </div>
                         <div class="col-xs-4 col-sm-3 col-md-2 col-lg-2">
@@ -150,7 +148,7 @@
                     {% endfor %}
                 </div>
                 <div>
-                    <h3 class="text-center">Available Powers</h3>
+                    <h3 class="text-center">Available Gifts</h3>
                     {% for power in unassigned_powers %}
                         <div class="row">
                                 <div class="hidden-xs hidden-sm col-xs-2 col-sm-3 col-md-2 col-lg-2">
@@ -162,9 +160,7 @@
                                 </div>
                                 <div class="col-xs-8 col-sm-9 col-md-9 col-lg-9">
                                     <a href="{% url 'powers:powers_view_power_full' power.id %}">
-                                    <div class="thumbnail">
-                                        <b>{{ power.name }} - </b> {{power.get_gift_cost}} Gift {{power.base.name}}  Power <br>
-                                    </div>
+                                        {% power_heading power.latest_rev %}
                                     </a>
                                 </div>
                                 <div class="col-xs-4 col-sm-3 col-md-3 col-lg-3">
