@@ -153,22 +153,20 @@ def view_scenario(request, scenario_id, game_id=None):
     else:
         viewer_can_edit = request.user.is_superuser \
                           or (request.user.is_authenticated and request.user.id == scenario.creator.id)
-        game_feedback = None
-        games_run = Game.objects.filter(gm_id=request.user.id, scenario_id=scenario.id).order_by("end_time").all()
-        games_run = [x for x in games_run if not x.is_scheduled() and not x.is_active()]
-        games_run_no_feedback = Game.objects.filter(gm_id=request.user.id, scenario_id=scenario.id, scenario_notes=None).all()
-        games_run_no_feedback = [x for x in games_run_no_feedback if not x.is_scheduled() and not x.is_active()]
-        if games_run_no_feedback:
-            game_feedback = GameFeedbackForm()
+        games_run_by_viewer = Game.objects.filter(gm_id=request.user.id, scenario_id=scenario.id).order_by("end_time").all()
+        games_run_by_viewer = [x for x in games_run_by_viewer if not x.is_scheduled() and not x.is_active()]
+        game_feedback_form = GameFeedbackForm()
+        games_run_by_others = Game.objects.exclude(gm_id=request.user.id).filter(scenario_id=scenario.id).order_by("end_time").all()
+        games_run_by_others = [x for x in games_run_by_others if not x.is_scheduled() and not x.is_active()]
         is_public = scenario.is_public()
         context = {
             'show_spoiler_warning': show_spoiler_warning,
             'scenario': scenario,
             'is_public': is_public,
             'viewer_can_edit': viewer_can_edit,
-            'games_run': games_run,
-            'games_run_no_feedback': games_run_no_feedback,
-            'game_feedback_form': game_feedback,
+            'games_run_by_viewer': games_run_by_viewer,
+            'games_run_by_others': games_run_by_others,
+            'game_feedback_form': game_feedback_form,
         }
         return render(request, 'games/view_scenario.html', context)
 

@@ -1,0 +1,20 @@
+<div style="margin-top: 10px;">
+    <ul class="nav nav-pills nav-justified navbar-default">
+        {% if viewer_can_edit %}
+            <li>
+                <a class="btn-primary" href="{% url 'games:games_scenario_edit' scenario.id %}">Edit Scenario</a>
+            </li>
+        {% endif %}
+        <li>
+            <a href="{% url 'games:games_view_scenario_gallery' %}">My Scenario Gallery</a>
+        </li>
+        <li>
+            <a href="{% url 'games:games_create_scenario' %}">Create New Scenario</a>
+        </li>
+        <li>
+            <a href="{% url 'games:games_create_game' %}">Enter Contract</a>
+        </li>
+    </ul>
+
+</div>
+

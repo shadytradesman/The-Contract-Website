@@ -1,0 +1,106 @@
+{% load bootstrap %}
+{% load account_tags %}
+
+<div>
+    <h3>
+        You have run this Scenario {{games_run_by_viewer|length}} time{{games_run_by_viewer|pluralize}}.
+    </h3>
+    <ul>
+        {% for game in games_run_by_viewer %}
+            <li>
+                <h4>
+                <a href="{% url 'games:games_view_game' game.id %}">
+                        {% if game.end_time %}
+                            Finished {{ game.end_time }}
+                        {% elif game.actual_start_time %}
+                            Started {{game.actual_start_time}} but never finished
+                        {% else %}
+                            Never finished
+                        {% endif %}
+                </a>
+                {% if game.cell %}
+                    in <a href="{% url 'cells:cells_view_cell' game.cell.id %}">{{ game.cell.name }}</a>
+                {% endif %}
+                </h4>
+                {% if game.get_journaled_attendances %}
+                <div>
+                    <b>Journals Written:</b>
+                </div>
+                {% endif %}
+                <ul>
+                    {% for attendance in game.get_journaled_attendances %}
+                    <li>
+                        <a href="{% url 'journals:journal_read_game' attendance.attending_character.id game.id %}"
+                           class="">
+                            {{attendance.attending_character.name}}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% if not game.scenario_notes %}
+                    <div>
+                        <form action="{% url 'games:games_view_scenario_feedback' scenario.id game.id %}" method="post">
+                            <div class="alert alert-info" >
+                                <h4>
+                                    Leave Feedback
+                                </h4>
+                                {{ game_feedback_form.non_field_errors }}
+                                {{ game_feedback_form.management_form }}
+                                {% csrf_token %}
+                                {% if game_feedback_form %}
+                                {{ game_feedback_form | bootstrap }}
+                                {% endif %}
+                                <input class="btn btn-primary" type="submit" value="Submit" />
+                            </div>
+                        </form>
+                    </div>
+                {% elif game.scenario_notes %}
+                    <div class="thumbnail">
+                        {{game.scenario_notes|linebreaks}}
+                    </div>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+{% if games_run_by_others %}
+<h3>Contracts run by other Players:</h3>
+<ul>
+    {% for game in games_run_by_others %}
+        <li>
+            <h4>
+                <a href="{% url 'profiles:profiles_view_profile' game.gm.id %}">{% user_display game.gm %}</a>
+                {% if game.cell %}
+                    ran it for
+                    <a href="{% url 'cells:cells_view_cell' game.cell.id %}">
+                        {{game.cell}}
+                    </a>
+                {% endif %}
+                on
+                <a href="{% url 'games:games_view_game' game.id %}">
+                    {{game.end_time}}
+                </a>
+            </h4>
+            {% if game.scenario_notes %}
+                <b>GM's notes:</b>
+                <div class="thumbnail">
+                    {{game.scenario_notes|linebreaks}}
+                </div>
+            {% endif %}
+            {% if game.get_journaled_attendances %}
+            <b>Journals Written:</b>
+            {% endif %}
+            <ul>
+                {% for attendance in game.get_journaled_attendances %}
+                <li>
+                    <a href="{% url 'journals:journal_read_game' attendance.attending_character.id game.id %}"
+                       class="">
+                        {{attendance.attending_character.name}}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </li>
+    {% endfor %}
+</ul>
+{% endif %}
