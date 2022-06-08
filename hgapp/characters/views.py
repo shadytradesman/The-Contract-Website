@@ -590,6 +590,7 @@ class CraftingTimelineBlock:
     total_exp_spent = None
     total_crafted_consumables = None
     power_quantity = None
+    scenario_name = None
 
     def __init__(self, crafting_events):
         self.crafting_events = crafting_events
@@ -600,6 +601,10 @@ class CraftingTimelineBlock:
         self.powers_by_artifact = defaultdict(list)
         self.total_art_effects_crafted = 0
         self.total_art_effects_free = 0
+        if len(crafting_events) > 0:
+            event = crafting_events[0]
+            if event.relevant_attendance is not None:
+                self.scenario_name = event.relevant_attendance.relevant_game.scenario.title
         for event in crafting_events:
             if event.relevant_power.modality.crafting_type == CRAFTING_CONSUMABLE:
                 self.total_exp_spent_consumables += event.total_exp_spent
@@ -637,9 +642,9 @@ def character_timeline(request, character_id):
         current_crafting_list = []
         last_attendance_examined = craftings[0].relevant_attendance
         if last_attendance_examined is not None:
-            craft_time = last_attendance_examined.relevant_game.end_time + timedelta(seconds=6)
+            craft_time = last_attendance_examined.relevant_game.end_time + timedelta(seconds=9)
         else:
-            craft_time = character.pub_date + timedelta(seconds=6)
+            craft_time = character.pub_date + timedelta(seconds=9)
         for crafting in craftings:
             if last_attendance_examined != crafting.relevant_attendance:
                 crafting_tuples.append(
@@ -649,6 +654,7 @@ def character_timeline(request, character_id):
                 )
                 current_crafting_list = []
                 last_attendance_examined = crafting.relevant_attendance
+                craft_time = last_attendance_examined.relevant_game.end_time + timedelta(seconds=9)
             current_crafting_list.append(crafting)
         crafting_tuples.append(
             (
@@ -666,9 +672,9 @@ def character_timeline(request, character_id):
         if event[1] == "edit":
             phrases = event[2].get_change_phrases()
             if len(phrases):
-                timeline[event[0].strftime("%d %b %Y")].append((event[1], phrases))
+                timeline[event[0].strftime("%d %b %Y")].append((event[1], phrases, event[0].strftime("%d %b %H:%M")))
         else:
-            timeline[event[0].strftime("%d %b %Y")].append((event[1], event[2]))
+            timeline[event[0].strftime("%d %b %Y")].append((event[1], event[2], event[0].strftime("%d %b %H:%M")))
     context = {
         'timeline': dict(timeline),
     }

@@ -4,6 +4,7 @@
   <h4>{{ date }}</h4>
   <ul>
     {% for event in event_list %}
+      {{ event.2 }}
       {% if event.0 == "game"%}
         {% with event.1 as attendance %}
           {% include "games/game_attendance_badge_snippet.html" %}
@@ -21,6 +22,9 @@
         </li>
       {% elif event.0 == "crafting" %}
         <li class="css-timeline-item css-timeline-crafting">
+          {% if event.1.scenario_name %}
+            <p>Crafting for <b>{{event.1.scenario_name}}</b></p>
+          {% endif %}
           {% if event.1.total_crafted_consumables %}
             Crafted <b>{{event.1.total_crafted_consumables}}</b> consumable{{event.1.total_crafted_consumables|pluralize}} for <b>{{event.1.total_exp_spent_consumables}}</b> Experience
             {% if event.1.power_quantity %}
