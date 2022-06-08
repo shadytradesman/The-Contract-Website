@@ -29,7 +29,9 @@
             </small>
         </a>
     </h4>
-    <p>{{attendance.notes}}</p>
+    {% if attendance.notes %}
+        <p>{{attendance.notes}}</p>
+    {% endif %}
     {% if attendance.associated_character_reward %}
         <h5>
             {% if attendance.associated_character_reward.relevant_power %}

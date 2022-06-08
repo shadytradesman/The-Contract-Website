@@ -431,13 +431,15 @@ class GameModelTests(TestCase):
         self.assertEquals(self.char_user2_nocell.exp_earned(), EXP_NEW_CHAR)
         self.assertEquals(self.user2.game_invite_set.filter(attendance__is_confirmed=False).exclude(is_declined=True).all().count(), 1)
         attendance.confirm_and_reward()
+        game.update_profile_stats()
+        self.char_user2_nocell.refresh_from_db()
+        self.assertEquals(self.user2.game_invite_set.filter(attendance__is_confirmed=False).exclude(is_declined=True).all().count(), 0)
         self.assertEquals(self.char_user2_nocell.num_unspent_rewards(), 1)
         self.assertEquals(self.char_user2_nocell.num_unspent_gifts(), 1)
         self.assertEquals(self.char_user2_nocell.completed_games().count(), 1)
         self.assertEquals(self.char_user2_nocell.number_of_victories(), 1)
         self.assertEquals(self.char_user2_nocell.number_of_losses(), 0)
         self.assertEquals(self.char_user2_nocell.exp_earned(), EXP_NEW_CHAR + EXP_WIN)
-        self.assertEquals(self.user2.game_invite_set.filter(attendance__is_confirmed=False).exclude(is_declined=True).all().count(), 0)
 
     def test_cannot_double_invite(self):
         game = Game(

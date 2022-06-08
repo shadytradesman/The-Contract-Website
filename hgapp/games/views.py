@@ -627,6 +627,8 @@ def end_game(request, game_id):
                 game = Game.objects.select_for_update().get(pk=game.pk)
                 for form in declare_outcome_formset:
                     attendance = get_object_or_404(Game_Attendance, id=form.cleaned_data['hidden_attendance'].id)
+                    if attendance.relevant_game_id != game.pk:
+                        raise ValueError("Attendance edited for wrong game!")
                     attendance.outcome = form.cleaned_data['outcome']
                     attendance.is_mvp = form.cleaned_data['MVP']
                     if form.cleaned_data['notes']:

@@ -201,12 +201,12 @@ class Game(models.Model):
 
     def get_header_display(self):
         if self.is_scheduled():
-            return "Upcoming Game"
+            return "Upcoming Contract"
         if self.is_active():
-            return "Ongoing Game"
+            return "Ongoing Contract"
         if self.is_canceled():
-            return "Canceled Game"
-        return "Completed Game"
+            return "Canceled Contract"
+        return "Completed Contract"
 
     def is_scheduled(self):
         return self.status == GAME_STATUS[0][0]
@@ -408,6 +408,7 @@ class Game(models.Model):
         for invite in self.invitations.all():
             invite.profile.recompute_titles()
         for character in self.attended_by.all():
+            character.refresh_from_db()
             character.update_contractor_game_stats()
 
     def update_profile_stats(self):
@@ -515,10 +516,8 @@ class Game_Attendance(models.Model):
             return None
 
     def confirm_and_reward(self):
-        self.is_confirmed=True
+        self.is_confirmed = True
         self.save()
-        if self.attending_character:
-            self.attending_character.update_contractor_game_stats()
         self.give_reward()
 
     def get_reward(self):
