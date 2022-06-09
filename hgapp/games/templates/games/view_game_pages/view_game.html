@@ -37,18 +37,24 @@
                         is
                     {% endif %}
                     currently running
-                {% elif game.canceled %}
-                    was going to run
+                {% elif game.is_canceled %}
+                    {% if request.user == game.gm %}
+                        were
+                    {% else %}
+                        was
+                    {% endif %}
+                    going to run
                 {% else %}
                     ran
                 {% endif %}
                 {% render_scenario_title_check_for_link game.scenario %}
                 {% if scenario_spoiled %}
                     {% if game.scenario.summary %}
-                        <br>
-                        <small>
-                            {{game.scenario.summary}}
-                        </small>
+                        <div style="padding-left: 10px; padding-right: 10px;">
+                            <small>
+                                {{game.scenario.summary}}
+                            </small>
+                        </div>
                     {% endif %}
                 {% endif %}
             </h3>
