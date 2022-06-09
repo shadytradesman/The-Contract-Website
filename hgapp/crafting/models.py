@@ -44,6 +44,12 @@ class CraftingEvent(models.Model):
             models.Index(fields=['relevant_character']),
         ]
 
+    def __str__(self):
+        return "{} crafted [{}] after {}".format(
+            self.relevant_character.name,
+            self.relevant_power_full.name,
+            self.relevant_attendance.relevant_game.scenario.title if self.relevant_attendance else "character creation")
+
     def get_exp_cost_per_consumable(self):
         return 2
 
@@ -223,6 +229,13 @@ class CraftedArtifact(models.Model):
             models.Index(fields=['quantity_free']),
             models.Index(fields=['is_refundable']),
         ]
+
+    def __str__(self):
+        return "{} crafted [{}] onto {} (after {})".format(
+            self.relevant_crafting.relevant_character.name,
+            self.relevant_crafting.relevant_power_full.name,
+            self.relevant_artifact.name,
+            self.relevant_crafting.relevant_attendance.relevant_game.scenario.title if self.relevant_crafting.relevant_attendance else "character creation")
 
     def save(self, *args, **kwargs):
         if self.quantity_free > self.quantity:
