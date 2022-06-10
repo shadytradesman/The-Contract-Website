@@ -115,6 +115,10 @@ def save_gift(request, power_full=None, character=None):
         if character:
             character.reset_attribute_bonuses()
             refund_or_assign_rewards(new_power, old_power=previous_rev)
+            if power_full.crafting_type in [CRAFTING_CONSUMABLE, CRAFTING_ARTIFACT]:
+                power_full.character.highlight_crafting = True
+                power_full.character.crafting_avail = True
+                power_full.character.save()
             if previous_rev:
                 _handle_crafting(previous_rev, new_power, power_full)
         return new_power
@@ -176,10 +180,6 @@ def _create_new_power_and_save(power_form, request, SigArtifactForm):
 
 
 def _handle_crafting(old_power, new_power, power_full):
-    if power_full.crafting_type in [CRAFTING_CONSUMABLE, CRAFTING_ARTIFACT]:
-        power_full.character.highlight_crafting = True
-        power_full.character.crafting_avail = True
-        power_full.character.save()
     if new_power.creation_reason in CREATION_ADJUSTMENT:
         gift_adjustment.send(sender=Power.__class__, old_power=old_power, new_power=new_power, power_full=power_full)
     if new_power.creation_reason in [CREATION_REVISION, CREATION_IMPROVEMENT]:
