@@ -1,3 +1,7 @@
+.css-section-body p, .css-section-body li, .css-section-body td {
+    font-family: Georgia, Times, serif;
+}
+
 .css-guide-section {
     display: block;
     position: relative;
@@ -45,15 +49,72 @@ body {position:relative;}
 .css-section-body {
     background-color: #353e4b !important;
     padding: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
     border-radius: 4px;
 }
 
-.css-section-body p, .css-section-body li, .css-section-body td, .css-section-body .col-md-6, .css-section-body .col-sm-6 {
-    /*font-family: "Georgia", Times, serif;*/
+.css-section-body>p, .css-section-body>h3, .css-section-body>h4, .css-section-body>h5{
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-.css-section-body td {
-    padding: 3px;
+@media (max-width: 768px) {
+    .css-section-body {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+}
+
+.css-section-body .col-xs-12 {
+    overflow: scroll;
+}
+
+.css-section-body td, .css-section-body th {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+.css-section-backdrop hr {
+    margin-bottom: 0px;
+    margin-top: 15px;
+    padding-top: 20px;
+}
+
+.css-section-heading-1 {
+    padding-top: 15px;
+    margin-top: 15px;
+}
+
+.css-section-heading-1 h1 {
+    margin-top: 0px;
+}
+
+.css-section-heading-2 {
+    background-color: #28313f;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-radius: 4px;
+}
+.css-section-heading-2 h2 {
+    margin-top: 0px;
+}
+
+.css-section-heading-3 {
+    background-color: #303a48;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+.css-section-heading-3 h3 {
+    margin-top: 0px;
+}
+
+.css-section-heading-4 {
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
 
 .css-section-backdrop {
@@ -65,6 +126,7 @@ body {position:relative;}
 }
 
 .css-guide-content {
+    padding-top: 0px;
     z-index: 4;
     position: relative;
 }

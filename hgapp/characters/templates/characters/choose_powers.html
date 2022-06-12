@@ -120,6 +120,13 @@
                                 {% endfor %}
                             </div>
                         </div>
+                        <div class="hidden-md hidden-lg col-xs-2 col-sm-3 col-md-2 col-lg-2">
+                            <a href="{% url 'characters:characters_item_toggle' character.id item.id %}">
+                                <div class="btn-default btn">
+                                    Assign
+                                </div>
+                            </a>
+                        </div>
                     {% endfor %}
                 </div>
             </div>

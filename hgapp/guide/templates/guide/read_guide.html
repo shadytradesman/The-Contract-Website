@@ -35,21 +35,23 @@
             </div>
         </div>
         <div class="col-sm-8 col-md-9 css-guidebook-col">
-            <h1 class="text-center">
+            <h1 class="text-center" style="font-size: 42px;">
                 {{guidebook.title}}
             </h1>
             <div class="panel panel-default" style="margin-right: 10px; margin-left: 10px; z-index: 4;">
                 <div class="panel-body css-guide-content">
                     {% for section in sections %}
                         <div class="{% if section.is_hidden %} css-hidden-section {% endif %}">
-                            {% if section.header_level > 2 %}
+                            {% if section.header_level > 1 %}
                                 <div class="css-section-backdrop">
                             {% endif %}
                             <div id="{{section.slug}}" class="css-guide-section"></div>
                             <div class="text-center">
+                                <div class="css-section-heading-{{section.header_level}}">
                                 <h{{section.header_level}}>
                                     {{section.title}}
                                 </h{{section.header_level}}>
+
                                 {% if can_edit %}
                                     {% if section.is_hidden %}
                                         <div class="css-hidden-section-warning">
@@ -76,14 +78,17 @@
                                         <i class="fa fa-link"></i> link to this section
                                     </a>
                                 </div>
-                                {% if section.header_level < 2 %}
-                                    <hr>
+                                </div>
+                                {% if section.header_level == 1 %}
+                                <hr>
                                 {% endif %}
                             </div>
+                            {% if section.rendered_content %}
                             <div class="css-section-body">
                                 {{section.rendered_content|safe}}
                             </div>
-                            {% if section.header_level > 2 %}
+                            {% endif %}
+                            {% if section.header_level > 1 %}
                                 </div>
                             {% endif %}
                         </div>

@@ -806,16 +806,48 @@ class Character(models.Model):
             self.regen_stats_snapshot()
 
     def archive_txt(self):
-        output = "{}\nPlayed by: {}\nArchived on {}\n{} with {} wins and {} losses\n"
-        output = output.format(self.name,
-                               self.player.username if hasattr(self, "player") and self.player else "Anonymous User",
-                               datetime.today(),
-                               self.get_contractor_status_display(),
-                               self.number_of_victories(),
-                               self.number_of_losses())
-        output = output + "Age: {}\nSex: {}\nAppearance: {}\nConcept: {}\nAmbition: {}\n"
-        output = output.format(self.age, self.sex, self.appearance, self.concept_summary, self.ambition)
-        output = output + "\n=======\nPowers:\n=======\n"
+        header_format = """
+        # {}
+        Played by: {}
+        Archived on: {}
+        {} with {} victories and {} losses
+        
+        **{} is a {} who will risk {} life to {}.**
+        {} is {} years old, and often appears as {}.
+        {} 
+        """
+        if self.cell:
+            location_blurb = "{} lives in {}, a setting {}.".format(self.name, self.cell.name, self.cell.setting_sheet_blurb)
+        else:
+            location_blurb = ""
+
+        formatted_header = header_format.format(
+            self.name,
+            self.player.username if self.player else "an anonymous user",
+            datetime.today(),
+            self.get_contractor_status_display(),
+            self.number_of_victories(),
+            self.number_of_losses(),
+            self.name,
+            self.concept_summary,
+            self.get_pronoun_display(),
+            self.ambition,
+            self.pres_tense_to_be(),
+            self.age,
+            self.appearance,
+            location_blurb
+        )
+
+        output = """
+        {}
+        
+        # Gifts
+        """
+
+        return output.format(formatted_header)
+
+
+
         for power_full in self.power_full_set.all():
             output = output +"{}\n"
             output = output.format(power_full.latest_archive_txt())

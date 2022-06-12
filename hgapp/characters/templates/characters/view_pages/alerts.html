@@ -52,7 +52,7 @@
             <a href="{% url 'account_login' %}" class="btn btn-primary">Log in</a> and visit this page to claim {{character.name}}
             and start Playing.
             <br>
-            Until you do, anyone with the Edit URL will be able to edit this Contractor or claim it as their own.
+            Until you do, anyone with the Edit URL will be able to edit this Contractor or claim them as their own.
         </p>
         <br>
     </div>
@@ -64,7 +64,7 @@
         {% csrf_token %}
         <div class="col-md-8 col-md-offset-2 alert alert-success text-center css-char-alert" role="alert">
             <button type="submit" class="btn btn-success">
-                <h3>Claim This Character</h3>
+                <h3>Claim This Contractor</h3>
             </button>
         </div>
     </form>

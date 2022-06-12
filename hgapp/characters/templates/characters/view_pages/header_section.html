@@ -19,12 +19,12 @@
                     Delete Contractor
                 </a></li>
             {% endif %}
+            <li><a href="{% url 'characters:characters_archive' character.id %}" class="btn btn-default">
+                Download
+            </a></li>
             {% if character.player %}
                 <li><a href="{% url 'characters:characters_power_picker' character.id %}" class="btn btn-default">
                     Assign Gifts
-                </a></li>
-                <li><a href="{% url 'characters:characters_archive' character.id %}" class="btn btn-default">
-                    Archive
                 </a></li>
                 {% if character.is_dead %}
                     <li><a href="{%url 'characters:characters_obituary' character.id %}" class="btn btn-default">

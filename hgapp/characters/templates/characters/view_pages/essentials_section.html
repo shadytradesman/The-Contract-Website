@@ -11,7 +11,7 @@
         <p style="margin-bottom: 5px;">
             {{character.name}} lives in
             <a href="{% url 'cells:cells_view_cell' character.cell.id %}">{{ character.cell.setting_name }}</a>,
-            a world {{ character.cell.setting_sheet_blurb}}.
+            a setting {{ character.cell.setting_sheet_blurb}}.
         </p>
     {% endif %}
     {% if num_journal_entries %}
