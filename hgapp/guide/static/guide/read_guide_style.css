@@ -7,8 +7,31 @@
 }
 
 .css-guide-image {
-    width:100%;
-    margin-left: -30px;
+    max-height: 100%;
+    max-width: 100%;
+    flex: 1;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: top, center;
+}
+
+@media (max-width: 991px) {
+    .css-guide-image {
+        min-height: 300px;
+    }
+}
+
+@media (min-width: 991px) {
+    .css-section-body>.css-guide-image {
+        min-height: 500px;
+    }
+}
+
+.css-guide-image-caption {
+    text-align: center;
+    font-style: italic;
+    font-size: 12px;
+    padding-top: 5px;
 }
 
 .css-guide-section {
@@ -63,8 +86,15 @@ body {position:relative;}
     border-radius: 4px;
 }
 
-.css-section-body p+p {
-    text-indent: 30px;
+@media (min-width: 991px) {
+    .css-section-body p+p {
+        text-indent: 30px;
+    }
+
+    .css-section-body p+p .css-guide-image {
+        /* images shouldn't be indented */
+        margin-left: -30px;
+    }
 }
 
 .css-section-body>p, .css-section-body>h3, .css-section-body>h4, .css-section-body>h5{
@@ -82,6 +112,16 @@ body {position:relative;}
 
 .css-section-body .col-xs-12 {
     overflow: scroll;
+    display: flex;
+    align-content: flex-start;
+    align-items: stretch;
+    flex-flow: column;
+}
+
+.css-section-body .row {
+    display: flex;
+  display: -webkit-flex;
+  flex-wrap: wrap;
 }
 
 .css-section-body td, .css-section-body th {

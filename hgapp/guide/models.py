@@ -76,7 +76,10 @@ class GuideSection(models.Model):
         return "{}#{}".format(guidebook_url, self.slug)
 
     def __render_images(self, content):
-        return re.sub(r"\{!image ([\w./-]+)!\}", lambda x: '<img class="css-guide-image" src="{}">'.format(static(x.group(1))), content)
+        return re.sub(r"(<p>[\s]*)?\{![\s]*image ([\w./-]+)[\s]*!\}([\s]*</p>)?",
+                      lambda x: '<div class="css-guide-image" style="background-image: url(\'{}\');"></div>'.format(
+                          static(x.group(2))),
+                      content)
 
     # {{article-slug|link-text}} to link to that article
     def __render_section_links(self, content):
@@ -87,16 +90,16 @@ class GuideSection(models.Model):
         col1_start = '<div class="row"><div class="col-md-6 col-xs-12">'
         col2_start = '</div><div class="col-md-6 col-xs-12">'
         col_end = '</div></div>'
-        rendered_content = re.sub(r"\{!col1!\}", col1_start, content)
-        rendered_content = re.sub(r"\{!col2!\}", col2_start, rendered_content)
-        rendered_content = re.sub(r"\{!colend!\}", col_end, rendered_content)
+        rendered_content = re.sub(r"(<p>[\s]*)?\{!col1!\}([\s]*</p>)?", col1_start, content)
+        rendered_content = re.sub(r"(<p>[\s]*)?\{!col2!\}([\s]*</p>)?", col2_start, rendered_content)
+        rendered_content = re.sub(r"(<p>[\s]*)?\{!colend!\}([\s]*</p>)?", col_end, rendered_content)
         return rendered_content
 
     def __render_gm_tip(self, content):
         start = '<div class="css-gm-tip"><div class="css-gm-tip-header"><span class="glyphicon glyphicon-star" aria-hidden="true"></span> GM Tip</div><div class="css-gm-tip-content">'
         end = '</div></div>'
-        rendered_content = re.sub(r"\{!start-gm-tip!\}", start, content)
-        rendered_content = re.sub(r"\{!end-gm-tip!\}", end, rendered_content)
+        rendered_content = re.sub(r"(<p>[\s]*)?\{!start-gm-tip!\}([\s]*</p>)?", start, content)
+        rendered_content = re.sub(r"(<p>[\s]*)?\{!end-gm-tip!\}([\s]*</p>)?", end, rendered_content)
         return rendered_content
 
 
