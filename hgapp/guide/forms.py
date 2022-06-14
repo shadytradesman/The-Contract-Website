@@ -13,7 +13,7 @@ GUIDE_SECTION_TINYMCE_SETTINGS = {
     "toolbar": "formatselect fontselect fontsizeselect | "
                "bold italic strikethrough underline removeformat | backcolor forecolor | alignleft aligncenter "
                "| bullist numlist link unlink | table"
-               " | help",
+               " | help ",
     "toolbar_mode": 'wrap',
     'content_css': "/static/css/site.css",
 }
@@ -51,6 +51,7 @@ def make_guide_section_form(previous_section=None, next_section=None):
 
         tags = forms.JSONField(label='tags',
                               required=False,
+                               widget=forms.TextInput,
                               help_text='["tags", "for searching in", "navbar"]')
     return GuideSectionForm
 
