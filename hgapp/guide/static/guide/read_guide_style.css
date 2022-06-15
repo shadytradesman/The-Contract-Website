@@ -9,6 +9,7 @@
 .css-guide-image {
     max-height: 100%;
     max-width: 100%;
+    min-height: 250px;
     flex: 1;
     background-size: contain;
     background-repeat: no-repeat;
@@ -25,13 +26,6 @@
     .css-section-body>.css-guide-image {
         min-height: 500px;
     }
-}
-
-.css-guide-image-caption {
-    text-align: center;
-    font-style: italic;
-    font-size: 12px;
-    padding-top: 5px;
 }
 
 .css-guide-section {
