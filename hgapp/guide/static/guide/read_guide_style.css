@@ -16,6 +16,32 @@
     background-position: top, center;
 }
 
+.css-guide-image-sm {
+    display: inline;
+    float: left;
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: top, center;
+}
+
+.css-guide-image-xs {
+    display: inline-block;
+    float: left;
+    margin-right: 5px;
+    min-width: 25px;
+    min-height: 25px;
+    max-height: 100%;
+    max-width: 100%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: top, center;
+}
+
 @media (max-width: 991px) {
     .css-guide-image {
         min-height: 300px;
@@ -85,13 +111,13 @@ body {position:relative;}
         text-indent: 30px;
     }
 
-    .css-section-body p+p .css-guide-image {
+    .css-section-body p+p .css-guide-image, .css-section-body p+p .css-guide-image-sm {
         /* images shouldn't be indented */
         margin-left: -30px;
     }
 }
 
-.css-section-body>p, .css-section-body>h3, .css-section-body>h4, .css-section-body>h5{
+.css-section-body>p, .css-section-body>h3, .css-section-body>h4, .css-section-body>h5, .css-section-body>ul{
     max-width: 800px;
     margin-left: auto;
     margin-right: auto;

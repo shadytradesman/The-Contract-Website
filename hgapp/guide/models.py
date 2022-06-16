@@ -77,9 +77,10 @@ class GuideSection(models.Model):
         return "{}#{}".format(guidebook_url, self.slug)
 
     def __render_images(self, content):
-        return re.sub(r"(<p>[\s]*)?\{![\s]*image ([\w./-]+)[\s]*!\}([\s]*</p>)?",
-                      lambda x: '<div class="css-guide-image" style="background-image: url(\'{}\');"></div>'.format(
-                          get_object_or_404(GuidePic, slug=x.group(2)).picture.url),
+        return re.sub(r"(<p>[\s]*)?\{![\s]*image(-sm)? ([\w./-]+)[\s]*!\}([\s]*</p>)?",
+                      lambda x: '<div class="css-guide-image{}" style="background-image: url(\'{}\');"></div>'.format(
+                          x.group(2) if x.group(2) else "",
+                          get_object_or_404(GuidePic, slug=x.group(3)).picture.url),
                       content)
 
     # {{article-slug|link-text}} to link to that article
@@ -97,7 +98,8 @@ class GuideSection(models.Model):
         return rendered_content
 
     def __render_gm_tip(self, content):
-        start = '<div class="css-gm-tip"><div class="css-gm-tip-header"><span class="glyphicon glyphicon-star" aria-hidden="true"></span> GM Tip</div><div class="css-gm-tip-content">'
+        start = '<div class="css-gm-tip"><div class="css-gm-tip-header"><div class="css-guide-image-xs" style="background-image: url(\'{}\')"></div> GM Tip</div><div class="css-gm-tip-content">'\
+            .format(static("guide/graphics/Silver_D10.png"))
         end = '</div></div>'
         rendered_content = re.sub(r"(<p>[\s]*)?\{!start-gm-tip!\}([\s]*</p>)?", start, content)
         rendered_content = re.sub(r"(<p>[\s]*)?\{!end-gm-tip!\}([\s]*</p>)?", end, rendered_content)
