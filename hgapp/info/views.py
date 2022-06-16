@@ -114,7 +114,7 @@ def how_to_play(request):
         'powers_modal_art_url': static('overrides/art/front-bamboo.jpg'),
         'sig_item_modal_art_url': static('overrides/art/lady_lake_sm.jpg'),
         'art_craft_modal_art_url': static('overrides/art/front-music.jpg'),
-        'consumable_craft_modal_art_url': static('overrides/art/ocean-lg-modal.jpg'),
+        'consumable_craft_modal_art_url': static('overrides/art/sushi.jpg'),
         'mod_power': get_object_or_404(Base_Power, slug='power'),
         'mod_sig_item': get_object_or_404(Base_Power, slug='signature-item-mod'),
         'mod_consumable': get_object_or_404(Base_Power, slug='craftable-consumable'),
