@@ -65,7 +65,7 @@ def get_edit_context(existing_power_full=None, is_edit=False, existing_char=None
         'powers_modal_art_url': static('overrides/art/front-bamboo.jpg'),
         'sig_item_modal_art_url': static('overrides/art/lady_lake_sm.jpg'),
         'art_craft_modal_art_url': static('overrides/art/front-music.jpg'),
-        'consumable_craft_modal_art_url': static('overrides/art/ocean-lg-modal.jpg'),
+        'consumable_craft_modal_art_url': static('overrides/art/sushi.jpg'),
     }
     form_url = reverse("powers:powers_create_ps2")
     if existing_power_full:
