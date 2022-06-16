@@ -2,6 +2,7 @@ from django.db import models
 from django.db.models import Q
 from django.urls import reverse
 from django.conf import settings
+from django.shortcuts import get_object_or_404
 from django.templatetags.static import static
 from django.template import loader
 import re
@@ -78,7 +79,7 @@ class GuideSection(models.Model):
     def __render_images(self, content):
         return re.sub(r"(<p>[\s]*)?\{![\s]*image ([\w./-]+)[\s]*!\}([\s]*</p>)?",
                       lambda x: '<div class="css-guide-image" style="background-image: url(\'{}\');"></div>'.format(
-                          static(x.group(2))),
+                          get_object_or_404(GuidePic, slug=x.group(2)).picture.url),
                       content)
 
     # {{article-slug|link-text}} to link to that article
@@ -105,3 +106,7 @@ class GuideSection(models.Model):
 
     #Render text on save. Replaces
     # {{fancy-section}} with entire section
+
+class GuidePic(models.Model):
+    slug = models.SlugField(primary_key=True)
+    picture = models.ImageField()

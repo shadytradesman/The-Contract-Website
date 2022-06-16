@@ -10,7 +10,7 @@ from django.http import HttpResponseRedirect
 
 from django.db import transaction
 
-from .models import GuideBook, GuideSection
+from .models import GuideBook, GuideSection, GuidePic
 from .forms import make_guide_section_form, DeleteGuideSectionForm
 
 class ReadGuideBook(View):
@@ -94,6 +94,7 @@ class WriteGuideSection(View):
             'previous_section': self.previous_section,
             'current_section': self.current_section,
             'next_section': self.next_section,
+            'pics': GuidePic.objects.order_by("slug").all(),
         }
         return context
 
