@@ -69,6 +69,7 @@ class GuideSection(models.Model):
         rendered_content = self.__render_section_links(str(self.content))
         rendered_content = self.__render_columns(rendered_content)
         rendered_content = self.__render_gm_tip(rendered_content)
+        rendered_content = self.__render_examples(rendered_content)
         rendered_content = self.__render_images(rendered_content)
         return rendered_content
 
@@ -99,11 +100,26 @@ class GuideSection(models.Model):
 
     def __render_gm_tip(self, content):
         start = '<div class="css-gm-tip"><div class="css-gm-tip-header"><div class="css-guide-image-xs" style="background-image: url(\'{}\')"></div> GM Tip</div><div class="css-gm-tip-content">'\
-            .format(static("guide/graphics/Silver_D10.png"))
+            .format(static("guide/graphics/Sky_D10.png"))
         end = '</div></div>'
         rendered_content = re.sub(r"(<p>[\s]*)?\{!start-gm-tip!\}([\s]*</p>)?", start, content)
         rendered_content = re.sub(r"(<p>[\s]*)?\{!end-gm-tip!\}([\s]*</p>)?", end, rendered_content)
         return rendered_content
+
+    def __render_examples(self, content):
+        start = '<div class="css-examples">' \
+                '<a class="wiki-entry-collapsible" role="button">' \
+                '<div class="css-examples-header"><div class="css-guide-image-xs" style="background-image: url(\'{}\')">' \
+                '</div> {} <small style="font-size: 12px; font-weight: 400;">(<span class="visible-xs-inline visible-sm-inline">tap</span><span class="hidden-xs hidden-sm">click</span> to expand)</small></div>' \
+                '</a>' \
+                '<div class="css-examples-content collapse-content"  style="display:none;">' \
+            .format(static("guide/graphics/Pink_D10.png"), r"\2")
+        end = '</div></div>'
+        rendered_content = re.sub(r"(<p>[\s]*)?\{!start-examples\|([\w\s]+)!\}([\s]*</p>)?", start, content)
+        rendered_content = re.sub(r"(<p>[\s]*)?\{!end-examples!\}([\s]*</p>)?", end, rendered_content)
+        return rendered_content
+
+
 
 
     #Render text on save. Replaces

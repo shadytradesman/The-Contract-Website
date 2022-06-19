@@ -6,6 +6,18 @@
     font-family: Helvetica Neue,Helvetica,Arial,sans-serif;
 }
 
+.css-section-body ul {
+    list-style-type: "\25C6";
+}
+
+.css-section-body li {
+    padding-left: 8px;
+}
+
+.css-section-body ul ul {
+    list-style-type: "\25C7";
+}
+
 .css-guide-image {
     max-height: 100%;
     max-width: 100%;
@@ -221,6 +233,9 @@ body {position:relative;}
 
 /* stml stylings */
 .css-gm-tip {
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
     padding-left: 15px;
     padding-right: 15px;
     padding-top: 5px;
@@ -233,11 +248,17 @@ body {position:relative;}
 
 .css-gm-tip-header {
     font-size: 18px;
+    font-weight: 500;
     padding-top: 5px;
+    font-family: Helvetica Neue,Helvetica,Arial,sans-serif;
+}
+.css-gm-tip-header .css-guide-image-xs {
+    margin-right: 10px;
 }
 
 .css-gm-tip-content {
-    padding-left: 20px;
+    padding-left: 35px;
+    padding-top: 5px;
 }
 
 .css-subsection { /* TODO: implement or delete*/
@@ -250,3 +271,32 @@ body {position:relative;}
     border: 1px solid #252e3b;
 }
 
+.css-examples {
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 5px;
+    padding-bottom: 10px;
+    font-style: italic;
+    background-color: #454764 !important;
+    border-radius: 4px;
+    border: 1px solid #252e3b;
+}
+
+.css-examples-header {
+    font-size: 18px;
+    font-weight: 500;
+    padding-top: 5px;
+    font-family: Helvetica Neue,Helvetica,Arial,sans-serif;
+}
+
+.css-examples-header .css-guide-image-xs {
+    margin-right: 10px;
+}
+
+.css-examples-content {
+    padding-left: 35px;
+    padding-top: 5px;
+}
