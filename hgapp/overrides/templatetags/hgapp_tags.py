@@ -1,13 +1,25 @@
 import json
 from collections import defaultdict
 from django.core.cache import cache
-
+from cells.models import WorldEvent
 from django import template
 from django.urls import reverse
 
 from guide.models import GuideBook, GuideSection
 
 register = template.Library()
+
+@register.inclusion_tag('tags/ticker.html')
+def ticker(user=None):
+    if user and hasattr(user, "is_authenticated") and user.is_authenticated:
+        cell_ids = set(user.cell_set.values_list('id', flat=True).all())
+        world_events = WorldEvent.objects\
+                           .filter(parent_cell__id__in=cell_ids)\
+                           .order_by('-created_date')\
+                           .values_list('headline', flat=True)[:5]
+        return {
+            "ticker_items": world_events,
+        }
 
 @register.inclusion_tag('tags/gwynn_art.html')
 def gwynn_jpg(filename, hide_caption=None):

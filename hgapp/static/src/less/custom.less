@@ -832,3 +832,39 @@ ul.dropdown-menu ul {
     position: relative;
     bottom: 6px;
 }
+
+
+.tcontainer {
+    width: 100%;
+    overflow: hidden;
+}
+
+.ticker-wrap {
+    width: 100%;
+    padding-left: 100%;
+    background-color: #373a42;
+}
+
+@keyframes ticker {
+    100% {
+        transform: translate3d(-100%, 0, 0);
+    }
+}
+
+.ticker-move {
+    display: inline-block;
+    white-space: nowrap;
+    padding-right: 100%;
+    animation-timing-function: linear;
+    animation: ticker 40s infinite;
+}
+
+.ticker-move:hover {
+    animation-play-state: paused;
+}
+
+.ticker-item {
+    display: inline-block;
+    padding: 0 40px;
+    font-size: 20px;
+}
