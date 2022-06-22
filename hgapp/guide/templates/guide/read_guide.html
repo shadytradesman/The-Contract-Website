@@ -39,8 +39,19 @@
             <h1 class="text-center" style="font-size: 42px;">
                 {{guidebook.title}}
             </h1>
+            {% if can_edit %}
+                <div class="css-admin-buttons text-center">
+                    <a class="btn btn-default btn-xs"
+                       href="{% url 'guide:edit_guidebook' guidebook.slug %}">
+                        Edit Guidebook intro
+                    </a>
+                </div>
+            {% endif %}
             <div class="panel panel-default" style="margin-right: 10px; margin-left: 10px; z-index: 4;">
                 <div class="panel-body css-guide-content">
+                    <div class="css-section-body" style="margin-top: 15px;">
+                        {{guidebook.rendered_content|safe}}
+                    </div>
                     {% for section in sections %}
                         <div class="{% if section.is_hidden %} css-hidden-section {% endif %}">
                             {% if section.header_level > 1 %}

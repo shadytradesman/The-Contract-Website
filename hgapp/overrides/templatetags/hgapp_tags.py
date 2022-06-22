@@ -63,7 +63,11 @@ def guide_toc(context, guidebook=None):
     can_edit = context["request"].user.is_superuser if "request" in context and context["request"].user else False
     sections_by_book = []
     for book in guidebooks:
+        if guidebook and book == guidebook:
+            continue
         sections_by_book.append((book, book.get_sections_in_order(is_admin=can_edit),))
+    if guidebook:
+        sections_by_book.append((guidebook, guidebook.get_sections_in_order(is_admin=can_edit),))
     nav_list = __get_nav_list(sections_by_book, active_book=guidebook, logged_in=logged_in)
     context["nav_list"] = nav_list
     return context
@@ -112,10 +116,3 @@ def __get_nav_list_for_sections(sections, is_viewing_guidebook, guidebook_url):
         nav_list = nav_list + "</ol>"
     return nav_list
 
-
-@register.inclusion_tag('tags/article_list.html', takes_context=True)
-def article_list(context, urlpath, depth):
-    context['parent'] = urlpath
-    context['children'] = get_article_children(article=urlpath.article, article__current_revision__deleted=False)
-    context['depth'] = depth
-    return context

@@ -129,7 +129,7 @@ body {position:relative;}
     }
 }
 
-.css-section-body>p, .css-section-body>h3, .css-section-body>h4, .css-section-body>h5, .css-section-body>ul{
+.css-section-body>p, .css-section-body>h3, .css-section-body>h4, .css-section-body>h5, .css-section-body>ul {
     max-width: 800px;
     margin-left: auto;
     margin-right: auto;

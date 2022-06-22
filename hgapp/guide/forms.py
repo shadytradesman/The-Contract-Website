@@ -19,6 +19,17 @@ GUIDE_SECTION_TINYMCE_SETTINGS = {
 }
 
 
+class GuidebookForm(forms.Form):
+    title = forms.CharField(label='Guidebook Title',
+                            required=True,
+                            max_length=380)
+    content = forms.CharField(label='Content',
+                              widget=TinyMCE(attrs={'cols': 80, 'rows': 30}, mce_attrs=GUIDE_SECTION_TINYMCE_SETTINGS),
+                              max_length=73000,
+                              required=False,
+                              help_text='write the content for the guidebook intro.')
+
+
 def make_guide_section_form(previous_section=None, next_section=None):
     prev_sect_pos = "Previous section ({}) Position: {}. ".format(previous_section.title, previous_section.position) if previous_section else ""
     next_sect_pos = "Next section ({}) Position: {}.".format(next_section.title, next_section.position) if next_section else ""

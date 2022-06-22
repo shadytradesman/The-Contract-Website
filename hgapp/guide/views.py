@@ -11,7 +11,7 @@ from django.http import HttpResponseRedirect
 from django.db import transaction
 
 from .models import GuideBook, GuideSection, GuidePic
-from .forms import make_guide_section_form, DeleteGuideSectionForm
+from .forms import make_guide_section_form, DeleteGuideSectionForm, GuidebookForm
 
 class ReadGuideBook(View):
     template_name = 'guide/read_guide.html'
@@ -203,3 +203,45 @@ class EditGuideSection(WriteGuideSection):
                 reverse('guide:read_guidebook', args=(self.guidebook.slug,)),
                 self.section.slug))
         raise ValueError("Invalid section form")
+
+
+@method_decorator(login_required(login_url='account_login'), name='dispatch')
+class EditGuidebook(View):
+    template_name = 'guide/edit_guide.html'
+    guidebook = None
+    initial = None
+
+    def dispatch(self, *args, **kwargs):
+        if not self.request.user.is_superuser:
+            raise PermissionDenied("Only admins can edit the players guide")
+        self.guidebook = get_object_or_404(GuideBook, pk=self.kwargs['guidebook_slug'])
+        self.initial = {
+            "title": self.guidebook.title,
+            "content": self.guidebook.content,
+        }
+        return super().dispatch(*args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        form = GuidebookForm(request.POST)
+
+        if form.is_valid():
+            with transaction.atomic():
+                self.guidebook = GuideBook.objects.select_for_update().get(pk=self.guidebook.pk)
+                self.guidebook.title = form.cleaned_data["title"]
+                self.guidebook.content = form.cleaned_data['content']
+                self.guidebook.save()
+            return HttpResponseRedirect("{}".format(reverse('guide:read_guidebook', args=(self.guidebook.slug,))))
+        raise ValueError("Invalid section form")
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, self.__get_context_data())
+
+    def __get_context_data(self):
+        context = {
+            'form': GuidebookForm(initial=self.initial),
+            'guidebook': self.guidebook,
+            'pics': GuidePic.objects.order_by("slug").all(),
+            'editing_guidebook': True,
+        }
+        return context
+

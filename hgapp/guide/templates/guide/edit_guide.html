@@ -17,6 +17,8 @@
     <h1 class="text-center">
         {% if current_section %}
             Editing {{current_section.title}}
+        {% elif editing_guidebook %}
+            Editing intro
         {% else %}
             Writing new Section
         {% endif %}
@@ -29,6 +31,8 @@
                     action="{% url 'guide:edit_guide_section' guidebook.slug current_section.slug %}"
                 {% elif previous_section %}
                     action="{% url 'guide:new_guide_section' guidebook.slug previous_section.slug %}"
+                {% elif editing_guidebook %}
+                    action="{% url 'guide:edit_guidebook' guidebook.slug %}"
                 {% else %}
                     action="{% url 'guide:new_guide_section' guidebook.slug %}"
                 {% endif %}

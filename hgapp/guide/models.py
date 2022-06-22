@@ -2,11 +2,14 @@ from django.db import models
 from django.db.models import Q
 from django.urls import reverse
 from django.conf import settings
-from django.shortcuts import get_object_or_404
-from django.templatetags.static import static
-from django.template import loader
-import re
 
+from .content_renderer import render_content
+
+def get_pics_by_slug():
+    pics_by_slug = {}
+    for pic in GuidePic.objects.all():
+        pics_by_slug[pic.slug] = pic
+    return pics_by_slug
 
 class GuideBook(models.Model):
     # A container for Guide Sections.
@@ -15,6 +18,12 @@ class GuideBook(models.Model):
     position = models.PositiveIntegerField(default=1) # determines position in dropdown menu and index
     expanded = models.BooleanField(default=False) # should this book be expanded in quick-access from navbar
     redirect_url = models.CharField(max_length=400, blank=True, null=True) # redirect to here instead of being viewable as a guidebook
+    content = models.TextField(max_length=74000) # tinymce html content for editing
+    rendered_content = models.TextField(max_length=74000)  # content that is rendered for display
+
+    def save(self, *args, **kwargs):
+        self.rendered_content = render_content(self.content, get_pics_by_slug())
+        super(GuideBook, self).save(*args, **kwargs)
 
     def get_sections_in_order(self, is_admin=False):
         sections = GuideSection.objects.filter(book=self, is_deleted=False)
@@ -59,71 +68,13 @@ class GuideSection(models.Model):
         ]
 
     def save(self, *args, **kwargs):
-        self.rendered_content = self.__render_content()
+        self.rendered_content = render_content(self.content, get_pics_by_slug())
         super(GuideSection, self).save(*args, **kwargs)
-
-    # Support for "STML" or Spencer Text Markup Language
-    # This is a super-janky markup language that is intended only for admin use.
-    # DO NOT GIVE USERS ACCESS TO THESE METHODS. THEY ARE NOT SECURE OR EVEN REALLY STABLE.
-    def __render_content(self):
-        rendered_content = self.__render_section_links(str(self.content))
-        rendered_content = self.__render_columns(rendered_content)
-        rendered_content = self.__render_gm_tip(rendered_content)
-        rendered_content = self.__render_examples(rendered_content)
-        rendered_content = self.__render_images(rendered_content)
-        return rendered_content
 
     def to_url(self):
         guidebook_url = self.book.get_url()
         return "{}#{}".format(guidebook_url, self.slug)
 
-    def __render_images(self, content):
-        return re.sub(r"(<p>[\s]*)?\{![\s]*image(-sm)? ([\w./-]+)[\s]*!\}([\s]*</p>)?",
-                      lambda x: '<div class="css-guide-image{}" style="background-image: url(\'{}\');"></div>'.format(
-                          x.group(2) if x.group(2) else "",
-                          get_object_or_404(GuidePic, slug=x.group(3)).picture.url),
-                      content)
-
-    # {{article-slug|link-text}} to link to that article
-    def __render_section_links(self, content):
-        return re.sub(r"\{\{([\w-]+)\|([\w\s-]+)\}\}", r"<a href=#\1>\2</a>", content)
-
-    # {!col1!} {!col2!} {!colend!}
-    def __render_columns(self, content):
-        col1_start = '<div class="row"><div class="col-md-6 col-xs-12">'
-        col2_start = '</div><div class="col-md-6 col-xs-12">'
-        col_end = '</div></div>'
-        rendered_content = re.sub(r"(<p>[\s]*)?\{!col1!\}([\s]*</p>)?", col1_start, content)
-        rendered_content = re.sub(r"(<p>[\s]*)?\{!col2!\}([\s]*</p>)?", col2_start, rendered_content)
-        rendered_content = re.sub(r"(<p>[\s]*)?\{!colend!\}([\s]*</p>)?", col_end, rendered_content)
-        return rendered_content
-
-    def __render_gm_tip(self, content):
-        start = '<div class="css-gm-tip"><div class="css-gm-tip-header"><div class="css-guide-image-xs" style="background-image: url(\'{}\')"></div> GM Tip</div><div class="css-gm-tip-content">'\
-            .format(static("guide/graphics/Sky_D10.png"))
-        end = '</div></div>'
-        rendered_content = re.sub(r"(<p>[\s]*)?\{!start-gm-tip!\}([\s]*</p>)?", start, content)
-        rendered_content = re.sub(r"(<p>[\s]*)?\{!end-gm-tip!\}([\s]*</p>)?", end, rendered_content)
-        return rendered_content
-
-    def __render_examples(self, content):
-        start = '<div class="css-examples">' \
-                '<a class="wiki-entry-collapsible" role="button">' \
-                '<div class="css-examples-header"><div class="css-guide-image-xs" style="background-image: url(\'{}\')">' \
-                '</div> {} <small style="font-size: 12px; font-weight: 400;">(<span class="visible-xs-inline visible-sm-inline">tap</span><span class="hidden-xs hidden-sm">click</span> to expand)</small></div>' \
-                '</a>' \
-                '<div class="css-examples-content collapse-content"  style="display:none;">' \
-            .format(static("guide/graphics/Pink_D10.png"), r"\2")
-        end = '</div></div>'
-        rendered_content = re.sub(r"(<p>[\s]*)?\{!start-examples\|([\w\s]+)!\}([\s]*</p>)?", start, content)
-        rendered_content = re.sub(r"(<p>[\s]*)?\{!end-examples!\}([\s]*</p>)?", end, rendered_content)
-        return rendered_content
-
-
-
-
-    #Render text on save. Replaces
-    # {{fancy-section}} with entire section
 
 class GuidePic(models.Model):
     slug = models.SlugField(primary_key=True)

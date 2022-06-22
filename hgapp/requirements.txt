@@ -32,6 +32,7 @@ django-user-accounts==3.0.2
 docopt==0.6.2
 docutils==0.12
 future==0.16.0
+html2text==2020.1.16
 html5lib==1.0.1
 idna==2.7
 importlib-metadata==1.6.0
