@@ -1,5 +1,9 @@
 from django.templatetags.static import static
+from django.template.loader import render_to_string
+
 import re
+
+from characters.models import Ability, Limit, StockBattleScar, MINOR_SCAR, MAJOR_SCAR, SEVERE_SCAR, EXTREME_SCAR
 
 # Support for "STML" or Spencer Text Markup Language
 # This is a super-janky markup language that is intended only for admin use.
@@ -10,13 +14,16 @@ def render_content(unrendered_content, pics_by_slug):
     rendered_content = __render_gm_tip(rendered_content)
     rendered_content = __render_examples(rendered_content)
     rendered_content = __render_images(rendered_content, pics_by_slug)
+    rendered_content = __render_fancy_sections(rendered_content)
     return rendered_content
 
 def __render_images(content, pics_by_slug):
-    return re.sub(r"(<p>[\s]*)?\{![\s]*image(-sm)? ([\w./-]+)[\s]*!\}([\s]*</p>)?",
-                  lambda x: '<div class="css-guide-image{}" style="background-image: url(\'{}\');"></div>'.format(
+    return re.sub(r"(<p>[\s]*)?\{![\s]*image(-sm)? ([\w./-]+)[\s]+([\w\./\s\'\,\"\(\)-]*)!\}([\s]*</p>)?",
+                  lambda x: '<div class="css-guide-image{}"><img src=\'{}\'><div class="css-guide-image-caption">{}</div></div>'.format(
                       x.group(2) if x.group(2) else "",
-                      pics_by_slug[x.group(3)].picture.url),
+                      pics_by_slug[x.group(3)].picture.url,
+                      x.group(4),
+                  ),
                   content)
 
 
@@ -57,6 +64,40 @@ def __render_examples(content):
     rendered_content = re.sub(r"(<p>[\s]*)?\{!start-examples\|([\w\s]+)!\}([\s]*</p>)?", start, content)
     rendered_content = re.sub(r"(<p>[\s]*)?\{!end-examples!\}([\s]*</p>)?", end, rendered_content)
     return rendered_content
+
+
+def __fancy_abilities():
+    abilities = Ability.objects.filter(is_primary=True).order_by("name").all()
+    return render_to_string("guide/rendered-sections/abilities.html", {"abilities": abilities})
+
+def __fancy_primary_limits():
+    limits = Limit.objects.filter(is_default=True, is_primary=True).order_by("name").all()
+    return render_to_string("guide/rendered-sections/limits.html", {"limits": limits})
+
+def __fancy_alt_limits():
+    limits = Limit.objects.filter(is_default=False, is_primary=True).order_by("name").all()
+    return render_to_string("guide/rendered-sections/limits.html", {"limits": limits})
+
+def __fancy_battle_scars():
+    minor_scars = StockBattleScar.objects.filter(type=MINOR_SCAR).order_by("description").all()
+    major_scars = StockBattleScar.objects.filter(type=MAJOR_SCAR).order_by("description").all()
+    severe_scars = StockBattleScar.objects.filter(type=SEVERE_SCAR).order_by("description").all()
+    extreme_scars = StockBattleScar.objects.filter(type=EXTREME_SCAR).order_by("description").all()
+    return render_to_string("guide/rendered-sections/scars.html", {
+        "scar_categories": [minor_scars, major_scars, severe_scars, extreme_scars]
+    })
+
+
+content_methods = {
+    "abilities": __fancy_abilities,
+    "primary_limits": __fancy_primary_limits,
+    "alternative_limits": __fancy_alt_limits,
+    "battle_scars": __fancy_battle_scars,
+}
+
+def __render_fancy_sections(content):
+    return re.sub(r"(<p>[\s]*)?\{\{([\w-]+)\}\}([\s]*</p>)?", lambda x: content_methods[x.group(2)](), content)
+
 
 # Render text on save. Replaces
 # {{fancy-section}} with entire section

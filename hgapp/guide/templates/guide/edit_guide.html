@@ -74,7 +74,16 @@
                         </ul>
                     </li>
                     <li>
-                        <b>Images:</b> {! image slug !} or {! image-sm slug !} e.g. {! image lucy !}
+                        <b>Images:</b> {! image slug caption !} or {! image-sm slug caption !} e.g. {! image lucy it is lucy !}
+                    </li>
+                    <li>
+                        <b>Fancy Sections:</b> These render data from the website on save.
+                        <ul>
+                            <li>{{abilities}}</li>
+                            <li>{{primary_limits}}</li>
+                            <li>{{alternative_limits}}</li>
+                            <li>{{battle_scars}}</li>
+                        </ul>
                     </li>
                 </ul>
                 Note that all STML tags cannot have any styling changes in the middle of them. For example:

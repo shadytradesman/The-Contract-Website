@@ -1,0 +1,12 @@
+{% for cat in scar_categories %}
+    <h5 style="font-size: 16px;">
+        {{cat.0.get_type_display}}
+    </h5>
+    <ul>
+        {% for scar in cat %}
+        <li>
+            <strong>{{scar.description}}</strong> <i>({{scar.system}})</i>
+        </li>
+        {% endfor %}
+    </ul>
+{% endfor %}

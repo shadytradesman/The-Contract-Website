@@ -22,10 +22,21 @@
     max-height: 100%;
     max-width: 100%;
     min-height: 250px;
-    flex: 1;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: top, center;
+    position: relative;
+    margin-bottom: 10px;
+}
+.css-guide-image img {
+   object-fit: contain;
+   max-width: 100%;
+   max-height: 100%;
+   display: block;
+   margin: auto;
+}
+
+.css-guide-image-caption {
+    padding-top: 5px;
+    text-align: center;
+    font-style: italic;
 }
 
 .css-guide-image-sm {
@@ -190,7 +201,7 @@ body {position:relative;}
 
 .css-section-heading-3 {
     background-color: #303a48;
-    padding-top: 5px;
+    padding-top: 10px;
     padding-bottom: 5px;
 }
 .css-section-heading-3 h3 {
