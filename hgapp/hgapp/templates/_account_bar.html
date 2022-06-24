@@ -31,18 +31,6 @@
     {% endif %}
 </ul>
 <ul class="nav navbar-nav pull-left">
-    {% cache 500 nav-rules-toc1 guidebook.slug request.user.is_authenticated %}
-    <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-            Player's Guide <span class="caret"></span>
-        </a>
-        <div id="js-guide-toc-nav" class="guide-toc">
-            <div class=" dropdown-menu">
-                {% guide_toc %}
-            </div>
-        </div>
-    </li>
-    {% endcache %}
     {% if request.user.is_authenticated %}
     {% else %}
         <li class="dropdown">
@@ -67,10 +55,10 @@
                     <a href="{% url 'characters:characters_create'%}">Create a Contractor</a>
                 </li>
                 <li>
-                    <a href="{% url 'powers:powers_stock'%}">View Stock Gifts</a>
+                    <a href="{% url 'powers:powers_stock'%}">Stock Gifts</a>
                 </li>
                 <li>
-                    <a href="{% url 'powers:powers_create'%}">Create a Gift</a>
+                    <a href="{% url 'powers:powers_create'%}">Create Gift</a>
                 </li>
                 <li>
                     <a href="{%url 'pinax_blog:blog' %}">

@@ -113,6 +113,17 @@ body {
     color:  @text-color;
 }
 
+@media (max-width: 767px) {
+    .navbar-nav .open .guide-toc .dropdown-menu {
+        background-color: inherit !important;
+        position:absolute;
+        left: -50px;
+        max-height: 100vh;
+        overflow: auto;
+    }
+}
+
+
 section {
   padding: 20px 0px;
 }

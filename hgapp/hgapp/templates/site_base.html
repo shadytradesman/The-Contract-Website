@@ -3,6 +3,7 @@
 {% load static %}
 {% load i18n %}
 {% load hgapp_tags %}
+{% load cache %}
 
 
 
@@ -65,6 +66,20 @@
             {% endif %}
         </a>
     </li>
+    {% cache 500 nav-rules-toc1 guidebook.slug request.user.is_authenticated %}
+    <li class="dropdown">
+        <a href="#" class="dropdown-toggle css-nav-butt" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+            Guide <span class="caret"></span>
+        </a>
+        <div id="js-guide-toc-nav" class="guide-toc">
+            <div class="dropdown-menu">
+                <div>
+                    {% guide_toc %}
+                </div>
+            </div>
+        </div>
+    </li>
+    {% endcache %}
         {% if request.user.is_authenticated and not request.user.game_set.all %}
             <li>
                 <a class="css-nav-butt btn-primary" href="{% url 'info:how-to-play' %}">Start Playing</a>
