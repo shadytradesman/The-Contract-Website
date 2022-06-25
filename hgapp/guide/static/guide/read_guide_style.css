@@ -23,20 +23,27 @@
     max-width: 100%;
     min-height: 250px;
     position: relative;
-    margin-bottom: 10px;
+    height: 100%;
 }
+
 .css-guide-image img {
    object-fit: contain;
    max-width: 100%;
    max-height: 100%;
    display: block;
-   margin: auto;
+   position: absolute;
+   margin: 0px;
+   top: 50%;
+   left: 50%;
+   -ms-transform: translate(-50%, -50%);
+   transform: translate(-50%, -50%);
 }
 
 .css-guide-image-caption {
     padding-top: 5px;
     text-align: center;
     font-style: italic;
+    margin-bottom: 10px;
 }
 
 .css-guide-image-sm {

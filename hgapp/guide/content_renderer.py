@@ -19,7 +19,7 @@ def render_content(unrendered_content, pics_by_slug):
 
 def __render_images(content, pics_by_slug):
     return re.sub(r"(<p>[\s]*)?\{![\s]*image(-sm)? ([\w./-]+)[\s]+([\w\./\s\'\,\"\(\)-]*)!\}([\s]*</p>)?",
-                  lambda x: '<div class="css-guide-image{}"><img src=\'{}\'><div class="css-guide-image-caption">{}</div></div>'.format(
+                  lambda x: '<div class="css-guide-image{}"><img src=\'{}\'></div><div class="css-guide-image-caption">{}</div>'.format(
                       x.group(2) if x.group(2) else "",
                       pics_by_slug[x.group(3)].picture.url,
                       x.group(4),
