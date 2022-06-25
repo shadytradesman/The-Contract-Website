@@ -1,7 +1,10 @@
 <ul>
   {% for limit in limits %}
     <li>
-      <strong>{{limit.name}}: </strong> {{limit.description}}
+      <strong>{{limit.name}}</strong>
+      <div class="css-bullet-list-sub">
+        {{limit.description}}
+      </div>
     </li>
   {% endfor %}
 </ul>

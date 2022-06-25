@@ -1,7 +1,8 @@
 <ul>
   {% for ability in abilities %}
     <li>
-      <strong>{{ability.name}}: </strong> {{ability.tutorial_text}}
+      <strong>{{ability.name}} </strong>
+      <div class="css-bullet-list-sub"> {{ability.tutorial_text}}</div>
     </li>
   {% endfor %}
 </ul>

@@ -30,45 +30,6 @@
         {% endif %}
     {% endif %}
 </ul>
-<ul class="nav navbar-nav pull-left">
-    {% if request.user.is_authenticated %}
-    {% else %}
-        <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                Quick Access <span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu">
-                <li>
-                    <a class="btn-primary" href="https://discord.gg/xUZZegYNNy">Visit Discord Server</a>
-                </li>
-                <li>
-                    <a href="{% url 'games:games_looking_for_game' %}">
-                        Looking for Game
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url 'info:leaderboard' %}">
-                        Statistics
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url 'characters:characters_create'%}">Create a Contractor</a>
-                </li>
-                <li>
-                    <a href="{% url 'powers:powers_stock'%}">Stock Gifts</a>
-                </li>
-                <li>
-                    <a href="{% url 'powers:powers_create'%}">Create Gift</a>
-                </li>
-                <li>
-                    <a href="{%url 'pinax_blog:blog' %}">
-                         News and Updates
-                    </a>
-                </li>
-            </ul>
-        </li>
-    {% endif %}
-</ul>
 
 <form id="accountLogOutForm" style="display: none;" action="{% url 'account_logout' %}" method="POST">
     {% csrf_token %}

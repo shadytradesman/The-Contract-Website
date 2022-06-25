@@ -84,6 +84,11 @@
     visibility: hidden;
 }
 
+.css-bullet-list-sub {
+    padding-left: 10px;
+    margin-bottom: 5px;
+}
+
 .css-hidden-section {
     border: 2px dotted violet;
 }

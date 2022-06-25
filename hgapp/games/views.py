@@ -30,7 +30,7 @@ from .games_constants import GAME_STATUS, EXP_V1_V2_GAME_ID
 from cells.forms import EditWorldEventForm
 from cells.models import WorldEvent
 
-from games.models import Scenario, Game, DISCOVERY_REASON, Game_Invite, Game_Attendance, Reward
+from games.models import Scenario, Game, DISCOVERY_REASON, Game_Invite, Game_Attendance, Reward, REQUIRED_HIGH_ROLLER_STATUS
 
 from hgapp.utilities import get_queryset_size, get_object_or_none
 
@@ -268,6 +268,11 @@ def post_game_webhook(game, request):
         if game.list_in_lfg:
             content = "{} {}".format("<@&921821283551940638>", content)
             requests.post(settings.LFG_WEBHOOK_URL, json={'content': content, })
+            if game.required_character_status in [REQUIRED_HIGH_ROLLER_STATUS[1][0], REQUIRED_HIGH_ROLLER_STATUS[2][0]] \
+                and game.gm.pk in [23, 11, 156, 116, 169, 55, 203, 142, 552, 529, 414, 339]:
+                # LFG newbie game posted by approved GM.
+                content = "{} {}".format("<@&921870632138965063>", content)
+                requests.post(settings.NEWBIE_WEBHOOK_URL, json={'content': content, })
         for webhook in cell_webhooks:
             webhook.post(content)
 
