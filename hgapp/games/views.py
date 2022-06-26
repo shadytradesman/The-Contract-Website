@@ -266,13 +266,13 @@ def post_game_webhook(game, request):
     if game.list_in_lfg or cell_webhooks:
         content = game.get_webhook_post(request)
         if game.list_in_lfg:
-            content = "{} {}".format("<@&921821283551940638>", content)
-            requests.post(settings.LFG_WEBHOOK_URL, json={'content': content, })
+            lfg_content = "{} {}".format("<@&921821283551940638>", content)
+            requests.post(settings.LFG_WEBHOOK_URL, json={'content': lfg_content, })
             if game.required_character_status in [REQUIRED_HIGH_ROLLER_STATUS[1][0], REQUIRED_HIGH_ROLLER_STATUS[2][0]] \
                 and game.gm.pk in [23, 11, 156, 116, 169, 55, 203, 142, 552, 529, 414, 339]:
                 # LFG newbie game posted by approved GM.
-                content = "{} {}".format("<@&921870632138965063>", content)
-                requests.post(settings.NEWBIE_WEBHOOK_URL, json={'content': content, })
+                content_newbie = "{} {}".format("<@&921870632138965063>", content)
+                requests.post(settings.NEWBIE_WEBHOOK_URL, json={'content': content_newbie, })
         for webhook in cell_webhooks:
             webhook.post(content)
 
