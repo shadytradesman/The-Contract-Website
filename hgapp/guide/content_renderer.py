@@ -13,9 +13,7 @@ def render_content(unrendered_content, pics_by_slug):
     rendered_content = __render_columns(rendered_content)
     rendered_content = __render_gm_tip(rendered_content)
     rendered_content = __render_examples(rendered_content)
-    print(1, rendered_content)
     rendered_content = __render_images(rendered_content, pics_by_slug)
-    print(2, rendered_content)
     rendered_content = __render_fancy_sections(rendered_content)
     return rendered_content
 

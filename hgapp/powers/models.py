@@ -1,5 +1,6 @@
 import uuid, json
 from collections import defaultdict
+import html2text
 
 from django.conf import settings
 from django.db import models
@@ -922,8 +923,8 @@ class Power_Full(models.Model):
             power.private = False
             power.save()
 
-    def latest_archive_txt(self):
-        return self.latest_revision().archive_txt()
+    def latest_archive_text(self):
+        return self.latest_rev.archive_txt()
 
     def reward_count(self, include_improvements=True):
         count = 0
@@ -1222,23 +1223,16 @@ class Power(models.Model):
         return mark_safe(rendered_system)
 
     def archive_txt(self):
-        output = "{}\nA {} point {} {} power\nCreated by {}\n"
-        output = output.format(self.name, self.get_gift_cost(), self.get_activation_style_display(), self.base.name, self.created_by.username)
-        output = output + "{}\nDescription: {}\nSystem: {}\n"
-        output = output.format(self.flavor_text,self.description, self.get_system())
-        output = output + "Parameters:\n-------------\n"
-        for parameter_value in self.parameter_value_set.all():
-            output = output + "{}"
-            output = output.format(parameter_value.archive_txt())
-        output = output + "Enhancements:\n-------------\n"
-        for enhancement_instance in self.enhancement_instance_set.all():
-            output = output + "{}"
-            output = output.format(enhancement_instance.archive_txt())
-        output = output + "Drawbacks:\n----------\n"
-        for drawback_instance in self.drawback_instance_set.all():
-            output = output + "{}"
-            output = output.format(drawback_instance.archive_txt())
-        return output
+        if self.dice_system != SYS_PS2:
+            return ""
+        format_text = "## {}\nGift cost: {}\n{}\n\n### Description\n{}\n\n### System\n{}"
+        return format_text.format(
+            self.name,
+            self.get_gift_cost(),
+            self.gift_summary,
+            self.description,
+            html2text.html2text(self.system),
+        )
 
     def creation_reason_action_text(self):
         if self.creation_reason == CREATION_REASON[0][0]:

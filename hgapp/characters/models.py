@@ -805,19 +805,21 @@ class Character(models.Model):
             source_rev.save()
             self.regen_stats_snapshot()
 
-    def archive_txt(self):
-        header_format = """
-        # {}
-        Played by: {}
-        Archived on: {}
-        {} with {} victories and {} losses
-        
-        **{} is a {} who will risk {} life to {}.**
-        {} is {} years old, and often appears as {}.
-        {} 
+    def _archive_text_header(self):
+        header_format = \
+"""# {}
+
+Played by: {}
+Archived on: {}
+{} Contractor with {} victories and {} losses
+
+**{} is a {} who will risk {} life to {}.**
+{} is {} years old, and often appears as {}.
+{} 
         """
         if self.cell:
-            location_blurb = "{} lives in {}, a setting {}.".format(self.name, self.cell.name, self.cell.setting_sheet_blurb)
+            location_blurb = "{} lives in {}, a setting {}.".format(self.name, self.cell.name,
+                                                                    self.cell.setting_sheet_blurb)
         else:
             location_blurb = ""
 
@@ -837,21 +839,57 @@ class Character(models.Model):
             self.appearance,
             location_blurb
         )
+        return formatted_header
 
-        output = """
-        {}
-        
-        # Gifts
-        """
+    def _archive_text_gifts(self):
+        gift_texts = [power_full.latest_archive_text() for power_full in self.power_full_set.all()]
+        return "#Gifts\n{}".format("\n".join(gift_texts))
 
-        return output.format(formatted_header)
+    def _archive_text_other_stat_info(self):
+        format_text = \
+"""
+## Body: {}
 
+### Injuries 
 
+{}
 
-        for power_full in self.power_full_set.all():
-            output = output +"{}\n"
-            output = output.format(power_full.latest_archive_txt())
-        return output
+### Battle Scars
+
+{}
+
+## Mind: {}
+
+### Limits
+
+{}
+
+### Traumas
+
+{}
+"""
+        return format_text.format(self.num_body_levels(),
+                                  "\n".join(
+                                      ["* **{}** - {}".format(inj.severity, inj.description) for inj in self.injury_set.all()]
+                                  ),
+                                  "\n".join(
+                                      ["* **{}** *({})*".format(scr.description, scr.system) for scr in self.battlescar_set.all()]
+                                  ),
+                                  self.num_mind_levels(),
+                                  "\n".join(
+                                      ["* **{}** *({})*".format(lim.relevant_limit.name, lim.relevant_limit.description) for lim in self.stats_snapshot.limitrevision_set.all()]
+                                  ),
+                                  "\n".join(
+                                      ["* {}".format(trm.relevant_trauma.description) for trm in self.stats_snapshot.traumarevision_set.all()]
+                                  ))
+
+    def archive_txt(self):
+        header = self._archive_text_header()
+        stats = self.stats_snapshot.archive_text()
+        other_stat_info = self._archive_text_other_stat_info()
+        gifts = self._archive_text_gifts()
+        return "\n\n".join([header, stats, other_stat_info, gifts])
+
 
     def unspent_experience(self):
         total_exp = self.exp_earned()
@@ -1775,6 +1813,30 @@ class ContractStats(models.Model):
             models.Index(fields=['assigned_character', 'is_snapshot'], name='stats_char_idx'),
             models.Index(fields=['created_time'], name='stats_date_idx'),
         ]
+
+
+    def archive_text(self):
+        format_string = \
+"""## Stats
+
+### Attributes
+{}
+
+### Abilities
+{}"""
+        attribute_phrases = []
+        for attribute in self.attributevalue_set.all():
+            if attribute.relevant_attribute.is_deprecated or not attribute.previous_revision:
+                continue
+            attribute_phrases.append("**{}:** {}".format(attribute.relevant_attribute.name, attribute.value))
+        attributes_txt = "\n".join(attribute_phrases)
+
+        ability_phrases = []
+        for ability in self.abilityvalue_set.all():
+            ability_phrases.append("**{}:** {}".format(ability.relevant_ability.name, ability.value))
+        abilities_txt = "\n".join(ability_phrases)
+
+        return format_string.format(attributes_txt, abilities_txt)
 
     def calc_attr_change_ex_cost(self, old_value, new_value):
         return ((new_value - old_value) * (old_value + new_value - 1) / 2) * EXP_ADV_COST_ATTR_MULTIPLIER
