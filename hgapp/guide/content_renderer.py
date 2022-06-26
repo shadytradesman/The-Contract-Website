@@ -13,13 +13,15 @@ def render_content(unrendered_content, pics_by_slug):
     rendered_content = __render_columns(rendered_content)
     rendered_content = __render_gm_tip(rendered_content)
     rendered_content = __render_examples(rendered_content)
+    print(1, rendered_content)
     rendered_content = __render_images(rendered_content, pics_by_slug)
+    print(2, rendered_content)
     rendered_content = __render_fancy_sections(rendered_content)
     return rendered_content
 
 def __render_images(content, pics_by_slug):
-    return re.sub(r"(<p>[\s]*)?\{![\s]*image(-sm)? ([\w./-]+)[\s]+([\w\./\s\'\,\"\(\)-]*)!\}([\s]*</p>)?",
-                  lambda x: '<div class="css-guide-image{}"><img src=\'{}\'></div><div class="css-guide-image-caption">{}</div>'.format(
+    return re.sub(r"(<p>[\s]*)?\{![\s]*image(-sm)? ([\w./-]+)[\s]+([\w\./\s\'\,\"\(\)\?\-\!]*)!\}([\s]*</p>)?",
+                  lambda x: '<span class="css-guide-image{}"><img src=\'{}\'></span><span class="css-guide-image-caption">{}</span>'.format(
                       x.group(2) if x.group(2) else "",
                       pics_by_slug[x.group(3)].picture.url,
                       x.group(4),

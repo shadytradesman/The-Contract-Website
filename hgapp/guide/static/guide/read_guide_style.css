@@ -49,14 +49,14 @@
 .css-guide-image-sm {
     display: inline;
     float: left;
-    width: 50px;
-    height: 50px;
     margin-right: 10px;
     margin-bottom: 10px;
     margin-top: 10px;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: top, center;
+}
+
+.css-guide-image-sm img {
+    width: 50px;
+    height: 50px;
 }
 
 .css-guide-image-xs {
