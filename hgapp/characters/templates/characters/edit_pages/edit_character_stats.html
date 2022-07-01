@@ -281,10 +281,10 @@
             {% for form in source_formset %}
                 <div class="row">
                     {{form.source_id}}{{form.rev_id}}
-                    <div class="col-xs-2 col-xs-offset-4" data-toggle="tooltip" title='The name of your power source. For example: "Quintessence," "Blood," or "Mana"'>
+                    <div class="col-md-2 col-md-offset-4 col-xs-6" data-toggle="tooltip" title='The name of your power source. For example: "Quintessence," "Blood," or "Mana"'>
                         <b>Source Name</b> {{form.name}}
                     </div>
-                    <div class="col-xs-2 text-center" data-toggle="tooltip" title='The maximum capacity of your Source.'>
+                    <div class="col-md-2 text-center col-xs-6" data-toggle="tooltip" title='The maximum capacity of your Source.'>
                         <b>Capacity</b><br>
                         <span class="source-form"
                               data-initial-val="{{form.initial.value}}"
@@ -320,17 +320,19 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-10 col-md-offset-1 alert alert-danger js-exp-warn text-center" role="alert" style="display:none;">
-            Your Character does not have enough Experience to purchase the desired stats.
-            <br>
-            <b>Remaining Exp: <span class="js-remaining-exp">150</span></b>
-            <br>
-            <a class="btn btn-default btn-sm wiki-entry-collapsible">Why can I still save?</a>
-            <div class="collapse-content clearfix"  style="display:none;">
-                In order to support custom house rules, The Contract's website does not strictly enforce the
-                official format.
+        <div class="col-xs-12 col-md-10 col-md-offset-1">
+            <div class="alert alert-danger js-exp-warn text-center" role="alert" style="display:none;">
+                Your Character does not have enough Experience to purchase the desired stats.
                 <br>
-                Instead, we merely flag when actions deviate from the official rules.
+                <b>Remaining Exp: <span class="js-remaining-exp">150</span></b>
+                <br>
+                <a class="btn btn-default btn-sm wiki-entry-collapsible">Why can I still save?</a>
+                <div class="collapse-content clearfix"  style="display:none;">
+                    In order to support custom house rules, The Contract's website does not strictly enforce the
+                    official format.
+                    <br>
+                    Instead, we merely flag when actions deviate from the official rules.
+                </div>
             </div>
         </div>
     </div>
