@@ -96,7 +96,9 @@
     <div class="collapse-content clearfix" style="display:none;">
       <div class="text-left">
         {% with 'artifact' as element %}
+          {% with default_trophy_form as default_form %}
             {% include "characters/view_pages/world_element_form.html" %}
+          {% endwith %}
         {% endwith %}
       </div>
     </div>

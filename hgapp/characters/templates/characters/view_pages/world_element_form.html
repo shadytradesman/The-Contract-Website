@@ -4,6 +4,11 @@
       data-edit-world-element-url="{% url 'characters:edit_world_element' 'worldElementIdJs' element  secret_key %}"
       data-delete-world-element-url="{% url 'characters:delete_world_element' 'worldElementIdJs' element secret_key %}">
     {% csrf_token %}
+    {% if default_form and early_access %}
+        <div class="js-premade-element-form">
+            {{default_form|bootstrap}}
+        </div>
+    {% endif %}
     <div class="form-inline">
         {{condition_form.name|bootstrap}} {{condition_form.cell|bootstrap}}
     </div>

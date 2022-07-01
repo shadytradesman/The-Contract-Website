@@ -82,6 +82,24 @@ $("#id_premade_scar_field").change(function (e) {
     }
 })
 
+var descByName = JSON.parse(document.getElementById('descByName').textContent);
+
+$(".js-premade-element-form select").change(function (e) {
+    let selectedOption = e.target.options[e.target.selectedIndex];
+    let nameField = $(e.target).closest(".js-world-element-form").find("#id_name");
+    let descField = $(e.target).closest(".js-world-element-form").find("#id_description");
+    let systemField = $(e.target).closest(".js-world-element-form").find("#id_system");
+    if (selectedOption.value.length > 0) {
+        systemField.val(selectedOption.value);
+        descField.val(descByName[selectedOption.text]);
+        nameField.val(selectedOption.text);
+    } else {
+        systemField.val("");
+        descField.val("");
+        nameField.val("");
+    }
+})
+
 // add battle scar
 $("#scar-form").submit(function (e) {
     e.preventDefault();

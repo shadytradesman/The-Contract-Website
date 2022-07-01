@@ -179,7 +179,9 @@
                 <div class="collapse-content clearfix" style="display:none;">
                     <div class="text-left">
                     {% with 'condition' as element %}
-                        {% include "characters/view_pages/world_element_form.html" %}
+                        {% with default_condition_form as default_form %}
+                            {% include "characters/view_pages/world_element_form.html" %}
+                        {% endwith %}
                     {% endwith %}
                     </div>
                 </div>
@@ -299,7 +301,9 @@
                     <div class="collapse-content clearfix" style="display:none;">
                         <div class="col-md-8 col-md-offset-2 text-left">
                             {% with 'circumstance' as element %}
-                                {% include "characters/view_pages/world_element_form.html" %}
+                                {% with default_circumstance_form as default_form %}
+                                    {% include "characters/view_pages/world_element_form.html" %}
+                                {% endwith %}
                             {% endwith %}
                         </div>
                     </div>

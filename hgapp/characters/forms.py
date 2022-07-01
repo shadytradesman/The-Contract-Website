@@ -6,7 +6,7 @@ from overrides.widgets import CustomStylePagedown
 
 from games.game_utilities import get_character_contacts
 from characters.models import Character, BasicStats, Character_Death, BattleScar, PORT_STATUS, StockBattleScar, GIVEN,\
-    STOLEN, LOOTED, LOST, DESTROYED, RECOVERED, REPAIRED, AT_HOME
+    STOLEN, LOOTED, LOST, DESTROYED, RECOVERED, REPAIRED, AT_HOME, StockWorldElement, StockElementCategory
 from cells.models import Cell
 
 ATTRIBUTE_VALUES = {
@@ -211,6 +211,7 @@ def get_ability_form(ability_max):
                 self.fields['value_id'].initial = self.initial['value_id']
     return AbilityForm
 
+
 class QuirkForm(forms.Form):
     id = forms.IntegerField(label=None, widget=forms.HiddenInput(),) # hidden field to track which quirks we are editing.
     details_id = forms.IntegerField(label=None, widget=forms.HiddenInput(),required=False)
@@ -233,11 +234,14 @@ class QuirkForm(forms.Form):
         if 'details_id' in self.initial:
             self.fields['details_id'].initial = self.initial['details']
 
+
 class LiabilityForm(QuirkForm):
     pass
 
+
 class AssetForm(QuirkForm):
     pass
+
 
 class LimitForm(forms.Form):
     checked = forms.BooleanField(required=False)
@@ -266,7 +270,7 @@ class LimitForm(forms.Form):
 
 
 # method to get floating field because field is used only on FE and never submitted to the backend.
-def get_default_scar_choice_field():
+def get_default_scar_choice_form():
     stock_scars = StockBattleScar.objects.order_by("type").all()
     options = [("", "Create Custom Scar")]
     if stock_scars.count() > 0:
@@ -282,10 +286,34 @@ def get_default_scar_choice_field():
     default_field = forms.ChoiceField(choices=options,
                                       label="Select Scar",
                                       required=False,)
+
     class DefaultScarForm(forms.Form):
         premade_scar_field = default_field
+
     return DefaultScarForm
 
+
+def get_default_world_element_choice_form(element_type):
+    stock_elements = StockWorldElement.objects.filter(type=element_type).order_by("category").all()
+    options = [("", "Create Custom " + element_type)]
+    if stock_elements.count() > 0:
+        current_options = []
+        current_category = stock_elements[0].category
+        for element in stock_elements:
+            if element.category != current_category:
+                options.append((current_category.name, current_options))
+                current_options = []
+                current_category = element.category
+            current_options.append((element.system, element.name))
+        options.append((current_category.name, current_options))
+    default_field = forms.ChoiceField(choices=options,
+                                      label="Select Premade " + element_type,
+                                      required=False,)
+
+    class DefaultElementForm(forms.Form):
+        premade_element_field = default_field
+
+    return DefaultElementForm
 
 
 class BattleScarForm(forms.Form):
@@ -302,6 +330,7 @@ class TraumaForm(forms.Form):
                                   label=None,
                                   widget=forms.TextInput(attrs={'class': 'form-control'}))
 
+
 class SourceForm(forms.Form):
     source_id = forms.IntegerField(label=None,
                                     widget=forms.HiddenInput())  # hidden field to track which source we are editing.
@@ -311,6 +340,7 @@ class SourceForm(forms.Form):
     rev_id = forms.IntegerField(label=None, widget=forms.HiddenInput(), required=False)
     name = forms.CharField(max_length=50,
                            widget=forms.TextInput(attrs={'class': 'form-control source-name'}))
+
     def __init__(self, *args, **kwargs):
         super(SourceForm, self).__init__(*args, **kwargs)
         if 'source' in self.initial:
@@ -319,6 +349,7 @@ class SourceForm(forms.Form):
             self.fields['source_id'].initial = source.id
         if 'rev_id' in self.initial and self.initial['rev_id']:
             self.fields['rev_id'].initial = self.initial['rev_id']
+
 
 class InjuryForm(forms.Form):
     description = forms.CharField(max_length=900,

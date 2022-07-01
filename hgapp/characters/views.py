@@ -1,5 +1,6 @@
 from random import randint
 from datetime import timedelta
+import json
 
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404
@@ -17,14 +18,14 @@ from django.middleware.csrf import rotate_token
 
 from characters.models import Character, BasicStats, Character_Death, Graveyard_Header, Attribute, Ability, \
     CharacterTutorial, Asset, Liability, BattleScar, Trauma, TraumaRevision, Injury, Source, ExperienceReward, Artifact, \
-    LOST, DESTROYED, AT_HOME
+    LOST, DESTROYED, AT_HOME, CONDITION, CIRCUMSTANCE, TROPHY, TRAUMA,StockWorldElement
 from powers.models import Power_Full, SYS_LEGACY_POWERS, SYS_PS2, CRAFTING_NONE, CRAFTING_SIGNATURE, CRAFTING_ARTIFACT, \
     CRAFTING_CONSUMABLE
 from powers.signals import gift_major_revision
 from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, get_ability_form, \
     AssetForm, LiabilityForm, BattleScarForm, TraumaForm, InjuryForm, SourceValForm, make_allocate_gm_exp_form, EquipmentForm,\
-    DeleteCharacterForm, BioForm, make_world_element_form, get_default_scar_choice_field, make_artifact_status_form, \
-    make_transfer_artifact_form, make_consumable_use_form, NotesForm
+    DeleteCharacterForm, BioForm, make_world_element_form, get_default_scar_choice_form, make_artifact_status_form, \
+    make_transfer_artifact_form, make_consumable_use_form, NotesForm, get_default_world_element_choice_form
 from characters.form_utilities import get_edit_context, character_from_post, update_character_from_post, \
     grant_trauma_to_character, delete_trauma_rev, get_world_element_class_from_url_string
 from characters.view_utilities import get_characters_next_journal_credit, get_world_element_default_dict, get_weapons_by_type
@@ -265,13 +266,25 @@ def view_character(request, character_id, secret_key=None):
     world_element_initial_cell = character.world_element_initial_cell()
     world_element_cell_choices = None
     default_scar_field = None
+    default_condition_form = None
+    default_circumstance_form = None
+    default_trauma_form = None
+    default_trophy_form = None
+    element_description_by_name = None
     if user_can_edit:
         # We only need these choices if the user can edit, both for forms and for char sheet.
         world_element_cell_choices = character.world_element_cell_choices()
         circumstance_form = make_world_element_form(world_element_cell_choices, world_element_initial_cell)
         condition_form = make_world_element_form(world_element_cell_choices, world_element_initial_cell)
         artifact_form = make_world_element_form(world_element_cell_choices, world_element_initial_cell)
-        default_scar_field = get_default_scar_choice_field()
+        default_scar_field = get_default_scar_choice_form()
+        default_condition_form = get_default_world_element_choice_form(CONDITION)
+        default_circumstance_form = get_default_world_element_choice_form(CIRCUMSTANCE)
+        default_trauma_form = get_default_world_element_choice_form(TRAUMA)
+        default_trophy_form = get_default_world_element_choice_form(TROPHY)
+        element_descriptions = StockWorldElement.objects.values_list('name', 'description')
+        element_description_by_name = {x[0]: x[1] for x in element_descriptions}
+
 
     artifacts = get_world_element_default_dict(world_element_cell_choices)
     signature_items = []
@@ -324,6 +337,11 @@ def view_character(request, character_id, secret_key=None):
         'tutorial': get_object_or_404(CharacterTutorial),
         'battle_scar_form': BattleScarForm(),
         'default_scar_field': default_scar_field,
+        'element_description_by_name': element_description_by_name,
+        'default_condition_form': default_condition_form,
+        'default_circumstance_form': default_circumstance_form,
+        'default_trophy_form': default_trophy_form,
+        'default_trauma_form': default_trauma_form,
         'trauma_form': TraumaForm(prefix="trauma"),
         'injury_form': InjuryForm(request.POST, prefix="injury"),
         'exp_cost': exp_cost,
