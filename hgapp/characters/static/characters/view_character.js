@@ -100,6 +100,14 @@ $(".js-premade-element-form select").change(function (e) {
     }
 })
 
+$(".js-premade-trauma-form select").change(function (e) {
+    let selectedOption = e.target.options[e.target.selectedIndex];
+    if (selectedOption.text in descByName) {
+        $("#id_trauma-name").val(selectedOption.text);
+        $("#id_trauma-system").val(descByName[selectedOption.text]);
+    }
+})
+
 // add battle scar
 $("#scar-form").submit(function (e) {
     e.preventDefault();
@@ -163,14 +171,15 @@ $("#trauma-form").submit(function (e) {
         data: serializedData,
         success: function (response) {
             $("#trauma-form").trigger('reset');
-            $("#id_trauma-description").focus();
+            $("#id_trauma-system").focus();
 
             // display the newly friend to table.
             delUrl = delUrl.replace(/traumaIdJs/g, JSON.parse(response["id"]));
             delWithXpUrl = delUrl.replace(/useXpJs/g, "T");
             delWithoutXpUrl = delUrl.replace(/useXpJs/g, "F");
             var tmplMarkup = $('#trauma-template').html();
-            var compiledTmpl = tmplMarkup.replace(/__description__/g, response["description"]);
+            var compiledTmpl = tmplMarkup.replace(/__name__/g, response["name"]);
+            var compiledTmpl = compiledTmpl.replace(/__system__/g, response["system"]);
             var compiledTmpl = compiledTmpl.replace(/__delUrlExp__/g, delWithXpUrl);
             var compiledTmpl = compiledTmpl.replace(/__delUrlNoExp__/g, delWithoutXpUrl);
             $("#js-trauma-container").append(

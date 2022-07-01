@@ -120,8 +120,7 @@
             {% endfor%}
         </div>
         {% if user_can_edit and not character.is_dead %}
-            <br>
-            <div class="col-xs-12">
+            <div class="col-xs-12 text-left">
             <div class="row form-inline">
                 <form id="injury-form"
                       class="injury-form"
@@ -135,8 +134,12 @@
                     <span class="js-injury-form">
                         {{ injury_form.severity }}
                     </span>
-                    {{injury_form.description}}
-                    <input type="submit" class="btn btn-default" value="Ouch!" />
+                    <span class="css-field-inline">
+                        {{injury_form.description}}
+                    </span>
+                    <div class="text-center" style="margin-top: 5px;">
+                        <input type="submit" class="btn btn-default" value="Ouch!" />
+                    </div>
                 </form>
             </div>
             </div>

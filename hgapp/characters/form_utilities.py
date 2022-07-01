@@ -154,7 +154,7 @@ def update_character_from_post(user, POST, existing_character):
         raise ValueError("invalid edit char_form")
 
 def grant_trauma_to_character(form, character):
-    trauma = Trauma(description=form.cleaned_data['description'])
+    trauma = Trauma(description=form.cleaned_data['system'], name=form.cleaned_data["name"])
     new_stats_rev = ContractStats(assigned_character=character)
     new_stats_rev.save()
     trauma.save()

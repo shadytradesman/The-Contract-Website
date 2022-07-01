@@ -105,7 +105,7 @@ input[type="number"] {
       outline: none !important;
 }
 
-.nav-tabs > li, .nav-pills > li {
+form .nav-tabs > li, form .nav-pills > li {
     float:none;
     display:inline-block;
     *display:inline; /* ie7 fix */

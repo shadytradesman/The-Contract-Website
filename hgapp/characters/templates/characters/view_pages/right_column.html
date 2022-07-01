@@ -1,11 +1,11 @@
+{% load bootstrap %}
+
 <script type="text/html" id="trauma-template">
     <div class="stat-value js-trauma-entry">
         <li>
-            __description__
             {% if user_can_edit %}
-                <span class="btn btn-danger btn-xs js-expand-next-block pull-right">
+                <span class="btn btn-danger btn-xs js-expand-next-block ">
                     X
-                    <br>
                 </span>
                 <div class="text-center alert alert-warning" style="display:none;">
                     <p>
@@ -22,8 +22,8 @@
                         </form>
                     </p>
                 </div>
-                <div class="clearfix"></div>
             {%endif%}
+            <b>__name__</b> __system__
         </li>
     </div>
 </script>
@@ -58,11 +58,9 @@
             {% for trauma in character.stats_snapshot.traumarevision_set.all %}
             <div class="stat-value js-trauma-entry">
                 <li>
-                    {{trauma.relevant_trauma.description}}
                     {% if user_can_edit %}
-                        <span class="btn btn-danger btn-xs js-expand-next-block pull-right">
+                        <span class="btn btn-danger btn-xs js-expand-next-block">
                             X
-                            <br>
                         </span>
                         <div class="text-center alert alert-warning" style="display:none;">
                             <p>
@@ -79,8 +77,9 @@
                                 </form>
                             </p>
                         </div>
-                        <div class="clearfix"></div>
                     {%endif%}
+                    {% if trauma.relevant_trauma.name %}<b>{{trauma.relevant_trauma.name}}</b> {% endif %}
+                    {{trauma.relevant_trauma.description}}
                 </li>
             </div>
             {% empty %}
@@ -88,19 +87,30 @@
             {% endfor%}
         </div>
         {% if user_can_edit %}
-            <form id="trauma-form"
-                  data-new-trauma-url="{% url 'characters:post_trauma' character.id secret_key %}"
-                  data-delete-trauma-url="{% url 'characters:delete_trauma' 'traumaIdJs' 'useXpJs' secret_key %}">
-                {{ trauma_form.about.errors }}
-                {{ trauma_form.non_field_errors }}
-                {% csrf_token %}
-                <div class="col-md-8">
-                    {{trauma_form.description}}
+            <div class="text-center">
+                <a class="btn btn-default btn-sm wiki-entry-collapsible text-center">Add Trauma</a>
+                <div class="collapse-content clearfix" style="display:none; margin-top: 10px;">
+                    <div class="text-left">
+                        {% if early_access  and default_trauma_form %}
+                            <div class="js-premade-trauma-form">
+                                {{default_trauma_form|bootstrap}}
+                            </div>
+                        {% endif %}
+                        <form id="trauma-form"
+                              data-new-trauma-url="{% url 'characters:post_trauma' character.id secret_key %}"
+                              data-delete-trauma-url="{% url 'characters:delete_trauma' 'traumaIdJs' 'useXpJs' secret_key %}">
+                            {{ trauma_form.about.errors }}
+                            {{ trauma_form.non_field_errors }}
+                            {% csrf_token %}
+                            {{trauma_form.name | bootstrap}}
+                            {{trauma_form.system | bootstrap}}
+                            <div class="text-center" style="margin-top: 5px;">
+                                <input type="submit" class="btn btn-primary" value="Add Trauma" />
+                            </div>
+                        </form>
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <input type="submit" class="btn btn-default" value="Add Trauma" />
-                </div>
-            </form>
+            </div>
         {% endif %}
     </div>
 </div>

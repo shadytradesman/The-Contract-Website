@@ -326,7 +326,10 @@ class BattleScarForm(forms.Form):
 
 
 class TraumaForm(forms.Form):
-    description = forms.CharField(max_length=900,
+    name = forms.CharField(max_length=900,
+                                  label=None,
+                                  widget=forms.TextInput(attrs={'class': 'form-control'}))
+    system = forms.CharField(max_length=900,
                                   label=None,
                                   widget=forms.TextInput(attrs={'class': 'form-control'}))
 

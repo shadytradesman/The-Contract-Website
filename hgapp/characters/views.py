@@ -285,7 +285,6 @@ def view_character(request, character_id, secret_key=None):
         element_descriptions = StockWorldElement.objects.values_list('name', 'description')
         element_description_by_name = {x[0]: x[1] for x in element_descriptions}
 
-
     artifacts = get_world_element_default_dict(world_element_cell_choices)
     signature_items = []
     lost_signature_items = []
@@ -781,7 +780,10 @@ def post_trauma(request, character_id, secret_key = None):
             with transaction.atomic():
                 character = Character.objects.select_for_update().get(pk=character.pk)
                 trauma_rev = grant_trauma_to_character(form, character)
-            return JsonResponse({"id": trauma_rev.id, "description": trauma_rev.relevant_trauma.description}, status=200)
+            return JsonResponse({"id": trauma_rev.id,
+                                 "system": trauma_rev.relevant_trauma.description,
+                                 "name": trauma_rev.relevant_trauma.name},
+                                status=200)
         else:
             return JsonResponse({"error": form.errors}, status=400)
     return JsonResponse({"error": ""}, status=400)

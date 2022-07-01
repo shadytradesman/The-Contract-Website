@@ -185,6 +185,15 @@ input[type="number"] {
     padding-right: 40px;
 }
 
+.css-world-entity-container+.css-world-entity-container {
+    margin-top: 10px;
+}
+
+.css-field-inline .form-control {
+    display: inline-block;
+    width: inherit;
+}
+
 .css-circumstance-section .css-world-element-delete {
     padding-right: 10px;
     height: 12px;
