@@ -71,11 +71,15 @@ ROLL_SPEED = (
     (REACTION, "a Reaction")
 )
 
+QUIRK_PHYSICAL = 'PHYSICAL'
+QUIRK_BACKGROUND = 'BACKGROUND'
+QUIRK_MENTAL = 'MENTAL'
+QUIRK_RESTRICTED = 'RESTRICTED'
 QUIRK_CATEGORY = (
-    ('PHYSICAL', 'Physical'),
-    ('BACKGROUND', 'Background'),
-    ('MENTAL', 'Mental'),
-    ('RESTRICTED', 'Restricted'),
+    (QUIRK_PHYSICAL, 'Physical'),
+    (QUIRK_BACKGROUND, 'Background'),
+    (QUIRK_MENTAL, 'Mental'),
+    (QUIRK_RESTRICTED, 'Restricted'),
 )
 
 PRONOUN = (
@@ -155,6 +159,17 @@ WEAPON_TYPE = (
     (WEAPON_THROWN, "Thrown"),
     (WEAPON_PROJECTILE, "Projectile"),
     (WEAPON_OTHER, "Other")
+)
+
+CONDITION = "Condition"
+CIRCUMSTANCE = "Circumstance"
+TROPHY = "Trophy"
+TRAUMA = "Trauma"
+ELEMENT_TYPE = (
+    (CONDITION, 'Condition'),
+    (CIRCUMSTANCE, 'Circumstance'),
+    (TROPHY, 'Trophy'),
+    (TRAUMA, 'Trauma'),
 )
 
 GIVEN = "GIVEN"
@@ -1186,10 +1201,12 @@ class WorldElement(models.Model):
     character = models.ForeignKey(Character, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=500)
     description = models.CharField(max_length=5000)
+    origin = models.CharField(max_length=2000, blank=True)
     system = models.CharField(max_length=1000, blank=True)
     created_time = models.DateTimeField(auto_now_add=True, null=True) #null because added in migration
     is_deleted = models.BooleanField(default=False)
     deleted_date = models.DateTimeField(null=True, blank=True)
+    deletion_reason = models.CharField(max_length=5000, blank=True)
 
     # when cell is null, element is created by gift system
     cell = models.ForeignKey(Cell,
@@ -1204,11 +1221,31 @@ class WorldElement(models.Model):
     class Meta:
         abstract = True
 
+
 class Condition(WorldElement):
     pass
 
+
 class Circumstance(WorldElement):
     pass
+
+
+class StockElementCategory(models.Model):
+    name = models.CharField(max_length=500)
+
+
+class StockWorldElement(models.Model):
+    name = models.CharField(max_length=500)
+    description = models.CharField(max_length=5000)
+    system = models.CharField(max_length=1000, blank=True)
+    type = models.CharField(choices=ELEMENT_TYPE,
+                            max_length=45,
+                            default=CONDITION)
+    category = models.ForeignKey(StockElementCategory, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return "[{}] {} - {}".format(self.get_type_display(), self.category.name, self.name)
+
 
 
 class Artifact(WorldElement):
@@ -1717,7 +1754,7 @@ class Quirk(models.Model):
     is_public = models.BooleanField(default=True)
     category = models.CharField(choices=QUIRK_CATEGORY,
                               max_length=50,
-                              default=QUIRK_CATEGORY[1][0])
+                              default=QUIRK_PHYSICAL)
     eratta = models.CharField(max_length=2500,
                               blank = True,
                               null = True)
@@ -1726,18 +1763,20 @@ class Quirk(models.Model):
                               null = True)
     multiplicity_allowed = models.BooleanField(default=False)
     grants_gift = models.BooleanField(default=False)
+    grants_element = models.ForeignKey(StockWorldElement, on_delete=models.CASCADE, blank=True, null=True)
+    grants_scar = models.ForeignKey(StockBattleScar, on_delete=models.CASCADE, blank=True, null=True)
 
     def is_physical(self):
-        return self.category == QUIRK_CATEGORY[0][0]
+        return self.category == QUIRK_PHYSICAL
 
     def is_background(self):
-        return self.category == QUIRK_CATEGORY[1][0]
+        return self.category == QUIRK_BACKGROUND
 
     def is_mental(self):
-        return self.category == QUIRK_CATEGORY[2][0]
+        return self.category == QUIRK_MENTAL
 
     def is_restricted(self):
-        return self.category == QUIRK_CATEGORY[3][0]
+        return self.category == QUIRK_RESTRICTED
 
     def __str__(self):
         return self.name
@@ -1745,22 +1784,28 @@ class Quirk(models.Model):
     class Meta:
         abstract = True
 
+
 class Asset(Quirk):
     def is_liability(self):
         return False
+
 
 class Liability(Quirk):
     def is_liability(self):
         return True
 
+
 class Trauma(models.Model):
+    name = models.CharField(max_length=500, blank=True)
     description = models.CharField(max_length=500)
+
 
 class Source(models.Model):
     name = models.CharField(max_length=500)
     owner = models.ForeignKey(Character,
                               on_delete=models.CASCADE)
     current_val = models.PositiveIntegerField(default = 1) # Max val is stored on the revision
+
 
 class Limit(models.Model):
     name = models.CharField(max_length=40)
@@ -1772,6 +1817,7 @@ class Limit(models.Model):
                               null=True,
                               blank=True,
                               on_delete=models.CASCADE)
+
 
 class ContractStats(models.Model):
     created_time = models.DateTimeField(default=timezone.now)
