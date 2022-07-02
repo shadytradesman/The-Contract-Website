@@ -294,7 +294,7 @@ def get_default_scar_choice_form():
 
 
 def get_default_world_element_choice_form(element_type):
-    stock_elements = StockWorldElement.objects.filter(type=element_type).order_by("category").all()
+    stock_elements = StockWorldElement.objects.filter(type=element_type).exclude(category__name="creation-only").order_by("category").all()
     options = [("", "Create Custom " + element_type)]
     if stock_elements.count() > 0:
         current_options = []

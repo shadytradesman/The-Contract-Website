@@ -13,21 +13,34 @@
             data-initial="{{form.initial.is_selected}}"
             data-liability="{{quirk.is_liability}}">
         <div class="quirk-btn-inner">
-            <h4>
+            <h4 style="margin-top: 5px; margin-bottom: 5px;">
                 {{form.is_selected}}
-                &ensp;
-                <b class="js-quirk-value">{{quirk.value|safe}}</b>
-                -
-                {{quirk.name|safe}}
-                <span class="css-experience-cost">
-                     (
-                    <span class="js-experience-cost-value">0</span>
-                    Exp )
+                <span style="margin-left: 5px;">
+                    <b class="js-quirk-value">{{quirk.value|safe}}</b>
+                    -
+                    {{quirk.name|safe}}
+                    <span class="css-experience-cost">
+                         (
+                        <span class="js-experience-cost-value">0</span>
+                        Exp )
+                    </span>
                 </span>
             </h4>
             <p>
-                {{quirk.description|safe}}
-                {{quirk.system|safe}}
+                {% if quirk.grants_element %}
+                    <b>{{quirk.grants_element.get_type_display}}</b>:
+                    {{quirk.grants_element.description}}
+                {% if quirk.grants_element.system %}
+                    <span class="css-system-text-user-input">
+                        <i>
+                            ({{quirk.grants_element.system}})
+                        </i>
+                    </span>
+                {% endif %}
+                {% else %}
+                    {{quirk.description|safe}}
+                    {{quirk.system|safe}}
+                {% endif %}
                 {{form.id}}
                 {{form.details_id}}
                 {% if quirk.eratta %}
@@ -55,4 +68,3 @@
         </div>
     {% endif %}
     </div>
-<br>

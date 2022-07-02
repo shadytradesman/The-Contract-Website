@@ -9,6 +9,7 @@ from django.urls import reverse
 from django.core.cache import cache
 from django.core.files.base import ContentFile
 
+
 from characters.models import Character, HIGH_ROLLER_STATUS, Attribute, Roll, NO_PARRY_INFO, NO_SPEED_INFO, DODGE_ONLY, \
     ATTACK_PARRY_TYPE, ROLL_SPEED, THROWN, Attribute, Ability, Weapon, WEAPON_MELEE, WEAPON_TYPE, Artifact, STATUS_SEASONED, \
     STATUS_VETERAN
@@ -16,6 +17,34 @@ from guardian.shortcuts import assign_perm, remove_perm
 from django.utils.html import mark_safe, escape, linebreaks
 from django.db.utils import IntegrityError
 from hgapp.utilities import get_object_or_none
+
+html_replace_map = {
+    '(': '&#40;',
+    ')': '&#41;',
+    '[': '&#91;',
+    ']': '&#93;',
+    '&': '&#38;',
+    '%': '&#37;',
+    '|': '&#124;',
+    '{': '&#123;',
+    '}': '&#125;',
+    '$': '&#36;',
+    '+': '&#43;',
+    '#': '&#35;',
+    ';': '&#59;',
+    '"': '&#8220;',
+}
+
+def clean_user_input_field(user_input):
+    # We do this so the user can't mess up system text rendering.
+    output = ""
+    for char in user_input:
+        if char in html_replace_map:
+            output += html_replace_map[char]
+        else:
+            output += char
+    return output
+
 
 PASSIVE = 'PASSIVE'
 ACTIVE = 'ACTIVE'
@@ -1042,13 +1071,13 @@ class Power(models.Model):
         return True
 
     def get_enhancement_list(self):
-        return "<b>Enhancements:</b><br>{}".format("<br>".join(self.enhancement_names))
+        return "<b>Enhancements:</b><br>{}".format(clean_user_input_field("<br>".join(self.enhancement_names)))
 
     def get_num_enhancements(self):
         return len(self.enhancement_names)
 
     def get_drawback_list(self):
-        return "<b>Drawbacks:</b><br>{}".format("<br>".join(self.drawback_names))
+        return "<b>Drawbacks:</b><br>{}".format(clean_user_input_field("<br>".join(self.drawback_names)))
 
     def get_num_drawbacks(self):
         return len(self.drawback_names)

@@ -1248,6 +1248,19 @@ class StockWorldElement(models.Model):
     def __str__(self):
         return "[{}] {} - {}".format(self.get_type_display(), self.category.name, self.name)
 
+    def grant_to_character(self, character, stats):
+        if self.type in [CONDITION, CIRCUMSTANCE, TROPHY]:
+            ElementClass = Condition if self.type == CONDITION else Artifact if self.type == TROPHY else Circumstance
+            ElementClass.objects.create(character=character,
+                             name=self.name,
+                             description=self.description,
+                             system=self.system,)
+            return
+        if self.type == TRAUMA:
+            new_trauma = Trauma.objects.create(name=self.name, description=self.description)
+            TraumaRevision.objects.create(relevant_stats=stats, relevant_trauma=new_trauma)
+            return
+        raise ValueError("Could not grant element to contractor")
 
 
 class Artifact(WorldElement):
@@ -2058,10 +2071,15 @@ class AssetDetails(QuirkDetails):
             VoidAssetGifts.send_robust(sender=self.__class__,
                                   assetDetail=self,
                                   character=self.relevant_stats.assigned_character)
-        if not self.previous_revision and not self.is_deleted and self.relevant_asset.grants_gift:
-            GrantAssetGift.send_robust(sender=self.__class__,
-                                  assetDetail=self,
-                                  character=self.relevant_stats.assigned_character)
+        if not self.previous_revision and not self.is_deleted:
+            if self.relevant_asset.grants_gift:
+                GrantAssetGift.send_robust(sender=self.__class__,
+                                      assetDetail=self,
+                                      character=self.relevant_stats.assigned_character)
+            granted_element = self.relevant_quirk().grants_element
+            if granted_element:
+                granted_element.grant_to_character(self.relevant_stats.assigned_character, self.relevant_stats)
+
 
     class Meta:
         indexes = [
@@ -2079,6 +2097,13 @@ class LiabilityDetails(QuirkDetails):
         indexes = [
             models.Index(fields=['relevant_stats']),
         ]
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if not self.previous_revision and not self.is_deleted:
+            granted_element = self.relevant_quirk().grants_element
+            if granted_element:
+                granted_element.grant_to_character(self.relevant_stats.assigned_character, self.relevant_stats)
 
     def relevant_quirk(self):
         return self.relevant_liability

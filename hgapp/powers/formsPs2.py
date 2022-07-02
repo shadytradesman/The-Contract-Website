@@ -234,7 +234,6 @@ html_replace_map = {
     ';': '&#59;',
 }
 
-
 def clean_user_input_field(user_input):
     # We do this so the user can't mess up system text rendering.
     output = ""

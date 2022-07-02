@@ -7,7 +7,7 @@ from characters.models import Character, BasicStats, Character_Death, Graveyard_
     CharacterTutorial, Asset, Liability, AttributeValue, ContractStats, AbilityValue, LiabilityDetails, AssetDetails, \
     Limit, LimitRevision, Trauma, TraumaRevision, EXP_NEW_CHAR, EXP_ADV_COST_ATTR_MULTIPLIER, \
     EXP_ADV_COST_SKILL_MULTIPLIER, EXP_COST_QUIRK_MULTIPLIER, EXP_ADV_COST_SOURCE_MULTIPLIER, Source, SourceRevision, \
-    Condition, Circumstance, Artifact
+    Condition, Circumstance, Artifact, CONDITION, CIRCUMSTANCE, TROPHY, TRAUMA
 from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, get_ability_form, \
     AssetForm, LiabilityForm, LimitForm, PHYS_MENTAL, SourceForm, make_charon_coin_form, make_character_ported_form
 from collections import defaultdict

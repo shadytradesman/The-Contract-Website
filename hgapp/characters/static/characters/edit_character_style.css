@@ -61,6 +61,7 @@ input[type="number"] {
 .quirk-btn-cont {
   background-color: #191c23;
   border-radius: 4px;
+  margin-bottom: 8px;
 }
 
 .css-ability-form {
@@ -70,7 +71,9 @@ input[type="number"] {
 .quirk-btn-inner {
   text-align: left;
   white-space: normal;
-  font-weight: 200;
+}
+
+.quirk-btn-inner p {
 }
 
 .quirk-btn.active {

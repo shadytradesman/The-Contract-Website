@@ -118,9 +118,11 @@
                               style="display:none;"
                           {% endif %}
                     >
-                        <a href="{% url 'cells:cells_view_cell' cell.id %}">
-                            {{cell.name}}
-                        </a>
+                        {% if cell %}
+                            <a href="{% url 'cells:cells_view_cell' cell.id %}">
+                                {{cell.name}}
+                            </a>
+                        {% endif %}
                     </span>
                 <div class="js-world-element-content-{{cell.id}}">
                     {% for condition in conditions %}
@@ -234,7 +236,9 @@
                        {% endif %}
                     >
                         <div class="panel-heading css-circumstance-heading" role="tab" id="circumstance-heading-{{cell.id}}">
-                            <h5 class="panel-title">{{cell.name}}</h5>
+                            {% if cell %}
+                                <h5 class="panel-title">{{cell.name}}</h5>
+                            {% endif %}
                         </div>
                     </a>
                     <div id="collapse-circumstance-{{cell.id}}"
