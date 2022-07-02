@@ -6,7 +6,7 @@ from overrides.widgets import CustomStylePagedown
 
 from games.game_utilities import get_character_contacts
 from characters.models import Character, BasicStats, Character_Death, BattleScar, PORT_STATUS, StockBattleScar, GIVEN,\
-    STOLEN, LOOTED, LOST, DESTROYED, RECOVERED, REPAIRED, AT_HOME, StockWorldElement, StockElementCategory
+    STOLEN, LOOTED, LOST, DESTROYED, RECOVERED, REPAIRED, AT_HOME, StockWorldElement, StockElementCategory, START_ONLY_SCAR
 from cells.models import Cell
 
 ATTRIBUTE_VALUES = {
@@ -271,7 +271,7 @@ class LimitForm(forms.Form):
 
 # method to get floating field because field is used only on FE and never submitted to the backend.
 def get_default_scar_choice_form():
-    stock_scars = StockBattleScar.objects.order_by("type").all()
+    stock_scars = StockBattleScar.objects.exclude(type=START_ONLY_SCAR).order_by("type").all()
     options = [("", "Create Custom Scar")]
     if stock_scars.count() > 0:
         current_options = []

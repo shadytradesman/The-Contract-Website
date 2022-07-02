@@ -28,15 +28,23 @@
             </h4>
             <p>
                 {% if quirk.grants_element %}
-                    <b>{{quirk.grants_element.get_type_display}}</b>:
+                    <b>{{quirk.grants_element.get_type_display}}:</b>
                     {{quirk.grants_element.description}}
-                {% if quirk.grants_element.system %}
+                    {% if quirk.grants_element.system %}
+                        <span class="css-system-text-user-input">
+                            <i>
+                                ({{quirk.grants_element.system}})
+                            </i>
+                        </span>
+                    {% endif %}
+                {% elif quirk.grants_scar %}
+                    <b>Battle Scar:</b>
+                    {{quirk.description}}
                     <span class="css-system-text-user-input">
-                        <i>
-                            ({{quirk.grants_element.system}})
-                        </i>
+                            <i>
+                                {{ quirk.grants_scar.system }}
+                            </i>
                     </span>
-                {% endif %}
                 {% else %}
                     {{quirk.description|safe}}
                     {{quirk.system|safe}}

@@ -102,11 +102,13 @@ MINOR_SCAR = "1MINOR"
 MAJOR_SCAR = "2MAJOR"
 SEVERE_SCAR = "3SEVERE"
 EXTREME_SCAR = "4EXTREME"
+START_ONLY_SCAR = "5STARTONLY"
 SCAR_SEVERITY = (
     (MINOR_SCAR, "Minor Scars (Severity 4)"),
     (MAJOR_SCAR, "Major Scars (Severity 5)"),
     (SEVERE_SCAR, "Severe Scars (Severity 6)"),
     (EXTREME_SCAR, "Extreme Scars (Severity 7+)"),
+    (START_ONLY_SCAR, "Asset and Liability Scars"),
 )
 
 BODY_STATUS = (
@@ -1187,6 +1189,9 @@ class StockBattleScar(models.Model):
     description = models.CharField(max_length=500)
     system = models.CharField(max_length=500)
 
+    def __str__(self):
+        return "[{}] {}".format(self.get_type_display(), self.description)
+
 
 class BattleScar(models.Model):
     character = models.ForeignKey(Character,
@@ -1214,7 +1219,6 @@ class WorldElement(models.Model):
                              null=True,
                              on_delete=models.CASCADE)
 
-
     def __str__(self):
         return self.name
 
@@ -1235,6 +1239,7 @@ class StockElementCategory(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class StockWorldElement(models.Model):
     name = models.CharField(max_length=500)
@@ -1801,11 +1806,13 @@ class Quirk(models.Model):
 
 
 class Asset(Quirk):
+
     def is_liability(self):
         return False
 
 
 class Liability(Quirk):
+
     def is_liability(self):
         return True
 
@@ -2062,9 +2069,10 @@ class QuirkDetails(models.Model):
                 raise ValueError("A Quirk's parent revision cannot be owned by a snapshot.")
         super(QuirkDetails, self).save(*args, **kwargs)
 
+
 class AssetDetails(QuirkDetails):
-    relevant_asset = models.ForeignKey(Asset,
-                                       on_delete=models.CASCADE)
+    relevant_asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
+
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         if self.previous_revision and self.is_deleted and self.relevant_asset.grants_gift:
@@ -2079,6 +2087,11 @@ class AssetDetails(QuirkDetails):
             granted_element = self.relevant_quirk().grants_element
             if granted_element:
                 granted_element.grant_to_character(self.relevant_stats.assigned_character, self.relevant_stats)
+            granted_scar = self.relevant_quirk().grants_scar
+            if granted_scar:
+                BattleScar.objects.create(character=self.relevant_stats.assigned_character,
+                                          description=granted_scar.description,
+                                          system=granted_scar.system)
 
 
     class Meta:
@@ -2088,6 +2101,7 @@ class AssetDetails(QuirkDetails):
 
     def relevant_quirk(self):
         return self.relevant_asset
+
 
 class LiabilityDetails(QuirkDetails):
     relevant_liability = models.ForeignKey(Liability,
@@ -2104,6 +2118,11 @@ class LiabilityDetails(QuirkDetails):
             granted_element = self.relevant_quirk().grants_element
             if granted_element:
                 granted_element.grant_to_character(self.relevant_stats.assigned_character, self.relevant_stats)
+            granted_scar = self.relevant_quirk().grants_scar
+            if granted_scar:
+                BattleScar.objects.create(character=self.relevant_stats.assigned_character,
+                                          description=granted_scar.description,
+                                          system=granted_scar.system)
 
     def relevant_quirk(self):
         return self.relevant_liability
