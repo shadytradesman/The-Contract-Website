@@ -2093,7 +2093,6 @@ class AssetDetails(QuirkDetails):
                                           description=granted_scar.description,
                                           system=granted_scar.system)
 
-
     class Meta:
         indexes = [
             models.Index(fields=['relevant_stats']),
