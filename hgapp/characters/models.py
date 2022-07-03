@@ -930,19 +930,41 @@ Archived on: {}
         else:
             return 5
 
-    def to_create_power_blob(self):
-        unspent_gifts = []
-        unspent_improvements = []
-        for reward in self.unspent_rewards().all():
-            if reward.is_improvement:
-                unspent_improvements.append("{} from {}".format(reward.type_text(), reward.reason_text()))
-            else:
-                unspent_gifts.append("{} from {}".format(reward.type_text(), reward.reason_text()))
-        unspent_gifts.extend(unspent_improvements)
+    def to_print_blob(self):
+        self.stats_snapshot
+
         return {
             "name": self.name,
-            "avail_rewards": unspent_gifts,
-            "status": self.status,
+            "tagline": self.tagline,
+            "player": self.player.username if self.player else "",
+            "status": self.get_status_display(),
+            "appearance": self.appearance,
+            "sex": self.sex,
+            "concept_summary": self.concept_summary,
+            "ambition": self.ambition,
+            "num_games": self.num_games,
+            "num_victories": self.num_victories,
+            "num_losses": self.num_losses,
+            "equipment": self.equipment,
+            "bio": self.background,
+
+            "mind": self.num_mind_levels(),
+            "body": self.num_body_levels(),
+            "source": self.source_values(),
+
+            "attributes": [(x.relevant_attribute.name, x.value) for x in self.get_attributes()],
+            "abilities": [(x.relevant_ability.name, x.value) for x in self.get_abilities()],
+            "battle_scars": [(scr.description, scr.system) for scr in self.battlescar_set.all()],
+            "limits": [(lim.relevant_limit.name, lim.relevant_limit.description) for lim in self.stats_snapshot.limitrevision_set.all()],
+            "traumas": [(trm.relevant_trauma.name, trm.relevant_trauma.description) for trm in self.stats_snapshot.traumarevision_set.all()],
+            "conditions": [(elem.name, elem.description, elem.system) for elem in self.condition_set.exclude(is_deleted=True).all()],
+            "circumstances": [(elem.name, elem.description, elem.system) for elem in self.circumstance_set.exclude(is_deleted=True).all()],
+            "trophies": [(elem.name, elem.description, elem.system) for elem in
+                              self.circumstance_set.filter(cell__isnull=True).exclude(is_deleted=True).all()],
+
+            "powers": None,
+            "crafting_gifts": None,
+            "artifacts": None,
         }
 
     # WARNING: this is an expensive call
@@ -2196,6 +2218,7 @@ class LimitRevision(models.Model):
                                           blank=True,
                                           on_delete=models.CASCADE)  # Used in revisioning to determine value change.
     is_deleted = models.BooleanField(default=False)
+
     class Meta:
         indexes = [
             models.Index(fields=['relevant_stats']),

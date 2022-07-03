@@ -18,6 +18,9 @@ urlpatterns = [
     # ex: .com/characters/archive/c/110
     url(r'^archive/c/(?P<character_id>[\d]+)/$', views.archive_character, name='characters_archive'),
 
+    # ex: .com/characters/print/c/110
+    url(r'^print/c/(?P<character_id>[\d]+)/$', views.print_character, name='characters_print'),
+
     # ex: .com/characters/create/
     url(r'^create/$', views.create_character, name='characters_create'),
     # ex: .com/characters/create/world/123

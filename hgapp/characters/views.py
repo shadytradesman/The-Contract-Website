@@ -303,6 +303,7 @@ def view_character(request, character_id, secret_key=None):
                 unavail_crafted_artifacts.append(artifact)
             else:
                 avail_crafted_artifacts.append(artifact)
+
     for artifact in Artifact.objects.filter(crafting_character=character, is_signature=True, is_deleted=False).all():
         if artifact.character is not None and artifact.character != character:
             lost_signature_items.append(artifact)
@@ -379,6 +380,16 @@ def view_character(request, character_id, secret_key=None):
     }
     return render(request, 'characters/view_pages/view_character.html', context)
 
+
+def print_character(request, character_id):
+    character = get_object_or_404(Character, id=character_id)
+    if not character.player_can_view(request.user):
+        raise PermissionDenied("You do not have permission to view this Character")
+    context = {
+        "character": character,
+        "character_blob": character.to_print_blob()
+    }
+    return render(request, 'characters/print_pages/print_character.html', context)
 
 def archive_character(request, character_id):
     character = get_object_or_404(Character, id=character_id)

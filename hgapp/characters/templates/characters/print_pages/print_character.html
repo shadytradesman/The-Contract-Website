@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{character.name}}'s Sheet</title>
+    {{character_blob|json_script:"characterblob"}}
+    <script src="{% static 'characters/print_character.js' %}"></script>
+</head>
+<body>
+
+</body>
+</html>

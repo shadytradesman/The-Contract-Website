@@ -80,7 +80,7 @@
 
 @media (min-width: 991px) {
     .css-section-body>.css-guide-image {
-        min-height: 500px;
+        min-height: 450px;
     }
 }
 
@@ -140,6 +140,10 @@ body {position:relative;}
     padding-right: 20px;
     border-radius: 4px;
     overflow: auto;
+    display: flex;
+    align-content: flex-start;
+    align-items: stretch;
+    flex-flow: column;
 }
 
 @media (min-width: 991px) {
