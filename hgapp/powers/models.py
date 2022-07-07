@@ -1771,8 +1771,7 @@ class PowerSystem(models.Model):
     @staticmethod
     def _generate_component_blob(base_type):
         # TODO: select related and stuff.
-        # TODO: filter on is_public=True
-        components = Base_Power.objects.filter(base_type=base_type) \
+        components = Base_Power.objects.filter(base_type=base_type, is_public=True) \
             .order_by("-name") \
             .prefetch_related("basepowerfieldsubstitution_set") \
             .prefetch_related("power_param_set").all()
