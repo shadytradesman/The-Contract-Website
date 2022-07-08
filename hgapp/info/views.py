@@ -111,7 +111,7 @@ def how_to_play(request):
         "first_action": first_action.json_serialize(),
         "tutorial": character_tutorial,
         "expand_step": expand_step,
-        'powers_modal_art_url': static('overrides/art/front-bamboo.jpg'),
+        'powers_modal_art_url': static('overrides/art/grace.png'),
         'sig_item_modal_art_url': static('overrides/art/lady_lake_sm.jpg'),
         'art_craft_modal_art_url': static('overrides/art/front-music.jpg'),
         'consumable_craft_modal_art_url': static('overrides/art/sushi.jpg'),

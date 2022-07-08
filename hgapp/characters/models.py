@@ -930,6 +930,21 @@ Archived on: {}
         else:
             return 5
 
+    def to_create_power_blob(self):
+        unspent_gifts = []
+        unspent_improvements = []
+        for reward in self.unspent_rewards().all():
+            if reward.is_improvement:
+                unspent_improvements.append("{} from {}".format(reward.type_text(), reward.reason_text()))
+            else:
+                unspent_gifts.append("{} from {}".format(reward.type_text(), reward.reason_text()))
+        unspent_gifts.extend(unspent_improvements)
+        return {
+            "name": self.name,
+            "avail_rewards": unspent_gifts,
+            "status": self.status,
+        }
+
     def to_print_blob(self):
         self.stats_snapshot
 
