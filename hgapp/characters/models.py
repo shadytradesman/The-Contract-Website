@@ -167,11 +167,20 @@ CONDITION = "Condition"
 CIRCUMSTANCE = "Circumstance"
 TROPHY = "Trophy"
 TRAUMA = "Trauma"
+BATTLE_SCAR = "Battle Scar"
 ELEMENT_TYPE = (
     (CONDITION, 'Condition'),
     (CIRCUMSTANCE, 'Circumstance'),
     (TROPHY, 'Trophy'),
     (TRAUMA, 'Trauma'),
+)
+
+ELEMENT_TYPE_INC_SCAR = (
+    (CONDITION, 'Condition'),
+    (CIRCUMSTANCE, 'Circumstance'),
+    (TROPHY, 'Trophy'),
+    (TRAUMA, 'Trauma'),
+    (BATTLE_SCAR, 'Battle Scar'),
 )
 
 GIVEN = "GIVEN"
@@ -1290,16 +1299,17 @@ class StockWorldElement(models.Model):
     def __str__(self):
         return "[{}] {} - {}".format(self.get_type_display(), self.category.name, self.name)
 
-    def grant_to_character(self, character, stats):
+    def grant_to_character(self, stats, name_override=None):
+        name = name_override if name_override is not None else self.name
         if self.type in [CONDITION, CIRCUMSTANCE, TROPHY]:
             ElementClass = Condition if self.type == CONDITION else Artifact if self.type == TROPHY else Circumstance
-            ElementClass.objects.create(character=character,
-                             name=self.name,
+            ElementClass.objects.create(character=stats.assigned_character,
+                             name=name,
                              description=self.description,
                              system=self.system,)
             return
         if self.type == TRAUMA:
-            new_trauma = Trauma.objects.create(name=self.name, description=self.description)
+            new_trauma = Trauma.objects.create(name=name, description=self.description)
             TraumaRevision.objects.create(relevant_stats=stats, relevant_trauma=new_trauma)
             return
         raise ValueError("Could not grant element to contractor")
@@ -1820,8 +1830,13 @@ class Quirk(models.Model):
                               null = True)
     multiplicity_allowed = models.BooleanField(default=False)
     grants_gift = models.BooleanField(default=False)
-    grants_element = models.ForeignKey(StockWorldElement, on_delete=models.CASCADE, blank=True, null=True)
-    grants_scar = models.ForeignKey(StockBattleScar, on_delete=models.CASCADE, blank=True, null=True)
+    grants_element = models.ForeignKey(StockWorldElement, on_delete=models.CASCADE, blank=True, null=True, help_text="Grants stock element")
+    grants_scar = models.ForeignKey(StockBattleScar, on_delete=models.CASCADE, blank=True, null=True, help_text="Grants stock scar")
+    grants_non_stock_element = models.CharField(
+        choices=ELEMENT_TYPE_INC_SCAR,
+        max_length=55,
+        blank=True,
+        help_text="Grants world element that isn't stock. Don't set if using one of the stock world elements.")
 
     def is_physical(self):
         return self.category == QUIRK_PHYSICAL
@@ -1840,6 +1855,32 @@ class Quirk(models.Model):
 
     class Meta:
         abstract = True
+
+    def grant_element_if_needed(self, stats, details=None):
+        granted_element = self.grants_element
+        if granted_element:
+            name = "{}: {}".format(self.name, details) if details else self.name
+            granted_element.grant_to_character(stats, name)
+        granted_scar = self.grants_scar
+        if granted_scar:
+            BattleScar.objects.create(character=stats.assigned_character,
+                                      description=granted_scar.description,
+                                      system=granted_scar.system)
+        if self.grants_non_stock_element:
+            elem_type = self.grants_non_stock_element
+            if elem_type in [CONDITION, CIRCUMSTANCE, TROPHY]:
+                ElementClass = Condition if elem_type == CONDITION else Artifact if elem_type == TROPHY else Circumstance
+                ElementClass.objects.create(character=stats.assigned_character,
+                                            name=self.name,
+                                            description=self.description,
+                                            system=details, )
+            elif elem_type == TRAUMA:
+                new_trauma = Trauma.objects.create(name=self.name, description=details)
+                TraumaRevision.objects.create(relevant_stats=stats, relevant_trauma=new_trauma)
+            elif elem_type == BATTLE_SCAR:
+                BattleScar.objects.create(character=stats.assigned_character,
+                                          description=details,
+                                          system="")
 
 
 class Asset(Quirk):
@@ -2121,14 +2162,8 @@ class AssetDetails(QuirkDetails):
                 GrantAssetGift.send_robust(sender=self.__class__,
                                       assetDetail=self,
                                       character=self.relevant_stats.assigned_character)
-            granted_element = self.relevant_quirk().grants_element
-            if granted_element:
-                granted_element.grant_to_character(self.relevant_stats.assigned_character, self.relevant_stats)
-            granted_scar = self.relevant_quirk().grants_scar
-            if granted_scar:
-                BattleScar.objects.create(character=self.relevant_stats.assigned_character,
-                                          description=granted_scar.description,
-                                          system=granted_scar.system)
+            self.relevant_quirk().grant_element_if_needed(self.relevant_stats, self.details)
+
 
     class Meta:
         indexes = [
@@ -2151,14 +2186,7 @@ class LiabilityDetails(QuirkDetails):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         if not self.previous_revision and not self.is_deleted:
-            granted_element = self.relevant_quirk().grants_element
-            if granted_element:
-                granted_element.grant_to_character(self.relevant_stats.assigned_character, self.relevant_stats)
-            granted_scar = self.relevant_quirk().grants_scar
-            if granted_scar:
-                BattleScar.objects.create(character=self.relevant_stats.assigned_character,
-                                          description=granted_scar.description,
-                                          system=granted_scar.system)
+            self.relevant_quirk().grant_element_if_needed(self.relevant_stats, self.details)
 
     def relevant_quirk(self):
         return self.relevant_liability

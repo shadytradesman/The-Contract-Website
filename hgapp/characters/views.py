@@ -311,7 +311,8 @@ def view_character(request, character_id, secret_key=None):
 
     circumstances = get_world_element_default_dict(world_element_cell_choices)
     for circumstance in character.circumstance_set.exclude(is_deleted=True).all():
-        circumstances[circumstance.cell].append(circumstance)
+        cell = circumstance.cell if circumstance.cell else character.cell
+        circumstances[cell].append(circumstance)
     circumstances = dict(circumstances)
 
     conditions = get_world_element_default_dict(world_element_cell_choices)

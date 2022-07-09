@@ -35,9 +35,14 @@
                           style="display:none;"
                           {% endif %}
                     >
-                        <a href="{% url 'cells:cells_view_cell' cell.id %}">
-                            {{cell.name}}
-                        </a>
+                        {% if cell %}
+                            From
+                            <a href="{% url 'cells:cells_view_cell' cell.id %}">
+                                {{cell.name}}
+                            </a>
+                        {% else %}
+                            From Assets and Liabilities
+                        {% endif %}
                     </span>
     <div class="js-world-element-content-{{cell.id}}">
       {% for artifact in artifacts %}
