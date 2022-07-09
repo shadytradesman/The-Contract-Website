@@ -5,7 +5,17 @@
   <ul>
     {% for event in event_list %}
       {{ event.2 }}
-      {% if event.0 == "game"%}
+      {% if event.0 == "elem_created" %}
+        <li class="css-timeline-item css-timeline-element">
+          <b>Aquired {{event.1.get_type_display}}: {{event.1.name}} </b>
+          <i>{{event.1.description}}</i>
+        </li>
+      {% elif event.0 == "elem_deleted" %}
+        <li class="css-timeline-item css-timeline-element">
+          <b>Removed {{event.1.get_type_display}}: {{event.1.name}} </b>
+          <i>{{event.1.description}}</i>
+        </li>
+      {% elif event.0 == "game"%}
         {% with event.1 as attendance %}
           {% include "games/game_attendance_badge_snippet.html" %}
         {% endwith %}

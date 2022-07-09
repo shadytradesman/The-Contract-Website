@@ -664,6 +664,8 @@ def character_timeline(request, character_id):
 
     assigned_rewards = [(x.assigned_on, "reward", x) for x in character.spent_rewards_rev_sort()]
     completed_games = [(x.relevant_game.end_time, "game", x) for x in character.completed_games_rev_sort()]
+    condition_creation = [(x.created_time, "elem_created", x) for x in character.condition_set.order_by("-created_time")]
+    condition_deletion = [(x.deleted_date, "elem_deleted", x) for x in character.condition_set.filter(is_deleted=True).order_by("-deleted_date")]
 
     craftings = character.craftingevent_set.order_by("-relevant_attendance__relevant_game__end_time").all()
     crafting_tuples = []
@@ -695,7 +697,14 @@ def character_timeline(request, character_id):
     character_edit_history = [(x.created_time, "edit", x) for x in
                               character.contractstats_set.filter(is_snapshot=False).order_by("-created_time").all()[:1]]
     exp_rewards = [(x.created_time + timedelta(seconds=2), "exp_reward", x) for x in character.experiencereward_set.filter(is_void=False).order_by("-created_time").all()]
-    events_by_date = list(merge(assigned_rewards, completed_games, character_edit_history, exp_rewards, crafting_tuples, reverse=True))
+    events_by_date = list(merge(assigned_rewards,
+                                completed_games,
+                                condition_creation,
+                                condition_deletion,
+                                character_edit_history,
+                                exp_rewards,
+                                crafting_tuples,
+                                reverse=True))
     timeline = defaultdict(list)
     for event in events_by_date:
         if event[1] == "edit":

@@ -4,23 +4,26 @@
 <h3 class="text-center" data-toggle="tooltip" title='{{tutorial.artifacts|safe}}' style="margin-top: 15px;">
     Trophies
 </h3>
-{% if not artifacts_by_cell %}
+{% if not artifacts_by_cell or character.number_completed_games == 0 %}
     <div class="row">
       <div class="col-xs-12">
-        <div class="alert alert-info text-center">
-          <p>
+        <div class="alert alert-info">
+          <p class="text-center">
             <b>Trophies are special objects and equipment.</b>
           </p>
           <p>
             Examples of Trophies include healing potions, scrolls, sci-fi technology, or any supernatural
-            item that was not created with The Contract's Power system.
-            Trophies are not subject to standardized balance.
-            Therefore, their effects may be altered or ignored outside the Playgroup where they were obtained.
+            item that was not created with The Contract's Gift system.
           </p>
-          {% if user_can_edit %}
           <p>
-            Until you participate in a Contract or join a Playgroup, you cannot add
-            Trophies to your Contractor.
+            Because Trophies may have GM-created systems, they also record the Playgroup they were acquired in.
+          </p>
+          {% if user_can_edit and character.number_completed_games == 0 and not character.cell %}
+          <p class="text-center">
+              <b>
+                  Until you participate in a Contract or join a Playgroup, you cannot add
+                  Trophies to your Contractor.
+              </b>
           </p>
           {% endif %}
         </div>

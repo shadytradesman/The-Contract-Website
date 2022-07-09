@@ -169,6 +169,10 @@ input[type="number"] {
     border-color: wheat;
 }
 
+.css-timeline-element {
+    border-color: darkolivegreen;
+}
+
 .css-game-badge {
     border-color: lightskyblue;
 }

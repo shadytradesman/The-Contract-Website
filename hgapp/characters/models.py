@@ -1273,11 +1273,15 @@ class WorldElement(models.Model):
 
 
 class Condition(WorldElement):
-    pass
+
+    def get_type_display(self):
+        return "Condition"
 
 
 class Circumstance(WorldElement):
-    pass
+
+    def get_type_display(self):
+        return "Circumstance"
 
 
 class StockElementCategory(models.Model):
