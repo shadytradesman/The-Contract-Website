@@ -395,7 +395,7 @@ TINYMCE_DEFAULT_CONFIG = {
     "code,help,wordcount",
     "toolbar": "formatselect fontselect fontsizeselect | "
     "bold italic strikethrough underline removeformat | backcolor forecolor | alignleft aligncenter "
-    "| bullist numlist link unlink | "
+    "| bullist numlist link unlink | image "
     " | help",
     'content_css': "/static/css/site.css",
 }

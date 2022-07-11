@@ -12,7 +12,7 @@ GUIDE_SECTION_TINYMCE_SETTINGS = {
                "code,help,wordcount",
     "toolbar": "formatselect fontselect fontsizeselect | "
                "bold italic strikethrough underline removeformat | backcolor forecolor | alignleft aligncenter "
-               "| bullist numlist link unlink | table"
+               "| bullist numlist link unlink | table | image"
                " | help ",
     "toolbar_mode": 'wrap',
     'content_css': "/static/css/site.css",
