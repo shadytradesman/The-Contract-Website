@@ -177,7 +177,7 @@ class FieldSubstitution(models.Model):
 
     def save(self, *args, **kwargs):
         super(FieldSubstitution, self).save(*args, **kwargs)
-        PowerSystem.get_singleton().mark_dirty()
+        PowerSystem.mark_all_dirty()
 
     def to_blob(self):
         return {
@@ -224,7 +224,7 @@ class EnhancementGroup(models.Model):
 
     def save(self, *args, **kwargs):
         super(EnhancementGroup, self).save(*args, **kwargs)
-        PowerSystem.get_singleton().mark_dirty()
+        PowerSystem.mark_all_dirty()
 
     def to_blob(self):
         return {
@@ -278,7 +278,7 @@ class Modifier(models.Model):
 
     def save(self, *args, **kwargs):
         super(Modifier, self).save(*args, **kwargs)
-        PowerSystem.get_singleton().mark_dirty()
+        PowerSystem.mark_all_dirty()
 
     def display(self):
         return self.name + " (" + self.description + ")"
@@ -419,7 +419,7 @@ class Parameter(models.Model):
 
     def save(self, *args, **kwargs):
         super(Parameter, self).save(*args, **kwargs)
-        PowerSystem.get_singleton().mark_dirty()
+        PowerSystem.mark_all_dirty()
 
     def get_levels(self):
         levels = []
@@ -495,7 +495,7 @@ class Base_Power_Category(models.Model):
 
     def save(self, *args, **kwargs):
         super(Base_Power_Category, self).save(*args, **kwargs)
-        PowerSystem.get_singleton().mark_dirty()
+        PowerSystem.mark_all_dirty()
 
     def container_class(self):
         return "css-cat-container-" + self.slug
@@ -588,7 +588,7 @@ class Base_Power(models.Model):
 
     def save(self, *args, **kwargs):
         super(Base_Power, self).save(*args, **kwargs)
-        PowerSystem.get_singleton().mark_dirty()
+        PowerSystem.mark_all_dirty()
 
     def get_absolute_url(self):
         return reverse('powers:powers_create_power', kwargs={'base_power_slug': self.slug})
@@ -651,7 +651,7 @@ class VectorCostCredit(models.Model):
 
     def save(self, *args, **kwargs):
         super(VectorCostCredit, self).save(*args, **kwargs)
-        PowerSystem.get_singleton().mark_dirty()
+        PowerSystem.mark_all_dirty()
 
     def to_blob(self):
         return {
@@ -686,7 +686,7 @@ class Base_Power_System(models.Model):
 
     def save(self, *args, **kwargs):
         super(Base_Power_System, self).save(*args, **kwargs)
-        PowerSystem.get_singleton().mark_dirty()
+        PowerSystem.mark_all_dirty()
 
     def __str__(self):
         return ":".join([self.base_power.name, str(self.dice_system)])
@@ -742,7 +742,7 @@ class Power_Param(models.Model):
 
     def save(self, *args, **kwargs):
         super(Power_Param, self).save(*args, **kwargs)
-        PowerSystem.get_singleton().mark_dirty()
+        PowerSystem.mark_all_dirty()
 
     def to_blob(self):
         return {
@@ -1374,7 +1374,7 @@ class SystemField(models.Model):
 
     def save(self, *args, **kwargs):
         super(SystemField, self).save(*args, **kwargs)
-        PowerSystem.get_singleton().mark_dirty()
+        PowerSystem.mark_all_dirty()
 
     def to_blob(self):
         return {
@@ -1698,6 +1698,11 @@ class PowerSystem(models.Model):
     @staticmethod
     def get_singleton(is_admin=False):
         return PowerSystem.objects.get(cache_key=(PowerSystem.KEY_ADMIN if is_admin else PowerSystem.KEY_USER))
+
+    @staticmethod
+    def mark_all_dirty():
+        PowerSystem.get_singleton(is_admin=False).mark_dirty()
+        PowerSystem.get_singleton(is_admin=True).mark_dirty()
 
     def mark_dirty(self):
         self.revision = uuid.uuid4()

@@ -1201,7 +1201,6 @@ const ComponentRendering = {
                 $('#giftPreviewModal').modal({});
             }
             setFormInputPrefixValues();
-
           });
       },
       clickModalityTab() {
