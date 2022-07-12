@@ -28,7 +28,7 @@ function scrollToc() {
     /* vertical scroll fix */
     if (target.getBoundingClientRect().bottom > window.innerHeight) {
         // scroll at bottom
-        target.scrollIntoView(false);
+        target.scrollIntoView({block: "end", inline: "nearest"});
     }
     if (target.getBoundingClientRect().top < 50) {
         // scroll at top
@@ -40,11 +40,11 @@ function scrollToc() {
     if ($(target).hasClass("js-last-section")) {
         $("#js-guide-index").scrollTop($("#js-guide-index")[0].scrollHeight);
     }
-    if (target.getBoundingClientRect().left <0 ) {
-        target.scrollIntoView(false);
+    if (target.getBoundingClientRect().left < 0 ) {
+        target.scrollIntoView({block: "end", inline: "center"});
     }
     if (target.getBoundingClientRect().right > window.innerWidth) {
-        target.scrollIntoView();
+        target.scrollIntoView({block: "start", inline: "center"});
     }
 }
 
