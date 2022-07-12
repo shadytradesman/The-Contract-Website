@@ -1,9 +1,11 @@
 from django.templatetags.static import static
 from django.template.loader import render_to_string
+from collections import defaultdict
 
 import re
 
-from characters.models import Ability, Limit, StockBattleScar, MINOR_SCAR, MAJOR_SCAR, SEVERE_SCAR, EXTREME_SCAR
+from characters.models import Ability, Limit, StockBattleScar, MINOR_SCAR, MAJOR_SCAR, SEVERE_SCAR, EXTREME_SCAR,\
+    StockWorldElement, CONDITION, CIRCUMSTANCE, TROPHY, TRAUMA
 
 # Support for "STML" or Spencer Text Markup Language
 # This is a super-janky markup language that is intended only for admin use.
@@ -88,11 +90,45 @@ def __fancy_battle_scars():
     })
 
 
+def __fancy_world_element(element_type):
+    stock_elements = StockWorldElement.objects.filter(type=element_type).exclude(category__name="creation-only").order_by("category").all()
+    options = []
+    current_options = []
+    current_category = stock_elements[0].category
+    for element in stock_elements:
+        if element.category != current_category:
+            options.append((current_category.name, current_options))
+            current_options = []
+            current_category = element.category
+        current_options.append((element.name, element.description, element.system))
+    options.append((current_category.name, current_options))
+    return render_to_string("guide/rendered-sections/world_elements.html", {"elements": options})
+
+
+def __fancy_conditions():
+    return __fancy_world_element(CONDITION)
+
+def __fancy_circumstances():
+    return __fancy_world_element(CIRCUMSTANCE)
+
+
+def __fancy_traumas():
+    return __fancy_world_element(TRAUMA)
+
+
+def __fancy_trophies():
+    return __fancy_world_element(TROPHY)
+
+
 content_methods = {
     "abilities": __fancy_abilities,
     "primary_limits": __fancy_primary_limits,
     "alternative_limits": __fancy_alt_limits,
     "battle_scars": __fancy_battle_scars,
+    "conditions": __fancy_conditions,
+    "circumstances": __fancy_circumstances,
+    "traumas": __fancy_traumas,
+    "trophies": __fancy_trophies,
 }
 
 def __render_fancy_sections(content):
