@@ -21,8 +21,8 @@ def merge_status(current_status, incoming_status):
 
 class PowerEngine:
 
-    def __init__(self):
-        self.blob = PowerSystem.get_singleton().get_python()
+    def __init__(self, is_admin=False):
+        self.blob = PowerSystem.get_singleton(is_admin).get_python()
 
     def get_json_power_blob(self):
         return json.dumps(self.blob)
@@ -37,10 +37,7 @@ class PowerEngine:
             mod, mod_type = self.get_mod_and_type_for_inst(mod_inst)
             if mod_type == "enh^" and mod["group"]:
                 active_groups[mod["group"]] += 1
-            print("merging statuses")
-            print(current_status,  mod["required_status"][0])
             current_status = merge_status(current_status, mod["required_status"][0])
-            print(current_status)
         for param_inst in param_instances:
             pow_param = param_inst.relevant_power_param
             if param_inst.value >= pow_param.veteran:
@@ -123,6 +120,7 @@ class PowerEngine:
         allowed_power_params = PowerEngine._get_allowed_params_for_components(components)
         allowed_power_param_by_slug = {x["id"]: x for x in allowed_power_params}
         for form in param_formset:
+            print(form.cleaned_data)
             form_param_id = form.cleaned_data["power_param_id"]
             if form_param_id not in allowed_power_param_by_slug:
                 raise ValueError("Power Param not available for components. components: {}, Form data: {}, allowed: {}".format(

@@ -46,7 +46,7 @@ def get_edit_context(existing_power_full=None, is_edit=False, existing_char=None
     categories = Base_Power_Category.objects.all()
     show_tutorial = (not user) or (not user.is_authenticated) or (not user.power_full_set.exists())
     context = {
-        'power_blob_url': PowerSystem.get_singleton().get_json_url(),
+        'power_blob_url': PowerSystem.get_singleton(is_admin=user and user.is_superuser).get_json_url(),
         'character_blob': json.dumps(existing_char.to_create_power_blob()) if existing_char else None,
         'modifier_formset': modifiers_formset,
         'params_formset': params_formset,
@@ -141,7 +141,7 @@ def _calculate_req_status(power_engine, power, modifier_instances, param_instanc
 
 
 def _create_new_power_and_save(power_form, request, SigArtifactForm):
-    power_engine = PowerEngine()
+    power_engine = PowerEngine(is_admin=request.user and request.user.is_superuser)
 
     # power is not saved yet
     power = _get_power_from_form_and_validate(power_form=power_form, power_engine=power_engine, user=request.user)
@@ -227,6 +227,7 @@ def _get_modifier_instances_and_validate(POST, power_engine, effect_id, vector_i
 
 
 def _get_param_instances_and_validate(POST, power_engine, effect_id, vector_id, modality_id):
+    print(POST)
     params_formset = get_params_formset(POST)
     if params_formset.is_valid():
         power_engine.validate_new_param_forms(effect_id, vector_id, modality_id, params_formset)

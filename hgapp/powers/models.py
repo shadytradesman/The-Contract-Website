@@ -1669,8 +1669,14 @@ class PowerTutorial(models.Model):
 
 
 class PowerSystem(models.Model):
+    # Cache Keys
+    KEY_USER = "user"
+    KEY_ADMIN = "admin"
+
+    # Fields
     json_media = models.FileField(blank=True)
     revision = models.UUIDField(default=uuid.uuid4)
+    cache_key = models.CharField(default=KEY_USER, max_length=220)
 
     # Power blob keys.
     # DO NOT CHANGE THESE WITHOUT UPDATING THE POWER SYSTEM FRONT END AS THESE VALUES ARE HARD CODED THERE.
@@ -1690,17 +1696,17 @@ class PowerSystem(models.Model):
     VECTORS = 'vectors'
 
     @staticmethod
-    def get_singleton():
-        return PowerSystem.objects.get()
+    def get_singleton(is_admin=False):
+        return PowerSystem.objects.get(cache_key=(PowerSystem.KEY_ADMIN if is_admin else PowerSystem.KEY_USER))
 
     def mark_dirty(self):
         self.revision = uuid.uuid4()
         self.save()
 
     def regenerate(self):
-        python_blob = self._generate_python()
+        python_blob = self._generate_python(is_admin=(self.cache_key == PowerSystem.KEY_ADMIN))
         self.revision = uuid.uuid4()
-        self.json_media.save("power_system_json_{}.json".format(self.revision), ContentFile(json.dumps(python_blob).encode("utf-8"), name="power_blob.json"))
+        self.json_media.save("power_system_json_{}_{}.json".format(self.revision, self.cache_key), ContentFile(json.dumps(python_blob).encode("utf-8"), name="power_blob.json"))
         cache.set(self._get_cache_key(), python_blob, timeout=None)
         self.save()
         return python_blob
@@ -1721,13 +1727,13 @@ class PowerSystem(models.Model):
         return cache.get(self._get_cache_key())
 
     def _get_cache_key(self):
-        return "power_blob:{}".format(self.revision)
+        return "power_blob:{}:{}".format(self.revision, self.cache_key)
 
     @staticmethod
-    def _generate_python():
-        vectors = PowerSystem._generate_component_blob(VECTOR)
-        effects = PowerSystem._generate_component_blob(EFFECT)
-        modalities = PowerSystem._generate_component_blob(MODALITY)
+    def _generate_python(is_admin=False):
+        vectors = PowerSystem._generate_component_blob(VECTOR, is_admin)
+        effects = PowerSystem._generate_component_blob(EFFECT, is_admin)
+        modalities = PowerSystem._generate_component_blob(MODALITY, is_admin)
         effects_by_modality = defaultdict(list)
         vectors_by_effect = defaultdict(list)
         vectors_by_modality = {}
@@ -1769,10 +1775,14 @@ class PowerSystem(models.Model):
         }
 
     @staticmethod
-    def _generate_component_blob(base_type):
+    def _generate_component_blob(base_type, is_admin=False):
         # TODO: select related and stuff.
-        components = Base_Power.objects.filter(base_type=base_type, is_public=True) \
-            .order_by("-name") \
+        components = Base_Power.objects
+        if not is_admin:
+            components = components.filter(base_type=base_type, is_public=True)
+        else:
+            components = components.filter(base_type=base_type)
+        components = components.order_by("-name") \
             .prefetch_related("basepowerfieldsubstitution_set") \
             .prefetch_related("power_param_set").all()
         #TODO: Determine if these prefetches do anything

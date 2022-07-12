@@ -1200,6 +1200,8 @@ const ComponentRendering = {
             if (this.giftPreviewModalFirstShow && window.innerWidth <= 770) {
                 $('#giftPreviewModal').modal({});
             }
+            setFormInputPrefixValues();
+
           });
       },
       clickModalityTab() {
