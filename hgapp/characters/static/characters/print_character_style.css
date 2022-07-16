@@ -1,0 +1,167 @@
+body {
+    box-sizing: border-box;
+    font-family: Helvetica Neue,Helvetica,Arial,sans-serif;
+    -webkit-print-color-adjust: exact !important;
+
+}
+
+.text-center {
+    text-align: center;
+}
+
+.css-page {
+    width: 8in;
+    border: 2px solid grey;
+    border-style: ridge;
+    padding: .2in;
+    margin: auto;
+}
+
+.css-no-print {
+    width: 8in;
+    border: 1px solid grey;
+    padding: .2in;
+    margin: auto;
+    margin-top: 5px;
+    margin-bottom: 15px;
+}
+
+
+/* MAIN CONTENT INTRO */
+.css-main-logo {
+    height: .8in;
+    float: right;
+}
+
+.css-char-name-cont {
+    padding-right: 10px;
+    flex: 1;
+}
+
+.css-char-name {
+    font-size: 2.5em;
+    text-align: center;
+}
+
+.css-char-name-subtitle {
+    font-size: .8em;
+    text-align: center;
+}
+
+.css-blank-fill {
+    border-bottom: 1px solid black;
+}
+
+.css-character-intro {
+    max-height: 1in;
+    margin-bottom: .1in;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between
+}
+
+/* CSS ESSENTIALS SECTION */
+
+.css-essentials-section {
+    border: 1px solid #f0f0f0;
+    padding: .1in;
+    font-size: .9em;
+    margin-bottom: .1in;
+}
+
+/* STATS SECTION */
+
+.css-section-stats {
+    margin-bottom: .2in;
+    display: flex;
+}
+
+.css-section-attributes {
+    width: 2.5in;
+    padding-right: .1in;
+    border-right: 1px solid black;
+}
+
+.css-section-abilities {
+    width: 5.45in;
+    padding-left: .1in;
+}
+
+.css-ability-values {
+    column-count: 2;
+}
+
+.css-ability-values .css-stat-value {
+    font-size: .8em;
+}
+
+.css-ability-values .css-stat-name {
+    font-size: 0.9em;
+}
+
+.css-attr {
+    font-size: 1.15em;
+}
+
+.css-attribute-values {
+    display:flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-evenly;
+    margin-top: -.1in;
+}
+
+.css-stat-name {
+}
+
+.css-stat-value {
+    font-size: 0.8em;
+    float: right;
+}
+
+.css-stat-extra-value {
+    font-size: 0.6em;
+    padding-top: .2em;
+    float: right;
+    color: #aeaeae;
+}
+
+.dot {
+  height: 1em;
+  width: 1em;
+  background-color: #ffffff;
+  border: 1px solid black;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 1px;
+}
+
+.dot-filled {
+  height: 1em;
+  width: 1em;
+  color: black;
+  background-color: black;
+  border: 1px solid black;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 1px;
+}
+
+.css-content {
+    border: 1px solid #FAFAFA;
+}
+
+@page {
+    margin: 0.25in;
+}
+
+@media print {
+    .css-no-print {
+        display: none;
+    }
+
+    h1 {
+        break-before: always;
+    }
+}

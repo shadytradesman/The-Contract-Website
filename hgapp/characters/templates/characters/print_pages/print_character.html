@@ -4,10 +4,24 @@
 <head>
     <meta charset="UTF-8">
     <title>{{character.name}}'s Sheet</title>
-    {{character_blob|json_script:"characterblob"}}
-    <script src="{% static 'characters/print_character.js' %}"></script>
+    {{character_blob|json_script:"characterBlob"}}
+    <link rel="stylesheet" type="text/css" href="{% static 'characters/print_character_style.css' %}" />
+<!--    <script src="https://unpkg.com/vue@3.2.26/dist/vue.global.prod.js"></script>-->
 </head>
 <body>
-
+<div id="js-sheet-component" >
+    <div v-if="ready">
+        <div class="css-no-print" >
+            {% include "characters/print_pages/no_print_section.html" %}
+        </div>
+        <div class="css-page" >
+            <div class="css-content">
+                {% include "characters/print_pages/print_character_content.html" %}
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://unpkg.com/vue@3"></script>
+<script src="{% static 'characters/print_character.js' %}"></script>
 </body>
 </html>

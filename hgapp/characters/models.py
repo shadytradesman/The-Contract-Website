@@ -955,7 +955,9 @@ Archived on: {}
         }
 
     def to_print_blob(self):
-        self.stats_snapshot
+        abilities = [(x.relevant_ability.name, x.value) for x in self.get_abilities()]
+        abilities.append(("____________________", 0))
+        abilities.append(("____________________", 0))
 
         return {
             "name": self.name,
@@ -966,6 +968,9 @@ Archived on: {}
             "sex": self.sex,
             "concept_summary": self.concept_summary,
             "ambition": self.ambition,
+            "pronoun": self.get_pronoun_display(),
+            "pronoun_pres": self.pres_tense_to_be(),
+            "age": self.age,
             "num_games": self.num_games,
             "num_victories": self.num_victories,
             "num_losses": self.num_losses,
@@ -977,7 +982,7 @@ Archived on: {}
             "source": self.source_values(),
 
             "attributes": [(x.relevant_attribute.name, x.value) for x in self.get_attributes()],
-            "abilities": [(x.relevant_ability.name, x.value) for x in self.get_abilities()],
+            "abilities": abilities,
             "battle_scars": [(scr.description, scr.system) for scr in self.battlescar_set.all()],
             "limits": [(lim.relevant_limit.name, lim.relevant_limit.description) for lim in self.stats_snapshot.limitrevision_set.all()],
             "traumas": [(trm.relevant_trauma.name, trm.relevant_trauma.description) for trm in self.stats_snapshot.traumarevision_set.all()],
