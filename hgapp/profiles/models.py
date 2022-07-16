@@ -4,7 +4,7 @@ from django.contrib.auth.models import Permission
 from .apps import ProfilesConfig
 
 from django.utils import timezone
-from games.models import Game
+from games.models import Game, Move
 from games.games_constants import get_completed_game_invite_excludes_query, get_completed_game_excludes_query
 
 UNTESTED = 'UNTESTED'
@@ -97,6 +97,7 @@ class Profile(models.Model):
                                  default=GM_SUFFIX[0][0])
 
     num_games_gmed = models.IntegerField(default=0)
+    num_moves_gmed = models.IntegerField(default=0)
     num_gm_kills = models.IntegerField(default=0)
     num_gm_victories = models.IntegerField(default=0)
     num_gm_losses = models.IntegerField(default=0)
@@ -128,6 +129,7 @@ class Profile(models.Model):
             models.Index(fields=['num_player_games']),
             models.Index(fields=['num_played_ringers']),
             models.Index(fields=['num_player_survivals']),
+            models.Index(fields=['num_moves_gmed']),
         ]
 
     # This should be the only way you set the user's adult content prefs
@@ -163,6 +165,7 @@ class Profile(models.Model):
         self.num_gmed_contractors = len(contractors_gmed)
         self.num_gmed_cells = len(cells_gmed)
         self.num_games_gmed = num_gm_games
+        self.num_moves_gmed = self.get_moves_where_player_gmed().count()
         self.num_gm_losses = num_gm_losses
         self.num_gm_kills = num_gm_kills
         self.num_gm_victories = num_gm_victories
@@ -227,7 +230,7 @@ class Profile(models.Model):
         return [invite for invite in invites_with_death if invite.attendance and invite.attendance.is_death()]
 
     def recompute_gm_title(self):
-        self.gm_suffix = self._gm_suffix_from_num_gm_games(self.num_games_gmed)
+        self.gm_suffix = self._gm_suffix_from_num_gm_games(self.num_games_gmed, self.num_moves_gmed)
 
         # gm_prefix can be None, so we return the db value here
         self.gm_prefix = self._gm_prefix_from_stats(num_gm_games=self.num_games_gmed,
@@ -255,6 +258,9 @@ class Profile(models.Model):
         return Game.objects.filter(gm=self.user).exclude(get_completed_game_excludes_query()) \
                 .order_by("-end_time") \
                 .all()
+
+    def get_moves_where_player_gmed(self):
+        return Move.objects.filter(gm=self.user).exclude(deleted_on__isnull=False).order_by("-created_date").all()
 
     def get_gm_title_tooltip(self):
         return "Games GMed: {}<br>Contractors killed: {}<br>Victories awarded: {} <br>Losses awarded: {}"\
@@ -296,7 +302,8 @@ class Profile(models.Model):
         else:
             return GRANDMASTER
 
-    def _gm_suffix_from_num_gm_games(self, num_gm_games):
+    def _gm_suffix_from_num_gm_games(self, num_games_gmed, num_moves_gmed):
+        num_gm_games = num_games_gmed + (0.25 * num_moves_gmed)
         if num_gm_games < 1:
             return SPECTATOR
         elif num_gm_games < 5:

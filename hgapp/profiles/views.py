@@ -77,6 +77,7 @@ class ProfileView(generic.DetailView):
 
     def populate_gm_stats_context(self, context):
         context['num_gm_games'] = self.profile.num_games_gmed
+        context['num_gm_moves'] = self.profile.num_moves_gmed
         context['num_cells_gmed'] = self.profile.num_gmed_cells
         context['num_contractors_gmed'] = self.profile.num_gmed_contractors
         context['num_players_gmed'] = self.profile.num_gmed_players

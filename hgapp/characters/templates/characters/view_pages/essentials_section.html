@@ -7,15 +7,14 @@
     <p>
         {{character.pres_tense_to_be}} <b>{{character.age}}</b> years old, and often appears as <b>{{character.appearance}}</b>.
     </p>
+    {% if character.cell or num_journal_entries %}
+    <p style="margin-bottom: 5px;">
     {% if character.cell %}
-        <p style="margin-bottom: 5px;">
-            {{character.name}} lives in
-            <a href="{% url 'cells:cells_view_cell' character.cell.id %}">{{ character.cell.setting_name }}</a>,
-            a setting {{ character.cell.setting_sheet_blurb}}.
-        </p>
+        {{character.name}} lives in
+        <a href="{% url 'cells:cells_view_cell' character.cell.id %}">{{ character.cell.setting_name }}</a>,
+        a setting {{ character.cell.setting_sheet_blurb}}.
     {% endif %}
     {% if num_journal_entries %}
-        <p style="margin-bottom: 5px;">
             {{character.pronoun_possessive_capitalized}}
             {% if journal_cover %}
                 journal,
@@ -28,13 +27,14 @@
                 {% endif %}
             </a>
             has {{num_journal_entries}} {% if num_journal_entries > 1 %} entries{% else %} entry{%endif%}.
-        </p>
     {% elif user_can_edit and next_entry %}
-        <a class="btn btn-sm btn-success js-journal-link"
+        <a class="btn btn-sm btn-primary js-journal-link"
            href="{% url 'journals:journal_write_next' character.id %}">
             Earn Experience and Improvements
             <br class="visible-xs-block">
             for {{character.name}} by writing in {{character.get_pronoun_display}} journal!
         </a>
+    {% endif %}
+    </p>
     {% endif %}
 </div>

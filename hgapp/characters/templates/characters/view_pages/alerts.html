@@ -160,7 +160,7 @@
 {% endif %}
 {% if next_entry %}
     <a href="{% url 'journals:journal_write_next' character.id %}">
-        <div class="alert alert-success btn btn-success css-char-alert" role="alert">
+        <div class="alert alert-info btn btn-primary css-char-alert" role="alert">
             Earn
             {% if next_entry.reward_is_improvement %}
             <b>an Improvement</b>

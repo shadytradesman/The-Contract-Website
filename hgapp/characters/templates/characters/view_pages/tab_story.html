@@ -81,7 +81,7 @@
     </a>
     {% if user_can_edit %}
         {% if next_entry %}
-        <a class="btn btn-sm btn-success js-journal-link"
+        <a class="btn btn-sm btn-primary js-journal-link"
            href="{% url 'journals:journal_write_next' character.id %}">
             Earn
             {% if next_entry.reward_is_improvement %}

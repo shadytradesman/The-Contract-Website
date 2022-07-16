@@ -238,6 +238,7 @@ EXP_WIN_V2 = "WIN_V2"
 EXP_WIN_IN_WORLD_V2 = "WIN_IN_WORLD_V2"
 EXP_WIN_RINGER_V2 = "WIN_RINGER_V2"
 EXP_GM = "GM"
+EXP_GM_MOVE = "GM_MOVE"
 EXP_JOURNAL = "JOURNAL"
 EXP_CUSTOM = "CUSTOM"
 EXP_REWARD_TYPE = (
@@ -253,6 +254,7 @@ EXP_REWARD_TYPE = (
     (EXP_WIN_IN_WORLD_V2, "winning in-World Contract"),
     (EXP_WIN_RINGER_V2, "winning as a ringer"),
     (EXP_GM, "GMing"),
+    (EXP_GM_MOVE, "GMing a Move"),
     (EXP_JOURNAL, "writing a journal"),
     (EXP_CUSTOM, "custom reason"),
 )
@@ -270,6 +272,7 @@ EXP_REWARD_VALUES = {
     EXP_WIN_IN_WORLD_V2: 5,
     EXP_WIN_RINGER_V2: 3,
     EXP_GM: 6,
+    EXP_GM_MOVE: 2,
     EXP_JOURNAL: 1,
 }
 
@@ -1530,6 +1533,8 @@ class ExperienceReward(models.Model):
         reason = "from {}".format(self.get_type_display())
         if self.type == EXP_GM:
             return "{} {}".format(reason, self.game.scenario.title)
+        if self.type == EXP_GM_MOVE:
+            return "{} in {}: {}".format(reason, self.move.cell, self.move.title)
         if self.type == EXP_JOURNAL:
             return mark_safe("<a href={}>{}: {}</a>".format(
                 reverse("journals:journal_read_id", args=(self.journal.pk,)),

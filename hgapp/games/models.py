@@ -5,7 +5,7 @@ from django.db.models import Count
 from django.conf import settings
 from characters.models import Character, HIGH_ROLLER_STATUS, Character_Death, ExperienceReward, AssetDetails, EXP_GM, \
     EXP_LOSS_V2, EXP_WIN_V2, EXP_LOSS_RINGER_V2, EXP_WIN_RINGER_V2, EXP_LOSS_IN_WORLD_V2, EXP_WIN_IN_WORLD_V2, EXP_MVP,\
-    EXP_WIN_V1, EXP_LOSS_V1, Artifact
+    EXP_WIN_V1, EXP_LOSS_V1, Artifact, EXP_GM_MOVE
 from powers.models import Power, Power_Full
 from cells.models import Cell
 from django.utils import timezone
@@ -1119,3 +1119,74 @@ class GameMedium(models.Model):
 
     def __str__(self):
         return self.medium
+
+
+class Move(models.Model):
+    main_character = models.ForeignKey(Character, on_delete=models.PROTECT)
+    gm = models.ForeignKey( settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    # Cannot make a move before first Downtime. HOWEVER, if an attendance is changed, this downtime can become blank
+    downtime = models.ForeignKey(Game_Attendance,
+                                 blank=True,
+                                 null=True,
+                                 on_delete=models.CASCADE)
+    created_date = models.DateTimeField('date created', auto_now_add=True)
+    cell = models.ForeignKey(Cell, on_delete=models.CASCADE)
+    title = models.TextField(max_length=500, blank=True)
+    summary = models.TextField(max_length=50000, blank=True)
+
+    # Rewards and public event
+    public_event = models.TextField(max_length=50000, blank=True)
+    gm_experience_reward = models.OneToOneField(ExperienceReward, null=True, blank=True, on_delete=models.CASCADE)
+    is_valid = models.BooleanField(default=False)
+
+    deleted_on = models.DateTimeField('date deleted', blank=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['main_character', 'created_date']), # display on sheet
+            models.Index(fields=['main_character', 'downtime']), # display on journal
+            models.Index(fields=['gm', 'created_date']), # display on gm profile
+            models.Index(fields=['cell', 'created_date']), # display in cell / world events
+            models.Index(fields=['gm_experience_reward']), # exp progeny
+        ]
+
+    def __repr__(self):
+        return "[{} in {}] {}".format(self.main_character.name, self.cell.name, self.title)
+
+    def save(self, *args, **kwargs):
+        self.__update_is_valid()
+        super(Move, self).save(*args, **kwargs)
+        if self.is_valid and (not self.gm_experience_reward or self.gm_experience_reward.is_void):
+            self.__grant_gm_exp_reward()
+
+    def mark_void(self):
+        if self.deleted_on:
+            raise ValueError("Move is already void")
+        self.deleted_on = timezone.now()
+
+    def player_can_edit(self, player):
+        if player.is_superuser:
+            return True
+        return player.is_authenticated and (player == self.gm) or self.cell.player_can_manage_games(player)
+
+    def __grant_gm_exp_reward(self):
+        if self.gm_experience_reward and not self.gm_experience_reward.is_void:
+            raise ValueError("Move is granting exp reward to gm when it already has one.", str(self.id))
+        exp_reward = ExperienceReward(
+            rewarded_player=self.gm,
+            type=EXP_GM_MOVE
+        )
+        exp_reward.save()
+        self.gm_experience_reward = exp_reward
+        self.save()
+
+    def __update_is_valid(self):
+        event_words = self.__get_event_wordcount()
+        self.is_valid = (event_words > 100) and (event_words + self.__get_summary_wordcount() > 250)
+
+    def __get_event_wordcount(self):
+        soup = BeautifulSoup(self.public_event, features="html5lib")
+        return len(soup.text.split())
+
+    def __get_summary_wordcount(self):
+        return len(self.summary.split())
