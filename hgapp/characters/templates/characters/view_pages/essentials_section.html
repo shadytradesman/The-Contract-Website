@@ -27,13 +27,6 @@
                 {% endif %}
             </a>
             has {{num_journal_entries}} {% if num_journal_entries > 1 %} entries{% else %} entry{%endif%}.
-    {% elif user_can_edit and next_entry %}
-        <a class="btn btn-sm btn-primary js-journal-link"
-           href="{% url 'journals:journal_write_next' character.id %}">
-            Earn Experience and Improvements
-            <br class="visible-xs-block">
-            for {{character.name}} by writing in {{character.get_pronoun_display}} journal!
-        </a>
     {% endif %}
     </p>
     {% endif %}

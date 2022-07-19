@@ -1,0 +1,59 @@
+{% if assets or liabilities %}
+<h3 class="text-center">Assets And Liabilities</h3>
+<div class="row">
+  <div class="col-xs-12 col-sm-6">
+    {% if assets %}
+      <h4>
+          Assets
+      </h4>
+    {% for asset_details in assets %}
+    <div class="css-quirk-container">
+      <b>
+                            <span class="css-quirk-value">
+                                +{{asset_details.relevant_asset.value}}
+                            </span>
+      </b>
+      <span class="css-quirk-content">
+                            <b class="css-quirk-name">
+                                {{asset_details.relevant_asset.name}}
+                            </b>
+                            {% if asset_details.details %}
+                                <div class="css-quirk-details">
+                                    {{asset_details.relevant_asset.details_field_name}}:
+                                    {{asset_details.details}}
+                                </div>
+                            {% endif %}
+                        </span>
+    </div>
+    {% endfor %}
+    {% endif %}
+  </div>
+  <div class="col-xs-12 col-sm-6">
+    {% if liabilities %}
+      <h4>
+          Liabilities
+      </h4>
+    {% for liability_details in liabilities %}
+    <div>
+      <b>
+        <span class="css-quirk-value">
+            -{{liability_details.relevant_liability.value}}
+        </span>
+      </b>
+      <span class="css-quirk-content">
+                            <b class="css-quirk-name">
+                                {{liability_details.relevant_liability.name}}
+                            </b>
+                            {% if liability_details.details %}
+                                <div class="css-quirk-details">
+                                    {{liability_details.relevant_liability.details_field_name}}:
+                                    {{liability_details.details}}
+                                </div>
+                            {% endif %}
+                        </span>
+    </div>
+    {% endfor %}
+    {% endif %}
+  </div>
+</div>
+{% endif %}

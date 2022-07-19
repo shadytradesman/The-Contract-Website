@@ -1,0 +1,103 @@
+{% if num_journal_entries %}
+    <div class="text-center">
+        <a href="{% url 'journals:journal_read' character.id %}">
+            <h3>
+                {% if journal_cover %}
+                    Journal: {{journal_cover.title}}
+                {% else %}
+                    Journal
+                {% endif %}
+            </h3>
+        </a>
+        {% if user_can_edit and next_entry %}
+            <a class="btn btn-sm btn-primary js-journal-link"
+               href="{% url 'journals:journal_write_next' character.id %}">
+                Earn
+                {% if next_entry.reward_is_improvement %}
+                <b>an Improvement</b>
+                {% else %}
+                1 Exp
+                {% endif %}
+                for {{character.name}}
+                <br class="visible-xs-block">
+                by writing a
+                {% if next_entry.is_downtime %}
+                Downtime
+                {% else %}
+                Contract
+                {% endif %}
+                journal
+            </a>
+        {% endif %}
+    </div>
+    {% if latest_journals %}
+        <i>Latest {{ latest_journals|length }} of {{num_journal_entries}} entries</i>
+        {% for journal in latest_journals %}
+            <ul>
+                <li>
+                    <a href="{% url 'journals:journal_read_id' journal.id %}">
+                        {% if journal.title %}
+                            <h4>{{journal.title}}</h4>
+                        {% else %}
+                            <h4>An untitled Journal</h4>
+                        {% endif %}
+                    </a>
+                </li>
+            </ul>
+        {% endfor %}
+    {% endif %}
+{% else %}
+<div class="text-center">
+    <h3>
+        Journal
+        <div>
+            <small>
+                {{character.name}} has not written in {{character.get_pronoun_display}} journal yet.
+            </small>
+        </div>
+    </h3>
+    {% if user_can_edit %}
+        {% if next_entry %}
+            <div style=" margin-bottom: 5px;">
+                <a class="btn btn-sm btn-primary js-journal-link"
+                   href="{% url 'journals:journal_write_next' character.id %}">
+                    Earn
+                    {% if next_entry.reward_is_improvement %}
+                    <b>an Improvement</b>
+                    {% else %}
+                    1 Exp
+                    {% endif %}
+                    for {{character.name}}
+                    <br class="visible-xs-block">
+                    by writing a
+                    {% if next_entry.is_downtime %}
+                    Downtime
+                    {% else %}
+                    Contract
+                    {% endif %}
+                    journal
+                </a>
+            </div>
+        {% endif %}
+        <div class="alert alert-info">
+            <p class="text-center">
+                <b>Journals record your story.</b>
+            </p>
+            <p>
+                Players can earn Rewards for writing in-character Journals about their Contractor's experience in
+                Contracts and Downtimes.
+            </p>
+            <p>
+                <a  href="/guide/rules/#journals">Read more about Journals in the Player's Guide.</a>
+            </p>
+            {% if not next_entry %}
+            <p class="text-center">
+                <b>
+                    Until you participate in a Contract, you cannot write a Journal.
+                </b>
+            </p>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endif %}

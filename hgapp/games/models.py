@@ -7,7 +7,7 @@ from characters.models import Character, HIGH_ROLLER_STATUS, Character_Death, Ex
     EXP_LOSS_V2, EXP_WIN_V2, EXP_LOSS_RINGER_V2, EXP_WIN_RINGER_V2, EXP_LOSS_IN_WORLD_V2, EXP_WIN_IN_WORLD_V2, EXP_MVP,\
     EXP_WIN_V1, EXP_LOSS_V1, Artifact, EXP_GM_MOVE
 from powers.models import Power, Power_Full
-from cells.models import Cell
+from cells.models import Cell, WorldEvent
 from django.utils import timezone
 from bs4 import BeautifulSoup
 from .games_constants import EXP_V1_V2_GAME_ID
@@ -1135,7 +1135,7 @@ class Move(models.Model):
     summary = models.TextField(max_length=50000, blank=True)
 
     # Rewards and public event
-    public_event = models.TextField(max_length=50000, blank=True)
+    public_event = models.OneToOneField(WorldEvent, null=True, blank=True, on_delete=models.CASCADE)
     gm_experience_reward = models.OneToOneField(ExperienceReward, null=True, blank=True, on_delete=models.CASCADE)
     is_valid = models.BooleanField(default=False)
 
@@ -1156,13 +1156,20 @@ class Move(models.Model):
     def save(self, *args, **kwargs):
         self.__update_is_valid()
         super(Move, self).save(*args, **kwargs)
+        self.fix_rewards()
+
+    def fix_rewards(self):
+        self.__update_is_valid()
         if self.is_valid and (not self.gm_experience_reward or self.gm_experience_reward.is_void):
             self.__grant_gm_exp_reward()
+        if (not self.is_valid) and (self.gm_experience_reward and not self.gm_experience_reward.is_void):
+            self.refund_reward()
 
     def mark_void(self):
         if self.deleted_on:
             raise ValueError("Move is already void")
         self.deleted_on = timezone.now()
+        self.refund_reward()
 
     def player_can_edit(self, player):
         if player.is_superuser:
@@ -1180,13 +1187,27 @@ class Move(models.Model):
         self.gm_experience_reward = exp_reward
         self.save()
 
+    def unlink_event(self):
+        self.public_event = None
+        self.is_valid = False
+        self.refund_reward()
+
+    def refund_reward(self):
+        if self.gm_experience_reward and not self.gm_experience_reward.is_void:
+            self.gm_experience_reward.mark_void()
+            self.experience_reward = None
+        self.save()
+
     def __update_is_valid(self):
         event_words = self.__get_event_wordcount()
         self.is_valid = (event_words > 100) and (event_words + self.__get_summary_wordcount() > 250)
 
     def __get_event_wordcount(self):
-        soup = BeautifulSoup(self.public_event, features="html5lib")
-        return len(soup.text.split())
+        if hasattr("public_event", self) and self.public_event and self.public_event.event_description:
+            soup = BeautifulSoup(self.public_event.event_description, features="html5lib")
+            return len(soup.text.split())
+        else:
+            return 0
 
     def __get_summary_wordcount(self):
         return len(self.summary.split())

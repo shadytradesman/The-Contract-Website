@@ -294,6 +294,16 @@ class WorldEvent(models.Model):
                                       null=True,
                                       blank=True)
 
+    def save(self, *args, **kwargs):
+        super(WorldEvent, self).save(*args, **kwargs)
+        if self.pk and self.move:
+            self.move.fix_rewards()
+
+    def delete(self, *args, **kwargs):
+        if self.move:
+            self.move.unlink_event()
+        super(WorldEvent, self).delete(*args, **kwargs)
+
     def get_permalink(self, request):
         return "{}#event-{}".format(request.build_absolute_uri(reverse('cells:cells_view_cell', args=(self.parent_cell.id,))), self.id)
 

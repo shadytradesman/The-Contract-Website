@@ -1,0 +1,69 @@
+{% load markdown_deux_tags %}
+
+{% if user_can_edit and not request.user.is_anonymous and request.user != character.player %}
+<h3 style="margin-bottom: 10px;">GM Notes</h3>
+<div style="margin-left: 5px;">
+  <small>These notes are <b>hidden</b> from the Player who owns this Contractor.
+    Only other Players who can edit this Contractor can view these notes.</small>
+</div>
+<div class="thumbnail">
+  {% if character.notes or user_can_edit %}
+  <div class="css-notes-text">
+    <div id="js-notes-text">
+      {{character.notes | markdown}}
+    </div>
+  </div>
+  {% endif %}
+  {% if user_can_edit %}
+  <form id="notes-form"
+        data-post-url="{% url 'characters:post_notes' character.id secret_key %}">
+    <div id="js-notes-form" style="display:none;">
+      {{ notes_form.about.errors }}
+      {{ notes_form.non_field_errors }}
+      {% csrf_token %}
+      {{ notes_form.notes}}
+      <div style="margin-top: 5px; margin-bottom: 5px;">
+        <input class="btn btn-sm btn-default" type="submit" value="Save">
+        <small><a href="https://commonmark.org/help/">Markdown</a> enabled</small>
+      </div>
+    </div>
+  </form>
+  <div id="js-edit-notes-button" class="btn btn-default btn-xs">
+    <i class="fa fa-edit fa-2x"></i> Edit GM Notes
+  </div>
+  {% endif %}
+</div>
+{% endif %}
+
+
+{% if character.background or user_can_edit %}
+<h3>Biography</h3>
+<div class="thumbnail">
+  {% if character.background or user_can_edit %}
+  <div class="css-bio-text">
+    <div id="js-bio-text">
+      {{character.background | markdown}}
+    </div>
+  </div>
+  {% endif %}
+  {% if user_can_edit %}
+  <form id="bio-form"
+        data-post-url="{% url 'characters:post_bio' character.id secret_key %}">
+    <div id="js-bio-form" style="display:none;">
+      {{ bio_form.about.errors }}
+      {{ bio_form.non_field_errors }}
+      {% csrf_token %}
+      {{ bio_form.bio}}
+      <div style="margin-top: 5px; margin-bottom: 5px;">
+        <input class="btn btn-sm btn-default" type="submit" value="Save">
+        <small><a href="https://commonmark.org/help/">Markdown</a> enabled</small>
+      </div>
+    </div>
+  </form>
+  <div id="js-edit-bio-button" class="btn btn-default btn-xs">
+    <i class="fa fa-edit fa-2x"></i> Edit Biography
+  </div>
+  {% endif %}
+</div>
+{% endif %}
+

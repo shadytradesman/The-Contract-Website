@@ -11,19 +11,21 @@
     - <b>{{ num_improvements }} </b> Improvement{{num_improvements|pluralize}}
     {% endif %}
   </div>
-  {% if character.number_of_victories %}
-  <div class="text-center">
-    <h5 style="margin-top: 5px; margin-bottom: 5px;">
-      <a href="{% url 'characters:characters_view_contacts' character.id %}">
-        View {{character.name}}'s Encountered Contractors
-      </a>
-    </h5>
-  </div>
-  {% endif %}
   <div {% if unspent_experience < 0 %}class="text-danger"{% endif %}>
-    <b>Remaining Exp: </b>{{unspent_experience}}.
-    (<b>Earned: </b> {{exp_earned}} - <b>Spent: </b> {{exp_cost}})
+    <b>Remaining Exp: </b>{{unspent_experience}}
+    <small>
+      (<b>Earned: </b> {{exp_earned}} - <b>Spent: </b> {{exp_cost}})
+    </small>
   </div>
+{% if character.number_of_victories %}
+<div class="text-center">
+  <h5 style="margin-top: 5px; margin-bottom: 5px;">
+    <a href="{% url 'characters:characters_view_contacts' character.id %}">
+      View {{character.name}}'s Encountered Contractors
+    </a>
+  </h5>
+</div>
+{% endif %}
 
 </div>
 
@@ -38,7 +40,7 @@
       Load Full Timeline
     </button>
     <div>
-      <small>An itemized record of every Contract, Gift, Improvement, and Experience changes</small>
+      <small>An itemized record of every Contract, Reward, Experience change, Condition, Circumstance, and Move</small>
     </div>
   </div>
 </div>
