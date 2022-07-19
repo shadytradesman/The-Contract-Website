@@ -13,6 +13,8 @@ from django.utils.safestring import mark_safe
 from django.urls import reverse
 from django.db import transaction
 
+from heapq import merge
+
 from hgapp.utilities import get_queryset_size, get_object_or_none
 from cells.models import Cell
 from characters.signals import GrantAssetGift, VoidAssetGifts, AlterPortedRewards, transfer_consumables
@@ -957,8 +959,23 @@ Archived on: {}
             "status": self.status,
         }
 
+    def get_abilities_by_name_and_id(self):
+        char_ability_values = self.get_abilities()
+        ability_value_by_id = {}
+        char_value_ids = [x.relevant_ability.id for x in char_ability_values]
+        primary_zero_values = [(x.name, x, 0) for x in Ability.objects.filter(is_primary=True).order_by("name").all()
+                               if x.id not in char_value_ids]
+        all_ability_values = []
+        for x in char_ability_values:
+            all_ability_values.append((x.relevant_ability.name, x.relevant_ability, x.value))
+            ability_value_by_id[x.relevant_ability.id] = x.value
+        return (list(merge(primary_zero_values, all_ability_values)), ability_value_by_id)
+
     def to_print_blob(self):
-        abilities = [(x.relevant_ability.name, x.value) for x in self.get_abilities()]
+        abilities = self.get_abilities_by_name_and_id()[0]
+        abilities = [(x[0], x[2]) for x in abilities]
+
+        # abilities = [(x.relevant_ability.name, x.value) for x in self.get_abilities()]
         abilities.append(("____________________", 0))
         abilities.append(("____________________", 0))
 

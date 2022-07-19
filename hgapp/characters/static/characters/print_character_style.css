@@ -107,8 +107,8 @@ body {
 .css-attribute-values {
     display:flex;
     flex-direction: column;
-    height: 100%;
-    justify-content: space-evenly;
+    height: 95%;
+    justify-content: space-around;
     margin-top: -.1in;
 }
 
@@ -125,6 +125,12 @@ body {
     padding-top: .2em;
     float: right;
     color: #aeaeae;
+}
+
+.css-advancement-text {
+    position: relative;
+    bottom: 0.5em;
+    color: #212121;
 }
 
 .dot {

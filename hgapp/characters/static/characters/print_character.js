@@ -10,6 +10,7 @@ const charSheetRendering = {
       ready: false,
       character: null,
       showExtraStats: true,
+      showAdvancementCosts: true,
     }
   },
   methods: {

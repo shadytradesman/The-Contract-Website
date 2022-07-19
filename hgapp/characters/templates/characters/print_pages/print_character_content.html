@@ -30,6 +30,13 @@
     <div class="css-section-attributes">
         <h3 class="text-center" style="margin-top: 5px; margin-bottom: 5px;">Attributes</h3>
         <div class="css-attribute-values">
+            <div class="css-advancement-text text-center" v-if="showAdvancementCosts" >
+                <small>
+                    <i>
+                        Cost to increase: current rating x 5 Exp
+                    </i>
+                </small>
+            </div>
             <div class="css-attr" v-for="attribute in character.attributes">
                 <b>
                     <span class="css-stat-name" v-text="attribute[0]"></span>
@@ -41,6 +48,13 @@
     </div>
     <div class="css-section-abilities">
         <h3 class="text-center" style="margin-top: 5px; margin-bottom: 5px;">Abilities</h3>
+        <div class="css-advancement-text text-center" v-if="showAdvancementCosts" >
+            <small>
+                <i>
+                    Cost to increase: current rating x 2 (2 Exp for first rank)
+                </i>
+            </small>
+        </div>
         <div class="css-ability-values">
             <div class="css-abil" v-for="ability in character.abilities">
                 <b>
@@ -52,3 +66,5 @@
         </div>
     </div>
 </div>
+
+<hr>

@@ -10,7 +10,6 @@ from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.core import serializers
 from collections import defaultdict
-from heapq import merge
 from django.forms import formset_factory
 from django.http import HttpResponseRedirect
 from django.middleware.csrf import rotate_token
@@ -226,16 +225,7 @@ def view_character(request, character_id, secret_key=None):
     crafting_artifact_gifts = character.power_full_set.filter(dice_system=SYS_PS2, crafting_type=CRAFTING_ARTIFACT).all()
     crafting_consumable_gifts = character.power_full_set.filter(dice_system=SYS_PS2, crafting_type=CRAFTING_CONSUMABLE).all()
 
-    char_ability_values = character.get_abilities()
-    ability_value_by_id = {}
-    char_value_ids = [x.relevant_ability.id for x in char_ability_values]
-    primary_zero_values = [(x.name, x, 0) for x in Ability.objects.filter(is_primary=True).order_by("name").all()
-                 if x.id not in char_value_ids]
-    all_ability_values = []
-    for x in char_ability_values:
-        all_ability_values.append((x.relevant_ability.name, x.relevant_ability, x.value))
-        ability_value_by_id[x.relevant_ability.id] = x.value
-    ability_value_by_name = list(merge(primary_zero_values, all_ability_values))
+    ability_value_by_name, ability_value_by_id = character.get_abilities_by_name_and_id()
     unspent_experience = character.unspent_experience()
     exp_earned = character.exp_earned()
     exp_cost = character.exp_cost()
