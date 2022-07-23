@@ -295,13 +295,14 @@ class WorldEvent(models.Model):
                                       blank=True)
 
     def save(self, *args, **kwargs):
+        is_edit = self.pk is not None
         super(WorldEvent, self).save(*args, **kwargs)
-        if self.pk and self.move:
+        if is_edit and self.move:
             self.move.fix_rewards()
 
     def delete(self, *args, **kwargs):
         if self.move:
-            self.move.unlink_event()
+            raise ValueError("Cannot delete a world event with an associated Move")
         super(WorldEvent, self).delete(*args, **kwargs)
 
     def get_permalink(self, request):
@@ -344,8 +345,13 @@ class WebHook(models.Model):
             request.build_absolute_uri(reverse('profiles:profiles_view_profile', args=(player.id,))))
         return self.post(content)
 
-    def post_for_event(self, event, request):
-        content = "**{}**\nRead More: {}".format(
+    def post_for_event(self, event, request, move=None):
+        if move:
+            move_text = "{} made a Move! ".format(move.main_character.name)
+        else:
+            move_text = ""
+        content = "{}**{}**\nRead More: {}".format(
+            move_text,
             event.headline,
             event.get_permalink(request))
         return self.post(content)

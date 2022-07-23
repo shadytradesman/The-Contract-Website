@@ -1,7 +1,35 @@
-<h3>Moves</h3>
-Record Move (GM only)
-Total number of Moves
-What is a Move
-Recent Moves
-* title, GM, summary?
+<h3 style="margin-bottom: 5px;">Moves</h3>
+<b>
+    {{character.name}} has made {{num_moves}} Move{{num_moves|pluralize}}.
+</b>
+<ul>
+    {% for move in moves %}
+    <li>
+        <a href="{% url 'games:view_move' move.id %}">
+            {{move.title}}
+        </a>
+    </li>
+    {% endfor %}
+</ul>
+<div>
+    {% if user_posts_moves and character.num_games > 0 %}
+        <a class="btn btn-sm btn-default" href="{% url 'games:create_move_char' character.id %}">
+            Record Move
+        </a>
+    {% else %}
+        <small>
+            {% if character.num_games == 0 %}
+                Contractors must have participated in at least one Contract before they can make Moves.
+            {% elif character.cell %}
+                {% if character.player == request.user %}
+                    You cannot post Moves for your own Contractors.
+                {% endif %}
+                Only GMs who have permission to run Contracts and post World Events in {{character.cell.name}} can post
+                Moves for {{character.name}}.
+            {% else %}
+                    Only Contractors in Playgroups can make Moves.
+            {% endif %}
+        </small>
+    {% endif %}
+</div>
 

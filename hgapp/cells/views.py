@@ -205,6 +205,8 @@ class PostWorldEvent(View):
         else:
             if not self.cell.player_can_edit_world(self.request.user) and not self.world_event.creator == self.request.user:
                 raise PermissionDenied("You don't have permission to edit this World Event.")
+            if self.world_event.move:
+                raise ValueError("You cannot edit the event of a move individually")
 
 
     def __get_context_data(self):

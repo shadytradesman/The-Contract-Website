@@ -307,36 +307,28 @@
                 </div>
             {% endif %}
             {% endcache %}
-            {% cache 9000 view_profile_timeline profile.user.id %}
             <div class="row">
-                <div class="text-center">
-                    <h2>
-                        Contract Record
-                    </h2>
+                <div class="col-xs-12">
+                    <div class="text-center">
+                        <h2>
+                            Contract Record
+                        </h2>
+                    </div>
+                    <div id="hx-timeline-profile">
+                        <div class="text-center" style="margin-top: 10px;">
+                            <button
+                                    class="btn btn-primary"
+                                    hx-get="{% url 'profiles:profiles_timeline' profile.user.id %}"
+                                    hx-trigger="click"
+                                    hx-target="#hx-timeline-profile"
+                                    hx-swap="outerHTML">
+                                Load Contract, GM, and Move history
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
-            {% for date, event_list in game_timeline.items %}
-                <h4>{{ date }}</h4>
-                <ul>
-                {% for event in event_list %}
-                    {% if event.0 == "play" and event.1.attendance %}
-                        {% with event.1.attendance as attendance %}
-                            {% include "games/game_attendance_badge_snippet.html" %}
-                        {% endwith %}
-                    {% elif event.0 == "gm" %}
-                        {% with event.1 as game %}
-                            {% include "games/game_gm_badge_snippet.html" %}
-                        {% endwith %}
-                    {% else %}
-                        Unexpected element. Please file a bug.
-                    {% endif %}
-                {% endfor %}
-                </ul>
-            {% empty %}
-            <h4 class="text-center"><small>{{profile.user.username}} has never GMed or attended a Contract</small></h4>
-            {% endfor %}
         </div>
-        {% endcache %}
     </div>
 </div>
 

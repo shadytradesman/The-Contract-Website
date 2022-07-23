@@ -15,6 +15,10 @@
           <b>Removed {{event.1.get_type_display}}: {{event.1.name}} </b>
           <i>{{event.1.description}}</i>
         </li>
+      {% elif event.0 == "move" %}
+        {% with event.1 as move %}
+          {% render_move move False %}
+        {% endwith %}
       {% elif event.0 == "game"%}
         {% with event.1 as attendance %}
           {% include "games/game_attendance_badge_snippet.html" %}

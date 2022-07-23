@@ -1,6 +1,6 @@
 from random import randint
 from datetime import timedelta
-import json
+from heapq import merge
 
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404
@@ -214,6 +214,8 @@ def view_character(request, character_id, secret_key=None):
     else:
         secret_key = ""
     user_can_edit = (request.user.is_authenticated and character.player_can_edit(request.user)) or secret_key_valid
+    user_posts_moves = (request.user.is_authenticated and character.cell) \
+                       and (character.cell.player_can_post_world_events(request.user) and character.cell.player_can_run_games(request.user))
     early_access = request.user and hasattr(request.user, "profile") and request.user.profile.early_access_user
     if not character.stats_snapshot:
         context={"character": character,
@@ -316,9 +318,13 @@ def view_character(request, character_id, secret_key=None):
     attribute_value_by_id = {}
     for attr in attributes:
         attribute_value_by_id[attr.relevant_attribute.id] = attr.val_with_bonuses()
+
+    moves = character.move_set.order_by("-created_date").all()
     context = {
         'character': character,
         'user_can_edit': user_can_edit,
+        'user_is_manager': user_can_edit and not request.user.is_anonymous and character.player and request.user != character.player,
+        'user_posts_moves': user_posts_moves,
         'early_access': early_access,
         'health_display': character.get_health_display(),
         'ability_value_by_name': ability_value_by_name,
@@ -368,6 +374,8 @@ def view_character(request, character_id, secret_key=None):
         'unavail_crafted_artifacts': unavail_crafted_artifacts,
         'lost_signature_items': lost_signature_items,
         'num_improvements': character.num_improvements() if character.player == request.user else None,
+        'moves': moves,
+        'num_moves':  moves.count(),
     }
     return render(request, 'characters/view_pages/view_character.html', context)
 
@@ -687,6 +695,9 @@ def character_timeline(request, character_id):
     character_edit_history = [(x.created_time, "edit", x) for x in
                               character.contractstats_set.filter(is_snapshot=False).order_by("-created_time").all()[:1]]
     exp_rewards = [(x.created_time + timedelta(seconds=2), "exp_reward", x) for x in character.experiencereward_set.filter(is_void=False).order_by("-created_time").all()]
+
+    moves = [(x.created_date, "move", x) for x in character.move_set.order_by("-created_date").all()]
+
     events_by_date = list(merge(assigned_rewards,
                                 completed_games,
                                 condition_creation,
@@ -694,6 +705,7 @@ def character_timeline(request, character_id):
                                 character_edit_history,
                                 exp_rewards,
                                 crafting_tuples,
+                                moves,
                                 reverse=True))
     timeline = defaultdict(list)
     for event in events_by_date:

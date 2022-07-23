@@ -45,3 +45,14 @@ def render_scenario_title_with_link(scenario):
         "scenario": scenario,
         "render_link": True,
     }
+
+@register.inclusion_tag('games/moves/move_badge.html', takes_context=True)
+def render_move(context, move, gm_display=True):
+    request = context["request"] if "request" in context else None
+    if not request:
+        raise ValueError("Scenario tag had no context")
+    return {
+        "move": move,
+        "render_link": move.main_character.player_can_view(request.user),
+        "gm_display": gm_display,
+    }

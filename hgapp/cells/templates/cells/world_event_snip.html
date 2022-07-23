@@ -1,25 +1,46 @@
 <span style="margin-left:5px;">
     <small>
-        Posted by
-        <a href="{% url 'profiles:profiles_view_profile' event.creator.id %}">
-            {{event.creator.username}},
-        </a>
+        {% if event.move %}
+            <a href="{% url 'characters:characters_view' event.move.main_character.id %}">
+                {{event.move.main_character.name}}
+            </a>
+            made a Move
+            (<a href="{% url 'profiles:profiles_view_profile' event.move.gm.id %}">{{event.move.gm.username}}</a> GMed)
+        {% else %}
+            Posted by
+            <a href="{% url 'profiles:profiles_view_profile' event.creator.id %}">
+                {{event.creator.username}},
+            </a>
+        {% endif %}
         {{event.created_date|timesince}} ago.
-        <a href="#event-{{event.id}}">
-            Permalink
-        </a>
+        {% if event.move %}
+            <a href="{% url 'games:view_move' event.move.id %}">
+                View Move
+            </a>
+        {% else %}
+            <a href="#event-{{event.id}}">
+                Permalink
+            </a>
+        {% endif %}
 
     </small>
 </span>
 <div class="thumbnail expandable-outer js-expandable-collapsed" role="button" style="padding-left: 20px; padding-right: 20px;">
-    <h3 >
+    <h3 style="margin-top:5px;">
         {{event.headline}}
     </h3>
     {{event.event_description|safe}}
     {% if can_edit_world or request.user == event.creator %}
-    <br>
-    <a class="btn btn-default btn-sm" href="{% url 'cells:cells_edit_world_event' cell.id event.id %}">
-        Edit Event
-    </a>
+        <div>
+            {% if event.move %}
+                <a class="btn btn-default btn-sm" href="{% url 'games:edit_move' event.move.id %}">
+                    Edit Move
+                </a>
+            {% else %}
+                <a class="btn btn-default btn-sm" href="{% url 'cells:cells_edit_world_event' cell.id event.id %}">
+                    Edit Event
+                </a>
+            {% endif %}
+        </div>
     {% endif %}
 </div>

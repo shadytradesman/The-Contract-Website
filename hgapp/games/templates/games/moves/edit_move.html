@@ -1,0 +1,117 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+{% load bootstrap %}
+{% load static %}
+
+{% block extra_head %}
+{{ move_form.media }}
+{% endblock %}
+
+{% block extra_scripts %}
+{% endblock %}
+
+{% block extra_styles %}
+  <link rel="stylesheet" type="text/css" href="{% static 'games/edit_game.css' %}" />
+{% endblock %}
+
+{% block head_title %}
+  {% if move %}
+    Editing Move
+  {% else %}
+    Entering Move
+  {% endif %}
+{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% block body_base %}
+<div class="container">
+  <div class="text-center">
+    <h1>
+      {% if move %}
+        Editing Move for {{move.main_character.name}}
+      {% else %}
+        Entering Move
+        {% if character %}
+          for {{character.name}}
+        {% elif cell %}
+          in {{cell.name}}
+        {% endif %}
+      {% endif %}
+    </h1>
+  </div>
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <form action="
+      {% if move %}
+        {% url 'games:edit_move' move.id %}
+      {% elif character %}
+        {% url 'games:create_move_char' character.id %}
+      {% else %}
+        {% url 'games:create_move_cell' cell.id %}
+      {% endif %}"
+      method="post">
+        {% csrf_token %}
+        <div class="text-center">
+          <h3 style="margin-top: 5px;">
+            {% if move %}
+              {% if move.gm == request.user %}
+                You
+              {% else %}
+                {{move.gm.username}}
+              {% endif %}
+            {% else %}
+              You
+            {% endif %}
+            GMed a Move in
+            <a href="{% url 'cells:cells_view_cell' cell.id %}">
+              {{cell.name}}
+            </a>
+            {% if character %}
+              for
+              <a href="{% url 'characters:characters_view' character.id %}">
+                {{character.name}}
+              </a>
+              on the Downtime following
+              {% if move %}
+                <a href="{% url 'games:games_view_game' move.downtime.relevant_game.id %}">
+                  {{move.downtime.relevant_game.title}}
+                </a>
+              {% else %}
+                <a href="{% url 'games:games_view_game' character.get_current_downtime_attendance.relevant_game.id %}">
+                  {{character.get_current_downtime_attendance.relevant_game.title}}
+                </a>
+              {% endif %}
+            {% endif %}
+            {% if not move %}
+              <div>
+                <small>
+                  You will receive 2 Exp for one of your Contractors if the Move's World Event is at least 100 words long
+                  and the summary and world event combined are at least 250 words long.
+                </small>
+              </div>
+            {% endif %}
+          </h3>
+        </div>
+
+        {{move_form|bootstrap}}
+        <h4>
+          Each Move has a World Event
+          <div>
+            <small>
+              The World Event will be posted to {{cell.name}} and should indicate how this Move has affected the Setting.
+              For subtle Moves, write a short vignette alluding to the area, NPCs, and/or Contractor involved.
+            </small>
+          </div>
+        </h4>
+        {{event_form.headline |bootstrap }}
+        {{event_form.event_description | bootstrap}}
+        <div class="text-center">
+          <input class="btn btn-primary" type="submit" value="Save"/>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

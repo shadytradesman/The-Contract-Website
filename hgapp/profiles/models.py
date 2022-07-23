@@ -139,6 +139,10 @@ class Profile(models.Model):
             self.date_set_adult_content = timezone.now()
             self.save()
 
+    def update_move_stat(self):
+        self.num_moves_gmed = self.get_moves_where_player_gmed().count()
+        self.save()
+
     def update_gm_stats(self):
         gm_games = self.get_games_where_player_gmed()
         num_gm_games = gm_games.count()

@@ -16,6 +16,11 @@
                 Schedule Contract
             </a>
         </li>
+        {% if can_post_world_events %}
+        <li>
+            <a href="{% url 'games:create_move_cell' cell.id %}">Record Move</a>
+        </li>
+        {% endif %}
     {% endif %}
     {% if my_cell_contractors %}
     <li class="dropdown">

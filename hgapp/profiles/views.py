@@ -34,18 +34,6 @@ class ProfileView(generic.DetailView):
         self.living_characters = [character for character in characters if not character.is_dead()]
         self.deceased_characters = [character for character in characters if character.is_dead()]
 
-        self.completed_game_invites = self.profile.completed_game_invites()
-        self.gmed_games = self.profile.get_games_where_player_gmed()
-
-        played_games_by_date = [(x.relevant_game.end_time, "play", x) for x in self.completed_game_invites]
-        gmed_games_by_date = [(x.end_time, "gm", x) for x in self.gmed_games]
-
-        events_by_date = list(merge(played_games_by_date, gmed_games_by_date, reverse=True))
-        timeline = defaultdict(list)
-        for event in events_by_date:
-            timeline[event[0].strftime("%d %b %Y")].append((event[1], event[2]))
-
-        self.game_timeline = dict(timeline)
         self.attended_games = self.profile.user.game_set.exclude(get_completed_game_excludes_query()).all()
 
         return Profile.objects
@@ -62,7 +50,6 @@ class ProfileView(generic.DetailView):
         context['deceased_characters'] = self.deceased_characters
         context['scenarios'] = self.scenarios
         context['attended_games'] = self.attended_games
-        context['game_timeline'] = self.game_timeline
         context['profile_view'] = True
         return context
 
@@ -87,6 +74,38 @@ class ProfileView(generic.DetailView):
         context['num_gm_losses'] = self.profile.num_gm_losses
         return context
 
+class ProfileTimelineView(generic.DetailView):
+    template_name = 'profiles/contract_record_snip.html'
+
+    def get_queryset(self):
+        self.profile = get_object_or_404(Profile, pk=self.kwargs['pk'])
+        self.cells = self.profile.user.cell_set.filter(cellmembership__is_banned=False).all()
+
+        self.completed_game_invites = self.profile.completed_game_invites()
+        self.gmed_games = self.profile.get_games_where_player_gmed()
+        self.gmed_moves = self.profile.get_moves_where_player_gmed()
+
+        played_games_by_date = [(x.relevant_game.end_time, "play", x) for x in self.completed_game_invites]
+        gmed_games_by_date = [(x.end_time, "gm", x) for x in self.gmed_games]
+        gmed_moves_by_date = [(x.created_date, "move", x) for x in self.gmed_moves]
+
+        events_by_date = list(merge(played_games_by_date, gmed_games_by_date, gmed_moves_by_date, reverse=True))
+        timeline = defaultdict(list)
+        for event in events_by_date:
+            timeline[event[0].strftime("%d %b %Y")].append((event[1], event[2]))
+
+        self.game_timeline = dict(timeline)
+        self.attended_games = self.profile.user.game_set.exclude(get_completed_game_excludes_query()).all()
+
+        return Profile.objects
+
+    def get_context_data(self, **kwargs):
+        context = super(ProfileTimelineView, self).get_context_data(**kwargs)
+
+        context['profile'] = self.profile
+        context['game_timeline'] = self.game_timeline
+        context['profile_view'] = True
+        return context
 
 def profile_edit(request):
     profile = get_object_or_404(Profile, pk=request.user.pk)

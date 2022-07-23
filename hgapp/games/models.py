@@ -1135,11 +1135,11 @@ class Move(models.Model):
     summary = models.TextField(max_length=50000, blank=True)
 
     # Rewards and public event
-    public_event = models.OneToOneField(WorldEvent, null=True, blank=True, on_delete=models.CASCADE)
+    public_event = models.OneToOneField(WorldEvent, on_delete=models.CASCADE)
     gm_experience_reward = models.OneToOneField(ExperienceReward, null=True, blank=True, on_delete=models.CASCADE)
     is_valid = models.BooleanField(default=False)
 
-    deleted_on = models.DateTimeField('date deleted', blank=True)
+    deleted_on = models.DateTimeField('date deleted', blank=True, null=True)
 
     class Meta:
         indexes = [
@@ -1187,11 +1187,6 @@ class Move(models.Model):
         self.gm_experience_reward = exp_reward
         self.save()
 
-    def unlink_event(self):
-        self.public_event = None
-        self.is_valid = False
-        self.refund_reward()
-
     def refund_reward(self):
         if self.gm_experience_reward and not self.gm_experience_reward.is_void:
             self.gm_experience_reward.mark_void()
@@ -1203,7 +1198,7 @@ class Move(models.Model):
         self.is_valid = (event_words > 100) and (event_words + self.__get_summary_wordcount() > 250)
 
     def __get_event_wordcount(self):
-        if hasattr("public_event", self) and self.public_event and self.public_event.event_description:
+        if hasattr(self, "public_event") and self.public_event and self.public_event.event_description:
             soup = BeautifulSoup(self.public_event.event_description, features="html5lib")
             return len(soup.text.split())
         else:

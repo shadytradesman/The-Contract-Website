@@ -1,4 +1,6 @@
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 from django.forms import formset_factory
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect, JsonResponse
@@ -21,7 +23,7 @@ logger = logging.getLogger("app." + __name__)
 from games.forms import CreateScenarioForm, CellMemberAttendedForm, make_game_form, make_allocate_improvement_form, \
     CustomInviteForm, make_accept_invite_form, ValidateAttendanceForm, DeclareOutcomeForm, GameFeedbackForm, \
     OutsiderAttendedForm, make_who_was_gm_form,make_archive_game_general_info_form, get_archival_outcome_form, \
-    RsvpAttendanceForm
+    RsvpAttendanceForm, make_edit_move_form
 from .game_form_utilities import get_context_for_create_finished_game, change_time_to_current_timezone, convert_to_localtime, \
     create_archival_game, get_context_for_completed_edit, handle_edit_completed_game, get_context_for_choose_attending, \
     get_gm_form, get_outsider_formset, get_member_formset, get_players_for_new_attendances
@@ -30,7 +32,10 @@ from .games_constants import GAME_STATUS, EXP_V1_V2_GAME_ID
 from cells.forms import EditWorldEventForm
 from cells.models import WorldEvent
 
-from games.models import Scenario, Game, DISCOVERY_REASON, Game_Invite, Game_Attendance, Reward, REQUIRED_HIGH_ROLLER_STATUS
+from games.models import Scenario, Game, DISCOVERY_REASON, Game_Invite, Game_Attendance, Reward, REQUIRED_HIGH_ROLLER_STATUS, \
+    Move
+
+from characters.models import Character
 
 from hgapp.utilities import get_queryset_size, get_object_or_none
 
@@ -890,3 +895,144 @@ class LookingForGame(View):
         return context
 
 
+# MOVES
+@method_decorator(login_required(login_url='account_login'), name='dispatch')
+class ViewMove(View):
+    template_name = 'games/moves/view_move.html'
+    move = None
+
+    def dispatch(self, *args, **kwargs):
+        self.move = get_object_or_404(Move, id=self.kwargs['move_id'])
+        redirect = self.__check_permissions()
+        if redirect:
+            return redirect
+        return super().dispatch(*args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, self.__get_context_data())
+
+    def __check_permissions(self):
+        if not self.move.main_character.player_can_view(self.request.user):
+            raise PermissionDenied("You do not have permission to view this contractor")
+
+    def __get_context_data(self):
+        self.cell = self.move.cell
+        can_edit = self.cell.player_can_run_games(self.request.user) and self.cell.player_can_post_world_events(self.request.user)
+        context = {
+            'move': self.move,
+            'player_can_edit': can_edit,
+        }
+        return context
+
+
+@method_decorator(login_required(login_url='account_login'), name='dispatch')
+class EnterMove(View):
+    event_form_class = EditWorldEventForm
+    move_form_class = None
+    template_name = 'games/moves/edit_move.html'
+    initial_move = None
+    initial_event = None
+    world_event = None
+    move = None
+    cell = None
+    character = None
+
+    def dispatch(self, *args, **kwargs):
+        redirect = self.__check_permissions()
+        if redirect:
+            return redirect
+        return super().dispatch(*args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, self.__get_context_data())
+
+    def post(self, request, *args, **kwargs):
+        event_form = self.event_form_class(request.POST)
+        move_form = self.move_form_class(request.POST)
+        if event_form.is_valid() and move_form.is_valid():
+            with transaction.atomic():
+                new_event = self.world_event is None
+                if new_event:
+                    self.world_event = WorldEvent(creator=request.user,
+                                                  parent_cell=self.cell,
+                                                  )
+                self.world_event.headline = event_form.cleaned_data["headline"] if "headline" in event_form.cleaned_data else " "
+                self.world_event.event_description = event_form.cleaned_data["event_description"]
+                self.world_event.save()
+
+                move_char = self.character if self.character else move_form.cleaned_data["character"]
+                if self.move is None:
+                    self.move = Move(gm=self.request.user,
+                                     downtime=move_char.get_current_downtime_attendance(),
+                                     cell=self.cell,
+                                     public_event=self.world_event,
+                                     main_character=move_char,
+                                     )
+                self.move.title = move_form.cleaned_data["title"]
+                self.move.summary = move_form.cleaned_data["summary"]
+                self.move.save()
+
+                if new_event:
+                    self.move.gm.profile.update_move_stat()
+                    webhooks = self.cell.webhook_cell.filter(send_for_events=True).all()
+                    for webhook in webhooks:
+                        webhook.post_for_event(self.world_event, request, self.move)
+            return HttpResponseRedirect(reverse('games:view_move', args=(self.move.id,)))
+        raise ValueError("Invalid Move or event form")
+
+    def __check_permissions(self):
+        if self.character:
+            if not self.character.cell:
+                raise PermissionDenied("Contractors must be a part of a Playgroup to make Moves.")
+            if self.character.num_games == 0:
+                raise PermissionDenied("Only Contractors who have participated in at least one Contract can make Moves.")
+        if not self.cell.player_can_run_games(self.request.user):
+            raise PermissionDenied("You must have permissions to run Contracts in this Playgroup to GM Moves.")
+        if not self.cell.player_can_post_world_events(self.request.user):
+            raise PermissionDenied("You must have permissions to post world events in this Playgroup to GM Moves.")
+
+    def __get_context_data(self):
+        context = {
+            'character': self.character,
+            'move': self.move,
+            'cell': self.cell,
+            'move_form': self.move_form_class(initial=self.initial_move),
+            'event_form': self.event_form_class(initial=self.initial_event),
+        }
+        return context
+
+
+class CreateMoveCell(EnterMove):
+
+    def dispatch(self, *args, **kwargs):
+        self.cell = get_object_or_404(Cell, id=self.kwargs['cell_id'])
+        self.move_form_class = make_edit_move_form(self.request.user, cell=self.cell)
+        return super().dispatch(*args, **kwargs)
+
+
+class CreateMoveChar(EnterMove):
+
+    def dispatch(self, *args, **kwargs):
+        self.character = get_object_or_404(Character, id=self.kwargs['character_id'])
+        self.cell = self.character.cell
+        self.move_form_class = make_edit_move_form(self.request.user)
+        return super().dispatch(*args, **kwargs)
+
+
+class EditMove(EnterMove):
+
+    def dispatch(self, *args, **kwargs):
+        self.move = get_object_or_404(Move, id=self.kwargs['move_id'])
+        self.world_event = self.move.public_event
+        self.character = self.move.main_character
+        self.cell = self.move.cell
+        self.move_form_class = make_edit_move_form(self.move.gm)
+        self.initial_move = {
+            "title": self.move.title,
+            "summary": self.move.summary,
+        }
+        self.initial_event = {
+            "headline": self.world_event.headline,
+            "event_description": self.world_event.event_description,
+        }
+        return super().dispatch(*args, **kwargs)

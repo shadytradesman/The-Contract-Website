@@ -392,3 +392,25 @@ def get_archival_outcome_form(game_id):
 
 class RsvpAttendanceForm(forms.Form):
     pass
+
+
+def make_edit_move_form(gm, cell=None):
+    if cell:
+        queryset = cell.character_set.exclude(player=gm).exclude(num_games=0).exclude(character_death__isnull=False).all()
+    else:
+        queryset = None
+
+    class EditMoveForm(forms.Form):
+        if cell:
+            character = forms.ModelChoiceField(queryset=queryset,
+                                               label="Who made the Move?",
+                                               empty_label="Select a Contractor",
+                                               required=True)
+        title = forms.CharField(label='Move Title',
+                                max_length=200,
+                                help_text='The Move\'s title')
+        summary = forms.CharField(label='Move Summary',
+                                  widget=TinyMCE(attrs={'cols': 80, 'rows': 30}),
+                                  max_length=70000,
+                                  help_text='Describe the events and outcome of the Move. This will appear on the Contractor\'s sheet and Journal')
+    return EditMoveForm

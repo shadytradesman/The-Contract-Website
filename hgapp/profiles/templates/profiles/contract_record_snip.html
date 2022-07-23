@@ -1,0 +1,26 @@
+{% load games_tags %}
+
+{% for date, event_list in game_timeline.items %}
+<h4>{{ date }}</h4>
+<ul>
+    {% for event in event_list %}
+        {% if event.0 == "play" and event.1.attendance %}
+            {% with event.1.attendance as attendance %}
+                {% include "games/game_attendance_badge_snippet.html" %}
+            {% endwith %}
+        {% elif event.0 == "gm" %}
+            {% with event.1 as game %}
+                {% include "games/game_gm_badge_snippet.html" %}
+            {% endwith %}
+        {% elif event.0 == "move" %}
+            {% with event.1 as move %}
+                {% render_move move %}
+            {% endwith %}
+        {% else %}
+            Unexpected element. Please file a bug.
+        {% endif %}
+    {% endfor %}
+</ul>
+{% empty %}
+<h4 class="text-center"><small>{{profile.user.username}} has never GMed or attended a Contract</small></h4>
+{% endfor %}

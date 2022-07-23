@@ -1,0 +1,84 @@
+{% extends "site_base.html" %}
+
+{% load bootstrap %}
+{% load static %}
+
+{% block extra_head %}
+{% endblock %}
+
+{% block extra_scripts %}
+{% endblock %}
+
+{% block extra_styles %}
+{% endblock %}
+
+{% block head_title %}
+  Viewing Move
+{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% block body_base %}
+<div class="container">
+  <div class="text-center">
+    <h1>
+      Viewing Move: {{move.title}}
+    </h1>
+  </div>
+  <div class="panel panel-default">
+    <div class="panel-body">
+        <div class="text-center">
+          <h5 style="margin-top: 5px;">
+            {% if move.is_valid %}
+            <img class ="css-valid-quill-img"
+                 src="{% static 'journals/quill.svg' %}"
+                 data-toggle="tooltip"
+                 data-title="{{move.gm.username}} GMed and wrote at least 250 words recording this Move. They earned 2 Exp."
+            />
+            {% else %}
+            <img class ="css-quill-img"
+                 src="{% static 'journals/quill.svg' %}"
+                 data-toggle="tooltip"
+                 data-title="This Move's writeup is too short for credit. The World Event must be at least 100 words, and the Move's total must be at least 250 words."
+            />
+            {% endif %}
+            {% if move.gm == request.user %}
+              You
+            {% else %}
+              {{move.gm.username}}
+            {% endif %}
+            GMed a Move in
+            <a href="{% url 'cells:cells_view_cell' move.cell.id %}">
+              {{move.cell.name}}
+            </a>
+            for
+            <a href="{% url 'characters:characters_view' move.main_character.id %}">
+              {{move.main_character.name}}
+            </a>
+            on the Downtime following
+            <a href="{% url 'games:games_view_game' move.downtime.relevant_game.id %}">
+              {{move.downtime.relevant_game.title}}
+            </a>
+          </h5>
+          <a class="btn btn-default" href="{% url 'games:edit_move' move.id %}">Edit Move</a>
+        </div>
+      <hr>
+      <h3 class="text-center">
+        Move Summary
+      </h3>
+      <div style="max-width: 800px; margin: auto;">
+        {{move.summary|safe}}
+      </div>
+      <h3 class="text-center">Public Event</h3>
+      <div style="max-width: 800px; margin: auto;">
+        <h4>
+          {{move.public_event.headline}}
+        </h4>
+        <div>
+          {{move.public_event.event_description|safe}}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% load static %}
+
+<div class="css-timeline-item" style="border-color: #884444;">
+    {% if gm_display %}
+        {% if move.is_valid %}
+        <img class ="css-valid-quill-img"
+             src="{% static 'journals/quill.svg' %}"
+             data-toggle="tooltip"
+             data-title="{{move.gm.username}} GMed and wrote at least 250 words recording this Move. They earned 2 Exp."
+        />
+        {% else %}
+        <img class ="css-quill-img"
+             src="{% static 'journals/quill.svg' %}"
+             data-toggle="tooltip"
+             data-title="This Move's writeup is too short for credit. The World Event must be at least 100 words, and the Move's total must be 250 words."
+        />
+        {% endif %}
+    {% endif %}
+    {% if gm_display %}
+        GMed a Move for
+    {% else %}
+        Made a Move:
+    {% endif %}
+    {% if render_link %}
+        {% if gm_display %}
+        <a href="{% url 'characters:characters_view' move.main_character.id %}">
+            {{move.main_character.name}}</a>:{% endif %}
+        <b>
+            <a href="{% url 'games:view_move' move.id %}">
+                {{move.title}}
+            </a>
+        </b>
+    {% else %}
+        {% if gm_display %}{{move.main_character.name}}: {% endif %}
+        <b>
+            {{move.title}}
+        </b>
+    {% endif %}
+</div>

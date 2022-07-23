@@ -1,4 +1,5 @@
 from django.conf.urls import url
+from django.urls import path
 
 from . import views
 
@@ -97,6 +98,12 @@ urlpatterns = [
     # ex: .com/games/allocate_improvement
     url(r'^allocate_improvement/$', views.allocate_improvement_generic,
         name='games_allocate_improvement_generic'),
+
+    path('moves/create/c/<int:character_id>/', views.CreateMoveChar.as_view(), name='create_move_char'),
+    path('moves/create/playgroup/<int:cell_id>/', views.CreateMoveCell.as_view(), name='create_move_cell'),
+    path('moves/edit/m/<int:move_id>/', views.EditMove.as_view(), name='edit_move'),
+    path('moves/view/m/<int:move_id>/', views.ViewMove.as_view(), name='view_move'),
+    # path('moves/delete/m/<int:move_id>/', views.DeleteMove.as_view(), name='delete_move'),
 
     ##################
     # AJAX endpoints

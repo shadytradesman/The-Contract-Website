@@ -1,6 +1,6 @@
 {% load markdown_deux_tags %}
 
-{% if user_can_edit and not request.user.is_anonymous and request.user != character.player %}
+{% if user_is_manager %}
 <h3 style="margin-bottom: 10px;">GM Notes</h3>
 <div style="margin-left: 5px;">
   <small>These notes are <b>hidden</b> from the Player who owns this Contractor.
