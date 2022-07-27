@@ -297,11 +297,11 @@ class WorldEvent(models.Model):
     def save(self, *args, **kwargs):
         is_edit = self.pk is not None
         super(WorldEvent, self).save(*args, **kwargs)
-        if is_edit and self.move:
+        if is_edit and hasattr(self, "move") and self.move:
             self.move.fix_rewards()
 
     def delete(self, *args, **kwargs):
-        if self.move:
+        if hasattr(self, "move") and self.move:
             raise ValueError("Cannot delete a world event with an associated Move")
         super(WorldEvent, self).delete(*args, **kwargs)
 

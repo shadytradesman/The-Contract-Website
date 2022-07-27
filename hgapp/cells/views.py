@@ -178,23 +178,22 @@ class PostWorldEvent(View):
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
         if form.is_valid():
-            posting_new_event = not self.world_event
-            if posting_new_event:
-                self.world_event = WorldEvent(creator=request.user,
-                                              parent_cell=self.cell,)
-            else:
-                if form.cleaned_data["should_delete"]:
-                    with transaction.atomic():
-                        self.world_event.delete()
-                    return HttpResponseRedirect(reverse('cells:cells_view_cell', args=(self.cell.id,)))
-            self.world_event.headline = form.cleaned_data["headline"] if "headline" in form.cleaned_data else " "
-            self.world_event.event_description = form.cleaned_data["event_description"]
             with transaction.atomic():
+                posting_new_event = not self.world_event
+                if posting_new_event:
+                    self.world_event = WorldEvent(creator=request.user,
+                                                  parent_cell=self.cell,)
+                else:
+                    if form.cleaned_data["should_delete"] and not (hasattr(self.world_event, "move") and self.world_event.move):
+                        self.world_event.delete()
+                        return HttpResponseRedirect(reverse('cells:cells_view_cell', args=(self.cell.id,)))
+                self.world_event.headline = form.cleaned_data["headline"] if "headline" in form.cleaned_data else " "
+                self.world_event.event_description = form.cleaned_data["event_description"]
                 self.world_event.save()
-            if posting_new_event:
-                webhooks = self.cell.webhook_cell.filter(send_for_events=True).all()
-                for webhook in webhooks:
-                    webhook.post_for_event(self.world_event, request)
+                if posting_new_event:
+                    webhooks = self.cell.webhook_cell.filter(send_for_events=True).all()
+                    for webhook in webhooks:
+                        webhook.post_for_event(self.world_event, request)
             return HttpResponseRedirect(reverse('cells:cells_view_cell', args=(self.cell.id,)))
         raise ValueError("Invalid edit setting form")
 
@@ -205,7 +204,7 @@ class PostWorldEvent(View):
         else:
             if not self.cell.player_can_edit_world(self.request.user) and not self.world_event.creator == self.request.user:
                 raise PermissionDenied("You don't have permission to edit this World Event.")
-            if self.world_event.move:
+            if hasattr(self.world_event, "move") and self.world_event.move:
                 raise ValueError("You cannot edit the event of a move individually")
 
 

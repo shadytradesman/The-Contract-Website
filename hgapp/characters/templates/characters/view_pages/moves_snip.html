@@ -1,16 +1,18 @@
-<h3 style="margin-bottom: 5px;">Moves</h3>
+<h3 style="margin-bottom: 5px;" data-toggle="tooltip" title='{{tutorial.moves|safe}}'>Moves</h3>
 <b>
     {{character.name}} has made {{num_moves}} Move{{num_moves|pluralize}}.
 </b>
-<ul>
-    {% for move in moves %}
-    <li>
-        <a href="{% url 'games:view_move' move.id %}">
-            {{move.title}}
-        </a>
-    </li>
-    {% endfor %}
-</ul>
+{% if moves %}
+    <ul>
+        {% for move in moves %}
+        <li>
+            <a href="{% url 'games:view_move' move.id %}">
+                {{move.title}}
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+{% endif %}
 <div>
     {% if user_posts_moves and character.num_games > 0 %}
         <a class="btn btn-sm btn-default" href="{% url 'games:create_move_char' character.id %}">

@@ -3,11 +3,14 @@ from datetime import timedelta
 from heapq import merge
 
 from django.http import HttpResponse, JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.utils import timezone
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
+from django.views import View
 from django.core import serializers
 from collections import defaultdict
 from django.forms import formset_factory
@@ -17,14 +20,15 @@ from django.middleware.csrf import rotate_token
 
 from characters.models import Character, BasicStats, Character_Death, Graveyard_Header, Attribute, Ability, \
     CharacterTutorial, Asset, Liability, BattleScar, Trauma, TraumaRevision, Injury, Source, ExperienceReward, Artifact, \
-    LOST, DESTROYED, AT_HOME, CONDITION, CIRCUMSTANCE, TROPHY, TRAUMA,StockWorldElement
+    LOST, DESTROYED, AT_HOME, CONDITION, CIRCUMSTANCE, TROPHY, TRAUMA,StockWorldElement, LooseEnd, LOOSE_END
 from powers.models import Power_Full, SYS_LEGACY_POWERS, SYS_PS2, CRAFTING_NONE, CRAFTING_SIGNATURE, CRAFTING_ARTIFACT, \
     CRAFTING_CONSUMABLE
 from powers.signals import gift_major_revision
 from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, get_ability_form, \
     AssetForm, LiabilityForm, BattleScarForm, TraumaForm, InjuryForm, SourceValForm, make_allocate_gm_exp_form, EquipmentForm,\
     DeleteCharacterForm, BioForm, make_world_element_form, get_default_scar_choice_form, make_artifact_status_form, \
-    make_transfer_artifact_form, make_consumable_use_form, NotesForm, get_default_world_element_choice_form
+    make_transfer_artifact_form, make_consumable_use_form, NotesForm, get_default_world_element_choice_form, \
+    LooseEndForm
 from characters.form_utilities import get_edit_context, character_from_post, update_character_from_post, \
     grant_trauma_to_character, delete_trauma_rev, get_world_element_class_from_url_string
 from characters.view_utilities import get_characters_next_journal_credit, get_world_element_default_dict, get_weapons_by_type
@@ -320,10 +324,11 @@ def view_character(request, character_id, secret_key=None):
         attribute_value_by_id[attr.relevant_attribute.id] = attr.val_with_bonuses()
 
     moves = character.move_set.order_by("-created_date").all()
+    loose_ends = character.looseend_set.filter(is_deleted=False).order_by("cutoff").all()
     context = {
         'character': character,
         'user_can_edit': user_can_edit,
-        'user_is_manager': user_can_edit and not request.user.is_anonymous and character.player and request.user != character.player,
+        'user_can_gm': character.player_can_gm(request.user),
         'user_posts_moves': user_posts_moves,
         'early_access': early_access,
         'health_display': character.get_health_display(),
@@ -376,6 +381,7 @@ def view_character(request, character_id, secret_key=None):
         'num_improvements': character.num_improvements() if character.player == request.user else None,
         'moves': moves,
         'num_moves':  moves.count(),
+        'loose_ends': loose_ends,
     }
     return render(request, 'characters/view_pages/view_character.html', context)
 
@@ -580,6 +586,7 @@ def allocate_gm_exp(request, secret_key = None):
         }
         return render(request, 'characters/gm_exp_reward.html', context)
 
+
 def claim_character(request, character_id, secret_key = None):
     if request.method == "POST":
         character = get_object_or_404(Character, id=character_id)
@@ -593,6 +600,97 @@ def claim_character(request, character_id, secret_key = None):
         return HttpResponseRedirect(reverse('characters:characters_view', args=(character_id,)))
     return HttpResponseRedirect(reverse('characters:characters_view', args= (character_id, secret_key,)))
 
+
+
+@method_decorator(login_required(login_url='account_login'), name='dispatch')
+class EnterLooseEnd(View):
+    form_class = LooseEndForm
+    template_name = 'characters/loose_ends/edit_loose_end.html'
+    initial = None
+    loose_end = None
+    cell = None
+    character = None
+
+    def dispatch(self, *args, **kwargs):
+        redirect = self.__check_permissions()
+        if redirect:
+            return redirect
+        return super().dispatch(*args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, self.__get_context_data())
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            with transaction.atomic():
+                if not self.loose_end:
+                    self.loose_end = LooseEnd(
+                        character=self.character,
+                        cell=self.character.cell,
+                        granting_player=self.request.user,
+                        original_cutoff=form.cleaned_data["cutoff"]
+                    )
+                self.loose_end.name = form.cleaned_data["name"]
+                self.loose_end.description = form.cleaned_data["details"]
+                self.loose_end.system = form.cleaned_data["threat"]
+                self.loose_end.cutoff = form.cleaned_data["cutoff"]
+                self.loose_end.threat_level = form.cleaned_data["threat_level"]
+                self.loose_end.how_to_tie_up = form.cleaned_data["how_to_tie_up"]
+                self.loose_end.save()
+            return HttpResponseRedirect(reverse('characters:characters_view', args=(self.character.id,)))
+        raise ValueError("Invalid loose end form")
+
+    def __check_permissions(self):
+        if not self.character.cell:
+            raise PermissionDenied("Contractors must be a part of a Playgroup to have Loose Ends.")
+        if not self.character.player_can_gm(self.request.user):
+            raise PermissionDenied("You must have permissions to run Contracts in this Contractor's Playgroup to assign Loose Ends.")
+
+    def __get_context_data(self):
+        context = {
+            'character': self.character,
+            'loose_end': self.loose_end,
+            'form': self.form_class(initial=self.initial),
+            'stock_loose_end': get_default_world_element_choice_form(LOOSE_END),
+        }
+        return context
+
+
+class CreateLooseEnd(EnterLooseEnd):
+
+    def dispatch(self, *args, **kwargs):
+        self.character = get_object_or_404(Character, id=self.kwargs['character_id'])
+        self.cell = self.character.cell
+        return super().dispatch(*args, **kwargs)
+
+
+class EditLooseEnd(EnterLooseEnd):
+
+    def dispatch(self, *args, **kwargs):
+        self.loose_end = get_object_or_404(LooseEnd, id=self.kwargs['loose_end_id'])
+        self.character = self.loose_end.character
+        self.cell = self.loose_end.cell
+        self.initial = {
+            "name": self.loose_end.name,
+            "details": self.loose_end.description,
+            "cutoff": self.loose_end.cutoff,
+            "threat": self.loose_end.system,
+            "threat_level": self.loose_end.threat_level,
+            "how_to_tie_up": self.loose_end.how_to_tie_up,
+        }
+        return super().dispatch(*args, **kwargs)
+
+
+def delete_loose_end(request, loose_end_id):
+    loose_end = get_object_or_404(LooseEnd, id=loose_end_id)
+    character = loose_end.character
+    if request.method == "POST":
+        pass
+        with transaction.atomic():
+            pass
+        return HttpResponseRedirect(reverse('characters:characters_view', args=(character.id,)))
+    return HttpResponseRedirect(reverse('characters:characters_view', args= (character.id,)))
 
 #####
 # View Character AJAX
@@ -664,6 +762,8 @@ def character_timeline(request, character_id):
     completed_games = [(x.relevant_game.end_time, "game", x) for x in character.completed_games_rev_sort()]
     condition_creation = [(x.created_time, "elem_created", x) for x in character.condition_set.order_by("-created_time")]
     condition_deletion = [(x.deleted_date, "elem_deleted", x) for x in character.condition_set.filter(is_deleted=True).order_by("-deleted_date")]
+    circumstance_creation = [(x.created_time, "elem_created", x) for x in character.circumstance_set.order_by("-created_time")]
+    circumstance_deletion = [(x.deleted_date, "elem_deleted", x) for x in character.circumstance_set.filter(is_deleted=True).order_by("-deleted_date")]
 
     craftings = character.craftingevent_set.order_by("-relevant_attendance__relevant_game__end_time").all()
     crafting_tuples = []
@@ -698,10 +798,17 @@ def character_timeline(request, character_id):
 
     moves = [(x.created_date, "move", x) for x in character.move_set.order_by("-created_date").all()]
 
+    loose_ends = [(x.created_time, "elem_created", x) for x in character.looseend_set.order_by("-created_time").all()]
+    loose_end_deleted = [(x.created_time, "elem_deleted", x) for x in character.looseend_set.filter(is_deleted=True).order_by("-created_time").all()]
+
     events_by_date = list(merge(assigned_rewards,
                                 completed_games,
                                 condition_creation,
                                 condition_deletion,
+                                circumstance_creation,
+                                circumstance_deletion,
+                                loose_ends,
+                                loose_end_deleted,
                                 character_edit_history,
                                 exp_rewards,
                                 crafting_tuples,

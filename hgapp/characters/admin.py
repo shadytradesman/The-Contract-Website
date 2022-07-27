@@ -2,7 +2,8 @@ from django.contrib import admin
 
 from characters.models import Character, Graveyard_Header, Character_Death, Attribute, Ability, Asset, Liability, \
     CharacterTutorial, ContractStats, Limit, LiabilityDetails, AssetDetails, AttributeValue, AbilityValue, ExperienceReward, \
-    TraumaRevision, Condition, Circumstance, Artifact, Roll, StockBattleScar, Weapon, StockElementCategory, StockWorldElement
+    TraumaRevision, Condition, Circumstance, Artifact, Roll, StockBattleScar, Weapon, StockElementCategory, StockWorldElement, \
+    LooseEnd
 
 
 class AbilityValueTabular(admin.TabularInline):
@@ -47,3 +48,4 @@ admin.site.register(StockBattleScar)
 admin.site.register(Weapon)
 admin.site.register(StockElementCategory)
 admin.site.register(StockWorldElement)
+admin.site.register(LooseEnd)

@@ -6,7 +6,8 @@ from overrides.widgets import CustomStylePagedown
 
 from games.game_utilities import get_character_contacts
 from characters.models import Character, BasicStats, Character_Death, BattleScar, PORT_STATUS, StockBattleScar, GIVEN,\
-    STOLEN, LOOTED, LOST, DESTROYED, RECOVERED, REPAIRED, AT_HOME, StockWorldElement, StockElementCategory, START_ONLY_SCAR
+    STOLEN, LOOTED, LOST, DESTROYED, RECOVERED, REPAIRED, AT_HOME, StockWorldElement, StockElementCategory, START_ONLY_SCAR,\
+    LOOSE_END_THREAT
 from cells.models import Cell
 
 ATTRIBUTE_VALUES = {
@@ -296,6 +297,7 @@ def get_default_scar_choice_form():
 def get_default_world_element_choice_form(element_type):
     stock_elements = StockWorldElement.objects.filter(type=element_type).exclude(category__name="creation-only").order_by("category").all()
     options = [("", "Create Custom " + element_type)]
+    elem_data_by_name = {}
     if stock_elements.count() > 0:
         current_options = []
         current_category = stock_elements[0].category
@@ -305,6 +307,13 @@ def get_default_world_element_choice_form(element_type):
                 current_options = []
                 current_category = element.category
             current_options.append((element.system, element.name))
+            elem_data_by_name[element.name] = {
+                "description": element.description,
+                "system": element.system,
+                "how_to_tie_up": element.how_to_tie_up,
+                "cutoff": element.cutoff,
+                "threat_level": element.threat_level,
+            }
         options.append((current_category.name, current_options))
     default_field = forms.ChoiceField(choices=options,
                                       label="Select Premade " + element_type,
@@ -312,6 +321,7 @@ def get_default_world_element_choice_form(element_type):
 
     class DefaultElementForm(forms.Form):
         premade_element_field = default_field
+        element_data_by_name = elem_data_by_name
 
     return DefaultElementForm
 
@@ -438,6 +448,34 @@ def make_world_element_form(cell_choices=None, initial_cell=None, for_new=True):
                                       required=for_new,
                                       )
     return WorldElementForm
+
+
+class LooseEndForm(forms.Form):
+    name = forms.CharField(max_length=500,
+                           label="Name",
+                           widget=forms.TextInput(attrs={'class': 'form-control'}))
+    details = forms.CharField(max_length=5000,
+                              label="Details",
+                              help_text="Background information about this Loose End. Where it came from, how to get rid of it, etc.",
+                              widget=forms.TextInput(attrs={'class': 'form-control'}))
+    cutoff = forms.IntegerField(validators=[MaxValueValidator(20), MinValueValidator(0)],
+                                widget=forms.NumberInput(attrs={'class': 'js-injury-value-input form-control'}),
+                                help_text="How many Contracts until this Loose End's Threat manifests?",
+                                initial=1)
+    threat = forms.CharField(max_length=5000,
+                             label="Threat",
+                             help_text="What happens when the Cutoff hits zero? Hidden from the Player.",
+                             widget=forms.TextInput(attrs={'class': 'form-control'}))
+    threat_level = forms.ChoiceField(
+        choices=LOOSE_END_THREAT,
+        required=True,
+        label="Threat Level",
+        help_text="How dangerous is this Loose End's Threat? Shown to the Player.")
+    how_to_tie_up = forms.CharField(max_length=5000,
+                                    required=False,
+                             label="How to Tie Up",
+                             help_text="(Optional) Record some ideas on the Moves the Contractor may be able to make to tie up this Loose End.",
+                             widget=forms.TextInput(attrs={'class': 'form-control'}))
 
 
 def make_artifact_status_form(current_status=None):

@@ -28,11 +28,11 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-xs-12 col-md-6">
         <h3 class="text-center" data-toggle="tooltip" title='{{tutorial.circumstances|safe}}'>
             Circumstances
         </h3>
-        {% if not circumstances_by_cell or character.number_completed_games == 0 %}
+        {% if not circumstances_by_cell or not circumstances_by_cell or character.number_completed_games == 0 %}
         <div class="row">
             <div class="col-xs-12">
                 <div class="alert alert-info" style="margin-bottom: 10px;">
@@ -157,12 +157,12 @@
             </div>
             {% endif %}
     </div>
-    <div class="col-md-6">
+    <div class="col-xs-12 col-md-6">
         <div class="visible-xs-block" style="height:35px;"></div>
         <h3 class="text-center" data-toggle="tooltip" title='{{tutorial.conditions|safe}}'>
             Conditions
         </h3>
-        {% if not circumstances_by_cell or character.number_completed_games == 0 %}
+        {% if not conditions_by_cell or character.number_completed_games == 0 %}
             <div class="row">
                 <div class="col-xs-12">
                     <div class="alert alert-info">
@@ -170,11 +170,11 @@
                             <b>Conditions describe your state of being.</b>
                         </p>
                         <p>
-                            Examples of Conditions include curses, personality quirks, and diseases.
+                            Examples of Conditions include curses, diseases, and impactful personality quirks.
                         </p>
                         <p>
                             Conditions are granted by Assets and Liabilities or by GMs based on the events of Contracts
-                            and Downtimes.
+                            and Downtime activities like Moves, and Loose Ends.
                         </p>
                         <p>
                             Because Conditions may have GM-created systems, they also record the Playgroup they were acquired in.
@@ -276,3 +276,4 @@
         </div>
     </div>
 </div>
+{% include "characters/view_pages/loose_end_snip.html" %}

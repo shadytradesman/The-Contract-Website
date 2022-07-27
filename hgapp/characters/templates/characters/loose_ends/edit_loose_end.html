@@ -1,0 +1,105 @@
+{% extends "site_base.html" %}
+
+{% load static %}
+{% load bootstrap %}
+
+{% block head_title %}
+    {% if loose_end %}
+        Editing
+    {% else %}
+        Creating
+    {% endif %}
+        Loose End
+{% endblock %}
+
+{% block extra_head %}
+{% endblock %}
+
+{% block extra_styles %}
+{% endblock %}
+
+{% block extra_scripts %}
+    {{stock_loose_end.element_data_by_name|json_script:"elementData"}}
+    <script src="{% static 'characters/edit_loose_end.js' %}"></script>
+{% endblock %}
+
+{% block body_base %}
+<div class="container">
+    <h1 class="text-center">
+        {% if loose_end %}
+            Editing Loose End {{loose_end.name}}
+        {% else %}
+            Creating a Loose End for
+            <a href="{% url 'characters:characters_view' character.id %}">
+                {{character.name}}
+            </a>
+        {% endif %}
+    </h1>
+    <div class="panel panel-default">
+        <div class="panel-body js-world-element-form">
+            <form
+                    {% if loose_end %}
+                    action="{% url 'characters:edit_loose_end' loose_end.id %}"
+                    {% else %}
+                    action="{% url 'characters:create_loose_end' character.id %}"
+                    {% endif %}
+                    method="post" onsubmit="setFormSubmitting()">
+                {% csrf_token %}
+                <div style="max-width: 800px; margin: auto;">
+                    <div class="alert alert-info">
+                        <div class="text-center">
+                            <P>
+                                <b>
+                                    Note: It is <i>your</i> responsibility to run the Loose Ends you assign.
+                                </b>
+                            </P>
+                        </div>
+                        <p>
+                            If a Contractor wishes to make a Move to deal with a Loose End you've assigned them, you
+                            must run it.
+                        </p>
+                        <p>
+                            When your Loose End's cutoff hits 0, it is up to you to inform the Player what happens,
+                            the consequences, and (if needed) run a Hustle to conclude it.
+                        </p>
+                        <p>
+                            Do not assign Loose Ends you cannot follow up on.
+                        </p>
+                    </div>
+                </div>
+                {% if not loose_end %}
+                    {{stock_loose_end|bootstrap}}
+                {% endif %}
+                <div class="text-center">
+                    <i>
+                        <h4>
+                            Visible to the Player
+                        </h4>
+                    </i>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12 col-md-6">
+                        {{form.name|bootstrap}}
+                    </div>
+                    <div class="col-xs-12 col-md-6">
+                        {{form.threat_level|bootstrap}}
+                    </div>
+                </div>
+                <div class="text-center">
+                    <i>
+                        <h4>
+                            Hidden from the Player
+                        </h4>
+                    </i>
+                </div>
+                {{form.threat|bootstrap}}
+                {{form.cutoff|bootstrap}}
+                {{form.details|bootstrap}}
+                {{form.how_to_tie_up|bootstrap}}
+                <input class="btn btn-primary" type="submit" value="Submit" />
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

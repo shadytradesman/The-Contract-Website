@@ -436,3 +436,65 @@ input[type="number"] {
 .css-stabilization-text {
   font-size: 90%;
 }
+
+.css-loose-end-container {
+   max-width: 800px;
+   margin: auto;
+   background-color: #353e4b;
+   padding: 15px;
+   border-radius: 2px;
+   margin-bottom: 15px;
+}
+
+.css-loose-end-button {
+}
+
+.css-loose-end-system {
+    font-style: italic;
+    position: relative;
+    opacity: 0.8;
+}
+
+
+.css-loose-end-threat-level {
+    border: 1px solid grey;
+    border-radius: 3px;
+    padding: 3px;
+}
+.css-cutoff-present {
+    color: #cb4b45;
+}
+
+.css-cutoff-imminent {
+    color: darkorange;
+}
+
+.css-cutoff-moderate {
+    color: #d3d2e6;
+}
+
+.css-cutoff-distant {
+}
+
+.css-loose-end-threat-level {
+    margin-left: 5px;
+
+}
+
+@media (min-width: 767px) {
+    .css-loose-end-header {
+        display: inline-block;
+    }
+
+    .css-loose-end-subheader {
+        display: inline-block;
+    }
+
+    .css-loose-end-subheader span {
+        margin-left: 3px;
+    }
+
+    .css-loose-end-content {
+        padding-left: 20px;
+    }
+}

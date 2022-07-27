@@ -113,6 +113,15 @@ SCAR_SEVERITY = (
     (START_ONLY_SCAR, "Asset and Liability Scars"),
 )
 
+THREAT_DANGEROUS = "1DANGEROUS"
+THREAT_DEADLY = "3DEADLY"
+THREAT_FATEFUL = "5FATEFUL"
+LOOSE_END_THREAT = (
+    (THREAT_DANGEROUS, "Dangerous"),
+    (THREAT_DEADLY, "Deadly"),
+    (THREAT_FATEFUL, "Fateful"),
+)
+
 BODY_STATUS = (
     'Scuffed',
     'Scuffed',
@@ -170,11 +179,13 @@ CIRCUMSTANCE = "Circumstance"
 TROPHY = "Trophy"
 TRAUMA = "Trauma"
 BATTLE_SCAR = "Battle Scar"
+LOOSE_END = "Loose End"
 ELEMENT_TYPE = (
     (CONDITION, 'Condition'),
     (CIRCUMSTANCE, 'Circumstance'),
     (TROPHY, 'Trophy'),
     (TRAUMA, 'Trauma'),
+    (LOOSE_END, 'Loose End'),
 )
 
 ELEMENT_TYPE_INC_SCAR = (
@@ -183,6 +194,7 @@ ELEMENT_TYPE_INC_SCAR = (
     (TROPHY, 'Trophy'),
     (TRAUMA, 'Trauma'),
     (BATTLE_SCAR, 'Battle Scar'),
+    (LOOSE_END, 'Loose End'),
 )
 
 GIVEN = "GIVEN"
@@ -591,6 +603,21 @@ class Character(models.Model):
             return self.cell.player_can_edit_characters(player)
         else:
             return False
+
+    def player_can_gm(self, player):
+        if player.is_superuser:
+            return True
+        if player.is_anonymous:
+            return False
+        if self.is_deleted:
+            return False
+        if not hasattr(self, 'player') or not self.player:
+            return False
+        if self.player == player:
+            return False
+        if not hasattr(self, 'cell') or not self.cell:
+            return False
+        return self.cell.player_can_run_games(player)
 
     def player_can_edit(self, player):
         if player.is_superuser:
@@ -1278,7 +1305,7 @@ class WorldElement(models.Model):
     name = models.CharField(max_length=500)
     description = models.CharField(max_length=5000)
     origin = models.CharField(max_length=2000, blank=True)
-    system = models.CharField(max_length=1000, blank=True)
+    system = models.CharField(max_length=5000, blank=True, help_text="Threat for Loose Ends")
     created_time = models.DateTimeField(auto_now_add=True, null=True) #null because added in migration
     is_deleted = models.BooleanField(default=False)
     deleted_date = models.DateTimeField(null=True, blank=True)
@@ -1309,6 +1336,44 @@ class Circumstance(WorldElement):
         return "Circumstance"
 
 
+class LooseEnd(WorldElement):
+    granting_player = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    cutoff = models.PositiveIntegerField(default=1)
+    threat_level = models.CharField(choices=LOOSE_END_THREAT, max_length=45, default=THREAT_DANGEROUS)
+    original_cutoff = models.PositiveIntegerField(default=1)
+    # use self.system field for threat information
+    how_to_tie_up = models.CharField(max_length=5000, blank=True)
+
+    CUTOFF_NOW = "present"
+    CUTOFF_IMMINENT = "imminent"
+    CUTOFF_MODERATE = "moderate"
+    CUTOFF_LONG = "distant"
+
+    def get_type_display(self):
+        return "Loose End"
+
+    def get_threat_level_hover_text(self):
+        if self.threat_level == THREAT_DANGEROUS:
+            return "The sort of threat which may crop up for people in the real world. For example, The loss of " \
+                   "resources or equipment, imprisonment, infamy,  or mundane gang-level violence."
+        if self.threat_level == THREAT_DEADLY:
+            return "A supernatural or extreme threat that poses a significant risk even to Contractors." \
+                    "For example, An assassination attempt from a powerful foe or organization, being put into a coma, " \
+                   "gaining a severe curse. "
+        if self.threat_level == THREAT_FATEFUL:
+            return "Reserved for Loose Ends which will cause certain or almost-certain death when the Cutoff hits 0. " \
+                   "For example, A chronic deadly disease, an implanted bomb exploding, an assassination attempt from a harbinger-level foe."
+
+    def get_cutoff_category(self):
+        if self.cutoff == 0:
+            return LooseEnd.CUTOFF_NOW
+        if self.cutoff < 3:
+            return LooseEnd.CUTOFF_IMMINENT
+        if self.cutoff < 5:
+            return LooseEnd.CUTOFF_MODERATE
+        return LooseEnd.CUTOFF_LONG
+
+
 class StockElementCategory(models.Model):
     name = models.CharField(max_length=500)
 
@@ -1319,11 +1384,14 @@ class StockElementCategory(models.Model):
 class StockWorldElement(models.Model):
     name = models.CharField(max_length=500)
     description = models.CharField(max_length=5000)
-    system = models.CharField(max_length=1000, blank=True)
+    system = models.CharField(max_length=1000, blank=True, help_text="Threat for Loose Ends")
     type = models.CharField(choices=ELEMENT_TYPE,
                             max_length=45,
                             default=CONDITION)
     category = models.ForeignKey(StockElementCategory, on_delete=models.CASCADE)
+    cutoff = models.PositiveIntegerField("cutoff (for loose ends)", default=1)
+    how_to_tie_up = models.CharField(max_length=1000, blank=True, help_text="For Loose Ends only")
+    threat_level = models.CharField(choices=LOOSE_END_THREAT, max_length=45, default=THREAT_DANGEROUS, help_text="for loose ends only")
 
     def __str__(self):
         return "[{}] {} - {}".format(self.get_type_display(), self.category.name, self.name)
@@ -2391,6 +2459,8 @@ class CharacterTutorial(models.Model):
     charon_coin = models.TextField(max_length=3000)
     conditions = models.TextField(max_length=3000, default="placeholder")
     circumstances = models.TextField(max_length=3000, default="placeholder")
+    loose_ends = models.TextField(max_length=3000, default="placeholder")
+    moves = models.TextField(max_length=3000, default="placeholder")
     artifacts = models.TextField(max_length=3000, default="placeholder")
     modal_1 = models.TextField(max_length=3000)
     modal_2 = models.TextField(max_length=3000)

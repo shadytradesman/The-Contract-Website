@@ -14,6 +14,9 @@
         <li class="css-timeline-item css-timeline-element">
           <b>Removed {{event.1.get_type_display}}: {{event.1.name}} </b>
           <i>{{event.1.description}}</i>
+          {% if event.1.deletion_reason %}
+            {{event.1.deletion_reason}}
+          {% endif %}
         </li>
       {% elif event.0 == "move" %}
         {% with event.1 as move %}

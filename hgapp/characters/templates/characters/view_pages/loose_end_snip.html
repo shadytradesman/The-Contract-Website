@@ -1,0 +1,132 @@
+{% load bootstrap %}
+
+<div class="visible-xs-block" style="height:35px;"></div>
+    <h3 class="text-center" data-toggle="tooltip" title='{{tutorial.loose_ends|safe}}'>
+        Loose Ends
+    </h3>
+    {% if not loose_ends or character.number_completed_games == 0 %}
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="alert alert-info" style="max-width: 800px; margin: auto;">
+                <p class="text-center">
+                    <b>Loose Ends will cause problems for you if you don't tie them up. </b>
+                </p>
+                <p>
+                    Examples of Loose Ends include enemies, debts, evidence, and promises.
+                </p>
+                <p>
+                    All Loose Ends have a Cutoff that counts down each time you attend a Contract. When it hits zero,
+                    the Threat of your Loose End manifests, causing issues for your Contractor.
+                </p>
+                <p>
+                    You cannot see the current values of your Loose Ends' Cutoffs, but you can take initiative and make
+                    Moves on your Downtimes to deal with them before time runs out.
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    <div class="js-world-element-container">
+        <div class="css-condition-section">
+            <div class="js-world-element-content-{{cell.id}}">
+                {% for loose_end in loose_ends %}
+                <div class="css-loose-end-container">
+                    {% if user_can_gm %}
+                        <div>
+                            <span class="pull-right css-loose-end-button">
+                                <a class="btn btn-xs btn-default"
+                                   href="{% url 'characters:delete_loose_end' loose_end.id %}"
+                                   style="margin-right: 5px;">
+                                    End
+                                </a>
+                            </span>
+                            <span class="pull-right css-loose-end-button">
+                                <a class="btn btn-xs btn-default"
+                                   href="{% url 'characters:edit_loose_end' loose_end.id %}"
+                                   style="margin-right: 5px;">
+                                    <i class="fa fa-edit fa-1x"></i> Edit
+                                </a>
+                            </span>
+
+                        </div>
+                        <div class="css-loose-end-header">
+                            <b>
+                                <h4 class="css-cutoff-{{loose_end.get_cutoff_category}}" style="display: inline-block; margin-bottom: 5px; margin-top: 0px;">
+                                    {{loose_end.name}}
+                                </h4>
+                            </b>
+                        </div>
+                        <div class="css-loose-end-subheader">
+                            <span  class="css-cutoff-{{loose_end.get_cutoff_category}}"
+                                    data-toggle="tooltip"
+                                data-title="Cutoff. This Contractor can attend {{loose_end.cutoff}} Contract{{loose_end.cutoff|pluralize}} before this Loose End's Threat manifests.">
+
+                                <span class="glyphicon glyphicon-time" aria-hidden="true"></span>
+                                <b>{{loose_end.cutoff}}</b>
+                            </span>
+                            <span class="css-loose-end-threat-level css-loose-end-threat-{{loose_end.threat_level}}"
+                                   data-toggle="tooltip"
+                                   data-title="Threat level: {{loose_end.get_threat_level_display}}. {{loose_end.get_threat_level_hover_text}}">
+                                {{loose_end.get_threat_level_display}}
+                            </span>
+                        </div>
+                        <div class="css-loose-end-content">
+                            <div>
+                                {{loose_end.description}}
+                            </div>
+                            <div>
+                                <b>
+                                    Threat:
+                                </b>
+                                <span class="css-loose-end-system">
+                                    {{loose_end.system}}
+                                </span>
+                            </div>
+                            {% if loose_end.how_to_tie_up %}
+                                <div>
+                                    <b>
+                                        To tie up:
+                                    </b>
+                                    <span class="css-loose-end-system">
+                                        {{loose_end.how_to_tie_up}}
+                                    </span>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                    <div class="css-loose-end-header">
+                        <b>
+                            <h4 class="css-cutoff-{{loose_end.get_cutoff_category}}" style="display: inline-block; margin-bottom: 5px; margin-top: 0px;">
+                                {{loose_end.name}}
+                            </h4>
+                        </b>
+                    </div>
+                    <div class="css-loose-end-subheader">
+                        <span  class="css-cutoff-{{loose_end.get_cutoff_category}}">
+                            <span class="glyphicon glyphicon-time" aria-hidden="true"></span>
+                            <b>{{loose_end.get_cutoff_category|capfirst}}</b>
+                        </span>
+                        <span class="css-loose-end-threat-level css-loose-end-threat-{{loose_end.threat_level}}"
+                              data-toggle="tooltip"
+                              data-title="Threat level: {{loose_end.get_threat_level_display}}. {{loose_end.get_threat_level_hover_text}}">
+                                {{loose_end.get_threat_level_display}}
+                        </span>
+                    </div>
+                    <div class="css-loose-end-content">
+                        <div>
+                            {{loose_end.description}}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% if user_can_gm and character.cell %}
+            <div class="text-center" style="margin-top: 5px;">
+                <a class="btn btn-default btn-sm wiki-entry-collapsible text-center" href="{% url 'characters:create_loose_end' character.id%}">
+                    New Loose End
+                </a>
+            </div>
+        {% endif %}
+    </div>

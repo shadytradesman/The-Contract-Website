@@ -1,4 +1,5 @@
 from django.conf.urls import url
+from django.urls import path
 
 from . import views
 
@@ -59,6 +60,10 @@ urlpatterns = [
 
     # ex: .com/characters/claim/c/112/6db20aef104038d363eca31985142c08daa82be57e29e53ad3c8171b9d46083f
     url(r'^claim/c/(?P<character_id>[\d]+)/(?P<secret_key>[\da-z]*)$', views.claim_character, name='characters_claim'),
+
+    path('loose-end/create/c/<int:character_id>/', views.CreateLooseEnd.as_view(), name='create_loose_end'),
+    path('loose-end/edit/l/<int:loose_end_id>/', views.EditLooseEnd.as_view(), name='edit_loose_end'),
+    url(r'^loose-end/delete/l/(?P<loose_end_id>[\d]+)$', views.delete_loose_end, name='delete_loose_end'),
 
     #####
     # AJAX endpoints for character view page
