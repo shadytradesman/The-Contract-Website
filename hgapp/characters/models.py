@@ -978,6 +978,8 @@ Archived on: {}
                 loose_end.cutoff = loose_end.cutoff - 1
                 loose_end.save()
 
+    def has_due_loose_end(self):
+        return self.looseend_set.filter(is_deleted=False, cutoff=0).count() > 0
 
     def to_create_power_blob(self):
         unspent_gifts = []

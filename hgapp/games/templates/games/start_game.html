@@ -49,9 +49,14 @@
                         </b>
                         {{ form.player}} {{ form.character }}
                         {% if form.attendance.game_invite.invitee_is_spoiled_on_scenario %}
-                            <span class="text-danger">
+                            <div class="text-danger">
                                 This Player has already discovered this Scenario and should only play an NPC Ringer.
-                            </span>
+                            </div>
+                        {% endif %}
+                        {% if form.attendance.attending_character.has_due_loose_end %}
+                            <div class="text-danger">
+                                This Contractor has Loose Ends due. You should resolve their Loose Ends before they play in a Contract.
+                            </div>
                         {% endif %}
                     </p>
 
