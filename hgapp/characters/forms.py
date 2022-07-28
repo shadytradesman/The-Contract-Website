@@ -449,6 +449,11 @@ def make_world_element_form(cell_choices=None, initial_cell=None, for_new=True):
                                       )
     return WorldElementForm
 
+class LooseEndDeleteForm(forms.Form):
+    resolution = forms.CharField(max_length=5000,
+                           label="Resolution",
+                           help_text="A quick summary of what happened and any new Conditions or Circumstances for the Contractor.",
+                           widget=forms.TextInput(attrs={'class': 'form-control'}))
 
 class LooseEndForm(forms.Form):
     name = forms.CharField(max_length=500,

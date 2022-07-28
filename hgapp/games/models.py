@@ -265,6 +265,12 @@ class Game(models.Model):
         self.give_rewards()
         self.update_profile_stats()
         self.unlock_stock_scenarios()
+        self.progress_loose_ends()
+
+    def progress_loose_ends(self):
+        for character in self.attended_by.all():
+            character.progress_loose_ends(self.actual_start_time)
+
 
     def is_introductory_game(self):
         # Returns True if this Game had at least one new Player in it.

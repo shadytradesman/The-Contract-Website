@@ -1,0 +1,49 @@
+{% extends "site_base.html" %}
+
+{% load static %}
+{% load bootstrap %}
+
+{% block head_title %}
+    Resolving Loose End
+{% endblock %}
+
+{% block extra_head %}
+{% endblock %}
+
+{% block extra_styles %}
+{% endblock %}
+
+{% block extra_scripts %}
+{% endblock %}
+
+{% block body_base %}
+<div class="container">
+    <h1 class="text-center">
+        Ending Loose End: {{loose_end.name}}
+    </h1>
+    <div class="panel panel-default">
+        <div class="panel-body js-world-element-form">
+            <form action="{% url 'characters:delete_loose_end' loose_end.id %}"
+                    method="post" onsubmit="setFormSubmitting()">
+                {% csrf_token %}
+                <div style="max-width: 800px; margin: auto;">
+                    <div class="alert alert-info">
+                        <div class="text-center">
+                            <P>
+                                <b>
+                                    Note: You must manually enter any new Conditions, Circumstances, or other results of this Loose End.
+                                </b>
+                            </P>
+                        </div>
+                    </div>
+                </div>
+                {{form|bootstrap}}
+                <div class="text-center">
+                    <input class="btn btn-primary" type="submit" value="Submit" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

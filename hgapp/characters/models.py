@@ -971,6 +971,14 @@ Archived on: {}
         else:
             return 5
 
+    def progress_loose_ends(self, game_start_time):
+        loose_ends = self.looseend_set.filter(is_deleted=False, created_time__lte=game_start_time, cutoff__gte=1).all()
+        for loose_end in loose_ends:
+            if loose_end.cutoff > 0:
+                loose_end.cutoff = loose_end.cutoff - 1
+                loose_end.save()
+
+
     def to_create_power_blob(self):
         unspent_gifts = []
         unspent_improvements = []

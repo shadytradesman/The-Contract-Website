@@ -90,11 +90,13 @@
                 {% endif %}
             {% endif %}
             {% if can_rsvp %}
-                <h4 class="text-center">
-                    <a href="{% url 'games:games_accept_invite' game.id %}" class="btn btn-xl btn-success">
-                        Click here to RSVP
-                    </a>
-                </h4>
+                {% if not my_invitation and not my_invitation.attendance %}
+                    <h4 class="text-center">
+                        <a href="{% url 'games:games_accept_invite' game.id %}" class="btn btn-xl btn-success">
+                            Click here to RSVP
+                        </a>
+                    </h4>
+                {% endif %}
                 {% if scenario_spoiled %}
                     <div class="alert alert-warning text-center">
                         <h4>You have already spoiled this Scenario</h4>

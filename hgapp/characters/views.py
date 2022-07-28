@@ -28,7 +28,7 @@ from characters.forms import make_character_form, CharacterDeathForm, ConfirmAss
     AssetForm, LiabilityForm, BattleScarForm, TraumaForm, InjuryForm, SourceValForm, make_allocate_gm_exp_form, EquipmentForm,\
     DeleteCharacterForm, BioForm, make_world_element_form, get_default_scar_choice_form, make_artifact_status_form, \
     make_transfer_artifact_form, make_consumable_use_form, NotesForm, get_default_world_element_choice_form, \
-    LooseEndForm
+    LooseEndForm, LooseEndDeleteForm
 from characters.form_utilities import get_edit_context, character_from_post, update_character_from_post, \
     grant_trauma_to_character, delete_trauma_rev, get_world_element_class_from_url_string
 from characters.view_utilities import get_characters_next_journal_credit, get_world_element_default_dict, get_weapons_by_type
@@ -646,6 +646,8 @@ class EnterLooseEnd(View):
             raise PermissionDenied("Contractors must be a part of a Playgroup to have Loose Ends.")
         if not self.character.player_can_gm(self.request.user):
             raise PermissionDenied("You must have permissions to run Contracts in this Contractor's Playgroup to assign Loose Ends.")
+        if self.character.player == self.request.user:
+            raise PermissionDenied("You cannot edit your own loose ends")
 
     def __get_context_data(self):
         context = {
@@ -685,12 +687,34 @@ class EditLooseEnd(EnterLooseEnd):
 def delete_loose_end(request, loose_end_id):
     loose_end = get_object_or_404(LooseEnd, id=loose_end_id)
     character = loose_end.character
+    if not character.cell:
+        raise PermissionDenied("Contractors must be a part of a Playgroup to have Loose Ends.")
+    if not character.player_can_gm(request.user):
+        raise PermissionDenied(
+            "You must have permissions to run Contracts in this Contractor's Playgroup to assign Loose Ends.")
+    if character.player == request.user:
+        raise PermissionDenied("You cannot resolve your own loose ends")
+    if loose_end.is_deleted:
+        raise ValueError("cannot end an already ended loose end")
     if request.method == "POST":
-        pass
-        with transaction.atomic():
-            pass
+        form = LooseEndDeleteForm(request.POST)
+        if form.is_valid():
+            with transaction.atomic():
+                loose_end = LooseEnd.objects.select_for_update().get(pk=loose_end.id)
+                loose_end.deletion_reason = form.cleaned_data["resolution"]
+                loose_end.is_deleted = True
+                loose_end.deleted_date = timezone.now()
+                loose_end.save()
+        else:
+            raise ValueError("Invalid loose end form")
         return HttpResponseRedirect(reverse('characters:characters_view', args=(character.id,)))
-    return HttpResponseRedirect(reverse('characters:characters_view', args= (character.id,)))
+    form = LooseEndDeleteForm()
+    context = {
+        "character": character,
+        "loose_end": loose_end,
+        "form": form,
+    }
+    return render(request, 'characters/loose_ends/delete_loose_end.html', context)
 
 #####
 # View Character AJAX
@@ -799,7 +823,7 @@ def character_timeline(request, character_id):
     moves = [(x.created_date, "move", x) for x in character.move_set.order_by("-created_date").all()]
 
     loose_ends = [(x.created_time, "elem_created", x) for x in character.looseend_set.order_by("-created_time").all()]
-    loose_end_deleted = [(x.created_time, "elem_deleted", x) for x in character.looseend_set.filter(is_deleted=True).order_by("-created_time").all()]
+    loose_end_deleted = [(x.deleted_datex, "elem_deleted", x) for x in character.looseend_set.filter(is_deleted=True).order_by("-created_time").all()]
 
     events_by_date = list(merge(assigned_rewards,
                                 completed_games,

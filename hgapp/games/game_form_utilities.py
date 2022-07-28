@@ -215,6 +215,8 @@ def create_archival_game(request, general_form, cell, outcome_formset):
                     character.save()
                     if not form.cleaned_data['attending_character'].cell == cell:
                         attendance.is_confirmed = False
+                    elif game.creator.id != player.id:
+                        character.progress_loose_ends(occurred_time)
                 else:
                     attendance.is_confirmed = False
             else:
@@ -222,6 +224,7 @@ def create_archival_game(request, general_form, cell, outcome_formset):
                 attendance.is_confirmed = False
             if game.creator.id == player.id:
                 attendance.is_confirmed = True
+                attendance.attending_character.progress_loose_ends(occurred_time)
             attendance.save()
             game_invite.attendance = attendance
             game_invite.save()

@@ -69,6 +69,14 @@
                                    data-title="Threat level: {{loose_end.get_threat_level_display}}. {{loose_end.get_threat_level_hover_text}}">
                                 {{loose_end.get_threat_level_display}}
                             </span>
+                            <span>
+                                <small>
+                                    Given by
+                                    <a href="{% url 'profiles:profiles_view_profile' loose_end.granting_player.id %}">
+                                        {{loose_end.granting_player}}
+                                    </a>
+                                </small>
+                            </span>
                         </div>
                         <div class="css-loose-end-content">
                             <div>
@@ -110,6 +118,14 @@
                               data-toggle="tooltip"
                               data-title="Threat level: {{loose_end.get_threat_level_display}}. {{loose_end.get_threat_level_hover_text}}">
                                 {{loose_end.get_threat_level_display}}
+                        </span>
+                        <span>
+                            <small>
+                                Given by
+                                <a href="{% url 'profiles:profiles_view_profile' loose_end.granting_player.id %}">
+                                    {{loose_end.granting_player}}
+                                </a>
+                            </small>
                         </span>
                     </div>
                     <div class="css-loose-end-content">

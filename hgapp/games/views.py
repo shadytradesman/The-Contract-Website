@@ -825,6 +825,8 @@ def confirm_attendance(request, attendance_id, confirmed=None):
                 if confirmed == 'y':
                     attendance.confirm_and_reward()
                     attendance.relevant_game.update_profile_stats()
+                    if hasattr(attendance, "attending_character") and attendance.attending_character:
+                        attendance.attending_character.progress_loose_ends(attendance.relevant_game.actual_start_time)
                 else:
                     invite = attendance.game_invite
                     invite.is_declined = True
@@ -956,6 +958,8 @@ class EnterMove(View):
                     self.world_event = WorldEvent(creator=request.user,
                                                   parent_cell=self.cell,
                                                   )
+                else:
+                    self.world_event = WorldEvent.objects.select_for_update().get(pk=self.world_event.pk)
                 self.world_event.headline = event_form.cleaned_data["headline"] if "headline" in event_form.cleaned_data else " "
                 self.world_event.event_description = event_form.cleaned_data["event_description"]
                 self.world_event.save()
@@ -968,6 +972,8 @@ class EnterMove(View):
                                      public_event=self.world_event,
                                      main_character=move_char,
                                      )
+                else:
+                    self.move = Move.objects.select_for_update().get(pk=self.move.pk)
                 self.move.title = move_form.cleaned_data["title"]
                 self.move.summary = move_form.cleaned_data["summary"]
                 self.move.save()
