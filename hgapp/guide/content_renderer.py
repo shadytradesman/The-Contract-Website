@@ -91,7 +91,7 @@ def __fancy_battle_scars():
 
 
 def __fancy_world_element(element_type):
-    stock_elements = StockWorldElement.objects.filter(type=element_type).exclude(category__name="creation-only").order_by("category").all()
+    stock_elements = StockWorldElement.objects.filter(type=element_type).exclude(category__name__in=["creation-only", "General"]).order_by("category").all()
     options = []
     current_options = []
     current_category = stock_elements[0].category
