@@ -4,6 +4,7 @@ from heapq import merge
 
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.utils.decorators import method_decorator
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
@@ -554,8 +555,8 @@ def spend_reward(request, character_id):
 def allocate_gm_exp(request, secret_key = None):
     if not request.user.is_authenticated:
         raise PermissionDenied("You must be logged in to allocate exp")
-    users_living_character_ids = [char.id for char in request.user.character_set.filter(is_deleted=False).all() if not char.is_dead()]
-    queryset = Character.objects.filter(id__in=users_living_character_ids)
+    valid_character_ids = [char.id for char in request.user.character_set.filter(is_deleted=False).all() if char.can_get_bonus_exp()]
+    queryset = Character.objects.filter(id__in=valid_character_ids)
     RewardForm = make_allocate_gm_exp_form(queryset)
     RewardFormset = formset_factory(RewardForm, extra=0)
     if request.method == 'POST':
@@ -564,16 +565,19 @@ def allocate_gm_exp(request, secret_key = None):
             initial=[{"reward": x} for x in request.user.profile.get_avail_exp_rewards()])
         if reward_formset.is_valid():
             for form in reward_formset:
-                reward = get_object_or_404(ExperienceReward, id=form.cleaned_data["reward_id"])
-                if reward.rewarded_character or reward.rewarded_player != request.user:
-                    raise PermissionDenied("This reward has been allocated, or it isn't yours")
-                if "chosen_character" in form.changed_data:
-                    char = form.cleaned_data["chosen_character"]
-                    if char.player != request.user:
-                        raise PermissionDenied("You cannot give your rewards to other people's characters!")
-                    reward.rewarded_character = char
-                    reward.created_time = timezone.now()
-                    with transaction.atomic():
+                with transaction.atomic():
+                    user = User.objects.select_for_update().get(pk=request.user.id) # for locking
+                    reward = get_object_or_404(ExperienceReward, id=form.cleaned_data["reward_id"])
+                    if reward.rewarded_character or reward.rewarded_player != request.user:
+                        raise PermissionDenied("This reward has been allocated, or it isn't yours")
+                    if "chosen_character" in form.changed_data:
+                        char = form.cleaned_data["chosen_character"]
+                        if char.player != request.user:
+                            raise PermissionDenied("You cannot give your rewards to other people's characters!")
+                        if not char.can_get_bonus_exp():
+                            continue
+                        reward.rewarded_character = char
+                        reward.created_time = timezone.now()
                         reward.save()
             return HttpResponseRedirect(reverse('home'))
         else:

@@ -949,6 +949,10 @@ Archived on: {}
         return "\n\n".join([header, stats, other_stat_info, gifts])
 
 
+    def can_get_bonus_exp(self):
+        return not self.is_dead() and self.exp_earned() < (EXP_NEW_CHAR + 10 + (self.num_victories * 12))
+
+
     def unspent_experience(self):
         total_exp = self.exp_earned()
         exp_cost = self.exp_cost()

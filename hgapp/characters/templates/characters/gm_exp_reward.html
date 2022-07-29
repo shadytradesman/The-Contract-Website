@@ -2,7 +2,7 @@
 
 {% load i18n %}
 
-{% block head_title %}Rewarding Character{% endblock %}
+{% block head_title %}Granting Bonus Exp{% endblock %}
 
 {% block body_class %}home{% endblock %}
 
@@ -13,14 +13,28 @@
 {% block body_base %}
     <div class="container">
         <div class="text-center form-inline">
-            <h1>Grant Experience</h1>
+            <h1>Grant Bonus Experience</h1>
             <p class="help-block">
-                Declare which Characters should receive Experience.
+                Declare which Contractors should receive Bonus Experience.
                 Once confirmed, this action cannot be undone.
-                Only living characters may be rewarded.
             </p>
             <div class="panel panel-default">
                 <div class="panel-body">
+                    <p>
+
+                        Only Contractors that meet the following conditions may be rewarded:
+                    <div class="text-left" style="max-width: 800px; margin: auto;">
+                        <ol >
+                            <li>
+                                They are alive.
+                            </li>
+                            <li>
+                                Their total earned Exp is less than 10 + (12 * their number of Victories).
+                            </li>
+                        </ol>
+                    </div>
+                    </p>
+                    <hr>
                     <form action="{% url 'characters:characters_allocate_gm_exp'%}" method="post">
                         {% csrf_token %}
                         {{ reward_formset.management_form }}
