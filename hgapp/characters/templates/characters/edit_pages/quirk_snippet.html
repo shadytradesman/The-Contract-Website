@@ -30,7 +30,7 @@
                 {% if quirk.grants_element %}
                     <b>{{quirk.grants_element.get_type_display}}:</b>
                     {{quirk.grants_element.description}}
-                    {% if quirk.grants_element.system %}
+                    {% if quirk.grants_element.system and not quirk.grants_element.type == 'Loose End' %}
                         <span class="css-system-text-user-input">
                             <i>
                                 ({{quirk.grants_element.system}})

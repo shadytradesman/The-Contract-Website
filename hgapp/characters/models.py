@@ -1351,7 +1351,7 @@ class Circumstance(WorldElement):
 
 
 class LooseEnd(WorldElement):
-    granting_player = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    granting_player = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True)
     cutoff = models.PositiveIntegerField(default=1)
     threat_level = models.CharField(choices=LOOSE_END_THREAT, max_length=45, default=THREAT_DANGEROUS)
     original_cutoff = models.PositiveIntegerField(default=1)
@@ -1365,6 +1365,9 @@ class LooseEnd(WorldElement):
 
     def get_type_display(self):
         return "Loose End"
+
+    def is_loose_end(self):
+        return True
 
     def get_threat_level_hover_text(self):
         if self.threat_level == THREAT_DANGEROUS:
@@ -1422,6 +1425,17 @@ class StockWorldElement(models.Model):
         if self.type == TRAUMA:
             new_trauma = Trauma.objects.create(name=name, description=self.description)
             TraumaRevision.objects.create(relevant_stats=stats, relevant_trauma=new_trauma)
+            return
+        if self.type == LOOSE_END:
+            LooseEnd.objects.create(
+                character=stats.assigned_character,
+                name=name,
+                description=self.description,
+                system=self.system,
+                cutoff=self.cutoff,
+                threat_level=self.threat_level,
+                how_to_tie_up=self.how_to_tie_up,
+                granting_player=stats.assigned_character.player)
             return
         raise ValueError("Could not grant element to contractor")
 

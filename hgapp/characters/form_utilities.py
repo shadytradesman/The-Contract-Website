@@ -291,10 +291,16 @@ def __save_stats_diff_from_post(POST, existing_character=None, new_character=Non
         new_stats_rev = ContractStats(assigned_character=existing_character)
         new_stats_rev.save()
         limit_formset = __get_limit_formset_for_edit(existing_character, POST)
+        current_snapshot_asset_details = existing_character.stats_snapshot.assetdetails_set.all()
+        current_asset_details = set([x.previous_revision.id for x in current_snapshot_asset_details])
+        current_snapshot_liability_details = existing_character.stats_snapshot.liabilitydetails_set.all()
+        current_liability_details = set([x.previous_revision.id for x in current_snapshot_liability_details])
         for asset_formset in asset_formsets:
-            __save_edit_quirks_from_formset(formset=asset_formset, stats=new_stats_rev, is_asset=True)
+            __save_edit_quirks_from_formset(formset=asset_formset, stats=new_stats_rev, is_asset=True, current_details=current_asset_details)
         for liability_formset in liability_formsets:
-            __save_edit_quirks_from_formset(formset=liability_formset, stats=new_stats_rev, is_asset=False)
+            __save_edit_quirks_from_formset(formset=liability_formset, stats=new_stats_rev, is_asset=False, current_details=current_liability_details)
+        __remove_deprecated_quirks(stats=new_stats_rev, is_asset=True, deprecated_details=current_asset_details)
+        __remove_deprecated_quirks(stats=new_stats_rev, is_asset=False, deprecated_details=current_liability_details)
         ability_formset = __get_ability_formset_for_edit(existing_character, AbilityFormSet, POST)
         __save_edit_abilities_from_formset(formset=ability_formset, stats=new_stats_rev)
         attribute_formset = __get_attribute_formset_for_edit(existing_character, AttributeFormSet, POST)
@@ -521,7 +527,7 @@ def __get_quirk_formsets_for_edit_context(details_by_quirk_id, is_asset, all_qui
                                           prefix=prefix + str(quirk.id)))
     return quirk_formsets
 
-def __save_edit_quirks_from_formset(formset, stats, is_asset):
+def __save_edit_quirks_from_formset(formset, stats, is_asset, current_details):
     Quirk = Asset if is_asset else Liability
     QuirkDetails = AssetDetails if is_asset else LiabilityDetails
     if formset.is_valid():
@@ -530,6 +536,7 @@ def __save_edit_quirks_from_formset(formset, stats, is_asset):
             if form.cleaned_data["details_id"]:
                 details_id = form.cleaned_data['details_id']
                 prev_details = get_object_or_404(QuirkDetails, id=details_id)
+                current_details.remove(details_id)
                 if form.changed_data:
                     new_details = QuirkDetails(
                         relevant_stats=stats,
@@ -558,6 +565,24 @@ def __save_edit_quirks_from_formset(formset, stats, is_asset):
     else:
         logger.error('Bad Quirk edit formset: %s', str(formset.errors))
         raise ValueError("invalid quirk formset from edit post")
+
+
+def __remove_deprecated_quirks(stats, is_asset, deprecated_details):
+    QuirkDetails = AssetDetails if is_asset else LiabilityDetails
+    # Unseen details indicates that the quirk was made non-public or removed since taken. We delete these on edit.
+    for unseen_detail_id in deprecated_details:
+        prev_revision = get_object_or_404(QuirkDetails, id=unseen_detail_id)
+        new_details = QuirkDetails(
+            relevant_stats=stats,
+            is_deleted=True,
+            details="",
+            previous_revision=prev_revision,
+        )
+        if is_asset:
+            new_details.relevant_asset = prev_revision.relevant_asset
+        else:
+            new_details.relevant_liability =prev_revision.relevant_liability
+        new_details.save()
 
 
 def __get_source_formset_for_edit(existing_character, POST = None):

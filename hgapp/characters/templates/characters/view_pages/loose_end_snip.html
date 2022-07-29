@@ -4,7 +4,7 @@
     <h3 class="text-center" data-toggle="tooltip" title='{{tutorial.loose_ends|safe}}'>
         Loose Ends
     </h3>
-    {% if not loose_ends or character.number_completed_games == 0 %}
+    {% if not loose_ends and character.num_games == 0 %}
     <div class="row">
         <div class="col-xs-12">
             <div class="alert alert-info" style="max-width: 800px; margin: auto;">
@@ -72,9 +72,13 @@
                             <span>
                                 <small>
                                     Given by
-                                    <a href="{% url 'profiles:profiles_view_profile' loose_end.granting_player.id %}">
-                                        {{loose_end.granting_player}}
-                                    </a>
+                                    {% if loose_end.granting_player == character.player %}
+                                        a Liability
+                                    {% else %}
+                                        <a href="{% url 'profiles:profiles_view_profile' loose_end.granting_player.id %}">
+                                            {{loose_end.granting_player}}
+                                        </a>
+                                    {% endif %}
                                 </small>
                             </span>
                         </div>
@@ -122,9 +126,13 @@
                         <span>
                             <small>
                                 Given by
-                                <a href="{% url 'profiles:profiles_view_profile' loose_end.granting_player.id %}">
-                                    {{loose_end.granting_player}}
-                                </a>
+                                {% if loose_end.granting_player == character.player %}
+                                    a Liability
+                                {% else %}
+                                    <a href="{% url 'profiles:profiles_view_profile' loose_end.granting_player.id %}">
+                                        {{loose_end.granting_player}}
+                                    </a>
+                                {% endif %}
                             </small>
                         </span>
                     </div>

@@ -103,179 +103,12 @@
     <br>
     </div>
 </div>
-<div class="panel panel-default">
-    <h2 class = "row text-center" data-toggle="tooltip" title='{{tutorial.assets_and_liabilities|safe}}'>
-        Assets and Liabilities
-        <br>
-        <small>"You play the hand you're dealt, good and bad."</small>
-    </h2>
-    <div class="panel-body">
-        {# asset and liability management forms #}
-        {% for formset in asset_formsets %}
-            {{ formset.management_form }}
-        {% endfor %}
-        {% for formset in liability_formsets %}
-            {{ formset.management_form }}
-        {% endfor %}
-
-        <ul class="nav nav-pills text-center center-pills css-quirk-cat-buttons">
-            <li class="active">
-                <a data-toggle="pill" href="#physical" class="js-quirk-cat-button">
-                    Physical
-                </a>
-                <div class="css-quirk-cat-caption-cont">
-                    &nbsp;
-                    <span class="css-experience-cost">
-                        ( <span id="js-quirk-cat-physical-exp-val">-0</span> Exp )
-                    </span>
-                    &nbsp;
-                </div>
-            </li>
-            <li>
-                <a data-toggle="pill" href="#background" class="js-quirk-cat-button">
-                    Background
-                </a>
-                <div class="css-quirk-cat-caption-cont">
-                    &nbsp;
-                    <span class="css-experience-cost">
-                        ( <span id="js-quirk-cat-background-exp-val">-0</span> Exp )
-                    </span>
-                    &nbsp;
-                </div>
-            </li>
-            <li>
-                <a data-toggle="pill" href="#mental" class="js-quirk-cat-button">
-                Mental/Emotional
-                </a>
-                <div class="css-quirk-cat-caption-cont">
-                    &nbsp;
-                    <span class="css-experience-cost">
-                        ( <span id="js-quirk-cat-mental-exp-val">-0</span> Exp )
-                    </span>
-                    &nbsp;
-                </div>
-            </li>
-            <li data-toggle="tooltip"
-                   title="Restricted Assets and Liabilities require the approval of your World's leader to take.">
-                <a data-toggle="pill" href="#restricted" class="js-quirk-cat-button" >
-                    Restricted
-                </a>
-                <div class="css-quirk-cat-caption-cont">
-                    &nbsp;
-                    <span class="css-experience-cost">
-                        ( <span id="js-quirk-cat-restricted-exp-val">-0</span> Exp )
-                    </span>
-                    &nbsp;
-                </div>
-            </li>
-        </ul>
-        {# TODO: THIS SECTION IS AWFUL AND SLOW. ITERATE AND CHECK LESS #}
-        <div class="tab-content">
-            <div id="physical" class="tab-pane fade in active">
-                <div class="row">
-                    <div class="col-md-6 col-xs-12">
-                        <h3 id="physical-assets">Physical Assets</h3>
-                        {% for formset in asset_formsets %}
-                            {% for form in formset %}
-                                {% if form.initial.quirk.is_physical %}
-                                    {% include "characters/edit_pages/quirk_outer_snippet.html" %}
-                                {% endif %}
-                            {% endfor %}
-                        {% endfor %}
-                    </div>
-                    <div class="col-md-6 col-xs-12">
-                        <h3 id="physical-flaws">Physical Liabilities</h3>
-                        {% for formset in liability_formsets %}
-                            {% for form in formset %}
-                                {% if form.initial.quirk.is_physical %}
-                                        {% include "characters/edit_pages/quirk_outer_snippet.html" %}
-                                {% endif %}
-                            {% endfor %}
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-            <div id="background" class="tab-pane fade">
-                <div class="row">
-                    <div class="col-md-6 col-xs-12">
-                        <h3 id="background-assets">Background Assets</h3>
-                            {% for formset in asset_formsets %}
-                                {% for form in formset %}
-                                    {% if form.initial.quirk.is_background %}
-                                            {% include "characters/edit_pages/quirk_outer_snippet.html" %}
-                                    {% endif %}
-                                {% endfor %}
-                        {% endfor %}
-                    </div>
-                    <div class="col-md-6 col-xs-12">
-                        <h3 id="background-liabilities">Background Liabilities</h3>
-                        {% for formset in liability_formsets %}
-                            {% for form in formset %}
-                                {% if form.initial.quirk.is_background %}
-                                    {% include "characters/edit_pages/quirk_outer_snippet.html" %}
-                                {% endif %}
-                            {% endfor %}
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-            <div id="mental" class="tab-pane fade">
-                <div class="row">
-                    <div class="col-md-6 col-xs-12">
-                        <h3 id="mental-assets">Mental Assets</h3>
-                        {% for formset in asset_formsets %}
-                            {% for form in formset %}
-                                {% if form.initial.quirk.is_mental %}
-                                    {% include "characters/edit_pages/quirk_outer_snippet.html" %}
-                                {% endif %}
-                            {% endfor %}
-                        {% endfor %}
-                    </div>
-                    <div class="col-md-6 col-xs-12">
-                        <h3 id="mental-liabilities">Mental Liabilities</h3>
-                        {% for formset in liability_formsets %}
-                            {% for form in formset %}
-                                {% if form.initial.quirk.is_mental %}
-                                    {% include "characters/edit_pages/quirk_outer_snippet.html" %}
-                                {% endif %}
-                            {% endfor %}
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-            <div id="restricted" class="tab-pane fade">
-                <div class="row">
-                    <div class="col-md-6 col-xs-12">
-                        <h3 id="restricted-assets">Restricted Assets</h3>
-                        {% for formset in asset_formsets %}
-                            {% for form in formset %}
-                                {% if form.initial.quirk.is_restricted %}
-                                    {% include "characters/edit_pages/quirk_outer_snippet.html" %}
-                                {% endif %}
-                            {% endfor %}
-                        {% endfor %}
-                    </div>
-                    <div class="col-md-6 col-xs-12">
-                        <h3 id="restricted-liabilities">Restricted Liabilities</h3>
-                        {% for formset in liability_formsets %}
-                            {% for form in formset %}
-                                {% if form.initial.quirk.is_restricted %}
-                                    {% include "characters/edit_pages/quirk_outer_snippet.html" %}
-                                {% endif %}
-                            {% endfor %}
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 {{ source_formset.management_form }}
 {% if source_formset and source_formset|length > 0 %}
     {{ source_formset.management_form }}
     <div class="panel panel-default">
         <h2 class = "row text-center" data-toggle="tooltip" title='{{tutorial.source_edit|safe}}'>
-            Sources
+            Source
         </h2>
         <div class="panel-body">
             {% for form in source_formset %}
@@ -305,6 +138,8 @@
         </div>
     </div>
 {% endif %}
+
+{% include "characters/edit_pages/section_assets_and_liabilities.html" %}
 
 <div class="thumbnail">
     <div class="row">
