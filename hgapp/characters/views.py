@@ -827,7 +827,7 @@ def character_timeline(request, character_id):
     moves = [(x.created_date, "move", x) for x in character.move_set.order_by("-created_date").all()]
 
     loose_ends = [(x.created_time, "elem_created", x) for x in character.looseend_set.order_by("-created_time").all()]
-    loose_end_deleted = [(x.deleted_datex, "elem_deleted", x) for x in character.looseend_set.filter(is_deleted=True).order_by("-created_time").all()]
+    loose_end_deleted = [(x.deleted_date, "elem_deleted", x) for x in character.looseend_set.filter(is_deleted=True).order_by("-created_time").all()]
 
     events_by_date = list(merge(assigned_rewards,
                                 completed_games,
