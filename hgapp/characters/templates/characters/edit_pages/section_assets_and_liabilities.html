@@ -1,6 +1,13 @@
 <div class="panel panel-default">
   {% if character and character.num_games > 0 %}
-    <a class="btn btn-default btn-sm wiki-entry-collapsible" style="width: 100%; text-align: center;">Edit Assets and Liabilities</a>
+    <div class="text-center" style="padding:5px;">
+      <i>
+        <small>
+          (This Contractor has already attended a Contract and should no longer edit their Assets or Liabilities)
+        </small>
+      </i>
+    </div>
+    <a class="btn btn-default btn-sm wiki-entry-collapsible" style="width: 100%; text-align: center;">Edit Assets and Liabilities Anyway</a>
   {% endif %}
   <div class="collapse-content clearfix" {% if character and character.num_games > 0 %} style="display:none;" {% endif %}>
 

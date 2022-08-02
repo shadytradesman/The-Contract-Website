@@ -72,12 +72,18 @@
                             <span>
                                 <small>
                                     Given by
-                                    {% if loose_end.granting_gm == character.player %}
+                                    {% if loose_end.granting_gm == character.player or loose_end.granting_player == character.player %}
                                         a Liability
                                     {% else %}
+                                        {% if loose_end.granting_gm %}
                                         <a href="{% url 'profiles:profiles_view_profile' loose_end.granting_gm.id %}">
                                             {{loose_end.granting_gm}}
                                         </a>
+                                        {% else %}
+                                        <a href="{% url 'profiles:profiles_view_profile' loose_end.granting_player.id %}">
+                                            {{loose_end.granting_player}}
+                                        </a>
+                                        {% endif %}
                                     {% endif %}
                                 </small>
                             </span>
@@ -126,12 +132,18 @@
                         <span>
                             <small>
                                 Given by
-                                {% if loose_end.granting_gm == character.player %}
+                                {% if loose_end.granting_gm  == character.player or loose_end.granting_player == character.player %}
                                     a Liability
                                 {% else %}
+                                    {% if loose_end.granting_gm %}
                                     <a href="{% url 'profiles:profiles_view_profile' loose_end.granting_gm.id %}">
                                         {{loose_end.granting_gm}}
                                     </a>
+                                    {% else %}
+                                    <a href="{% url 'profiles:profiles_view_profile' loose_end.granting_player.id %}">
+                                        {{loose_end.granting_player}}
+                                    </a>
+                                    {% endif %}
                                 {% endif %}
                             </small>
                         </span>
