@@ -1324,6 +1324,7 @@ class WorldElement(models.Model):
     is_deleted = models.BooleanField(default=False)
     deleted_date = models.DateTimeField(null=True, blank=True)
     deletion_reason = models.CharField(max_length=5000, blank=True)
+    granting_gm = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True)
 
     # when cell is null, element is created by gift system
     cell = models.ForeignKey(Cell,
@@ -1351,7 +1352,7 @@ class Circumstance(WorldElement):
 
 
 class LooseEnd(WorldElement):
-    granting_player = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True)
+    granting_player = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True, related_name="granting_gm")
     cutoff = models.PositiveIntegerField(default=1)
     threat_level = models.CharField(choices=LOOSE_END_THREAT, max_length=45, default=THREAT_DANGEROUS)
     original_cutoff = models.PositiveIntegerField(default=1)
@@ -1435,7 +1436,7 @@ class StockWorldElement(models.Model):
                 cutoff=self.cutoff,
                 threat_level=self.threat_level,
                 how_to_tie_up=self.how_to_tie_up,
-                granting_player=stats.assigned_character.player)
+                granting_gm=stats.assigned_character.player)
             return
         raise ValueError("Could not grant element to contractor")
 
@@ -1445,7 +1446,8 @@ class Artifact(WorldElement):
     crafting_character = models.ForeignKey(Character, related_name="creator", on_delete=models.CASCADE, null=True)
     creating_player = models.ForeignKey(settings.AUTH_USER_MODEL,
                                         on_delete=models.CASCADE,
-                                        null=True)
+                                        null=True,
+                                        related_name = "creating_player")
     is_consumable = models.BooleanField(default=False)
     is_signature = models.BooleanField(default=False)
     is_crafted_artifact = models.BooleanField(default=False)

@@ -1,5 +1,8 @@
+.col-md-6 {
+    width: 100%!important;
+}
+
 .css-section-body p, .css-section-body li, .css-section-body td, .css-section-body .col-xs-12 {
-    font-family: Georgia, Times, serif;
 }
 
 .css-section-body strong, .css-section-body h4, .css-section-body h5, .css-section-body h3{
@@ -82,6 +85,14 @@
     .css-section-body>.css-guide-image {
         min-height: 450px;
     }
+
+    p, h5 {
+        padding-left: 25px;
+    }
+
+    ul, ol {
+        padding-left: 55px;
+    }
 }
 
 .css-guide-section {
@@ -111,7 +122,7 @@
 }
 
 #main-container {
-    max-width: 1650px;
+    max-width: 1050px;
     margin: auto;
 }
 
@@ -125,6 +136,21 @@
         padding-right: 0px;
         position: relative;
         top: 40px;
+        z-index: 4;
+    }
+}
+
+@media (min-width: 768px) {
+
+    .css-toc-sec {
+        width: 350px;
+    }
+
+    .css-guidebook-col {
+        padding-left: 0px;
+        padding-right: 0px;
+        position: relative;
+        margin-left: 350px;
         z-index: 4;
     }
 }
@@ -144,17 +170,6 @@ body {position:relative;}
     align-content: flex-start;
     align-items: stretch;
     flex-flow: column;
-}
-
-@media (min-width: 991px) {
-    .css-section-body p+p {
-        text-indent: 30px;
-    }
-
-    .css-section-body p+p .css-guide-image, .css-section-body p+p .css-guide-image-sm {
-        /* images shouldn't be indented */
-        margin-left: -30px;
-    }
 }
 
 .css-section-body>p, .css-section-body>h3, .css-section-body>h4, .css-section-body>h5, .css-section-body>ul {
@@ -206,6 +221,11 @@ body {position:relative;}
 
 .css-section-heading-1 h1 {
     margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+.css-section-heading-1+hr {
+    margin-top: 10px;
 }
 
 .css-section-heading-2 {
@@ -216,6 +236,7 @@ body {position:relative;}
 }
 .css-section-heading-2 h2 {
     margin-top: 0px;
+    margin-bottom: 0px;
 }
 
 .css-section-heading-3 {
@@ -247,7 +268,8 @@ body {position:relative;}
 }
 
 .css-section-anchor-link {
-    margin-top: -10px;
+    margin-top: 10px;
+    margin-left: -5px;
 }
 
 @media(max-width: 768px) {
@@ -263,7 +285,7 @@ body {position:relative;}
 
 /* stml stylings */
 .css-gm-tip {
-    max-width: 800px;
+    max-width: 500px;
     margin-left: auto;
     margin-right: auto;
     padding-left: 15px;
@@ -274,6 +296,7 @@ body {position:relative;}
     background-color: #455864 !important;
     border-radius: 4px;
     border: 1px solid #252e3b;
+    margin-bottom: 10px;
 }
 
 .css-gm-tip-header {
@@ -287,8 +310,12 @@ body {position:relative;}
 }
 
 .css-gm-tip-content {
-    padding-left: 35px;
+    padding-left: 25px;
     padding-top: 5px;
+}
+
+.css-gm-tip-content ul {
+    padding-left: 0px;
 }
 
 .css-subsection { /* TODO: implement or delete*/
@@ -302,7 +329,7 @@ body {position:relative;}
 }
 
 .css-examples {
-    max-width: 800px;
+    width: 500px;
     margin-left: auto;
     margin-right: auto;
     padding-left: 15px;
@@ -327,6 +354,5 @@ body {position:relative;}
 }
 
 .css-examples-content {
-    padding-left: 35px;
     padding-top: 5px;
 }

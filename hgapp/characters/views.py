@@ -41,6 +41,16 @@ from hgapp.utilities import get_object_or_none
 
 from games.game_utilities import get_character_contacts
 
+def __check_world_element_perms(request, character, secret_key=None):
+    try:
+        __check_edit_perms(request, character, secret_key)
+        return True
+    except PermissionDenied:
+        if hasattr(character, "cell") and character.cell.player_can_run_games(request.user):
+            return True
+    raise PermissionDenied("You do not have permission to edit this Character")
+
+
 def __check_edit_perms(request, character, secret_key=None):
     requester_can_edit = False
     if request.user.is_superuser:
@@ -219,6 +229,7 @@ def view_character(request, character_id, secret_key=None):
     else:
         secret_key = ""
     user_can_edit = (request.user.is_authenticated and character.player_can_edit(request.user)) or secret_key_valid
+    user_can_gm = character.player_can_gm(request.user)
     user_posts_moves = (request.user.is_authenticated and character.cell) \
                        and (character.cell.player_can_post_world_events(request.user) and character.cell.player_can_run_games(request.user))
     early_access = request.user and hasattr(request.user, "profile") and request.user.profile.early_access_user
@@ -268,7 +279,7 @@ def view_character(request, character_id, secret_key=None):
     default_trauma_form = None
     default_trophy_form = None
     element_description_by_name = None
-    if user_can_edit:
+    if user_can_edit or user_can_gm:
         # We only need these choices if the user can edit, both for forms and for char sheet.
         world_element_cell_choices = character.world_element_cell_choices()
         circumstance_form = make_world_element_form(world_element_cell_choices, world_element_initial_cell)
@@ -329,7 +340,7 @@ def view_character(request, character_id, secret_key=None):
     context = {
         'character': character,
         'user_can_edit': user_can_edit,
-        'user_can_gm': character.player_can_gm(request.user),
+        'user_can_gm': user_can_gm,
         'user_posts_moves': user_posts_moves,
         'early_access': early_access,
         'health_display': character.get_health_display(),
@@ -632,7 +643,7 @@ class EnterLooseEnd(View):
                     self.loose_end = LooseEnd(
                         character=self.character,
                         cell=self.character.cell,
-                        granting_player=self.request.user,
+                        granting_gm=self.request.user,
                         original_cutoff=form.cleaned_data["cutoff"]
                     )
                 self.loose_end.name = form.cleaned_data["name"]
@@ -1099,7 +1110,7 @@ def post_world_element(request, character_id, element, secret_key = None):
         if not WorldElement:
             return JsonResponse({"error": "Invalid world element"}, status=400)
         character = get_object_or_404(Character, id=character_id)
-        __check_edit_perms(request, character, secret_key)
+        __check_world_element_perms(request, character, secret_key)
         world_element_cell_choices = character.world_element_cell_choices()
         world_element_initial_cell = character.world_element_initial_cell()
         form = make_world_element_form(world_element_cell_choices, world_element_initial_cell)(request.POST)
@@ -1110,6 +1121,7 @@ def post_world_element(request, character_id, element, secret_key = None):
                 description=form.cleaned_data['description'],
                 system=form.cleaned_data['system'],
                 cell=form.cleaned_data['cell'],
+                granting_gm=request.user,
             )
             with transaction.atomic():
                 new_element.save()
@@ -1126,12 +1138,13 @@ def delete_world_element(request, element_id, element, secret_key = None):
             return JsonResponse({"error": "Invalid world element"}, status=400)
         ext_element = get_object_or_404(WorldElement, id=element_id)
         character = ext_element.character
-        __check_edit_perms(request, character, secret_key)
+        __check_world_element_perms(request, character, secret_key)
         if hasattr(ext_element, "is_signature") and ext_element.is_signature:
             raise ValueError("Cannot delete signature items")
         with transaction.atomic():
             ext_element.is_deleted = True
             ext_element.deleted_date = timezone.now()
+            ext_element.deletion_reason = "Removed by {}".format(request.user.username)
             ext_element.save()
         return JsonResponse({}, status=200)
     return JsonResponse({"error": ""}, status=400)
@@ -1144,7 +1157,7 @@ def edit_world_element(request, element_id, element, secret_key=None):
             return JsonResponse({"error": "Invalid world element"}, status=400)
         ext_element = get_object_or_404(WorldElement, id=element_id)
         character = ext_element.character
-        __check_edit_perms(request, character, secret_key)
+        __check_world_element_perms(request, character, secret_key)
         world_element_cell_choices = character.world_element_cell_choices()
         world_element_initial_cell = character.world_element_initial_cell()
         form = make_world_element_form(world_element_cell_choices, world_element_initial_cell, for_new=False)(request.POST)

@@ -72,11 +72,11 @@
                             <span>
                                 <small>
                                     Given by
-                                    {% if loose_end.granting_player == character.player %}
+                                    {% if loose_end.granting_gm == character.player %}
                                         a Liability
                                     {% else %}
-                                        <a href="{% url 'profiles:profiles_view_profile' loose_end.granting_player.id %}">
-                                            {{loose_end.granting_player}}
+                                        <a href="{% url 'profiles:profiles_view_profile' loose_end.granting_gm.id %}">
+                                            {{loose_end.granting_gm}}
                                         </a>
                                     {% endif %}
                                 </small>
@@ -126,11 +126,11 @@
                         <span>
                             <small>
                                 Given by
-                                {% if loose_end.granting_player == character.player %}
+                                {% if loose_end.granting_gm == character.player %}
                                     a Liability
                                 {% else %}
-                                    <a href="{% url 'profiles:profiles_view_profile' loose_end.granting_player.id %}">
-                                        {{loose_end.granting_player}}
+                                    <a href="{% url 'profiles:profiles_view_profile' loose_end.granting_gm.id %}">
+                                        {{loose_end.granting_gm}}
                                     </a>
                                 {% endif %}
                             </small>

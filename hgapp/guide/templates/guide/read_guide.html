@@ -24,7 +24,7 @@
 </div>
 <div class="container-fluid">
     <div id="main-container" class="row">
-        <div class="col-sm-4 col-md-3 css-toc-sec">
+        <div class="css-toc-sec">
             <div id="js-guide-index" class="horizontal-toc">
                 <div id="js-guide-sidebar" class="guide-toc">
                     <h3 class="text-center hidden-xs">
@@ -35,7 +35,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-sm-8 col-md-9 css-guidebook-col">
+        <div class="css-guidebook-col">
             <h1 class="text-center" style="font-size: 42px;">
                 {{guidebook.title}}
             </h1>
@@ -58,10 +58,15 @@
                                 <div class="css-section-backdrop">
                             {% endif %}
                             <div id="{{section.slug}}" class="css-guide-section"></div>
-                            <div class="text-center">
-                                <div class="css-section-heading-{{section.header_level}}">
+                            <div>
+                                <div class="css-section-heading-{{section.header_level}}"  style="padding-left: 15px;">
                                 <h{{section.header_level}}>
                                     {{section.title}}
+                                    <span class="css-section-anchor-link">
+                                        <a class="btn-xs" href="#{{section.slug}}">
+                                            <i class="fa fa-link"></i> Link
+                                        </a>
+                                    </span>
                                 </h{{section.header_level}}>
 
                                 {% if can_edit %}
@@ -70,7 +75,7 @@
                                             This Section is only viewable by admins
                                         </div>
                                     {% endif %}
-                                    <div class="css-admin-buttons">
+                                    <div class="css-admin-buttons" >
                                         <a class="btn btn-default btn-xs"
                                            href="{% url 'guide:edit_guide_section' guidebook.slug section.slug %}">
                                             Edit Section
@@ -85,11 +90,6 @@
                                         </a>
                                     </div>
                                 {% endif %}
-                                <div class="css-section-anchor-link">
-                                    <a class="btn-xs" href="#{{section.slug}}">
-                                        <i class="fa fa-link"></i> link to this section
-                                    </a>
-                                </div>
                                 </div>
                                 {% if section.header_level == 1 %}
                                 <hr>

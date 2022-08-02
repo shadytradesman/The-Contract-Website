@@ -18,7 +18,7 @@
           <p>
             Because Trophies may have GM-created systems, they also record the Playgroup they were acquired in.
           </p>
-          {% if user_can_edit and character.number_completed_games == 0 and not character.cell %}
+          {% if user_can_edit or user_can_gm and character.number_completed_games == 0 and not character.cell %}
           <p class="text-center">
               <b>
                   Until you participate in a Contract or join a Playgroup, you cannot add
@@ -50,7 +50,7 @@
     <div class="js-world-element-content-{{cell.id}}">
       {% for artifact in artifacts %}
         <div>
-            {% if user_can_edit  %}
+            {% if user_can_edit or user_can_gm %}
                 <span class="pull-left css-world-element-edit">
                     <button class="btn btn-xs btn-default js-edit-world-element-button"
                             data-id="{{artifact.id}}"
