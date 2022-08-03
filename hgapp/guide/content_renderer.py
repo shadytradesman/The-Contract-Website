@@ -20,11 +20,11 @@ def render_content(unrendered_content, pics_by_slug):
     return rendered_content
 
 def __render_images(content, pics_by_slug):
-    return re.sub(r"(<p>[\s]*)?\{![\s]*image(-sm)? ([\w./-]+)[\s]+([\w\./\s\'\,\"\(\)\?\-\!]*)!\}([\s]*</p>)?",
-                  lambda x: '<span class="css-guide-image{}"><img src=\'{}\'></span><span class="css-guide-image-caption">{}</span>'.format(
+    return re.sub(r"(<p>[\s]*)?\{![\s]*image(-sm|-md)? ([\w./-]+)[\s]+([\w\./\s\'\,\"\(\)\?\-\!]*)!\}([\s]*</p>)?",
+                  lambda x: '<span class="css-guide-image{}"><img src=\'{}\'></span>{}'.format(
                       x.group(2) if x.group(2) else "",
                       pics_by_slug[x.group(3)].picture.url,
-                      x.group(4),
+                      '<span class="css-guide-image-caption">{}</span>'.format(x.group(4)) if not x.group(2) else "",
                   ),
                   content)
 
@@ -34,13 +34,11 @@ def __render_section_links(content):
     return re.sub(r"\{\{([\w-]+)\|([\w\s-]+)\}\}", r"<a href=#\1>\2</a>", content)
 
 
-# {!col1!} {!col2!} {!colend!}
+# {!cols!} {!colend!}
 def __render_columns(content):
-    col1_start = '<div class="row"><div class="col-md-6 col-xs-12">'
-    col2_start = '</div><div class="col-md-6 col-xs-12">'
-    col_end = '</div></div>'
-    rendered_content = re.sub(r"(<p>[\s]*)?\{!col1!\}([\s]*</p>)?", col1_start, content)
-    rendered_content = re.sub(r"(<p>[\s]*)?\{!col2!\}([\s]*</p>)?", col2_start, rendered_content)
+    cols_start = '<div class="css-guide-cols">'
+    col_end = '</div>'
+    rendered_content = re.sub(r"(<p>[\s]*)?\{!cols!\}([\s]*</p>)?", cols_start, content)
     rendered_content = re.sub(r"(<p>[\s]*)?\{!colend!\}([\s]*</p>)?", col_end, rendered_content)
     return rendered_content
 

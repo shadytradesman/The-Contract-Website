@@ -32,14 +32,29 @@
 .css-guide-image img {
    object-fit: contain;
    max-width: 100%;
-   max-height: 100%;
+   max-height: 500px;
    display: block;
-   position: absolute;
-   margin: 0px;
-   top: 50%;
-   left: 50%;
-   -ms-transform: translate(-50%, -50%);
-   transform: translate(-50%, -50%);
+   margin: auto;
+}
+
+.css-guide-image-md {
+    display: inline;
+    float: right;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    position: relative;
+    left: 10px;
+}
+
+.css-guide-image-md img {
+   object-fit: contain;
+   max-width: 175px;
+}
+
+@media (min-width: 991px) {
+    .css-guide-cols {
+        column-count: 2
+    }
 }
 
 .css-guide-image-caption {
@@ -47,6 +62,18 @@
     text-align: center;
     font-style: italic;
     margin-bottom: 10px;
+    width: 100%;
+    display: inline-block;
+}
+
+.css-guide-image-md+.css-guide-image-caption {
+    padding-top: 5px;
+    text-align: center;
+    font-style: italic;
+    margin-bottom: 10px;
+    width: 200px;
+    float: right;
+    display: block;
 }
 
 .css-guide-image-sm {
@@ -166,14 +193,10 @@ body {position:relative;}
     padding-right: 20px;
     border-radius: 4px;
     overflow: auto;
-    display: flex;
-    align-content: flex-start;
-    align-items: stretch;
-    flex-flow: column;
 }
 
-.css-section-body>p, .css-section-body>h3, .css-section-body>h4, .css-section-body>h5, .css-section-body>ul {
-    max-width: 800px;
+.css-section-body>p, .css-section-body>h3, .css-section-body>ul {
+    max-width: 700px;
     width: 100%;
     margin-left: auto;
     margin-right: auto;
@@ -185,20 +208,6 @@ body {position:relative;}
         padding-left: 15px;
         padding-right: 15px;
     }
-}
-
-.css-section-body .col-xs-12 {
-    overflow: auto;
-    display: flex;
-    align-content: flex-start;
-    align-items: stretch;
-    flex-flow: column;
-}
-
-.css-section-body .row {
-    display: flex;
-  display: -webkit-flex;
-  flex-wrap: wrap;
 }
 
 .css-section-body td, .css-section-body th {
@@ -329,7 +338,7 @@ body {position:relative;}
 }
 
 .css-examples {
-    width: 500px;
+    max-width: 500px;
     margin-left: auto;
     margin-right: auto;
     padding-left: 15px;
