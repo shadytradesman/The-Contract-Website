@@ -101,6 +101,7 @@ body {
 
 .css-ability-values .css-stat-value {
     font-size: .8em;
+    height: .1in;
 }
 
 .css-ability-values .css-stat-name {
@@ -350,5 +351,5 @@ h3 {
     display: inline-block;
     position: relative;
     right: .6in;
-    bottom: 1px;
+    bottom: .01in;
 }
