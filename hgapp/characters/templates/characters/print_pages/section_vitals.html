@@ -2,17 +2,12 @@
 
 <div class="css-section-vitals">
     <div class="css-body-sec">
-        <div class="css-double-col">
+        <div class="css-col-left">
             <h3 class="text-center">
                 Injuries
             </h3>
-            <div v-for="index in getNumInjuryPadding()">
-                <div class="">
-                    <div class="css-invisible-box">
-                    </div>
-                </div>
-            </div>
-            <div v-for="index in numBodyLevels">
+            <div v-for="index in (character.body + getNumInjuryPadding())">
+                <i class="fa fa-heart-o"></i>
                 <div class="css-blank-injury-sev">
                     <div class="css-invisible-box">
                     </div>
@@ -22,50 +17,131 @@
                     </div>
                 </div>
             </div>
-            <h3 class="text-center">
+            <h3 class="text-center css-lower-header">
                 Battle Scars
             </h3>
-            <div v-for="index in 4">
+            <div v-if="showFieldValues" v-for="scar in character.battle_scars">
                 <div class="css-blank-field">
+                    <span class="css-field-value">
+                    <b>
+                        {scar[0]}
+                    </b>
+                        {scar[1]}
+                    </span>
                     <div class="css-invisible-box">
 
                     </div>
                 </div>
             </div>
+            <div v-for="index in showFieldValues ? Math.max(4 - character.battle_scars.length,0) : 4">
+                    <div class="css-blank-field">
+                        <div class="css-invisible-box">
+
+                        </div>
+                    </div>
+
+            </div>
         </div>
-        <div class="css-double-col">
+        <div class="css-col-right">
             <div class="css-header-block">
                 <h3 class="css-left">
-                    Body
+                    Body {character.body}
                 </h3>
                 <span>
                 </span>
                 <h3 class="css-right">
-                    Mind
+                   {character.mind} Mind
                 </h3>
             </div>
-            <div v-for="index in Math.max(numBodyLevels + 1, numMindLevels)">
+            <div v-for="index in Math.max(character.body + 1, character.mind)">
                 <div>
                     <div class="css-body-level">
-                        <div v-if="index > Math.max(numMindLevels - numBodyLevels, 1)" style="display:inline-block;">
+                        <div v-if="index > Math.max(character.mind - character.body, 1)" style="display:inline-block;">
+                            <div v-if="index != Math.max(character.body + 1, character.mind)" class="left-dotted-line">
+                                <div>
+                                </div>
+                            </div>
                             <div class="css-empty-box">
                             </div>
-                            <div class="css-penalty-level" v-text="getPenalty(Math.max(numBodyLevels + 1, numMindLevels), index)">
+                            <div class="css-penalty-level" v-text="getPenalty(Math.max(character.body + 1, character.mind), index)">
                             </div>
                         </div>
-                        <div v-if="index <= Math.max(numMindLevels - numBodyLevels, 1)" style="display:inline-block;">
+                        <div v-if="index <= Math.max(character.mind - character.body, 1)" style="display:inline-block;">
                             <div class="css-invisible-box">
                             </div>
-                            <div v-if="(numBodyLevels <= numMindLevels) || index > 0" class="css-penalty-level" v-text="getPenalty(Math.max(numBodyLevels + 1, numMindLevels), index)">
+                            <div v-if="(character.body < character.mind) || index > 1" class="css-penalty-level" v-text="getPenalty(Math.max(character.body + 1, character.mind), index)">
                             </div>
                         </div>
-                        <div v-if="index - 1 > numBodyLevels - numMindLevels" class="css-empty-box">
+                        <div v-if="index - 1 > character.body - character.mind" class="css-empty-box">
                         </div>
                     </div>
+                </div>
+            </div>
+            <div>
+                <div class="css-body-level">
+                    <div class="css-empty-box-dotted">
+                    </div>
+                    <div class="css-penalty-level">
+                        <img class="css-dead-img" src="{% static 'characters/skull.svg' %}"/>
+                    </div>
+                    <div class="css-empty-box-dotted">
+                    </div>
+                </div>
+                <div class="css-body-level">
+                    <div class="css-help-text">
+                        Mark Body boxes next to each injury, + boxes equal to largest Injury Severity
+                    </div>
+                </div>
+            </div>
+            <div v-for="source in character.source">
+                <h3 class="text-center" style="margin-top: 5;">
+                    {source[0]}
+                </h3>
+                <div class="text-center">
+                <span v-for="x in source[1][1]" style="margin-left: 5px;">
+                    <div class="css-empty-box">
+                    </div>
+                </span>
                 </div>
             </div>
 
         </div>
 
+    </div>
+    <div class="css-mind-sec">
+        <h3 class="text-center">
+            Limits
+        </h3>
+        <div v-for="limit in character.limits">
+            <div class="css-blank-field">
+                <div class="css-field-value">
+                    <b>
+                    {limit[0]}
+                    </b>
+                    <i style="font-size: .8em;">
+                        ({limit[1]})
+                    </i>
+                </div>
+            </div>
+        </div>
+        <h3 class="text-center css-lower-header">
+            Traumas
+        </h3>
+        <div v-if="showFieldValues" v-for="trauma in character.traumas">
+            <div class="css-blank-field">
+                <div class="css-field-value">
+                    <b>
+                        {trauma[0]}
+                    </b>
+                        {trauma[1]}
+                </div>
+            </div>
+        </div>
+        <div v-for="index in showFieldValues ? (Math.max(5-character.traumas.length, 0)) : 5">
+            <div class="css-blank-field">
+                <div class="css-invisible-box">
+                </div>
+            </div>
+        </div>
     </div>
 </div>

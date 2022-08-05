@@ -13,8 +13,7 @@ const charSheetRendering = {
       character: null,
       showExtraStats: false,
       showAdvancementCosts: true,
-      numBodyLevels: 8,
-      numMindLevels: 6,
+      showFieldValues: false,
     }
   },
   methods: {
@@ -28,7 +27,7 @@ const charSheetRendering = {
         return max - row + 1 <= penalties.length ? penalties[penalties.length - (max - row + 1)] : "-0";
     },
     getNumInjuryPadding() {
-        return Math.max(Math.max(this.numMindLevels - (this.numBodyLevels + 1), 0), 0);
+        return Math.max(Math.max(this.character.mind - (this.character.body + 1), 0), 0);
     },
   }
 }

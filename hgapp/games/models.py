@@ -1159,6 +1159,9 @@ class Move(models.Model):
     def __repr__(self):
         return "[{} in {}] {}".format(self.main_character.name, self.cell.name, self.title)
 
+    def __str__(self):
+        return self.__repr__()
+
     def save(self, *args, **kwargs):
         self.__update_is_valid()
         super(Move, self).save(*args, **kwargs)

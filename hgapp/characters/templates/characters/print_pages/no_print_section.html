@@ -7,11 +7,18 @@
 
 <div>
     <b>Options:</b>
-    <input type="checkbox" id="opt-showExtraStats" v-model="showExtraStats">
-    <label for="opt-showExtraStats">Show blank extra stat levels</label>
+    <div>
+        <input type="checkbox" id="opt-showExtraStats" v-model="showExtraStats">
+        <label for="opt-showExtraStats">Show blank extra stat levels</label>
 
-    <input type="checkbox" id="opt-showAdvancementCosts" v-model="showAdvancementCosts">
-    <label for="opt-showAdvancementCosts">Show advancement cost reference</label>
+        <input type="checkbox" id="opt-showAdvancementCosts" v-model="showAdvancementCosts">
+        <label for="opt-showAdvancementCosts">Show advancement cost reference</label>
+    </div>
+    <div>
+        <input type="checkbox" id="opt-showFieldValues" v-model="showFieldValues">
+        <label for="opt-showFieldValues">Show field values</label>
+    </div>
+
     <div class="text-center" style="margin-top: 10px;">
         <button onclick="window.print()">Print / Download PDF</button>
     </div>

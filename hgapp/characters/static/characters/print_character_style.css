@@ -15,6 +15,13 @@ body {
     border-style: ridge;
     padding: .2in;
     margin: auto;
+    page-break-inside: avoid;
+    max-height: 10.5in;
+    overflow: hidden;
+}
+
+.css-condition-field {
+    padding: .05in;
 }
 
 .css-no-print {
@@ -192,13 +199,33 @@ h3 {
     margin-bottom: 5px;
 }
 
-.css-body-sec {
-    width: 5in;
-    height: 4in;
+.css-lower-header {
+    margin-top: 15px;
 }
 
-.css-double-col {
-    width: 50%;
+.css-section-vitals:after {
+    display: table;
+    content: " ";
+    clear: both;
+}
+
+.css-body-sec {
+    width: 5in;
+    float: left;
+}
+
+.css-mind-sec {
+    width: 2.9in;
+    float: left;
+}
+
+.css-col-left {
+    width: 3in;
+    float: left;
+}
+
+.css-col-right {
+    width: 1.9in;
     float: left;
 }
 
@@ -207,10 +234,11 @@ h3 {
     border-bottom: 1px solid black;
     height: 1em;
     display: inline-block;
+    margin-left: 5px;
 }
 
 .css-blank-injury-field {
-    width: 2.2in;
+    width: 2.4in;
     margin-left: .1in;
     border-bottom: 1px solid black;
     height: 1em;
@@ -240,6 +268,13 @@ h3 {
     display: inline-block;
 }
 
+.css-empty-box-dotted {
+    height: 1em;
+    width: 1em;
+    border: 1px dotted black;
+    display: inline-block;
+}
+
 .css-penalty-level {
     display: inline-block;
     position: absolute;
@@ -247,7 +282,7 @@ h3 {
     font-size: .8em;
     position: relative;
     bottom: .3em;
-    width: .5in;
+    width: .6in;
 }
 
 .css-left {
@@ -257,6 +292,7 @@ h3 {
 
 .css-right {
     float: right;
+    margin-right: .2in;
 }
 
 .css-header-block {
@@ -266,4 +302,53 @@ h3 {
 .css-blank-field {
     width: 100%;
     border-bottom: 1px solid black;
+    min-height: 1em;
+}
+
+.css-dead-img {
+    width: 1.5em;
+    height: 1.5em;
+    position: relative;
+    top: 5px;
+}
+
+.css-field-value {
+    font-size: .8em;
+}
+
+.css-help-text {
+    font-size: .6em;
+    font-style: italic;
+    opacity: 50%;
+}
+
+.css-double-col {
+    width: 50%;
+    float: left;
+}
+
+.css-field-container {
+    margin: 5px;
+}
+
+.css-section-conditions {
+    margin-top: 5px;
+}
+
+.css-section-conditions h3 {
+    margin-bottom: 0px;
+}
+
+.left-dotted-line {
+    position: absolute;
+}
+
+.left-dotted-line>div {
+    border-bottom: 1px solid black;
+    width: 0.45in;
+    height: 1em;
+    display: inline-block;
+    position: relative;
+    right: .6in;
+    bottom: 1px;
 }

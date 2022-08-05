@@ -843,6 +843,13 @@ class Character(models.Model):
                                     date_of_death=timezone.now())
         new_death.save()
 
+    def source_name_values(self):
+        values = []
+        for rev in self.stats_snapshot.sourcerevision_set.all():
+            source = rev.relevant_source
+            values.append((source.name, (source.current_val, rev.max)),)
+        return values
+
     def source_values(self):
         values = {}
         for rev in self.stats_snapshot.sourcerevision_set.all():
@@ -1040,7 +1047,7 @@ Archived on: {}
 
             "mind": self.num_mind_levels(),
             "body": self.num_body_levels(),
-            "source": self.source_values(),
+            "source": self.source_name_values(),
 
             "attributes": [(x.relevant_attribute.name, x.value) for x in self.get_attributes()],
             "abilities": abilities,

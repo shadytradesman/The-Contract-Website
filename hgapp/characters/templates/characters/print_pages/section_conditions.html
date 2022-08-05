@@ -1,0 +1,68 @@
+<div class="css-section-vitals css-section-conditions">
+  <div class="css-double-col">
+    <h3 class="text-center">
+      Conditions
+    </h3>
+    <div v-for="condition in character.conditions">
+      <div class="css-field-container">
+      <div class="css-blank-field">
+        <div class="css-field-value css-condition-field">
+          <b>
+            {condition[0]}
+          </b>
+          <span style="font-size: .8em; margin-left: 5px;">
+          <span v-if="showFieldValues">
+            {condition[1]}
+            </span>
+              <i>
+              ({condition[2]})
+              </i>
+          </span>
+            <span v-if="showFieldValues">
+            </span>
+          </span>
+        </div>
+        </div>
+      </div>
+    </div>
+    <div v-for="index in 10">
+      <div class="css-field-container">
+      <div class="css-blank-field">
+      </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="css-double-col">
+    <h3 class="text-center">
+      Circumstances
+    </h3>
+    <div v-for="circumstance in character.circumstances">
+      <div class="css-field-container">
+      <div class="css-blank-field">
+        <div class="css-field-value css-condition-field">
+          <b>
+            {circumstance[0]}
+          </b>
+          <span style="font-size: .8em; margin-left: 5px;">
+          <span v-if="showFieldValues">
+              {circumstance[1]}
+            </span>
+              <i>
+                ({circumstance[2]})
+              </i>
+          </span>
+        </div>
+        </div>
+      </div>
+    </div>
+    <div v-for="index in 10">
+      <div class="css-field-container">
+        <div class="css-blank-field">
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
