@@ -1,0 +1,68 @@
+{% load static %}
+<div class="css-character-intro">
+    <div class="css-char-name-cont css-header">
+        <div class="css-char-name" v-text="character.name"></div>
+        <div class="css-char-name-subtitle">
+            <div>
+                <span>A {character.num_victories}-Victory <b>{character.status}</b> Contractor </span>
+                <span>played by {character.player}</span>
+            </div>
+        </div>
+    </div>
+    <div>
+        <img class="css-main-logo" src="{% static 'overrides/branding/contract-white.svg' %}">
+    </div>
+</div>
+
+<div class="css-essentials-section">
+    <i>
+        <div>
+            {character.name} is a <b>{character.concept_summary}</b> who will risk {character.pronoun} life to
+            <b>{character.ambition}</b>.
+        </div>
+        <div style="margin-top: 5px;">
+            {character.pronoun_pres} <b>{character.age}</b> years old and often appears as <b>{character.appearance}</b>.
+        </div>
+    </i>
+</div>
+
+<div class="css-section-stats">
+    <div class="css-section-attributes">
+        <h3 class="text-center">Attributes</h3>
+        <div class="css-attribute-values">
+            <div class="css-advancement-text text-center" v-if="showAdvancementCosts" >
+                <small>
+                    <i>
+                        Cost to increase: current rating x 5 Exp
+                    </i>
+                </small>
+            </div>
+            <div class="css-attr" v-for="attribute in character.attributes">
+                <b>
+                    <span class="css-stat-name" v-text="attribute[0]"></span>
+                </b>
+                <span class="css-stat-extra-value" v-html="displayValue(0, 8 - Math.max(attribute[1], 5))" v-if="showExtraStats"></span>
+                <span class="css-stat-value" v-html="displayValue(attribute[1], 5)"></span>
+            </div>
+        </div>
+    </div>
+    <div class="css-section-abilities">
+        <h3 class="text-center">Abilities</h3>
+        <div class="css-advancement-text text-center" v-if="showAdvancementCosts" >
+            <small>
+                <i>
+                    Cost to increase: current rating x 2 (2 Exp for first rank)
+                </i>
+            </small>
+        </div>
+        <div class="css-ability-values">
+            <div class="css-abil" v-for="ability in character.abilities">
+                <b>
+                    <span class="css-stat-name" v-text="ability[0]"></span>
+                </b>
+                <span class="css-stat-extra-value" v-html="displayValue(0, 6 - Math.max(ability[1], 5))" v-if="showExtraStats"></span>
+                <span class="css-stat-value" v-html="displayValue(ability[1], 5)"></span>
+            </div>
+        </div>
+    </div>
+</div>

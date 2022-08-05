@@ -1,0 +1,71 @@
+{% load static %}
+
+<div class="css-section-vitals">
+    <div class="css-body-sec">
+        <div class="css-double-col">
+            <h3 class="text-center">
+                Injuries
+            </h3>
+            <div v-for="index in getNumInjuryPadding()">
+                <div class="">
+                    <div class="css-invisible-box">
+                    </div>
+                </div>
+            </div>
+            <div v-for="index in numBodyLevels">
+                <div class="css-blank-injury-sev">
+                    <div class="css-invisible-box">
+                    </div>
+                </div>
+                <div class="css-blank-injury-field">
+                    <div class="css-invisible-box">
+                    </div>
+                </div>
+            </div>
+            <h3 class="text-center">
+                Battle Scars
+            </h3>
+            <div v-for="index in 4">
+                <div class="css-blank-field">
+                    <div class="css-invisible-box">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="css-double-col">
+            <div class="css-header-block">
+                <h3 class="css-left">
+                    Body
+                </h3>
+                <span>
+                </span>
+                <h3 class="css-right">
+                    Mind
+                </h3>
+            </div>
+            <div v-for="index in Math.max(numBodyLevels + 1, numMindLevels)">
+                <div>
+                    <div class="css-body-level">
+                        <div v-if="index > Math.max(numMindLevels - numBodyLevels, 1)" style="display:inline-block;">
+                            <div class="css-empty-box">
+                            </div>
+                            <div class="css-penalty-level" v-text="getPenalty(Math.max(numBodyLevels + 1, numMindLevels), index)">
+                            </div>
+                        </div>
+                        <div v-if="index <= Math.max(numMindLevels - numBodyLevels, 1)" style="display:inline-block;">
+                            <div class="css-invisible-box">
+                            </div>
+                            <div v-if="(numBodyLevels <= numMindLevels) || index > 0" class="css-penalty-level" v-text="getPenalty(Math.max(numBodyLevels + 1, numMindLevels), index)">
+                            </div>
+                        </div>
+                        <div v-if="index - 1 > numBodyLevels - numMindLevels" class="css-empty-box">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>

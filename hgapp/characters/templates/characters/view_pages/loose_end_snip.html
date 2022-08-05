@@ -31,7 +31,7 @@
             <div class="js-world-element-content-{{cell.id}}">
                 {% for loose_end in loose_ends %}
                 <div class="css-loose-end-container">
-                    {% if user_can_gm %}
+                    {% if user_can_gm and character.player and request.user != character.player %}
                         <div>
                             <span class="pull-right css-loose-end-button">
                                 <a class="btn btn-xs btn-default"

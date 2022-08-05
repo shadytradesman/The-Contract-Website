@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <title>{{character.name}}'s Sheet</title>
     {{character_blob|json_script:"characterBlob"}}
+    {{d10_outline_url|json_script:"d10Outline"}}
+    {{d10_filled_url|json_script:"d10Filled"}}
     <link rel="stylesheet" type="text/css" href="{% static 'characters/print_character_style.css' %}" />
 <!--    <script src="https://unpkg.com/vue@3.2.26/dist/vue.global.prod.js"></script>-->
 </head>

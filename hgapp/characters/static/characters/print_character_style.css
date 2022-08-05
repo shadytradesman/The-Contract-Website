@@ -98,6 +98,7 @@ body {
 
 .css-ability-values .css-stat-name {
     font-size: 0.9em;
+    line-height: 1.3;
 }
 
 .css-attr {
@@ -143,6 +144,20 @@ body {
   margin-right: 1px;
 }
 
+.d10-filled {
+  height: 1.3em;
+  width: 1.3em;
+  position: relative;
+  top: .2em;
+}
+
+.d10-outline {
+  height: 1.3em;
+  width: 1.3em;
+  position: relative;
+  top: .2em;
+}
+
 .dot-filled {
   height: 1em;
   width: 1em;
@@ -170,4 +185,85 @@ body {
     h1 {
         break-before: always;
     }
+}
+
+h3 {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.css-body-sec {
+    width: 5in;
+    height: 4in;
+}
+
+.css-double-col {
+    width: 50%;
+    float: left;
+}
+
+.css-blank-injury-sev {
+    width: .2in;
+    border-bottom: 1px solid black;
+    height: 1em;
+    display: inline-block;
+}
+
+.css-blank-injury-field {
+    width: 2.2in;
+    margin-left: .1in;
+    border-bottom: 1px solid black;
+    height: 1em;
+    display: inline-block;
+    color: white;
+}
+
+.css-blank-body {
+}
+
+.css-body-level {
+    width: 1in;
+    margin: auto;
+}
+
+.css-invisible-box {
+    height: 1em;
+    width: 1em;
+    border: 1px solid transparent;
+    display: inline-block;
+}
+
+.css-empty-box {
+    height: 1em;
+    width: 1em;
+    border: 1px solid black;
+    display: inline-block;
+}
+
+.css-penalty-level {
+    display: inline-block;
+    position: absolute;
+    text-align: center;
+    font-size: .8em;
+    position: relative;
+    bottom: .3em;
+    width: .5in;
+}
+
+.css-left {
+    float: left;
+    margin-left: .2in;
+}
+
+.css-right {
+    float: right;
+}
+
+.css-header-block {
+    height: 2.1em;
+}
+
+.css-blank-field {
+    width: 100%;
+    border-bottom: 1px solid black;
 }

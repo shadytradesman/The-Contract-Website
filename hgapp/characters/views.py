@@ -17,6 +17,7 @@ from collections import defaultdict
 from django.forms import formset_factory
 from django.http import HttpResponseRedirect
 from django.middleware.csrf import rotate_token
+from django.templatetags.static import static
 
 
 from characters.models import Character, BasicStats, Character_Death, Graveyard_Header, Attribute, Ability, \
@@ -33,6 +34,7 @@ from characters.forms import make_character_form, CharacterDeathForm, ConfirmAss
 from characters.form_utilities import get_edit_context, character_from_post, update_character_from_post, \
     grant_trauma_to_character, delete_trauma_rev, get_world_element_class_from_url_string
 from characters.view_utilities import get_characters_next_journal_credit, get_world_element_default_dict, get_weapons_by_type
+
 
 from journals.models import Journal, JournalCover
 from cells.models import Cell
@@ -128,7 +130,6 @@ def edit_obituary(request, character_id, secret_key = None):
                     edited_death.is_void = obit_form.cleaned_data['is_void']
                     edited_death.save()
             else:
-                print(obit_form.errors)
                 return None
         else:
             obit_form=CharacterDeathForm(request.POST)
@@ -139,7 +140,6 @@ def edit_obituary(request, character_id, secret_key = None):
                 with transaction.atomic():
                     new_character_death.save()
             else:
-                print(obit_form.errors)
                 return None
         url_args = (character.id,) if request.user.is_authenticated else (character.id, character.edit_secret_key,)
         return HttpResponseRedirect(reverse('characters:characters_view', args=url_args))
@@ -404,7 +404,9 @@ def print_character(request, character_id):
         raise PermissionDenied("You do not have permission to view this Character")
     context = {
         "character": character,
-        "character_blob": character.to_print_blob()
+        "character_blob": character.to_print_blob(),
+        "d10_outline_url": static("overrides/branding/d10-outline2.svg"),
+        "d10_filled_url": static("overrides/branding/d10-filled.svg"),
     }
     return render(request, 'characters/print_pages/print_character.html', context)
 
