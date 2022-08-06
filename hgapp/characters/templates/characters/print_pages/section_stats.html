@@ -56,12 +56,30 @@
             </small>
         </div>
         <div class="css-ability-values">
-            <div class="css-abil" v-for="ability in character.abilities">
-                <b>
-                    <span class="css-stat-name" v-text="ability[0]"></span>
-                </b>
-                <span class="css-stat-extra-value" v-html="displayValue(0, 6 - Math.max(ability[1], 5))" v-if="showExtraStats"></span>
-                <span class="css-stat-value" v-html="displayValue(ability[1], 5)"></span>
+            <div class="css-double-col">
+                <div class="css-abil" v-for="ability in character.abilities.slice(0, Math.ceil(character.abilities.length/2))">
+                    <b>
+                        <span class="css-stat-name" v-text="ability[0]"></span>
+                    </b>
+                    <span class="css-stat-extra-value" v-html="displayValue(0, 6 - Math.max(ability[1], 5))" v-if="showExtraStats"></span>
+                    <span class="css-stat-value" v-html="displayValue(ability[1], 5)"></span>
+                </div>
+            </div>
+            <div class="css-double-col" >
+                <div style="margin-left: .1in;">
+                    <div class="css-abil" v-for="ability in character.abilities.slice(-Math.floor(character.abilities.length/2))">
+                        <b>
+                            <span class="css-stat-name" v-text="ability[0]"></span>
+                        </b>
+                        <span class="css-stat-extra-value" v-html="displayValue(0, 6 - Math.max(ability[1], 5))" v-if="showExtraStats"></span>
+                        <span class="css-stat-value" v-html="displayValue(ability[1], 5)"></span>
+                    </div>
+                    <div class="css-abil">
+                        <div class="css-blank-field" style="width: 1.2in; display: inline-block;"></div>
+                        <span class="css-stat-value" v-html="displayValue(0, 5)"></span>
+                    </div>
+
+                </div>
             </div>
         </div>
     </div>

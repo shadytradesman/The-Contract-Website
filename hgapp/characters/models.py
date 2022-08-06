@@ -1023,10 +1023,6 @@ Archived on: {}
         abilities = self.get_abilities_by_name_and_id()[0]
         abilities = [(x[0], x[2]) for x in abilities]
 
-        # abilities = [(x.relevant_ability.name, x.value) for x in self.get_abilities()]
-        abilities.append(("____________________", 0))
-        abilities.append(("____________________", 0))
-
         return {
             "name": self.name,
             "tagline": self.tagline,
@@ -1049,7 +1045,7 @@ Archived on: {}
             "body": self.num_body_levels(),
             "source": self.source_name_values(),
 
-            "attributes": [(x.relevant_attribute.name, x.value) for x in self.get_attributes()],
+            "attributes": [(x.relevant_attribute.name, x.value + self.get_bonus_for_attribute(x.relevant_attribute)) for x in self.get_attributes()],
             "abilities": abilities,
             "battle_scars": [(scr.description, scr.system) for scr in self.battlescar_set.all()],
             "limits": [(lim.relevant_limit.name, lim.relevant_limit.description) for lim in self.stats_snapshot.limitrevision_set.all()],

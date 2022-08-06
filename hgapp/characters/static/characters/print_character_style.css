@@ -2,7 +2,7 @@ body {
     box-sizing: border-box;
     font-family: Helvetica Neue,Helvetica,Arial,sans-serif;
     -webkit-print-color-adjust: exact !important;
-
+    font-size: 1em;
 }
 
 .text-center {
@@ -16,12 +16,14 @@ body {
     padding: .2in;
     margin: auto;
     page-break-inside: avoid;
-    max-height: 10.5in;
+    max-height: 10.4in;
     overflow: hidden;
+    box-decoration-break: clone;
 }
 
 .css-condition-field {
-    padding: .05in;
+    padding-left: .05in;
+    padding-right: .05in;
 }
 
 .css-no-print {
@@ -96,7 +98,6 @@ body {
 }
 
 .css-ability-values {
-    column-count: 2;
 }
 
 .css-ability-values .css-stat-value {
@@ -125,7 +126,7 @@ body {
 }
 
 .css-stat-value {
-    font-size: 0.8em;
+    font-size: 0.7em;
     float: right;
 }
 
@@ -315,6 +316,8 @@ h3 {
 
 .css-field-value {
     font-size: .8em;
+    line-height: .9;
+    padding: 0.03in;
 }
 
 .css-help-text {
@@ -345,7 +348,7 @@ h3 {
 }
 
 .left-dotted-line>div {
-    border-bottom: 1px solid black;
+    border-bottom: 1px dotted black;
     width: 0.45in;
     height: 1em;
     display: inline-block;
