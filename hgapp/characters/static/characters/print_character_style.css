@@ -16,6 +16,7 @@ body {
     padding: .2in;
     margin: auto;
     page-break-inside: avoid;
+    break-inside: avoid;
     max-height: 10.4in;
     overflow: hidden;
     box-decoration-break: clone;
@@ -131,14 +132,20 @@ body {
 }
 
 .css-stat-extra-value {
-    font-size: 0.6em;
-    padding-top: .2em;
+    font-size: 0.7em;
     float: right;
     color: #aeaeae;
 }
 
+.css-ability-values .css-stat-extra-value {
+    font-size: .8em;
+    height: .1in;
+}
+
 .css-advancement-text {
     position: relative;
+    font-size: .7em;
+    font-style: italic;
     bottom: 0.5em;
     color: #212121;
 }
@@ -179,7 +186,6 @@ body {
 }
 
 .css-content {
-    border: 1px solid #FAFAFA;
 }
 
 @page {
@@ -355,4 +361,114 @@ h3 {
     position: relative;
     right: .6in;
     bottom: .01in;
+}
+
+
+/*
+
+PAGE 2
+
+*/
+
+.css-page-spacer {
+    height: .05in;
+    border: none;
+}
+
+.css-page-header-sm {
+    height: .3in;
+    border-bottom: 1px solid grey;
+}
+
+.css-header-left {
+    float: left;
+    position: relative;
+    top: .05in;
+}
+
+.css-sm-logo {
+    height: .25in;
+    float: right;
+}
+
+.css-equip {
+    font-size: .8em;
+}
+
+.css-equip ul {
+    margin-top: .1in;
+    margin-bottom: .1in;
+}
+
+.css-equip h4 {
+    margin-top: .0in;
+    margin-bottom: .0in;
+}
+
+.css-equip h5 {
+    margin-top: .0in;
+    margin-bottom: 0in;
+}
+
+.panel {
+    border: 1px solid black;
+}
+
+.panel-collapse {
+    background-color: white !important;
+}
+
+.panel-body {
+    padding: 10px;
+}
+
+.css-ps2-power-badge {
+    font-size: .8em;
+}
+
+.power-badge {
+    background-color: white !important;
+    padding-bottom: 0px !important;
+}
+
+.power-badge a {
+    text-decoration: none;
+    color: black;
+}
+
+.css-ps2-power-badge p {
+    margin-top: 0.05in !important;
+    margin-bottom: 0.05in !important;
+}
+
+.css-power-flavor-text {
+    font-size: .7em;
+    color: grey;
+    font-style: italic;
+}
+
+.js-render-power-keywords a {
+    display: none !important;
+}
+
+.css-mod-summary {
+    display: none!important;
+}
+
+.power-badge img {
+    filter: invert(100%);
+}
+
+
+.css-gift-cost-icon {
+    background-color: white !important;
+    border-color: black !important;
+}
+
+.visible-xs-block {
+    display: none !important;
+}
+
+.hidden-xs {
+    display: none !important;
 }

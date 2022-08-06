@@ -7,12 +7,18 @@
                 Injuries
             </h3>
             <div v-for="index in (character.body + getNumInjuryPadding())">
-                <i class="fa fa-heart-o"></i>
-                <div class="css-blank-injury-sev">
-                    <div class="css-invisible-box">
+                <span v-if="index > getNumInjuryPadding()">
+                    <i class="fa fa-heart-o"></i>
+                    <div class="css-blank-injury-sev">
+                        <div class="css-invisible-box">
+                        </div>
                     </div>
-                </div>
-                <div class="css-blank-injury-field">
+                    <div class="css-blank-injury-field">
+                        <div class="css-invisible-box">
+                        </div>
+                    </div>
+                </span>
+                <div v-if="index <= getNumInjuryPadding()">
                     <div class="css-invisible-box">
                     </div>
                 </div>
@@ -88,7 +94,7 @@
                     </div>
                 </div>
                 <div class="css-body-level">
-                    <div class="css-help-text">
+                    <div class="css-help-text"  v-if="showTutorialText" >
                         Mark Body boxes next to each injury, + boxes equal to largest Injury Severity
                     </div>
                 </div>
@@ -118,7 +124,7 @@
                     <b>
                     {limit[0]}
                     </b>
-                    <i style="font-size: .8em;">
+                    <i style="font-size: .8em;"  v-if="showTutorialText" >
                         ({limit[1]})
                     </i>
                 </div>

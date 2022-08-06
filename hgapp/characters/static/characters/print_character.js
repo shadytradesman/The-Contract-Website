@@ -12,7 +12,7 @@ const charSheetRendering = {
       ready: false,
       character: null,
       showExtraStats: false,
-      showAdvancementCosts: true,
+      showTutorialText: true,
       showFieldValues: false,
     }
   },

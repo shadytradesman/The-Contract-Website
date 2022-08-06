@@ -1,9 +1,9 @@
-<div style="min-height: 25px; margin-top: -5px;">
+<div class="css-power-components" style="min-height: 25px; margin-top: -5px;">
     <span
             data-title="{{power.get_gift_cost}}"
             data-original-title="Gift cost: {{power.get_gift_cost}}"
             data-toggle="tooltip"
-            class="has-popover"
+            class="has-popover css-gift-cost-icon"
             style="border-radius: 3px; background-color: #20252d;display:inline-block; height: 25px; position:relative; top: 3px;" >
         <span style="font-size: 18px; height: 25px; display: inline-block;  padding: 5px;"><b style="position:relative; bottom: 5px;">{{power.get_gift_cost}}</b>
         </span>
@@ -48,7 +48,7 @@
             data-original-title="{{power.get_enhancement_list|safe}}"
             data-placement="bottom"
             data-toggle="tooltip"
-            class="css-system-text-enhancement"
+            class="css-system-text-enhancement css-mod-summary"
             style=" height: 25px; display: inline-block; position: relative; bottom: 5px;">
                 <span style="position:relative; left: 1px; top: 3px; font-size: 18px; line-height: 1;">
                     {{ power.get_num_enhancements }}
@@ -65,7 +65,7 @@
             data-original-title="{{power.get_drawback_list|safe}}"
             data-placement="bottom"
             data-toggle="tooltip"
-            class="css-system-text-drawback"
+            class="css-system-text-drawback css-mod-summary"
             style=" height: 25px; display: inline-block;  position: relative; bottom: 5px;">
                 <span style="position:relative; left: 1px; top: 3px; font-size: 18px; line-height: 1;">
                     {{ power.get_num_drawbacks }}

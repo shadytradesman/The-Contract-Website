@@ -402,9 +402,16 @@ def print_character(request, character_id):
     character = get_object_or_404(Character, id=character_id)
     if not character.player_can_view(request.user):
         raise PermissionDenied("You do not have permission to view this Character")
+    new_powers = character.power_full_set.filter(dice_system=SYS_PS2, crafting_type=CRAFTING_NONE).all()
+    crafting_artifact_gifts = character.power_full_set.filter(dice_system=SYS_PS2, crafting_type=CRAFTING_ARTIFACT).all()
+    crafting_consumable_gifts = character.power_full_set.filter(dice_system=SYS_PS2, crafting_type=CRAFTING_CONSUMABLE).all()
+
     context = {
         "character": character,
         "character_blob": character.to_print_blob(),
+        'new_powers': new_powers,
+        'crafting_artifact_gifts': crafting_artifact_gifts,
+        'crafting_consumable_gifts': crafting_consumable_gifts,
         "d10_outline_url": static("overrides/branding/d10-outline2.svg"),
         "d10_filled_url": static("overrides/branding/d10-filled.svg"),
     }

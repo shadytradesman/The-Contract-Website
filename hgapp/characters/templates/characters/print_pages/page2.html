@@ -1,0 +1,48 @@
+{% load static %}
+{% load power_tags %}
+
+<div class="css-page-header-sm">
+    <span class="css-header-left" v-text="character.name">
+    </span>
+    <img class="css-sm-logo" src="{% static 'overrides/branding/contract-white.svg' %}">
+</div>
+<div class="css-page-content">
+    <div class="css-double-col">
+        <h3 class="text-center" style="margin-top: .1in;">Equipment</h3>
+        <div class="css-advancement-text text-center" v-if="showTutorialText">
+            Max Encumbrance: Brawn x 15 lbs.
+        </div>
+        <div class="css-equip" v-html="character.equipment"> </div>
+        <div v-for="trophy in character.trophies">
+            <div class="css-blank-field">
+                <div class="css-field-value css-condition-field">
+                    <b>
+                        {trophy[0]}
+                    </b>
+                    <span v-if="showFieldValues" style="margin-left: 5px;">
+                        {trophy[1]}
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div v-for="index in 70">
+            <div class="css-field-container">
+                <div class="css-blank-field">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="css-double-col">
+        <h3 class="text-center" style="margin-top: .1in;">Gifts</h3>
+        {% for power_full in crafting_artifact_gifts %}
+        <div>
+            {% power_badge power_full %}
+        </div>
+        {% endfor %}
+        {% for power_full in new_powers %}
+        <div>
+            {% power_badge power_full False None user_can_edit %}
+        </div>
+        {% endfor %}
+    </div>
+</div>

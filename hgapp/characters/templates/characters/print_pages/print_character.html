@@ -19,7 +19,16 @@
         </div>
         <div class="css-page" >
             <div class="css-content">
-                {% include "characters/print_pages/print_character_content.html" %}
+                {% include "characters/print_pages/section_stats.html" %}
+                <hr>
+                {% include "characters/print_pages/section_vitals.html" %}
+                {% include "characters/print_pages/section_conditions.html" %}
+            </div>
+        </div>
+        <div class="css-no-print css-page-spacer"></div>
+        <div class="css-page">
+            <div class="css-content">
+                {% include "characters/print_pages/page2.html" %}
             </div>
         </div>
     </div>

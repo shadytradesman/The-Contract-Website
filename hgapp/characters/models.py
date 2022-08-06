@@ -13,6 +13,8 @@ from django.utils.safestring import mark_safe
 from django.urls import reverse
 from django.db import transaction
 
+from markdown_deux.templatetags.markdown_deux_tags import markdown_filter
+
 from heapq import merge
 
 from hgapp.utilities import get_queryset_size, get_object_or_none
@@ -1038,7 +1040,7 @@ Archived on: {}
             "num_games": self.num_games,
             "num_victories": self.num_victories,
             "num_losses": self.num_losses,
-            "equipment": self.equipment,
+            "equipment": markdown_filter(self.equipment),
             "bio": self.background,
 
             "mind": self.num_mind_levels(),
@@ -1053,9 +1055,8 @@ Archived on: {}
             "conditions": [(elem.name, elem.description, elem.system) for elem in self.condition_set.exclude(is_deleted=True).all()],
             "circumstances": [(elem.name, elem.description, elem.system) for elem in self.circumstance_set.exclude(is_deleted=True).all()],
             "trophies": [(elem.name, elem.description, elem.system) for elem in
-                              self.circumstance_set.filter(cell__isnull=True).exclude(is_deleted=True).all()],
+                              self.artifact_set.filter(cell__isnull=False).exclude(is_deleted=True).all()],
 
-            "powers": None,
             "crafting_gifts": None,
             "artifacts": None,
         }
