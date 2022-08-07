@@ -17,9 +17,23 @@ body {
     margin: auto;
     page-break-inside: avoid;
     break-inside: avoid;
-    max-height: 10.4in;
+    max-height: 10.3in;
     overflow: hidden;
-    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+    page-break-after: always;
+}
+
+.css-page-long {
+    width: 8in;
+    border: 2px solid grey;
+    border-style: ridge;
+    padding: .2in;
+    margin: auto;
+    page-break-after: always;
+}
+
+.css-page-long-section {
+    -webkit-box-decoration-break: clone;
 }
 
 .css-condition-field {
@@ -200,6 +214,11 @@ body {
     h1 {
         break-before: always;
     }
+
+    .css-page-spacer {
+        break-inside: auto;
+        height: .05in;
+    }
 }
 
 h3 {
@@ -337,6 +356,17 @@ h3 {
     float: left;
 }
 
+.css-col-cont {
+    display: table;
+    content: " ";
+    clear: both;
+}
+
+.padded-col {
+    padding-left: .05in;
+    padding-right: .05in;
+}
+
 .css-field-container {
     margin: 5px;
 }
@@ -423,7 +453,12 @@ PAGE 2
 }
 
 .css-ps2-power-badge {
-    font-size: .8em;
+    font-size: .7em;
+    page-break-inside: avoid;
+}
+
+.css-ps2-power-badge h4 {
+    font-size: 1.5em!important;
 }
 
 .power-badge {
@@ -465,10 +500,30 @@ PAGE 2
     border-color: black !important;
 }
 
+.css-gift-summary {
+    display: none!important;
+}
+
 .visible-xs-block {
     display: none !important;
 }
 
 .hidden-xs {
     display: none !important;
+}
+
+.css-gift-mini-badge {
+    border: 1px solid black;
+    padding: 0.05in;
+    margin-bottom: .05in;
+}
+
+.css-gift-mini-badge h5 {
+    margin-top: 0.02in;
+    margin-bottom: 0.02in;
+    font-size: .9em;
+}
+
+.css-mini-gift-summary {
+    font-size: .7em;
 }

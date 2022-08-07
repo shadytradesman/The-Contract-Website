@@ -405,11 +405,13 @@ def print_character(request, character_id):
     new_powers = character.power_full_set.filter(dice_system=SYS_PS2, crafting_type=CRAFTING_NONE).all()
     crafting_artifact_gifts = character.power_full_set.filter(dice_system=SYS_PS2, crafting_type=CRAFTING_ARTIFACT).all()
     crafting_consumable_gifts = character.power_full_set.filter(dice_system=SYS_PS2, crafting_type=CRAFTING_CONSUMABLE).all()
+    mid_powers = new_powers.count() // 2
 
     context = {
         "character": character,
         "character_blob": character.to_print_blob(),
-        'new_powers': new_powers,
+        'new_powers_1': new_powers[mid_powers:],
+        'new_powers_2': new_powers[:mid_powers],
         'crafting_artifact_gifts': crafting_artifact_gifts,
         'crafting_consumable_gifts': crafting_consumable_gifts,
         "d10_outline_url": static("overrides/branding/d10-outline2.svg"),

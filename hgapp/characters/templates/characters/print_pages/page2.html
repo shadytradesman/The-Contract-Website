@@ -34,14 +34,20 @@
     </div>
     <div class="css-double-col">
         <h3 class="text-center" style="margin-top: .1in;">Gifts</h3>
-        {% for power_full in crafting_artifact_gifts %}
-        <div>
-            {% power_badge power_full %}
+        {% for power_full in new_powers_1 %}
+        <div class="css-gift-mini-badge">
+            <h5>{{power_full.latest_rev.name}}</h5>
+            <div class="css-mini-gift-summary">
+                {{power_full.latest_rev.gift_summary|safe}}
+            </div>
         </div>
         {% endfor %}
-        {% for power_full in new_powers %}
-        <div>
-            {% power_badge power_full False None user_can_edit %}
+        {% for power_full in new_powers_2 %}
+        <div class="css-gift-mini-badge">
+            <h5>{{power_full.latest_rev.name}}</h5>
+            <div class="css-mini-gift-summary">
+                {{power_full.latest_rev.gift_summary|safe}}
+            </div>
         </div>
         {% endfor %}
     </div>
