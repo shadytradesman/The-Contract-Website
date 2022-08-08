@@ -33,22 +33,82 @@
         </div>
     </div>
     <div class="css-double-col">
-        <h3 class="text-center" style="margin-top: .1in;">Gifts</h3>
-        {% for power_full in new_powers_1 %}
-        <div class="css-gift-mini-badge">
-            <h5>{{power_full.latest_rev.name}}</h5>
-            <div class="css-mini-gift-summary">
-                {{power_full.latest_rev.gift_summary|safe}}
-            </div>
+        <div class="padded-col">
+            {% if new_powers_1 %}
+                <h3 class="text-center" style="margin-top: .1in;">Powers</h3>
+                <div {% if new_powers_2|length > 9 %} class="css-double-col" {% endif %}>
+                    <div class="padded-col">
+                    {% for power_full in new_powers_1 %}
+                        {% with power_full.latest_rev as power %}
+                            {% include "characters/print_pages/power_mini_badge.html" %}
+                        {% endwith %}
+                    {% endfor %}
+                    </div>
+                </div>
+                <div {% if new_powers_2|length > 9 %} class="css-double-col" {% endif %}>
+                    <div class="padded-col">
+                    {% for power_full in new_powers_2 %}
+                        {% with power_full.latest_rev as power %}
+                            {% include "characters/print_pages/power_mini_badge.html" %}
+                        {% endwith %}
+                    {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if artifacts.signature_items or artifacts.lost_signature_items %}
+                <h3 class="text-center">Legendary Artifacts</h3>
+                {% for item in artifacts.signature_items %}
+                    <div class="css-item">
+                        <h5 class="text-center">
+                            {{item.name}}
+                        </h5>
+                        {% for power in item.power_set.all %}
+                            {% include "characters/print_pages/power_mini_badge.html" %}
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+                {% for item in artifacts.lost_signature_items %}
+                <div class="css-item css-item-lost">
+                    <h5>
+                        {{item.name}} (lost)
+                    </h5>
+                    {% for power in item.power_set.all %}
+                        {% include "characters/print_pages/power_mini_badge.html" %}
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            {% endif %}
+
+            {% if artifacts.consumables %}
+                <h3 class="text-center">Consumables</h3>
+                {% for consumable in artifacts.consumables %}
+                    <div>
+                        {{consumable.name}}
+                        <small>
+                            Quantity: {{consumable.quantity}}
+                        </small>
+                    </div>
+                    {% with consumable.power_set.first as power %}
+                        {% include "characters/print_pages/power_mini_badge.html" %}
+                    {% endwith %}
+                {% endfor %}
+            {% endif %}
+
+
+            {% if artifacts.avail_crafted_artifacts%}
+                <h3 class="text-center">Crafted Artifacts</h3>
+                {% for item in artifacts.avail_crafted_artifacts %}
+                    <div class="css-item">
+                        <h5 class="text-center">
+                            {{item.name}}
+                        </h5>
+                        {% for power in item.power_set.all %}
+                        {% include "characters/print_pages/power_mini_badge.html" %}
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            {% endif %}
         </div>
-        {% endfor %}
-        {% for power_full in new_powers_2 %}
-        <div class="css-gift-mini-badge">
-            <h5>{{power_full.latest_rev.name}}</h5>
-            <div class="css-mini-gift-summary">
-                {{power_full.latest_rev.gift_summary|safe}}
-            </div>
-        </div>
-        {% endfor %}
     </div>
 </div>

@@ -217,6 +217,41 @@ def view_artifact(request, artifact_id):
     return render(request, 'characters/view_artifact.html', context)
 
 
+class CharacterArtifacts:
+    artifacts = None
+    signature_items = None
+    lost_signature_items = None
+    consumables = None
+    avail_crafted_artifacts = None
+    unavail_crafted_artifacts = None
+
+    def __init__(self, character, world_element_cell_choices):
+        self.signature_items = []
+        self.lost_signature_items = []
+        self.consumables = []
+        self.avail_crafted_artifacts = []
+        self.unavail_crafted_artifacts = []
+        self.artifacts = get_world_element_default_dict(world_element_cell_choices)
+        for artifact in character.artifact_set.exclude(is_deleted=True).all():
+            if hasattr(artifact, "cell") and artifact.cell:
+                self.artifacts[artifact.cell].append(artifact)
+            elif artifact.is_signature:
+                self.signature_items.append(artifact)
+            elif artifact.is_consumable:
+                self.consumables.append(artifact)
+            elif artifact.is_crafted_artifact:
+                if artifact.most_recent_status_change and artifact.most_recent_status_change in [LOST, AT_HOME,
+                                                                                                 DESTROYED]:
+                    self.unavail_crafted_artifacts.append(artifact)
+                else:
+                    self.avail_crafted_artifacts.append(artifact)
+
+        for artifact in Artifact.objects.filter(crafting_character=character, is_signature=True,
+                                                is_deleted=False).all():
+            if artifact.character is not None and artifact.character != character:
+                self.lost_signature_items.append(artifact)
+
+
 def view_character(request, character_id, secret_key=None):
     character = get_object_or_404(Character, id=character_id)
     if character.player and secret_key:
@@ -293,29 +328,8 @@ def view_character(request, character_id, secret_key=None):
         element_descriptions = StockWorldElement.objects.values_list('name', 'description')
         element_description_by_name = {x[0]: x[1] for x in element_descriptions}
 
-    artifacts = get_world_element_default_dict(world_element_cell_choices)
-    signature_items = []
-    lost_signature_items = []
-    consumables = []
-    avail_crafted_artifacts = []
-    unavail_crafted_artifacts = []
-    for artifact in character.artifact_set.exclude(is_deleted=True).all():
-        if hasattr(artifact, "cell") and artifact.cell:
-            artifacts[artifact.cell].append(artifact)
-        elif artifact.is_signature:
-            signature_items.append(artifact)
-        elif artifact.is_consumable:
-            consumables.append(artifact)
-        elif artifact.is_crafted_artifact:
-            if artifact.most_recent_status_change and artifact.most_recent_status_change in [LOST, AT_HOME, DESTROYED]:
-                unavail_crafted_artifacts.append(artifact)
-            else:
-                avail_crafted_artifacts.append(artifact)
-
-    for artifact in Artifact.objects.filter(crafting_character=character, is_signature=True, is_deleted=False).all():
-        if artifact.character is not None and artifact.character != character:
-            lost_signature_items.append(artifact)
-    artifacts = dict(artifacts)
+    char_artifacts = CharacterArtifacts(character, world_element_cell_choices)
+    artifacts = dict(char_artifacts.artifacts)
 
     circumstances = get_world_element_default_dict(world_element_cell_choices)
     for circumstance in character.circumstance_set.exclude(is_deleted=True).all():
@@ -385,11 +399,11 @@ def view_character(request, character_id, secret_key=None):
         'new_powers': new_powers,
         'crafting_artifact_gifts': crafting_artifact_gifts,
         'crafting_consumable_gifts': crafting_consumable_gifts,
-        'signature_items': signature_items,
-        'consumables': consumables,
-        'avail_crafted_artifacts': avail_crafted_artifacts,
-        'unavail_crafted_artifacts': unavail_crafted_artifacts,
-        'lost_signature_items': lost_signature_items,
+        'signature_items': char_artifacts.signature_items,
+        'consumables': char_artifacts.consumables,
+        'avail_crafted_artifacts': char_artifacts.avail_crafted_artifacts,
+        'unavail_crafted_artifacts': char_artifacts.unavail_crafted_artifacts,
+        'lost_signature_items': char_artifacts.lost_signature_items,
         'num_improvements': character.num_improvements() if character.player == request.user else None,
         'moves': moves,
         'num_moves':  moves.count(),
@@ -406,7 +420,7 @@ def print_character(request, character_id):
     crafting_artifact_gifts = character.power_full_set.filter(dice_system=SYS_PS2, crafting_type=CRAFTING_ARTIFACT).all()
     crafting_consumable_gifts = character.power_full_set.filter(dice_system=SYS_PS2, crafting_type=CRAFTING_CONSUMABLE).all()
     mid_powers = new_powers.count() // 2
-
+    char_artifacts = CharacterArtifacts(character, None)
     context = {
         "character": character,
         "character_blob": character.to_print_blob(),
@@ -414,6 +428,7 @@ def print_character(request, character_id):
         'new_powers_2': new_powers[:mid_powers],
         'crafting_artifact_gifts': crafting_artifact_gifts,
         'crafting_consumable_gifts': crafting_consumable_gifts,
+        'artifacts': char_artifacts,
         "d10_outline_url": static("overrides/branding/d10-outline2.svg"),
         "d10_filled_url": static("overrides/branding/d10-filled.svg"),
     }

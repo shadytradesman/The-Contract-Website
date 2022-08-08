@@ -452,12 +452,12 @@ PAGE 2
     padding: 10px;
 }
 
-.css-ps2-power-badge {
+.css-ps2-power-badge, .css-item {
     font-size: .7em;
     page-break-inside: avoid;
 }
 
-.css-ps2-power-badge h4 {
+.css-ps2-power-badge h4, .css-item h4 {
     font-size: 1.5em!important;
 }
 
@@ -466,7 +466,7 @@ PAGE 2
     padding-bottom: 0px !important;
 }
 
-.power-badge a {
+.power-badge a, .css-item a {
     text-decoration: none;
     color: black;
 }
@@ -497,7 +497,9 @@ PAGE 2
 
 .css-gift-cost-icon {
     background-color: white !important;
-    border-color: black !important;
+    border: 1px solid black !important;
+    border-radius: 3px;
+
 }
 
 .css-gift-summary {
@@ -513,12 +515,26 @@ PAGE 2
 }
 
 .css-gift-mini-badge {
-    border: 1px solid black;
-    padding: 0.05in;
-    margin-bottom: .05in;
+    border: 1px solid grey;
+    padding: 0.03in;
+    margin-bottom: .03in;
 }
 
-.css-gift-mini-badge h5 {
+.css-item {
+    border: 1px solid grey;
+    padding: 0.03in;
+    margin-bottom: .03in;
+}
+
+.css-item-lost {
+    border: 1px dotted grey;
+}
+
+.css-item .css-gift-mini-badge {
+    border: 1px solid #D0D0D0;
+}
+
+.css-gift-mini-badge h5, .css-item h5, .css-item h4 {
     margin-top: 0.02in;
     margin-bottom: 0.02in;
     font-size: .9em;
@@ -526,4 +542,8 @@ PAGE 2
 
 .css-mini-gift-summary {
     font-size: .7em;
+}
+
+.css-item .btn {
+    display: none!important;
 }

@@ -1,0 +1,63 @@
+{% load static %}
+{% load power_tags %}
+{% load character_tags %}
+
+<div class="css-page-header-sm">
+    <span class="css-header-left" v-text="character.name">
+    </span>
+    <img class="css-sm-logo" src="{% static 'overrides/branding/contract-white.svg' %}">
+</div>
+<div class="css-page-content">
+    <div class="css-col-cont">
+    {% if artifacts.signature_items or artifacts.lost_signature_items %}
+        <div class="css-double-col">
+            <h3 class="text-center">Legendary Artifacts (Expanded)</h3>
+            <div class="padded-col">
+        {% for item in artifacts.signature_items %}
+            <div class="css-item">
+                {% render_sig_item item request.user character %}
+            </div>
+        {% endfor %}
+        {% for item in artifacts.lost_signature_items %}
+            <div class="css-item">
+                {% render_sig_item item request.user character %}
+            </div>
+        {% endfor %}
+            </div>
+            </div>
+    {% endif %}
+
+    {% if artifacts.consumables %}
+        <div class="css-double-col">
+            <h3 class="text-center">Consumables (Expanded)</h3>
+            <div class="padded-col">
+                {% for consumable in artifacts.consumables %}
+                    <div>
+                        {{consumable.name}}
+                        <small>
+                            Quantity: {{consumable.quantity}}
+                        </small>
+                    </div>
+                    {% with consumable.power_set.first as power %}
+                        {% power_rev_badge power False consumable%}
+                    {% endwith %}
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+
+    {% if artifacts.avail_crafted_artifacts %}
+        <div class="css-double-col">
+            <h3 class="text-center">Crafted Artifacts (Expanded)</h3>
+            <div class="padded-col">
+                {% for item in artifacts.avail_crafted_artifacts %}
+                <div class="css-item">
+                    {% render_sig_item item request.user character %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+    </div>
+</div>
