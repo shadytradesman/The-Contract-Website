@@ -100,10 +100,15 @@
                     {% endif %}
                 {% else %}
                     <h3 class="text-center">You have been invited to attend this Contract.</h3>
+                    <h4 class="text-center">
+                        <a href="{% url 'games:games_accept_invite' game.id %}" class="btn btn-xl btn-success">
+                            Click here to RSVP
+                        </a>
+                    </h4>
                 {% endif %}
             {% endif %}
             {% if can_rsvp %}
-                {% if my_invitation and not my_invitation.attendance %}
+                {% if not my_invitation %}
                     <h4 class="text-center">
                         <a href="{% url 'games:games_accept_invite' game.id %}" class="btn btn-xl btn-success">
                             Click here to RSVP
