@@ -34,6 +34,10 @@ body {
     position:relative;
 }
 
+.css-page-long:last-child {
+    page-break-after: avoid;
+}
+
 .css-page-long-section {
     -webkit-box-decoration-break: clone;
 }
@@ -47,6 +51,7 @@ body {
     width: 8in;
     border: 1px solid grey;
     padding: .2in;
+    padding-bottom: .05in;
     margin: auto;
     margin-top: 5px;
     margin-bottom: 15px;

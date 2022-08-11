@@ -37,10 +37,9 @@
                 TheContractRPG.com
             </div>
         </div>
-        <div v-if="includeExpandedPowers">
             {% if new_powers_1 %}
-                <div class="css-page-spacer"></div>
-                <div class="css-page-long">
+                <div v-if="includeExpandedPowers" class="css-page-spacer"></div>
+                <div v-if="includeExpandedPowers" class="css-page-long">
                     <div class="css-content">
                         {% include "characters/print_pages/page3.html" %}
                     </div>
@@ -49,11 +48,9 @@
                     </div>
                 </div>
             {% endif %}
-        </div>
-        <div v-if="includeCraftedItems">
             {% if artifacts.consumables or artifacts.signature_items or artifacts.avail_crafted_artifacts %}
-                <div class="css-page-spacer"></div>
-                <div class="css-page-long">
+                <div v-if="includeCraftedItems" class="css-page-spacer"></div>
+                <div v-if="includeCraftedItems" class="css-page-long">
                     <div class="css-content">
                         {% include "characters/print_pages/page4.html" %}
                     </div>
@@ -62,11 +59,9 @@
                     </div>
                 </div>
             {% endif %}
-        </div>
-        <div v-if="includeCraftables">
             {% if crafting_artifact_gifts or crafting_consumable_gifts %}
-            <div class="css-page-spacer"></div>
-            <div class="css-page-long">
+            <div v-if="includeCraftables" class="css-page-spacer"></div>
+            <div v-if="includeCraftables" class="css-page-long">
                 <div class="css-content">
                     {% include "characters/print_pages/page_craftables.html" %}
                 </div>
@@ -75,7 +70,6 @@
                 </div>
             </div>
             {% endif %}
-        </div>
     </div>
 </div>
 <script src="https://unpkg.com/vue@3"></script>

@@ -90,15 +90,17 @@
             {% if artifacts.consumables %}
                 <h3 class="text-center">Consumables</h3>
                 {% for consumable in artifacts.consumables %}
-                    <div>
-                        {{consumable.name}}
-                        <small>
-                            Quantity: {{consumable.quantity}}
-                        </small>
-                    </div>
-                    {% with consumable.power_set.first as power %}
-                        {% include "characters/print_pages/power_mini_badge.html" %}
-                    {% endwith %}
+                    {% if consumable.quantity > 0 %}
+                        <div>
+                            {{consumable.name}}
+                            <small>
+                                Quantity: {{consumable.quantity}}
+                            </small>
+                        </div>
+                        {% with consumable.power_set.first as power %}
+                            {% include "characters/print_pages/power_mini_badge.html" %}
+                        {% endwith %}
+                    {% endif %}
                 {% endfor %}
             {% endif %}
 
