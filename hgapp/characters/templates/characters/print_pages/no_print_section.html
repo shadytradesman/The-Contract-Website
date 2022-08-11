@@ -8,15 +8,39 @@
 <div>
     <b>Options:</b>
     <div>
-        <input type="checkbox" id="opt-showExtraStats" v-model="showExtraStats">
-        <label for="opt-showExtraStats">Show blank extra stat levels</label>
+        <span class="css-option">
+            <input type="checkbox" id="opt-showExtraStats" v-model="showExtraStats">
+            <label for="opt-showExtraStats">Show blank extra stat levels</label>
+        </span>
 
-        <input type="checkbox" id="opt-showTutorialText" v-model="showTutorialText">
-        <label for="opt-showTutorialText">Show rule references</label>
+        <span class="css-option">
+            <input type="checkbox" id="opt-showTutorialText" v-model="showTutorialText">
+            <label for="opt-showTutorialText">Show rule references</label>
+        </span>
+        <span class="css-option">
+            <input type="checkbox" id="opt-showFieldValues" v-model="showFieldValues">
+            <label for="opt-showFieldValues">Include Battle Scars and Traumas</label>
+        </span>
     </div>
     <div>
-        <input type="checkbox" id="opt-showFieldValues" v-model="showFieldValues">
-        <label for="opt-showFieldValues">Show field values</label>
+        {% if new_powers_1 %}
+            <span class="css-option">
+                <input type="checkbox" id="opt-includeExpandedPowers" v-model="includeExpandedPowers">
+                <label for="opt-includeExpandedPowers">Include Expanded Powers</label>
+            </span>
+        {% endif %}
+        {% if artifacts.consumables or artifacts.signature_items or artifacts.avail_crafted_artifacts %}
+            <span class="css-option">
+                <input type="checkbox" id="opt-includeCraftedItems" v-model="includeCraftedItems">
+                <label for="opt-includeCraftedItems">Include Crafted items in possession</label>
+            </span>
+        {% endif %}
+        {% if crafting_artifact_gifts or crafting_consumable_gifts %}
+            <span class="css-option">
+                <input type="checkbox" id="opt-includeCraftables" v-model="includeCraftables">
+                <label for="opt-includeCraftables">Include Craftables</label>
+            </span>
+        {% endif %}
     </div>
 
     <div class="text-center" style="margin-top: 10px;">

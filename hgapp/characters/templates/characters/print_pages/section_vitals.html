@@ -28,14 +28,13 @@
             </h3>
             <div v-if="showFieldValues" v-for="scar in character.battle_scars">
                 <div class="css-blank-field">
-                    <span class="css-field-value">
+                    <div class="css-field-value">
                     <b>
                         {scar[0]}
                     </b>
-                        {scar[1]}
-                    </span>
-                    <div class="css-invisible-box">
-
+                        <span class="css-field-system" v-if="showTutorialText">
+                            {scar[1]}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -139,7 +138,9 @@
                     <b>
                         {trauma[0]}
                     </b>
+                    <span class="css-field-system" v-if="showTutorialText">
                         {trauma[1]}
+                    </span>
                 </div>
             </div>
         </div>

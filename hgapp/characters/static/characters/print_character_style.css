@@ -21,6 +21,7 @@ body {
     overflow: hidden;
     -webkit-box-decoration-break: clone;
     page-break-after: always;
+    position:relative;
 }
 
 .css-page-long {
@@ -30,6 +31,7 @@ body {
     padding: .2in;
     margin: auto;
     page-break-after: always;
+    position:relative;
 }
 
 .css-page-long-section {
@@ -50,11 +52,27 @@ body {
     margin-bottom: 15px;
 }
 
+.css-option {
+    margin-left: .1in;
+}
+
 
 /* MAIN CONTENT INTRO */
 .css-main-logo {
     height: .8in;
     float: right;
+}
+
+.css-logo-url {
+    text-align: right;
+    font-size: .7em;
+    position: absolute;
+    bottom: 0.02in;
+    right: 0.15in;
+    width: 4in;
+    z-index: 9999;
+    background-color: white;
+    padding: .03in;
 }
 
 .css-char-name-cont {
@@ -92,6 +110,7 @@ body {
     padding: .1in;
     font-size: .9em;
     margin-bottom: .1in;
+    text-align: center;
 }
 
 /* STATS SECTION */
@@ -200,6 +219,7 @@ body {
 }
 
 .css-content {
+    padding-bottom: .03in;
 }
 
 @page {
@@ -345,6 +365,11 @@ h3 {
     padding: 0.03in;
 }
 
+.css-field-system {
+    padding-left: 0.05in;
+    font-size: 0.8em;
+}
+
 .css-help-text {
     font-size: .6em;
     font-style: italic;
@@ -360,6 +385,7 @@ h3 {
     display: table;
     content: " ";
     clear: both;
+    width: 100%;
 }
 
 .padded-col {
@@ -452,6 +478,16 @@ PAGE 2
     padding: 10px;
 }
 
+.css-ps2-power-badge {
+    max-width: 3.75in;
+    margin-left: 0.05in;
+    margin-right: 0.05in;
+}
+
+.css-world-entity-value {
+    text-align: center;
+}
+
 .css-ps2-power-badge, .css-item {
     font-size: .7em;
     page-break-inside: avoid;
@@ -499,7 +535,9 @@ PAGE 2
     background-color: white !important;
     border: 1px solid black !important;
     border-radius: 3px;
-
+    top: 0px!important;
+    margin-right: .02in !important;
+    height: 23px !important;
 }
 
 .css-gift-summary {
@@ -523,7 +561,17 @@ PAGE 2
 .css-item {
     border: 1px solid grey;
     padding: 0.03in;
-    margin-bottom: .03in;
+    margin-bottom: .1in;
+}
+
+.css-flex-col, .css-item-gift-list {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.css-flex-col .css-item {
+    width: 47%;
+    margin-left: .01in;
 }
 
 .css-item-lost {
@@ -546,4 +594,8 @@ PAGE 2
 
 .css-item .btn {
     display: none!important;
+}
+
+.css-craftables .css-ps2-power-badge {
+    border-style: dotted !important;
 }

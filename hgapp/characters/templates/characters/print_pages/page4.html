@@ -10,9 +10,8 @@
 <div class="css-page-content">
     <div class="css-col-cont">
     {% if artifacts.signature_items or artifacts.lost_signature_items %}
-        <div class="css-double-col">
-            <h3 class="text-center">Legendary Artifacts (Expanded)</h3>
-            <div class="padded-col">
+        <h3 class="text-center">Legendary Artifacts (Expanded)</h3>
+        <div class="css-flex-col">
         {% for item in artifacts.signature_items %}
             <div class="css-item">
                 {% render_sig_item item request.user character %}
@@ -24,14 +23,16 @@
             </div>
         {% endfor %}
             </div>
-            </div>
     {% endif %}
+    </div>
 
     {% if artifacts.consumables %}
-        <div class="css-double-col">
+    <div class="css-col-cont">
             <h3 class="text-center">Consumables (Expanded)</h3>
-            <div class="padded-col">
+            <div class="css-flex-col">
                 {% for consumable in artifacts.consumables %}
+                <div class="padded-col">
+
                     <div>
                         {{consumable.name}}
                         <small>
@@ -41,14 +42,14 @@
                     {% with consumable.power_set.first as power %}
                         {% power_rev_badge power False consumable%}
                     {% endwith %}
+                </div>
                 {% endfor %}
             </div>
-        </div>
+    </div>
     {% endif %}
 
-
     {% if artifacts.avail_crafted_artifacts %}
-        <div class="css-double-col">
+        <div class="">
             <h3 class="text-center">Crafted Artifacts (Expanded)</h3>
             <div class="padded-col">
                 {% for item in artifacts.avail_crafted_artifacts %}
@@ -59,5 +60,4 @@
             </div>
         </div>
     {% endif %}
-    </div>
 </div>

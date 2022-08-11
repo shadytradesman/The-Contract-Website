@@ -10,13 +10,11 @@
           <b>
             {condition[0]}
           </b>
-          <span style="font-size: .8em; margin-left: 5px;">
-          <span v-if="showFieldValues">
+          <span class="css-field-system" v-if="showTutorialText">
             {condition[1]}
               <i>
               ({condition[2]})
               </i>
-            </span>
           </span>
             <span v-if="showFieldValues">
             </span>
@@ -45,13 +43,11 @@
           <b>
             {circumstance[0]}
           </b>
-          <span style="font-size: .8em; margin-left: 5px;">
-          <span v-if="showFieldValues">
+          <span class="css-field-system" v-if="showTutorialText">
               {circumstance[1]}
               <i>
                 ({circumstance[2]})
               </i>
-            </span>
           </span>
         </div>
         </div>

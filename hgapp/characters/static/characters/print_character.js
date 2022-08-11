@@ -14,6 +14,9 @@ const charSheetRendering = {
       showExtraStats: false,
       showTutorialText: true,
       showFieldValues: false,
+      includeExpandedPowers: true,
+      includeCraftedItems: true,
+      includeCraftables: true,
     }
   },
   methods: {

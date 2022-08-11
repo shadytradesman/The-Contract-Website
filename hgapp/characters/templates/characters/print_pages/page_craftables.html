@@ -1,0 +1,39 @@
+{% load static %}
+{% load power_tags %}
+{% load character_tags %}
+
+<div class="css-page-header-sm">
+    <span class="css-header-left" v-text="character.name">
+    </span>
+    <img class="css-sm-logo" src="{% static 'overrides/branding/contract-white.svg' %}">
+</div>
+<div class="css-page-long-section css-col-cont css-craftables">
+    <div class="css-double-col">
+    {% if crafting_artifact_gifts %}
+        <div class="padded-col">
+            <div class="text-center">
+                <h3>Craftable Artifact Effects</h3>
+            </div>
+            {% for power_full in crafting_artifact_gifts %}
+            <div>
+                {% power_badge power_full False None user_can_edit %}
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    </div>
+    <div class="css-double-col" >
+        {% if crafting_consumable_gifts %}
+        <div class="padded-col">
+            <div class="text-center">
+                <h3>Craftable Consumables </h3>
+            </div>
+            {% for power_full in crafting_consumable_gifts %}
+                <div>
+                    {% power_badge power_full False None user_can_edit %}
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
