@@ -512,6 +512,11 @@ PAGE 2
     color: black;
 }
 
+.css-timeline-item a {
+    text-decoration: none;
+    color: black;
+}
+
 .css-ps2-power-badge p {
     margin-top: 0.05in !important;
     margin-bottom: 0.05in !important;
@@ -603,4 +608,77 @@ PAGE 2
 
 .css-craftables .css-ps2-power-badge {
     border-style: dotted !important;
+}
+
+.css-bio {
+    column-count: 2;
+}
+
+.css-bio>p {
+    margin-top: 0px;
+}
+
+/*
+
+TIME LINE
+
+*/
+
+.css-timeline {
+    font-size: .7em;
+}
+
+.css-timeline h4 {
+    margin-top: .1in;
+    margin-bottom: .1in;
+}
+
+.css-timeline ul {
+    margin-top: 0in;
+    margin-bottom: 0in;
+}
+.css-timeline-item {
+    display: block;
+    padding: 4px;
+    margin-bottom: 5px;
+    line-height: 1.42857143;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.css-timeline-crafting {
+    border-color: gray;
+}
+
+.css-timeline-exp {
+    border-color: wheat;
+}
+
+.css-timeline-element {
+    border-color: darkolivegreen;
+}
+
+.css-game-badge {
+    border-color: lightskyblue;
+}
+
+.css-timeline-date {
+    float: left;
+    padding-top: 8px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.css-timeline-item h4, .css-timeline-item h5 {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+.css-timeline-item p {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.css-timeline-item {
+    page-break-inside: avoid;
 }

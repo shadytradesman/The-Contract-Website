@@ -166,6 +166,8 @@
                     </a>
                     <div
                             class="panel-collapse collapse collapse-errata-{{latest_revision.id}} css-extended-system"
+                            style="margin-top: 10px;"
+                            v-if="showTutorialText === null || showTutorialText"
                             role="tabpanel"
                             aria-labelledby="collapse-errata-{{latest_revision.id}}-heading">
                         {{latest_revision.errata|safe}}

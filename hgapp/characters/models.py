@@ -1041,7 +1041,7 @@ Archived on: {}
             "num_victories": self.num_victories,
             "num_losses": self.num_losses,
             "equipment": markdown_filter(self.equipment),
-            "bio": self.background,
+            "bio": markdown_filter(self.background),
 
             "mind": self.num_mind_levels(),
             "body": self.num_body_levels(),

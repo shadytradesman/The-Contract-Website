@@ -18,6 +18,7 @@ from django.forms import formset_factory
 from django.http import HttpResponseRedirect
 from django.middleware.csrf import rotate_token
 from django.templatetags.static import static
+from django.template.loader import render_to_string
 
 
 from characters.models import Character, BasicStats, Character_Death, Graveyard_Header, Attribute, Ability, \
@@ -431,6 +432,7 @@ def print_character(request, character_id):
         'artifacts': char_artifacts,
         "d10_outline_url": static("overrides/branding/d10-outline2.svg"),
         "d10_filled_url": static("overrides/branding/d10-filled.svg"),
+        "timeline": character_timeline_str(request, character_id),
     }
     return render(request, 'characters/print_pages/print_character.html', context)
 
@@ -819,17 +821,29 @@ class CraftingTimelineBlock:
 
 
 def character_timeline(request, character_id):
+    context = timeline_context(character_id, request)
+    return render(request, 'characters/character_timeline.html', context)
+
+
+def character_timeline_str(request, character_id):
+    context = timeline_context(character_id, request)
+    return render_to_string('characters/character_timeline.html', context, request)
+
+
+def timeline_context(character_id, request):
     character = get_object_or_404(Character, id=character_id)
     if not character.player_can_view(request.user):
         raise PermissionDenied("You do not have permission to view this Character")
-
     assigned_rewards = [(x.assigned_on, "reward", x) for x in character.spent_rewards_rev_sort()]
     completed_games = [(x.relevant_game.end_time, "game", x) for x in character.completed_games_rev_sort()]
-    condition_creation = [(x.created_time, "elem_created", x) for x in character.condition_set.order_by("-created_time")]
-    condition_deletion = [(x.deleted_date, "elem_deleted", x) for x in character.condition_set.filter(is_deleted=True).order_by("-deleted_date")]
-    circumstance_creation = [(x.created_time, "elem_created", x) for x in character.circumstance_set.order_by("-created_time")]
-    circumstance_deletion = [(x.deleted_date, "elem_deleted", x) for x in character.circumstance_set.filter(is_deleted=True).order_by("-deleted_date")]
-
+    condition_creation = [(x.created_time, "elem_created", x) for x in
+                          character.condition_set.order_by("-created_time")]
+    condition_deletion = [(x.deleted_date, "elem_deleted", x) for x in
+                          character.condition_set.filter(is_deleted=True).order_by("-deleted_date")]
+    circumstance_creation = [(x.created_time, "elem_created", x) for x in
+                             character.circumstance_set.order_by("-created_time")]
+    circumstance_deletion = [(x.deleted_date, "elem_deleted", x) for x in
+                             character.circumstance_set.filter(is_deleted=True).order_by("-deleted_date")]
     craftings = character.craftingevent_set.order_by("-relevant_attendance__relevant_game__end_time").all()
     crafting_tuples = []
     if craftings:
@@ -856,16 +870,14 @@ def character_timeline(request, character_id):
                 "crafting",
                 CraftingTimelineBlock(current_crafting_list))
         )
-
     character_edit_history = [(x.created_time, "edit", x) for x in
                               character.contractstats_set.filter(is_snapshot=False).order_by("-created_time").all()[:1]]
-    exp_rewards = [(x.created_time + timedelta(seconds=2), "exp_reward", x) for x in character.experiencereward_set.filter(is_void=False).order_by("-created_time").all()]
-
+    exp_rewards = [(x.created_time + timedelta(seconds=2), "exp_reward", x) for x in
+                   character.experiencereward_set.filter(is_void=False).order_by("-created_time").all()]
     moves = [(x.created_date, "move", x) for x in character.move_set.order_by("-created_date").all()]
-
     loose_ends = [(x.created_time, "elem_created", x) for x in character.looseend_set.order_by("-created_time").all()]
-    loose_end_deleted = [(x.deleted_date, "elem_deleted", x) for x in character.looseend_set.filter(is_deleted=True).order_by("-created_time").all()]
-
+    loose_end_deleted = [(x.deleted_date, "elem_deleted", x) for x in
+                         character.looseend_set.filter(is_deleted=True).order_by("-created_time").all()]
     events_by_date = list(merge(assigned_rewards,
                                 completed_games,
                                 condition_creation,
@@ -890,7 +902,7 @@ def character_timeline(request, character_id):
     context = {
         'timeline': dict(timeline),
     }
-    return render(request, 'characters/character_timeline.html', context)
+    return context
 
 
 def use_consumable(request, artifact_id):
@@ -1216,6 +1228,5 @@ def edit_world_element(request, element_id, element, secret_key=None):
                            "artifact_status": art_status,
                            "cellId": ext_element.cell.id if ext_element.cell else None}
             return JsonResponse(responseMap, status=200)
-        print(form.errors)
         return JsonResponse({}, status=200)
     return JsonResponse({"error": ""}, status=400)

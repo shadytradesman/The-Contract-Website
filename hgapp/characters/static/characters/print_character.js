@@ -4,6 +4,7 @@ if (document.getElementById('characterBlob')) {
 }
 d10OutlineUrl = JSON.parse(document.getElementById('d10Outline').textContent);
 d10FilledUrl = JSON.parse(document.getElementById('d10Filled').textContent);
+timeline = JSON.parse(document.getElementById('timeline').textContent);
 
 const charSheetRendering = {
   delimiters: ['{', '}'],
@@ -17,6 +18,9 @@ const charSheetRendering = {
       includeExpandedPowers: true,
       includeCraftedItems: true,
       includeCraftables: true,
+      includeStory: true,
+      includeTimeline: false,
+      timeline: timeline,
     }
   },
   methods: {

@@ -4,7 +4,9 @@
   <h4>{{ date }}</h4>
   <ul>
     {% for event in event_list %}
-      {{ event.2 }}
+      <div class="css-timeline-date">
+        {{ event.2 }}
+      </div>
       {% if event.0 == "elem_created" %}
         <li class="css-timeline-item css-timeline-element">
           <b>Aquired {{event.1.get_type_display}}: {{event.1.name}} </b>

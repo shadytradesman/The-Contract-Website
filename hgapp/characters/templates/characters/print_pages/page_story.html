@@ -1,0 +1,67 @@
+{% load static %}
+{% load power_tags %}
+{% load character_tags %}
+
+<div class="css-page-header-sm">
+    <span class="css-header-left" v-text="character.name">
+    </span>
+  <img class="css-sm-logo" src="{% static 'overrides/branding/contract-white.svg' %}">
+</div>
+<div class="css-page-content">
+  <div class="css-col-cont">
+
+    <h3 class="text-center">Biography</h3>
+    <div v-if="character.bio">
+      <div class="css-equip css-bio" v-html="character.bio"> </div>
+    </div>
+    <div class="css-double-col">
+      <div class="padded-col">
+        <div v-for="index in 5">
+          <div class="css-field-container">
+            <div class="css-blank-field">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="css-double-col">
+      <div class="padded-col">
+        <div v-for="index in 5">
+          <div class="css-field-container">
+            <div class="css-blank-field">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="text-center">Notes</h3>
+  <div class="css-double-col">
+    <div class="padded-col">
+      <div v-for="index in 5">
+        <div class="css-field-container">
+          <div class="css-blank-field">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="css-double-col">
+    <div class="padded-col">
+      <div v-for="index in 5">
+        <div class="css-field-container">
+          <div class="css-blank-field">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="css-col-cont">
+    <div v-if="includeTimeline">
+      <h3 class="text-center">Timeline</h3>
+      <div v-html="timeline" class="css-timeline"></div>
+    </div>
+  </div>
+</div>

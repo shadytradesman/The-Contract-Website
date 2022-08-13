@@ -7,6 +7,7 @@
     {{character_blob|json_script:"characterBlob"}}
     {{d10_outline_url|json_script:"d10Outline"}}
     {{d10_filled_url|json_script:"d10Filled"}}
+    {{timeline|json_script:"timeline"}}
     <link rel="stylesheet" type="text/css" href="{% static 'characters/print_character_style.css' %}" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <!--    <script src="https://unpkg.com/vue@3.2.26/dist/vue.global.prod.js"></script>-->
@@ -60,16 +61,25 @@
                 </div>
             {% endif %}
             {% if crafting_artifact_gifts or crafting_consumable_gifts %}
-            <div v-if="includeCraftables" class="css-page-spacer"></div>
-            <div v-if="includeCraftables" class="css-page-long">
-                <div class="css-content">
-                    {% include "characters/print_pages/page_craftables.html" %}
+                <div v-if="includeCraftables" class="css-page-spacer"></div>
+                <div v-if="includeCraftables" class="css-page-long">
+                    <div class="css-content">
+                        {% include "characters/print_pages/page_craftables.html" %}
+                    </div>
+                    <div class="css-logo-url">
+                        TheContractRPG.com
+                    </div>
                 </div>
-                <div class="css-logo-url">
-                    TheContractRPG.com
-                </div>
-            </div>
             {% endif %}
+        <div v-if="includeStory" class="css-page-spacer"></div>
+        <div v-if="includeStory" class="css-page-long">
+            <div class="css-content">
+                {% include "characters/print_pages/page_story.html" %}
+            </div>
+            <div class="css-logo-url">
+                TheContractRPG.com
+            </div>
+        </div>
     </div>
 </div>
 <script src="https://unpkg.com/vue@3"></script>

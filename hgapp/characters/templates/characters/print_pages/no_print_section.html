@@ -41,6 +41,17 @@
                 <label for="opt-includeCraftables">Include Craftables</label>
             </span>
         {% endif %}
+        <div>
+        <span class="css-option">
+                <input type="checkbox" id="opt-includeStory" v-model="includeStory">
+                <label for="opt-includeStory">Include Story</label>
+            </span>
+            <span class="css-option">
+                <input type="checkbox" id="opt-includeTimeline" v-model="includeTimeline">
+                <label for="opt-includeTimeline">Include Timeline</label>
+            </span>
+
+        </div>
     </div>
 
     <div class="text-center" style="margin-top: 10px;">
