@@ -1,6 +1,6 @@
 branch-defaults:
   awsl2:
-    environment: Contractel2-env
+    environment: contract-al2-hgapp
     group_suffix: null
   default:
     environment: Default-Environment
@@ -12,7 +12,7 @@ environment-defaults:
     branch: null
     repository: null
 global:
-  application_name: python-3.8
+  application_name: hgapp
   branch: null
   default_ec2_keyname: mcserv
   default_platform: Python 3.8 running on 64bit Amazon Linux 2
