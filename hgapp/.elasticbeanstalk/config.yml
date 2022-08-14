@@ -1,6 +1,6 @@
 branch-defaults:
   awsl2:
-    environment: contract-al2-2
+    environment: Contractel2-env
   default:
     environment: Default-Environment
   master:
