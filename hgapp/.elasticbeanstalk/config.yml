@@ -1,6 +1,6 @@
 branch-defaults:
   awsl2:
-    environment: contract-al2-hgapp
+    environment: Hgapp-env-1
     group_suffix: null
   default:
     environment: Default-Environment
