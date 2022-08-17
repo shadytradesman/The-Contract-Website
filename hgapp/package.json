@@ -50,7 +50,7 @@
     "jsdom-global": "2.1.1",
     "less": "2.7.2",
     "mocha": "3.2.0",
-    "moment": "^2.18.1",
+    "moment": "^2.29.4",
     "onchange": "3.2.1",
     "uglifyjs": "2.4.10",
     "watchify": "3.9.0"
