@@ -308,6 +308,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+if DEBUG:
+    DEFAULT_HTTP_PROTOCOL = "http"
+else:
+    DEFAULT_HTTP_PROTOCOL = "https"
+
 # Caching
 if DEBUG:
     pass
