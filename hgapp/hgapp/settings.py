@@ -35,6 +35,9 @@ else:
         'www.thecontractgame.com',
         'thecontractrpg.com',
         'www.thecontractrpg.com',
+        'contract-al2-hgapp.wrumqdjmpw.us-west-2.elasticbeanstalk.com',
+        'hgapp-env-contract.wrumqdjmpw.us-west-2.elasticbeanstalk.com',
+        'hgapp-env-1.wrumqdjmpw.us-west-2.elasticbeanstalk.com',
     ]
     SESSION_COOKIE_DOMAIN = ".thecontractrpg.com"
 

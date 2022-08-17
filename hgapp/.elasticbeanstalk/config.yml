@@ -1,4 +1,7 @@
 branch-defaults:
+  awsl2:
+    environment: Hgapp-env-1
+    group_suffix: null
   default:
     environment: Default-Environment
   master:
@@ -10,8 +13,15 @@ environment-defaults:
     repository: null
 global:
   application_name: hgapp
-  default_ec2_keyname: null
-  default_platform: 64bit Amazon Linux 2016.09 v2.2.0 running Python 3.4
+  branch: null
+  default_ec2_keyname: mcserv
+  default_platform: Python 3.8 running on 64bit Amazon Linux 2
   default_region: us-west-2
+  include_git_submodules: true
+  instance_profile: null
+  platform_name: null
+  platform_version: null
   profile: eb-cli
+  repository: null
   sc: git
+  workspace_type: Application
