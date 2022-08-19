@@ -4,6 +4,7 @@ from django.core.cache import cache
 
 from django import template
 from django.urls import reverse
+from account.models import EmailAddress
 
 from guide.models import GuideBook, GuideSection
 
@@ -52,6 +53,14 @@ def _get_guide_index_blob():
             section_by_tag[tag.lower()].append(search_hit)
     return {
         'blob': json.dumps(dict(section_by_tag)),
+    }
+
+
+@register.inclusion_tag('tags/email_verified.html')
+def email_verified(user):
+    email = EmailAddress.objects.get_primary(user)
+    return {
+        "verified": email and email.verified
     }
 
 

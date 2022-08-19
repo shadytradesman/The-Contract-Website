@@ -2,6 +2,7 @@
 
 {% load i18n %}
 {% load bootstrap %}
+{% load hgapp_tags %}
 
 {% block body_class %}account account-settings{% endblock %}
 
@@ -13,7 +14,13 @@
             <form method="POST" action="{% url "account_settings" %}">
                 <legend>{% trans "Account" %}</legend>
                 {% csrf_token %}
-                {{ form|bootstrap }}
+                <span class="css-email-field">
+                    {{ form.email|bootstrap }}
+                </span>
+                {% email_verified request.user %}
+                <hr>
+                {{form.timezone|bootstrap}}
+                {{form.language|bootstrap}}
                 <button class="btn btn-primary" type="submit">{% trans "Save" %}</button>
             </form>
             <h4>
