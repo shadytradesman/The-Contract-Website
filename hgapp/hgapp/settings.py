@@ -274,6 +274,7 @@ if 'RDS_HOSTNAME' in os.environ:
         }
     }
 elif 'LOCAL_CONTRACT_POSTGRES' in os.environ:
+    print("Using local postgres")
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -351,24 +352,21 @@ FIXTURE_DIRS = [
     os.path.join(PROJECT_ROOT, "fixtures"),
 ]
 
-# if DEBUG:
-#     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-# else:
-#     # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-#     # DEFAULT_FROM_EMAIL = 'thecontractgame@gmail.com'
-#     # EMAIL_HOST = 'smtp.gmail.com'
-#     # EMAIL_PORT = 587
-#     # EMAIL_HOST_USER = 'thecontractgame@gmail.com'
-#     # EMAIL_HOST_PASSWORD = os.environ["EMAIL_PASS"]
-
-AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
-AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
-
-DEFAULT_FROM_EMAIL = 'The Contract RPG <admin@thecontractrpg.com>'
-EMAIL_USE_TLS = True
-EMAIL_BACKEND = 'django_ses.SESBackend'
-AWS_SES_REGION_NAME = 'us-west-2'
-AWS_SES_REGION_ENDPOINT = 'email.us-west-2.amazonaws.com'
+if DEBUG:
+    if os.environ['AWS_ACCESS_KEY_ID']:
+        DEFAULT_FROM_EMAIL = 'The Contract RPG <admin@thecontractrpg.com>'
+        EMAIL_USE_TLS = True
+        EMAIL_BACKEND = 'django_ses.SESBackend'
+        AWS_SES_REGION_NAME = 'us-west-2'
+        AWS_SES_REGION_ENDPOINT = 'email.us-west-2.amazonaws.com'
+    else:
+        EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+else:
+    DEFAULT_FROM_EMAIL = 'The Contract RPG <admin@thecontractrpg.com>'
+    EMAIL_USE_TLS = True
+    EMAIL_BACKEND = 'django_ses.SESBackend'
+    AWS_SES_REGION_NAME = 'us-west-2'
+    AWS_SES_REGION_ENDPOINT = 'email.us-west-2.amazonaws.com'
 
 
 def do_nothing(deletion):

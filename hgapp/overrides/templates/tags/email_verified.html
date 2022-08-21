@@ -1,15 +1,15 @@
 <div class="css-email-verified">
     {% if verified %}
-    <span class="css-email-is-verified">
-    <span class="glyphicon glyphicon-check" aria-hidden="true"> </span>
-        Email Verified
-    </span>
+        <span class="css-email-is-verified">
+        <span class="glyphicon glyphicon-check" aria-hidden="true"> </span>
+            Email Verified
+        </span>
     {% else %}
-    <span class="css-email-not-verified">
-        Email Not Verified
-    </span>
-    <a href="{% url 'account_resend_confirmation' %}" class="btn btn-xs">
-        Resend Verification email
-    </a>
+        <span class="css-email-not-verified">
+            Email Not Verified
+        </span>
+        <a href="{% url 'account_resend_confirmation' %}">
+            Resend Verification email
+        </a>
     {% endif %}
 </div>
