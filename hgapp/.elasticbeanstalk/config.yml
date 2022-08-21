@@ -1,7 +1,4 @@
 branch-defaults:
-  awsl2:
-    environment: Hgapp-env-1
-    group_suffix: null
   default:
     environment: Default-Environment
   master:
