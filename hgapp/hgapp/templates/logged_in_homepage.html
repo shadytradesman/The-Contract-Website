@@ -26,6 +26,14 @@
         <h1>Welcome, {% user_display request.user %} </h1>
         <br>
         {% include "_messages.html" %}
+        {% if not email_verified %}
+            <div class="alert alert-info text-center css-contractor-alert">
+                <h4>Your Email Address is not verified.</h4>
+                <p>Your email address {{request.user.email}} is not verified.</p>
+                <a href="{% url 'account_resend_confirmation' %}" class="btn btn-primary btn-sm">Resend Confirmation Email</a>
+                <a href="{% url 'account_settings' %}" class="btn btn-primary btn-sm">Change Email Address</a>
+            </div>
+        {% endif %}
     </div>
     <div class="css-transparent-overlay-dark" style="padding-top: 5px; padding-left: 10px; padding-bottom: 10px;">
         {% with latest_blog_post as post %}

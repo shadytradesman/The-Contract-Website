@@ -15,3 +15,6 @@ class SignupForm(account.forms.SignupForm):
         required=False,
         initial="US/Pacific"
     )
+
+class ResendEmailConfirmation(forms.Form):
+    pass

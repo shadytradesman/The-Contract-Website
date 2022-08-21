@@ -28,6 +28,7 @@ urlpatterns = [
     url(r'^powers/', include('powers.urls'), name="powers"),
     url(r"^account/signup/$", views.SignupView.as_view(), name="account_signup"),
     url(r"^account/login/$", views.LoginView.as_view(), name="account_signup"),
+    url(r"^account/resend-confirmation/$", views.ResendConfirmation.as_view(), name="account_resend_confirmation"),
     url(r"^account/password/reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$", views.PasswordResetTokenView.as_view(),
         name="account_password_reset_token"),
     url(r"^account/", include("account.urls")),
