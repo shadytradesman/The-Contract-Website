@@ -5,7 +5,7 @@ branch-defaults:
   default:
     environment: Default-Environment
   master:
-    environment: Hgapp-env-contract
+    environment: Hgapp-env-1
     group_suffix: null
 environment-defaults:
   Default-Environment:
