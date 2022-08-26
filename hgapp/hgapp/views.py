@@ -8,6 +8,10 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.shortcuts import render
+from django.http import (
+    HttpResponse, HttpResponseGone, HttpResponseNotAllowed,
+    HttpResponsePermanentRedirect, HttpResponseRedirect,
+)
 import account.views
 from django.core.exceptions import PermissionDenied
 from account.models import EmailAddress
@@ -148,3 +152,43 @@ def home(request):
 
 def csrf_failure(request, reason=""):
     raise PermissionDenied("CSRF token failure. Refresh form and try again.")
+
+
+class RedirectRootUrlView(View):
+    """Provide a redirect on any GET request."""
+    permanent = False
+    new_root = None
+
+    def get_redirect_url(self, *args, **kwargs):
+        path = self.request.get_full_path()
+        second_slash_index = path[1:].find('/') + 1
+        new_path = path[second_slash_index:]
+        return self.new_root + new_path
+
+    def get(self, request, *args, **kwargs):
+        url = self.get_redirect_url(*args, **kwargs)
+        if url:
+            if self.permanent:
+                return HttpResponsePermanentRedirect(url)
+            else:
+                return HttpResponseRedirect(url)
+        else:
+            return HttpResponseGone()
+
+    def head(self, request, *args, **kwargs):
+        return self.get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return self.get(request, *args, **kwargs)
+
+    def options(self, request, *args, **kwargs):
+        return self.get(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        return self.get(request, *args, **kwargs)
+
+    def put(self, request, *args, **kwargs):
+        return self.get(request, *args, **kwargs)
+
+    def patch(self, request, *args, **kwargs):
+        return self.get(request, *args, **kwargs)

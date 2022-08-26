@@ -1,21 +1,8 @@
-"""hgapp URL Configuration
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/1.10/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  url(r'^$', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  url(r'^$', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.conf.urls import url, include
-    2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
-"""
 from django.conf import settings
 from django.conf.urls import include, url
 from django.urls import path
+from django.views.generic.base import RedirectView
+from django.shortcuts import redirect
 from django.conf.urls.static import static
 from hgapp import views
 
@@ -25,7 +12,8 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^messages/', include('postman.urls', namespace="postman"), name="postman"),
     url(r"^$", views.home, name="home"),
-    url(r'^powers/', include('powers.urls'), name="powers"),
+    url(r'^gift/', include('powers.urls'), name="powers"),
+    url(r'^powers/', views.RedirectRootUrlView.as_view(new_root="/gift", permanent="true")),
     url(r"^account/signup/$", views.SignupView.as_view(), name="account_signup"),
     url(r"^account/login/$", views.LoginView.as_view(), name="account_signup"),
     url(r"^account/resend-confirmation/$", views.ResendConfirmation.as_view(), name="account_resend_confirmation"),
@@ -33,11 +21,15 @@ urlpatterns = [
         name="account_password_reset_token"),
     url(r"^account/", include("account.urls")),
     url(r"^profile/", include ("profiles.urls"), name="profile"),
-    url(r"^characters/", include ("characters.urls"), name="character"),
-    url(r"^games/", include("games.urls"), name="games"),
-    url(r"^groups/", include("cells.urls"), name="cells"),
+    url(r"^contractor/", include ("characters.urls"), name="character"),
+    url(r'^characters/', views.RedirectRootUrlView.as_view(new_root="/contractor", permanent="true")),
+    url(r"^contract/", include("games.urls"), name="games"),
+    url(r'^games/', views.RedirectRootUrlView.as_view(new_root="/contract", permanent="true")),
+    url(r"^playgroup/", include("cells.urls"), name="cells"),
+    url(r'^groups/', views.RedirectRootUrlView.as_view(new_root="/playgroup", permanent="true")),
     url(r"info/", include("info.urls"), name="info"),
-    url(r"journals/", include("journals.urls"), name="journals"),
+    url(r"journal/", include("journals.urls"), name="journals"),
+    url(r"journals/", views.RedirectRootUrlView.as_view(new_root="/journal", permanent="true")),
     url(r"guide/", include("guide.urls"), name="guide"),
     url(r"crafting/", include("crafting.urls"), name="crafting"),
     url(r"^tinymce/", include("tinymce.urls")),

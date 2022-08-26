@@ -255,7 +255,7 @@ class ViewPower(View):
             return redirect
         if self.power.parent_power:
             power_full = Power_Full.objects.get(id=self.power.parent_power.id)
-            if power_full.latest_revision() == self.power and "history" not in self.request.path:
+            if power_full.latest_revision() == self.power and "revision" in self.request.path:
                 return HttpResponseRedirect(reverse('powers:powers_view_power_full', args=(power_full.id,)))
         return super().dispatch(*args, **kwargs)
 

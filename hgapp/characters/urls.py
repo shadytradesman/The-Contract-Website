@@ -2,66 +2,73 @@ from django.conf.urls import url
 from django.urls import path
 
 from . import views
+from django.views.generic.base import RedirectView
 
 app_name = 'characters'
 urlpatterns = [
-    # ex: .com/characters/view/c/110
-    url(r'^view/c/(?P<character_id>[\d]+)/$', views.view_character, name='characters_view'),
-    # ex: .com/characters/view/c/110/6db20aef104038d363eca31985142c08daa82be57e29e53ad3c8171b9d46083f
-    url(r'^view/c/(?P<character_id>[\d]+)/(?P<secret_key>[\da-z]*)$', views.view_character, name='characters_view'),
+    # ex: .com/contractor/view/c/110
+    url(r'^(?P<character_id>[\d]+)/$', views.view_character, name='characters_view'),
+    url(r'^view/c/(?P<character_id>[\d]+)/$',
+        RedirectView.as_view(pattern_name='characters:characters_view', query_string=True)),
+    # ex: .com/contractor/view/c/110/6db20aef104038d363eca31985142c08daa82be57e29e53ad3c8171b9d46083f
+    url(r'^(?P<character_id>[\d]+)/(?P<secret_key>[\da-z]*)$', views.view_character, name='characters_view'),
+    url(r'^view/c/(?P<character_id>[\d]+)/(?P<secret_key>[\da-z]*)$',
+        RedirectView.as_view(pattern_name='characters:characters_view', query_string=True)),
 
-    # ex: .com/characters/view-contacts/c/110
-    url(r'^view-contacts/c/(?P<character_id>[\d]+)/$', views.view_character_contacts, name='characters_view_contacts'),
+    # ex: .com/contractor/view-contacts/110
+    url(r'^view-contacts/(?P<character_id>[\d]+)/$', views.view_character_contacts, name='characters_view_contacts'),
 
-    # ex: .com/characters/reward/c/110
-    url(r'^reward/c/(?P<character_id>[\d]+)/$', views.spend_reward, name='characters_spend_reward'),
+    # ex: .com/contractor/reward/110
+    url(r'^reward/(?P<character_id>[\d]+)/$', views.spend_reward, name='characters_spend_reward'),
 
-    # ex: .com/characters/archive/c/110
-    url(r'^archive/c/(?P<character_id>[\d]+)/$', views.archive_character, name='characters_archive'),
+    # ex: .com/contractor/download-txt/110
+    url(r'^download-txt/(?P<character_id>[\d]+)/$', views.archive_character, name='characters_archive'),
 
-    # ex: .com/characters/print/c/110
-    url(r'^print/c/(?P<character_id>[\d]+)/$', views.print_character, name='characters_print'),
+    # ex: .com/contractor/print/110
+    url(r'^print/(?P<character_id>[\d]+)/$', views.print_character, name='characters_print'),
 
-    # ex: .com/characters/create/
+    # ex: .com/contractor/create/
     url(r'^create/$', views.create_character, name='characters_create'),
-    # ex: .com/characters/create/world/123
-    url(r'^create/world/(?P<cell_id>[\d]+)$', views.create_character, name='characters_create_world'),
+    # ex: .com/contractor/create/in-playgroup/123
+    url(r'^create/in-playgroup/(?P<cell_id>[\d]+)$', views.create_character, name='characters_create_world'),
 
-    # ex: .com/characters/view/a/110
-    url(r'^view/a/(?P<artifact_id>[\d]+)/$', views.view_artifact, name='characters_artifact_view'),
+    # ex: .com/contractor/view/a/110
+    url(r'^artifact/(?P<artifact_id>[\d]+)/$', views.view_artifact, name='characters_artifact_view'),
+    url(r'^view/a/(?P<artifact_id>[\d]+)/$',
+        RedirectView.as_view(pattern_name='characters:characters_artifact_view', query_string=True)),
 
-    # ex: .com/characters/graveyard/
+    # ex: .com/contractor/graveyard/
     url(r'^graveyard/$', views.graveyard, name='characters_graveyard'),
 
-    # ex: .com/characters/edit/c/112
-    url(r'^edit/c/(?P<character_id>[\d]+)/$', views.edit_character, name='characters_edit'),
-    # ex: .com/characters/edit/c/112/6db20aef104038d363eca31985142c08daa82be57e29e53ad3c8171b9d46083f
-    url(r'^edit/c/(?P<character_id>[\d]+)/(?P<secret_key>[\da-z]*)$', views.edit_character, name='characters_edit'),
+    # ex: .com/contractor/edit/112
+    url(r'^edit/(?P<character_id>[\d]+)/$', views.edit_character, name='characters_edit'),
+    # ex: .com/contractor/edit/112/6db20aef104038d363eca31985142c08daa82be57e29e53ad3c8171b9d46083f
+    url(r'^edit/(?P<character_id>[\d]+)/(?P<secret_key>[\da-z]*)$', views.edit_character, name='characters_edit'),
 
-    # ex: .com/characters/delete/c/112
-    url(r'^delete/c/(?P<character_id>[\d]+)/$', views.delete_character, name='characters_delete'),
+    # ex: .com/contractor/delete/112
+    url(r'^delete/(?P<character_id>[\d]+)/$', views.delete_character, name='characters_delete'),
 
-    # ex: .com/characters/obituary/c/112
-    url(r'^obituary/c/(?P<character_id>[\d]+)/$', views.edit_obituary, name='characters_obituary'),
-    url(r'^obituary/c/(?P<character_id>[\d]+)/(?P<secret_key>[\da-z]*)$', views.edit_obituary, name='characters_obituary'),
+    # ex: .com/contractor/obituary/112
+    url(r'^obituary/(?P<character_id>[\d]+)/$', views.edit_obituary, name='characters_obituary'),
+    url(r'^obituary/(?P<character_id>[\d]+)/(?P<secret_key>[\da-z]*)$', views.edit_obituary, name='characters_obituary'),
 
-    # ex: .com/characters/edit/powers/c/112/
-    url(r'^edit/powers/c/(?P<character_id>[\d]+)/$', views.choose_powers, name='characters_power_picker'),
+    # ex: .com/contractor/assign-gifts/112/
+    url(r'^assign-gifts/(?P<character_id>[\d]+)/$', views.choose_powers, name='characters_power_picker'),
 
-    # ex: .com/characters/gm/reward/
+    # ex: .com/contractor/gm/reward/
     url(r'^gm/reward/$', views.allocate_gm_exp, name='characters_allocate_gm_exp'),
 
-    # ex: .com/characters/edit/c/112/p/21
+    # ex: .com/contractor/edit/c/112/p/21
     url(r'^edit/c/(?P<character_id>[\d]+)/p/(?P<power_full_id>[\d]+)$', views.toggle_power, name='characters_power_toggle'),
 
-    # ex: .com/characters/edit/c/112/i/21
+    # ex: .com/contractor/edit/c/112/i/21
     url(r'^edit/c/(?P<character_id>[\d]+)/i/(?P<sig_artifact_id>[\d]+)$', views.toggle_item,
         name='characters_item_toggle'),
 
-    # ex: .com/characters/claim/c/112/6db20aef104038d363eca31985142c08daa82be57e29e53ad3c8171b9d46083f
-    url(r'^claim/c/(?P<character_id>[\d]+)/(?P<secret_key>[\da-z]*)$', views.claim_character, name='characters_claim'),
+    # ex: .com/contractor/claim/112/6db20aef104038d363eca31985142c08daa82be57e29e53ad3c8171b9d46083f
+    url(r'^claim/(?P<character_id>[\d]+)/(?P<secret_key>[\da-z]*)$', views.claim_character, name='characters_claim'),
 
-    path('loose-end/create/c/<int:character_id>/', views.CreateLooseEnd.as_view(), name='create_loose_end'),
+    path('loose-end/create/<int:character_id>/', views.CreateLooseEnd.as_view(), name='create_loose_end'),
     path('loose-end/edit/l/<int:loose_end_id>/', views.EditLooseEnd.as_view(), name='edit_loose_end'),
     url(r'^loose-end/delete/l/(?P<loose_end_id>[\d]+)$', views.delete_loose_end, name='delete_loose_end'),
 

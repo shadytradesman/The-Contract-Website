@@ -26,7 +26,7 @@
 
 {% block body_base %}
     <div class="container">
-        <form action="{% url 'powers:powers_edit_power' og_power.parent_power.id %}" method="post">
+        <form action="{% url 'powers:powers_edit_ps2' og_power.parent_power.id %}" method="post">
             {% include "powers/create_power_pages/create_power_form_snippet.html" %}
         </form>
     </div>

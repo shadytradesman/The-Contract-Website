@@ -2,9 +2,9 @@
     {% for power in powers_list %}
         <div class="col-lg-4 col-sm-6">
             {% if character %}
-                <a href="{% url 'powers:powers_create_power_for_char' power.slug character.id %}">
+                <a href="{% url 'powers:powers_create_ps2_for_char' power.slug character.id %}">
             {% else %}
-                <a href="{% url 'powers:powers_create_power' power.slug %}">
+                <a href="{% url 'powers:powers_create_ps2' power.slug %}">
             {% endif %}
                 <div class="thumbnail">
                     <div class="label">
