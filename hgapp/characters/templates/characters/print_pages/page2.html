@@ -8,6 +8,9 @@
 </div>
 <div class="css-page-content">
     <div class="css-double-col">
+        <div v-if="!useTwoStatsPages()">
+            {% include "characters/print_pages/section_loose_ends.html" %}
+        </div>
         <h3 class="text-center" style="margin-top: .1in;">Equipment</h3>
         <div class="css-advancement-text text-center" v-if="showTutorialText">
             Max Encumbrance: Brawn x 15 lbs.
@@ -126,5 +129,14 @@
                     {% endfor %}
                 </div>
             {% endif %}
+        {% if not new_powers_1 %}
+            <h3 class="text-center">Gifts</h3>
+        {% endif %}
+        <div v-for="index in 70">
+            <div class="css-field-container">
+                <div class="css-blank-field">
+                </div>
+            </div>
+        </div>
     </div>
 </div>

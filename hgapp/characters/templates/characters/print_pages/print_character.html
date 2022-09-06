@@ -23,10 +23,26 @@
                 {% include "characters/print_pages/section_stats.html" %}
                 <hr>
                 {% include "characters/print_pages/section_vitals.html" %}
-                {% include "characters/print_pages/section_conditions.html" %}
+                <div v-if="!useTwoStatsPages()">
+                    {% include "characters/print_pages/section_conditions.html" %}
+                </div>
+                <div v-if="useTwoStatsPages()">
+                    {% include "characters/print_pages/section_loose_ends.html" %}
+                </div>
             </div>
             <div class="css-logo-url">
                 TheContractRPG.com
+            </div>
+        </div>
+        <div v-if="useTwoStatsPages()">
+            <div class="css-page-spacer"></div>
+            <div class="css-page">
+                <div class="css-content">
+                    {% include "characters/print_pages/page_stats_extended.html" %}
+                </div>
+                <div class="css-logo-url">
+                    TheContractRPG.com
+                </div>
             </div>
         </div>
         <div class="css-page-spacer"></div>
@@ -72,9 +88,18 @@
                 </div>
             {% endif %}
         <div v-if="includeStory" class="css-page-spacer"></div>
-        <div v-if="includeStory" class="css-page-long">
+        <div v-if="includeStory" class="css-page">
             <div class="css-content">
                 {% include "characters/print_pages/page_story.html" %}
+            </div>
+            <div class="css-logo-url">
+                TheContractRPG.com
+            </div>
+        </div>
+        <div v-if="includeTimeline" class="css-page-spacer"></div>
+        <div v-if="includeTimeline" class="css-page-long">
+            <div class="css-content">
+                {% include "characters/print_pages/page_timeline.html" %}
             </div>
             <div class="css-logo-url">
                 TheContractRPG.com

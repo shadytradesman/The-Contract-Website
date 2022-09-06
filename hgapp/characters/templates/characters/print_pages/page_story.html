@@ -1,6 +1,4 @@
 {% load static %}
-{% load power_tags %}
-{% load character_tags %}
 
 <div class="css-page-header-sm">
     <span class="css-header-left" v-text="character.name">
@@ -14,7 +12,7 @@
     <div v-if="character.bio">
       <div class="css-equip css-bio" v-html="character.bio"> </div>
     </div>
-    <div class="css-double-col">
+    <div v-if="null === character.bio || character.bio.length < 10" class="css-double-col">
       <div class="padded-col">
         <div v-for="index in 5">
           <div class="css-field-container">
@@ -24,7 +22,7 @@
         </div>
       </div>
     </div>
-    <div class="css-double-col">
+    <div v-if="null === character.bio || character.bio.length < 10" class="css-double-col">
       <div class="padded-col">
         <div v-for="index in 5">
           <div class="css-field-container">
@@ -39,7 +37,7 @@
   <h3 class="text-center">Notes</h3>
   <div class="css-double-col">
     <div class="padded-col">
-      <div v-for="index in 5">
+      <div v-for="index in 50">
         <div class="css-field-container">
           <div class="css-blank-field">
           </div>
@@ -49,7 +47,7 @@
   </div>
   <div class="css-double-col">
     <div class="padded-col">
-      <div v-for="index in 5">
+      <div v-for="index in 50">
         <div class="css-field-container">
           <div class="css-blank-field">
           </div>

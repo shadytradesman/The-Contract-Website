@@ -15,6 +15,7 @@ const charSheetRendering = {
       showExtraStats: false,
       showTutorialText: true,
       showFieldValues: false,
+      includePortrait: false,
       includeExpandedPowers: true,
       includeCraftedItems: true,
       includeCraftables: true,
@@ -35,6 +36,13 @@ const charSheetRendering = {
     },
     getNumInjuryPadding() {
         return Math.max(Math.max(this.character.mind - (this.character.body + 1), 0), 0);
+    },
+    useTwoStatsPages() {
+        let numCircumstances = this.character.circumstances.length
+        let numConditions = this.character.conditions.length
+        let hasLongWorldElements = (this.showTutorialText && (numConditions > 2 || numCircumstances > 2))
+        let hasManyWorldElements = numConditions > 5 || numCircumstances > 5
+        return this.includePortrait || hasLongWorldElements || hasManyWorldElements;
     },
   }
 }

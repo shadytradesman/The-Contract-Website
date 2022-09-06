@@ -1,0 +1,10 @@
+{% load static %}
+
+<div class="css-page-header-sm">
+    <span class="css-header-left" v-text="character.name">
+    </span>
+    <img class="css-sm-logo" src="{% static 'overrides/branding/contract-white.svg' %}">
+</div>
+<div class="css-page-content">
+    {% include "characters/print_pages/section_conditions.html" %}
+</div>

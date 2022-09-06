@@ -19,9 +19,19 @@
                     Delete Contractor
                 </a></li>
             {% endif %}
-            <li><a href="{% url 'characters:characters_archive' character.id %}" class="btn btn-default">
-                Download
-            </a></li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle btn btn-default" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                    Download or Print <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="{% url 'characters:characters_archive' character.id %}" >
+                        Plaintext / Markdown
+                    </a></li>
+                    <li><a href="{% url 'characters:characters_print' character.id %}" >
+                        PDF / Print
+                    </a></li>
+                </ul>
+            </li>
             {% if character.player %}
                 <li><a href="{% url 'characters:characters_power_picker' character.id %}" class="btn btn-default">
                     Assign Gifts

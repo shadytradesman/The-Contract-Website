@@ -1057,6 +1057,9 @@ Archived on: {}
             "trophies": [(elem.name, elem.description, elem.system) for elem in
                               self.artifact_set.filter(cell__isnull=False).exclude(is_deleted=True).all()],
 
+            "loose_ends": [(end.name, end.description, end.get_cutoff_category(), end.get_threat_level_display(), end.system)
+                           for end in self.looseend_set.filter(is_deleted=False).all()],
+
             "crafting_gifts": None,
             "artifacts": None,
         }

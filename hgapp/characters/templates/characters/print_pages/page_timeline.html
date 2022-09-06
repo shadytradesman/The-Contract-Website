@@ -1,0 +1,15 @@
+{% load static %}
+{% load power_tags %}
+{% load character_tags %}
+
+<div class="css-page-header-sm">
+    <span class="css-header-left" v-text="character.name">
+    </span>
+    <img class="css-sm-logo" src="{% static 'overrides/branding/contract-white.svg' %}">
+</div>
+<div class="css-page-content">
+    <div class="css-col-cont">
+        <h3 class="text-center">Timeline</h3>
+        <div v-html="timeline" class="css-timeline"></div>
+    </div>
+</div>

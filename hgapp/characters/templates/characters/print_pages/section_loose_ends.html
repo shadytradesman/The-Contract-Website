@@ -1,0 +1,50 @@
+<div>
+    <h3 class="text-center">Loose Ends</h3>
+    <div v-for="looseEnd in character.loose_ends">
+        <div class="css-field-container">
+            <div class="css-blank-field">
+                <div class="css-field-value css-condition-field">
+                    <b>
+                        {looseEnd[0]}
+                    </b>
+                    <i style="padding-left: 5px;">
+                        {looseEnd[3]}, {looseEnd[2]}
+                    </i>
+                    <span class="css-field-system" v-if="showTutorialText">
+                            {looseEnd[1]}
+                        </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div v-if="useTwoStatsPages()">
+        <div class="css-double-col">
+            <div class="padded-col">
+                <div v-for="index in 5">
+                    <div class="css-field-container">
+                        <div class="css-blank-field">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="css-double-col">
+            <div class="padded-col">
+                <div v-for="index in 5">
+                    <div class="css-field-container">
+                        <div class="css-blank-field">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div v-if="!useTwoStatsPages()">
+        <div v-for="index in 5">
+            <div class="css-field-container">
+                <div class="css-blank-field">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
