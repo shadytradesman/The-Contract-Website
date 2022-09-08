@@ -12,6 +12,7 @@
 {% endblock %}
 {% block extra_styles %}
     <link rel="stylesheet" type="text/css" href="{% static 'characters/view_character_style.css' %}" />
+    <link rel="stylesheet" type="text/css" media="print" href="{% static 'characters/print_character_style.css' %}" />
 {% endblock %}
 {% block extra_scripts %}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.1/showdown.js"></script>
@@ -69,7 +70,13 @@
         </form>
     </div>
 </script>
-<div class="container">
+<div class="container css-only-print-block">
+    <h1>
+        Use the "PDF / Print" option under the "Download or Print" dropdown at the top of the character sheet to print this
+        Contractor.
+    </h1>
+</div>
+<div class="container css-no-print">
     {% include "characters/view_pages/header_section.html" %}
     <div class="char-view-alerts">
         <div class="row text-center">
