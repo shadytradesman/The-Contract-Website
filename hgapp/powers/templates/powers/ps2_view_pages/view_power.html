@@ -20,11 +20,15 @@
     {% endif %}
 {% endblock %}
 
+{% block extra_styles %}
+    <link rel="stylesheet" type="text/css" media="print" href="{% static 'characters/print_character_style.css' %}" />
+{% endblock %}
+
 {% block body_base %}
 <div class="container">
     <div class="row">
         <div class="col-xs-12 col-lg-8 col-lg-offset-2">
-            <div class="text-center" style="padding-top: 10px; padding-bottom: 10px;">
+            <div class="text-center css-no-print" style="padding-top: 10px; padding-bottom: 10px;">
                 <ul class="nav nav-pills nav-justified  css-power-view-buttons">
                     {% if request.user.is_authenticated %}
                     {% player_can_edit_power power request.user as can_edit %}
@@ -42,11 +46,14 @@
                     <li>
                         <a href="{% url 'powers:powers_create_from_existing_ps2' power.parent_power.id %}" class="btn btn-default">Copy and Edit New</a>
                     </li>
+                    <li>
+                        <a class="btn btn-default" onclick="window.print()">Print / PDF</a>
+                    </li>
                 </ul>
             </div>
 
 
-            <div class="panel panel-default ">
+            <div class="panel panel-default power-badge">
                 <div class="panel-heading">
                     <h2 style="margin-bottom: 5px; margin-top: 0px;">
                         {{ power.name }}
@@ -84,15 +91,21 @@
                 </div>
                 <div class="panel-body">
                     {% if power.visibility_requirements %}
-                    <span class="has-popover pull-left"
-                            data-title="{{power.visibility_requirements}}"
-                            data-html="True"
-                            data-toggle="tooltip">
-                    <span class="glyphicon glyphicon-eye-open"
-                          style="margin-right: 6px;"
-                          aria-hidden="true"
-                    ></span>
-                </span>
+                        <span class="has-popover pull-left css-no-print"
+                                data-title="{{power.visibility_requirements}}"
+                                data-html="True"
+                                data-toggle="tooltip">
+                            <span class="glyphicon glyphicon-eye-open"
+                                  style="margin-right: 6px;"
+                                  aria-hidden="true"></span>
+                        </span>
+                        <div class="has-popover pull-left css-only-print-block">
+                                <span class="glyphicon glyphicon-eye-open"
+                                      style="margin-right: 6px;"
+                                      aria-hidden="true"></span>
+                                ({{power.visibility_requirements|safe}})
+                        </div>
+                        <br class="css-only-print-block">
                     {% endif %}
                         <i class="text-muted">{{ power.description|linebreaks}}</i>
                     {% if power.extended_description %}
@@ -140,6 +153,7 @@
 
                     </div>
                     {% if power_full %}
+                    <span class="css-no-print">
                         <hr>
                         <a id="collapse-history-{{power.id}}-heading"
                                role="button" data-toggle="collapse"
@@ -154,12 +168,13 @@
                                     aria-labelledby="collapse-history-{{power.id}}-heading">
                             {% include "powers/power_view_history_snippet.html" %}
                         </div>
+                    </span>
                     {% endif %}
                 </div>
             </div>
         </div>
     </div>
-    <div class="row">
+    <div class="row css-no-print">
     {% if related_gifts %}
         <div class="col-xs-12 col-md-6">
             <h2 class="text-center" style="margin-top: 10px;">

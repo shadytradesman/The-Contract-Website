@@ -57,6 +57,7 @@ body {
     margin-bottom: 15px;
 }
 
+
 .css-option {
     margin-left: .1in;
 }
@@ -236,6 +237,14 @@ body {
         display: none;
     }
 
+    .css-only-print-block {
+        display: block!important;
+    }
+
+    .css-only-print-inline {
+        display: inline-block!important;
+    }
+
     h1 {
         break-before: always;
     }
@@ -244,6 +253,28 @@ body {
         break-inside: auto;
         height: .05in;
     }
+}
+
+.text-muted, .text-muted p {
+    color: grey !important;
+}
+
+.css-system-text-drawback {
+    color: grey !important;
+    font-weight: bold;
+    text-decoration-color: grey;
+    text-decoration-line: underline;
+    text-decoration-style: dotted;
+    font-style: oblique;
+}
+
+.css-system-text-enhancement {
+    color: grey !important;
+    font-weight: bold;
+}
+
+.js-render-power-keywords .css-system-text-user-input {
+    text-decoration: underline;
 }
 
 h3 {
@@ -507,6 +538,10 @@ PAGE 2
     padding-bottom: 0px !important;
 }
 
+.power-badge .collapse {
+    display: block !important;
+}
+
 .power-badge a, .css-item a {
     text-decoration: none;
     color: black;
@@ -538,6 +573,10 @@ PAGE 2
 
 .power-badge img {
     filter: invert(100%);
+}
+
+hr {
+    border-color: black !important;
 }
 
 
