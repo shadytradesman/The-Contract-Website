@@ -22,9 +22,13 @@
   {% endif %}
 {% endblock %}
 
+{% block extra_styles %}
+  <link rel="stylesheet" type="text/css" media="print" href="{% static 'characters/print_character_style.css' %}" />
+{% endblock %}
+
 {% block body_base %}
 <div class="container">
-  <h1 class="text-center">
+  <h1 class="text-center css-no-print">
     {% if artifact.is_signature %}
       Legendary Artifact
     {% elif artifact.is_crafted_artifact %}
@@ -40,6 +44,37 @@
       {% endif %}
     </div>
   </div>
+  <div class="text-center">
+    <a class="btn btn-default css-no-print" onclick="window.print()">Print / PDF</a>
+  </div>
+
+  <div class="row css-no-print">
+    {% if related_artifacts %}
+    <div class="col-xs-12 col-md-6">
+      <h2 class="text-center" style="margin-top: 10px;">
+        Community Artifacts
+      </h2>
+      {% for item in related_artifacts %}
+        {% if item.pk != artifact.pk %}
+          {% render_sig_item item request.user item.character %}
+        {% endif %}
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% if stock_gifts %}
+    <div class="col-xs-12 col-md-6">
+      <h2 class="text-center" style="margin-top: 10px;">
+        Stock {% if artifact.is_signature %} Legendary Artifact {% else %} Artifact Crafting {% endif %} Gifts
+      </h2>
+      {% for power_full in stock_gifts %}
+      {% if power_full.pk != power.parent_power.pk %}
+      {% discovery_power_badge power_full %}
+      {% endif %}
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+
 </div>
 
 {% endblock %}

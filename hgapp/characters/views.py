@@ -4,6 +4,7 @@ from heapq import merge
 
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.contrib.auth.models import User
 from django.utils.decorators import method_decorator
 from django.shortcuts import render, get_object_or_404
@@ -210,10 +211,24 @@ def view_artifact(request, artifact_id):
     if artifact.character:
         attribute_val_by_id = artifact.character.get_attribute_values_by_id()
         ability_val_by_id = artifact.character.get_ability_values_by_id()
+
+    related_artifacts = []
+    stock_gifts = []
+    power = artifact.power_set.first()
+    if power:
+        related_artifacts = Artifact.objects\
+            .filter(Q(is_crafted_artifact=True) | Q(is_signature=True))\
+            .exclude(character__isnull=True)\
+            .exclude(character__private=True).order_by('?')[:5]
+        stock_gifts = Power_Full.objects\
+            .filter(dice_system=SYS_PS2, tags__in=["example"], latest_rev__modality=power.modality_id)\
+            .order_by('?')[:5]
     context = {
         "artifact": artifact,
         "attribute_value_by_id": attribute_val_by_id,
         "ability_value_by_id": ability_val_by_id,
+        "stock_gifts": stock_gifts,
+        "related_artifacts": related_artifacts,
     }
     return render(request, 'characters/view_artifact.html', context)
 

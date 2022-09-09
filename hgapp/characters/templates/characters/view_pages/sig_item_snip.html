@@ -3,7 +3,7 @@
 
 <div class="css-item-display {% if item.is_crafted_artifact %}css-crafted-art{% else %}css-signature-item{% endif %} js-world-element-container {% if is_greyed_out %}css-sig-item-greyed-out{% endif %}">
     {% if user_can_edit  %}
-        <span class="pull-right css-world-element-edit">
+        <span class="pull-right css-world-element-edit css-no-print">
             <button class="btn btn-xs btn-default js-edit-world-element-button"
                     data-id="{{item.id}}"
                     data-element-type="artifact"
@@ -12,7 +12,7 @@
             </button>
         </span>
         {% if transfer_form %}
-        <span class="pull-right">
+        <span class="pull-right css-no-print">
             <button class="btn btn-xs btn-default js-transfer-artifact-button"
                     data-id="{{item.id}}"
                     style="margin-right: 5px; margin-left: 2px;">
@@ -40,7 +40,7 @@
     <i class="css-system-text-user-input css-world-element-description">{{item.description}}</i>
   </div>
     {% if transfer_form and user_can_edit %}
-        <form class="js-transfer-artifact-form"
+        <form class="js-transfer-artifact-form css-no-print"
               action="{% url 'characters:transfer_artifact' item.id %}"
               method="post"
               style="display:none;">
@@ -108,7 +108,7 @@
             {% endfor %}
         {% endif %}
     </div>
-    <div id="hx-timeline-item{{item.id}}">
+    <div id="hx-timeline-item{{item.id}}" class="css-no-print">
         <button
                 class="btn btn-default btn-xs"
                 hx-get="{% url 'characters:item_timeline' item.id %}"

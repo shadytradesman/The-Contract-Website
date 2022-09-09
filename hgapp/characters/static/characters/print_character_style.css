@@ -538,7 +538,7 @@ PAGE 2
     padding-bottom: 0px !important;
 }
 
-.power-badge .collapse {
+.power-badge .collapse, .css-item-gift-list .collapse {
     display: block !important;
 }
 
