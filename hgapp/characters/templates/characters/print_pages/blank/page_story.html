@@ -1,0 +1,76 @@
+{% load static %}
+
+<div class="css-page-header-sm">
+    <span class="css-header-left">
+    </span>
+    <img class="css-sm-logo" src="{% static 'overrides/branding/contract-white.svg' %}">
+</div>
+
+<div class="css-page-content">
+    <div class="css-col-cont">
+
+        <h3 class="text-center">Biography</h3>
+        <div class="css-double-col">
+            <div class="padded-col">
+                <div v-for="index in 8">
+                    <div class="css-field-container">
+                        <div class="css-blank-field">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="css-double-col">
+            <div class="padded-col">
+                <div v-for="index in 8">
+                    <div class="css-field-container">
+                        <div class="css-blank-field">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <h3 class="text-center">Contract Record</h3>
+            <div style="margin-bottom: .1in;">
+                <span class="css-user-fill">
+                    <span class="css-contract-num">
+                        1
+                    </span>
+                    <div class="css-blank-contract-outcome">
+                        <span class="css-field-label-contract">Outcome</span>
+                    </div>
+                    <div class="css-empty-checkbox" style="position: relative; top: 4px;">
+                        <span class="css-field-label-contract" style="right:8px; top: 4px;">Journal</span>
+                    </div>
+                    <div class="css-blank-contract-name">
+                        <span class="css-field-label-contract">Scenario Name</span>
+                    </div>
+                </span>
+                <span class="css-user-fill">
+                    <div class="css-blank-contract-notes">
+                        <span class="css-field-label-contract">Notes</span>
+                    </div>
+                </span>
+            </div>
+            <div v-for="index in 30">
+                <span>
+                    <span class="css-contract-num">
+                        {index + 1}
+                    </span>
+                    <div class="css-blank-contract-outcome">
+                        <div class="css-invisible-box">
+                        </div>
+                    </div>
+                    <div class="css-empty-checkbox">
+                    </div>
+                    <div class="css-blank-contract-name">
+                        <div class="css-invisible-box">
+                        </div>
+                    </div>
+                    <div class="css-blank-contract-notes">
+                    </div>
+                </span>
+            </div>
+
+</div>

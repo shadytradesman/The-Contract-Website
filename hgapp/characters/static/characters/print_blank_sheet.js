@@ -1,12 +1,8 @@
-let characterData = null;
-if (document.getElementById('characterBlob')) {
-    characterData = JSON.parse(document.getElementById('characterBlob').textContent);
-}
-d10OutlineUrl = JSON.parse(document.getElementById('d10Outline').textContent);
-d10FilledUrl = JSON.parse(document.getElementById('d10Filled').textContent);
-timeline = null;
-if (document.getElementById('timeline')) {
-    timeline = JSON.parse(document.getElementById('timeline').textContent);
+let data = null;
+if (document.getElementById('blankSheetData')) {
+    data = JSON.parse(document.getElementById('blankSheetData').textContent);
+    d10OutlineUrl = data["d10_outline_url"];
+    d10FilledUrl = data["d10_filled_url"];
 }
 
 const charSheetRendering = {
@@ -14,7 +10,7 @@ const charSheetRendering = {
   data() {
     return {
       ready: false,
-      character: null,
+
       showExtraStats: false,
       showTutorialText: true,
       showFieldValues: false,
@@ -23,8 +19,13 @@ const charSheetRendering = {
       includeCraftedItems: true,
       includeCraftables: true,
       includeStory: true,
-      includeTimeline: false,
-      timeline: timeline,
+
+      tutorial: null,
+      abilities: null,
+      attributes: null,
+      limits: null,
+      assets: null,
+      liabilities: null,
     }
   },
   methods: {
@@ -36,9 +37,6 @@ const charSheetRendering = {
     getPenalty(max, row) {
         const penalties = ['-1', '-1', '-2', '-3', '-4', 'X_X'];
         return max - row + 1 <= penalties.length ? penalties[penalties.length - (max - row + 1)] : "-0";
-    },
-    getNumInjuryPadding() {
-        return Math.max(Math.max(this.character.mind - (this.character.body + 1), 0), 0);
     },
     useTwoStatsPages() {
         let numCircumstances = this.character.circumstances.length
@@ -52,5 +50,10 @@ const charSheetRendering = {
 
 const app = Vue.createApp(charSheetRendering);
 const mountedApp = app.mount('#js-sheet-component');
-mountedApp.character = characterData;
+mountedApp.tutorial = data["tutorial"];
+mountedApp.limits = data["limits"];
+mountedApp.attributes = data["attributes"];
+mountedApp.abilities = data["abilities"];
+mountedApp.assets = data["assets"];
+mountedApp.liabilities = data["liabilities"];
 mountedApp.ready = true;

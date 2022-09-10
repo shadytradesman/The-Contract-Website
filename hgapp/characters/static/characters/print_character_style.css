@@ -351,10 +351,19 @@ h3 {
     display: inline-block;
 }
 
+.css-empty-checkbox {
+    height: .7em;
+    width: .7em;
+    border: 1px solid black;
+    display: inline-block;
+    margin-left: .1in;
+    margin-right: .1in;
+}
+
 .css-empty-box-dotted {
     height: 1em;
     width: 1em;
-    border: 1px dotted black;
+    border: 1px dotted grey;
     display: inline-block;
 }
 
@@ -386,6 +395,127 @@ h3 {
     width: 100%;
     border-bottom: 1px solid black;
     min-height: 1em;
+}
+
+.css-field-label {
+    text-align: center;
+    font-size: 9px;
+    color: grey;
+    font-style: italic;
+    position: relative;
+    top: 2.3em;
+}
+
+.css-field-label-contract {
+    text-align: center;
+    font-size: 9px;
+    color: grey;
+    font-style: italic;
+    position: relative;
+    top: .9em;
+}
+
+.css-user-fill {
+    line-height: 1.8em;
+}
+
+.css-blank-field-margin {
+    margin-left: .1in;
+}
+
+.css-blank-field-txt {
+    display: inline-block;
+    vertical-align: -.1in;
+    padding-left: .1in;
+    padding-right: .1in;
+}
+
+.css-blank-field-num {
+    text-align: center;
+    width: .2in;
+    display: inline-block;
+    border-bottom: 1px solid black;
+    min-height: 1em;
+}
+
+.css-blank-field-len0 {
+    text-align: center;
+    width: .7in;
+    display: inline-block;
+    border-bottom: 1px solid black;
+    min-height: 1em;
+}
+
+.css-blank-field-len1 {
+    text-align: center;
+    width: 1in;
+    display: inline-block;
+    border-bottom: 1px solid black;
+    min-height: 1em;
+}
+
+.css-blank-field-len2 {
+    text-align: center;
+    width: 2in;
+    display: inline-block;
+    border-bottom: 1px solid black;
+    min-height: 1em;
+}
+
+.css-blank-field-len3 {
+    text-align: center;
+    width: 3in;
+    display: inline-block;
+    border-bottom: 1px solid black;
+    min-height: 1em;
+}
+
+.css-blank-field-len6 {
+    text-align: center;
+    width: 6in;
+    display: inline-block;
+    border-bottom: 1px solid black;
+    min-height: 1em;
+}
+
+.css-blank-field-fill {
+    text-align: center;
+    width: 100%;
+    display: inline-block;
+    border-bottom: 1px solid black;
+    min-height: 1em;
+}
+
+.css-contract-num {
+    font-size: .8em;
+    width: 1.1em;
+    display: inline-block;
+}
+
+.css-blank-contract-outcome {
+    width: .5in;
+    border-bottom: 1px solid black;
+    height: 1em;
+    display: inline-block;
+    margin-left: 5px;
+}
+
+.css-blank-contract-name {
+    width: 2.7in;
+    margin-left: .1in;
+    border-bottom: 1px solid black;
+    height: 1em;
+    display: inline-block;
+    color: white;
+}
+
+.css-blank-contract-notes {
+    width: 3.8in;
+    margin-left: .1in;
+    border-bottom: 1px solid black;
+    height: 1em;
+    display: inline-block;
+    color: white;
 }
 
 .css-dead-img {

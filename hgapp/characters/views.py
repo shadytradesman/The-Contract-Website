@@ -34,7 +34,7 @@ from characters.forms import make_character_form, CharacterDeathForm, ConfirmAss
     make_transfer_artifact_form, make_consumable_use_form, NotesForm, get_default_world_element_choice_form, \
     LooseEndForm, LooseEndDeleteForm
 from characters.form_utilities import get_edit_context, character_from_post, update_character_from_post, \
-    grant_trauma_to_character, delete_trauma_rev, get_world_element_class_from_url_string
+    grant_trauma_to_character, delete_trauma_rev, get_world_element_class_from_url_string, get_blank_sheet_context
 from characters.view_utilities import get_characters_next_journal_credit, get_world_element_default_dict, get_weapons_by_type
 
 
@@ -65,6 +65,11 @@ def __check_edit_perms(request, character, secret_key=None):
         requester_can_edit = secret_key and character.is_editable_with_key(secret_key)
     if not requester_can_edit:
         raise PermissionDenied("You do not have permission to edit this Character")
+
+
+def blank_sheet(request):
+    context = get_blank_sheet_context()
+    return render(request, 'characters/print_pages/blank/blank_sheet.html', context)
 
 
 def create_character(request, cell_id=None):

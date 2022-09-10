@@ -1,0 +1,38 @@
+<div class="text-center">
+    <i>
+        The contents of this section will not appear on the printed / downloaded sheet.
+    </i>
+</div>
+
+<div>
+    <b>Options:</b>
+    <div>
+        <span class="css-option">
+            <input type="checkbox" id="opt-showExtraStats" v-model="showExtraStats">
+            <label for="opt-showExtraStats">Show blank extra stat levels</label>
+        </span>
+
+        <span class="css-option">
+            <input type="checkbox" id="opt-showTutorialText" v-model="showTutorialText">
+            <label for="opt-showTutorialText">Show rule references</label>
+        </span>
+
+        <span class="css-option">
+            <input type="checkbox" id="opt-showFieldValues" v-model="show">
+            <label for="opt-showFieldValues">Include Battle Scars and Traumas</label>
+        </span>
+    </div>
+    <div class="text-center" style="margin-top: 10px;">
+        <button onclick="window.print()">Print / Download PDF</button>
+        <div>
+            <small>
+                <i>
+                    (For PDF, select "print to PDF" printer)
+                    <div>
+                        Recommended browsers: anything but Safari
+                    </div>
+                </i>
+            </small>
+        </div>
+    </div>
+</div>

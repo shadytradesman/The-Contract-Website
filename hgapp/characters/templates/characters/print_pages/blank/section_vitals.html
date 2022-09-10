@@ -1,0 +1,137 @@
+{% load static %}
+
+<div class="css-section-vitals">
+    <div class="css-body-sec">
+        <div class="css-col-left">
+            <h3 class="text-center">
+                Injuries
+            </h3>
+            <div v-for="index in 6">
+                <span>
+                    <i class="fa fa-heart-o"></i>
+                    <div class="css-blank-injury-sev">
+                        <div class="css-invisible-box">
+                        </div>
+                    </div>
+                    <div class="css-blank-injury-field">
+                        <div class="css-invisible-box">
+                        </div>
+                    </div>
+                </span>
+            </div>
+            <h3 class="text-center css-lower-header">
+                Battle Scars
+            </h3>
+            <div v-for="index in 5">
+                    <div class="css-blank-field">
+                        <div class="css-invisible-box">
+                        </div>
+                    </div>
+            </div>
+        </div>
+        <div class="css-col-right">
+            <div class="css-header-block">
+                <h3 class="css-left css-user-fill">
+                    Body
+                    <span class="css-blank-field-num"></span>
+                </h3>
+                <span>
+                </span>
+                <h3 class="css-right css-user-fill">
+                    <span class="css-blank-field-num"></span>
+                   Mind
+                </h3>
+            </div>
+            <div v-for="index in 9">
+                <div>
+                    <div class="css-body-level">
+                        <div style="display:inline-block;">
+                            <div class="css-empty-box-dotted">
+                            </div>
+                            <div class="css-penalty-level" v-text="getPenalty(9, index)">
+                            </div>
+                            <div class="css-empty-box-dotted">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="css-body-level">
+                    <div class="css-invisible-box">
+                    </div>
+                    <div class="css-penalty-level">
+                        <img class="css-dead-img" src="{% static 'characters/skull.svg' %}"/>
+                    </div>
+                    <div class="css-invisible-box">
+                    </div>
+                </div>
+                <div class="css-body-level">
+                    <div class="css-help-text text-center"  v-if="showTutorialText" >
+                        Wound Level = highest severity Injury + number of other Injuries.
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    <div class="css-mind-sec">
+        <h3 class="text-center">
+            Limits
+        </h3>
+        <div v-for="index in 3">
+            <div class="css-blank-field">
+                <div class="css-invisible-box">
+                </div>
+            </div>
+        </div>
+        <h3 class="text-center css-lower-header">
+            Traumas
+        </h3>
+        <div v-for="index in 5">
+            <div class="css-blank-field">
+                <div class="css-invisible-box">
+                </div>
+            </div>
+        </div>
+        <h3 class="text-center css-lower-header">
+            Source
+        </h3>
+        <div class="text-center">
+            <span v-for="x in 10" style="margin-left: 2px; margin-right: 2px;">
+                <div class="css-empty-box-dotted">
+                </div>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="css-section-vitals css-section-conditions">
+    <div class="css-double-col">
+        <h3 class="text-center">
+            Conditions
+        </h3>
+        <div v-for="index in 50">
+            <div class="css-field-container">
+                <div class="css-blank-field">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="css-double-col">
+        <h3 class="text-center">
+            Circumstances
+        </h3>
+        <div v-for="index in 50">
+            <div class="css-field-container">
+                <div class="css-blank-field">
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

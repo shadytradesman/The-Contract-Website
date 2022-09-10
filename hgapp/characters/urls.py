@@ -27,6 +27,9 @@ urlpatterns = [
     # ex: .com/contractor/print/110
     url(r'^print/(?P<character_id>[\d]+)/$', views.print_character, name='characters_print'),
 
+    # ex: .com/contractor/blank
+    url(r'^blank/$', views.blank_sheet, name='characters_blank_sheet'),
+
     # ex: .com/contractor/create/
     url(r'^create/$', views.create_character, name='characters_create'),
     # ex: .com/contractor/create/in-playgroup/123

@@ -12,7 +12,10 @@ from characters.forms import make_character_form, CharacterDeathForm, ConfirmAss
     AssetForm, LiabilityForm, LimitForm, PHYS_MENTAL, SourceForm, make_charon_coin_form, make_character_ported_form
 from collections import defaultdict
 from django.utils import timezone
+from django.templatetags.static import static
 from django.core.exceptions import PermissionDenied
+from django.forms.models import model_to_dict
+from django.core import serializers
 from django.shortcuts import get_object_or_404
 
 
@@ -21,6 +24,27 @@ logger = logging.getLogger("app." + __name__)
 # logic for Character creation and editing
 # TRANSACTIONS HAPPEN IN VIEW LAYER
 # See tests.py for hints on how revisioning works.
+
+def get_blank_sheet_context():
+    tutorial = get_object_or_404(CharacterTutorial)
+    limits = Limit.objects.filter(is_primary=True).order_by('-is_default', 'name').all()
+    attributes = Attribute.objects.filter(is_deprecated=False).order_by('name').all()
+    abilities = Ability.objects.filter(is_primary=True).order_by('name').all()
+    assets = Asset.objects.filter(is_public=True).order_by('value').all()
+    liabilities = Liability.objects.filter(is_public=True).order_by('value').all()
+    return {
+        "data": {
+            "tutorial": model_to_dict(tutorial),
+            "limits": [model_to_dict(x) for x in limits],
+            "attributes": [model_to_dict(x) for x in attributes],
+            "abilities": [model_to_dict(x) for x in abilities],
+            "assets": [model_to_dict(x) for x in assets],
+            "liabilities": [model_to_dict(x) for x in liabilities],
+            "d10_outline_url": static("overrides/branding/d10-outline2.svg"),
+            "d10_filled_url": static("overrides/branding/d10-filled.svg"),
+        }
+    }
+
 
 def get_edit_context(user, existing_character=None, secret_key=None, cell=None):
     char_form = make_character_form(user, existing_character, supplied_cell=cell)(instance=existing_character)
