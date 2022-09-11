@@ -1,0 +1,114 @@
+{% load static %}
+
+<div class="css-page-header-sm">
+    <span class="css-header-left" style="font-size: .7em">
+        Guide: Creating a Contractor
+    </span>
+  <img class="css-sm-logo" src="{% static 'overrides/branding/contract-white.svg' %}">
+</div>
+
+<div class="css-page-content">
+    <h3 class="text-center">
+        Limits
+    </h3>
+    <div class="css-col-cont">
+        <div class="css-double-col">
+            <div class="padded-col">
+                <div class="css-limit" v-for="limit in limits.slice(0, Math.ceil(limits.length/2))">
+                    <b>
+                        {limit.name}
+                    </b>
+                    <span>
+                        {limit.description}
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="css-double-col">
+            <div class="padded-col">
+                <div class="css-limit" v-for="limit in limits.slice(-Math.floor(limits.length/2))">
+                    <b>
+                        {limit.name}
+                    </b>
+                    <span>
+                        {limit.description}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
+
+    <h3 class="text-center">
+        Attributes
+    </h3>
+    <div class="css-col-cont">
+        <div class="css-double-col">
+            <div class="padded-col">
+                <div class="css-tutorial-text" style="margin-bottom: .05in;">
+                    <i>
+                        Attributes are rated from 1-5. A rating of 2 is average, and a rating of 5 is world-class.
+                        Although Attributes are expensive to increase, they are used in every roll, and their ratings are referenced
+                        in many mechanics.
+                    </i>
+                </div>
+                <div class="css-limit" v-for="attr in attributes.slice(0, 2)">
+                    <b>
+                        {attr.name}
+                    </b>
+                    <span>
+                        {attr.tutorial_text}
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="css-double-col">
+            <div class="padded-col">
+                <div class="css-limit" v-for="attr in attributes.slice(2, 5)">
+                    <b>
+                        {attr.name}
+                    </b>
+                    <span>
+                        {attr.tutorial_text}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3 class="text-center">
+        Abilities
+    </h3>
+    <div class="css-col-cont">
+        <div class="css-double-col">
+            <div class="padded-col">
+                <div class="css-tutorial-text" style="margin-bottom: .1in;">
+                    <i>
+                        Abilities are rated from 0-5. A rating of 0 means your Contractor is untrained,
+                        a rating of 3 is professional-level, and 5 is world-class.
+                    </i>
+                </div>
+                <div class="css-limit" v-for="ability in abilities.slice(0, Math.floor(abilities.length/2))">
+                    <b>
+                        {ability.name}
+                    </b>
+                    <span>
+                        {ability.tutorial_text}
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="css-double-col">
+            <div class="padded-col">
+                <div class="css-limit" v-for="ability in abilities.slice(-Math.ceil(abilities.length/2))">
+                    <b>
+                        {ability.name}
+                    </b>
+                    <span>
+                        {ability.tutorial_text}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

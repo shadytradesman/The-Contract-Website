@@ -16,3 +16,14 @@
     margin-top: 8px;
     margin-bottom: 8px;
 }
+
+.css-limit {
+    font-size: .85em;
+    margin-bottom: .05in;
+}
+
+.css-limit span {
+    font-size: .85em;
+    margin-left: 5px;
+}
+
