@@ -2,13 +2,171 @@
 
 <div class="css-page-header-sm">
     <span class="css-header-left" style="font-size: .7em">
-        Contractor Name:
     </span>
     <img class="css-sm-logo" src="{% static 'overrides/branding/contract-white.svg' %}">
 </div>
 
 <div class="css-page-content">
     <div class="text-center">
-        <h2 style="margin-top: .1in;">How to Create a Contractor</h2>
+        <h2 style="margin-top: .1in; margin-bottom: .1in;">
+            How to Create a Contractor
+        </h2>
+    </div>
+    <div class="css-double-col">
+        <div class="padded-col css-how-to-character">
+            <p class="css-tutorial-text">
+                <i>
+                    Note: Using the website is the easiest way to create a Contractor. Visit
+                    www.TheContractRPG.com/contractor/create .
+                    Online Character Sheets can easily be printed out for in-person play.
+                </i>
+            </p>
+
+            <h3>Step 1: Come up with a concept</h3>
+            <div class="css-tutorial-text">
+                Before you start filling out stats, you need a rough idea of who your Contractor is. <b>All Contractors
+                have three things in common.</b>
+            </div>
+            <h5 class="text-center">You are Exceptional</h5>
+            <div class="css-tutorial-text" v-html="tutorial['modal_1']">
+            </div>
+            <h5 class="text-center">You Will Sign the Contract</h5>
+            <div class="css-tutorial-text" v-html="tutorial['modal_2']">
+            </div>
+            <h5 class="text-center">Incredible Powers Sleep Within You</h5>
+            <div class="css-tutorial-text" v-html="tutorial['modal_3']">
+            </div>
+
+            <h3>Step 2: Fill in the Blanks</h3>
+            <div class="css-tutorial-text">
+                Fill in the blanks at the top of the first page.
+                <ul>
+                    <li>
+                        <b>Contractor Name:</b> The name of your character.
+                    </li>
+                    <li>
+                        <b>Player Name:</b> Your own name.
+                    </li>
+                    <li>
+                        <b>#Victories, losses, and improvements:</b> These start at 0 and increase as you play.
+                    </li>
+                    <li>
+                        <b>Exp Remaining:</b> Leave this blank for now.
+                    </li>
+                    <li>
+                        <b>Archetype:</b> Your Contractor's core concept, e.g. "Skater-punk Werewolf" or "Cannibal Celebrity Chef."
+                    </li>
+                    <li>
+                        <b>Pronoun:</b> Your Contractor's preferred pronoun.
+                    </li>
+                    <li>
+                        <b>Ambition:</b> What drives your Contractor to risk their lives for power? What do they want
+                        to change about the status quo? Ambitions can change with time.
+                    </li>
+                    <li>
+                        <b>Appearance:</b> How does your Contractor usually look?
+                    </li>
+                </ul>
+            </div>
+
+            <h3>Step 3: Select Your Three Limits</h3>
+            <p class="css-tutorial-text" >
+                Limits describe experiences that test your ability to cope.
+            </p>
+            <p class="css-tutorial-text" >
+                Most humans have the three default Limits: <b>Anguish,</b> <b>Atrocities,</b> and <b>Murder.</b>
+                Other options are provided to enable different concepts, such as psychopaths, zealots, and faeries.
+                <i>You can find the other available options and more details on the Limits sheet.</i>
+            </p>
+            <p class="css-tutorial-text" >
+                Once you've selected your 3 Limits, write their names in the <b>Limits</b> field on the first page.
+            </p>
+        </div>
+    </div>
+    <div class="css-double-col">
+        <div class="padded-col css-how-to-character">
+            <h3>Step 4: Buy Attributes and Abilities</h3>
+            <p class="css-tutorial-text">
+                Attributes and Abilities define your Contractor's capabilities. The higher their values, the more likely
+                you are to succeed at the Actions you attempt. <i>Read more details on the "Attributes and Abilities" sheet.</i>
+            </p>
+            <p class="css-tutorial-text">
+                You can increase Attributes and Abilities by spending Experience Points.
+                <b>All new Contractors start with 150 Experience Points.</b>
+            </p>
+            <p class="css-tutorial-text">
+                The cost to increase an Attribute is its current rating x 5 (so buying the second level costs 5 Exp,
+                and buying the third costs 10 more Exp for a total of 15 Exp). Abilities cost 2 Exp for the first level, and then 2x their
+                current rating after that.
+            </p>
+            <p class="css-tutorial-text">
+                <b>If you'd rather not do the math,</b> you can select from the following Attribute/Ability value "spreads."
+                These will use up all 150 starting Exp without you having to do any calculations.
+            </p>
+            <div class="css-tutorial-text">
+                <b>Attribute Spreads.</b> Rank your contractor's Attributes from best to worst, then select a Spread to
+                determine their values.
+                <ul>
+                    <li>
+                        <b>Leveraged:</b> 5, 3, 2, 2, 1
+                    </li>
+                    <li>
+                        <b>Specialized:</b> 4, 4, 2, 2, 2
+                    </li>
+                    <li>
+                        <b>Blind Spot:</b> 4, 3, 3, 3, 1
+                    </li>
+                    <li>
+                        <b>Well-Rounded:</b> 3, 3, 3, 3, 3
+                    </li>
+                </ul>
+            </div>
+            <div class="css-tutorial-text">
+                <b>Ability Spreads.</b>
+                <ul>
+                    <li>
+                        <b>Devotee: </b> two Abilities at rank 5, two at 3, two at 2, one at 1
+                    </li>
+                    <li>
+                        <b>Specialist: </b> one at 5, one at 4, three at 3, two at 2, three at 1
+                    </li>
+                    <li>
+                        <b>Generalist:</b> six at 3, five at 2, three at 1
+                    </li>
+                </ul>
+            </div>
+
+            <h3>Step 5: Assets and Liabilities</h3>
+            <p class="css-tutorial-text">
+                You can further customize your Contractor using Assets and Liabilities. These are only available at
+                character creation, and allow you to start with various Conditions, Circumstances, Battle Scars, Traumas,
+                and Loose Ends.
+            </p>
+            <p class="css-tutorial-text">
+                <b>If you are purchasing your stats with Exp,</b> each Asset costs 3 x its rating to buy, and each Liability
+                credits 3 x its rating when you take it.
+            </p>
+            <p class="css-tutorial-text">
+                <b>If you are using "spreads"</b> take whichever Assets and Liabilities you'd like, but ensure they are
+                balanced (the sum of your Assets' values is equal to the sum of your Liabilities' values).
+            </p>
+            <p class="css-tutorial-text">
+                <i>See the Assets and Liabilities sheets for a list of the available Assets and Liabilities.</i>
+            </p>
+
+            <h3>Step 6: Calculate your Stats</h3>
+            <p class="css-tutorial-text">
+                Your Contractor's Body Rating represents their physical fortitude.
+                <b>Body Rating = 5 + (Brawn / 2, rounded up).</b>
+            </p>
+            <p class="css-tutorial-text">
+                Your Contractor's Mind Rating represents thier mental / emotional fortitude.
+                <b>Mind Rating = 1 + Charisma + Intellect, with a minimum rating of 3 and a maximum of 9.</b>
+            </p>
+            <p class="css-tutorial-text">
+                Write your Mind and Body Ratings on the first page, and use a pen to complete the outlines
+                of that many dotted boxes below, <b>Starting from the bottom.</b>
+            </p>
+        </div>
     </div>
 </div>
