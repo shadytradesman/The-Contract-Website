@@ -67,7 +67,7 @@
                     </div>
                 </div>
                 <div class="css-body-level">
-                    <div class="css-help-text text-center"  v-if="showTutorialText" >
+                    <div class="css-help-text text-center">
                         Wound Level = highest severity Injury + number of other Injuries.
                     </div>
                 </div>
@@ -98,6 +98,9 @@
         <h3 class="text-center css-lower-header">
             Source
         </h3>
+        <div class="css-advancement-text text-center"  v-if="showTutorialText">
+            Cost to increase: current rating x 2
+        </div>
         <div class="text-center">
             <span v-for="x in 10" style="margin-left: 2px; margin-right: 2px;">
                 <div class="css-empty-box-dotted">

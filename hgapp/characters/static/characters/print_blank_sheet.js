@@ -13,12 +13,11 @@ const charSheetRendering = {
 
       showExtraStats: false,
       showTutorialText: true,
-      showFieldValues: false,
-      includePortrait: false,
-      includeExpandedPowers: true,
-      includeCraftedItems: true,
-      includeCraftables: true,
-      includeStory: true,
+
+      showExpLog: true,
+      showExpLogDefault: true,
+
+      showNewCharacterGuide: true,
 
       tutorial: null,
       abilities: null,

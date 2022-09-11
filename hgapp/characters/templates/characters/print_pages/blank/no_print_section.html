@@ -14,12 +14,23 @@
 
         <span class="css-option">
             <input type="checkbox" id="opt-showTutorialText" v-model="showTutorialText">
-            <label for="opt-showTutorialText">Show rule references</label>
+            <label for="opt-showTutorialText">Show advancement costs</label>
         </span>
-
+    </div>
+    <div>
         <span class="css-option">
-            <input type="checkbox" id="opt-showFieldValues" v-model="show">
-            <label for="opt-showFieldValues">Include Battle Scars and Traumas</label>
+            <input type="checkbox" id="opt-showExpLog" v-model="showExpLog">
+            <label for="opt-showExpLog">Include Experience Log</label>
+        </span>
+        <span class="css-option" v-if="showExpLog">
+            <input type="checkbox" id="opt-showExpLogDefault" v-model="showExpLogDefault">
+            <label for="opt-showExpLogDefault">Include new Contractor Exp in Experience Log</label>
+        </span>
+    </div>
+    <div>
+        <span class="css-option">
+            <input type="checkbox" id="opt-showNewCharacterGuide" v-model="showNewCharacterGuide">
+            <label for="opt-showNewCharacterGuide">Include "How to Create a Contractor" Guide</label>
         </span>
     </div>
     <div class="text-center" style="margin-top: 10px;">

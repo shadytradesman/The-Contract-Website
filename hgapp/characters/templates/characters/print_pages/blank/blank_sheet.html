@@ -42,15 +42,28 @@
                 TheContractRPG.com
             </div>
         </div>
-        <div class="css-page-spacer"></div>
-        <div class="css-page">
-            <div class="css-content">
-                {% include "characters/print_pages/blank/page_char_creation_guide.html" %}
+        <span v-if="showExpLog">
+            <div class="css-page-spacer"></div>
+            <div class="css-page">
+                <div class="css-content">
+                    {% include "characters/print_pages/blank/page_exp_log.html" %}
+                </div>
+                <div class="css-logo-url">
+                    TheContractRPG.com
+                </div>
             </div>
-            <div class="css-logo-url">
-                TheContractRPG.com
+        </span>
+        <span v-if="showNewCharacterGuide">
+            <div class="css-page-spacer"></div>
+            <div class="css-page">
+                <div class="css-content">
+                    {% include "characters/print_pages/blank/page_char_creation_guide.html" %}
+                </div>
+                <div class="css-logo-url">
+                    TheContractRPG.com
+                </div>
             </div>
-        </div>
+        </span>
     </div>
 </div>
 

@@ -430,60 +430,47 @@ h3 {
     padding-right: .1in;
 }
 
-.css-blank-field-num {
+.css-blank {
     text-align: center;
-    width: .2in;
     display: inline-block;
     border-bottom: 1px solid black;
     min-height: 1em;
+}
+
+.css-blank-sm {
+    text-align: center;
+    display: inline-block;
+    border-bottom: 1px solid black;
+    height: 1em;
+    position: relative;
+}
+
+.css-blank-field-num {
+    width: .2in;
 }
 
 .css-blank-field-len0 {
-    text-align: center;
     width: .7in;
-    display: inline-block;
-    border-bottom: 1px solid black;
-    min-height: 1em;
 }
 
 .css-blank-field-len1 {
-    text-align: center;
     width: 1in;
-    display: inline-block;
-    border-bottom: 1px solid black;
-    min-height: 1em;
 }
 
 .css-blank-field-len2 {
-    text-align: center;
     width: 2in;
-    display: inline-block;
-    border-bottom: 1px solid black;
-    min-height: 1em;
 }
 
 .css-blank-field-len3 {
-    text-align: center;
     width: 3in;
-    display: inline-block;
-    border-bottom: 1px solid black;
-    min-height: 1em;
 }
 
 .css-blank-field-len6 {
-    text-align: center;
     width: 6in;
-    display: inline-block;
-    border-bottom: 1px solid black;
-    min-height: 1em;
 }
 
 .css-blank-field-fill {
-    text-align: center;
     width: 100%;
-    display: inline-block;
-    border-bottom: 1px solid black;
-    min-height: 1em;
 }
 
 .css-contract-num {
@@ -494,28 +481,41 @@ h3 {
 
 .css-blank-contract-outcome {
     width: .5in;
-    border-bottom: 1px solid black;
-    height: 1em;
-    display: inline-block;
     margin-left: 5px;
 }
 
 .css-blank-contract-name {
     width: 2.7in;
-    margin-left: .1in;
-    border-bottom: 1px solid black;
-    height: 1em;
-    display: inline-block;
-    color: white;
 }
 
 .css-blank-contract-notes {
     width: 3.8in;
     margin-left: .1in;
-    border-bottom: 1px solid black;
-    height: 1em;
-    display: inline-block;
-    color: white;
+}
+
+.css-blank-cutoff {
+    width: .5in;
+    margin-left: 5px;
+}
+
+.css-blank-loose-end {
+    width: 3.3in;
+    margin-left: .1in;
+}
+
+.css-blank-exp-spent {
+    width: 5.9in;
+    margin-left: .1in;
+}
+
+.css-pre-filled {
+    font-size: .8em;
+    display: inline;
+    position: absolute;
+    text-align: left;
+    bottom: -.6em;
+    width: 8in;
+    color: grey;
 }
 
 .css-dead-img {
