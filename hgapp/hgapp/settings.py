@@ -367,7 +367,7 @@ else:
     EMAIL_BACKEND = 'django_ses.SESBackend'
     AWS_SES_REGION_NAME = 'us-west-2'
     AWS_SES_REGION_ENDPOINT = 'email.us-west-2.amazonaws.com'
-    SERVER_EMAIL = 'thecontractgame@gmail.com'
+    SERVER_EMAIL = 'The Contract RPG <admin@thecontractrpg.com>'
 
 
 def do_nothing(deletion):
