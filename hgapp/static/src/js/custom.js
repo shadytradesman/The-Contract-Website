@@ -349,6 +349,7 @@ const guidebookSearchBar = {
                 }
             }
         }
+        this.articlesHit = this.articlesHit.sort((a,b) => a.title.length - b.title.length);
       }
   }
 }
@@ -378,6 +379,7 @@ const guidebookSearchBar2 = {
                 }
             }
         }
+        this.articlesHit = this.articlesHit.sort((a,b) => a.title.length - b.title.length);
       }
   }
 }

@@ -13,17 +13,17 @@ urlpatterns = [
     # ex: .com/contract/create/scenario/
     url(r'^scenario/create$', views.create_scenario, name='games_create_scenario'),
     url(r'^create/scenario/$',
-        RedirectView.as_view(pattern_name='games:games_create_scenario', query_string=True)),
+        RedirectView.as_view(pattern_name='games:games_create_scenario', query_string=True, permanent=True)),
 
     # ex: .com/contract/scenario/edit/112
     url(r'^scenario/edit/(?P<scenario_id>[\d]+)/$', views.edit_scenario, name='games_scenario_edit'),
     url(r'^edit/s/(?P<scenario_id>[\d]+)/$',
-        RedirectView.as_view(pattern_name='games:games_scenario_edit', query_string=True)),
+        RedirectView.as_view(pattern_name='games:games_scenario_edit', query_string=True, permanent=True)),
 
     # ex: .com/contract/scenario/110
     url(r'^scenario/(?P<scenario_id>[\d]+)/$', views.view_scenario, name='games_view_scenario'),
     url(r'^view/s/(?P<scenario_id>[\d]+)/$',
-        RedirectView.as_view(pattern_name='games:games_view_scenario', query_string=True)),
+        RedirectView.as_view(pattern_name='games:games_view_scenario', query_string=True, permanent=True)),
 
     # ex: .com/contract/view/s/110/g/1231
     url(r'^view/s/(?P<scenario_id>[\d]+)/g/(?P<game_id>[\d]+)/$', views.view_scenario, name='games_view_scenario_feedback'),
@@ -31,7 +31,7 @@ urlpatterns = [
     # ex: .com/contract/scenario/gallery
     url(r'^scenario/gallery/$', views.view_scenario_gallery, name='games_view_scenario_gallery'),
     url(r'^view/s/gallery/$',
-        RedirectView.as_view(pattern_name='games:games_view_scenario_gallery', query_string=True)),
+        RedirectView.as_view(pattern_name='games:games_view_scenario_gallery', query_string=True, permanent=True)),
 
     # ex: .com/contract/create/
     url(r'^create/$', views.create_game, name='games_create_game'),
@@ -86,7 +86,7 @@ urlpatterns = [
     # ex: .com/contract/110
     url(r'^(?P<game_id>[\d]+)/$', views.view_game, name='games_view_game'),
     url(r'^view/g/(?P<game_id>[\d]+)/$',
-        RedirectView.as_view(pattern_name='games:games_view_game', query_string=True)),
+        RedirectView.as_view(pattern_name='games:games_view_game', query_string=True, permanent=True)),
 
     # ex: .com/contract/cancel/110
     url(r'^cancel/(?P<game_id>[\d]+)/$', views.cancel_game, name='games_cancel_game'),

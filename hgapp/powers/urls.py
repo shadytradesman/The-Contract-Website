@@ -11,20 +11,20 @@ urlpatterns = [
     ### NEW POWER SYSTEM
     # ex: .com/gift/create/
     path('create/', views.CreatePower.as_view(), name='powers_create_ps2'),
-    path('create-ps2/', RedirectView.as_view(pattern_name='powers:powers_create_ps2', query_string=True)),
+    path('create-ps2/', RedirectView.as_view(pattern_name='powers:powers_create_ps2', query_string=True, permanent=True)),
 
     # ex: .com/gift/create/for-contractor/32
     path('create/for-contractor/<int:character_id>/', views.CreatePower.as_view(), name='powers_create_ps2_for_char'),
-    path('create-ps2/c/<int:character_id>/', RedirectView.as_view(pattern_name='powers:powers_create_ps2_for_char', query_string=True)),
+    path('create-ps2/c/<int:character_id>/', RedirectView.as_view(pattern_name='powers:powers_create_ps2_for_char', query_string=True, permanent=True)),
 
     # ex: .com/gift/edit/21
     path('edit/<int:power_full_id>/', views.EditExistingPower.as_view(), name='powers_edit_ps2'),
-    path('edit-ps2/p/<int:power_full_id>/', RedirectView.as_view(pattern_name='powers:powers_edit_ps2', query_string=True)),
+    path('edit-ps2/p/<int:power_full_id>/', RedirectView.as_view(pattern_name='powers:powers_edit_ps2', query_string=True, permanent=True)),
 
     # ex: .com/gift/create/from-existing/21
     path('create/from-existing/<int:power_full_id>/', views.CreatePower.as_view(), name='powers_create_from_existing_ps2'),
     path('create-ps2/p/<int:power_full_id>/',
-         RedirectView.as_view(pattern_name='powers:powers_create_from_existing_ps2', query_string=True)),
+         RedirectView.as_view(pattern_name='powers:powers_create_from_existing_ps2', query_string=True, permanent=True)),
 
     # ex: .com/powers/toggle-active/p/21/off/
     path('toggle-active/p/<int:power_id>/<is_currently_active>/', views.toggle_active, name='powers_toggle_active'),
@@ -41,7 +41,7 @@ urlpatterns = [
     # ex: .com/gift/delete/110
     url(r'^delete/(?P<power_id>[\d]+)/$', views.delete_power, name='powers_delete_power'),
     url(r'^delete/p/(?P<power_id>[\d]+)/$',
-         RedirectView.as_view(pattern_name='powers:powers_delete_power', query_string=True)),
+         RedirectView.as_view(pattern_name='powers:powers_delete_power', query_string=True, permanent=True)),
 
     # ex: .com/gift/stock
     url(r'^stock/$', views.stock, name='powers_stock'),
@@ -50,13 +50,13 @@ urlpatterns = [
     # ex: .com/powers/view/p/121
     path('revision/<int:power_id>/', views.ViewPower.as_view(), name='powers_view_power'),
     path('view/p/<int:power_id>/',
-         RedirectView.as_view(pattern_name='powers:powers_view_power', query_string=True)),
+         RedirectView.as_view(pattern_name='powers:powers_view_power', query_string=True, permanent=True)),
 
     # this url is useful for always showing the most recent version of a power
     # ex: .com/powers/view/history/p/121
     url(r'^(?P<power_full_id>[\d]+)/$', views.power_full_view, name='powers_view_power_full'),
     url(r'^view/history/p/(?P<power_full_id>[\d]+)/$',
-         RedirectView.as_view(pattern_name='powers:powers_view_power_full', query_string=True)),
+         RedirectView.as_view(pattern_name='powers:powers_view_power_full', query_string=True, permanent=True)),
 
     ### LEGACY POWER SYSTEM
     # ex: .com/powers/create/

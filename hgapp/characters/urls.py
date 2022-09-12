@@ -9,11 +9,11 @@ urlpatterns = [
     # ex: .com/contractor/view/c/110
     url(r'^(?P<character_id>[\d]+)/$', views.view_character, name='characters_view'),
     url(r'^view/c/(?P<character_id>[\d]+)/$',
-        RedirectView.as_view(pattern_name='characters:characters_view', query_string=True)),
+        RedirectView.as_view(pattern_name='characters:characters_view', query_string=True, permanent=True)),
     # ex: .com/contractor/view/c/110/6db20aef104038d363eca31985142c08daa82be57e29e53ad3c8171b9d46083f
     url(r'^(?P<character_id>[\d]+)/(?P<secret_key>[\da-z]*)$', views.view_character, name='characters_view'),
     url(r'^view/c/(?P<character_id>[\d]+)/(?P<secret_key>[\da-z]*)$',
-        RedirectView.as_view(pattern_name='characters:characters_view', query_string=True)),
+        RedirectView.as_view(pattern_name='characters:characters_view', query_string=True, permanent=True)),
 
     # ex: .com/contractor/view-contacts/110
     url(r'^view-contacts/(?P<character_id>[\d]+)/$', views.view_character_contacts, name='characters_view_contacts'),
@@ -38,7 +38,7 @@ urlpatterns = [
     # ex: .com/contractor/view/a/110
     url(r'^artifact/(?P<artifact_id>[\d]+)/$', views.view_artifact, name='characters_artifact_view'),
     url(r'^view/a/(?P<artifact_id>[\d]+)/$',
-        RedirectView.as_view(pattern_name='characters:characters_artifact_view', query_string=True)),
+        RedirectView.as_view(pattern_name='characters:characters_artifact_view', query_string=True, permanent=True)),
 
     # ex: .com/contractor/graveyard/
     url(r'^graveyard/$', views.graveyard, name='characters_graveyard'),

@@ -94,6 +94,41 @@
                     Quick Nav<span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu">
+                    <div class="visible-xs-block clearfix"></div>
+                    <li class="dropdown-header">
+                        Gifts
+                    </li>
+                    <li>
+                        <a href="{% url 'powers:powers_create_ps2'%}">Create Gift</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'powers:powers_stock'%}">Stock Gifts</a>
+                    </li>
+                    <li class="dropdown-header">
+                        Contracts
+                    </li>
+                    <li>
+                        <a href="{% url 'games:games_create_game' %}">
+                            Schedule Contract
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'games:games_view_scenario_gallery' %}">
+                            Scenario Gallery
+                        </a>
+                    </li>
+                    <li class="dropdown-header">
+                        Contractors
+                    </li>
+                    <li>
+                        <a href="{% url 'characters:characters_create'%}">Create Contractor</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'characters:characters_graveyard' %}">Visit Graveyard</a>
+                    </li>
+                    <li class="dropdown-header">
+                        Community
+                    </li>
                     <li>
                         <a href="{% url 'cells:cells_find_world' %}" >
                             Find Playgroup
@@ -105,31 +140,12 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{% url 'games:games_create_game' %}">
-                            Schedule Contract
-                        </a>
-                    </li>
-                    <li>
                         <a href="{% url 'info:leaderboard' %}">
-                            Statistics
+                            Community Records
                         </a>
                     </li>
-                    <li>
-                        <a href="{% url 'games:games_view_scenario_gallery' %}">
-                            Scenario Gallery
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'characters:characters_create'%}">Create Contractor</a>
-                    </li>
-                    <li>
-                        <a href="{% url 'characters:characters_graveyard' %}">Visit Graveyard</a>
-                    </li>
-                    <li>
-                        <a href="{% url 'powers:powers_stock'%}">Stock Gifts</a>
-                    </li>
-                    <li>
-                        <a href="{% url 'powers:powers_create_ps2'%}">Create Gift</a>
+                    <li class="dropdown-header">
+                        Website
                     </li>
                     <li>
                         <a href="{%url 'pinax_blog:blog' %}">
@@ -144,17 +160,13 @@
         Quick Nav <span class="caret"></span>
     </a>
     <ul class="dropdown-menu" style="color: #aebdc7 !important;">
-        <li>
-            <a class="btn-primary" href="https://discord.gg/xUZZegYNNy">Visit Discord Server</a>
+        <li class="dropdown-header">
+            Community
         </li>
         <li>
-            <a href="{% url 'characters:characters_create'%}">Create a Contractor</a>
-        </li>
-        <li>
-            <a href="{% url 'powers:powers_create_ps2'%}">Create Gift</a>
-        </li>
-        <li>
-            <a href="{% url 'powers:powers_stock'%}">Stock Gifts</a>
+            <a class="btn-primary" href="https://discord.gg/xUZZegYNNy">
+                Visit Discord Server
+            </a>
         </li>
         <li>
             <a href="{% url 'games:games_looking_for_game' %}">
@@ -163,8 +175,26 @@
         </li>
         <li>
             <a href="{% url 'info:leaderboard' %}">
-                Stats and Records
+                Community Records
             </a>
+        </li>
+        <li class="dropdown-header">
+            Contractors
+        </li>
+        <li>
+            <a href="{% url 'characters:characters_create'%}">Create Contractor</a>
+        </li>
+        <li class="dropdown-header">
+            Gifts
+        </li>
+        <li>
+            <a href="{% url 'powers:powers_create_ps2'%}">Create Gift</a>
+        </li>
+        <li>
+            <a href="{% url 'powers:powers_stock'%}">Stock Gifts</a>
+        </li>
+        <li class="dropdown-header">
+            Website
         </li>
         <li>
             <a href="{%url 'pinax_blog:blog' %}">
