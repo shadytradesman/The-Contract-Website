@@ -85,7 +85,7 @@
                     <div class="css-quickstart-container">
                         <div class="row">
                             {% for ability_value in ability_value_by_name %}
-                                <div class="ability {% if not ability_value.2%} zero-ability {% endif %}">
+                                <div class="ability {% if not ability_value.2%} zero-ability {% endif %} css-ability-val-{{ability_value.2}}">
                                     <div class="col-md-4 col-sm-3 col-xs-6 css-physical-ability"
                                         data-toggle="tooltip"
                                          title='{{ability_value.1.tutorial_text}}'>

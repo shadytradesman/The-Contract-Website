@@ -190,9 +190,9 @@ h4 {
 }
 
 .css-two-thirds-col-right {
-    width: 66%;
+    width: 60%;
     position: relative;
-    left: 33%;
+    left: 40%;
     background-color: rgba(17, 20, 24, 0.5);
     padding-top: 10px;
     padding-bottom: 10px;

@@ -82,7 +82,10 @@ $("#id_premade_scar_field").change(function (e) {
     }
 })
 
-var descByName = JSON.parse(document.getElementById('descByName').textContent);
+var descByName = null;
+if (document.getElementById('descByName')) {
+    descByName = JSON.parse(document.getElementById('descByName').textContent);
+}
 
 $(".js-premade-element-form select").change(function (e) {
     let selectedOption = e.target.options[e.target.selectedIndex];
