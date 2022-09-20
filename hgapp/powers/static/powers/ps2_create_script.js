@@ -897,9 +897,11 @@ const ComponentRendering = {
       enhancements: [],
       selectedEnhancements: [],
       disabledEnhancements: {}, // map of disabled enhancements slug to reason.
+      advancementEnhancements: [],
       drawbacks: [],
       selectedDrawbacks: [],
       disabledDrawbacks: {}, // map of disabled drawback slug to reason.
+      advancementDrawbacks: [],
       effectImageUrls: [],
       parameters: [],
       parameterSelections: {},
@@ -938,7 +940,8 @@ const ComponentRendering = {
       sigItemDescription: "",
       renderedVisual: "",
       breadCrumbs: [],
-      currentCrumb: interactiveTutorial
+      currentCrumb: interactiveTutorial,
+      userIsAdmin: userAdmin
     }
   },
   methods: {
@@ -1081,18 +1084,21 @@ const ComponentRendering = {
         this.selectedDrawbacks = [];
 
         powerEditBlob["enhancements"].forEach(mod => {
-
             let availEnhancements = this.enhancements.filter(enh =>
                 !(enh.slug in this.disabledEnhancements)
                 && !(this.selectedEnhancements.map(e => e.id).includes(enh.id)));
             let selectedEnhancement = availEnhancements.find(enh => enh.slug === mod["enhancement_slug"]);
             if (selectedEnhancement) {
-                if (mod["detail"] != null) {
-                    selectedEnhancement.details = mod["detail"].decodeHTML();
+                if (mod["is_advancement"]) {
+                    this.advancementEnhancements.push(selectedEnhancement);
+                } else {
+                    if (mod["detail"] != null) {
+                        selectedEnhancement.details = mod["detail"].decodeHTML();
+                    }
+                    this.selectedEnhancements.push(selectedEnhancement);
+                    this.enhancements = handleModifierMultiplicity(selectedEnhancement.slug, selectedEnhancement.id, "enhancements", this.enhancements, this.getSelectedAndActiveEnhancements());
+                    this.calculateRestrictedElements();
                 }
-                this.selectedEnhancements.push(selectedEnhancement);
-                this.enhancements = handleModifierMultiplicity(selectedEnhancement.slug, selectedEnhancement.id, "enhancements", this.enhancements, this.getSelectedAndActiveEnhancements());
-                this.calculateRestrictedElements();
             }
         });
         console.log("Enhancements assigned");
@@ -1107,6 +1113,9 @@ const ComponentRendering = {
                     selectedDrawback.details = mod["detail"].decodeHTML();
                 }
                 this.selectedDrawbacks.push(selectedDrawback);
+                if (mod["is_advancement"]) {
+                    this.advancementDrawbacks.push(selectedDrawback);
+                }
                 this.drawbacks = handleModifierMultiplicity(selectedDrawback.slug, selectedDrawback.id, "drawbacks", this.drawbacks, this.getSelectedAndActiveDrawbacks());
                 this.calculateRestrictedElements();
             }

@@ -36,7 +36,6 @@ def get_edit_context(existing_power_full=None, is_edit=False, existing_char=None
                 'tags': existing_power_full.tags.all(),
                 'example_description': existing_power_full.example_description,
             })
-        pass
     else:
         power_form = PowerForm ()
     sig_item_artifact_form = make_select_signature_artifact_form(
@@ -47,6 +46,7 @@ def get_edit_context(existing_power_full=None, is_edit=False, existing_char=None
     show_tutorial = (not user) or (not user.is_authenticated) or (not user.power_full_set.exists())
     context = {
         'power_blob_url': PowerSystem.get_singleton(is_admin=user and user.is_superuser).get_json_url(),
+        'user_is_admin': user.is_superuser,
         'character_blob': json.dumps(existing_char.to_create_power_blob()) if existing_char else None,
         'modifier_formset': modifiers_formset,
         'params_formset': params_formset,
@@ -154,14 +154,14 @@ def _create_new_power_and_save(power_form, request, SigArtifactForm):
 
     # These instances are unsaved and do not yet reference the power.
     modifier_instances = _get_modifier_instances_and_validate(
-        request.POST, power_engine, power.base_id, power.vector_id, power.modality_id)
+        request.POST, power_engine, power.base_id, power.vector_id, power.modality_id, request.user.is_superuser)
     param_instances = _get_param_instances_and_validate(
         request.POST, power_engine, power.base_id, power.vector_id, power.modality_id)
     field_instances = _get_field_instances_and_validate(
         request.POST, power_engine, power.base_id, power.vector_id, power.modality_id)
     _populate_power_system_and_errata(power_engine, power, modifier_instances, param_instances, field_instances)
 
-    power.enhancement_names = [enh.relevant_enhancement.name for enh in modifier_instances if hasattr(enh, "relevant_enhancement")]
+    power.enhancement_names = [enh.relevant_enhancement.name for enh in modifier_instances if hasattr(enh, "relevant_enhancement") and not enh.is_advancement]
     power.drawback_names = [mod.relevant_drawback.name for mod in modifier_instances if hasattr(mod, "relevant_drawback")]
     power.shouldDisplayVector = power_engine.should_display_vector(power.base_id, power.modality_id)
     power.required_status = _calculate_req_status(power_engine, power, modifier_instances, param_instances)
@@ -204,22 +204,29 @@ def _get_power_from_form_and_validate(power_form, power_engine, user=None):
     return power
 
 
-def _get_modifier_instances_and_validate(POST, power_engine, effect_id, vector_id, modality_id):
+def _get_modifier_instances_and_validate(POST, power_engine, effect_id, vector_id, modality_id, is_superuser):
     modifiers_formset = get_modifiers_formset(POST)
     if modifiers_formset.is_valid():
-        selected_modifier_forms = [x for x in modifiers_formset if "is_selected" in x.cleaned_data and x.cleaned_data["is_selected"]]
+        selected_modifier_forms = [x for x in modifiers_formset if ("is_selected" in x.cleaned_data and x.cleaned_data["is_selected"])]
         power_engine.validate_new_mod_forms(effect_id, vector_id, modality_id, selected_modifier_forms)
+
+        persisted_modifier_forms = [x for x in modifiers_formset
+                                   if ("is_selected" in x.cleaned_data and x.cleaned_data["is_selected"])
+                                   or is_superuser and ("is_advancement" in x.cleaned_data and x.cleaned_data["is_advancement"])]
         modifiers = []
-        for form in selected_modifier_forms:
+        for form in persisted_modifier_forms:
+            print(form.cleaned_data)
             details = form.cleaned_data["details"] if "details" in form.cleaned_data else None
             if form.cleaned_data["is_enhancement"]:
                 enhancement = get_object_or_404(Enhancement, pk=form.cleaned_data["mod_slug"])
                 new_instance = Enhancement_Instance(relevant_enhancement=enhancement, detail=details)
-                modifiers.append(new_instance)
             else:
                 drawback = get_object_or_404(Drawback, pk=form.cleaned_data["mod_slug"])
                 new_instance = Drawback_Instance(relevant_drawback=drawback, detail=details)
-                modifiers.append(new_instance)
+            if is_superuser:
+                new_instance.is_advancement = form.cleaned_data["is_advancement"]
+                print("persisting advancement", form.cleaned_data)
+            modifiers.append(new_instance)
         return modifiers
     else:
         logger.error("Invalid modifier form. errors: {}".format(modifiers_formset.errors))

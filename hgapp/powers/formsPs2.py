@@ -125,6 +125,11 @@ class ModifierForm(forms.Form):
         'v-bind:checked': '(modifier.isEnhancement?selectedEnhancements:selectedDrawbacks).map(enh => enh.id).includes(modifier.id)',
         'v-bind:value': '(modifier.isEnhancement?selectedEnhancements:selectedDrawbacks).map(enh => enh.id).includes(modifier.id)',
     }),)
+    # This field is an admin-only field to mark which modifiers are advancement recs for stock gifts
+    is_advancement = forms.BooleanField(required=False, label=None, widget=forms.HiddenInput(attrs={
+        'v-bind:checked': '(modifier.isEnhancement?advancementEnhancements:advancementDrawbacks).map(enh => enh.id).includes(modifier.id)',
+        'v-bind:value': '(modifier.isEnhancement?advancementEnhancements:advancementDrawbacks).map(enh => enh.id).includes(modifier.id)',
+    }),)
     # metadata fields
     mod_slug = forms.CharField(required=True, label=None, widget=forms.HiddenInput(attrs={
         'v-bind:value': 'modifier.slug',

@@ -21,6 +21,11 @@
         {% else %}
             showTutorial=false;
         {% endif %}
+        {% if user_is_admin %}
+        	userAdmin = true;
+        {% else %}
+        	userAdmin = false;
+        {% endif %}
 	</script>
 	{{power_edit_blob|json_script:"powerEditBlob"}}
 	{{character_blob|json_script:"characterBlob"}}

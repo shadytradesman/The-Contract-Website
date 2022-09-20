@@ -319,11 +319,11 @@ else:
 if DEBUG:
     pass
     # Comment this CACHES block out to test caching during development.
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
-        }
-    }
+    # CACHES = {
+    #     'default': {
+    #         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+    #     }
+    # }
 else:
     CACHES = {
         'default': {
@@ -353,7 +353,7 @@ FIXTURE_DIRS = [
 ]
 
 if DEBUG:
-    if os.environ['AWS_ACCESS_KEY_ID']:
+    if 'AWS_ACCESS_KEY_ID' in os.environ:
         DEFAULT_FROM_EMAIL = 'The Contract RPG <admin@thecontractrpg.com>'
         EMAIL_USE_TLS = True
         EMAIL_BACKEND = 'django_ses.SESBackend'

@@ -8,12 +8,12 @@
          aria-controls="collapse-power-{{latest_revision.id}}">
     <div >
         {% if power_full.tags.count > 0 %}
-        <div class="pull-right" style="margin-left: 5px;">
-            <a href="{% url 'powers:powers_create_from_existing_ps2' power_full.id %}"
-               class="btn btn-default btn-xs">
-                Customize
-            </a>
-        </div>
+            <div class="pull-right" style="margin-left: 5px;">
+                <a href="{% url 'powers:powers_create_from_existing_ps2' power_full.id %}"
+                   class="btn btn-default btn-xs">
+                    Customize
+                </a>
+            </div>
         {% endif %}
         {% if show_active_toggle %}
         <div class="pull-right form-inline" style="margin-left: 5px;">

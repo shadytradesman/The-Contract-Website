@@ -1082,6 +1082,12 @@ class Power(models.Model):
     def get_num_drawbacks(self):
         return len(self.drawback_names)
 
+    def get_advancement_enhancements(self):
+        return self.enhancement_instance_set.filter(is_advancement=True).all()
+
+    def get_advancement_drawbacks(self):
+        return self.drawback_instance_set.filter(is_advancement=True).all()
+
     #TODO: this seems to be for base powers??/
     def __check_constraints(self):
         if hasattr(self, "modality") and self.modality:
@@ -1197,7 +1203,7 @@ class Power(models.Model):
         for param_val in self.parameter_value_set.all():
             total_parameter_cost = total_parameter_cost + (param_val.value - param_val.relevant_power_param.default)
         cost_of_power = cost_of_power \
-                + self.selected_enhancements.count() \
+                + self.enhancement_instance_set.filter(is_advancement=False).count() \
                 - self.base.num_free_enhancements \
                 - self.selected_drawbacks.count() \
                 + total_parameter_cost
@@ -1579,6 +1585,12 @@ class Enhancement_Instance(models.Model):
     detail = models.CharField(max_length=1500,
                               null=True,
                               blank=True)
+    # If true, this modifier is not attached to the power as normal but is used as an advancement suggestion for stock
+    # gifts
+    is_advancement = models.BooleanField(default=False)
+
+    def is_enhancement(self):
+        return True
 
     def archive_txt(self):
         output = "{} ({}) "
@@ -1593,6 +1605,7 @@ class Enhancement_Instance(models.Model):
         return {
             "enhancement_slug": self.relevant_enhancement_id,
             "detail": self.detail,
+            "is_advancement": self.is_advancement,
         }
 
     def __str__(self):
@@ -1609,6 +1622,13 @@ class Drawback_Instance(models.Model):
     detail = models.CharField(max_length=1500,
                               null=True,
                               blank=True)
+    # If true, this modifier is not attached to the power as normal but is used as an advancement suggestion for stock
+    # gifts
+    is_advancement = models.BooleanField(default=False)
+
+
+    def is_enhancement(self):
+        return False
 
     def archive_txt(self):
         output = "{} ({}) "
@@ -1623,6 +1643,7 @@ class Drawback_Instance(models.Model):
         return {
             "drawback_slug": self.relevant_drawback_id,
             "detail": self.detail,
+            "is_advancement": self.is_advancement,
         }
 
     def __str__(self):

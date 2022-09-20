@@ -52,4 +52,16 @@
             </div>
         </div>
     </span>
+    <div v-if="userIsAdmin">
+        <label v-bind:for="'adv-' + modifier.checkboxId">
+            <input type="checkbox"
+                   v-bind:id="'adv-' + modifier.checkboxId"
+                   v-bind:name="modifier.checkboxName"
+                   v-bind:value="modifier"
+                   v-model="advancement{{vue_model_name}}"
+                   @change="{{vue_on_click}}"
+                   :disabled="(modifier.slug in disabled{{vue_model_name}}) || modifier.isEnhancement?selected{{vue_model_name}}.includes(modifier) : !selected{{vue_model_name}}.includes(modifier) ">
+            Stock Gift Advancement
+        </label>
+    </div>
 </label>

@@ -34,6 +34,9 @@ class PowerEngine:
         for component in components:
             current_status = merge_status(current_status, component["required_status"][0])
         for mod_inst in modifier_instances:
+            if mod_inst.is_enhancement() and mod_inst.is_advancement:
+                # Don't include the enhancements marked as advancements
+                continue
             mod, mod_type = self.get_mod_and_type_for_inst(mod_inst)
             if mod_type == "enh^" and mod["group"]:
                 active_groups[mod["group"]] += 1
@@ -373,10 +376,16 @@ class SystemTextRenderer:
         # This replicates the detailsByModifiers map in the FE
         details_by_mod = defaultdict(list)
         for modifier_inst in modifier_instances:
+            if modifier_inst.is_enhancement() and modifier_inst.is_advancement:
+                # Don't include the enhancements marked as advancements
+                continue
             modifier, mod_type = self.system.get_mod_and_type_for_inst(modifier_inst)
             details_by_mod[mod_type + modifier["slug"]].append(modifier_inst.detail)
 
         for modifier_inst in modifier_instances:
+            if modifier_inst.is_enhancement() and modifier_inst.is_advancement:
+                # Don't include the enhancements marked as advancements
+                continue
             modifier, mod_type = self.system.get_mod_and_type_for_inst(modifier_inst)
             replacement_formatter = SystemTextRenderer._mark_enhancement_text if mod_type == "enh^" else SystemTextRenderer._mark_drawback_text
             mod_joining_strategy = modifier["joining_strategy"]

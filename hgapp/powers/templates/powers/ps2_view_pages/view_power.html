@@ -54,6 +54,25 @@
 
 
             <div class="panel panel-default power-badge">
+                {% if request.user.is_superuser %}
+                Advancement Enhancements:
+                <ul>
+                    {% for enh in power.get_advancement_enhancements %}
+
+                    <li>
+                        {{enh.relevant_enhancement.name}}
+                    </li>
+                    {% endfor %}
+                </ul>
+                Advancement Drawbacks:
+                <ul>
+                    {% for mod in power.get_advancement_drawbacks %}
+                    <li>
+                        {{mod.relevant_drawback.name}}
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
                 <div class="panel-heading">
                     <h2 style="margin-bottom: 5px; margin-top: 0px;">
                         {{ power.name }}
