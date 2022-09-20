@@ -1,0 +1,99 @@
+{% load static %}
+
+<div class="css-page-header-sm">
+    <span class="css-header-left" style="font-size: .7em">
+        Guide: Creating a Contractor
+    </span>
+  <img class="css-sm-logo" src="{% static 'overrides/branding/contract-white.svg' %}">
+</div>
+
+<div class="css-page-content">
+    <div class="css-no-break">
+        <h3 class="text-center">
+            Physical Assets
+        </h3>
+        <div class="css-quirk-cont">
+            <div class="css-quirk" v-for="quirk in assets.filter(mod=>mod.category == 'Physical')">
+                {% include "characters/print_pages/blank/quirk_snip.html" %}
+            </div>
+        </div>
+    </div>
+
+    <div class="css-no-break">
+        <h3 class="text-center">
+            Background Assets
+        </h3>
+        <div class="css-quirk-cont">
+            <div class="css-quirk" v-for="quirk in assets.filter(mod=>mod.category == 'Background')">
+                {% include "characters/print_pages/blank/quirk_snip.html" %}
+            </div>
+        </div>
+    </div>
+
+    <div class="css-no-break">
+        <h3 class="text-center">
+            Mental Assets
+        </h3>
+        <div class="css-quirk-cont">
+            <div class="css-quirk" v-for="quirk in assets.filter(mod=>mod.category == 'Mental')">
+                {% include "characters/print_pages/blank/quirk_snip.html" %}
+            </div>
+        </div>
+    </div>
+
+    <div class="css-no-break">
+        <h3 class="text-center">
+            Restricted Assets
+        </h3>
+        <div class="css-quirk-cont">
+            <div class="css-quirk" v-for="quirk in assets.filter(mod=>mod.category == 'Restricted')">
+                {% include "characters/print_pages/blank/quirk_snip.html" %}
+            </div>
+        </div>
+    </div>
+
+    <div class="css-no-break">
+        <h3 class="text-center">
+            Physical Liabilities
+        </h3>
+        <div class="css-quirk-cont">
+            <div class="css-quirk" v-for="quirk in liabilities.filter(mod=>mod.category == 'Physical')">
+                {% include "characters/print_pages/blank/quirk_snip.html" %}
+            </div>
+        </div>
+    </div>
+
+    <div class="css-no-break">
+        <h3 class="text-center">
+            Background Liabilities
+        </h3>
+        <div class="css-quirk-cont">
+            <div class="css-quirk" v-for="quirk in liabilities.filter(mod=>mod.category == 'Background')">
+                {% include "characters/print_pages/blank/quirk_snip.html" %}
+            </div>
+        </div>
+    </div>
+
+    <div class="css-no-break">
+        <h3 class="text-center">
+            Mental Liabilities
+        </h3>
+        <div class="css-quirk-cont">
+            <div class="css-quirk" v-for="quirk in liabilities.filter(mod=>mod.category == 'Mental')">
+                {% include "characters/print_pages/blank/quirk_snip.html" %}
+            </div>
+        </div>
+    </div>
+
+
+    <div class="css-no-break">
+        <h3 class="text-center">
+            Restricted Liabilities
+        </h3>
+        <div class="css-quirk-cont">
+            <div class="css-quirk" v-for="quirk in liabilities.filter(mod=>mod.category == 'Restricted')">
+                {% include "characters/print_pages/blank/quirk_snip.html" %}
+            </div>
+        </div>
+    </div>
+</div>

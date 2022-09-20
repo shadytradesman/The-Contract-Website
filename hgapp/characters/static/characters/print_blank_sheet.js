@@ -18,6 +18,8 @@ const charSheetRendering = {
       showExpLogDefault: true,
 
       showNewCharacterGuide: true,
+      showLimitsAndStats: true,
+      showAssetsAndLiabilities: true,
 
       tutorial: null,
       abilities: null,

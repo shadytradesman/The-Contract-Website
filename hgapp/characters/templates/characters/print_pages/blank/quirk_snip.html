@@ -1,0 +1,17 @@
+<b class="css-quirk-value">
+    <span>
+        {quirk.value} -
+    </span>
+    {quirk.name}
+</b>
+<div>
+    <b v-if="quirk.element_type">
+        {quirk.element_type}:
+    </b>
+    <span class="css-quirk-desc">
+        {quirk.description}
+    </span>
+    <span class="css-quirk-system">
+        ({quirk.system})
+    </span>
+</div>

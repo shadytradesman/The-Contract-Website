@@ -1974,6 +1974,38 @@ class Quirk(models.Model):
         blank=True,
         help_text="Grants world element that isn't stock. Don't set if using one of the stock world elements.")
 
+    class Meta:
+        abstract = True
+
+    def to_blob(self):
+        # This method works similarly to what is displayed in the character creation page quirk_snippet.html
+        blob = {
+            "name": self.name,
+            "category": self.get_category_display(),
+            "value": self.value,
+            "errata": self.eratta,
+        }
+
+        granted_element = self.grants_element
+        if granted_element:
+            blob["element_type"] = granted_element.get_type_display()
+            blob["description"] = granted_element.description
+            if granted_element.type == 'Loose End':
+                blob["system"] = ""
+            else:
+                blob["system"] = granted_element.system
+        elif self.grants_scar:
+            granted_scar = self.grants_scar
+            blob["element_type"] = "Battle Scar"
+            blob["description"] = self.description
+            blob["system"] = granted_scar.system
+        else:
+            blob["element_type"] = ""
+            blob["description"] = self.description
+            blob["system"] = self.system
+
+        return blob
+
     def is_physical(self):
         return self.category == QUIRK_PHYSICAL
 
@@ -1988,9 +2020,6 @@ class Quirk(models.Model):
 
     def __str__(self):
         return self.name
-
-    class Meta:
-        abstract = True
 
     def grant_element_if_needed(self, stats, details=None):
         granted_element = self.grants_element

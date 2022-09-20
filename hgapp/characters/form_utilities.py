@@ -38,8 +38,8 @@ def get_blank_sheet_context():
             "limits": [model_to_dict(x) for x in limits],
             "attributes": [model_to_dict(x) for x in attributes],
             "abilities": [model_to_dict(x) for x in abilities],
-            "assets": [model_to_dict(x) for x in assets],
-            "liabilities": [model_to_dict(x) for x in liabilities],
+            "assets": [x.to_blob() for x in assets],
+            "liabilities": [x.to_blob() for x in liabilities],
             "d10_outline_url": static("overrides/branding/d10-outline2.svg"),
             "d10_filled_url": static("overrides/branding/d10-filled.svg"),
         }

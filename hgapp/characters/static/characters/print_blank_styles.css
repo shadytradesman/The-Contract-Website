@@ -27,3 +27,40 @@
     margin-left: 5px;
 }
 
+.css-no-break {
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+
+.css-quirk-cont {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: space-around;
+    justify-content: space-between;
+}
+
+.css-quirk {
+    width: 48%;
+    font-size: .85em;
+    margin-bottom: .03in;
+    padding: 5px;
+    align-content: space-around;
+    justify-content: space-between;
+    border: 1px solid black;
+    border-radius: 4px;
+}
+
+.css-quirk-desc {
+    font-size: .9em;
+}
+
+.css-quirk-system {
+    font-size: .9em;
+    font-style: italic;
+    padding-left: .01in;
+}
+
+.css-quirk-value {
+    font-size: 1.2em;
+}

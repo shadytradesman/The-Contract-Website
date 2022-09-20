@@ -32,6 +32,19 @@
             <input type="checkbox" id="opt-showNewCharacterGuide" v-model="showNewCharacterGuide">
             <label for="opt-showNewCharacterGuide">Include "How to Create a Contractor" Guide</label>
         </span>
+        <div style="margin-left: 20px;">
+            <span class="css-option" v-if="showNewCharacterGuide">
+                <input type="checkbox" id="opt-showLimitsAndStats" v-model="showLimitsAndStats">
+                <label for="opt-showLimitsAndStats">Include Limits, Attributes, and Abilities reference</label>
+            </span>
+        </div>
+        <div style="margin-left: 20px;">
+            <span class="css-option" v-if="showNewCharacterGuide">
+            <input type="checkbox" id="opt-showAssetsAndLiabilities" v-model="showAssetsAndLiabilities">
+            <label for="opt-showAssetsAndLiabilities">Include Assets and Liabilities reference</label>
+        </span>
+        </div>
+
     </div>
     <div class="text-center" style="margin-top: 10px;">
         <button onclick="window.print()">Print / Download PDF</button>
