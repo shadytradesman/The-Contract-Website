@@ -27,7 +27,7 @@
                     <a href="{% url 'powers:powers_view_power_full' power_full.id %}">
                         <div class="col-xs-6 ">
                             <div class="thumbnail">
-                                {{ power_full.name }}
+                                {{ power_full.latest_revision.name }}
                             </div>
                         </div>
                     </a>

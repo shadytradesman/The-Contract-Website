@@ -109,6 +109,7 @@ def save_gift(request, power_full=None, character=None):
             power_full.tags.set(power_form.cleaned_data["tags"])
             power_full.example_description = power_form.cleaned_data["example_description"]
         power_full.latest_rev = new_power
+        power_full.name = new_power.name
         power_full.save()
         new_power.parent_power = power_full
         new_power.save()

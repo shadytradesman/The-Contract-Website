@@ -12,9 +12,9 @@
 <div class="container">
      <div class="text-center">
         {% if power_full.character.id != character.id %}
-            <h1>Assign {{power_full.name}} to {{character.name}}?</h1>
+            <h1>Assign {{power_full.latest_rev.name}} to {{character.name}}?</h1>
         {% else %}
-            <h1>Remove {{power_full.name}} from {{character.name}}?</h1>
+            <h1>Remove {{power_full.latest_rev.name}} from {{character.name}}?</h1>
         {% endif %}
      </div>
     <div class="panel panel-defaul text-center">
@@ -32,7 +32,7 @@
                     <div class="row">
                         <div class="col-md-8 col-md-offset-2 alert alert-danger" role="alert">
                             <h4>{{character.name}} does not have a sufficient number of Gifts and Improvements to grant this Power.</h4>
-                            <p>{{power_full.name}} has a cost of {{power_full.get_gift_cost}}, and {{character.name}} can only afford {{rewards_to_spend|length}}.</p>
+                            <p>{{power_full.latest_rev.name}} has a cost of {{power_full.get_gift_cost}}, and {{character.name}} can only afford {{rewards_to_spend|length}}.</p>
                             <p>You require <b>{{reward_deficit}}</b> more Gift{{reward_deficit|pluralize}} or Improvement{{reward_deficit|pluralize}}.</br>
                             <b>You can still assign this Power, but it will put your Contractor in bad standing.</b></p>
                         </div>
