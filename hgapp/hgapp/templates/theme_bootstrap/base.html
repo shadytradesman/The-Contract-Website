@@ -5,6 +5,7 @@
     <head>
         <meta charset="utf-8" />
         <title>{% block head_title_base %}{% block head_title %}{% endblock %} | The Contract RPG{% endblock %}</title>
+        <link href='https://fonts.googleapis.com/css?family=Alex Brush' rel='stylesheet'>
         {% block viewport %}
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
         {% endblock %}
@@ -60,7 +61,7 @@
             {% endblock %}
 
             {% block footer_base %}
-                <hr />
+                <hr class="css-no-print" />
                 <footer>
                     <div class="container">
                         {% block footer %}{% endblock %}
