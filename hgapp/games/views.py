@@ -27,13 +27,15 @@ from games.forms import CreateScenarioForm, CellMemberAttendedForm, make_game_fo
 from .game_form_utilities import get_context_for_create_finished_game, change_time_to_current_timezone, convert_to_localtime, \
     create_archival_game, get_context_for_completed_edit, handle_edit_completed_game, get_context_for_choose_attending, \
     get_gm_form, get_outsider_formset, get_member_formset, get_players_for_new_attendances
-from .games_constants import GAME_STATUS, EXP_V1_V2_GAME_ID
+from .games_constants import GAME_STATUS, EXP_V1_V2_GAME_ID, get_completed_game_excludes_query
 
 from cells.forms import EditWorldEventForm
 from cells.models import WorldEvent
 
 from games.models import Scenario, Game, DISCOVERY_REASON, Game_Invite, Game_Attendance, Reward, REQUIRED_HIGH_ROLLER_STATUS, \
     Move
+
+from profiles.models import Profile
 
 from characters.models import Character
 
@@ -51,6 +53,33 @@ def enter_game(request):
     }
     return render(request, 'games/enter_game.html', context)
 
+def activity(request):
+    num_total_games = Game.objects.count()
+    num_finished_games = Game.objects.exclude(get_completed_game_excludes_query()).count()
+    num_players = Profile.objects.count()
+    num_contractors = Character.objects.count()
+    num_contractors_played = Character.objects.filter(num_games__gte=1).count()
+    now = datetime.datetime.now()
+    two_hours_ago = now - datetime.timedelta(hours=2)
+    games_query = Game.objects.filter(
+        list_in_lfg=True,
+        status=GAME_STATUS[0][0],
+        scheduled_start_time__gte=two_hours_ago)
+    upcoming_games = games_query.order_by('-scheduled_start_time').all()
+    past_games_query = Game.objects.filter(
+        list_in_lfg=True,
+        scheduled_start_time__lte=two_hours_ago)
+    past_games = past_games_query.order_by('-scheduled_start_time','-actual_start_time').prefetch_related('gm', 'cell', 'scenario').all()
+    context = {
+        "num_total_games": num_total_games,
+        "num_finished_games": num_finished_games,
+        "num_players": num_players,
+        "num_contractors": num_contractors,
+        "num_contractors_played": num_contractors_played,
+        "upcoming_games": upcoming_games,
+        "past_games": past_games,
+    }
+    return render(request, 'games/activity.html', context)
 
 def create_scenario(request):
     if not request.user.is_authenticated:

@@ -418,10 +418,10 @@ TINYMCE_DEFAULT_CONFIG = {
                      " Book Antiqua=book antiqua,palatino; Comic Sans MS=comic sans ms,sans-serif; Courier New=courier "
                      "new,courier; Georgia=georgia,palatino; Helvetica=helvetica; Impact=impact,chicago; Symbol=symbol; "
                      "Tahoma=tahoma,arial,helvetica,sans-serif; Terminal=terminal,monaco; Times New Roman=times new roman,times; "
-                     "Trebuchet MS=trebuchet ms,geneva; Verdana=verdana,geneva; Webdings=webdings; Wingdings=wingdings,zapf dingbats; "
+                     "Trebuchet MS=trebuchet ms,geneva; Verdana=verdana,geneva; "
                      "Alex Brush=Alex Brush; Aladin=Aladin; Annie Use Your Telescope=Annie Use Your Telescope; "
                      "Beth Ellen=Beth Ellen; Cedarville Cursive=Cedarville Cursive; Spirax=Spirax; Yomogi=Yomogi; "
-                     "Rock Salt=Rock Salt"
+                     "Rock Salt=Rock Salt; Webdings=webdings; Wingdings=wingdings,zapf dingbats"
 }
 
 # Pinax Blog settings

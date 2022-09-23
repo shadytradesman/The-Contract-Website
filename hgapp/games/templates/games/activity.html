@@ -1,0 +1,168 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+{% load static %}
+{% load account_tags %}
+{% load games_tags %}
+
+{% block head_title %}
+    Contract Activity
+{% endblock %}
+
+{% block extra_head %}
+{% endblock %}
+
+{% block extra_styles %}
+{% endblock %}
+
+{% block extra_scripts %}
+{% endblock %}
+
+{% block body_base %}
+<div class="container">
+    <h1 class="text-center">
+        Contract Activity
+    </h1>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-10 col-md-offset-1">
+                    <div role="alert" class="alert alert-info text-center">
+                        <p >
+                            There have been a total of <b>{{num_total_games}}</b> Contracts scheduled
+                            and <b>{{num_finished_games}}</b> Contracts completed.
+                        </p>
+                        <p>
+                            There are <b>{{num_players}}</b> Players registered. A total of <b>{{num_contractors}}</b>
+                            Contractors have been made, and of those <b>{{num_contractors_played}}</b> have played in at least
+                            one Contract.
+                        </p>
+                        <p>
+                            To see other records, visit the
+                            <a href="{% url 'info:leaderboard' %}">
+                                Community Records
+                            </a>
+                            page.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <h3>Upcoming Contracts</h3>
+            {% for game in upcoming_games %}
+            <div class="thumbnail">
+                <h3 class="text-center" style="margin-top:10px;">
+                    {% url 'games:games_view_game' game.id as custom_link %}
+                    {% render_scenario_title_without_link game.scenario custom_link %}
+                </h3>
+                <p class="text-center">
+                    <b>Start time:</b>
+                    {{game.scheduled_start_time|timeuntil}}
+                    ({{game.scheduled_start_time}}
+                    {% if request.user.account %}
+                    {{request.user.account.timezone}}
+                    {% endif %}
+                    )
+                </p>
+                <div class="row">
+                    <div class="col-xs-6">
+                        <b>Game Master: </b>
+                        <a href="{% url 'profiles:profiles_view_profile' game.gm.id %}">
+                            {% user_display game.gm %}
+                        </a>
+                        <br>
+                        <b>In Playgroup: </b>
+                        <a href="{% url 'cells:cells_view_cell' game.cell.id %}">
+                            {{game.cell.name}}
+                        </a>
+                    </div>
+                    <div class="col-xs-6">
+                        <b>GM Title:</b>
+                        {% render_gm_title game.gm %}
+                        <br>
+                        <b>Status:</b>
+                        {{game.get_required_character_status_display}}
+                    </div>
+                </div>
+                {% if game.mediums.all|length %}
+                <div class="row">
+                    <div class="col-xs-12">
+                        <b>Medium:</b>
+                        {% render_game_mediums game %}
+                    </div>
+                </div>
+                {% endif %}
+                <hr>
+                <div class="expandable-outer js-expandable-collapsed">
+                    {{game.hook|linebreaks}}
+                    <div class="text-center">
+                        <i><small>
+                            <a href="{% url 'games:games_view_game' game.id %}">
+                                (click to RSVP or learn more)
+                            </a>
+                        </small></i>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+
+            <h3>Past Contracts</h3>
+            {% for game in past_games %}
+            <div class="thumbnail">
+                {% if game.is_scheduled or game.is_active or game.is_canceled %}
+                <h5 class="text-muted">
+                    Unfinished Contract -
+                    <a href="{% url 'profiles:profiles_view_profile' game.gm.id %}">
+                        {% user_display game.gm %}
+                    </a>
+                    <span class="hidden-xs">
+                                    the
+                                    {% render_gm_title game.gm %}
+                                </span>
+                    scheduled
+                    {% url 'games:games_view_game' game.id as custom_link %}
+                    {% render_scenario_title_without_link game.scenario custom_link %}
+                    {% if game.cell %}
+                    in Playgroup "{{game.cell.name}}"
+                    {% endif %}
+                    <br class="visible-xs">
+                    {{game.scheduled_start_time|timesince}} ago
+                    <span class="visible-xs-block">
+                                    <br class="visible-xs">
+                                    GM Title:
+                                    {% render_gm_title game.gm %}
+                                </span>
+                </h5>
+
+                {% elif game.is_finished or game.is_archived or game.is_recorded or game.is_void %}
+                    <h5>
+                        <a href="{% url 'profiles:profiles_view_profile' game.gm.id %}">
+                            {% user_display game.gm %}
+                        </a>
+                        <span class="hidden-xs">
+                                    the
+                                    {% render_gm_title game.gm %}
+                                </span>
+                        ran
+                        {% url 'games:games_view_game' game.id as custom_link %}
+                        {% render_scenario_title_without_link game.scenario custom_link %}
+                        {% if game.cell %}
+                            in Playgroup "{{game.cell.name}}"
+                        {% endif %}
+                        <br class="visible-xs">
+                        {{game.end_time|timesince}} ago
+                        <span class="visible-xs-block">
+                                    <br class="visible-xs">
+                                    GM Title:
+                                    {% render_gm_title game.gm %}
+                                </span>
+                    </h5>
+                {% else %}
+                    Unknown state
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
