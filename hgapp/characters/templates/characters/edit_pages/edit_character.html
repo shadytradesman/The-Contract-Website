@@ -19,6 +19,11 @@
         {% endif %}
     </script>
     {{cell_info|json_script:"cellInfos"}}
+    {{tutorial.professions|json_script:"professions"}}
+    {{tutorial.archetypes|json_script:"archetypes"}}
+    {{tutorial.personality_traits|json_script:"personalityTraits"}}
+    {{tutorial.paradigms|json_script:"paradigms"}}
+    {{tutorial.ambitions|json_script:"ambitions"}}
     <script src="{% static 'characters/edit_character.js' %}"></script>
     <script src="{% static 'overrides/wiki-macro-scripts.js' %}"></script>
 {% endblock %}

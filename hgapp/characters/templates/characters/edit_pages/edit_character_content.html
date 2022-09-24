@@ -20,10 +20,13 @@
                 </div>
                 <div class="clearfix visible-xs-block"></div>
                 <span class="css-essential-text"> is a </span>
-                <div id="css-concept-field" class="css-essential-field"  >
+                <div id="css-concept-field" class="css-essential-field">
                     {{ char_form.concept_summary}}
                     <figcaption class="help-block">
                         {{ char_form.concept_summary.help_text|safe}}
+                        <a id="js-random-archetype-button" class="btn btn-default btn-xs">
+                            Inspire Me!
+                        </a>
                     </figcaption>
                 </div>
                 <div class="clearfix visible-xs-block visible-sm-block visible-md-block"></div>
@@ -38,6 +41,9 @@
                     {{ char_form.ambition}}
                     <figcaption class="help-block">
                         {{ char_form.ambition.help_text|safe}}
+                        <a id="js-random-ambition-button" class="btn btn-default btn-xs">
+                            Inspire Me!
+                        </a>
                     </figcaption>
                 </div>
                 <span class="css-essential-text visible-lg-block"> .</span>

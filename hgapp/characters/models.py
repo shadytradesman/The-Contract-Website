@@ -2539,6 +2539,11 @@ class CharacterTutorial(models.Model):
                                    related_name="char_dodge")
     sprint_roll = models.ForeignKey(Roll, on_delete=models.CASCADE, blank=True, null=True,
                                     related_name="char_sprint")
+    professions = models.JSONField(default=list)
+    archetypes = models.JSONField(default=list)
+    personality_traits = models.JSONField(default=list)
+    paradigms = models.JSONField(default=list)
+    ambitions = models.JSONField(default=list)
 
 
 # TODO: Potentially delete this after new powers update rollout

@@ -355,6 +355,49 @@ $(function(){
     $("#id_cell").change();
 });
 
+const professions = JSON.parse(document.getElementById('professions').textContent);
+const archetypes = JSON.parse(document.getElementById('archetypes').textContent);
+const personalityTraits = JSON.parse(document.getElementById('personalityTraits').textContent);
+const paradigms = JSON.parse(document.getElementById('paradigms').textContent);
+const ambitions = JSON.parse(document.getElementById('ambitions').textContent);
+
+function randomFromList(items) {
+    var selected = items[Math.floor(Math.random()*items.length)];
+    if (selected instanceof Array) {
+        return randomFromList(selected);
+    }
+    return selected;
+}
+
+$(function(){
+    function randomArchetype() {
+        isDirty = true;
+        var extra = false;
+        var output = "";
+        if (Math.random() < 0.4) {
+            output = output + " " + randomFromList(personalityTraits);
+            extra = true;
+        }
+        if (Math.random() < 0.5) {
+            output = output + " " + randomFromList(archetypes);
+        } else {
+            output = output + " " + randomFromList(professions);
+        }
+        if (Math.random() < 0.5 || !extra) {
+            output = output + " " + randomFromList(paradigms);
+        }
+        $("#id_concept_summary").val(output.trim().toLowerCase());
+    }
+    document.getElementById("js-random-archetype-button").addEventListener("click", randomArchetype);
+
+    function randomAmbition() {
+        isDirty = true;
+        output = randomFromList(ambitions);
+        $("#id_ambition").val(output.trim());
+    }
+    document.getElementById("js-random-ambition-button").addEventListener("click", randomAmbition);
+});
+
 $(function(){
     function handleNameChange() {
         isDirty = true;
