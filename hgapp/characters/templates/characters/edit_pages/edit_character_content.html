@@ -24,9 +24,11 @@
                     {{ char_form.concept_summary}}
                     <figcaption class="help-block">
                         {{ char_form.concept_summary.help_text|safe}}
-                        <a id="js-random-archetype-button" class="btn btn-default btn-xs" style="display:inline;">
-                            Inspire Me!
-                        </a>
+                        {% if not character %}
+                            <a id="js-random-archetype-button" class="btn btn-default btn-xs" style="display:inline;">
+                                Inspire Me!
+                            </a>
+                        {% endif %}
                     </figcaption>
                 </div>
                 <div class="clearfix visible-xs-block visible-sm-block visible-md-block"></div>
@@ -41,9 +43,11 @@
                     {{ char_form.ambition}}
                     <figcaption class="help-block">
                         {{ char_form.ambition.help_text|safe}}
-                        <a id="js-random-ambition-button" class="btn btn-default btn-xs" style="display:inline;">
-                            Inspire Me!
-                        </a>
+                        {% if not character %}
+                            <a id="js-random-ambition-button" class="btn btn-default btn-xs" style="display:inline;">
+                                Inspire Me!
+                            </a>
+                        {% endif %}
                     </figcaption>
                 </div>
                 <span class="css-essential-text visible-lg-block"> .</span>
