@@ -386,3 +386,51 @@ const guidebookSearchBar2 = {
 
 const app2 = Vue.createApp(guidebookSearchBar2);
 const mountedApp2 = app2.mount('#js-guide-sidebar');
+
+/* Archetype Generator */
+
+$(function(){
+
+    function randomFromList(items) {
+        var selected = items[Math.floor(Math.random()*items.length)];
+        if (selected instanceof Array) {
+            return randomFromList(selected);
+        }
+        return selected;
+    }
+
+    if (document.getElementById('professions')) {
+        const professions = JSON.parse(document.getElementById('professions').textContent);
+        const archetypes = JSON.parse(document.getElementById('archetypes').textContent);
+        const personalityTraits = JSON.parse(document.getElementById('personalityTraits').textContent);
+        const paradigms = JSON.parse(document.getElementById('paradigms').textContent);
+        const ambitions = JSON.parse(document.getElementById('ambitions').textContent);
+        function randomArchetype() {
+            var extra = false;
+            var output = "";
+            if (Math.random() < 0.4) {
+                output = output + " " + randomFromList(personalityTraits);
+                extra = true;
+            }
+            if (Math.random() < 0.35) {
+                output = output + " " + randomFromList(archetypes);
+            } else {
+                output = output + " " + randomFromList(professions);
+            }
+            if (Math.random() < 0.5 || !extra) {
+                output = output + " " + randomFromList(paradigms);
+            }
+            $("#id_concept_summary").val(output.trim().toLowerCase());
+        }
+
+        function randomAmbition() {
+            var output = randomFromList(ambitions);
+            $("#id_ambition").val(output.trim());
+        }
+
+        if (document.getElementById('js-random-archetype-button')) {
+            document.getElementById("js-random-archetype-button").addEventListener("click", randomArchetype);
+            document.getElementById("js-random-ambition-button").addEventListener("click", randomAmbition);
+        }
+    }
+});

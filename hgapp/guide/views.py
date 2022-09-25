@@ -13,6 +13,9 @@ from django.db import transaction
 from .models import GuideBook, GuideSection, GuidePic
 from .forms import make_guide_section_form, DeleteGuideSectionForm, GuidebookForm
 
+from characters.models import CharacterTutorial
+
+
 class ReadGuideBook(View):
     template_name = 'guide/read_guide.html'
 
@@ -23,13 +26,14 @@ class ReadGuideBook(View):
         guidebook = get_object_or_404(GuideBook, pk=self.kwargs['guidebook_slug'])
         can_edit = self.request.user.is_superuser if self.request.user else False
         sections = guidebook.get_sections_in_order(is_admin=can_edit)
+        tutorial = CharacterTutorial.objects.first()
         context = {
             "guidebook": guidebook,
             "sections": sections,
             "can_edit": can_edit,
+            "tutorial": tutorial,
         }
         return context
-
 
 
 @method_decorator(login_required(login_url='account_login'), name='dispatch')
@@ -67,6 +71,7 @@ class DeleteGuideSection(View):
         }
         return context
 
+
 @method_decorator(login_required(login_url='account_login'), name='dispatch')
 class WriteGuideSection(View):
     template_name = 'guide/edit_guide.html'
@@ -97,6 +102,7 @@ class WriteGuideSection(View):
             'pics': GuidePic.objects.order_by("slug").all(),
         }
         return context
+
 
 class WriteNewGuideSection(WriteGuideSection):
     initial = {

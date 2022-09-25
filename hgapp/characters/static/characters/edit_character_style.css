@@ -165,9 +165,6 @@ form .nav-tabs > li, form .nav-pills > li {
 #css-name-field {
     max-width: 270px;
 }
-#css-concept-field {
-    max-width: 270px;
-}
 #css-ambition-field {
     max-width: 945px;
 }
@@ -286,7 +283,8 @@ form .nav-tabs > li, form .nav-pills > li {
 }
 
 .css-sm-modal-image {
-    height: 60vh;
+    max-height: 60vh;
+    max-width: 100%;
     display: block;
     margin-left: auto;
     margin-right: auto;

@@ -19,7 +19,7 @@ from account.models import EmailAddress
 # Create your views here.
 from django.urls import reverse
 
-from characters.models import Character
+from characters.models import Character, CharacterTutorial
 from powers.models import Power_Full, Enhancement, Drawback, Parameter, Base_Power, SYS_LEGACY_POWERS, SYS_PS2
 
 from games.models import GAME_STATUS, Scenario
@@ -95,8 +95,10 @@ class ResendConfirmation(View):
 def home(request):
     if request.user.is_anonymous:
         info = FrontPageInfo.objects.first()
+        tutorial = CharacterTutorial.objects.first()
         context = {
             'info': info,
+            'tutorial': tutorial,
         }
         return render(request, 'logged_out_homepage.html', context)
     else:

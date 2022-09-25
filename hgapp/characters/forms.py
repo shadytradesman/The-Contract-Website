@@ -78,12 +78,12 @@ def make_character_form(user, existing_character=None, supplied_cell=None):
             help_texts = {
                 'name': _('Name'),
                 'private': _("If checked, this Contractor will only be viewable by their Playgroup's leaders and any GMs "
-                             "running Games for them."),
+                             "running Contracts for them."),
                 'pronoun': _(""),
                 'tagline': _('(Optional) A subtitle that introduces your Contractor in a flavorful way'),
                 'appearance': _('A brief description of your Contractor\'s outward appearance.'),
                 'concept_summary': _('Archetype Summary (ex: "skater punk werewolf", "cannibal chef", or "golden-age comic book hero")'),
-                'ambition': _('Ambition. Why does this Contractor risk their life in the Games? Focus outward: how do they want to '
+                'ambition': _('Ambition. Why does this Contractor risk their life for power? Focus outward: how do they want to '
                               'change the world?'),
                 'age': _("Age"),
                 'paradigm': _('How do the character\'s powers work?'),
@@ -120,7 +120,7 @@ def make_character_form(user, existing_character=None, supplied_cell=None):
             queryset = user.cell_set.filter(cellmembership__is_banned=False).all()
         cell = forms.ModelChoiceField(queryset=queryset,
                                       widget=forms.Select(attrs={'class': 'form-control'}),
-                                      empty_label="Nowhere",
+                                      empty_label="No Playgroup",
                                       required=False,
                                       )
         if supplied_cell:
@@ -132,7 +132,7 @@ def make_character_form(user, existing_character=None, supplied_cell=None):
     else:
         cell = forms.ModelChoiceField(queryset=Cell.objects.none(),
                                       widget=forms.Select(attrs={'class': 'form-control'}),
-                                      empty_label="Nowhere",
+                                      empty_label="No Playgroup",
                                       required=False,
                                       )
     form.base_fields["cell"] = cell

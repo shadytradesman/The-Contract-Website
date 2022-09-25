@@ -18,8 +18,8 @@
                         {{ char_form.name.help_text|safe}}
                     </figcaption>
                 </div>
-                <div class="clearfix visible-xs-block"></div>
                 <span class="css-essential-text"> is a </span>
+                <div class="clearfix visible-xs-block"></div>
                 <div id="css-concept-field" class="css-essential-field">
                     {{ char_form.concept_summary}}
                     <figcaption class="help-block">
@@ -77,9 +77,12 @@
             <div class="col-xs-12 css-essential-cell-setting text-center" style="margin-top: 5px;">
                 They are from
                 <span class="form-inline">
-                    {{char_form.cell}}<span class="visible-sm-inline visible-md-inline visible-lg-inline">,</span>
+                    {{char_form.cell}}
                 </span>
-                a world <span id="js-cell-setting-blurb">{{cell.setting_sheet_blurb}}</span>.
+                <span id="js-a-world-phrase">
+                    <span class="visible-sm-inline visible-md-inline visible-lg-inline">,</span>
+                    a world <span id="js-cell-setting-blurb">{{cell.setting_sheet_blurb}}</span>.
+                </span>
             </div>
         </div>
         <div id="js-setting-container" class="row" style="margin-top: 10px;{% if not cell %} display: none;{% endif %}">
@@ -92,31 +95,31 @@
         <div id="js-setting-warning" class="row" style="margin-top: 10px; {% if cell %} display: none;{% endif %}">
             <div class="col-xs-12 col-md-10 col-md-offset-1">
                 <div class="alert alert-info">
-                    <h4 class="text-center">
+                    <h4 class="text-center" style="margin-bottom: 10px;">
                         <span class="js-contractor-name">
                             Your Contractor
                         </span>
                         has no Playgroup.
                     </h4>
-                    <div class="text-center">
+                    <p class="text-center">
+                        Playgroups are Player groups with a shared setting.
+                        Contractors without a Playgroup cannot interact with other Contractors on their Downtimes.
+                        Most GMs will not allow Contractors without an active Playgroup to participate in their Contracts.
                         <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#worldTutorialModal">
-                            What are Playgroups?
+                            More about Playgroups
                         </button>
-                    </div>
-                    <p>
-                        Contractors without a Playgroup live in an isolated parallel dimension of the default setting.
-                        They cannot interact with other Contractors between Contracts.
-                        You must select a Playgroup for your Contractor before their fourth Contract.
-                        <br>
+                    </p>
+                    <div class="text-center" style="margin-top: 5px;">
                         When you are finished creating your Contractor, you can
                         <a href="{% url 'cells:cells_find_world' %}" >
                             find a Playgroup
                         </a>
                         or
                         <a href="{% url 'cells:cells_create' %}" >
-                            create your own.
+                            create your own
                         </a>
-                    </p>
+                        and then edit your Contractor to add them to it.
+                    </div>
                 </div>
             </div>
         </div>

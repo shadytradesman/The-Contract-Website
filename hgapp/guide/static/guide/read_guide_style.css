@@ -113,8 +113,12 @@
         min-height: 450px;
     }
 
-    p, h5 {
+    p {
         padding-left: 25px;
+    }
+
+    h5 {
+        padding-left: 15px;
     }
 
     ul, ol {

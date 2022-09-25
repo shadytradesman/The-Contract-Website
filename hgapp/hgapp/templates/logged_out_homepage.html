@@ -14,6 +14,11 @@
 
 {% block extra_scripts %}
     <script src="{% static 'overrides/splash_scripts.js' %}"></script>
+    {{tutorial.professions|json_script:"professions"}}
+    {{tutorial.archetypes|json_script:"archetypes"}}
+    {{tutorial.personality_traits|json_script:"personalityTraits"}}
+    {{tutorial.paradigms|json_script:"paradigms"}}
+    {{tutorial.ambitions|json_script:"ambitions"}}
 {% endblock %}
 
 

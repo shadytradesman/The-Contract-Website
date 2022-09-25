@@ -88,6 +88,14 @@ def __fancy_battle_scars():
     })
 
 
+def __fancy_archetypes():
+    return render_to_string("guide/rendered-sections/archetype.html", {})
+
+
+def __fancy_ambitions():
+    return render_to_string("guide/rendered-sections/ambition.html", {})
+
+
 def __fancy_world_element(element_type):
     stock_elements = StockWorldElement.objects.filter(type=element_type).exclude(category__name__in=["creation-only", "General"]).order_by("category").all()
     options = []
@@ -105,6 +113,7 @@ def __fancy_world_element(element_type):
 
 def __fancy_conditions():
     return __fancy_world_element(CONDITION)
+
 
 def __fancy_circumstances():
     return __fancy_world_element(CIRCUMSTANCE)
@@ -127,6 +136,8 @@ content_methods = {
     "circumstances": __fancy_circumstances,
     "traumas": __fancy_traumas,
     "trophies": __fancy_trophies,
+    "archetypes": __fancy_archetypes,
+    "ambitions": __fancy_ambitions,
 }
 
 def __render_fancy_sections(content):
