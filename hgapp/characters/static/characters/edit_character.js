@@ -152,7 +152,7 @@ $(document).on('change','input[id^=id_liability-]', function(ev){
     let liabilities = $('input:checked[id^=id_liability-]');
     let liabilityVal = 0;
     liabilities.each(liab => {
-        liabilityVal += parseInt($(liabilities[liab]).next(".js-quirk-value").text());
+        liabilityVal += parseInt($(liabilities[liab]).next().children(".js-quirk-value").text());
     });
     var warnDiv = $('[class~=liability-warn]');
     if (liabilityVal < 8) {
