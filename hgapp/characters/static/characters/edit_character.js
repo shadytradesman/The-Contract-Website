@@ -378,7 +378,7 @@ $(function(){
             output = output + " " + randomFromList(personalityTraits);
             extra = true;
         }
-        if (Math.random() < 0.5) {
+        if (Math.random() < 0.35) {
             output = output + " " + randomFromList(archetypes);
         } else {
             output = output + " " + randomFromList(professions);
