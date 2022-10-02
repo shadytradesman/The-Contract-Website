@@ -44,6 +44,12 @@
                            {% endif %}
                            ready to spend.
                        </h4>
+                        <div>
+                            Assign Gifts you've already made below, or
+                            <a class="btn btn-success btn-xs" href="{% url 'characters:characters_spend_reward' character.id %}">
+                                click here to improve or create a new Gift for {{ character.name}}
+                            </a>
+                        </div>
                     </div>
                 </div>
             {% endif %}

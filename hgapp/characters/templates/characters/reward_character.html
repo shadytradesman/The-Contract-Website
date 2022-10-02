@@ -49,14 +49,14 @@
             <div class="panel-body">
                 <div class="row text-center">
                     {% if character.num_unspent_gifts > 0 %}
-                        <div class="col-xs-12 col-md-6">
+                        <div class="col-xs-12 col-sm-6">
                             <a class="btn btn-success btn-lg" href="{% url 'powers:powers_create_ps2_for_char' character.id %}">
                                 Create a New Gift
                             </a>
                         </div>
                     {% endif %}
                     {% if unassigned_powers %}
-                        <div class="col-xs-12 col-md-6">
+                        <div class="col-xs-12 col-sm-6">
                             <a class="btn btn-default btn-lg" href="{% url 'characters:characters_power_picker' character.id %}">
                                 Assign existing Gifts
                             </a>
@@ -68,12 +68,12 @@
                     <h2 class="text-center">Improve Existing Gifts</h2>
                     {% for power_full in character.power_full_set.all %}
                         <div class="row">
-                            <div class= "col-xs-1">
+                            <div class= "col-xs-3 col-md-1">
                                 <a href="{% url 'powers:powers_edit_ps2' power_full.id %}" class="btn btn-success">
                                     <i class="fa fa-plus-square fa-4x"></i>
                                 </a>
                             </div>
-                            <div class= "col-xs-11">
+                            <div class= "col-xs-9 col-md-11">
                                 {% power_heading power_full.latest_revision %}
                             </div>
                         </div>

@@ -117,6 +117,10 @@
                                     <h3 style="margin-top: 5px;">
                                         This Scenario has been run <b>{{ scenario.num_finished_games }}</b> time{{scenario.num_finished_games|pluralize}}
                                     </h3>
+                                    <div>
+                                        Run {{scenario.times_run}} times by {{scenario.num_gms_run}} GMs.
+                                        {{scenario.num_victories}} victories and {{scenario.num_deaths}} deaths.
+                                    </div>
                                     <div class="text-muted">
                                         (Click to expand history)
                                     </div>

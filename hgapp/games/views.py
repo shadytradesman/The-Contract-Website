@@ -187,11 +187,11 @@ def view_scenario(request, scenario_id, game_id=None):
     else:
         viewer_can_edit = request.user.is_superuser \
                           or (request.user.is_authenticated and request.user.id == scenario.creator.id)
-        games_run_by_viewer = Game.objects.filter(gm_id=request.user.id, scenario_id=scenario.id).order_by("end_time").all()
+        games_run_by_viewer = Game.objects.filter(gm_id=request.user.id, scenario_id=scenario.id).order_by("-end_time").all()
         games_run_by_viewer = [x for x in games_run_by_viewer if not x.is_scheduled() and not x.is_active()]
         game_feedback_form = GameFeedbackForm()
-        games_run_by_others = Game.objects.exclude(gm_id=request.user.id).filter(scenario_id=scenario.id).order_by("end_time").all()
-        games_run_by_others = [x for x in games_run_by_others if not x.is_scheduled() and not x.is_active()]
+        games_run_by_others = Game.objects.exclude(gm_id=request.user.id).filter(scenario_id=scenario.id).order_by("-end_time").all()
+        games_run_by_others = [x for x in games_run_by_others if not x.is_scheduled() and not x.is_active() and not x.is_canceled()]
         is_public = scenario.is_public()
         context = {
             'show_spoiler_warning': show_spoiler_warning,
