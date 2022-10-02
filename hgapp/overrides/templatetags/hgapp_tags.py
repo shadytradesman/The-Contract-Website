@@ -64,6 +64,13 @@ def email_verified(user):
     }
 
 
+@register.inclusion_tag('tags/character_nav_list.html')
+def characters_nav_list(user):
+    characters = user.character_set.filter(is_deleted=False).order_by("-edit_date")[:5]
+    return {
+        "characters": characters
+    }
+
 @register.inclusion_tag('tags/guidebook_toc.html', takes_context=True)
 def guide_toc(context, guidebook=None):
     guidebooks = GuideBook.objects.order_by('position').all()

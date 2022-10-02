@@ -95,6 +95,9 @@
                 </a>
                 <ul class="dropdown-menu">
                     <div class="visible-xs-block clearfix"></div>
+                    {% cache 5000 nav-contractors request.user.id %}
+                        {% characters_nav_list request.user %}
+                    {% endcache %}
                     <li class="dropdown-header">
                         Gifts
                     </li>

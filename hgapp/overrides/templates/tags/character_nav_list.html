@@ -1,0 +1,12 @@
+{% if characters %}
+    <li class="dropdown-header">
+        My Contractors
+    </li>
+    {% for character in characters %}
+        <li>
+            <a  href="{% url 'characters:characters_view' character.id %}">
+                {{ character.name }}
+            </a>
+        </li>
+    {% endfor %}
+{% endif %}
