@@ -16,6 +16,7 @@ import account.views
 from django.core.exceptions import PermissionDenied
 from account.models import EmailAddress
 
+
 # Create your views here.
 from django.urls import reverse
 
@@ -27,6 +28,7 @@ from hgapp.forms import SignupForm, ResendEmailConfirmation
 from blog.models import Post
 from info.models import FrontPageInfo
 from cells.models import WorldEvent
+from profiles.forms import EmailSettingsForm
 
 
 class SignupView(account.views.SignupView):
@@ -43,11 +45,38 @@ class LoginView(account.views.LoginView):
         }
 
 
+class SettingsView(account.views.SettingsView):
+    def get_context_data(self, **kwargs):
+        ctx = super(SettingsView, self).get_context_data(**kwargs)
+        if self.request.user.profile:
+            profile = self.request.user.profile
+            email_prefs_initial = {
+                "contract_invitations": profile.contract_invitations,
+                "intro_contracts": profile.intro_contracts,
+                "direct_messages": profile.direct_messages,
+                "site_announcements": profile.site_announcements,
+            }
+            ctx["email_settings_form"] = EmailSettingsForm(initial=email_prefs_initial)
+        return ctx
+
+    def update_settings(self, form, **kwargs):
+        super(SettingsView, self).update_settings(form, **kwargs)
+        email_form = EmailSettingsForm(self.request.POST)
+        if email_form.is_valid() and self.request.user.profile:
+            profile = self.request.user.profile
+            profile.contract_invitations = email_form.cleaned_data["contract_invitations"]
+            profile.intro_contracts = email_form.cleaned_data["intro_contracts"]
+            profile.direct_messages = email_form.cleaned_data["direct_messages"]
+            profile.site_announcements = email_form.cleaned_data["site_announcements"]
+            profile.save()
+
+
 class PasswordResetTokenView(account.views.PasswordResetTokenView):
     def get_context_data(self, **kwargs):
         ctx = super(PasswordResetTokenView, self).get_context_data(**kwargs)
         ctx["user"] = self.get_user()
         return ctx
+
 
 @method_decorator(login_required(login_url='account_login'), name='dispatch')
 class ResendConfirmation(View):

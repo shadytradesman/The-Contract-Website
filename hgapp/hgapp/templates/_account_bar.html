@@ -15,9 +15,9 @@
         </li>
         <li>
             {% if unread_count %}
-                <a href="{% url 'postman:inbox' %}"><i class="fa fa-envelope"></i> ({{ unread_count }})</a>
+                <a href="{% url 'postman:inbox' %}"><i class="fa fa-envelope"></i> ({{ unread_count }}) <span class="visible-xs-inline">Messages</span></a>
             {% else %}
-                <a href="{% url 'postman:inbox' %}"><i class="fa fa-envelope-o"></i></a>
+                <a href="{% url 'postman:inbox' %}"><i class="fa fa-envelope-o"></i> <span class="visible-xs-inline">Messages</span></a>
             {% endif %}
         </li>
         <li>

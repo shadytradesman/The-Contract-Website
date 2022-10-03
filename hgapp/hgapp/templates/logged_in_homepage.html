@@ -79,12 +79,12 @@
                 <br class="visible-xs-block ">
                 <br class="visible-xs-block ">
                 <a href="{% url 'journals:community_journals' %}" class="btn btn-default btn-lg">
-                    Read Community Journals
+                    Recent Journals
                 </a>
                 <br class="visible-xs-block ">
                 <br class="visible-xs-block ">
                 <a href="{% url 'info:leaderboard' %}" class="btn btn-default btn-lg">
-                    View Statistics
+                    Community Records
                 </a>
             </div>
         </p>
@@ -100,7 +100,7 @@
                 {% endif %}
             </div>
             <div>
-                <h3>New Characters</h3>
+                <h3>New Contractors</h3>
                  {% if new_characters %}
                     <ul class="nav nav-pills nav-stacked">
                         {% for character in new_characters %}
@@ -110,7 +110,7 @@
                 {% endif %}
             </div>
             <div>
-                <h3>New Powers</h3>
+                <h3>New Gifts</h3>
                  {% if new_powers %}
                     <ul class="nav nav-pills nav-stacked">
                         {% for power in new_powers %}

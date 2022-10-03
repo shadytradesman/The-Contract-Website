@@ -118,6 +118,12 @@ class Profile(models.Model):
     view_adult_content = models.BooleanField(default=False)
     date_set_adult_content = models.DateTimeField(blank=True, null=True)
 
+    # Email prefs
+    contract_invitations = models.BooleanField(default=True)
+    direct_messages = models.BooleanField(default=True)
+    intro_contracts = models.BooleanField(default=True)
+    site_announcements = models.BooleanField(default=True)
+
     def __str__(self):
         return self.user.username
 

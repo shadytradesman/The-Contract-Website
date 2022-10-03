@@ -10,7 +10,7 @@
 
 {% block body %}
     <div class="row">
-        <div class="col-md-5">
+        <div class="col-md-8">
             <form method="POST" action="{% url "account_settings" %}">
                 <legend>{% trans "Account" %}</legend>
                 {% csrf_token %}
@@ -18,12 +18,20 @@
                     {{ form.email|bootstrap }}
                 </span>
                 {% email_verified request.user %}
+                <div style="margin-top: 15px;">
+                    {% comment %}
+                        <b>Receive Emails for</b>
+                        {{ email_settings_form|bootstrap }}
+                    {% endcomment %}
+                </div>
                 <hr>
                 {{form.timezone|bootstrap}}
                 {{form.language|bootstrap}}
-                <button class="btn btn-primary" type="submit">{% trans "Save" %}</button>
+                <div class="text-center">
+                    <button class="btn btn-primary" type="submit">{% trans "Save" %}</button>
+                </div>
             </form>
-            <h4>
+            <h4 style="margin-top: 25px; margin-bottom: 10px;">
                 To edit your profile and preferences
                 <a href="{% url 'profiles:profiles_edit' %}">
                     click here.

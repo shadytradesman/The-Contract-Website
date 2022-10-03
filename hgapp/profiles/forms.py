@@ -15,5 +15,13 @@ class EditProfileForm(forms.Form):
                                     help_text="By selecting this box, you certify that you are age 18 or older and wish "
                                               "to view content marked as adult. Lying about your age is a bannable offense.")
 
+
+class EmailSettingsForm(forms.Form):
+    contract_invitations = forms.BooleanField(required=False)
+    direct_messages = forms.BooleanField(required=False)
+    intro_contracts = forms.BooleanField(required=False)
+    site_announcements = forms.BooleanField(required=False)
+
+
 class AcceptTermsForm(forms.Form):
     pass

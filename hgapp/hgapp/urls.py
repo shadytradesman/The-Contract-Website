@@ -5,6 +5,8 @@ from django.views.generic.base import RedirectView
 from django.shortcuts import redirect
 from django.conf.urls.static import static
 from hgapp import views
+from django_ses.views import SESEventWebhookView
+from django.views.decorators.csrf import csrf_exempt
 
 from django.contrib import admin
 
@@ -16,12 +18,14 @@ urlpatterns = [
     url(r'^powers/', views.RedirectRootUrlView.as_view(new_root="/gift", permanent="true")),
     url(r"^account/signup/$", views.SignupView.as_view(), name="account_signup"),
     url(r"^account/login/$", views.LoginView.as_view(), name="account_signup"),
+    url(r"^account/settings/$", views.SettingsView.as_view(), name="account_settings"),
     url(r"^account/resend-confirmation/$", views.ResendConfirmation.as_view(), name="account_resend_confirmation"),
     url(r"^account/password/reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$", views.PasswordResetTokenView.as_view(),
         name="account_password_reset_token"),
     url(r"^account/", include("account.urls")),
-    url(r"^profile/", include ("profiles.urls"), name="profile"),
-    url(r"^contractor/", include ("characters.urls"), name="character"),
+    url(r'^ses/event-webhook/$', SESEventWebhookView.as_view(), name='handle_event_webhook'),
+    url(r"^profile/", include("profiles.urls"), name="profile"),
+    url(r"^contractor/", include("characters.urls"), name="character"),
     url(r'^characters/', views.RedirectRootUrlView.as_view(new_root="/contractor", permanent="true")),
     url(r"^contract/", include("games.urls"), name="games"),
     url(r'^games/', views.RedirectRootUrlView.as_view(new_root="/contract", permanent="true")),
