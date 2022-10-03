@@ -197,10 +197,14 @@ LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
-            'verbose': {
-                'format': '{levelname} {asctime} {name} {message}',
-                'style': '{',
-            },
+        'verbose': {
+            'format': '{levelname} {asctime} {name} {message}',
+            'style': '{',
+        },
+        'verbose_ses': {
+            'format': '{levelname} {asctime} {name} {message} {notification}',
+            'style': '{',
+        },
     },
     'filters': {
         'require_debug_false': {
@@ -232,6 +236,14 @@ LOGGING = {
             'backupCount': 1,
             'formatter': 'verbose'
         },
+        'applogfile_ses': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(os.path.dirname(os.path.abspath(__file__)), 'contract-app.log'),
+            'maxBytes': 1024 * 1024 * 15,  # 15MB
+            'backupCount': 1,
+            'formatter': 'verbose_ses'
+        },
     },
     'loggers': {
         'django': {
@@ -257,7 +269,7 @@ LOGGING = {
             'propagate': True,
         },
         'django_ses': {
-            'handlers': ['console', 'applogfile'],
+            'handlers': ['console', 'applogfile_ses'],
             'level': os.getenv('APP_LOG_LEVEL', default='INFO'),
             'propagate': True,
         },
