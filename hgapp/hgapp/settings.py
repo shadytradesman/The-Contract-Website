@@ -385,6 +385,7 @@ else:
     EMAIL_BACKEND = 'django_ses.SESBackend'
     AWS_SES_REGION_NAME = 'us-west-2'
     AWS_SES_REGION_ENDPOINT = 'email.us-west-2.amazonaws.com'
+    AWS_SES_CONFIGURATION_SET = "bounced-emails"
     SERVER_EMAIL = 'The Contract RPG <admin@thecontractrpg.com>'
 
 
