@@ -1,5 +1,6 @@
 from django_ses.signals import bounce_received
 from django.dispatch import receiver
+from account import EmailAddress
 import logging
 
 logger = logging.getLogger("app." + __name__)
@@ -7,9 +8,10 @@ logger = logging.getLogger("app." + __name__)
 
 @receiver(bounce_received)
 def bounce_handler(sender, mail_obj, bounce_obj, raw_message, *args, **kwargs):
-    # you can then use the message ID and/or recipient_list(email address) to identify any problematic email messages that you have sent
-    message_id = mail_obj['messageId']
     recipient_list = mail_obj['destination']
-    print("This is bounce email object")
-    print(mail_obj)
-    logger.info(mail_obj)
+    logger.error(mail_obj)
+    for recipient in recipient_list:
+        bounced_addrs = EmailAddress.objects.filter(email=recipient).all()
+        for bounced_addr in bounced_addrs:
+            bounced_addr.verified = False
+            bounced_addr.save()
