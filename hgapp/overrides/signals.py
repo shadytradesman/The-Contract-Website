@@ -1,6 +1,6 @@
 from django_ses.signals import bounce_received
 from django.dispatch import receiver
-from account import EmailAddress
+from account.models import EmailAddress
 import logging
 
 logger = logging.getLogger("app." + __name__)
