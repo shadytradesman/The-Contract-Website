@@ -195,7 +195,7 @@ WSGI_APPLICATION = 'hgapp.wsgi.application'
 
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': True,
+    'disable_existing_loggers': False,
     'formatters': {
             'verbose': {
                 'format': '{levelname} {asctime} {name} {message}',
@@ -253,6 +253,7 @@ LOGGING = {
         },
         'app': {
             'handlers': ['console', 'applogfile'],
+            'level': os.getenv('APP_LOG_LEVEL', default='INFO'),
             'propagate': True,
         },
     }
