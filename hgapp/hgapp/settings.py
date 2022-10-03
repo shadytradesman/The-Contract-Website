@@ -256,7 +256,7 @@ LOGGING = {
             'level': os.getenv('APP_LOG_LEVEL', default='INFO'),
             'propagate': True,
         },
-        'django-ses': {
+        'django_ses': {
             'handlers': ['console', 'applogfile'],
             'level': os.getenv('APP_LOG_LEVEL', default='INFO'),
             'propagate': True,
