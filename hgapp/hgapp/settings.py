@@ -123,6 +123,7 @@ INSTALLED_APPS = [
     'journals.apps.JournalsConfig',
     'guide.apps.GuideConfig',
     'crafting.apps.CraftingConfig',
+    'emails.apps.EmailsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -411,6 +412,7 @@ AUTHENTICATION_BACKENDS = [
 #Postman settings
 POSTMAN_DISALLOW_ANONYMOUS = True
 POSTMAN_AUTO_MODERATE_AS = True
+POSTMAN_NOTIFIER_APP = "emails.postman"
 
 #Pagedown settings
 PAGEDOWN_WIDGET_CSS = ("overrides/pagedown_widget.css",)

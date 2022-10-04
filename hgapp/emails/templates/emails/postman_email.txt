@@ -1,0 +1,6 @@
+{% extends "emails/base_email.txt" %}
+{% block email_body %}
+You received a new direct message from {{sender}} on The Contract.
+
+Click here to read it: {{view_url}}
+{% endblock %}

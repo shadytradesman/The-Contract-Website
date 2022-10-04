@@ -19,10 +19,8 @@
                 </span>
                 {% email_verified request.user %}
                 <div style="margin-top: 15px;">
-                    {% comment %}
-                        <b>Receive Emails for</b>
-                        {{ email_settings_form|bootstrap }}
-                    {% endcomment %}
+                    <b>Receive Emails for</b>
+                    {{ email_settings_form|bootstrap }}
                 </div>
                 <hr>
                 {{form.timezone|bootstrap}}

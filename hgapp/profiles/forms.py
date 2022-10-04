@@ -17,10 +17,10 @@ class EditProfileForm(forms.Form):
 
 
 class EmailSettingsForm(forms.Form):
-    contract_invitations = forms.BooleanField(required=False)
+    contract_invitations = forms.BooleanField(required=False, widget=forms.HiddenInput)
     direct_messages = forms.BooleanField(required=False)
-    intro_contracts = forms.BooleanField(required=False)
-    site_announcements = forms.BooleanField(required=False)
+    intro_contracts = forms.BooleanField(required=False, widget=forms.HiddenInput)
+    site_announcements = forms.BooleanField(required=False, widget=forms.HiddenInput)
 
 
 class AcceptTermsForm(forms.Form):
