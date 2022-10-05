@@ -239,7 +239,7 @@ class Cell(models.Model):
         return self.cellmembership_set.filter(is_banned=False).count()
 
     def completed_games(self):
-        return self.completed_games_queryset().all()
+        return self.completed_games_queryset().select_related("scenario").all()
 
     def num_completed_games(self):
         return self.completed_games_queryset().count()

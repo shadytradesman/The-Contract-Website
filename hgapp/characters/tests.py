@@ -222,17 +222,16 @@ class CharacterModelTests(TestCase):
 
     def test_basic_death_and_void(self):
         self.char_full.kill()
-        self.assertTrue(self.char_full.is_dead())
+        self.assertTrue(self.char_full.is_dead)
         self.assertEquals(len(self.char_full.void_deaths()), 0)
         self.assertTrue(self.char_full.real_death())
         death = self.char_full.real_death()
-        death.is_void = True
-        death.save()
-        self.assertFalse(self.char_full.is_dead())
+        death.mark_void()
+        self.assertFalse(self.char_full.is_dead)
         self.assertEquals(len(self.char_full.void_deaths()), 1)
         self.assertFalse(self.char_full.real_death())
         self.char_full.kill()
-        self.assertTrue(self.char_full.is_dead())
+        self.assertTrue(self.char_full.is_dead)
         self.assertEquals(len(self.char_full.void_deaths()), 1)
         self.assertNotEquals(self.char_full.real_death().id, death.id)
 

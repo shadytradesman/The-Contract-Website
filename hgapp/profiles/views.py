@@ -31,8 +31,8 @@ class ProfileView(generic.DetailView):
         if self.request.user.is_authenticated:
             self.scenarios = self.request.user.scenario_discovery_set\
                 .filter(relevant_scenario__creator=self.profile.user).all()
-        self.living_characters = [character for character in characters if not character.is_dead()]
-        self.deceased_characters = [character for character in characters if character.is_dead()]
+        self.living_characters = [character for character in characters if not character.is_dead]
+        self.deceased_characters = [character for character in characters if character.is_dead]
 
         self.attended_games = self.profile.user.game_set.exclude(get_completed_game_excludes_query()).all()
 

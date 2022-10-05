@@ -680,7 +680,7 @@ class Game_Attendance(models.Model):
                 #if attending character has changed
                 orig.attending_character.default_perms_char_and_powers_to_player(self.relevant_game.gm)
         if self.outcome == OUTCOME[2][0] and not self.character_death and self.is_confirmed and self.attending_character:
-            if not self.attending_character.is_dead():
+            if not self.attending_character.character_death_set.filter(is_void=False).exists():
                 self.attending_character.kill()
             char_real_death = self.attending_character.real_death()
             if not hasattr(char_real_death, "game_attendance"):

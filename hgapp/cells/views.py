@@ -251,13 +251,10 @@ def view_cell(request, cell_id):
 
     memberships_and_characters = ()
     for role in ROLE:
-        for membership in cell.cellmembership_set.filter(role = role[0]):
-            characters = ()
-            for character in membership.member_player.character_set.filter(cell=cell, is_deleted=False):
-                if not character.is_dead():
-                    characters = characters + (character,)
+        for membership in cell.cellmembership_set.filter(role=role[0]).prefetch_related("member_player"):
+            characters = membership.member_player.character_set.filter(cell=cell, is_deleted=False, is_dead=False).all()
             memberships_and_characters = memberships_and_characters + ((membership, characters,),)
-    upcoming_games = cell.game_set.filter(status = GAME_STATUS[0][0])
+    upcoming_games = cell.game_set.filter(status=GAME_STATUS[0][0])
     completed_games = cell.completed_games()
     world_events = WorldEvent.objects.filter(parent_cell=cell).order_by("-created_date").all()
 

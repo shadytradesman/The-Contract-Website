@@ -346,6 +346,7 @@ class Character(models.Model):
     ambition = models.CharField(max_length=150)
     private = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
+    is_dead = models.BooleanField(default=False)
     pub_date = models.DateTimeField('date published')
     edit_date = models.DateTimeField('date last edited')
 
@@ -445,6 +446,7 @@ class Character(models.Model):
             models.Index(fields=['num_losses', 'private']),
             models.Index(fields=['num_games', 'private']),
             models.Index(fields=['num_journals']),
+            models.Index(fields=['player', 'cell']),
             models.Index(fields=['player']),
         ]
 
@@ -672,15 +674,8 @@ class Character(models.Model):
         if current_coin:
             current_coin.refund_and_unassign_from_character()
 
-    def is_dead(self):
-        return self.character_death_set.filter(is_void=False).all().count() > 0
-
     def real_death(self):
-        non_void_deaths = self.character_death_set.filter(is_void=False).all()
-        if len(non_void_deaths) > 0:
-            return non_void_deaths[0]
-        else:
-            return None
+        return self.character_death_set.filter(is_void=False).first()
 
     def needs_obit(self):
         death = self.real_death()
@@ -839,11 +834,13 @@ class Character(models.Model):
             return "Their"
 
     def kill(self):
-        if self.is_dead():
+        if self.character_death_set.filter(is_void=False).exists():
             raise ValueError("cannot kill a dead character")
         new_death = Character_Death(relevant_character=self,
                                     date_of_death=timezone.now())
         new_death.save()
+        self.is_dead = True
+        self.save()
 
     def source_name_values(self):
         values = []
@@ -959,7 +956,7 @@ Archived on: {}
 
 
     def can_get_bonus_exp(self):
-        return not self.is_dead() and self.exp_earned() < (EXP_NEW_CHAR + 10 + (self.num_victories * 12))
+        return not self.is_dead and self.exp_earned() < (EXP_NEW_CHAR + 10 + (self.num_victories * 12))
 
 
     def unspent_experience(self):
@@ -2487,6 +2484,9 @@ class Character_Death(models.Model):
     def mark_void(self):
         self.is_void = True
         self.save()
+        char = self.relevant_character
+        char.is_dead = char.character_death_set.filter(is_void=False).exists()
+        char.save()
 
 
 class Graveyard_Header(models.Model):

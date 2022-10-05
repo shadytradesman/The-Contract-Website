@@ -194,7 +194,7 @@ class CharDisplayModelChoiceField(ModelChoiceField):
 
 def make_accept_invite_form(invitation):
     class AcceptInviteForm(forms.Form):
-        users_living_character_ids = [char.id for char in invitation.invited_player.character_set.filter(is_deleted=False).all() if not char.is_dead()]
+        users_living_character_ids = [char.id for char in invitation.invited_player.character_set.filter(is_deleted=False, is_dead=False).all()]
         required_status = invitation.relevant_game.required_character_status
         if required_status == REQUIRED_HIGH_ROLLER_STATUS[0][0]: # any
             queryset = Character.objects.filter(id__in=users_living_character_ids)
@@ -284,8 +284,7 @@ class GameFeedbackForm(forms.Form):
 
 def make_allocate_improvement_form(user):
     class AllocateImprovementForm(forms.Form):
-        users_living_character_ids = [char.id for char in user.character_set.filter(is_deleted=False).all() if
-                                      not char.is_dead() and char.improvement_ok()]
+        users_living_character_ids = [char.id for char in user.character_set.filter(is_deleted=False, is_dead=False).all() if char.improvement_ok()]
         queryset = Character.objects.filter(id__in=users_living_character_ids)
         chosen_character = forms.ModelChoiceField(queryset=queryset,
                                                   label="Chosen Contractor",

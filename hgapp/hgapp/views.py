@@ -135,8 +135,8 @@ def home(request):
             if not request.user.profile.confirmed_agreements:
                 return HttpResponseRedirect(reverse('profiles:profiles_terms'))
         my_characters = request.user.character_set.filter(is_deleted=False).order_by('name').all()
-        living_characters = [x for x in my_characters if x.is_dead() == False]
-        dead_characters = [x for x in my_characters if x.is_dead() == True]
+        living_characters = [x for x in my_characters if x.is_dead == False]
+        dead_characters = [x for x in my_characters if x.is_dead == True]
         my_powers = request.user.power_full_set.filter(is_deleted=False).order_by('name').all()
         my_scenarios = request.user.scenario_creator.order_by("title").all()
         new_players = User.objects.order_by('-date_joined')[:6]
