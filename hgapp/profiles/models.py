@@ -4,7 +4,7 @@ from django.contrib.auth.models import Permission
 from .apps import ProfilesConfig
 
 from django.utils import timezone
-from games.models import Game, Move
+from games.models import Game, Move, REQUIRED_HIGH_ROLLER_STATUS
 from games.games_constants import get_completed_game_invite_excludes_query, get_completed_game_excludes_query
 
 UNTESTED = 'UNTESTED'
@@ -97,16 +97,21 @@ class Profile(models.Model):
                                  default=GM_SUFFIX[0][0])
 
     num_games_gmed = models.IntegerField(default=0)
+    num_games_gmed_novice = models.IntegerField(default=0)
     num_moves_gmed = models.IntegerField(default=0)
     num_gm_kills = models.IntegerField(default=0)
     num_gm_victories = models.IntegerField(default=0)
     num_gm_losses = models.IntegerField(default=0)
+    num_gm_kills_novice = models.IntegerField(default=0)
+    num_gm_victories_novice = models.IntegerField(default=0)
+    num_gm_losses_novice = models.IntegerField(default=0)
     num_golden_ratios = models.IntegerField(default=0)
     num_gmed_players = models.IntegerField(default=0)
     num_gmed_cells = models.IntegerField(default=0)
     num_gmed_contractors = models.IntegerField(default=0)
 
     num_player_games = models.IntegerField(default=0)
+    num_player_games_novice = models.IntegerField(default=0)
     num_player_victories = models.IntegerField(default=0)
     num_player_losses = models.IntegerField(default=0)
     num_player_deaths = models.IntegerField(default=0)
@@ -152,17 +157,32 @@ class Profile(models.Model):
     def update_gm_stats(self):
         gm_games = self.get_games_where_player_gmed()
         num_gm_games = gm_games.count()
+        num_gm_games_novice = 0
         num_gm_kills = 0
-        num_golden_ratio_games = 0
         num_gm_victories = 0
         num_gm_losses = 0
+        num_gm_kills_novice = 0
+        num_gm_victories_novice = 0
+        num_gm_losses_novice = 0
+        num_golden_ratio_games = 0
         cells_gmed = set()
         contractors_gmed = set()
         players_gmed = set()
         for game in gm_games:
-            num_gm_kills = num_gm_kills + game.number_deaths()
-            num_gm_victories = num_gm_victories + game.number_victories()
-            num_gm_losses = num_gm_losses + game.number_losses()
+            game_kills = game.number_deaths()
+            game_victories = game.number_victories()
+            game_losses = game.number_losses()
+            if game.required_character_status in (REQUIRED_HIGH_ROLLER_STATUS[0][0],
+                                                  REQUIRED_HIGH_ROLLER_STATUS[1][0],
+                                                  REQUIRED_HIGH_ROLLER_STATUS[2][0],
+                                                  REQUIRED_HIGH_ROLLER_STATUS[3][0]):
+                num_gm_kills_novice = num_gm_kills_novice + game_kills
+                num_gm_victories_novice = num_gm_victories_novice + game_victories
+                num_gm_losses_novice = num_gm_losses_novice + game_losses
+                num_gm_games_novice = num_gm_games_novice + 1
+            num_gm_kills = num_gm_kills + game_kills
+            num_gm_victories = num_gm_victories + game_victories
+            num_gm_losses = num_gm_losses + game_losses
             if game.achieves_golden_ratio():
                 num_golden_ratio_games = num_golden_ratio_games + 1
             if game.cell:
@@ -178,7 +198,11 @@ class Profile(models.Model):
         self.num_moves_gmed = self.get_moves_where_player_gmed().count()
         self.num_gm_losses = num_gm_losses
         self.num_gm_kills = num_gm_kills
-        self.num_gm_victories = num_gm_victories
+        self.num_gm_victories = num_gm_victories_novice
+        self.num_gm_losses_novice = num_gm_losses_novice
+        self.num_gm_kills_novice = num_gm_kills_novice
+        self.num_gm_victories_novice = num_gm_victories_novice
+        self.num_games_gmed_novice = num_gm_games_novice
         self.num_golden_ratios = num_golden_ratio_games
         self.save()
 
@@ -196,6 +220,7 @@ class Profile(models.Model):
         self.num_player_games = completed_game_invites.count()
         invites_with_death = self.get_invites_with_death(completed_game_invites)
         self.num_deadly_player_games = len(invites_with_death)
+        self.num_player_games_novice = self._get_novice_game_count(completed_game_invites)
         played_character_ids = set()
         num_deaths = 0
         num_victories = 0
@@ -224,7 +249,8 @@ class Profile(models.Model):
 
     def recompute_player_title(self):
         self.player_suffix = self._player_suffix_from_num_games(self.num_player_games)
-        self.player_prefix = self._player_prefix_from_counts(num_completed=self.num_player_games,
+        # Player prefix is calculated based on any/newbie/novice contracts because they expect higher death counts.
+        self.player_prefix = self._player_prefix_from_counts(num_completed=self.num_player_games_novice,
                                                              num_deadly_games=self.num_deadly_player_games,
                                                              num_deaths_on_games=self.num_player_deaths)
         self.save()
@@ -243,14 +269,16 @@ class Profile(models.Model):
         self.gm_suffix = self._gm_suffix_from_num_gm_games(self.num_games_gmed, self.num_moves_gmed)
 
         # gm_prefix can be None, so we return the db value here
-        self.gm_prefix = self._gm_prefix_from_stats(num_gm_games=self.num_games_gmed,
-                                                    num_killed_contractors=self.num_gm_kills)
+        # GM prefix is calculated based on any/newbie/novice contracts because they expect higher death counts.
+        self.gm_prefix = self._gm_prefix_from_stats(num_gm_games=self.num_games_gmed_novice,
+                                                    num_killed_contractors=self.num_gm_kills_novice)
         self.save()
 
     def completed_game_invites(self):
         return self.user.game_invite_set \
             .exclude(get_completed_game_invite_excludes_query()) \
             .exclude(is_declined=True) \
+            .prefetch_related("attendance", "attendance__attending_character") \
             .order_by("-relevant_game__end_time") \
             .all()
 
@@ -266,6 +294,7 @@ class Profile(models.Model):
 
     def get_games_where_player_gmed(self):
         return Game.objects.filter(gm=self.user).exclude(get_completed_game_excludes_query()) \
+                .prefetch_related("game_attendance_set") \
                 .order_by("-end_time") \
                 .all()
 
@@ -312,6 +341,7 @@ class Profile(models.Model):
         else:
             return GRANDMASTER
 
+
     def _gm_suffix_from_num_gm_games(self, num_games_gmed, num_moves_gmed):
         num_gm_games = num_games_gmed + (0.25 * num_moves_gmed)
         if num_gm_games < 1:
@@ -328,6 +358,7 @@ class Profile(models.Model):
             return HARBINGER
         else:
             return GOD
+
 
     def _gm_prefix_from_stats(self, num_gm_games, num_killed_contractors):
         if num_gm_games == 0:
@@ -348,4 +379,16 @@ class Profile(models.Model):
         else:
             # Cruel
             return GM_PREFIX[4][0]
+
+
+    def _get_novice_game_count(self, completed_game_invites):
+        count = 0
+        for invite in completed_game_invites:
+            if invite.relevant_game.required_character_status in (REQUIRED_HIGH_ROLLER_STATUS[0][0],
+                                                                  REQUIRED_HIGH_ROLLER_STATUS[1][0],
+                                                                  REQUIRED_HIGH_ROLLER_STATUS[2][0],
+                                                                  REQUIRED_HIGH_ROLLER_STATUS[3][0]):
+                count = count + 1
+        return count
+
 
