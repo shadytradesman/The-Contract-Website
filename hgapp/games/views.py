@@ -279,7 +279,7 @@ def create_game(request, cell_id=None):
                             game_invite.as_ringer = True
                         game_invite.save()
                         game_invite.notify_invitee(request, game)
-            messages.add_message(request, messages.SUCCESS, mark_safe("Your Game has been created Successfully."))
+            messages.add_message(request, messages.SUCCESS, mark_safe("Your Contract has been successfully scheduled."))
             post_game_webhook(game, request)
             return HttpResponseRedirect(reverse('games:games_invite_players', args=(game.id,)))
         else:

@@ -1,2 +1,4 @@
 {% block email_body %}
 {% endblock %}
+
+Click here to change your email preferences: https://thecontractrpg.com/{% url 'account_settings'%}

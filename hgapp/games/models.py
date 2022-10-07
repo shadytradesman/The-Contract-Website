@@ -18,6 +18,10 @@ from django.utils.safestring import SafeText
 from games.games_constants import GAME_STATUS, get_completed_game_excludes_query
 
 from hgapp.utilities import get_object_or_none
+import django.dispatch
+
+NotifyGameInvitee = django.dispatch.Signal(providing_args=['game_invite', 'request'])
+
 
 logger = logging.getLogger("app." + __name__)
 
@@ -695,6 +699,7 @@ class Game_Attendance(models.Model):
     class Meta:
         unique_together = (("attending_character", "relevant_game"))
 
+
 class Game_Invite(models.Model):
     invited_player = models.ForeignKey(settings.AUTH_USER_MODEL,
                                        on_delete=models.PROTECT)
@@ -720,21 +725,10 @@ class Game_Invite(models.Model):
         return "[{}] {} invitation to {}".format(status, self.invited_player.username, self.relevant_game.scenario.title)
 
     def notify_invitee(self, request, game):
-        # This string is considered "safe" only because the markdown renderer will escape malicious HTML and scripts.
-        message_body = SafeText('###{0} has invited you to an upcoming Game in {1}\n\n{2}\n\n [Click Here]({3}) to respond.'
-                                .format(self.relevant_game.creator.get_username(),
-                                        self.relevant_game.cell.name,
-                                        self.invite_text,
-                                        request.build_absolute_uri(reverse("games:games_view_game", args=[game.id])),
-                                        ))
-        pm_write(sender=self.relevant_game.creator,
-                 recipient=self.invited_player,
-                 subject= self.relevant_game.creator.get_username() + " has invited you to join " + self.relevant_game.title,
-                 body=message_body,
-                 skip_notification=False,
-                 auto_archive=True,
-                 auto_delete=False,
-                 auto_moderators=None)
+        NotifyGameInvitee.send_robust(sender=self.__class__,
+                                      game_invite=self,
+                                      request=request)
+
 
     def save(self, *args, **kwargs):
         if self.pk is None:

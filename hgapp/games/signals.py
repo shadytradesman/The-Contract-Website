@@ -1,6 +1,7 @@
+
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
-from games.models import Game_Attendance, Reward
+from .models import Game_Attendance, Reward
 from characters.signals import GrantAssetGift, VoidAssetGifts, AlterPortedRewards
 
 # This is done as a signal instead of model override due to django doc recommendation

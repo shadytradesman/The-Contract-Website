@@ -17,7 +17,7 @@ class EditProfileForm(forms.Form):
 
 
 class EmailSettingsForm(forms.Form):
-    contract_invitations = forms.BooleanField(required=False, widget=forms.HiddenInput)
+    contract_invitations = forms.BooleanField(required=False)
     direct_messages = forms.BooleanField(required=False)
     intro_contracts = forms.BooleanField(required=False, widget=forms.HiddenInput)
     site_announcements = forms.BooleanField(required=False, widget=forms.HiddenInput)

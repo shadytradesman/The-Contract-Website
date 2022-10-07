@@ -1,0 +1,10 @@
+{% extends "emails/base_email.txt" %}
+{% block email_body %}
+You have been invited by {{gm.username}} to join a Contract!
+
+The Contract takes place in {{game.cell.name}} for {{game.get_required_character_status_display}} Contractors.
+
+Click here to learn more and RSVP: {{game_url}}
+
+Invite text: {{invite.invite_text}}
+{% endblock %}
