@@ -68,7 +68,7 @@ GM_SUFFIX = (
     (RULER, 'Ruler'),
     (GOD, 'God'),
     (HARBINGER, 'Harbinger'),
-    (MIDDLE_MANAGEMENT, 'Middle Management')
+    (MIDDLE_MANAGEMENT, 'Manager')
 )
 
 
