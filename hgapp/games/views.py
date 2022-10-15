@@ -339,6 +339,7 @@ def edit_game(request, game_id):
      'allow_ringers': game.allow_ringers,
      'max_rsvp': game.max_rsvp,
      'gametime_url': game.gametime_url,
+     'invite_all_members': game.invite_all_members,
      'mediums': game.mediums.all(),
     }
     GameForm = make_game_form(user=request.user)
@@ -362,6 +363,7 @@ def edit_game(request, game_id):
             game.list_in_lfg = form.cleaned_data['list_in_lfg']
             game.allow_ringers = form.cleaned_data['allow_ringers']
             game.max_rsvp = form.cleaned_data['max_rsvp']
+            game.invite_all_members = form.cleaned_data['invite_all_members']
             game.gametime_url = form.cleaned_data['gametime_url']
             if 'only_over_18' in form.cleaned_data:
                 game.is_nsfw = form.cleaned_data['only_over_18']
@@ -403,7 +405,6 @@ def view_game(request, game_id):
     if request.user.is_authenticated and game.cell:
         user_membership = game.cell.get_player_membership(request.user)
         my_invitation = get_object_or_none(request.user.game_invite_set.filter(relevant_game=game_id))
-    can_view_community_link = False
     community_link = None
     if game.cell:
         can_view_community_link = game.cell.is_community_link_public or user_membership
@@ -461,9 +462,13 @@ def invite_players(request, game_id):
         form = CustomInviteForm(request.POST, initial=initial_data)
         if form.is_valid():
             player = get_object_or_404(User, username__iexact= form.cleaned_data['username'])
-            if get_queryset_size(player.game_invite_set.filter(relevant_game=game)) > 0:
-                #player is already invited. Maybe update invitation instead?
-                raise PermissionDenied("Player already invited")
+            invite = player.game_invite_set.filter(relevant_game=game).first()
+            if invite:
+                with transaction.atomic():
+                    invite.as_ringer = form.cleaned_data['invite_as_ringer']
+                    invite.invite_text = form.cleaned_data['message']
+                    invite.save()
+                return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
             if player == game.creator or player == game.gm:
                 raise PermissionDenied("You can't invite Players to a Game they created or are running.")
             game_invite = Game_Invite(invited_player=player,
@@ -523,7 +528,7 @@ def accept_invite(request, game_id):
             # if game is open for self-invites, make a temp invite that we don't save so we can make a form
             invite = Game_Invite(invited_player=request.user,
                                  relevant_game=game)
-            if game.scenario in request.user.scenario_set.all():
+            if scenario_spoiled:
                 invite.as_ringer = True
         form = make_accept_invite_form(invite)
         context = {

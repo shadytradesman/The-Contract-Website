@@ -102,10 +102,10 @@ def make_game_form(user):
                                                 "run in their Playgroup.",
                                       required=True)
 
-        invite_all_members = forms.BooleanField(initial=False,
+        invite_all_members = forms.BooleanField(initial=True,
                                                 required=False,
                                                 label='Invite all Playgroup Members',
-                                                help_text="Automatically send an invite and notification to all members "
+                                                help_text="Automatically send an invite to all Playgroup members "
                                                           "of the chosen Playgroup. ")
         required_character_status = forms.ChoiceField(label="Required Contractor Status",
                                                       choices=REQUIRED_HIGH_ROLLER_STATUS,

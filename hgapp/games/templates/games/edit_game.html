@@ -95,11 +95,31 @@
                 {% csrf_token %}
                 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
                 <div class="row">
+                    <div class="col-md-6">
+                        {% if game.is_scheduled or not game %}
+                        {{ form.scenario | bootstrap }}
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <div id="js-scenario-title">
+                            {{ form.title | bootstrap}}
+                        </div>
+                        <div id="js-scenario-already-play">
+                            <div class="alert alert-info text-center">
+                                <b>This Scenario has already been run in this Playgroup</b>
+                                <p>
+                                    Re-running some Scenarios can introduce story consistency issues.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
                     <div class="col-sm-6">
                         {{ form.cell | bootstrap}}
                     </div>
                     <div class="col-sm-6">
-                        {{ form.invite_all_members | bootstrap}}
+                        {{ form.required_character_status | bootstrap }}
                     </div>
                 </div>
                 {% if not form.cell.field.choices.queryset.all|length %}
@@ -119,26 +139,6 @@
                     <br>
                 {% endif %}
 
-                <div class="row">
-                    <div class="col-md-6">
-                        {% if game.is_scheduled or not game %}
-                            {{ form.scenario | bootstrap }}
-                        {% endif %}
-                    </div>
-                    <div class="col-md-6">
-                        <div id="js-scenario-title">
-                            {{ form.title | bootstrap}}
-                        </div>
-                        <div id="js-scenario-already-play">
-                            <div class="alert alert-info text-center">
-                                <b>This Scenario has already been run in this Playgroup</b>
-                                <p>
-                                    Re-running some Scenarios can introduce story consistency issues.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 {% if game.is_scheduled %}
                     {% if not form.scenario.field.choices.queryset.all|length %}
                         <div class="row">
@@ -163,7 +163,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-4">
-                        {{ form.required_character_status | bootstrap }}
+                        {{ form.invite_all_members | bootstrap}}
                     </div>
                     <div class="col-md-4">
                         {{ form.invitation_mode | bootstrap }}

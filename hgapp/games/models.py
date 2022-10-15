@@ -131,6 +131,7 @@ class Game(models.Model):
     open_invitations = models.BooleanField(default=True) # deprecated. Use invitation_mode instead.
     is_nsfw = models.BooleanField(default=False)
     list_in_lfg = models.BooleanField(default=False)
+    invite_all_members = models.BooleanField(default=False)
     allow_ringers = models.BooleanField(default=False)
     invitation_mode = models.CharField(choices=INVITE_MODE,
                               max_length=55,
