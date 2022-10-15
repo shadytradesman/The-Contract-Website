@@ -52,6 +52,7 @@ class SettingsView(account.views.SettingsView):
             profile = self.request.user.profile
             email_prefs_initial = {
                 "contract_invitations": profile.contract_invitations,
+                "contract_updates": profile.contract_updates,
                 "intro_contracts": profile.intro_contracts,
                 "direct_messages": profile.direct_messages,
                 "site_announcements": profile.site_announcements,

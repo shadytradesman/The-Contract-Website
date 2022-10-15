@@ -33,7 +33,7 @@ from cells.forms import EditWorldEventForm
 from cells.models import WorldEvent
 
 from games.models import Scenario, Game, DISCOVERY_REASON, Game_Invite, Game_Attendance, Reward, REQUIRED_HIGH_ROLLER_STATUS, \
-    Move
+    Move, GameChangeStartTime
 
 from profiles.models import Profile
 
@@ -295,10 +295,10 @@ def create_game(request, cell_id=None):
         }
         return render(request, 'games/edit_game.html', context)
 
-def post_game_webhook(game, request):
+def post_game_webhook(game, request, is_changed_start=False):
     cell_webhooks = game.cell.webhook_cell.filter(send_for_contracts=True).all()
     if game.list_in_lfg or cell_webhooks:
-        content = game.get_webhook_post(request)
+        content = game.get_webhook_post(request, is_changed_start)
         if game.list_in_lfg:
             lfg_content = "{} {}".format("<@&921821283551940638>", content)
             requests.post(settings.LFG_WEBHOOK_URL, json={'content': lfg_content, })
@@ -355,6 +355,7 @@ def edit_game(request, game_id):
                 account.timezone = form.cleaned_data["timezone"]
                 account.save()
                 start_time = change_time_to_current_timezone(start_time)
+            changed_start = start_time != game.scheduled_start_time
             game.scheduled_start_time = start_time
             game.required_character_status = form.cleaned_data['required_character_status']
             game.scenario=form.cleaned_data['scenario']
@@ -381,6 +382,10 @@ def edit_game(request, game_id):
                                                   as_ringer=False)
                         game_invite.save()
                         game_invite.notify_invitee(request, game)
+                if changed_start:
+                    print("changed start time")
+                    GameChangeStartTime.send_robust(sender=None, game=game, request=request)
+                    post_game_webhook(game, request, is_changed_start=True)
             return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
         else:
             logger.error('Error: invalid GameForm. Errors: %s', str(form.errors))

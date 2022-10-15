@@ -6,6 +6,7 @@ from .apps import ProfilesConfig
 from django.utils import timezone
 from games.models import Game, Move, REQUIRED_HIGH_ROLLER_STATUS
 from games.games_constants import get_completed_game_invite_excludes_query, get_completed_game_excludes_query
+from account.models import EmailAddress
 
 UNTESTED = 'UNTESTED'
 SHELTERED = 'SHELTERED'
@@ -125,6 +126,7 @@ class Profile(models.Model):
 
     # Email prefs
     contract_invitations = models.BooleanField(default=True)
+    contract_updates = models.BooleanField(default=True)
     direct_messages = models.BooleanField(default=True)
     intro_contracts = models.BooleanField(default=True)
     site_announcements = models.BooleanField(default=True)
@@ -142,6 +144,14 @@ class Profile(models.Model):
             models.Index(fields=['num_player_survivals']),
             models.Index(fields=['num_moves_gmed']),
         ]
+
+    def get_confirmed_email(self):
+        email = EmailAddress.objects.get_primary(self.user)
+        is_verified = email and email.verified
+        if is_verified:
+            return email
+        else:
+            return None
 
     # This should be the only way you set the user's adult content prefs
     def update_view_adult_content(self, view_adult_content):

@@ -1,0 +1,8 @@
+{% extends "emails/base_email.txt" %}
+{% block email_body %}
+{{gm.username}} has changed the start time for the Contract they invited you to.
+
+Click here to see the updated time and change your RSVP: {{game_url}}
+
+Invite text: {{invite.invite_text}}
+{% endblock %}

@@ -18,6 +18,9 @@ class EditProfileForm(forms.Form):
 
 class EmailSettingsForm(forms.Form):
     contract_invitations = forms.BooleanField(required=False)
+    contract_updates = forms.BooleanField(required=False,
+                                          help_text="Email me when a Contract I'm invited to changes its scheduled start "
+                                                    "time or when one I am attending ends and rewards are granted.")
     direct_messages = forms.BooleanField(required=False)
     intro_contracts = forms.BooleanField(required=False, widget=forms.HiddenInput)
     site_announcements = forms.BooleanField(required=False, widget=forms.HiddenInput)

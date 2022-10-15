@@ -21,6 +21,7 @@ from hgapp.utilities import get_object_or_none
 import django.dispatch
 
 NotifyGameInvitee = django.dispatch.Signal(providing_args=['game_invite', 'request'])
+GameChangeStartTime = django.dispatch.Signal(providing_args=['game', 'request'])
 
 
 logger = logging.getLogger("app." + __name__)
@@ -194,8 +195,12 @@ class Game(models.Model):
         # ANYONE case
         return None
 
-    def get_webhook_post(self, request):
-        return "{} will run {} in {}. The Contract starts at <t:{}:f> (<t:{}:R>). RSVP: {}".format(
+    def get_webhook_post(self, request, is_changed_start):
+        if is_changed_start:
+            format_string = "{} has updated the start time of their Contract for {} in {}. The Contract *now* starts at <t:{}:f> (<t:{}:R>). RSVP: {}"
+        else:
+            format_string = "{} will run {} in {}. The Contract starts at <t:{}:f> (<t:{}:R>). RSVP: {}"
+        return format_string.format(
             self.gm.username,
             self.scenario.title,
             self.cell.name,
@@ -730,7 +735,6 @@ class Game_Invite(models.Model):
                                       game_invite=self,
                                       request=request)
 
-
     def save(self, *args, **kwargs):
         if self.pk is None:
             super(Game_Invite, self).save(*args, **kwargs)
@@ -739,6 +743,7 @@ class Game_Invite(models.Model):
 
     def invitee_is_spoiled_on_scenario(self):
         return self.invited_player.has_perm("view_scenario", self.relevant_game.scenario)
+
 
 class Scenario(models.Model):
     creator = models.ForeignKey(

@@ -2,20 +2,8 @@
 
 {% block email_body %}
 <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;background:#ffffff;">
-    <tr>
-        <td style="padding:0;">
-            <h4>You have received a new direct message from {{sender}} on <a href="https://www.thecontractrpg.com/">The Contract</a></h4>
-        </td>
-    </tr>
-    <tr>
-        <td style="padding:0; color:grey;">
-            <p>"{{content_snip}}". . .</p>
-        </td>
-    </tr>
-    <tr>
-        <td style="padding:0;">
-            <h4><a href="{{view_url}}">Click here to read and respond.</a></h4>
-        </td>
-    </tr>
+    <h3>You have received a new direct message from {{sender}} on <a href="https://www.thecontractrpg.com/">The Contract</a></h3>
+    <p style="color:grey;">"{{content_snip}}". . .</p>
+    <h4><a href="{{view_url}}">Click here to read and respond.</a></h4>
 </table>
 {% endblock %}
