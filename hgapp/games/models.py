@@ -22,6 +22,7 @@ import django.dispatch
 
 NotifyGameInvitee = django.dispatch.Signal(providing_args=['game_invite', 'request'])
 GameChangeStartTime = django.dispatch.Signal(providing_args=['game', 'request'])
+GameEnded = django.dispatch.Signal(providing_args=['game', 'request'])
 
 
 logger = logging.getLogger("app." + __name__)

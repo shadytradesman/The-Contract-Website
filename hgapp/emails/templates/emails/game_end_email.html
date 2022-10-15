@@ -1,0 +1,18 @@
+{% extends "emails/base_email.html" %}
+
+{% block email_body %}
+<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;background:#ffffff;">
+    {% if attendance.is_confirmed %}
+    <h3>
+        {{gm.username}} finalized the Contract you attended with {{character_name}}, and you earned rewards!
+    </h3>
+    <h4><a href="{{reward_url}}">Click here to spend your rewards</a></h4>
+    <h4><a href="{{game_url}}">Click here to view the completed Contract</a></h4>
+    {% else %}
+    <h3>
+        {{gm.username}} declared that you attended a Contract with {{character_name}}.
+    </h3>
+    <h4><a href="{{game_url}}">Click here to view the Contract event, confirm your attendance, and earn rewards.</a></h4>
+    {% endif %}
+</table>
+{% endblock %}

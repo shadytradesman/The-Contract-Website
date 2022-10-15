@@ -1,6 +1,6 @@
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
-from games.models import Game_Invite, NotifyGameInvitee, GameChangeStartTime
+from games.models import Game_Invite, NotifyGameInvitee, GameChangeStartTime, GameEnded
 from django.template.loader import render_to_string
 from django.core.mail import send_mail
 from postman.api import pm_write
@@ -27,6 +27,22 @@ def notify_changed_start(**kwargs):
                 send_email_for_game_time_update(email, invite, game_url)
 
 
+@receiver(GameEnded)
+def notify_game_ended(**kwargs):
+    game = kwargs["game"]
+    request = kwargs["request"]
+    game_url = request.build_absolute_uri(reverse("games:games_view_game", args=[game.id]))
+    for invite in game.game_invite_set.all():
+        profile = invite.invited_player.profile
+        if profile.contract_updates and hasattr(invite, "attendance") and invite.attendance:
+            email = invite.invited_player.profile.get_confirmed_email()
+            if email:
+                if invite.attendance.attending_character:
+                    reward_url = request.build_absolute_uri(reverse("characters:characters_view", args=[invite.attendance.attending_character.id]))
+                else:
+                    reward_url = request.build_absolute_uri(reverse("characters:characters_allocate_gm_exp"))
+                send_email_for_game_ended(email, invite, game_url, reward_url)
+
 @receiver(NotifyGameInvitee)
 def notify_game_invitee(sender, **kwargs):
     invite = kwargs["game_invite"]
@@ -51,6 +67,34 @@ def notify_game_invitee(sender, **kwargs):
         email = invite.invited_player.profile.get_confirmed_email()
         if email:
             send_email_for_game_invite(email, invite, game_url)
+
+
+def send_email_for_game_ended(email, game_invite, game_url, reward_url):
+    logger.info("sending game ended email to {}".format(email.email))
+    invited_player = game_invite.invited_player
+    gm = game_invite.relevant_game.creator
+    attendance = game_invite.attendance
+    character_name = attendance.attending_character.name if attendance.attending_character else "an NPC Ringer"
+    context = {
+        'invited_player': invited_player,
+        'gm': gm,
+        'attendance': attendance,
+        'character_name': character_name,
+        'game_url': game_url,
+        'reward_url': reward_url,
+        'game': game_invite.relevant_game,
+    }
+    if attendance.is_victory():
+        subject = "{} was victorious, earning a Gift and Experience!".format(character_name)
+    else:
+        subject = "{} finalized their Contract, and you earned Experience!".format(gm.username)
+    # Email subject *must not* contain newlines
+    subject = ''.join(subject.splitlines())
+
+    html_message = render_to_string("emails/game_end_email.html", context)
+    message = render_to_string('emails/game_end_email.txt', context)
+
+    send_mail(subject, message, from_email, [email.email], fail_silently=False, html_message=html_message)
 
 
 def send_email_for_game_time_update(email, game_invite, game_url):

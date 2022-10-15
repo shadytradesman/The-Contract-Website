@@ -1,0 +1,14 @@
+{% extends "emails/base_email.txt" %}
+{% block email_body %}
+{% if attendance.is_confirmed %}
+{{gm.username}} finalized the Contract you attended with {{character_name}}, and you earned rewards!
+
+Click here to spend your rewards: {{reward_url}}
+
+Click here to view the Contract event: {{game_url}}
+{% else %}
+{{gm.username}} declared that you attended a Contract.
+
+Click here to view the Contract event, confirm your attendance, and earn rewards: {{game_url}}
+{% endif %}
+{% endblock %}

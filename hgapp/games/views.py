@@ -33,7 +33,7 @@ from cells.forms import EditWorldEventForm
 from cells.models import WorldEvent
 
 from games.models import Scenario, Game, DISCOVERY_REASON, Game_Invite, Game_Attendance, Reward, REQUIRED_HIGH_ROLLER_STATUS, \
-    Move, GameChangeStartTime
+    Move, GameChangeStartTime, GameEnded
 
 from profiles.models import Profile
 
@@ -383,7 +383,6 @@ def edit_game(request, game_id):
                         game_invite.save()
                         game_invite.notify_invitee(request, game)
                 if changed_start:
-                    print("changed start time")
                     GameChangeStartTime.send_robust(sender=None, game=game, request=request)
                     post_game_webhook(game, request, is_changed_start=True)
             return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
@@ -697,6 +696,7 @@ def end_game(request, game_id):
                         webhook.post_for_event(world_event, request)
                 game.save()
                 game.transition_to_finished()
+                GameEnded.send_robust(sender=None, game=game, request=request)
             return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
         else:
             logger.error('Error: invalid declare_outcome_formset or game_feedback_form. declare_outcome_formset errors: %s\n\n game_feedback_form errors: %s',

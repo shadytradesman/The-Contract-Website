@@ -10,7 +10,7 @@ from django.contrib.auth.models import User
 
 from .forms import make_archive_game_general_info_form, get_archival_outcome_form, CellMemberAttendedForm, OutsiderAttendedForm, \
     make_who_was_gm_form
-from .models import Game, Game_Invite, Game_Attendance
+from .models import Game, Game_Invite, Game_Attendance, GameEnded
 from .games_constants import GAME_STATUS
 
 def convert_to_localtime(utctime):
@@ -231,6 +231,7 @@ def create_archival_game(request, general_form, cell, outcome_formset):
         game.give_rewards()
         game.update_profile_stats()
         game.unlock_stock_scenarios()
+        GameEnded.send_robust(sender=None, game=game, request=request)
 
 
 def get_context_for_choose_attending(cell, game=None):
