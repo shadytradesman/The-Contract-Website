@@ -15,17 +15,21 @@
 {% block body_base %}
 <div class="container">
     <div class="backdropped">
-    {% if character.num_unspent_rewards > 0 %}
+    {% if character.num_unspent_rewards > 0 or unspent_exp > 2 %}
         <div class="text-center">
             {% if character.num_unspent_gifts > 0 %}
                 <h1>
                     You've done well, <a href="{% url 'characters:characters_view' character.id %}">{{ character.name }}</a>
                 </h1>
                 <h3>
-                    {% if character.num_unspent_gifts == 1 and character.num_unspent_improvements == 0 %}
+                    {% if character.num_unspent_rewards > 0 and unspent_exp > 2 %}
+                        Spend these rewards wisely
+                    {% elif character.num_unspent_gifts == 1 and character.num_unspent_improvements == 0 %}
                         Spend this Gift wisely
                     {% elif character.num_unspent_gifts > 1 %}
                         Spend these Gifts wisely
+                    {% else %}
+                        Spend these rewards wisely
                     {% endif %}
                 </h3>
             {% else %}
@@ -34,31 +38,43 @@
                 </h1>
             {% endif %}
         </div>
-        {% if character.num_unspent_rewards > 0 %}
-            <ul class="list-unstyled text-center">
-                {% for reward in character.unspent_rewards %}
-                    <li>
-                        <div class="thumbnail" style="margin-bottom: 10px;">
-                            {% render_reward reward %}
-                        </div>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% endif %}
+        <ul class="list-unstyled text-center">
+            {% for reward in character.unspent_rewards %}
+                <li>
+                    <div class="thumbnail" style="margin-bottom: 10px;">
+                        {% render_reward reward %}
+                    </div>
+                </li>
+            {% endfor %}
+            {% if unspent_exp > 1 %}
+            <li>
+                <div class="thumbnail" style="margin-bottom: 10px;">
+                    {{unspent_exp}} unspent Experience
+                </div>
+            </li>
+            {% endif %}
+        </ul>
         <div class="panel panel-default">
             <div class="panel-body">
-                <div class="row text-center">
+                <div class="row text-center" style="display: flex; flex-wrap: wrap; justify-content: space-between;">
                     {% if character.num_unspent_gifts > 0 %}
-                        <div class="col-xs-12 col-sm-6">
+                        <div style="margin: auto;  margin-bottom: 5px;">
                             <a class="btn btn-success btn-lg" href="{% url 'powers:powers_create_ps2_for_char' character.id %}">
                                 Create a New Gift
                             </a>
                         </div>
                     {% endif %}
                     {% if unassigned_powers %}
-                        <div class="col-xs-12 col-sm-6">
+                        <div style="margin: auto;  margin-bottom: 5px;">
                             <a class="btn btn-default btn-lg" href="{% url 'characters:characters_power_picker' character.id %}">
                                 Assign existing Gifts
+                            </a>
+                        </div>
+                    {% endif %}
+                    {% if unspent_exp > 2 %}
+                        <div style="margin: auto; margin-bottom: 5px;">
+                            <a href="{% url 'characters:characters_edit' character.id secret_key %}" class="btn btn-success btn-lg">
+                                Spend {{unspent_exp}} Experience
                             </a>
                         </div>
                     {% endif %}

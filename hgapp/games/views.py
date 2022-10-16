@@ -44,6 +44,7 @@ from hgapp.utilities import get_queryset_size, get_object_or_none
 from cells.models import Cell
 
 
+@login_required
 def enter_game(request):
     if not request.user.is_authenticated:
         raise PermissionDenied("You must be logged in to enter a Game")
@@ -52,6 +53,7 @@ def enter_game(request):
         'cells' : cells,
     }
     return render(request, 'games/enter_game.html', context)
+
 
 def activity(request):
     num_total_games = Game.objects.count()
@@ -81,6 +83,8 @@ def activity(request):
     }
     return render(request, 'games/activity.html', context)
 
+
+@login_required
 def create_scenario(request):
     if not request.user.is_authenticated:
         raise PermissionDenied("You must be logged in to create a Scenario")
@@ -117,6 +121,8 @@ def create_scenario(request):
         }
         return render(request, 'games/edit_scenario.html', context)
 
+
+@login_required
 def edit_scenario(request, scenario_id):
     scenario = get_object_or_404(Scenario, id=scenario_id)
     if not request.user.has_perm('edit_scenario', scenario):
@@ -163,6 +169,8 @@ def edit_scenario(request, scenario_id):
         }
         return render(request, 'games/edit_scenario.html', context)
 
+
+@login_required
 def view_scenario(request, scenario_id, game_id=None):
     scenario = get_object_or_404(Scenario, id=scenario_id)
     if not scenario.is_public() and not scenario.player_discovered(request.user):
@@ -205,6 +213,7 @@ def view_scenario(request, scenario_id, game_id=None):
         return render(request, 'games/view_scenario.html', context)
 
 
+@login_required
 def view_scenario_gallery(request):
     if not request.user.is_authenticated:
         raise PermissionDenied("You must be logged in to view your Scenario Gallery")
@@ -223,6 +232,7 @@ def view_scenario_gallery(request):
     return render(request, 'games/view_scenario_gallery.html', context)
 
 
+@login_required
 def create_game(request, cell_id=None):
     if not request.user.is_authenticated:
         raise PermissionDenied("You must be logged in to schedule a Contract")
@@ -295,6 +305,8 @@ def create_game(request, cell_id=None):
         }
         return render(request, 'games/edit_game.html', context)
 
+
+
 def post_game_webhook(game, request, is_changed_start=False):
     cell_webhooks = game.cell.webhook_cell.filter(send_for_contracts=True).all()
     if game.list_in_lfg or cell_webhooks:
@@ -321,6 +333,7 @@ def get_scenarios_by_cells(request):
     return scenarios_by_cells
 
 
+@login_required
 def edit_game(request, game_id):
     game = get_object_or_404(Game, id=game_id)
     if request.user.is_anonymous or not game.player_can_edit(request.user):
@@ -401,7 +414,6 @@ def edit_game(request, game_id):
         return render(request, 'games/edit_game.html', context)
 
 
-
 def view_game(request, game_id):
     game = get_object_or_404(Game, id=game_id)
     my_invitation = None
@@ -438,7 +450,8 @@ def view_game(request, game_id):
     }
     return render(request, 'games/view_game_pages/view_game.html', context)
 
-#TODO: if game is active, add option to share scenario with participants
+
+@login_required
 def cancel_game(request, game_id):
     game = get_object_or_404(Game, id=game_id)
     if request.method == 'POST':
@@ -457,6 +470,8 @@ def cancel_game(request, game_id):
         }
         return render(request, 'games/cancel_game.html', context)
 
+
+@login_required
 def invite_players(request, game_id):
     game = get_object_or_404(Game, id=game_id)
     if not game.player_can_edit(request.user) or not game.is_scheduled():
@@ -489,6 +504,8 @@ def invite_players(request, game_id):
     else:
         return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
 
+
+@login_required
 def accept_invite(request, game_id):
     game = get_object_or_404(Game, id=game_id)
     if not game.player_can_rsvp(request.user):
@@ -543,6 +560,8 @@ def accept_invite(request, game_id):
         }
         return render(request, 'games/accept_invite.html', context)
 
+
+@login_required
 def decline_invite(request, game_id):
     game = get_object_or_404(Game, id=game_id)
     if game.is_scheduled():
@@ -645,6 +664,8 @@ def start_game(request, game_id, char_error="", player_error=""):
             context['player_errors'] = error_players
         return render(request, 'games/start_game.html', context)
 
+
+@login_required
 def end_game(request, game_id):
     game = get_object_or_404(Game, id=game_id)
     if not game.player_can_edit(request.user):
@@ -717,6 +738,7 @@ def end_game(request, game_id):
         }
         return render(request, 'games/end_game.html', context)
 
+
 def allocate_improvement_generic(request):
     if not request.user.is_authenticated:
         raise PermissionDenied("You must be logged in to allocate improvements")
@@ -726,6 +748,8 @@ def allocate_improvement_generic(request):
     else:
         return HttpResponseRedirect(reverse('hgapp:home', args=()))
 
+
+@login_required
 def allocate_improvement(request, improvement_id):
     improvement = get_object_or_404(Reward, id=improvement_id)
     if not improvement.is_improvement or improvement.rewarded_character:
@@ -750,7 +774,9 @@ def allocate_improvement(request, improvement_id):
         }
         return render(request, 'games/allocate_improvement.html', context)
 
+
 # Select which players attended and who was GM
+@login_required
 def create_ex_game_for_cell(request, cell_id):
     if not request.user.is_authenticated:
         raise PermissionDenied("You must log in to create archival Contract events")
@@ -776,6 +802,8 @@ def create_ex_game_for_cell(request, cell_id):
         context = get_context_for_choose_attending(cell)
         return render(request, 'games/create_ex_game_choose_attendance.html', context)
 
+
+@login_required
 def finalize_create_ex_game_for_cell(request, cell_id, gm_user_id, players):
     if not request.user.is_authenticated:
         raise PermissionDenied("Log in, yo")
@@ -805,6 +833,7 @@ def finalize_create_ex_game_for_cell(request, cell_id, gm_user_id, players):
 
 
 # Choose additional players to add to a completed game.
+@login_required
 def add_attendance(request, game_id):
     game = get_object_or_404(Game, id=game_id)
     _check_perms_for_edit_completed(request, game)
@@ -827,6 +856,7 @@ def add_attendance(request, game_id):
 
 
 
+@login_required
 def edit_completed(request, game_id, players = None):
     game = get_object_or_404(Game, id=game_id)
     _check_perms_for_edit_completed(request, game)
@@ -849,6 +879,8 @@ def _check_perms_for_edit_completed(request, game):
     if not game.player_can_edit(request.user):
         raise PermissionDenied("You don't have permission to edit this Game")
 
+
+@login_required
 def confirm_attendance(request, attendance_id, confirmed=None):
     if not request.user.is_authenticated:
         raise PermissionDenied("You gotta log in")
@@ -878,6 +910,8 @@ def confirm_attendance(request, attendance_id, confirmed=None):
     else:
         return render_confirm_attendance_page(request, attendance)
 
+
+@login_required
 def render_confirm_attendance_page(request, attendance):
     form = RsvpAttendanceForm()
     context = {
@@ -885,6 +919,7 @@ def render_confirm_attendance_page(request, attendance):
         'attendance': attendance,
     }
     return render(request, 'games/confirm_attendance.html', context)
+
 
 def spoil_scenario(request, scenario_id):
     if not request.user.is_authenticated:
@@ -901,6 +936,7 @@ def spoil_scenario(request, scenario_id):
                 discovery.spoil()
             return JsonResponse({}, status=200)
         return JsonResponse({"error": ""}, status=400)
+
 
 class LookingForGame(View):
     template_name = 'games/looking_for_game.html'

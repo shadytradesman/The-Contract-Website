@@ -102,6 +102,8 @@ def edit_character(request, character_id, secret_key = None):
         context = get_edit_context(user=request.user, existing_character=character, secret_key=secret_key)
         return render(request, 'characters/edit_pages/edit_character.html', context)
 
+
+@login_required
 def delete_character(request, character_id):
     character = get_object_or_404(Character, pk=character_id)
     if not character.player_can_edit(request.user):
@@ -120,6 +122,8 @@ def delete_character(request, character_id):
                    "character": character}
         return render(request, 'characters/delete_character.html', context)
 
+
+@login_required
 def edit_obituary(request, character_id, secret_key = None):
     character = get_object_or_404(Character, id=character_id)
     existing_death = character.character_death_set.filter(is_void=False).first()
@@ -372,8 +376,10 @@ def view_character(request, character_id, secret_key=None):
 
     moves = character.move_set.order_by("-created_date").all()
     loose_ends = character.looseend_set.filter(is_deleted=False).order_by("cutoff").all()
+    unspent_exp = character.unspent_experience()
     context = {
         'character': character,
+        'unspent_exp': unspent_exp,
         'user_can_edit': user_can_edit,
         'user_can_gm': user_can_gm,
         'user_posts_moves': user_posts_moves,
@@ -456,6 +462,7 @@ def print_character(request, character_id):
     }
     return render(request, 'characters/print_pages/print_character.html', context)
 
+
 def archive_character(request, character_id):
     character = get_object_or_404(Character, id=character_id)
     if not character.player_can_view(request.user):
@@ -463,6 +470,7 @@ def archive_character(request, character_id):
     return HttpResponse(character.archive_txt(), content_type='text/plain; charset=UTF-8')
 
 
+@login_required
 def choose_powers(request, character_id):
     character = get_object_or_404(Character, id=character_id)
     if request.user.is_anonymous or not character.player_can_edit(request.user):
@@ -481,6 +489,7 @@ def choose_powers(request, character_id):
     return render(request, 'characters/choose_powers.html', context)
 
 
+@login_required
 def toggle_item(request, character_id, sig_artifact_id):
     character = get_object_or_404(Character, id=character_id)
     sig_item = get_object_or_404(Artifact, id=sig_artifact_id)
@@ -537,6 +546,7 @@ def toggle_item(request, character_id, sig_artifact_id):
         return render(request, 'characters/confirm_item_assignment.html', context)
 
 
+@login_required
 def toggle_power(request, character_id, power_full_id):
     character = get_object_or_404(Character, id=character_id)
     power_full = get_object_or_404(Power_Full, id=power_full_id)
@@ -590,6 +600,7 @@ def toggle_power(request, character_id, power_full_id):
         }
         return render(request, 'characters/confirm_power_assignment.html', context)
 
+
 def view_character_contacts(request, character_id):
     character = get_object_or_404(Character, id=character_id)
     contacts = get_character_contacts(character)
@@ -600,17 +611,22 @@ def view_character_contacts(request, character_id):
     return render(request, 'characters/view_character_contacts.html', context)
 
 
+@login_required
 def spend_reward(request, character_id):
     character = get_object_or_404(Character, id=character_id)
     if not character.player_can_edit(request.user):
         raise PermissionDenied("You do not have permission to edit this Character")
     unassigned_powers = request.user.power_full_set.filter(is_deleted=False, character__isnull=True).all()
+    unspent_exp = character.unspent_experience()
     context = {
         'character': character,
         'unassigned_powers': unassigned_powers,
+        'unspent_exp': unspent_exp,
     }
     return render(request, 'characters/reward_character.html', context)
 
+
+@login_required
 def allocate_gm_exp(request, secret_key = None):
     if not request.user.is_authenticated:
         raise PermissionDenied("You must be logged in to allocate exp")
@@ -1015,6 +1031,7 @@ def post_trauma(request, character_id, secret_key = None):
             return JsonResponse({"error": form.errors}, status=400)
     return JsonResponse({"error": ""}, status=400)
 
+
 def delete_trauma(request, trauma_rev_id, used_xp, secret_key = None):
     if request.is_ajax and request.method == "POST":
         trauma_rev = get_object_or_404(TraumaRevision, id=trauma_rev_id)
@@ -1025,6 +1042,7 @@ def delete_trauma(request, trauma_rev_id, used_xp, secret_key = None):
             delete_trauma_rev(character, trauma_rev, True if used_xp == "T" else False)
         return JsonResponse({}, status=200)
     return JsonResponse({"error": ""}, status=400)
+
 
 def post_injury(request, character_id, secret_key = None):
     if request.is_ajax and request.method == "POST":
@@ -1043,6 +1061,7 @@ def post_injury(request, character_id, secret_key = None):
             return JsonResponse({"error": form.errors}, status=400)
     return JsonResponse({"error": ""}, status=400)
 
+
 def dec_injury(request, injury_id, secret_key = None):
     if request.is_ajax and request.method == "POST":
         injury = get_object_or_404(Injury, id=injury_id)
@@ -1058,6 +1077,7 @@ def dec_injury(request, injury_id, secret_key = None):
                              "stabilized": injury.is_stabilized}, status=200)
     return JsonResponse({"error": ""}, status=400)
 
+
 def inc_injury(request, injury_id, secret_key = None):
     if request.is_ajax and request.method == "POST":
         injury = get_object_or_404(Injury, id=injury_id)
@@ -1069,6 +1089,7 @@ def inc_injury(request, injury_id, secret_key = None):
                              "stabilized": injury.is_stabilized}, status=200)
     return JsonResponse({"error": ""}, status=400)
 
+
 def stabilize_injury(request, injury_id, secret_key = None):
     if request.is_ajax and request.method == "POST":
         injury = get_object_or_404(Injury, id=injury_id)
@@ -1079,6 +1100,7 @@ def stabilize_injury(request, injury_id, secret_key = None):
         return JsonResponse({"severity": injury.severity,
                              "stabilized": injury.is_stabilized}, status=200)
     return JsonResponse({"error": ""}, status=400)
+
 
 def set_mind_damage(request, character_id, secret_key = None):
     if request.is_ajax and request.method == "POST":
@@ -1116,6 +1138,7 @@ def set_source_val(request, source_id, secret_key = None):
             return JsonResponse({"error": form.errors}, status=400)
     return JsonResponse({"error": ""}, status=400)
 
+
 def post_equipment(request, character_id, secret_key = None):
     if request.is_ajax and request.method == "POST":
         character = get_object_or_404(Character, id=character_id)
@@ -1131,6 +1154,7 @@ def post_equipment(request, character_id, secret_key = None):
 
     return JsonResponse({"error": ""}, status=400)
 
+
 def post_bio(request, character_id, secret_key = None):
     if request.is_ajax and request.method == "POST":
         character = get_object_or_404(Character, id=character_id)
@@ -1145,6 +1169,7 @@ def post_bio(request, character_id, secret_key = None):
             return JsonResponse({"error": form.errors}, status=400)
 
     return JsonResponse({"error": ""}, status=400)
+
 
 def post_notes(request, character_id, secret_key = None):
     if request.is_ajax and request.method == "POST":

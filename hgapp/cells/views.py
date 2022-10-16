@@ -153,6 +153,7 @@ class EditFindWorld(View):
         }
         return context
 
+
 @method_decorator(login_required(login_url='account_login'), name='dispatch')
 class PostWorldEvent(View):
     form_class = EditWorldEventForm

@@ -38,10 +38,14 @@ def notify_game_ended(**kwargs):
             email = invite.invited_player.profile.get_confirmed_email()
             if email:
                 if invite.attendance.attending_character:
-                    reward_url = request.build_absolute_uri(reverse("characters:characters_view", args=[invite.attendance.attending_character.id]))
+                    reward_url = request.build_absolute_uri(reverse("characters:characters_spend_reward", args=[invite.attendance.attending_character.id]))
                 else:
                     reward_url = request.build_absolute_uri(reverse("characters:characters_allocate_gm_exp"))
-                send_email_for_game_ended(email, invite, game_url, reward_url)
+                if game.scenario.is_valid():
+                    scenario_url = request.build_absolute_uri(reverse("games:games_view_scenario", args=[game.scenario.id]))
+                else:
+                    scenario_url = None
+                send_email_for_game_ended(email, invite, game_url, reward_url, scenario_url)
 
 @receiver(NotifyGameInvitee)
 def notify_game_invitee(sender, **kwargs):
@@ -69,7 +73,7 @@ def notify_game_invitee(sender, **kwargs):
             send_email_for_game_invite(email, invite, game_url)
 
 
-def send_email_for_game_ended(email, game_invite, game_url, reward_url):
+def send_email_for_game_ended(email, game_invite, game_url, reward_url, scenario_url):
     logger.info("sending game ended email to {}".format(email.email))
     invited_player = game_invite.invited_player
     gm = game_invite.relevant_game.creator
@@ -83,6 +87,7 @@ def send_email_for_game_ended(email, game_invite, game_url, reward_url):
         'game_url': game_url,
         'reward_url': reward_url,
         'game': game_invite.relevant_game,
+        'scenario_url': scenario_url,
     }
     if attendance.is_victory():
         subject = "{} was victorious, earning a Gift and Experience!".format(character_name)
