@@ -44,7 +44,7 @@ def power_rev_badge(power, force_show_warnings=False, crafter_blurb=None, artifa
     }
 
 @register.inclusion_tag('powers/power_badge_snippet.html')
-def power_badge(power_full, force_show_warnings=False, artifact=None, can_edit=False):
+def power_badge(power_full, force_show_warnings=False, artifact=None, can_edit=False, rewarding_character=None):
     latest_revision = power_full.latest_revision()
     character = power_full.character if power_full.character else None
     show_status_warning = force_show_warnings
@@ -61,6 +61,7 @@ def power_badge(power_full, force_show_warnings=False, artifact=None, can_edit=F
         'power_full': power_full,
         'latest_revision': latest_revision,
         'character': character,
+        'rewarding_character': rewarding_character,
         'show_status_warning': show_status_warning,
         'show_active_toggle': show_active_toggle,
         'is_active': is_active,

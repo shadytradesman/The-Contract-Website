@@ -333,7 +333,11 @@ def power_full_view(request, power_full_id):
     return ViewPower.as_view()(request, power_id=most_recent_power.id)
 
 
-def stock(request):
+def stock(request, character_id=None):
+    if character_id:
+        character = get_object_or_404(Character, id=character_id)
+    else:
+        character = None
     generic_categories = PremadeCategory.objects.filter(is_generic=True).all()
     generic_powers_by_category = {}
     for cat in generic_categories:
@@ -345,6 +349,7 @@ def stock(request):
     context = {
         "generic_powers_by_category": generic_powers_by_category,
         "example_powers_by_category": example_powers_by_category,
+        "rewarding_character": character,
     }
     return render(request, 'powers/stock_powers.html', context)
 

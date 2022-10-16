@@ -9,10 +9,17 @@
     <div >
         {% if power_full.tags.count > 0 %}
             <div class="pull-right" style="margin-left: 5px;">
-                <a href="{% url 'powers:powers_create_from_existing_ps2' power_full.id %}"
-                   class="btn btn-default btn-xs">
-                    Customize
-                </a>
+                {% if rewarding_character %}
+                    <a href="{% url 'powers:powers_create_from_existing_ps2' power_full.id rewarding_character.id %}"
+                       class="btn btn-success btn-xs">
+                        Customize for {{rewarding_character.name}}
+                    </a>
+                {% else %}
+                    <a href="{% url 'powers:powers_create_from_existing_ps2' power_full.id %}"
+                       class="btn btn-default btn-xs">
+                        Customize
+                    </a>
+                {% endif %}
             </div>
         {% endif %}
         {% if show_active_toggle %}

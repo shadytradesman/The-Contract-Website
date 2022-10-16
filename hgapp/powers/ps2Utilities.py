@@ -44,6 +44,9 @@ def get_edit_context(existing_power_full=None, is_edit=False, existing_char=None
         user=user,)()
     categories = Base_Power_Category.objects.all()
     show_tutorial = (not user) or (not user.is_authenticated) or (not user.power_full_set.exists())
+    is_stock = False
+    if existing_power_full and existing_power_full.tags.count() > 0:
+        is_stock = True
     context = {
         'power_blob_url': PowerSystem.get_singleton(is_admin=user and user.is_superuser).get_json_url(),
         'user_is_admin': user.is_superuser,
@@ -58,6 +61,7 @@ def get_edit_context(existing_power_full=None, is_edit=False, existing_char=None
         'cat_colors': [(cat.container_class(), cat.color) for cat in categories],
         'current_power': existing_power_full.latest_revision() if existing_power_full else None,
         'power_full': existing_power_full if existing_power_full else None,
+        'is_stock': is_stock,
         'is_upgrade': existing_power_full.latest_revision().dice_system == SYS_LEGACY_POWERS if existing_power_full else False,
         'character': existing_char if existing_char else None,
         'show_tutorial': show_tutorial,

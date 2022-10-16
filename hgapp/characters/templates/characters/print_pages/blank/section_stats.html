@@ -63,10 +63,10 @@
     </div>
     <div class="css-section-abilities">
         <h3 class="text-center">Abilities</h3>
-        <div class="css-advancement-text text-center"  v-if="showTutorialText">
-            Cost to increase: current rating x 2 (2 Exp for first rank)
-        </div>
         <div class="css-ability-values">
+            <div class="css-advancement-text text-center"  v-if="showTutorialText">
+                Cost to increase: current rating x 2 (2 Exp for first rank)
+            </div>
             <div class="css-double-col">
                 <div class="css-abil" v-for="ability in abilities.slice(0, Math.ceil(abilities.length/2))">
                     <b>

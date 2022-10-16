@@ -63,11 +63,16 @@
                                 Create a New Gift
                             </a>
                         </div>
+                        <div style="margin: auto;  margin-bottom: 5px;">
+                            <a class="btn btn-success btn-lg" href="{% url 'powers:powers_stock' character.id %}">
+                                Customize a Stock Gift
+                            </a>
+                        </div>
                     {% endif %}
                     {% if unassigned_powers %}
                         <div style="margin: auto;  margin-bottom: 5px;">
                             <a class="btn btn-default btn-lg" href="{% url 'characters:characters_power_picker' character.id %}">
-                                Assign existing Gifts
+                                Grant Unassigned Gifts
                             </a>
                         </div>
                     {% endif %}

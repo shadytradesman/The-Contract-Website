@@ -23,6 +23,7 @@ urlpatterns = [
 
     # ex: .com/gift/create/from-existing/21
     path('create/from-existing/<int:power_full_id>/', views.CreatePower.as_view(), name='powers_create_from_existing_ps2'),
+    path('create/from-existing/<int:power_full_id>/c/<int:character_id>/', views.CreatePower.as_view(), name='powers_create_from_existing_ps2'),
     path('create-ps2/p/<int:power_full_id>/',
          RedirectView.as_view(pattern_name='powers:powers_create_from_existing_ps2', query_string=True, permanent=True)),
 
@@ -45,6 +46,8 @@ urlpatterns = [
 
     # ex: .com/gift/stock
     url(r'^stock/$', views.stock, name='powers_stock'),
+    # ex: .com/gift/stock/c/56
+    path('stock/c/<int:character_id>/', views.stock, name='powers_stock'),
 
     # View a revision of a gift
     # ex: .com/powers/view/p/121

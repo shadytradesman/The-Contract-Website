@@ -2,7 +2,6 @@
 
 {% load i18n %}
 {% load cache %}
-{% load power_tags %}
 
 {% block head_title %}Premade Powers{% endblock %}
 
@@ -12,160 +11,11 @@
 {% endblock %}
 
 {% block body_base %}
-{% cache 2000 stockPowers %}
-<div class="container">
-    <div class="backdropped">
-        <div class = "text-center main-header">
-            <h1>
-                Stock Gifts
-            </h1>
-        </div>
-        <div class="visible-md-block visible-lg-block visible-xl-block">
-            <div class="row no-gutters ">
-                <div class="tabbable tabs-left">
-                    <div class="tab-head">
-                            <h3 class="text-center">
-                                Generic Gifts
-                                <br>
-                                <small>Archetypical Gifts to gift as-is or customize</small>
-                            </h3>
-                        </div>
-                    <ul class="nav nav-tabs">
-                        {% for category, power_list in generic_powers_by_category.items %}
-                                <li role="presentation" class="{% if forloop.counter0 == 0 %}active{% endif %}">
-                                    <a href="#{{category.slug}}" aria-controls="{{category.slug}}" role="tab" data-toggle="tab">
-                                        <h4>{{category.name}}
-                                            <br>
-                                            <small>{{category.description}}</small>
-                                        </h4>
-                                    </a>
-                                </li>
-                        {% endfor %}
-                    </ul>
-                    <div class="tab-content">
-                        {% for category, power_list in generic_powers_by_category.items %}
-                            <div role="tabpanel"
-                                 class="tab-pane {% if forloop.counter0 == 0 %}active{% endif %}"
-                                 id="{{category.slug}}">
-                                <div class="panel-body">
-                                    {% for power_full in power_list %}
-                                        {% power_badge power_full %}
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-            <br>
-            <div class="row no-gutters ">
-                <div class="tabbable tabs-left">
-                    <h3 class="text-center">
-                        Example Gifts
-                        <br>
-                        <small>Flavorful Gifts that demonstrate personalized rewards for worthy Contractors</small>
-                    </h3>
-                    <ul class="nav nav-tabs">
-                        {% for category, power_list in example_powers_by_category.items %}
-                            <li  class="{% if forloop.counter0 == 0 %}active{% endif %}" role="presentation">
-                                <a href="#{{category.slug}}" aria-controls="{{category.slug}}" role="tab" data-toggle="tab">
-                                    <h4>
-                                        {{category.name}}
-                                        <br>
-                                        <small>{{category.description}}</small>
-                                    </h4>
-                                </a>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                    <div class="tab-content">
-                        {% for category, power_list in example_powers_by_category.items %}
-                            <div role="tabpanel" class="tab-pane  {% if forloop.counter0 == 0 %}active{% endif %}" id="{{category.slug}}">
-                                <div class="panel-body">
-                                    {% for power_full in power_list %}
-                                        {% power_badge power_full %}
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-
-        <!--       Small displays version -->
-        <div class="visible-sm-block visible-xs-block">
-            <div class="small-section-header">
-                <h2>
-                    Generic Gifts
-                    <br>
-                    <small>Archetypical Gifts to grant as-is or customize</small>
-                </h2>
-            </div>
-            <div class="small-section row" id="accordion-generic" role="tablist" aria-multiselectable="true">
-                {% for category, power_list in generic_powers_by_category.items %}
-                <div class="col-md-6">
-                    <div class="panel panel-default">
-                        <a class= "unstyled-link" role="button" data-toggle="collapse" href="#collapse{{category.slug}}" aria-expanded="false" aria-controls="collapse{{category.slug}}">
-                            <div class = "panel-heading text-center" role="tab" id="{{category.slug}}Heading">
-                                <h3 class="fake-link">
-                                    {{category.name}}
-                                </h3>
-                                {{category.description}}
-                            </div>
-                        </a>
-                        <div id="collapse{{category.slug}}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="{{category.slug}}Heading">
-                            <div class="panel-body">
-                                {% for power_full in power_list %}
-                                    {% power_badge power_full %}
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-            <br>
-            <div class="small-section-header">
-                <h2>
-                    Example Gifts
-                    <br>
-                    <small>Flavorful Gifts that demonstrate personalized rewards for worthy Contractors</small>
-                </h2>
-            </div>
-            <div class="small-section row" id="accordion-example" role="tablist" aria-multiselectable="true">
-                {% for category, power_list in example_powers_by_category.items %}
-                    <div class="col-md-6">
-                    <div class="panel panel-default">
-                        <a class="unstyled-link" role="button" data-toggle="collapse" href="#collapse{{category.slug}}" aria-expanded="false" aria-controls="collapse{{category.slug}}">
-                            <div class = "panel-heading text-center" role="tab" id="{{category.slug}}Heading">
-                                <h3 class="fake-link">
-                                    {{category.name}}
-                                </h3>
-                                <p>
-                                    {{category.description}}
-                                </p>
-                            </div>
-                        </a>
-                        <div id="collapse{{category.slug}}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="{{category.slug}}Heading">
-                            <div class="panel-body">
-                                {% for power_full in power_list %}
-                                    {% power_badge power_full %}
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-
-
-
-
-    </div>
-</div>
-{% endcache %}
+    {% if rewarding_character %}
+        {% include "powers/stock_powers_content.html" %}
+    {% else %}
+        {% cache 8000 stockPowers %}
+            {% include "powers/stock_powers_content.html" %}
+        {% endcache %}
+    {% endif %}
 {% endblock %}
