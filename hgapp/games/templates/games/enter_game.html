@@ -22,30 +22,38 @@
     <div class="panel panel-default">
         <div class="panel-body">
             <div class="row">
-                <div class="col-xs-6 text-center">
-                    <h2>
+                <div class="col-xs-12 col-sm-6 text-center">
+                    <h2 style="margin-top: 10px;">
                         hasn't happened yet
-                    </h2>
-                    <br>
-                    <a class="btn btn-primary btn-lg text-center" href="{% url 'games:games_create_game' %}">
-                        Schedule a Contract
-                    </a>
-                </div>
-                <div class="col-xs-6 text-center">
-                    <h2>
-                        occurred in the past
-                    </h2>
-                    {% if cells %}
                         <div>
-                            Record a completed Contract
+                            <small>
+                                Schedule an upcoming Contract
+                            </small>
                         </div>
-                    {% endif %}
-                    {% for cell in cells %}
-                        <br>
-                        <a class="btn btn-primary" href="{% url 'games:games_create_ex_game_for_cell' cell.id %}">
-                             In {{ cell.name }}
+                    </h2>
+                    <div>
+                        <a class="btn btn-primary btn-lg text-center" style="width: 100%;" href="{% url 'games:games_create_game' %}">
+                            Schedule a Contract
                         </a>
-                        <br>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-6 text-center">
+                    <h2 style="margin-top: 10px;">
+                        occurred in the past
+                        {% if cells %}
+                        <div>
+                            <small>
+                                Record a completed Contract
+                            </small>
+                        </div>
+                        {% endif %}
+                    </h2>
+                    {% for cell in cells %}
+                        <div style="margin-top: 10px;">
+                            <a class="btn btn-default" style="width: 100%;" href="{% url 'games:games_create_ex_game_for_cell' cell.id %}">
+                                In {{ cell.name }}
+                            </a>
+                        </div>
                     {% empty %}
                         <i class="text-danger">You may declare archival Contracts only if you have the "Manage Games"
                             permission in the Playgroup.</i>

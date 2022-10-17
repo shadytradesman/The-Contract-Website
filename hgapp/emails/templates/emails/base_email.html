@@ -18,13 +18,13 @@
         table, td, div, h1, p {font-family: Arial, sans-serif;}
     </style>
 </head>
-<body style="margin:0;padding:0;">
+<body style="margin:0;padding:10px;">
     {% block email_body %}
     {% endblock %}
     <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;background:#ffffff;">
         <tr>
             <td style="padding:0;text-align: center;font-size:10px;color:grey;">
-                <a href="https://thecontractrpg.com{% url 'account_settings'%}">Unsubscribe</a>
+                <a href="https://thecontractrpg.com{% url 'account_settings'%}">Change Email Preferences</a>
             </td>
         </tr>
     </table>

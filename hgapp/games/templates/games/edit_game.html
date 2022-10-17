@@ -53,7 +53,7 @@
                     method="post">
                 {% if not game %}
                     <div class="row text-center">
-                        <a class="btn btn-default btn-sm wiki-entry-collapsible">Toggle Tutorial</a>
+                        <a class="btn btn-default btn-sm wiki-entry-collapsible" style="margin-bottom: 10px">Toggle Tutorial</a>
                         <div class="collapse-content clearfix"  style="display:none;">
                             <br>
                             <div class="col-md-8 col-md-offset-2 thumbnail text-left">
@@ -63,29 +63,36 @@
                                     <a href="{% url 'games:games_enter_game' %}">
                                         click here.
                                     </a>
-                                    <br><br>
+                                </p>
+                                <p>
                                     Players who you invite or who find your Contract on the LFG page may RSVP and declare
                                     which Contractors they intend to bring. These Contractors will be revealed to you if they
-                                    are Private.
-                                    <br><br>
+                                    are private.
+                                </p>
+                                <p>
                                    When you are ready to start playing, visit your Contract's page, click the "Start Contract" button,
-                                    and confirm which Players and Contractors are attending. While the Contract is Active,
+                                    and confirm which Players and Contractors are attending. While the Contract is active,
                                     Players will not be able to bring their Contractor on other Contracts.
-                                   <br><br>
-                                   When the Contract is over, transition its status to Finished and declare the outcome for
+                                </p>
+                                <p>
+                                   When the Contract is over, transition its status to finished and declare the outcome for
                                     each Contractor.
                                    Surviving Contractors will receive Experience and, if they won, Gifts. Those less
                                     fortunate are interned in
                                     <a href="{%url 'characters:characters_graveyard' %}">
                                         the Graveyard.
                                     </a>
+                                </p>
+                                <p>
                                     Regardless of the outcome, the Contract's Scenario is revealed to the Players in their
                                     Scenario Gallery, and they will be able to view any in-character Journals written
                                     about it. As the GM, you can leave feedback about your experience running it.
-                                    <br><br>
-                                    You are awarded 4 Experience for GMing. If any of the Players are brand-new OR at
-                                    least one Contractor dies and at least one achieves Victory, you are given an
-                                    Improvement to use on one of your Contractors' Gifts.
+                                </p>
+                                <p>
+                                    You are awarded 6 Experience for GMing. You are given an Improvement to improve one
+                                    of your Contractors' Gifts if any of the Players are brand-new OR
+                                    your Playgroup has opted-into the Golden Ratio rules and at
+                                    least one Contractor dies and at least one achieves Victory.
                                </p>
                             </div>
                         </div>
