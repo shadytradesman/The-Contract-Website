@@ -103,6 +103,11 @@
                 <div class="text-muted css-gift-summary" style="display: inline-block;">
                     {{ latest_revision.gift_summary|safe }}
                 </div>
+                {%if power_full.tags.count > 0 %}
+                    <div class="css-system-text-user-input" style="display: inline-block;">
+                        {{ latest_revision.description|linebreaks }}
+                    </div>
+                {% endif %}
                 <div class="hidden-xs" style="display: inline-block;text-align: left; width: 120px;">
                     <small class="visible-sm-inline-block text-center"><i>(Tap to show system)</i></small>
                     <small class="visible-md-inline-block visible-lg-inline-block"><i>(Click to show system)</i></small>
