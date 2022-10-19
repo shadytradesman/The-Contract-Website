@@ -405,6 +405,9 @@ def make_edit_move_form(gm, cell=None):
                                                label="Who made the Move?",
                                                empty_label="Select a Contractor",
                                                required=True)
+        is_private = forms.BooleanField(label="Hide Move-Maker",
+                                 required=False,
+                                 help_text='If checked, the name of the Contractor who made the move will be hidden.')
         title = forms.CharField(label='Move Title',
                                 max_length=200,
                                 help_text='The Move\'s title')

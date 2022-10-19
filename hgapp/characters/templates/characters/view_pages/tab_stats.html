@@ -74,11 +74,7 @@
                        {% endif %}
                     >
                         <div class="panel-heading css-circumstance-heading" role="tab" id="circumstance-heading-{{cell.id}}">
-                            {% if cell %}
                             <h5 class="panel-title">In {{cell.name}}</h5>
-                            {% else %}
-                            <h5 class="panel-title">From Creation</h5>
-                            {% endif %}
                         </div>
                     </a>
                     <div id="collapse-circumstance-{{cell.id}}"
@@ -113,6 +109,23 @@
                                         <span class="css-world-element-name">
                                             {{circumstance.name}}
                                         </span>
+                                    {% if not circumstance.cell %}
+                                        <div class="css-world-element-source">
+                                            <small>
+                                                <i>
+                                                    From Assets and Liabilities
+                                                </i>
+                                            </small>
+                                        </div>
+                                    {% elif circumstance.granting_gm %}
+                                        <div class="css-world-element-source">
+                                            <small>
+                                                <i>
+                                                    Given by {{circumstance.granting_gm.username}}
+                                                </i>
+                                            </small>
+                                        </div>
+                                    {% endif %}
                                     <span class="css-world-element-description">
                                             {{circumstance.description}}
                                         </span>
@@ -136,12 +149,23 @@
                                 {% endif %}
                             </div>
                             {% endfor %}
+                            {% if trouble_circumstances %}
+                            <h5 data-toggle="tooltip" title="These are Circumstances that have been deleted from the character sheet without removing the Assets or Liabilities that granted them.">
+                                Deleted Circumstances with active Assets and Liabilities
+                            </h5>
+                            <ul>
+                                {% for circumstance in trouble_circumstances %}
+                                    <li>
+                                        {{circumstance.name}}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
                 {% endfor %}
             </div>
-        </div>
             {% if circumstance_form %}
             <div class="row text-center">
                 <a class="btn btn-default btn-sm wiki-entry-collapsible">New Circumstance</a>
@@ -156,6 +180,7 @@
                 </div>
             </div>
             {% endif %}
+        </div>
     </div>
     <div class="col-xs-12 col-md-6">
         <div class="visible-xs-block" style="height:35px;"></div>
@@ -258,6 +283,18 @@
                 </div>
             </div>
             {% endfor %}
+            {% if trouble_conditions %}
+            <h5 data-toggle="tooltip" title="These are Conditions that have been deleted from the character sheet without removing the Assets or Liabilities that granted them.">
+                Deleted Conditions with active Assets and Liabilities
+            </h5>
+            <ul>
+                {% for condition in trouble_conditions %}
+                    <li>
+                        {{condition.name}}
+                    </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
 
         {% if condition_form %}
             <div class="text-center">

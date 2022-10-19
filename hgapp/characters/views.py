@@ -361,11 +361,17 @@ def view_character(request, character_id, secret_key=None):
         cell = circumstance.cell if circumstance.cell else character.cell
         circumstances[cell].append(circumstance)
     circumstances = dict(circumstances)
+    deleted_but_not_bought_off_circumstances \
+        = [x for x in character.circumstance_set.filter(cell__isnull=True, is_deleted=True, deleted_by_quirk_removal=False).all() \
+            if x.record_of_quirk_grant()]
 
     conditions = get_world_element_default_dict(world_element_cell_choices)
     for condition in character.condition_set.exclude(is_deleted=True).all():
         conditions[condition.cell].append(condition)
     conditions = dict(conditions)
+    deleted_but_not_bought_off_conditions \
+        = [x for x in character.condition_set.filter(cell__isnull=True, is_deleted=True, deleted_by_quirk_removal=False).all() \
+           if x.record_of_quirk_grant()]
 
     assets = character.stats_snapshot.assetdetails_set.all()
     liabilities = character.stats_snapshot.liabilitydetails_set.all()
@@ -418,6 +424,8 @@ def view_character(request, character_id, secret_key=None):
         'artifacts_by_cell': artifacts,
         'conditions_by_cell': conditions,
         'circumstances_by_cell': circumstances,
+        'trouble_circumstances': deleted_but_not_bought_off_circumstances,
+        'trouble_conditions': deleted_but_not_bought_off_conditions,
         'initial_cell': world_element_initial_cell,
         'assets': assets,
         'liabilities': liabilities,
@@ -1225,10 +1233,7 @@ def delete_world_element(request, element_id, element, secret_key = None):
         if hasattr(ext_element, "is_signature") and ext_element.is_signature:
             raise ValueError("Cannot delete signature items")
         with transaction.atomic():
-            ext_element.is_deleted = True
-            ext_element.deleted_date = timezone.now()
-            ext_element.deletion_reason = "Removed by {}".format(request.user.username)
-            ext_element.save()
+            ext_element.mark_deleted("Removed by {}".format(request.user.username))
         return JsonResponse({}, status=200)
     return JsonResponse({"error": ""}, status=400)
 

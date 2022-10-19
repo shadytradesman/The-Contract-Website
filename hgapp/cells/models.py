@@ -347,7 +347,7 @@ class WebHook(models.Model):
 
     def post_for_event(self, event, request, move=None):
         if move:
-            move_text = "{} made a Move! ".format(move.main_character.name)
+            move_text = "{} made a Move! ".format(move.main_character.name if not move.is_private else "A Contractor")
         else:
             move_text = ""
         content = "{}**{}**\nRead More: {}".format(

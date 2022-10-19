@@ -1145,6 +1145,7 @@ class Move(models.Model):
     public_event = models.OneToOneField(WorldEvent, on_delete=models.CASCADE)
     gm_experience_reward = models.OneToOneField(ExperienceReward, null=True, blank=True, on_delete=models.CASCADE)
     is_valid = models.BooleanField(default=False)
+    is_private = models.BooleanField(default=False)
 
     deleted_on = models.DateTimeField('date deleted', blank=True, null=True)
 

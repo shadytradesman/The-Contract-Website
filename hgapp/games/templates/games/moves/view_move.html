@@ -52,13 +52,17 @@
               {{move.cell.name}}
             </a>
             for
-            <a href="{% url 'characters:characters_view' move.main_character.id %}">
-              {{move.main_character.name}}
-            </a>
-            on the Downtime following
-            <a href="{% url 'games:games_view_game' move.downtime.relevant_game.id %}">
-              {{move.downtime.relevant_game.title}}
-            </a>
+            {% if move.gm == request.user or not move.is_private %}
+              <a href="{% url 'characters:characters_view' move.main_character.id %}">
+                {{move.main_character.name}}
+              </a>
+              on the Downtime following
+              <a href="{% url 'games:games_view_game' move.downtime.relevant_game.id %}">
+                {{move.downtime.relevant_game.title}}
+              </a>
+            {% else %}
+              A Contractor
+            {% endif %}
           </h5>
           <a class="btn btn-default" href="{% url 'games:edit_move' move.id %}">Edit Move</a>
         </div>

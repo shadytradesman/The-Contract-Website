@@ -1,9 +1,13 @@
 <span style="margin-left:5px;">
     <small>
         {% if event.move %}
-            <a href="{% url 'characters:characters_view' event.move.main_character.id %}">
-                {{event.move.main_character.name}}
-            </a>
+            {% if event.move.is_private %}
+                A Contractor
+            {% else %}
+                <a href="{% url 'characters:characters_view' event.move.main_character.id %}">
+                    {{event.move.main_character.name}}
+                </a>
+            {% endif %}
             made a Move
             (<a href="{% url 'profiles:profiles_view_profile' event.move.gm.id %}">{{event.move.gm.username}}</a> GMed)
         {% else %}

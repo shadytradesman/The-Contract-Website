@@ -12,6 +12,7 @@ from guardian.shortcuts import assign_perm, remove_perm
 from django.utils.safestring import mark_safe
 from django.urls import reverse
 from django.db import transaction
+from django.utils.dateparse import parse_datetime
 
 from markdown_deux.templatetags.markdown_deux_tags import markdown_filter
 
@@ -1326,6 +1327,8 @@ class WorldElement(models.Model):
     system = models.CharField(max_length=5000, blank=True, help_text="Threat for Loose Ends")
     created_time = models.DateTimeField(auto_now_add=True, null=True) #null because added in migration
     is_deleted = models.BooleanField(default=False)
+    # If true, this World Element was deleted by removing its related quirk.
+    deleted_by_quirk_removal = models.BooleanField(default=True) # Default true to not mess up legacy sheets
     deleted_date = models.DateTimeField(null=True, blank=True)
     deletion_reason = models.CharField(max_length=5000, blank=True)
     granting_gm = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True)
@@ -1341,6 +1344,25 @@ class WorldElement(models.Model):
 
     class Meta:
         abstract = True
+
+    # Return "Asset" or "Liability" if this world element was granted by one, otherwise return None
+    def get_quirk_text(self):
+        if self.assetdetails_set.first():
+            return "Asset"
+        if self.liabilitydetails_set.first():
+            return "Liability"
+        return None
+
+    def mark_deleted(self, reason=None, deleted_by_quirk_removal=False):
+        self.is_deleted = True
+        self.deleted_by_quirk_removal = deleted_by_quirk_removal
+        self.deleted_date = timezone.now()
+        if reason:
+            self.deletion_reason = reason
+        self.save()
+
+    def record_of_quirk_grant(self):
+        return self.created_time > parse_datetime("2022-10-19 15:56:13.441822+00:00")
 
 
 class Condition(WorldElement):
@@ -1422,17 +1444,16 @@ class StockWorldElement(models.Model):
         name = name_override if name_override is not None else self.name
         if self.type in [CONDITION, CIRCUMSTANCE, TROPHY]:
             ElementClass = Condition if self.type == CONDITION else Artifact if self.type == TROPHY else Circumstance
-            ElementClass.objects.create(character=stats.assigned_character,
+            return ElementClass.objects.create(character=stats.assigned_character,
                              name=name,
                              description=self.description,
                              system=self.system,)
-            return
         if self.type == TRAUMA:
             new_trauma = Trauma.objects.create(name=name, description=self.description)
             TraumaRevision.objects.create(relevant_stats=stats, relevant_trauma=new_trauma)
             return
         if self.type == LOOSE_END:
-            LooseEnd.objects.create(
+            return LooseEnd.objects.create(
                 character=stats.assigned_character,
                 name=name,
                 description=self.description,
@@ -1441,7 +1462,6 @@ class StockWorldElement(models.Model):
                 threat_level=self.threat_level,
                 how_to_tie_up=self.how_to_tie_up,
                 granting_gm=stats.assigned_character.player)
-            return
         raise ValueError("Could not grant element to contractor")
 
 
@@ -2022,7 +2042,7 @@ class Quirk(models.Model):
         granted_element = self.grants_element
         if granted_element:
             name = "{}: {}".format(self.name, details) if details else self.name
-            granted_element.grant_to_character(stats, name)
+            return granted_element.grant_to_character(stats, name)
         granted_scar = self.grants_scar
         if granted_scar:
             BattleScar.objects.create(character=stats.assigned_character,
@@ -2032,7 +2052,7 @@ class Quirk(models.Model):
             elem_type = self.grants_non_stock_element
             if elem_type in [CONDITION, CIRCUMSTANCE, TROPHY]:
                 ElementClass = Condition if elem_type == CONDITION else Artifact if elem_type == TROPHY else Circumstance
-                ElementClass.objects.create(character=stats.assigned_character,
+                return ElementClass.objects.create(character=stats.assigned_character,
                                             name=self.name,
                                             description=self.description,
                                             system=details, )
@@ -2043,6 +2063,7 @@ class Quirk(models.Model):
                 BattleScar.objects.create(character=stats.assigned_character,
                                           description=details,
                                           system="")
+        return None
 
 
 class Asset(Quirk):
@@ -2299,6 +2320,9 @@ class QuirkDetails(models.Model):
                                blank=True,
                                on_delete=models.CASCADE)
     is_deleted = models.BooleanField(default=False) # used in revisioning to determine if this quirk was deleted.
+    relevant_condition = models.ForeignKey(Condition, null=True, blank=True, on_delete=models.CASCADE)
+    relevant_circumstance = models.ForeignKey(Circumstance, null=True, blank=True, on_delete=models.CASCADE)
+    relevant_loose_end = models.ForeignKey(LooseEnd, null=True, blank=True, on_delete=models.CASCADE)
 
     class Meta:
         abstract = True
@@ -2309,23 +2333,43 @@ class QuirkDetails(models.Model):
                 raise ValueError("A Quirk's parent revision cannot be owned by a snapshot.")
         super(QuirkDetails, self).save(*args, **kwargs)
 
+    def relevant_element(self):
+        if hasattr(self, "relevant_condition") and self.relevant_condition:
+            return self.relevant_condition
+        if hasattr(self, "relevant_circumstance") and self.relevant_circumstance:
+            return self.relevant_circumstance
+        if hasattr(self, "relevant_loose_end") and self.relevant_loose_end:
+            return self.relevant_loose_end
+        return None
+
 
 class AssetDetails(QuirkDetails):
     relevant_asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        if self.previous_revision and self.is_deleted and self.relevant_asset.grants_gift:
-            VoidAssetGifts.send_robust(sender=self.__class__,
-                                  assetDetail=self,
-                                  character=self.relevant_stats.assigned_character)
+        if self.previous_revision and self.is_deleted:
+            if self.relevant_asset.grants_gift:
+                VoidAssetGifts.send_robust(sender=self.__class__,
+                                           assetDetail=self,
+                                           character=self.relevant_stats.assigned_character)
+            elem = self.previous_revision.relevant_element()
+            if elem:
+                elem.mark_deleted("Asset refunded", True)
         if not self.previous_revision and not self.is_deleted:
             if self.relevant_asset.grants_gift:
                 GrantAssetGift.send_robust(sender=self.__class__,
                                       assetDetail=self,
                                       character=self.relevant_stats.assigned_character)
-            self.relevant_quirk().grant_element_if_needed(self.relevant_stats, self.details)
-
+            element = self.relevant_quirk().grant_element_if_needed(self.relevant_stats, self.details)
+            if element:
+                if isinstance(element, Condition):
+                    self.relevant_condition = element
+                if isinstance(element, Circumstance):
+                    self.relevant_circumstance = element
+                if isinstance(element, LooseEnd):
+                    self.relevant_loose_end = element
+                super().save(*args, **kwargs)
 
     class Meta:
         indexes = [
@@ -2337,8 +2381,7 @@ class AssetDetails(QuirkDetails):
 
 
 class LiabilityDetails(QuirkDetails):
-    relevant_liability = models.ForeignKey(Liability,
-                                       on_delete=models.CASCADE)
+    relevant_liability = models.ForeignKey(Liability, on_delete=models.CASCADE)
 
     class Meta:
         indexes = [
@@ -2348,7 +2391,19 @@ class LiabilityDetails(QuirkDetails):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         if not self.previous_revision and not self.is_deleted:
-            self.relevant_quirk().grant_element_if_needed(self.relevant_stats, self.details)
+            element = self.relevant_quirk().grant_element_if_needed(self.relevant_stats, self.details)
+            if element:
+                if isinstance(element, Condition):
+                    self.relevant_condition = element
+                if isinstance(element, Circumstance):
+                    self.relevant_circumstance = element
+                if isinstance(element, LooseEnd):
+                    self.relevant_loose_end = element
+                super().save(*args, **kwargs)
+        if self.previous_revision and self.is_deleted:
+            elem = self.previous_revision.relevant_element()
+            if elem:
+                elem.mark_deleted("Liability bought off", True)
 
     def relevant_quirk(self):
         return self.relevant_liability

@@ -1051,6 +1051,7 @@ class EnterMove(View):
                     self.move = Move.objects.select_for_update().get(pk=self.move.pk)
                 self.move.title = move_form.cleaned_data["title"]
                 self.move.summary = move_form.cleaned_data["summary"]
+                self.move.is_private = move_form.cleaned_data["is_private"]
                 self.move.save()
 
                 if new_event:

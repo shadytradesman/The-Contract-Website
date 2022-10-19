@@ -214,6 +214,11 @@ input[type="number"] {
     position: relative;
 }
 
+.css-circumstance-section .css-world-element-source {
+    left: 30px;
+    position: relative;
+}
+
 .css-circumstance-section .css-world-element-system {
     display: block;
     font-style: italic;
@@ -259,10 +264,18 @@ input[type="number"] {
 
 .css-condition-section .css-world-element-system::after {
   content: ")";
+  position:absolute;
+  padding-left: 3px;
+
+}
+.css-condition-section .css-world-element-system {
+    padding-left: 5px;
 }
 
 .css-condition-section .css-world-element-system::before {
   content: "(";
+  position:absolute;
+  margin-left: -5px;
 }
 
 .css-quirk-value {
