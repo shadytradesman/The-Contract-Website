@@ -426,23 +426,56 @@
         left:300px;
     }
 
-    .css-big-modal-lg {
-        position: relative;
-        left: 70px;
-    }
     .css-big-modal-footer {
      width:598px;
      position:relative;
      left:300px;
     }
 
-}
+    .css-big-modal-image {
+        height: 100%;
+        float:right;
+        position: absolute;
+        right: 600px;
+    }
 
-.css-big-modal-image {
-    height: 100%;
-    float:right;
-    position: absolute;
-    right: 600px;
+    .css-big-modal-lg {
+        position: relative;
+        left: 75px;
+    }
+
+    .modal-content-lg {
+        display: flex;
+    }
+
+    .modal-content-lg .css-modal-image-cont {
+        overflow: hidden;
+        width: 100%;
+        position: relative;
+        flex-shrink: 1;
+        flex-grow: 1;
+    }
+
+   .modal-content-lg .css-big-modal-image {
+       height: 100%;
+        width: 100%;
+        position: absolute;
+        object-fit: cover;
+        left: 0px;
+    }
+
+   .modal-lg-long {
+       width: 100%;
+       padding-left: 100px;
+       padding-right: 100px;
+       overflow: hidden;
+       left: 0px;
+   }
+
+    .modal-content-lg .css-big-modal-body, .modal-content-lg .css-big-modal-header, .modal-content-lg .css-big-modal-footer{
+        left:0px;
+    }
+
 }
 
 #tutorialModal {

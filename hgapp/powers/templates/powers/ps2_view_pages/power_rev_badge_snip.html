@@ -100,12 +100,13 @@
              role="tabpanel"
              aria-labelledby="collapse-power-{{latest_revision.id}}-heading" >
             <div class="css-gift-summary">
-                <div class="text-muted css-gift-summary" style="display: inline-block;">
-                    {{ latest_revision.gift_summary|safe }}
-                </div>
-                {%if power_full.tags.count > 0 %}
+                {%if power_full.tags.count > 0 or discovery_page %}
                     <div class="css-system-text-user-input" style="display: inline-block;">
                         {{ latest_revision.description|linebreaks }}
+                    </div>
+                {% else %}
+                    <div class="text-muted css-gift-summary" style="display: inline-block;">
+                        {{ latest_revision.gift_summary|safe }}
                     </div>
                 {% endif %}
                 <div class="hidden-xs" style="display: inline-block;text-align: left; width: 120px;">
