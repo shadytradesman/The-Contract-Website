@@ -2,25 +2,21 @@
 
 <div class="container">
   <div class="backdropped">
-    <div class = "text-center main-header">
-      <h1>
+    <div class = "text-center ">
+      <h1 style="margin-bottom: 15px;">
         {% if rewarding_character %}
           Select a Stock Gift for {{rewarding_character.name}}
         {% else %}
           Stock Gifts
+        <div>
+          <small>Example Gifts to take or customize</small>
+        </div>
         {% endif %}
       </h1>
     </div>
     <div class="visible-md-block visible-lg-block visible-xl-block">
       <div class="row no-gutters ">
         <div class="tabbable tabs-left">
-          <div class="tab-head">
-            <h3 class="text-center">
-              Generic Gifts
-              <br>
-              <small>Archetypical Gifts to gift as-is or customize</small>
-            </h3>
-          </div>
           <ul class="nav nav-tabs">
             {% for category, power_list in generic_powers_by_category.items %}
             <li role="presentation" class="{% if forloop.counter0 == 0 %}active{% endif %}">

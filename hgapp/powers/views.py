@@ -338,11 +338,11 @@ def stock(request, character_id=None):
         character = get_object_or_404(Character, id=character_id)
     else:
         character = None
-    generic_categories = PremadeCategory.objects.filter(is_generic=True).all()
+    generic_categories = PremadeCategory.objects.filter(is_generic=True).order_by("name").all()
     generic_powers_by_category = {}
     for cat in generic_categories:
         generic_powers_by_category[cat] = Power_Full.objects.filter(tags__slug__in=cat.tags.all()).all()
-    example_categories = PremadeCategory.objects.filter(is_generic=False).all()
+    example_categories = PremadeCategory.objects.filter(is_generic=False).order_by("name").all()
     example_powers_by_category = {}
     for cat in example_categories:
         example_powers_by_category[cat] = Power_Full.objects.filter(tags__slug__in=cat.tags.all()).all()
