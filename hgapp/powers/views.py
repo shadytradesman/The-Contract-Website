@@ -4,6 +4,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.core.exceptions import PermissionDenied
+from django.templatetags.static import static
 from django.views import View
 from django.views import generic
 from django.contrib.auth.decorators import login_required
@@ -349,7 +350,9 @@ def stock(request, character_id=None):
     context = {
         "generic_powers_by_category": generic_powers_by_category,
         "example_powers_by_category": example_powers_by_category,
+        'main_modal_art_url': static('overrides/art/mime.jpeg'),
         "rewarding_character": character,
+        "show_tutorial": (not request.user) or (not request.user.is_authenticated) or (not request.user.power_full_set.exists()),
     }
     return render(request, 'powers/stock_powers.html', context)
 

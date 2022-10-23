@@ -8,9 +8,23 @@
 {% load static %}
 {% block extra_styles %}
     <link rel="stylesheet" type="text/css" href="{% static 'powers/stock_powers_style.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'powers/ps2_create_style.css' %}" />
+{% endblock %}
+{% block extra_scripts %}
+    <script type="text/javascript">
+        {% if show_tutorial %}
+            showTutorial=true;
+        {% else %}
+            showTutorial=false;
+        {% endif %}
+	</script>
+    <script src="{% static 'powers/stock_powers_script.js' %}"></script>
 {% endblock %}
 
 {% block body_base %}
+{% with main_modal_art_url as modal_art_url %}
+    {% include "powers/stock_powers_modal.html" %}
+{% endwith %}
     {% if rewarding_character %}
         {% include "powers/stock_powers_content.html" %}
     {% else %}

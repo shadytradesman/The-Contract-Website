@@ -23,7 +23,7 @@ function getCookie(name) {
 }
 
 $(document).ready(function(){
-    var fullCookieName =  "stockPower2Tutorial"+cookieName;
+    var fullCookieName =  "stockGiftTutorial"+cookieName;
     var x = getCookie(fullCookieName);
     if (showTutorial && !x) {
         $('#mainTutorialModal').modal({});
