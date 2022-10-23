@@ -3,7 +3,7 @@
 <div class="text-muted text-center">
     Customize your Gift's behavior.
     <div class="visible-xs-block"></div>
-    When you're satisfied, scroll down to add flavor and finish.
+    When you're satisfied, scroll down to flavor and finish.
 </div>
 <div class="visible-xs-block text-center" style="padding: 10px;">
     <b>Tap this button any time to preview your Gift:</b>
@@ -24,6 +24,13 @@
             </div>
         </span>
     </div>
+    {% if is_stock %}
+        <div class="visible-xs-block visible-sm-block" style="margin-top: 10px;">
+            <button type="button" class="btn btn-default btn-xs " data-toggle="modal" data-target="#mainTutorialModal">
+                View Intro
+            </button>
+        </div>
+    {% endif %}
 </div>
 <div v-if="selectedEffect && selectedEffect.errata">
     <div class="row">

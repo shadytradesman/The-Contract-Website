@@ -56,7 +56,7 @@
 .affix {
     width: inherit;
     padding-left: 15px;
-    padding-right: 15px;
+    padding-right: 10px;
     top: 60px;
     z-index: 9 !important;
 }
@@ -140,16 +140,28 @@
     border-color: #504b62;
 }
 
+.css-cat-MOD_EFFECT.css-mod-selected {
+    border-color: #a39e6b;
+}
+
+.css-cat-MOD_GIFT.css-mod-selected {
+    border-color: #508b72;
+}
+
+.css-cat-MOD_ACTIVATION.css-mod-selected {
+    border-color: #807b92;
+}
+
 @media (min-width: 992px) {
-    .css-cat-MOD_EFFECT.css-mod-selected, .css-cat-MOD_EFFECT.css-mod-enabled:hover{
+    .css-cat-MOD_EFFECT.css-mod-enabled:hover{
         border-color: #a39e6b;
     }
 
-    .css-cat-MOD_GIFT.css-mod-selected, .css-cat-MOD_GIFT.css-mod-enabled:hover{
+    .css-cat-MOD_GIFT.css-mod-enabled:hover{
         border-color: #508b72;
     }
 
-    .css-cat-MOD_ACTIVATION.css-mod-selected, .css-cat-MOD_ACTIVATION.css-mod-enabled:hover{
+    .css-cat-MOD_ACTIVATION.css-mod-enabled:hover{
         border-color: #807b92;
     }
 }

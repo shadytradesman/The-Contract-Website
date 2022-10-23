@@ -35,6 +35,7 @@
         <div v-if="modifier.detailLabel && selected{{vue_model_name}}.includes(modifier)" class="form-inline" style="margin-top: 5px;">
             <b style="padding-right: 10px;">{modifier.detailLabel}:</b>
             <input type="text"
+                   autocorrect="off" autocapitalize="none" autocomplete="off"
                    required
                    v-model="modifier.details"
                    maxlength="1200"

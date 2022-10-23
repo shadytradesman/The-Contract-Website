@@ -120,7 +120,10 @@ class ModifierForm(forms.Form):
     # input fields
     details = forms.CharField(required=False, max_length=1200, widget=forms.HiddenInput(attrs={
         'v-bind:value': 'modifier.details',
-      }),)
+        "autocorrect": "off",
+        "autocapitalize": "none",
+        "autocomplete": "off",
+    }),)
     is_selected = forms.BooleanField(required=False, label=None, widget=forms.HiddenInput(attrs={
         'v-bind:checked': '(modifier.isEnhancement?selectedEnhancements:selectedDrawbacks).map(enh => enh.id).includes(modifier.id)',
         'v-bind:value': '(modifier.isEnhancement?selectedEnhancements:selectedDrawbacks).map(enh => enh.id).includes(modifier.id)',
@@ -172,6 +175,9 @@ class SystemFieldTextForm(SystemField):
                                       "v-model": "fieldTextInput[field.id]",
                                       "class": "form-control",
                                       "@input": "changeParam",
+                                      "autocorrect": "off",
+                                      "autocapitalize": "none",
+                                      "autocomplete": "off",
                                   }))
 
     def clean_details_text(self):

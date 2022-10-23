@@ -45,7 +45,7 @@ function getCookie(name) {
 }
 
 $(document).ready(function(){
-    var fullCookieName = "power2Tutorial"+cookieName;
+    var fullCookieName = isStock ? "power2TutorialStock"+cookieName : "power2Tutorial"+cookieName;
     var x = getCookie(fullCookieName);
     if (showTutorial && !x) {
         $('#mainTutorialModal').modal({});
@@ -491,7 +491,7 @@ function getDisabledModifiers(modType, availModifiers, selectedModifiers, active
                   return false;
               }
               const unsatisfiedRequirements = required
-                  .filter(reqEnh => !selectedModifiers.includes(reqEnh));
+                  .filter(reqMod => !selectedModifiers.includes(reqMod));
               if (unsatisfiedRequirements.length == 0) {
                   return false;
               }
@@ -941,7 +941,8 @@ const ComponentRendering = {
       renderedVisual: "",
       breadCrumbs: [],
       currentCrumb: interactiveTutorial,
-      userIsAdmin: userAdmin
+      userIsAdmin: userAdmin,
+      isStock: isStock
     }
   },
   methods: {
@@ -1648,9 +1649,10 @@ const ComponentRendering = {
           this.populateUniqueReplacementsMap();
           this.disabledEnhancements = {};
           this.disabledDrawbacks = {};
-          this.disabledEnhancements = getDisabledModifiers("enhancement", this.enhancements, this.getSelectedAndActiveEnhancements().map(mod => mod.slug), this.activeUniqueReplacementsByMarker);
+          let selectedAndActiveSlugs = this.getSelectedAndActiveEnhancements().concat(this.getSelectedAndActiveDrawbacks()).map(mod => mod.slug);
+          this.disabledEnhancements = getDisabledModifiers("enhancement", this.enhancements, selectedAndActiveSlugs, this.activeUniqueReplacementsByMarker);
           this.selectedEnhancements = this.selectedEnhancements.filter(mod => !(mod.slug in this.disabledEnhancements));
-          this.disabledDrawbacks = getDisabledModifiers("drawback", this.drawbacks, this.getSelectedAndActiveEnhancements().map(mod => mod.slug), this.activeUniqueReplacementsByMarker);
+          this.disabledDrawbacks = getDisabledModifiers("drawback", this.drawbacks, selectedAndActiveSlugs, this.activeUniqueReplacementsByMarker);
           this.selectedDrawbacks = this.selectedDrawbacks.filter(mod => !(mod.slug in this.disabledDrawbacks));
           this.disabledParameters = {};
           this.disabledParameters = getDisabledParameters(this.parameters, this.activeUniqueReplacementsByMarker);

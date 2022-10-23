@@ -21,6 +21,11 @@
         {% else %}
             showTutorial=false;
         {% endif %}
+        {% if is_stock %}
+        	isStock=true;
+        {% else %}
+        	isStock=false;
+		{% endif %}
         {% if user_is_admin %}
         	userAdmin = true;
         {% else %}

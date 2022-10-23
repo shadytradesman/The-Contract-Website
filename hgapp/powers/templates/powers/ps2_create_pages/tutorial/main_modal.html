@@ -3,57 +3,98 @@
 {% block modal_id %}mainTutorialModal{% endblock %}
 
 {% block modal_title %}
-Building Custom Gifts
+    {% if is_stock %}
+        Customizing Stock Gifts
+    {% else %}
+        Building Custom Gifts
+    {% endif %}
 {% endblock %}
 
 {% block modal_header %}
-"Gifts are why we sign The Contract"
+    {% if is_stock %}
+        "My spin on a classic"
+    {% else %}
+        "Gifts are why we sign The Contract"
+    {% endif %}
 {% endblock %}
 
 {% block modal_body %}
+{% if is_stock %}
 <p>
-        Each session of The Contract, the Players' Contractors are invited to risk their lives in a deadly mission.
-    <b>
-        Those who succeed are rewarded with a Gift Credit that can be spent here in exchange for extraordinary Artifacts or incredible Powers.
-    </b>
+    While you can take Stock Gifts as-is, it’s best to customize their flavor and behavior to match your Contractor’s concept.
 </p>
 <p>
-    No two Contractors are alike. Each Contractor's Gifts are a unique expression of their concept, and any character
-    concept can be realized by building custom Gifts.
+    Clicking "customize" on a Stock Gift opens it in the standard Gift Builder with all the form fields pre-populated.
+    Here you can change the Gift’s description and behavior as you would any custom Gift.
 </p>
 <p>
-    Each Gift's system is automatically generated during creation. These systems are simple but very specific.
-    While wordy, such specific systems focus gameplay on <i>using</i> Gifts creatively rather than
-    <i>interpreting</i> them creatively, and they ensure your Contractor plays the same no matter who is acting as GM.
+    The easiest way to customize a Gift is to scroll down to the “Customize Flavor and Finish” section, where you can edit its name, tagline, and visual description to match your Contractor’s flavor.
 </p>
+<p>
+    If you want to take this Gift as-is, simply scroll down and press “Save Gift.”
+</p>
+    <div class="text-center">
+        <h4>Advancing Stock Gifts</h4>
+    </div>
+<p>
+    Stock Gifts are merely starting points. Many interesting and powerful improvements are unlocked by purchasing Enhancements
+    and increasing their Parameters. However, doing so has a price.
+</p>
+<p>
+    All Stock Gifts have a Gift Cost of one. Gifts must have a cost of one when you purchase them with a Gift Credit
+    earned from a victorious Contract.
+</p>
+<p>
+    Purchasing Enhancements, improving Parameters, and buying off Drawbacks increases the Gift’s cost. Similarly, removing Enhancements, reducing Parameters, and taking Drawbacks decreases the Gift’s cost. The Gift’s system will update automatically based on the modifiers selected.
+</p>
+<p>
+    Later, when you have additional Gifts or Improvements to spend, you can edit the Gift and pay for improvements that increase its cost.
+</p>
+{% else %}
+    <p>
+            Each session of The Contract, the Players' Contractors are invited to risk their lives in a deadly mission.
+        <b>
+            Those who succeed are rewarded with a Gift Credit that can be spent here in exchange for extraordinary Artifacts or incredible Powers.
+        </b>
+    </p>
+    <p>
+        No two Contractors are alike. Each Contractor's Gifts are a unique expression of their concept, and any character
+        concept can be realized by building custom Gifts.
+    </p>
+    <p>
+        Each Gift's system is automatically generated during creation. These systems are simple but very specific.
+        While wordy, such specific systems focus gameplay on <i>using</i> Gifts creatively rather than
+        <i>interpreting</i> them creatively, and they ensure your Contractor plays the same no matter who is acting as GM.
+    </p>
 
-<div class="text-center">
-    <h4>Building Custom Gifts is Easy</h4>
-</div>
-<ol>
-    <li>
-        Form an idea of what you want your Contractor to be able to do.
-    </li>
-    <li>
-        Describe your concept to this Gift-Building webpage. Select a Gift Type and Effect, then customize its modifiers
-        until it matches your idea.
-    </li>
-    <li>
-        Apply flavor to your Gift by adding a description, name, and tagline.
-    </li>
-</ol>
+    <div class="text-center">
+        <h4>Building Custom Gifts is Easy</h4>
+    </div>
+    <ol>
+        <li>
+            Form an idea of what you want your Contractor to be able to do.
+        </li>
+        <li>
+            Describe your concept to this Gift-Building webpage. Select a Gift Type and Effect, then customize its modifiers
+            until it matches your idea.
+        </li>
+        <li>
+            Apply flavor to your Gift by adding a description, name, and tagline.
+        </li>
+    </ol>
 
-<p>
-    You can also start by customizing a <a href="/powers/stock" target="_blank">premade Stock Gift</a>.
-</p>
+    <p>
+        You can also start by customizing a <a href="/powers/stock" target="_blank">premade Stock Gift</a>.
+    </p>
 
-<p>
-    Further instructions are available at the bottom of this initial "Select Gift Type" page, and many elements can be
-    <span class="has-popover" data-toggle="tooltip" data-title="Exactly! When in doubt, tap/hover for more info.">
-        <i>
-            <span class="visible-xs-inline visible-sm-inline">tapped on</span> <span class="visible-md-inline visible-lg-inline">hovered over</span>
-            for more information.
-        </i>
-    </span>
-</p>
+    <p>
+        Further instructions are available at the bottom of this initial "Select Gift Type" page, and many elements can be
+        <span class="has-popover" data-toggle="tooltip" data-title="Exactly! When in doubt, tap/hover for more info.">
+            <i>
+                <span class="visible-xs-inline visible-sm-inline">tapped on</span> <span class="visible-md-inline visible-lg-inline">hovered over</span>
+                for more information.
+            </i>
+        </span>
+    </p>
+{% endif %}
 {% endblock %}

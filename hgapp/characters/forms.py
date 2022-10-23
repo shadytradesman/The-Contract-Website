@@ -103,13 +103,28 @@ def make_character_form(user, existing_character=None, supplied_cell=None):
             }
             widgets = {
                 'name': forms.TextInput(attrs={'class': 'form-control'}),
-                'concept_summary':forms.TextInput(attrs={'class': 'form-control '}),
-                'pronoun': forms.Select(attrs={'class': 'form-control '}),
-                'ambition': forms.TextInput(attrs={'class': 'form-control '}),
-                'age': forms.TextInput(attrs={'class': 'form-control '}),
-                'appearance': forms.TextInput(attrs={'class': 'form-control '}),
-                'equipment': CustomStylePagedown(),
-                'notes': CustomStylePagedown(),
+            'concept_summary':forms.TextInput(attrs={
+                'class': 'form-control',
+                "autocorrect": "off",
+                "autocapitalize": "none",
+                "autocomplete": "off",
+            }),
+            'pronoun': forms.Select(attrs={'class': 'form-control '}),
+            'ambition': forms.TextInput(attrs={
+                'class': 'form-control ',
+                "autocorrect": "off",
+                "autocapitalize": "none",
+                "autocomplete": "off",
+            }),
+            'age': forms.TextInput(attrs={'class': 'form-control '}),
+            'appearance': forms.TextInput(attrs={
+                'class': 'form-control',
+                "autocorrect": "off",
+                "autocapitalize": "none",
+                "autocomplete": "off",
+            }),
+            'equipment': CustomStylePagedown(),
+            'notes': CustomStylePagedown(),
             }
 
     form = CharacterForm
@@ -138,6 +153,7 @@ def make_character_form(user, existing_character=None, supplied_cell=None):
     form.base_fields["cell"] = cell
 
     return form
+
 
 class CharacterDeathForm(ModelForm):
     class Meta:
