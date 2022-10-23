@@ -1648,9 +1648,9 @@ const ComponentRendering = {
           this.populateUniqueReplacementsMap();
           this.disabledEnhancements = {};
           this.disabledDrawbacks = {};
-          this.disabledEnhancements = getDisabledModifiers("enhancement", this.enhancements, this.selectedEnhancements.map(mod => mod.slug), this.activeUniqueReplacementsByMarker);
+          this.disabledEnhancements = getDisabledModifiers("enhancement", this.enhancements, this.getSelectedAndActiveEnhancements().map(mod => mod.slug), this.activeUniqueReplacementsByMarker);
           this.selectedEnhancements = this.selectedEnhancements.filter(mod => !(mod.slug in this.disabledEnhancements));
-          this.disabledDrawbacks = getDisabledModifiers("drawback", this.drawbacks, this.selectedDrawbacks.map(mod => mod.slug), this.activeUniqueReplacementsByMarker);
+          this.disabledDrawbacks = getDisabledModifiers("drawback", this.drawbacks, this.getSelectedAndActiveEnhancements().map(mod => mod.slug), this.activeUniqueReplacementsByMarker);
           this.selectedDrawbacks = this.selectedDrawbacks.filter(mod => !(mod.slug in this.disabledDrawbacks));
           this.disabledParameters = {};
           this.disabledParameters = getDisabledParameters(this.parameters, this.activeUniqueReplacementsByMarker);
