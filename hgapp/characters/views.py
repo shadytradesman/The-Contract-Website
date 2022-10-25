@@ -137,9 +137,9 @@ def edit_obituary(request, character_id, secret_key = None):
             obit_form = CharacterDeathForm(request.POST, instance=existing_death)
             if obit_form.is_valid():
                 with transaction.atomic():
-                    edited_death = obit_form.save(commit=False)
-                    edited_death.is_void = obit_form.cleaned_data['is_void']
-                    edited_death.save()
+                    edited_death = obit_form.save()
+                    if obit_form.cleaned_data['is_void']:
+                        edited_death.mark_void()
             else:
                 return None
         else:
@@ -150,6 +150,8 @@ def edit_obituary(request, character_id, secret_key = None):
                 new_character_death.date_of_death = timezone.now()
                 with transaction.atomic():
                     new_character_death.save()
+                    character.is_dead = True
+                    character.save()
             else:
                 return None
         url_args = (character.id,) if request.user.is_authenticated else (character.id, character.edit_secret_key,)
