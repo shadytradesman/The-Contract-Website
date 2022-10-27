@@ -8,7 +8,17 @@
                     <b>
                         the {{tombstone.death.relevant_character.concept_summary}}
                     </b>
-                    <span class="pull-right">
+                    <div class="visible-xs-block text-muted" style="margin-top: 3px;">
+                        {% if tombstone.death.relevant_character.number_of_victories %}
+                            ({{tombstone.death.relevant_character.number_of_victories }}
+                            {% if tombstone.death.relevant_character.number_of_victories  == 1 %}
+                                Victory
+                            {% else %}
+                                Victories
+                            {% endif %}{% if tombstone.num_journals %}, {{tombstone.num_journals}} journals{%endif%})
+                        {% endif %}
+                    </div>
+                    <span class="pull-right hidden-xs">
                         {% if tombstone.death.relevant_character.number_of_victories %}
                             ({{tombstone.death.relevant_character.number_of_victories }}
                             {% if tombstone.death.relevant_character.number_of_victories  == 1 %}

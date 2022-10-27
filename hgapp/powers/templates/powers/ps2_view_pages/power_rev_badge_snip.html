@@ -96,15 +96,16 @@
             </small>
         </div>
         {% endif %}
+        {%if power_full.tags.count > 0 or discovery_page %}
+            <div class="css-system-text-user-input" style="display: inline-block;">
+                {{ latest_revision.description|linebreaks }}
+            </div>
+        {% endif %}
         <div class="collapse collapse-power-{{latest_revision.id}} in"
              role="tabpanel"
              aria-labelledby="collapse-power-{{latest_revision.id}}-heading" >
             <div class="css-gift-summary">
-                {%if power_full.tags.count > 0 or discovery_page %}
-                    <div class="css-system-text-user-input" style="display: inline-block;">
-                        {{ latest_revision.description|linebreaks }}
-                    </div>
-                {% else %}
+                {%if power_full.tags.count == 0 and not discovery_page %}
                     <div class="text-muted css-gift-summary" style="display: inline-block;">
                         {{ latest_revision.gift_summary|safe }}
                     </div>
@@ -139,7 +140,9 @@
                 </span>
             {% endif %}
             <span class="css-system-text-user-input">
-                <i>{{latest_revision.description|linebreaks}}</i>
+                {%if power_full.tags.count == 0 and not discovery_page %}
+                    <i>{{latest_revision.description|linebreaks}}</i>
+                {% endif %}
                 {% if latest_revision.extended_description %}
                     <div style="position: relative; bottom: 8px;">
                         <a id="collapse-ext-desc-{{latest_revision.id}}-heading"
@@ -162,7 +165,9 @@
                     </div>
                 {% endif %}
             </span>
-        <hr style="width: 50%; margin-top: 3px; margin-bottom: 8px;">
+        {%if power_full.tags.count == 0 and not discovery_page %}
+            <hr style="width: 50%; margin-top: 3px; margin-bottom: 8px;">
+        {% endif %}
         <span class="js-render-power-keywords">
                 {{latest_revision.system|safe}}
             {% if latest_revision.errata %}

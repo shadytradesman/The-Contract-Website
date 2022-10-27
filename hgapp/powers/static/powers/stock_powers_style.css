@@ -1,3 +1,15 @@
+.css-small-header {
+    padding: 5px;
+    border-radius: 3px;
+}
+
+.unstyled-link .css-small-header {
+    background-color: #454e5b;
+}
+
+.collapsed .css-small-header {
+    background-color: #353e4b;
+}
 
 /*Special Nav Tabs
 source: https://www.codeply.com/go/bp/74926
@@ -200,6 +212,8 @@ h3 {
 .fake-link {
     color: #84A0B1;
     text-decoration: underline;
+    margin-bottom: 5px;
+    margin-top: 0px;
 }
 
 .panel-heading {

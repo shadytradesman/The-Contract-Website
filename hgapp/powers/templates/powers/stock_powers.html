@@ -25,7 +25,7 @@
 {% with main_modal_art_url as modal_art_url %}
     {% include "powers/stock_powers_modal.html" %}
 {% endwith %}
-    {% if rewarding_character %}
+    {% if rewarding_character or request.user.is_superuser %}
         {% include "powers/stock_powers_content.html" %}
     {% else %}
         {% cache 8000 stockPowers %}
