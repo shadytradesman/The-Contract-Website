@@ -3,6 +3,10 @@
     border-radius: 3px;
 }
 
+.css-small-header h4 {
+    font-size: 22px;
+}
+
 .unstyled-link .css-small-header {
     background-color: #454e5b;
 }

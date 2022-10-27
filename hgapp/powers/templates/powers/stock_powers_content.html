@@ -102,6 +102,7 @@
               <div class="panel-body">
                 {% for power_full in power_list %}
                   {% power_badge power_full False None False rewarding_character %}
+                  <br>
                 {% endfor %}
               </div>
             </div>
@@ -109,17 +110,18 @@
         {% endfor %}
       </div>
       <br>
-      <div class="small-section-header">
-        <h2>
+      <div class="small-section-header text-center">
+        <h3>
           Example Gifts
-          <br>
-          <small>Flavorful Gifts that demonstrate personalized rewards for worthy Contractors</small>
-        </h2>
+          <div>
+            <small>Flavorful Gifts that demonstrate personalized rewards for worthy Contractors</small>
+          </div>
+        </h3>
       </div>
       <div class="small-section panel-group" id="accordion-example" role="tablist" aria-multiselectable="true">
         {% for category, power_list in example_powers_by_category.items %}
           <div class="panel panel-default">
-            <a class="unstyled-link" role="button" data-parent="#accordion-example" data-toggle="collapse" href="#collapse{{category.slug}}" aria-expanded="false" aria-controls="collapse{{category.slug}}">
+            <a class="unstyled-link collapsed" role="button" data-parent="#accordion-example" data-toggle="collapse" href="#collapse{{category.slug}}" aria-expanded="false" aria-controls="collapse{{category.slug}}">
               <div class = "css-small-header text-center" role="tab" id="{{category.slug}}Heading">
                 <h4 class="fake-link">
                   {{category.name}}
@@ -131,6 +133,7 @@
               <div class="panel-body">
                 {% for power_full in power_list %}
                   {% power_badge power_full False None False rewarding_character %}
+                  <br>
                 {% endfor %}
               </div>
             </div>
