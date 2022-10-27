@@ -50,7 +50,7 @@
                     {% else %}
                         "{% url 'games:games_create_game' %}"
                     {% endif %}
-                    method="post">
+                    method="post" onsubmit="setFormSubmitting()">
                 {% if not game %}
                     <div class="row text-center">
                         <a class="btn btn-default btn-sm wiki-entry-collapsible" style="margin-bottom: 10px">Toggle Tutorial</a>
@@ -219,7 +219,7 @@
                     </div>
                 </div>
                 <div class="text-center">
-                    <input class="btn btn-primary" type="submit" value="
+                    <input id="edit-game-submit" class="btn btn-primary" type="submit" value="
                             {% if game %}
                                 Done
                             {% else %}

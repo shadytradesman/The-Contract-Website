@@ -1168,7 +1168,7 @@ const ComponentRendering = {
         this.updateGiftCost();
         this.updateRequiredStatus();
         this.populateWarnings();
-        this.openCustomizationTab();
+        this.openCustomizationTab(false);
         console.log("Edit power completed");
       },
       populateErrata() {
@@ -1189,23 +1189,29 @@ const ComponentRendering = {
               window.scrollTo(0, 0);
           });
       },
-      openModalityTab() {
+      openModalityTab(userClick) {
           this.expandedTab = "modalities";
           this.tabHeader = "Select a Gift Type";
           this.scrollToTop();
-          window.location.hash = '#modalities';
+          if (userClick) {
+            window.location.hash = '#modalities';
+          }
       },
-      openEffectsTab() {
+      openEffectsTab(userClick) {
           this.expandedTab = "effects";
           this.tabHeader = "Select an Effect";
           this.scrollToTop();
+          if (userClick) {
+          }
           window.location.hash = '#effects';
       },
-      openCustomizationTab() {
+      openCustomizationTab(userClick) {
           this.expandedTab = "customize";
           this.tabHeader = "Customize System";
           this.scrollToTop();
-          window.location.hash = '#customization';
+          if (userClick) {
+            window.location.hash = '#customization';
+          }
           this.$nextTick(function () {
             if (this.giftPreviewModalFirstShow && window.innerWidth <= 770) {
                 $('#giftPreviewModal').modal({});
@@ -1216,44 +1222,44 @@ const ComponentRendering = {
       clickModalityTab() {
           if (this.expandedTab === "modalities" && this.selectedModality) {
               if (this.selectedEffect === null) {
-                  this.openEffectsTab();
+                  this.openEffectsTab(true);
                   this.scrollToTop();
               } else {
-                  this.openCustomizationTab();
+                  this.openCustomizationTab(true);
                   this.scrollToTop();
               }
           } else {
-              this.openModalityTab();
+              this.openModalityTab(true);
               this.scrollToTop();
           }
       },
       clickEffectsTab() {
           if (this.expandedTab === "effects" && this.selectedEffect) {
-              this.openCustomizationTab();
+              this.openCustomizationTab(true);
               this.scrollToTop();
           } else if (this.selectedModality) {
-              this.openEffectsTab();
+              this.openEffectsTab(true);
               this.scrollToTop();
           }
       },
       clickCustomizationTab() {
           if (this.selectedModality && this.selectedEffect) {
-              this.openCustomizationTab();
+              this.openCustomizationTab(true);
               this.scrollToTop();
           }
       },
       clickModality(modality) {
           if (this.selectedModality && modality.target.getAttribute("id") === this.selectedModality.id) {
               if (this.selectedEffect === null) {
-                  this.openEffectsTab();
+                  this.openEffectsTab(true);
               } else {
-                  this.openCustomizationTab();
+                  this.openCustomizationTab(true);
               }
           }
       },
       clickEffect(effect) {
           if (this.selectedEffect && effect.target.getAttribute("id") === this.selectedEffect.id) {
-              this.openCustomizationTab();
+              this.openCustomizationTab(true);
           }
       },
       updateEffectCategoryDisplay() {
@@ -1292,9 +1298,9 @@ const ComponentRendering = {
 
           this.componentClick();
           if (shouldOpenEffectsTab) {
-              this.openEffectsTab();
+              this.openEffectsTab(true);
           } else {
-              this.openCustomizationTab();
+              this.openCustomizationTab(true);
           }
           this.scrollToTop();
       },
@@ -1404,7 +1410,7 @@ const ComponentRendering = {
               this.selectedVector = this.vectors.find(comp => comp.slug === this.selectedEffectFilter.value);
           }
           this.componentClick();
-          this.openCustomizationTab();
+          this.openCustomizationTab(true);
           this.scrollToTop();
       },
       updateAvailableVectors() {
@@ -1890,13 +1896,13 @@ $(function() {
     window.onpopstate = function() {
         switch(location.hash) {
             case '#customization':
-                mountedApp.openCustomizationTab();
+                mountedApp.openCustomizationTab(true);
                 break
             case '#effects':
-                mountedApp.openEffectsTab();
+                mountedApp.openEffectsTab(true);
                 break
             case '#modalities':
-                mountedApp.openModalityTab();
+                mountedApp.openModalityTab(true);
                 break
             default:
                 history.back();

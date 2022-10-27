@@ -1,5 +1,7 @@
 const scenariosByCell = JSON.parse(document.getElementById('scenariosByCells').textContent);
 
+var setFormSubmitting = function() { $("#edit-game-submit").prop('disabled', true);};
+
 $(function(){
     function handleScenarioChange() {
         const scenarioId = $("#id_scenario").val();
