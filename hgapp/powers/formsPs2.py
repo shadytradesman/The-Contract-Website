@@ -50,6 +50,7 @@ class PowerForm(forms.Form):
                                           help_text='Admin only, optional, for the stock powers page. Follow-up advice for this power. '
                                                     'What sorts of Enhancements and Drawbacks would be good?')
     stock_order = forms.IntegerField(label="Stock Gift ordering",
+                                     required=False,
                                      help_text="Determines the order in the stock Gifts page. Higher numbers appear first.")
 
     # Hidden Fields
