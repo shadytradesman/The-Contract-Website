@@ -280,6 +280,7 @@
     {% if request.user.is_superuser %}
         {{power_form.tags|bootstrap}}
         {{power_form.example_description|bootstrap}}
+        {{power_form.stock_order|bootstrap}}
     {% endif %}
     {{power_form.effect}}
     {{power_form.vector}}

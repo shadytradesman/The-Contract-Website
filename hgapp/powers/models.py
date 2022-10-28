@@ -140,8 +140,10 @@ class PowerTag(models.Model):
     slug = models.SlugField("Unique URL-Safe Name",
                             max_length=40,
                             primary_key=True)
+
     def __str__(self):
         return self.tag
+
 
 class PremadeCategory(models.Model):
     name = models.CharField(max_length=500)
@@ -839,6 +841,7 @@ class Power_Full(models.Model):
     example_description = models.CharField(max_length=9000,
                                            blank=True,
                                            null=True)
+    stock_order = models.IntegerField(default=0) # denormalized, access with get_gift_cost()
 
     class Meta:
         permissions = (

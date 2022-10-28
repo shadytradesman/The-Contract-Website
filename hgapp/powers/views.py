@@ -341,18 +341,28 @@ def stock(request, character_id=None):
         character = None
     generic_categories = PremadeCategory.objects.filter(is_generic=True).order_by("name").all()
     generic_powers_by_category = {}
+    total_gift_count = Power_Full.objects.filter(tags__isnull=False).count()
     for cat in generic_categories:
-        generic_powers_by_category[cat] = Power_Full.objects.filter(tags__slug__in=cat.tags.all()).all()
+        generic_powers_by_category[cat] = Power_Full.objects\
+            .filter(tags__slug__in=cat.tags.all())\
+            .select_related("latest_rev")\
+            .order_by("-stock_order", "name")\
+            .all()
     example_categories = PremadeCategory.objects.filter(is_generic=False).order_by("name").all()
     example_powers_by_category = {}
     for cat in example_categories:
-        example_powers_by_category[cat] = Power_Full.objects.filter(tags__slug__in=cat.tags.all()).all()
+        example_powers_by_category[cat] = Power_Full.objects\
+            .filter(tags__slug__in=cat.tags.all()) \
+            .select_related("latest_rev") \
+            .order_by("-stock_order", "name")\
+            .all()
     context = {
         "generic_powers_by_category": generic_powers_by_category,
         "example_powers_by_category": example_powers_by_category,
         'main_modal_art_url': static('overrides/art/mime.jpeg'),
         "rewarding_character": character,
         "show_tutorial": (not request.user) or (not request.user.is_authenticated) or (not request.user.power_full_set.exists()),
+        "total_gift_count": total_gift_count,
     }
     return render(request, 'powers/stock_powers.html', context)
 

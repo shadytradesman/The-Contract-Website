@@ -35,6 +35,7 @@ def get_edit_context(existing_power_full=None, is_edit=False, existing_char=None
             initial={
                 'tags': existing_power_full.tags.all(),
                 'example_description': existing_power_full.example_description,
+                'stock_order': existing_power_full.stock_order,
             })
     else:
         power_form = PowerForm ()
@@ -112,6 +113,7 @@ def save_gift(request, power_full=None, character=None):
         if request.user.is_superuser:
             power_full.tags.set(power_form.cleaned_data["tags"])
             power_full.example_description = power_form.cleaned_data["example_description"]
+            power_full.stock_order = power_form.cleaned_data["stock_order"]
         power_full.latest_rev = new_power
         power_full.name = new_power.name
         power_full.save()

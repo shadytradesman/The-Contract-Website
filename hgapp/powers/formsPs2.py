@@ -49,6 +49,8 @@ class PowerForm(forms.Form):
                                           required=False,
                                           help_text='Admin only, optional, for the stock powers page. Follow-up advice for this power. '
                                                     'What sorts of Enhancements and Drawbacks would be good?')
+    stock_order = forms.IntegerField(label="Stock Gift ordering",
+                                     help_text="Determines the order in the stock Gifts page. Higher numbers appear first.")
 
     # Hidden Fields
     modality = forms.ModelChoiceField(queryset=Base_Power.objects.filter(base_type=MODALITY).all(),

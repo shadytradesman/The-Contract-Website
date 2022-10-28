@@ -62,6 +62,7 @@ def get_create_power_context_from_power(power, new=True):
     if power.parent_power:
         initial['tags'] = power.parent_power.tags.all()
         initial['example_description'] = power.parent_power.example_description
+        initial['stock_order'] = power.parent_power.stock_order
 
     system = Base_Power_System.objects.filter(dice_system=DICE_SYSTEM[1][0]).get(base_power=power.base.slug)
     text_fields_formset = _get_text_field_formsets_for_edit(power, system)
