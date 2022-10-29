@@ -31,12 +31,14 @@
       {% if render_link %}
         </a>
       {% endif %}
-      <div class="text-center text-muted">
-          <small>
-              {{status_blurb|safe}}
-              <b><div class="css-reason-unavail">{% if reason_unavail %}{{reason_unavail}}{% endif %}</div></b>
-          </small>
-      </div>
+      {% if status_blurb %}
+        <div class="text-center text-muted">
+            <small>
+                {{status_blurb|safe}}
+                <b><div class="css-reason-unavail">{% if reason_unavail %}{{reason_unavail}}{% endif %}</div></b>
+            </small>
+        </div>
+      {% endif %}
     <i class="css-system-text-user-input css-world-element-description">{{item.description}}</i>
   </div>
     {% if transfer_form and user_can_edit %}
@@ -103,7 +105,7 @@
         {% else %}
             {% for power in item.power_full_set.all %}
                 <span class="css-world-element-name">
-                    {% power_badge power True item user_can_edit%}
+                    {% power_badge power True item user_can_edit rewarding_character %}
                 </span>
             {% endfor %}
         {% endif %}

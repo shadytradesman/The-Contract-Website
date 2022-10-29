@@ -34,7 +34,7 @@ def render_consumable(artifact, user):
 
 
 @register.inclusion_tag('characters/view_pages/sig_item_snip.html')
-def render_sig_item(artifact, user, viewing_character=None):
+def render_sig_item(artifact, user, viewing_character=None, rewarding_character=None, is_stock=False):
     if not (artifact.is_signature or artifact.is_crafted_artifact):
         raise ValueError("attempting to display non-signature artifact as signature")
     latest_transfer = artifact.get_latest_transfer()
@@ -51,30 +51,33 @@ def render_sig_item(artifact, user, viewing_character=None):
     is_greyed_out = False
     if viewing_character:
         is_greyed_out = is_lost_or_destroyed or artifact.character != viewing_character
-    if is_held_by_creator:
-        status_blurb = 'Created and held by <a href="{}">{}</a>.'.format(
-            reverse('characters:characters_view', args=(artifact.crafting_character.id,)),
-            artifact.crafting_character.name,)
-    elif artifact.crafting_character:
-        # if not held by creator, it should have a transfer.
-        status_blurb = 'Created by <a href="{}">{}</a>, {} <a href="{}">{}</a>.'.format(
-            reverse('characters:characters_view', args=(artifact.crafting_character.id,)),
-            artifact.crafting_character.name,
-            latest_transfer.get_transfer_type_display(),
-            reverse('characters:characters_view', args=(artifact.character.id,)),
-            artifact.character.name)
-    elif artifact.character:
-        status_blurb = 'Created by <a href="{}">{}</a> and orphaned. Held by <a href="{}">{}</a>'.format(
-            reverse('profiles:profiles_view_profile', args=(artifact.creating_player.id,)),
-            artifact.creating_player.username,
-            reverse('characters:characters_view', args=(artifact.character.id,)),
-            artifact.character.name)
-    elif artifact.creating_player:
-        status_blurb = 'Created by <a href="{}">{}</a> and orphaned.'.format(
-            reverse('profiles:profiles_view_profile', args=(artifact.creating_player.id,)),
-            artifact.creating_player.username)
+    if not is_stock:
+        if is_held_by_creator:
+            status_blurb = 'Created and held by <a href="{}">{}</a>.'.format(
+                reverse('characters:characters_view', args=(artifact.crafting_character.id,)),
+                artifact.crafting_character.name,)
+        elif artifact.crafting_character:
+            # if not held by creator, it should have a transfer.
+            status_blurb = 'Created by <a href="{}">{}</a>, {} <a href="{}">{}</a>.'.format(
+                reverse('characters:characters_view', args=(artifact.crafting_character.id,)),
+                artifact.crafting_character.name,
+                latest_transfer.get_transfer_type_display(),
+                reverse('characters:characters_view', args=(artifact.character.id,)),
+                artifact.character.name)
+        elif artifact.character:
+            status_blurb = 'Created by <a href="{}">{}</a> and orphaned. Held by <a href="{}">{}</a>'.format(
+                reverse('profiles:profiles_view_profile', args=(artifact.creating_player.id,)),
+                artifact.creating_player.username,
+                reverse('characters:characters_view', args=(artifact.character.id,)),
+                artifact.character.name)
+        elif artifact.creating_player:
+            status_blurb = 'Created by <a href="{}">{}</a> and orphaned.'.format(
+                reverse('profiles:profiles_view_profile', args=(artifact.creating_player.id,)),
+                artifact.creating_player.username)
+        else:
+            status_blurb = 'Created by an anonymous user.'.format()
     else:
-        status_blurb = 'Created by an anonymous user.'.format()
+        status_blurb = None
     reason_unavail = None
     if artifact.most_recent_status_change and artifact.most_recent_status_change not in [RECOVERED, REPAIRED]:
         reason_unavail = 'Currently {}.'.format(artifact.get_most_recent_status_change_display())
@@ -90,5 +93,6 @@ def render_sig_item(artifact, user, viewing_character=None):
         "status_form": status_form,
         "transfer_form": transfer_form,
         "render_link": render_link,
+        "rewarding_character": rewarding_character,
+        "is_stock": is_stock,
     }
-

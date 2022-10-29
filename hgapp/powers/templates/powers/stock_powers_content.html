@@ -1,4 +1,5 @@
 {% load power_tags %}
+{% load character_tags %}
 
 <div class="container">
   <div class="backdropped">
@@ -38,43 +39,34 @@
                  class="tab-pane {% if forloop.counter0 == 0 %}active{% endif %}"
                  id="{{category.slug}}">
               <div class="panel-body">
-                {% for power_full in power_list %}
-                  {% power_badge power_full False None False rewarding_character %}
-                {% endfor %}
-              </div>
-            </div>
-            {% endfor %}
-          </div>
-        </div>
-      </div>
-      <br>
-      <div class="row no-gutters ">
-        <div class="tabbable tabs-left">
-          <h3 class="text-center">
-            Example Gifts
-            <br>
-            <small>Flavorful Gifts that demonstrate personalized rewards for worthy Contractors</small>
-          </h3>
-          <ul class="nav nav-tabs">
-            {% for category, power_list in example_powers_by_category.items %}
-            <li  class="{% if forloop.counter0 == 0 %}active{% endif %}" role="presentation">
-              <a href="#{{category.slug}}" aria-controls="{{category.slug}}" role="tab" data-toggle="tab">
-                <h4>
-                  {{category.name}}
-                  <br>
-                  <small>{{category.description}}</small>
-                </h4>
-              </a>
-            </li>
-            {% endfor %}
-          </ul>
-          <div class="tab-content">
-            {% for category, power_list in example_powers_by_category.items %}
-            <div role="tabpanel" class="tab-pane  {% if forloop.counter0 == 0 %}active{% endif %}" id="{{category.slug}}">
-              <div class="panel-body">
-                {% for power_full in power_list %}
-                  {% power_badge power_full False None False rewarding_character %}
-                {% endfor %}
+                {% if power_list.0 %}
+                  <h4>
+                    Powers and Crafting
+                    <small data-toggle="tooltip"
+                           title='Power Gifts are intrinsic superpowers and capabilities. Crafting Gifts grant Contractors the ability to create exceptional items to use or trade.'>
+                      <small>
+                        <i class="fa fa-question-circle fa-lg"></i>
+                      </small>
+                    </small>
+                  </h4>
+                  {% for power_full in power_list.0 %}
+                    {% power_badge power_full False None False rewarding_character %}
+                  {% endfor %}
+                {% endif %}
+                {% if power_list.1 %}
+                  <h4>
+                    Legendary Artifacts
+                    <small data-toggle="tooltip"
+                           title='These are unique items that can be lost or stolen. Each item may have multiple Gifts on it. Customizing one of their Gifts will create a new Legendary Artifact for your Contractor.'>
+                      <small>
+                        <i class="fa fa-question-circle fa-lg"></i>
+                      </small>
+                    </small>
+                  </h4>
+                  {% for item in power_list.1 %}
+                    {% render_sig_item item request.user None rewarding_character True%}
+                  {% endfor %}
+                {% endif %}
               </div>
             </div>
             {% endfor %}
@@ -100,40 +92,38 @@
             </a>
             <div id="collapse{{category.slug}}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="{{category.slug}}Heading">
               <div class="panel-body">
-                {% for power_full in power_list %}
+                {% if power_list.0 %}
+                <h4 class="text-muted">
+                  Powers and Crafting
+                  <small data-toggle="tooltip"
+                         title='Power Gifts are intrinsic superpowers and capabilities. Crafting Gifts grant Contractors the ability to create exceptional items to use or trade.'>
+                    <small>
+                      <i class="fa fa-question-circle fa-lg"></i>
+                    </small>
+                  </small>
+                </h4>
+                {% for power_full in power_list.0 %}
                   {% power_badge power_full False None False rewarding_character %}
                   <br>
                 {% endfor %}
-              </div>
-            </div>
-          </div>
-        {% endfor %}
-      </div>
-      <br>
-      <div class="small-section-header text-center">
-        <h3>
-          Example Gifts
-          <div>
-            <small>Flavorful Gifts that demonstrate personalized rewards for worthy Contractors</small>
-          </div>
-        </h3>
-      </div>
-      <div class="small-section panel-group" id="accordion-example" role="tablist" aria-multiselectable="true">
-        {% for category, power_list in example_powers_by_category.items %}
-          <div class="panel panel-default">
-            <a class="unstyled-link collapsed" role="button" data-parent="#accordion-example" data-toggle="collapse" href="#collapse{{category.slug}}" aria-expanded="false" aria-controls="collapse{{category.slug}}">
-              <div class = "css-small-header text-center" role="tab" id="{{category.slug}}Heading">
-                <h4 class="fake-link">
-                  {{category.name}}
+                {% endif %}
+                {% if power_list.1 %}
+                <h4 class="text-muted">
+                  Legendary Artifacts
+                  <small data-toggle="tooltip"
+                         title='These are unique items that can be lost or stolen. Each item may have multiple Gifts on it. Customizing one of their Gifts will create a new Legendary Artifact for your Contractor.'>
+                    <small>
+                      <i class="fa fa-question-circle fa-lg"></i>
+                    </small>
+                  </small>
                 </h4>
-                  {{category.description}}
-              </div>
-            </a>
-            <div id="collapse{{category.slug}}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="{{category.slug}}Heading">
-              <div class="panel-body">
-                {% for power_full in power_list %}
-                  {% power_badge power_full False None False rewarding_character %}
+                {% for item in power_list.1 %}
+                  {% render_sig_item item request.user None rewarding_character True%}
                   <br>
+                {% endfor %}
+                {% endif %}
+                {% for power_full in power_list.0 %}
+                  {% power_badge power_full False None False rewarding_character %}
                 {% endfor %}
               </div>
             </div>

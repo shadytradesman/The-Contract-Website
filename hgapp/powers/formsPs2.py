@@ -51,6 +51,7 @@ class PowerForm(forms.Form):
                                                     'What sorts of Enhancements and Drawbacks would be good?')
     stock_order = forms.IntegerField(label="Stock Gift ordering",
                                      required=False,
+                                     initial=0,
                                      help_text="Determines the order in the stock Gifts page. Higher numbers appear first.")
 
     # Hidden Fields
