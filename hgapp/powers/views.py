@@ -341,7 +341,7 @@ def stock(request, character_id=None):
     else:
         character = None
     total_gift_count = Power_Full.objects.filter(tags__isnull=False, is_deleted=False).count()
-    cache_key = "{}{}".format("stock-gifts", request.user.is_superuser)
+    cache_key = "{}{}".format("stockgifts", request.user.is_superuser)
     sentinel = object()
     cache_contents = cache.get(cache_key, sentinel)
     if cache_contents is sentinel:
