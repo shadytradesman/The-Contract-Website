@@ -348,8 +348,9 @@ def stock(request, character_id=None):
     else:
         cache_contents = cache.get(cache_key, sentinel)
         if cache_contents is sentinel:
-            cache_contents = render_stock_page(request, character)
-            cache.set(cache_key, cache_contents, 8000)
+            page = render_stock_page(request, character)
+            cache.set(cache_key, page, 8000)
+            cache_contents = page
         return render(request, "powers/stock_powers.html", {"content":cache_contents})
 
 
@@ -358,17 +359,20 @@ def render_stock_page(request, character):
     generic_powers_by_category = {}
     total_gift_count = Power_Full.objects.filter(tags__isnull=False, is_deleted=False).count()
     for cat in generic_categories:
-        non_artifact_powers = Power_Full.objects \
-            .filter(tags__slug__in=cat.tags.all(), artifacts__isnull=True, is_deleted=False) \
-            .select_related("latest_rev") \
+        artifacts_query = Artifact.objects.filter(is_signature=True)
+        all_powers = Power_Full.objects \
+            .filter(tags__slug__in=cat.tags.all(), is_deleted=False) \
+            .prefetch_related(Prefetch("artifacts", queryset=artifacts_query)) \
             .order_by("-stock_order", "name") \
             .all()
-        artifact_powers = Power_Full.objects.filter(tags__slug__in=cat.tags.all(), artifacts__isnull=False,
-                                                    is_deleted=False) \
-            .prefetch_related(Prefetch("artifacts", queryset=Artifact.objects.filter(is_signature=True))).all()
+        non_artifact_powers = []
         artifacts = set()
-        for power in artifact_powers:
-            artifacts.update(list(power.artifacts.filter(is_signature=True).all()))
+        for power in all_powers:
+            item = power.artifacts.filter(is_signature=True).first()
+            if item:
+                artifacts.add(item)
+            else:
+                non_artifact_powers.append(power)
         generic_powers_by_category[cat] = (non_artifact_powers, artifacts)
     context = {
         "generic_powers_by_category": generic_powers_by_category,

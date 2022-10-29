@@ -1,6 +1,9 @@
 {% load power_tags %}
 {% load character_tags %}
 
+{% with main_modal_art_url as modal_art_url %}
+{% include "powers/stock_powers_modal.html" %}
+{% endwith %}
 <div class="container">
   <div class="backdropped">
     <div class = "text-center ">
@@ -50,7 +53,7 @@
                     </small>
                   </h4>
                   {% for power_full in power_list.0 %}
-                    {% power_badge power_full False None False rewarding_character %}
+                    {% power_badge power_full False None False rewarding_character True %}
                   {% endfor %}
                 {% endif %}
                 {% if power_list.1 %}
@@ -64,7 +67,7 @@
                     </small>
                   </h4>
                   {% for item in power_list.1 %}
-                    {% render_sig_item item request.user None rewarding_character True%}
+                    {% render_sig_item item request.user None rewarding_character True %}
                   {% endfor %}
                 {% endif %}
               </div>
@@ -103,7 +106,7 @@
                   </small>
                 </h4>
                 {% for power_full in power_list.0 %}
-                  {% power_badge power_full False None False rewarding_character %}
+                  {% power_badge power_full False None False rewarding_character True %}
                   <br>
                 {% endfor %}
                 {% endif %}
@@ -118,13 +121,10 @@
                   </small>
                 </h4>
                 {% for item in power_list.1 %}
-                  {% render_sig_item item request.user None rewarding_character True%}
+                  {% render_sig_item item request.user None rewarding_character True %}
                   <br>
                 {% endfor %}
                 {% endif %}
-                {% for power_full in power_list.0 %}
-                  {% power_badge power_full False None False rewarding_character %}
-                {% endfor %}
               </div>
             </div>
           </div>

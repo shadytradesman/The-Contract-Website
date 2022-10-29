@@ -21,8 +21,5 @@
 {% endblock %}
 
 {% block body_base %}
-{% with main_modal_art_url as modal_art_url %}
-    {% include "powers/stock_powers_modal.html" %}
-{% endwith %}
 {{content|safe}}
 {% endblock %}
