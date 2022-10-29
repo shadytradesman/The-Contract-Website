@@ -110,14 +110,16 @@
             {% endfor %}
         {% endif %}
     </div>
-    <div id="hx-timeline-item{{item.id}}" class="css-no-print">
-        <button
-                class="btn btn-default btn-xs"
-                hx-get="{% url 'characters:item_timeline' item.id %}"
-                hx-trigger="click"
-                hx-target="#hx-timeline-item{{item.id}}"
-                hx-swap="outerHTML">
-            History
-        </button>
-    </div>
+    {% if not is_stock %}
+        <div id="hx-timeline-item{{item.id}}" class="css-no-print">
+            <button
+                    class="btn btn-default btn-xs"
+                    hx-get="{% url 'characters:item_timeline' item.id %}"
+                    hx-trigger="click"
+                    hx-target="#hx-timeline-item{{item.id}}"
+                    hx-swap="outerHTML">
+                History
+            </button>
+        </div>
+    {% endif %}
 </div>
