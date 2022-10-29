@@ -3,6 +3,7 @@ import random
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
+from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from django.templatetags.static import static
 from django.views import View
@@ -339,21 +340,28 @@ def stock(request, character_id=None):
         character = get_object_or_404(Character, id=character_id)
     else:
         character = None
-    generic_categories = PremadeCategory.objects.order_by("name").all()
-    generic_powers_by_category = {}
     total_gift_count = Power_Full.objects.filter(tags__isnull=False, is_deleted=False).count()
-    for cat in generic_categories:
-        non_artifact_powers = Power_Full.objects\
-            .filter(tags__slug__in=cat.tags.all(), artifacts__isnull=True, is_deleted=False) \
-            .select_related("latest_rev")\
-            .order_by("-stock_order", "name")\
-            .all()
-        artifact_powers = Power_Full.objects.filter(tags__slug__in=cat.tags.all(), artifacts__isnull=False, is_deleted=False) \
-            .prefetch_related(Prefetch("artifacts", queryset=Artifact.objects.filter(is_signature=True))).all()
-        artifacts = set()
-        for power in artifact_powers:
-            artifacts.update(list(power.artifacts.filter(is_signature=True).all()))
-        generic_powers_by_category[cat] = (non_artifact_powers, artifacts)
+    cache_key = "{}{}".format("stock gifts", request.user.is_superuser)
+    sentinel = object()
+    cache_contents = cache.get(cache_key, sentinel)
+    if cache_contents is sentinel:
+        generic_categories = PremadeCategory.objects.order_by("name").all()
+        generic_powers_by_category = {}
+        for cat in generic_categories:
+            non_artifact_powers = Power_Full.objects\
+                .filter(tags__slug__in=cat.tags.all(), artifacts__isnull=True, is_deleted=False) \
+                .select_related("latest_rev")\
+                .order_by("-stock_order", "name")\
+                .all()
+            artifact_powers = Power_Full.objects.filter(tags__slug__in=cat.tags.all(), artifacts__isnull=False, is_deleted=False) \
+                .prefetch_related(Prefetch("artifacts", queryset=Artifact.objects.filter(is_signature=True))).all()
+            artifacts = set()
+            for power in artifact_powers:
+                artifacts.update(list(power.artifacts.filter(is_signature=True).all()))
+            generic_powers_by_category[cat] = (non_artifact_powers, artifacts)
+        cache.set(cache_key, generic_powers_by_category, timeout=150if request.user.is_superuser else 8000)
+    else:
+        generic_powers_by_category = cache_contents
     context = {
         "generic_powers_by_category": generic_powers_by_category,
         'main_modal_art_url': static('overrides/art/mime.jpeg'),
