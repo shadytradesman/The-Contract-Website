@@ -382,7 +382,7 @@ def render_stock_page(request, character):
             not request.user.power_full_set.exists()),
         "total_gift_count": total_gift_count,
     }
-    return render_to_string('powers/stock_powers_content.html', context, request)
+    return render_to_string('powers/stock_powers_content_cache.html', context, request)
 
 
 class BasePowerDetailView(generic.DetailView):
