@@ -458,7 +458,7 @@ def make_world_element_form(cell_choices=None, initial_cell=None, for_new=True):
                                  required=False,
                                  widget=forms.TextInput(attrs={'class': 'form-control'}))
         cell = forms.ModelChoiceField(label="Playgroup",
-                                      queryset=cell_choices,
+                                      queryset=cell_choices if cell_choices else Cell.objects.none(),
                                       widget=forms.Select(attrs={'class': 'form-control'}),
                                       initial=initial_cell if initial_cell else cell_choices.first() if cell_choices else None,
                                       required=for_new,
@@ -530,13 +530,18 @@ def make_artifact_status_form(current_status=None):
     return ArtifactStatusForm
 
 
-def make_transfer_artifact_form(character, cell=None, max_quantity=0):
-    character_options = get_character_contacts(character)
-    character_options = set([x.pk for x in character_options.keys()])
-    if character.cell:
-        character_options.update(cell.character_set.exclude(player=character.player).values_list('id', flat=True))
-    if character.pk in character_options:
-        character_options.remove(character.pk)
+def make_transfer_artifact_form(character=None, cell=None, max_quantity=0, user=None):
+    if character:
+        character_options = get_character_contacts(character)
+        character_options = set([x.pk for x in character_options.keys()])
+        if character.cell:
+            character_options.update(cell.character_set.exclude(player=character.player).values_list('id', flat=True))
+        if character.pk in character_options:
+            character_options.remove(character.pk)
+    elif user:
+        character_options = user.character_set.values_list('id', flat=True)
+    else:
+        raise ValueError("Must pass either a user or character to transfer artifact form")
 
 
     class TransferArtifactForm(forms.Form):

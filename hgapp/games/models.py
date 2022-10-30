@@ -418,7 +418,7 @@ class Game(models.Model):
         return "This game is " + self.get_status_display() + " and ended " + self.end_time.strftime('on %d, %b %Y at %I:%M %Z')
 
     def player_participated(self, player):
-        return self.gm == player or self.game_invite_set.filter(is_declined=False, invited_player=player)
+        return self.gm == player or self.game_invite_set.filter(is_declined=False, invited_player=player).first()
 
     def update_participant_titles(self):
         self.gm.profile.recompute_titles()

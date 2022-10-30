@@ -1613,7 +1613,10 @@ class ArtifactTransferEvent(models.Model):
 
     def get_timeline_string(self):
         time = self.created_time.strftime("%d %b %Y")
-        line = "{} - <b>{}</b> {} (from {})".format(time, self.get_transfer_type_display(), self.to_character.name, self.from_character.name)
+        line = "{} - <b>{}</b> {} (from {})".format(time,
+                                                    self.get_transfer_type_display(),
+                                                    self.to_character.name if self.to_character else "nobody",
+                                                    self.from_character.name if self.from_character else "nobody")
         if self.notes:
             line = line + '<i class="text-muted" style="padding-left: 5px;">({})</i>'.format(self.notes)
         return line

@@ -38,13 +38,15 @@ def render_sig_item(artifact, user, viewing_character=None, rewarding_character=
     if not (artifact.is_signature or artifact.is_crafted_artifact):
         raise ValueError("attempting to display non-signature artifact as signature")
     latest_transfer = artifact.get_latest_transfer()
-    can_edit = artifact.character.player_can_edit(user) if artifact.character else False
+    can_edit = artifact.character.player_can_edit(user) if artifact.character else artifact.creating_player == user
     edit_form = None
     status_form = None
     transfer_form = None
     if can_edit:
         edit_form = make_world_element_form(for_new=False)()
-        transfer_form = make_transfer_artifact_form(artifact.character, artifact.character.cell)
+        transfer_form = make_transfer_artifact_form(artifact.character if artifact.character else None,
+                                                    artifact.character.cell if artifact.character else None,
+                                                    user=user)
         status_form = make_artifact_status_form(artifact.most_recent_status_change)
     is_lost_or_destroyed = artifact.most_recent_status_change and artifact.most_recent_status_change in [LOST, AT_HOME, DESTROYED]
     is_held_by_creator = artifact.character and (artifact.character == artifact.crafting_character)

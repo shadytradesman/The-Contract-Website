@@ -84,12 +84,14 @@ def make_select_signature_artifact_form(existing_character=None, existing_power=
                 crafting_character=existing_character,
                 is_signature=True)
         elif existing_power and existing_power.owner:
-            queryset = existing_power.owner.artifact_set.filter(
+            queryset = Artifact.objects.filter(
+                creating_player=existing_power.owner,
                 cell__isnull=True,
                 crafting_character__isnull=True,
                 is_signature=True)
         elif user and user.is_authenticated:
-            queryset = user.artifact_set.filter(
+            queryset = Artifact.objects.filter(
+                creating_player=user,
                 cell__isnull=True,
                 crafting_character__isnull=True,
                 is_signature=True)

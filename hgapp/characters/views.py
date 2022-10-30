@@ -45,14 +45,19 @@ from hgapp.utilities import get_object_or_none
 
 from games.game_utilities import get_character_contacts
 
-def __check_world_element_perms(request, character, secret_key=None):
-    try:
-        __check_edit_perms(request, character, secret_key)
-        return True
-    except PermissionDenied:
-        if hasattr(character, "cell") and character.cell.player_can_run_games(request.user):
+def __check_world_element_perms(request, character, secret_key=None, ext_element=None):
+    if character:
+        try:
+            __check_edit_perms(request, character, secret_key)
             return True
-    raise PermissionDenied("You do not have permission to edit this Character")
+        except PermissionDenied:
+            if hasattr(character, "cell") and character.cell.player_can_run_games(request.user):
+                return True
+        raise PermissionDenied("You do not have permission to edit this Character")
+    if ext_element:
+        return ext_element.creating_player == request.user
+    else:
+        raise ValueError("Checking world element perms requires a character or existing element")
 
 
 def __check_edit_perms(request, character, secret_key=None):
@@ -971,14 +976,12 @@ def use_consumable(request, artifact_id):
 def transfer_artifact(request, artifact_id):
     artifact = get_object_or_404(Artifact, id=artifact_id)
     if request.method == "POST":
-        if not artifact.character:
-            raise ValueError("Artifact has no character and cannot be transferred")
         start_char = artifact.character
-        __check_edit_perms(request, start_char)
+        __check_world_element_perms(request, character=artifact.character, ext_element=Artifact)
         max_quantity = 0
         if artifact.is_consumable:
             max_quantity = artifact.quantity
-        form = make_transfer_artifact_form(start_char, start_char.cell, max_quantity)(request.POST)
+        form = make_transfer_artifact_form(start_char, start_char.cell if start_char else None, max_quantity, request.user)(request.POST)
         if form.is_valid():
             with transaction.atomic():
                 artifact = Artifact.objects.select_for_update().get(pk=artifact_id)
@@ -1247,9 +1250,9 @@ def edit_world_element(request, element_id, element, secret_key=None):
             return JsonResponse({"error": "Invalid world element"}, status=400)
         ext_element = get_object_or_404(WorldElement, id=element_id)
         character = ext_element.character
-        __check_world_element_perms(request, character, secret_key)
-        world_element_cell_choices = character.world_element_cell_choices()
-        world_element_initial_cell = character.world_element_initial_cell()
+        __check_world_element_perms(request, character, secret_key, ext_element)
+        world_element_cell_choices = character.world_element_cell_choices() if character else None
+        world_element_initial_cell = character.world_element_initial_cell() if character else None
         form = make_world_element_form(world_element_cell_choices, world_element_initial_cell, for_new=False)(request.POST)
         if form.is_valid():
             with transaction.atomic():
