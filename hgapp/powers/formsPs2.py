@@ -75,7 +75,7 @@ class PowerForm(forms.Form):
 def make_select_signature_artifact_form(existing_character=None, existing_power=None, user=None):
     class SelectArtifactForm(forms.Form):
         initial_artifact = None
-        if existing_power and existing_power.crafting_type == CRAFTING_SIGNATURE:
+        if existing_power and existing_power.crafting_type == CRAFTING_SIGNATURE and existing_power.owner == user:
             initial_artifact = get_object_or_none(
                 existing_power.artifactpowerfull_set.filter(relevant_artifact__is_signature=True))
         if existing_character:
@@ -83,7 +83,7 @@ def make_select_signature_artifact_form(existing_character=None, existing_power=
                 cell__isnull=True,
                 crafting_character=existing_character,
                 is_signature=True)
-        elif existing_power and existing_power.owner:
+        elif existing_power and existing_power.owner == user:
             queryset = Artifact.objects.filter(
                 creating_player=existing_power.owner,
                 cell__isnull=True,

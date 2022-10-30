@@ -47,8 +47,9 @@ def power_rev_badge(power, force_show_warnings=False, crafter_blurb=None, artifa
 def power_badge(power_full, force_show_warnings=False, artifact=None, can_edit=False, rewarding_character=None, is_stock=False):
     latest_revision = power_full.latest_revision()
     character = rewarding_character if rewarding_character else power_full.character if power_full.character else None
+    force_show_warnings = force_show_warnings and not is_stock
     show_status_warning = force_show_warnings
-    if character:
+    if character and (not is_stock or rewarding_character):
         show_status_warning = not latest_revision.passes_status_check(character.status)
     show_active_toggle = can_edit and latest_revision.show_status_toggle(artifact)
     is_active = show_active_toggle
