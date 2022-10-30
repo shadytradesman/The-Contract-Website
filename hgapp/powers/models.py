@@ -865,6 +865,9 @@ class Power_Full(models.Model):
     def is_crafting(self):
         return self.crafting_type in [CRAFTING_CONSUMABLE, CRAFTING_ARTIFACT]
 
+    def is_signature(self):
+        return self.crafting_type == CRAFTING_SIGNATURE
+
     def delete(self):
         self.character = None
         for reward in self.reward_list():

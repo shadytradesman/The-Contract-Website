@@ -34,7 +34,7 @@ def render_consumable(artifact, user):
 
 
 @register.inclusion_tag('characters/view_pages/sig_item_snip.html')
-def render_sig_item(artifact, user, viewing_character=None, rewarding_character=None, is_stock=False):
+def render_sig_item(artifact, user, viewing_character=None, rewarding_character=None, is_stock=False, is_preview=False):
     if not (artifact.is_signature or artifact.is_crafted_artifact):
         raise ValueError("attempting to display non-signature artifact as signature")
     latest_transfer = artifact.get_latest_transfer()
@@ -42,7 +42,7 @@ def render_sig_item(artifact, user, viewing_character=None, rewarding_character=
     edit_form = None
     status_form = None
     transfer_form = None
-    if can_edit:
+    if can_edit and not is_stock and not is_preview:
         edit_form = make_world_element_form(for_new=False)()
         transfer_form = make_transfer_artifact_form(artifact.character if artifact.character else None,
                                                     artifact.character.cell if artifact.character else None,
@@ -97,4 +97,5 @@ def render_sig_item(artifact, user, viewing_character=None, rewarding_character=
         "render_link": render_link,
         "rewarding_character": rewarding_character,
         "is_stock": is_stock,
+        "is_preview": is_preview,
     }

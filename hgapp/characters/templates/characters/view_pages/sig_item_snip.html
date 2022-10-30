@@ -2,7 +2,7 @@
 {% load bootstrap %}
 
 <div class="css-item-display {% if item.is_crafted_artifact %}css-crafted-art{% else %}css-signature-item{% endif %} js-world-element-container {% if is_greyed_out %}css-sig-item-greyed-out{% endif %}">
-    {% if user_can_edit  %}
+    {% if user_can_edit and not is_stock and not is_preview %}
         <span class="pull-right css-world-element-edit css-no-print">
             <button class="btn btn-xs btn-default js-edit-world-element-button"
                     data-id="{{item.id}}"
