@@ -34,7 +34,7 @@ urlpatterns = [
 
     ### SHARED
     # ex: .com/gift/bases_and_examples/
-    url(r'^bases_and_examples/$', views.powers_and_examples, name='powers_and_examples'),
+    url(r'^example-audit/$', views.powers_and_examples, name='powers_and_examples'),
 
     # ex: .com/gift/and-effects
     url(r'^and-effects/$', views.powers_and_effects, name='powers_and_effects'),

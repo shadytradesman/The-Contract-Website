@@ -596,7 +596,7 @@ class Base_Power(models.Model):
         return reverse('powers:powers_create_power', kwargs={'base_power_slug': self.slug})
 
     def example_powers(self):
-        return Power_Full.objects.filter(base=self, tags__in=["example"])
+        return Power_Full.objects.filter(base=self, tags__isnull=False).distinct()
 
     def used_power_fulls(self):
         return Power_Full.objects.filter(base=self, character__isnull=False, is_deleted=False)

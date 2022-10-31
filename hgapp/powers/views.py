@@ -114,8 +114,11 @@ def create(request, character_id=None):
 
 def powers_and_examples(request):
     base_powers_list = Base_Power.objects.order_by('name').all()
+    only_examples = Power_Full.objects.filter(tags__in=["example"])
+    only_examples = [x for x in only_examples if x.tags.count() == 1]
     context = {
         'base_powers_list': base_powers_list,
+        'only_examples': only_examples,
     }
     return render(request, 'powers/powers_and_examples.html', context)
 

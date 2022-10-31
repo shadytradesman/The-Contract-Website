@@ -1,6 +1,6 @@
 {% extends "site_base.html" %}
 
-{% load i18n %}
+{% load power_tags %}
 
 {% block head_title %}The Contract{% endblock %}
 
@@ -9,13 +9,25 @@
     <div class="page-header">
         <h1> Powers and Examples</h1>
     </div>
+    <div class="row">
+        <h2>gifts with examples but no stock tags</h2>
+        {% for gift in only_examples %}
+        <div class="col-xs-12 col-md-6" style="margin-bottom: 10px;">
+            {% power_badge gift %}
+        </div>
+        {% endfor %}
+    </div>
 <div class="row">
+    <h2>Example Gifts by effect</h2>
     {% if base_powers_list %}
     {% for base_power in base_powers_list %}
         <div class="col-lg-4 col-sm-6">
             <div class="thumbnail">
                 <div class="label">
                          <a class="btn btn-default" href="{% url 'powers:powers_view_base' base_power.slug %}" role="button"><h3>{{base_power.name}}:</h3></a>
+                        {% if not base_power.is_public %}
+                            <b class="text-warn">Not public</b>
+                        {% endif %}
                          {% for example in base_power.example_powers %}
                             <li><a class="btn btn-default" href="{% url 'powers:powers_view_power_full' example.id %}" role="button">{{example.name}}</a></li>
                          {% endfor %}
