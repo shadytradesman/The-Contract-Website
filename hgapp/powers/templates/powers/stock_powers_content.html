@@ -85,6 +85,7 @@
       <div class="small-section panel-group" id="accordion-generic" role="tablist" aria-multiselectable="false">
         {% for category, power_list in generic_powers_by_category.items %}
           <div class="panel panel-default">
+            <div class="scroll-target" style="display:none; position:relative; bottom:100px;"> </div>
             <a class="unstyled-link collapsed" role="button" data-parent="#accordion-generic" data-toggle="collapse" href="#collapse{{category.slug}}" aria-expanded="false" aria-controls="collapse{{category.slug}}">
               <div class = "css-small-header text-center" role="tab" id="{{category.slug}}Heading">
                 <h4 class="fake-link">
