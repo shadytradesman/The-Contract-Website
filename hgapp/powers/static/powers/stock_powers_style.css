@@ -75,7 +75,7 @@ source: https://www.codeply.com/go/bp/74926
 .tabs-left  .nav-tabs {
   float: left;
   margin-right: 20px;
-  border-right: 1px solid  #a6763a;
+  border-right: 2px solid  #a6763a;
 }
 
 .tabs-left  .nav-tabs > li > a {
@@ -130,7 +130,6 @@ source: https://www.codeply.com/go/bp/74926
     overflow: auto;
     background-color: #111418;
     border-top: 1px solid  #a6763a;
-    border-left: 1px solid  #a6763a;
 }
 
 .nav-tabs>li.active>a {
@@ -227,4 +226,17 @@ h3 {
 
 .panel-group {
     margin-bottom: 20px;
+}
+
+.css-desktop .css-sidebar{
+    position: static;
+    height: 95vh;
+    overflow: auto;
+    float: left;
+}
+
+.css-desktop .tab-content {
+    position: static;
+    height: 95vh;
+    overflow: auto;
 }

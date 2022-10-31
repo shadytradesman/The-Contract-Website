@@ -6,24 +6,25 @@
 {% endwith %}
 <div class="container">
   <div class="backdropped">
-    <div class = "text-center ">
-      <h1 style="margin-bottom: 15px;">
-        {% if rewarding_character %}
+    <div class="css-desktop visible-md-block visible-lg-block visible-xl-block">
+      <div >
+        <h1 style="margin-bottom: 15px;">
+          {% if rewarding_character %}
           Select a Stock Gift for {{rewarding_character.name}}
-        {% else %}
+          {% else %}
           Stock Gifts
-        <div>
-          <small>Example Gifts to take and customize</small>
-          <button type="button" class="btn btn-default btn-xs " data-toggle="modal" data-target="#mainTutorialModal">
-            Help
-          </button>
-        </div>
-        {% endif %}
-      </h1>
-    </div>
-    <div class="visible-md-block visible-lg-block visible-xl-block">
+            <small>Example Gifts to take and customize</small>
+            <button type="button" class="btn btn-default btn-xs " data-toggle="modal" data-target="#mainTutorialModal">
+              Help
+            </button>
+          {% endif %}
+        </h1>
+      </div>
+
       <div class="row no-gutters ">
         <div class="tabbable tabs-left">
+          <div class="css-sidebar">
+
           <ul class="nav nav-tabs">
             {% for category, power_list in generic_powers_by_category.items %}
             <li role="presentation" class="{% if forloop.counter0 == 0 %}active{% endif %}">
@@ -36,6 +37,7 @@
             </li>
             {% endfor %}
           </ul>
+          </div>
           <div class="tab-content">
             {% for category, power_list in generic_powers_by_category.items %}
             <div role="tabpanel"
@@ -82,6 +84,22 @@
 
     <!--       Small displays version -->
     <div class="visible-sm-block visible-xs-block">
+      <div class = "text-center">
+        <h1 style="margin-bottom: 15px;">
+          {% if rewarding_character %}
+          Select a Stock Gift for {{rewarding_character.name}}
+          {% else %}
+          Stock Gifts
+          <div>
+            <small>Example Gifts to take and customize</small>
+            <button type="button" class="btn btn-default btn-xs " data-toggle="modal" data-target="#mainTutorialModal">
+              Help
+            </button>
+          </div>
+          {% endif %}
+        </h1>
+      </div>
+
       <div class="small-section panel-group" id="accordion-generic" role="tablist" aria-multiselectable="false">
         {% for category, power_list in generic_powers_by_category.items %}
           <div class="panel panel-default">
