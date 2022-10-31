@@ -70,6 +70,8 @@ source: https://www.codeply.com/go/bp/74926
   min-width: 74px;
   margin-right: 0;
   margin-bottom: 3px;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
 .tabs-left  .nav-tabs {
@@ -230,13 +232,13 @@ h3 {
 
 .css-desktop .css-sidebar{
     position: static;
-    height: 95vh;
+    height: 82vh;
     overflow: auto;
     float: left;
 }
 
 .css-desktop .tab-content {
     position: static;
-    height: 95vh;
+    height: 82vh;
     overflow: auto;
 }
