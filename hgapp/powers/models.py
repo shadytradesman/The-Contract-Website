@@ -289,8 +289,8 @@ class Modifier(models.Model):
         return {
             "name": self.name,
             "slug": self.slug,
-            'required_enhancements': [x.pk for x in self.required_Enhancements.all()],
-            'required_drawbacks': [x.pk for x in self.required_drawbacks.all()],
+            'required_enhancements': list(self.required_Enhancements.values_list("pk", flat=True)),#[x.pk for x in self.required_Enhancements.all()],
+            'required_drawbacks': list(self.required_drawbacks.values_list("pk", flat=True)), #[x.pk for x in self.required_drawbacks.all()],
             "required_status": [self.required_status, self.get_required_status_display()],
             "category": self.category,
             "description": self.description,
@@ -596,7 +596,13 @@ class Base_Power(models.Model):
         return reverse('powers:powers_create_power', kwargs={'base_power_slug': self.slug})
 
     def example_powers(self):
-        return Power_Full.objects.filter(base=self, tags__isnull=False).distinct()
+        if self.base_type == EFFECT:
+            return Power_Full.objects.filter(latest_rev__base=self, tags__isnull=False, is_deleted=False).distinct()
+        if self.base_type == MODALITY:
+            return Power_Full.objects.filter(latest_rev__modality=self, tags__isnull=False, is_deleted=False).distinct()
+        if self.base_type == VECTOR:
+            return Power_Full.objects.filter(latest_rev__vector=self, tags__isnull=False, is_deleted=False).distinct()
+        raise ValueError("invalid base type")
 
     def used_power_fulls(self):
         return Power_Full.objects.filter(base=self, character__isnull=False, is_deleted=False)
@@ -1816,19 +1822,20 @@ class PowerSystem(models.Model):
             components = components.filter(base_type=base_type)
         components = components.order_by("-name") \
             .prefetch_related("basepowerfieldsubstitution_set") \
-            .prefetch_related("power_param_set").all()
-        #TODO: Determine if these prefetches do anything
-        # .prefetch_related("avail_enhancements") \
-        # .prefetch_related("avail_drawbacks") \
-        # .prefetch_related("blacklist_enhancements") \
-        # .prefetch_related("blacklist_drawbacks") \
-        # .all()
+            .prefetch_related("power_param_set") \
+            .prefetch_related("avail_enhancements") \
+            .prefetch_related("avail_drawbacks") \
+            .prefetch_related("blacklist_enhancements") \
+            .prefetch_related("blacklist_drawbacks").all()
         return {x.pk: x.to_blob() for x in components}
 
     @staticmethod
     def _generate_modifier_blob(ModifierClass):
         related_field = "enhancementfieldsubstitution_set" if ModifierClass is Enhancement else "drawbackfieldsubstitution_set"
-        modifiers = ModifierClass.objects.exclude(system=SYS_LEGACY_POWERS).prefetch_related(related_field).all()
+        modifiers = ModifierClass.objects.exclude(system=SYS_LEGACY_POWERS)\
+            .prefetch_related(related_field)\
+            .prefetch_related("substitutions") \
+            .all()
         return {x.pk: x.to_blob() for x in modifiers}
 
     @staticmethod

@@ -5,7 +5,7 @@
     </h2>
     <div class="panel-group">
         <div class="panel panel-default css-start-play-section">
-            <a data-toggle="collapse" data-parent="#accordion" href="#collapse-play-1">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapse-play-1" >
                 <div class="panel-heading css-start-play-header">
                     Step 1 - Create an Account
                 </div>
@@ -21,12 +21,12 @@
                     </p>
                     <div class="text-center">
                         <h3>
-                            <a href="{% url 'account_signup' %}" class="btn btn-lg btn-success">Click Here to Create an Account</a>
+                            <a href="{% url 'account_signup' %}" class="btn btn-lg btn-success" target="_blank" rel="noopener noreferrer">Click Here to Create an Account</a>
                         </h3>
                     </div>
                     <div class="text-center">
                         Already have an account?
-                        <a href="{% url 'account_login' %}" class="btn btn-primary">Click Here to Log in</a>
+                        <a href="{% url 'account_login' %}" class="btn btn-primary" target="_blank" rel="noopener noreferrer">Click Here to Log in</a>
                     </div>
                 </div>
             </div>
@@ -43,7 +43,7 @@
                 <div class="panel-body css-start-play-body">
                     <div class="text-center">
                         Whether you're planning on playing or GMing, you should
-                        <a href="{% url 'characters:characters_create' %}" class="btn btn-success">
+                        <a href="{% url 'characters:characters_create' %}" class="btn btn-success" target="_blank" rel="noopener noreferrer">
                             Create a Contractor
                         </a>
                     </div>
@@ -91,7 +91,7 @@
                                 <div class="col-md-6">
                                     <p>
                                         Visit the
-                                        <a href="{% url 'games:games_looking_for_game' %}" class="btn btn-success">
+                                        <a href="{% url 'games:games_looking_for_game' %}" class="btn btn-success" target="_blank" rel="noopener noreferrer">
                                             Looking for Game
                                         </a>
                                         page for a list of upcoming Contracts.
@@ -101,7 +101,7 @@
                                     </p>
                                     <p>
                                         The surest way to schedule a Contract is to
-                                        <a class="btn btn-default btn" href="https://discord.gg/xUZZegYNNy">
+                                        <a class="btn btn-default btn" href="https://discord.gg/xUZZegYNNy" target="_blank" rel="noopener noreferrer">
                                             <img class="float-left" src="/static/overrides/other_graphics/Discord-Logo-Color.svg" style="width: 25px; height: 25px; position: absolute;">
                                             <span style="padding-left: 25px;"> Join Our Discord Server</span>
                                         </a>

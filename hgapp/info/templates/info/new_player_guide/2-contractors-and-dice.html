@@ -1,4 +1,5 @@
 {% load static %}
+{% load power_tags %}
 <h2 class="text-center">
     Contractors
     <hr>
@@ -753,14 +754,62 @@
                 <div class="css-rules css-rules-centered">
                     <b>Gifts</b>
                     <ul>
-                        <li>Gifts work. If a Gift allows you to side-step the primary challenge of a Contract, you win.</li>
-                        <li>You can create almost any Gift imaginable, provided it fits your Contractor’s concept.</li>
+                        <li>
+                            Gifts unlock a Contractor's latent supernatural potential.
+                        </li>
+                        <li>
+                            Each time a Contractor claims victory on a Contract, they receive a Gift Credit that can be
+                            spent on a new Gift or to improve an existing Gift.
+                        </li>
                         <li>Most Gifts do not grant dice bonuses or make you more effective in a fight.</li>
                         <ul>
                             <li>Instead, they provide information, options, and equipment.</li>
                         </ul>
+                        <li>Gifts work. If a Gift allows you to sidestep the primary challenge of a Contract, you win.</li>
                     </ul>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row" style="margin-top: 10px;">
+    <div class="col-md-6">
+        <div class="css-rules ">
+            <b>Building Custom Gifts</b>
+            <ul>
+                <li>
+                    Players create custom Gifts for their Contractors using The Contract's unique
+                    <a href="{% url 'powers:powers_create_ps2' %}"> Gift Builder</a>.
+                </li>
+                <li>
+                    Custom Gifts allow each Contractor to achieve their own unique concept.
+                </li>
+                <li>
+                    Each Gift's system text is automatically generated.
+                </li>
+                <li>
+                    Gift systems are specific to ensure they behave the same no matter who is acting as GM.
+                </li>
+            </ul>
+            <div class="text-center" style="margin-top: 15px;">
+                Wanna try it out?
+            </div>
+            <div class="text-center">
+                <a class="" href="{% url 'powers:powers_create_ps2' %}" target="_blank">
+                    Create a Gift
+                </a>
+                or check out the
+                <a class="" href="{% url 'powers:powers_stock' %}" target="_blank">
+                    Stock Gifts.
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="css-rules ">
+            <b>For example, here is the Gift Five used</b>
+            <div style="margin-top:10px;">
+                {% power_badge five_power False None False rewarding_character True %}
             </div>
         </div>
     </div>
@@ -786,6 +835,7 @@
                 <li>You must declare that you are Exerting before you roll. </li>
                 <li>Exerting allows you to ignore your Penalty for the roll AND increases its Outcome by 1.</li>
                 <li>You may Exert a maximum of once per Round of Combat.</li>
+                <li>Many Gifts require Exertion to activate.</li>
                 <li>
                     Exerting is stressful and takes a toll on your mental health.
                 </li>
@@ -979,11 +1029,11 @@
                 </li>
                 <li>
                     Dead Contractors are interred in
-                    <a href="{% url 'characters:characters_graveyard' %}">the Graveyard</a>
-                    and can never be played again.
+                    <a href="{% url 'characters:characters_graveyard' %}" target="_blank">the Graveyard</a>
+                    and can't be played again.
                 </li>
                 <li>
-                    All Contractors have <b>Will to Survive.</b> Once per Contract, they may reduce an incoming Injury's
+                    Imbuing grants Contractors <b>Will to Survive.</b> Once per Contract, they may reduce an incoming Injury's
                     Severity by up to four levels (to a minimum of Severity 4). However, they take a point of Mind damage,
                     and suffer a lingering Battle Scar.
                 </li>
@@ -1017,11 +1067,10 @@
                     Good. Contractors are not throwaway characters.
                 </li>
                 <li>
-                    The Golden ratio and Charon Coins exist only because GMs are hesitant to kill Player Characters even when they deserve it.
+                    The Golden ratio and Charon Coins only exist because most GMs are hesitant to kill Contractors who deserve it.
                 </li>
                 <li>
-                    While Contractor death is a vital ingredient to The Contract's challenge and story, each
-                    Player has a different appetite for danger.
+                    Each Player has a different appetite for danger.
                     <ul>
                         <li>
                             To help you find a group that suits your tastes, the website assigns <b>GM Titles</b>
@@ -1067,132 +1116,5 @@
                 And I did get paid. 
             </h4>
         </div>
-    </div>
-</div>
-<br>
-<div class="row">
-    <h3 class="text-center">
-        Gifts
-    </h3>
-    <div class="col-md-8">
-        <figure class="visible-xs-block" style="width: 100%; padding: 10px;">
-            <img src="{% static 'overrides/art/front-bamboo.jpg' %}" class="css-inline-image">
-            <figcaption class="text-center"></figcaption>
-        </figure>
-        <div class="css-rules">
-            <div class="">
-                <b>"Gifts are why we sign The Contract."</b>
-            </div>
-            <ul>
-                <li>
-                    Gifts unlock a Contractor's latent supernatural potential.
-                </li>
-                <li>
-                    Player's create custom Gifts for their Contractors using The Contract's unique
-                     <a href="{% url 'powers:powers_create_ps2' %}"> Gift Builder</a>.
-                </li>
-                <li>
-                    Creating custom Gifts allows each Contractor to achieve their own, unique concept.
-                </li>
-            </ul>
-            <div class="text-center">
-                <h4>
-                    Gift Types
-                    <div>
-                        <small>
-                            <i>(Click any Gift Type to learn more)</i>
-                        </small>
-                    </div>
-                </h4>
-                <div class="row">
-                    <div class="col-xs-12 col-lg-6">
-                        <button type="button"  class="btn btn-default" style="width:100%" data-toggle="modal" data-target="#tutorialModalpower">
-                            <h4 class="css-component-header"  style="margin-top: 5px; margin-bottom: 5px;">
-                                {{ mod_power.name}}
-                            </h4>
-                            <img src="{{mod_power.icon.url}}" width="75" height="75"/>
-                            <h5 style="margin-top: 0px; margin-bottom: 5px;">
-                                {{ mod_power.summary }}
-                            </h5>
-                            <div class="text-muted">
-                                <small>
-                                    {{ mod_power.description }}
-                                </small>
-                            </div>
-                        </button>
-                    </div>
-                    <div class="col-xs-12 col-lg-6">
-                        <button type="button"  class="btn btn-default" style="width:100%" data-toggle="modal" data-target="#tutorialModalsignature-item-mod">
-                            <h4 class="css-component-header"  style="margin-top: 5px; margin-bottom: 5px;">
-                                {{ mod_sig_item.name}}
-                            </h4>
-                            <img src="{{mod_sig_item.icon.url}}" width="75" height="75"/>
-                            <h5 style="margin-top: 0px; margin-bottom: 5px;">
-                                {{ mod_sig_item.summary }}
-                            </h5>
-                            <div class="text-muted">
-                                <small>
-                                    {{ mod_sig_item.description }}
-                                </small>
-                            </div>
-                        </button>
-                    </div>
-                </div>
-                <div class="hidden-xs" style="margin-top: 5px;"></div>
-                <div class="row">
-                    <div class="col-xs-12 col-lg-6">
-                        <button type="button"  class="btn btn-default" style="width:100%" data-toggle="modal" data-target="#tutorialModalcraftable-consumable">
-                            <h4 class="css-component-header"  style="margin-top: 5px; margin-bottom: 5px;">
-                                {{ mod_consumable.name}}
-                            </h4>
-                            <img src="{{mod_consumable.icon.url}}" width="75" height="75"/>
-                            <h5 style="margin-top: 0px; margin-bottom: 5px;">
-                                {{ mod_consumable.summary }}
-                            </h5>
-                            <div class="text-muted">
-                                <small>
-                                    {{ mod_consumable.description }}
-                                </small>
-                            </div>
-                        </button>
-                    </div>
-                    <div class="col-xs-12 col-lg-6">
-                        <button type="button"  class="btn btn-default" style="width:100%" data-toggle="modal" data-target="#tutorialModalcraftable-artifact">
-                            <h4 class="css-component-header"  style="margin-top: 5px; margin-bottom: 5px;">
-                                {{ mod_artifacts.name}}
-                            </h4>
-                            <img src="{{mod_artifacts.icon.url}}" width="75" height="75"/>
-                            <h5 style="margin-top: 0px; margin-bottom: 5px;">
-                                {{ mod_artifacts.summary }}
-                            </h5>
-                            <div class="text-muted">
-                                <small>
-                                    {{ mod_artifacts.description }}
-                                </small>
-                            </div>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="text-center" style="margin-top: 15px;">
-                Still Curious?
-
-            </div>
-            <div class="text-center">
-                <a class="btn btn-primary" href="{% url 'powers:powers_create_ps2' %}">
-                    Create a Gift
-                </a>
-                or check out the
-                <a class="btn btn-default" href="{% url 'powers:powers_stock' %}">
-                    Stock Gifts.
-                </a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4 hidden-xs">
-        <figure class="" style="height: 450px; padding: 10px;">
-            <img src="{% static 'overrides/art/front-bamboo.jpg' %}" class="css-inline-image">
-            <figcaption class="text-center"></figcaption>
-        </figure>
     </div>
 </div>
