@@ -4,7 +4,7 @@ from django.db.utils import IntegrityError
 from django.db import transaction
 from characters.models import Character, ContractStats, Asset, Liability, AssetDetails, LiabilityDetails, Attribute, \
     AttributeValue, Ability, AbilityValue, ExperienceReward, EXP_NEW_CHAR, EXP_REWARD_VALUES, EXP_WIN_V2, EXP_LOSS_V2, \
-    EXP_LOSS_IN_WORLD_V2, EXP_WIN_IN_WORLD_V2, EXP_GM_NEW_PLAYER
+    EXP_LOSS_IN_WORLD_V2, EXP_WIN_IN_WORLD_V2, EXP_GM_NEW_PLAYER, EXP_GM_RATIO
 from games.models import Game, Game_Attendance, Reward, Game_Invite, GAME_STATUS, OUTCOME, WIN, LOSS, DEATH, DECLINED, \
     RINGER_VICTORY, RINGER_FAILURE, Scenario
 
@@ -988,6 +988,7 @@ class GameModelTests(TestCase):
             self.assertEquals(self.cell_owner.profile.get_avail_improvements().count(), 1) # cell_owner gmed the game
             self.assertEquals(self.cell_owner.profile.get_avail_charon_coins().count(), 0)
             self.assertEquals(self.cell_owner.profile.get_avail_exp_rewards().count(), 1) # new player
+            self.assertEquals(self.cell_owner.profile.get_avail_exp_rewards().first().type, EXP_GM_NEW_PLAYER)
 
             attendance2 = Game_Attendance(
                 relevant_game=game,
@@ -1020,6 +1021,7 @@ class GameModelTests(TestCase):
             self.assertEquals(self.cell_owner.profile.get_avail_improvements().first().is_new_player_gm_reward, False) # ratio reward
             self.assertEquals(self.cell_owner.profile.get_avail_charon_coins().count(), 0)
             self.assertEquals(self.cell_owner.profile.get_avail_exp_rewards().count(), 1)  # from ratio
+            self.assertEquals(self.cell_owner.profile.get_avail_exp_rewards().first().type, EXP_GM_RATIO)
 
             attendance2.refresh_from_db()
             attendance2.change_outcome(new_outcome=WIN, is_confirmed=True)
@@ -1078,9 +1080,9 @@ class GameModelTests(TestCase):
             self.assertEquals(self.user2.profile.get_avail_improvements().count(), 0)
             self.assertEquals(self.user2.profile.get_avail_charon_coins().count(), 0)
             self.assertEquals(self.user2.profile.get_avail_exp_rewards().count(), 0)
-            self.assertEquals(self.cell_owner.profile.get_avail_improvements().count(), 1) # new player
+            self.assertEquals(self.cell_owner.profile.get_avail_improvements().count(), 1) # cell_owner gmed the game
             self.assertEquals(self.cell_owner.profile.get_avail_charon_coins().count(), 0)
-            self.assertEquals(self.cell_owner.profile.get_avail_exp_rewards().count(), 1) # cell_owner gmed the game
+            self.assertEquals(self.cell_owner.profile.get_avail_exp_rewards().count(), 1)  # new player
 
             game = Game(
                 scenario=self.scenario,
@@ -1113,6 +1115,7 @@ class GameModelTests(TestCase):
             self.assertEquals(self.cell_owner.profile.get_avail_improvements().count(), 2) # cell_owner gmed the game
             self.assertEquals(self.cell_owner.profile.get_avail_charon_coins().count(), 0)
             self.assertEquals(self.cell_owner.profile.get_avail_exp_rewards().count(), 1) # only one new player reward
+            self.assertEquals(self.cell_owner.profile.get_avail_exp_rewards().first().type, EXP_GM_NEW_PLAYER) # only one new player reward
 
             game = Game(
                 scenario=self.scenario,

@@ -145,16 +145,6 @@ class CellModelTests(TestCase):
         with self.assertRaises(ValueError):
             self.cell.cellinvite_set.get(invited_player=self.user2).reject()
 
-    def test_invite_player_already_invited(self):
-        self.cell.invitePlayer(self.user2, text="invite text")
-        with self.assertRaises(ValueError):
-            self.cell.invitePlayer(self.user2, text="invite tesxt")
-
-    def test_invite_player_already_member_fails(self):
-        self.cell.addPlayer(self.user2, role=ROLE[1])
-        with self.assertRaises(ValueError):
-            self.cell.invitePlayer(self.user2, text="invite text")
-
     def test_can_invite_player_who_left(self):
         invite = self.cell.invitePlayer(self.user2, text="invite text")
         invite.accept()
