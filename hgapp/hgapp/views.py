@@ -67,6 +67,7 @@ class SettingsView(account.views.SettingsView):
             profile = self.request.user.profile
             profile.contract_invitations = email_form.cleaned_data["contract_invitations"]
             profile.intro_contracts = email_form.cleaned_data["intro_contracts"]
+            profile.contract_updates = email_form.cleaned_data["contract_updates"]
             profile.direct_messages = email_form.cleaned_data["direct_messages"]
             profile.site_announcements = email_form.cleaned_data["site_announcements"]
             profile.save()
@@ -121,6 +122,7 @@ class ResendConfirmation(View):
             'email': self.email,
         }
         return context
+
 
 def home(request):
     if request.user.is_anonymous:
