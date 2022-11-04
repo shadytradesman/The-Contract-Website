@@ -5,7 +5,7 @@ from django.db.models import Count
 from django.conf import settings
 from characters.models import Character, HIGH_ROLLER_STATUS, Character_Death, ExperienceReward, AssetDetails, EXP_GM, \
     EXP_LOSS_V2, EXP_WIN_V2, EXP_LOSS_RINGER_V2, EXP_WIN_RINGER_V2, EXP_LOSS_IN_WORLD_V2, EXP_WIN_IN_WORLD_V2, EXP_MVP,\
-    EXP_WIN_V1, EXP_LOSS_V1, Artifact, EXP_GM_MOVE
+    EXP_WIN_V1, EXP_LOSS_V1, Artifact, EXP_GM_MOVE, EXP_GM_RATIO, EXP_GM_NEW_PLAYER
 from powers.models import Power, Power_Full
 from cells.models import Cell, WorldEvent
 from django.utils import timezone
@@ -293,66 +293,57 @@ class Game(models.Model):
 
     def give_rewards(self):
         if not self.is_finished() and not self.is_recorded():
-            print("Game is not finished: " + str(self.id))
-            return
+            raise ValueError("Game tried to grant rewards but is not completed: " + str(self.pk))
         for game_attendance in self.game_attendance_set.all():
             game_attendance.give_reward()
+        gm_reward = Reward(relevant_game=self,
+                           rewarded_player=self.gm,
+                           is_improvement=True,
+                           is_gm_reward=True)
+        gm_reward.save()
         if self.achieves_golden_ratio() and self.cell and self.cell.use_golden_ratio:
-            gm_reward = Reward(relevant_game=self,
-                               rewarded_player=self.gm,
-                               is_improvement=True)
-            gm_reward.save()
+            self._grant_gm_exp_reward(EXP_GM_RATIO)
         elif self.is_introductory_game():
-            gm_reward = Reward(relevant_game=self,
-                               rewarded_player=self.gm,
-                               is_improvement=True,
-                               is_new_player_gm_reward=True)
-            gm_reward.save()
-        self._grant_gm_exp_reward()
+            self._grant_gm_exp_reward(EXP_GM_NEW_PLAYER)
         self.scenario.grant_or_void_reward_as_necessary()
 
-
-    def _grant_gm_exp_reward(self):
+    def _grant_gm_exp_reward(self, reward_type):
         if self.gm_experience_reward and not self.gm_experience_reward.is_void:
             raise ValueError("Game is granting exp reward to gm when it already has one.", str(self.id))
         exp_reward = ExperienceReward(
             rewarded_player=self.gm,
-            type=EXP_GM
+            type=reward_type
         )
         exp_reward.save()
         self.gm_experience_reward = exp_reward
         self.save()
 
-    def recalculate_gm_reward(self, originally_achieves_golden_ratio):
-        current_reward = self.get_gm_reward()
-        now_achieves_ratio = self.recalculate_golden_ratio(originally_achieves_golden_ratio)
+    def recalculate_gm_reward(self):
+        current_exp_reward = self.gm_experience_reward
+        now_achieves_ratio = self.achieves_golden_ratio()
         should_have_ratio_reward = now_achieves_ratio and self.cell and self.cell.use_golden_ratio
-        if should_have_ratio_reward and current_reward and current_reward.is_new_player_gm_reward:
-                current_reward.mark_void()
+        if should_have_ratio_reward:
+            if current_exp_reward and current_exp_reward.type == EXP_GM_NEW_PLAYER:
+                current_exp_reward.mark_void()
+                self._grant_gm_exp_reward(EXP_GM_RATIO)
+            if not current_exp_reward:
+                self._grant_gm_exp_reward(EXP_GM_RATIO)
+            return
         if not should_have_ratio_reward:
-            if self.is_introductory_game():
-                if not current_reward or not current_reward.is_new_player_gm_reward:
-                    gm_reward = Reward(relevant_game=self,
-                                       rewarded_player=self.gm,
-                                       is_improvement=True,
-                                       is_new_player_gm_reward=True)
-                    gm_reward.save()
+            if current_exp_reward and current_exp_reward.type == EXP_GM_RATIO:
+                current_exp_reward.mark_void()
+        if self.is_introductory_game():
+            if not current_exp_reward or current_exp_reward.is_void:
+                self._grant_gm_exp_reward(EXP_GM_NEW_PLAYER)
 
-    # Determines if the game's golden ratio status has changed and handles GM rewards accordingly.
+    # Determines if the game's golden ratio status has changed
     def recalculate_golden_ratio(self, original_value):
         current_value = self.achieves_golden_ratio()
         if current_value != original_value:
             if current_value and self.cell and self.cell.use_golden_ratio:
-                gm_reward = Reward(relevant_game=self,
-                                   rewarded_player=self.gm,
-                                   is_improvement=True)
-                gm_reward.save()
-                # TODO: Why mark this experience reward void and then re-grant it?
                 if hasattr(self, "gm_experience_reward") and self.gm_experience_reward:
                     self.gm_experience_reward.mark_void()
-                self._grant_gm_exp_reward()
-            else:
-                self.get_gm_reward().mark_void()
+                self._grant_gm_exp_reward(EXP_GM_RATIO)
         return current_value
 
     def achieves_golden_ratio(self):
@@ -993,6 +984,7 @@ class Reward(models.Model):
         related_name='rewarded_player',
         on_delete=models.CASCADE)
     is_improvement = models.BooleanField(default=True)
+    is_gm_reward = models.BooleanField(default=False)
     is_ported_reward = models.BooleanField(default=False)
     is_charon_coin = models.BooleanField(default=False)
     is_void = models.BooleanField(default=False)
@@ -1085,6 +1077,8 @@ class Reward(models.Model):
             if self.relevant_game.gm.id == self.rewarded_player.id:
                 if self.is_new_player_gm_reward:
                     reason = "running for a new Player: "
+                elif self.is_gm_reward:
+                    reason = "running "
                 else:
                     reason = "achieving the Golden Ratio running "
             elif self.is_charon_coin:

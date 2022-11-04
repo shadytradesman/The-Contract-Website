@@ -255,6 +255,8 @@ EXP_WIN_V2 = "WIN_V2"
 EXP_WIN_IN_WORLD_V2 = "WIN_IN_WORLD_V2"
 EXP_WIN_RINGER_V2 = "WIN_RINGER_V2"
 EXP_GM = "GM"
+EXP_GM_RATIO = "GM_GOLDEN_RATIO"
+EXP_GM_NEW_PLAYER = "GM_NEW_PLAYER"
 EXP_GM_MOVE = "GM_MOVE"
 EXP_JOURNAL = "JOURNAL"
 EXP_CUSTOM = "CUSTOM"
@@ -271,6 +273,8 @@ EXP_REWARD_TYPE = (
     (EXP_WIN_IN_WORLD_V2, "winning in-World Contract"),
     (EXP_WIN_RINGER_V2, "winning as a ringer"),
     (EXP_GM, "GMing"),
+    (EXP_GM_RATIO, "GMing and achieving the Golden Ratio"),
+    (EXP_GM_NEW_PLAYER, "GMing for a new Player"),
     (EXP_GM_MOVE, "GMing a Move"),
     (EXP_JOURNAL, "writing a journal"),
     (EXP_CUSTOM, "custom reason"),
@@ -289,6 +293,8 @@ EXP_REWARD_VALUES = {
     EXP_WIN_IN_WORLD_V2: 5,
     EXP_WIN_RINGER_V2: 3,
     EXP_GM: 6,
+    EXP_GM_RATIO: 6,
+    EXP_GM_NEW_PLAYER: 6,
     EXP_GM_MOVE: 2,
     EXP_JOURNAL: 1,
 }
