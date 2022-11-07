@@ -14,6 +14,10 @@ NUM_FREE_ARTIFACTS_PER_DOWNTIME = 0
 NUM_FREE_ARTIFACTS_PER_REWARD = 1
 
 
+def get_exp_cost_per_consumable():
+    return 1
+
+
 class CraftingEvent(models.Model):
     # many to many because one power_full can create multiple artifacts or consumable stacks
     artifacts = models.ManyToManyField(Artifact,
@@ -50,9 +54,6 @@ class CraftingEvent(models.Model):
             self.relevant_power_full.name,
             self.relevant_attendance.relevant_game.scenario.title if self.relevant_attendance else "character creation")
 
-    def get_exp_cost_per_consumable(self):
-        return 2
-
     def get_exp_cost_per_artifact(self):
         return self.relevant_power.get_gift_cost() + 1
 
@@ -74,7 +75,7 @@ class CraftingEvent(models.Model):
             crafted_artifact.quantity -= num_refunded
             num_refunded_by_crafted_artifact_id[crafted_artifact.pk] += num_refunded
             remaining_to_refund -= num_refunded
-            self.total_exp_spent -= num_refunded * self.get_exp_cost_per_consumable()
+            self.total_exp_spent -= num_refunded * get_exp_cost_per_consumable()
         # now refund free ones
         for crafted_artifact in crafted_artifacts:
             if remaining_to_refund == 0:
@@ -157,12 +158,9 @@ class CraftingEvent(models.Model):
                     crafting.save()
                     self.total_exp_spent -= self.get_exp_cost_per_artifact()
                     num_avail_free -= 1
-        print("done")
         self.save()
 
     def craft_new_consumables(self, number_newly_crafted, new_number_free, power_full):
-        print("Crafting new consumables")
-        print(self.relevant_power_full)
         paid_crafted = number_newly_crafted - new_number_free
         crafted_artifacts = self.craftedartifact_set.filter(relevant_artifact__is_deleted=False).prefetch_related("relevant_artifact").all()
         crafter_held_crafted_artifact = None
@@ -207,7 +205,7 @@ class CraftingEvent(models.Model):
                 relevant_crafting=self,
                 quantity=paid_crafted + new_number_free,
                 quantity_free=new_number_free, )
-        self.total_exp_spent += (paid_crafted * self.get_exp_cost_per_consumable())
+        self.total_exp_spent += (paid_crafted * get_exp_cost_per_consumable())
         self.save()
 
 

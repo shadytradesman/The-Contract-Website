@@ -361,7 +361,7 @@ def stock(request, character_id=None):
 def render_stock_page(request, character):
     generic_categories = PremadeCategory.objects.order_by("name").all()
     generic_powers_by_category = {}
-    total_gift_count = Power_Full.objects.filter(tags__isnull=False, is_deleted=False).count()
+    total_gift_count = 0
     for cat in generic_categories:
         artifacts_query = Artifact.objects.filter(is_signature=True)
         all_powers = Power_Full.objects \
@@ -372,6 +372,7 @@ def render_stock_page(request, character):
         non_artifact_powers = []
         artifacts = set()
         for power in all_powers:
+            total_gift_count += 1
             item = power.artifacts.filter(is_signature=True).first()
             if item:
                 artifacts.add(item)
