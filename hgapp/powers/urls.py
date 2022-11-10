@@ -61,6 +61,9 @@ urlpatterns = [
     url(r'^view/history/p/(?P<power_full_id>[\d]+)/$',
          RedirectView.as_view(pattern_name='powers:powers_view_power_full', query_string=True, permanent=True)),
 
+    ### AJAX ENDPOINTS
+    path('ajax/example/effect/<slug:effect_id>/', views.ajax_example_view, name='powers_view_power_full_ajax'),
+
     ### LEGACY POWER SYSTEM
     # ex: .com/powers/create/
     url(r'^create-legacy/$', views.create, name='powers_create'),

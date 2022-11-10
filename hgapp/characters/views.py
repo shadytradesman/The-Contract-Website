@@ -389,6 +389,7 @@ def view_character(request, character_id, secret_key=None):
 
     moves = character.move_set.order_by("-created_date").all()
     loose_ends = character.looseend_set.filter(is_deleted=False).order_by("cutoff").all()
+    expired_loose_ends = character.looseend_set.filter(is_deleted=False, cutoff=0).exists()
     unspent_exp = character.unspent_experience()
     context = {
         'character': character,
@@ -450,6 +451,7 @@ def view_character(request, character_id, secret_key=None):
         'moves': moves,
         'num_moves':  moves.count(),
         'loose_ends': loose_ends,
+        'expired_loose_ends': expired_loose_ends,
     }
     return render(request, 'characters/view_pages/view_character.html', context)
 

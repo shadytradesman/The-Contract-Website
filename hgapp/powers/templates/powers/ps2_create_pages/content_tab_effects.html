@@ -3,6 +3,13 @@
     <br>
     <small>
         For example, the "Alternate Form" Effect could be used by both werewolves and magical girls.
+        <div>
+            Click the <span>
+            <a class="btn btn-default btn-xs ">
+                Ex
+            </a>
+            </span> button on any Effect to see an Example
+        </div>
     </small>
 </div>
 
@@ -48,16 +55,35 @@
                                class="css-component-radio css-effect-radio"
                                :class="{'css-selected-component': selectedEffect && component.id === selectedEffect.id}">
                             <div>
+                                <div class="visible-xs" style="float:right; display: inline-block; height: 5px; position: relative; bottom: 5px;">
+                                    <a class="btn btn-default btn-xs"
+                                        v-bind:value="component.slug"
+                                        v-bind:display="component.displayName"
+                                        @click.stop.prevent="clickEffectExample">
+                                        Ex
+                                    </a>
+                                </div>
+                                <div class="hidden-xs" style="float:right; display: inline-block; height: 5px; position: relative; bottom: 5px;">
+                                    <a class="btn btn-default btn-xs has-popover"
+                                       v-bind:value="component.slug"
+                                       v-bind:display="component.displayName"
+                                       @click.stop.prevent="clickEffectExample"
+                                       data-toggle="tooltip"
+                                       data-title="View Example">
+                                        Ex
+                                    </a>
+                                </div>
                                 <input type="radio"
                                        v-bind:id="component.id"
                                        v-bind:name="component.type"
                                        v-bind:value="component"
                                        v-model="selectedEffect"
                                        @change="changeEffect"
-                                       @click="clickEffect"
+                                       @click.self="clickEffect"
                                        style="display:none;"
                                 >
-                                <img v-bind:src="component.icon_url" width="40" height="40" style="position: absolute;">
+                                <img class="visible-xs" v-bind:src="component.icon_url" width="45" height="45" style="position: absolute;">
+                                <img class="hidden-xs" v-bind:src="component.icon_url" width="40" height="40" style="position: absolute;">
                                 <h4 class="css-component-header" style="margin-top: 4px !important; margin-bottom: 4px !important; padding-left: 50px;">
                                     {component.displayName}
                                     <div >

@@ -68,9 +68,18 @@
                 </span>
             {% endif %}
             <div class="css-world-entity-value">
-                <span class="css-world-element-name">
+                <div class="css-world-element-name">
                     {{artifact.name}}
-                </span>
+                </div>
+                {% if artifact.granting_gm %}
+                <div class="css-world-element-source">
+                    <small>
+                        <i>
+                            Given by {{artifact.granting_gm.username}}
+                        </i>
+                    </small>
+                </div>
+                {% endif %}
                 <span class="css-world-element-description">
                     {{artifact.description}}
                 </span>

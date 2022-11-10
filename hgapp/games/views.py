@@ -1002,7 +1002,6 @@ class ViewMove(View):
         return context
 
 
-@method_decorator(login_required(login_url='account_login'), name='dispatch')
 class EnterMove(View):
     event_form_class = EditWorldEventForm
     move_form_class = None
@@ -1087,6 +1086,8 @@ class EnterMove(View):
 class CreateMoveCell(EnterMove):
 
     def dispatch(self, *args, **kwargs):
+        if self.request.user.is_anonymous:
+            raise PermissionDenied("Must log in to create a move")
         self.cell = get_object_or_404(Cell, id=self.kwargs['cell_id'])
         self.move_form_class = make_edit_move_form(self.request.user, cell=self.cell)
         return super().dispatch(*args, **kwargs)
@@ -1095,6 +1096,8 @@ class CreateMoveCell(EnterMove):
 class CreateMoveChar(EnterMove):
 
     def dispatch(self, *args, **kwargs):
+        if self.request.user.is_anonymous:
+            raise PermissionDenied("Must log in to create a move")
         self.character = get_object_or_404(Character, id=self.kwargs['character_id'])
         self.cell = self.character.cell
         self.move_form_class = make_edit_move_form(self.request.user)

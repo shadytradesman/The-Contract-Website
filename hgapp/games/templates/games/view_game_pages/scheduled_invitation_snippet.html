@@ -21,7 +21,7 @@
                             </a>
                             {% if invitation.attendance.attending_character.has_due_loose_end %}
                                 <div class="text-danger">
-                                    This Contractor has Loose Ends due. You should resolve their Loose Ends before they play in a Contract.
+                                    This Contractor has Loose Ends due. <b>They must suffer the Threat of these Loose Ends before they play in a Contract.</b>
                                 </div>
                             {% endif %}
                         {% else %}
@@ -78,8 +78,10 @@
                                     {{my_invitation.attendance.attending_character.name}}
                             </a>
                         </h3>
-                        <h5> <a href="{% url 'games:games_accept_invite' game.id %}">Click here to change character</a></h5>
-                        <h5> <a href="{% url 'games:games_decline_invite' game.id %}">Click here to cancel your attendance</a></h5>
+                <div style="padding-left: 15px;">
+                    <h5> <a href="{% url 'games:games_accept_invite' game.id %}">Click here to change Contractor</a></h5>
+                    <h5> <a href="{% url 'games:games_decline_invite' game.id %}">Click here to cancel your attendance</a></h5>
+                </div>
                         {% if my_invitation.attendance.attending_character.has_due_loose_end %}
                             <div class="alert alert-warning text-center">
                                 <h4>Your Contractor has Loose Ends due!</h4>

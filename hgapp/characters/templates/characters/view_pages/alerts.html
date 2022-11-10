@@ -135,6 +135,18 @@
         </p>
     </div>
 {% endif %}
+{% if expired_loose_ends  %}
+<div class="alert alert-warning text-center css-char-alert" role="alert">
+    <p>
+        <b>
+            {{character.name}} has an expired Loose End and cannot play in a Contract until its threat is realized.
+        </b>
+    </p>
+    <p>
+        It's too late to use a Move to resolve these Loose Ends. Now the hammer falls. . .
+    </p>
+</div>
+{% endif %}
 {% if unspent_exp < 0 %}
         <div class="alert alert-danger text-center css-char-alert" role="alert">
             <p>

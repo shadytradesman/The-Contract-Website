@@ -55,7 +55,7 @@
                     </small>
                   </h4>
                   {% for power_full in power_list.0 %}
-                    {% power_badge power_full False None False rewarding_character True %}
+                    {{power_full|safe}}
                   {% endfor %}
                 {% endif %}
                 {% if power_list.1 %}
@@ -132,7 +132,7 @@
                   </small>
                 </h4>
                 {% for power_full in power_list.0 %}
-                  {% power_badge power_full False None False rewarding_character True %}
+                  {{power_full|safe}}
                   <br>
                 {% endfor %}
                 {% endif %}

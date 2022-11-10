@@ -1,7 +1,7 @@
 from collections import defaultdict
 import random
 import pickle
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse,JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.core.cache import cache
@@ -24,6 +24,7 @@ from .models import Power, Base_Power_Category, Base_Power, Base_Power_System, D
     PremadeCategory, PowerTutorial, SYS_PS2, EFFECT, VECTOR, MODALITY
 from .forms import DeletePowerForm
 from .ps2Utilities import get_edit_context, save_gift
+from .templatetags.power_tags import power_badge
 
 class EditPower(View):
     template_name = 'powers/ps2_create_pages/create_ps2.html'
@@ -340,25 +341,22 @@ def power_full_view(request, power_full_id):
     return ViewPower.as_view()(request, power_id=most_recent_power.id)
 
 
+def ajax_example_view(request, effect_id):
+    print(effect_id)
+    power_full = Power_Full.objects.filter(dice_system=SYS_PS2, tags__in=["example"], latest_rev__base=effect_id).first()
+    if not power_full.player_can_view(request.user):
+        raise PermissionDenied("This Power has been deleted or you're not allowed to view it")
+    preview_badge = get_stock_gift_display(request, None, power_full)
+    edit_blob = power_full.latest_revision().to_edit_blob()
+    return JsonResponse({"preview": preview_badge, "edit_blob": edit_blob}, status=200)
+
+
 def stock(request, character_id=None):
     if character_id:
         character = get_object_or_404(Character, id=character_id)
     else:
         character = None
-    cache_key = "stockGifts"
-    sentinel = object()
-    if character_id or request.user.is_superuser:
-        return render(request, "powers/stock_powers.html", {"content":render_stock_page(request, character)})
-    else:
-        cache_contents = cache.get(cache_key, sentinel)
-        if cache_contents is sentinel:
-            page = render_stock_page(request, character)
-            cache.set(cache_key, page, 8000)
-            cache_contents = page
-        return render(request, "powers/stock_powers.html", {"content":cache_contents})
-
-
-def render_stock_page(request, character):
+    use_cache = character_id or request.user.is_superuser
     generic_categories = PremadeCategory.objects.order_by("name").all()
     generic_powers_by_category = {}
     total_gift_count = 0
@@ -377,7 +375,7 @@ def render_stock_page(request, character):
             if item:
                 artifacts.add(item)
             else:
-                non_artifact_powers.append(power)
+                non_artifact_powers.append(get_stock_gift_display(request, character, power, use_cache))
         generic_powers_by_category[cat] = (non_artifact_powers, artifacts)
     context = {
         "generic_powers_by_category": generic_powers_by_category,
@@ -387,7 +385,26 @@ def render_stock_page(request, character):
             not request.user.power_full_set.exists()),
         "total_gift_count": total_gift_count,
     }
-    return render_to_string('powers/stock_powers_content_cache.html', context, request)
+    return render(request, 'powers/stock_powers.html', context)
+
+
+def get_stock_gift_display(request, rewarding_character, power, use_cache=True):
+    if use_cache:
+        cache_key = "{}{}".format("stockGift", power.pk)
+        sentinel = object()
+        cache_contents = cache.get(cache_key, sentinel)
+        if cache_contents is sentinel:
+            cache_contents = render_to_string(
+                'powers/power_badge_snippet.html',
+                power_badge(power, False, None, False, rewarding_character, True),
+                request)
+            cache.set(cache_key, cache_contents, 8000)
+        return cache_contents
+    else:
+        return render_to_string('powers/power_badge_snippet.html',
+                                power_badge(power, False, None, False, rewarding_character, True),
+                                request)
+
 
 
 class BasePowerDetailView(generic.DetailView):

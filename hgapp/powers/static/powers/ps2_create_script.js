@@ -486,11 +486,14 @@ function getDisabledModifiers(modType, availModifiers, selectedModifiers, active
     const requiredFieldName = "required_" + modType + "s";
     unfulfilledModifiers = availModifiers
           .filter(modifier => {
-              const required = powerBlob[powerBlobFieldName][modifier.slug][requiredFieldName];
-              if (required.length == 0) {
+              let required = powerBlob[powerBlobFieldName][modifier.slug][requiredFieldName];
+              let secondOrderReq = required.flatMap(mod => powerBlob[powerBlobFieldName][mod][requiredFieldName]);
+              let allRequired = new Set(required.concat(secondOrderReq));
+
+              if (allRequired.length == 0) {
                   return false;
               }
-              const unsatisfiedRequirements = required
+              const unsatisfiedRequirements = Array.from(allRequired)
                   .filter(reqMod => !selectedModifiers.includes(reqMod));
               if (unsatisfiedRequirements.length == 0) {
                   return false;
@@ -942,7 +945,10 @@ const ComponentRendering = {
       breadCrumbs: [],
       currentCrumb: interactiveTutorial,
       userIsAdmin: userAdmin,
-      isStock: isStock
+      isStock: isStock,
+      currentExamplePreview: "",
+      currentExampleBlob: null,
+      exampleEffectDisplay: "",
     }
   },
   methods: {
@@ -1261,6 +1267,31 @@ const ComponentRendering = {
           if (this.selectedEffect && effect.target.getAttribute("id") === this.selectedEffect.id) {
               this.openCustomizationTab(true);
           }
+      },
+      clickEffectExample(example) {
+        let baseSlug = example.target.attributes["value"].value;
+        let url = '/gift/ajax/example/effect/' + baseSlug + '/';
+        this.currentExamplePreview = "";
+        this.currentExampleBlob = null;
+        this.exampleEffectDisplay = example.target.attributes["display"].value;
+        $.ajax({
+            type: 'GET',
+            url: url,
+            success: function (response) {
+                console.log("success");
+                mountedApp.currentExamplePreview = response["preview"];
+                mountedApp.currentExampleBlob = response["edit_blob"];
+            },
+            error: function (response) {
+                console.log(response);
+                mountedApp.currentExamplePreview = "<h3 class=\"text-center\">Error Fetching Example</h3>"
+            }
+        })
+        $("#giftExampleModal").modal({});
+      },
+      customizeExampleGift() {
+        this.setStateForEdit(this.currentExampleBlob);
+        $("#giftExampleModal").modal('hide');
       },
       updateEffectCategoryDisplay() {
           let categories = powerBlob["component_categories"]

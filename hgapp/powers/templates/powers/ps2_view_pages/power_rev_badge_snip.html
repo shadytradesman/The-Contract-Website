@@ -11,12 +11,12 @@
             <div class="pull-right" style="margin-left: 5px;">
                 {% if rewarding_character %}
                     <a href="{% url 'powers:powers_create_from_existing_ps2' power_full.id rewarding_character.id %}"
-                       class="btn btn-success btn-xs">
+                       class="btn btn-success btn-xs css-stock-gift-customize-btn">
                         Customize for {{rewarding_character.name}}
                     </a>
                 {% else %}
                     <a href="{% url 'powers:powers_create_from_existing_ps2' power_full.id %}"
-                       class="btn btn-default btn-xs">
+                       class="btn btn-default btn-xs css-stock-gift-customize-btn">
                         Customize
                     </a>
                 {% endif %}
