@@ -288,6 +288,7 @@ form .nav-tabs > li, form .nav-pills > li {
     display: block;
     margin-left: auto;
     margin-right: auto;
+    margin-bottom: 10px;
 }
 
 
