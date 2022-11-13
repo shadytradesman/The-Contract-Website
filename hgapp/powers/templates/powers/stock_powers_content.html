@@ -2,8 +2,11 @@
 {% load character_tags %}
 
 {% with main_modal_art_url as modal_art_url %}
-{% include "powers/stock_powers_modal.html" %}
+  {% include "powers/stock_powers_modal.html" %}
 {% endwith %}
+
+{% include "powers/ps2_create_pages/tutorial/tutorial_modals.html" %}
+
 <div class="container">
   <div class="backdropped">
     <div class="css-desktop visible-md-block visible-lg-block visible-xl-block">
@@ -45,13 +48,12 @@
                  id="{{category.slug}}">
               <div class="panel-body">
                 {% if power_list.0 %}
-                  <h4>
-                    Powers and Crafting
-                    <small data-toggle="tooltip"
-                           title='Power Gifts are intrinsic superpowers and capabilities. Crafting Gifts grant Contractors the ability to create exceptional items to use or trade.'>
-                      <small>
-                        <i class="fa fa-question-circle fa-lg"></i>
-                      </small>
+                  <h4 class="css-subcat-header text-muted">
+                    Powers
+                    <small>
+                      <button type="button"  class="btn btn-xs btn-default" data-toggle="modal" data-target="#tutorialModalpower">
+                        <i class="fa fa-question-circle fa-lg text-muted"></i>
+                      </button>
                     </small>
                   </h4>
                   {% for power_full in power_list.0 %}
@@ -59,16 +61,41 @@
                   {% endfor %}
                 {% endif %}
                 {% if power_list.1 %}
-                  <h4>
-                    Legendary Artifacts
-                    <small data-toggle="tooltip"
-                           title='These are unique items that can be lost or stolen. Each item may have multiple Gifts on it. Customizing one of their Gifts will create a new Legendary Artifact for your Contractor.'>
-                      <small>
-                        <i class="fa fa-question-circle fa-lg"></i>
-                      </small>
+                  <h4 class="css-subcat-header text-muted">
+                    Consumable Crafting
+                    <small>
+                      <button type="button"  class="btn btn-xs btn-default" data-toggle="modal" data-target="#tutorialModalcraftable-consumable">
+                        <i class="fa fa-question-circle fa-lg text-muted"></i>
+                      </button>
                     </small>
                   </h4>
-                  {% for item in power_list.1 %}
+                  {% for power_full in power_list.1 %}
+                    {{power_full|safe}}
+                  {% endfor %}
+                {% endif %}
+                {% if power_list.2 %}
+                  <h4 class="css-subcat-header text-muted">
+                    Artifact Crafting
+                    <small>
+                      <button type="button"  class="btn btn-xs btn-default" data-toggle="modal" data-target="#tutorialModalcraftable-artifact">
+                        <i class="fa fa-question-circle fa-lg text-muted"></i>
+                      </button>
+                    </small>
+                  </h4>
+                  {% for power_full in power_list.2 %}
+                    {{power_full|safe}}
+                  {% endfor %}
+                {% endif %}
+                {% if power_list.3 %}
+                  <h4 class="css-subcat-header text-muted">
+                    Legendary Artifacts
+                    <small>
+                      <button type="button"  class="btn btn-xs btn-default" data-toggle="modal" data-target="#tutorialModalsignature-item-mod">
+                        <i class="fa fa-question-circle fa-lg text-muted"></i>
+                      </button>
+                    </small>
+                  </h4>
+                  {% for item in power_list.3 %}
                     {% render_sig_item item request.user None rewarding_character True %}
                   {% endfor %}
                 {% endif %}
@@ -81,7 +108,7 @@
       <div>
         <i>
           <small>
-            Scroll this column for more Stock Gifts
+            Scroll for more Stock Gifts
           </small>
         </i>
       </div>
@@ -122,34 +149,60 @@
             <div id="collapse{{category.slug}}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="{{category.slug}}Heading">
               <div class="panel-body">
                 {% if power_list.0 %}
-                <h4 class="text-muted">
-                  Powers and Crafting
-                  <small data-toggle="tooltip"
-                         title='Power Gifts are intrinsic superpowers and capabilities. Crafting Gifts grant Contractors the ability to create exceptional items to use or trade.'>
+                  <h4 class="text-muted">
+                    Powers
                     <small>
-                      <i class="fa fa-question-circle fa-lg"></i>
+                      <button type="button"  class="btn btn-xs btn-default" data-toggle="modal" data-target="#tutorialModalpower">
+                        <i class="fa fa-question-circle fa-lg text-muted"></i>
+                      </button>
                     </small>
-                  </small>
-                </h4>
-                {% for power_full in power_list.0 %}
-                  {{power_full|safe}}
-                  <br>
-                {% endfor %}
+                  </h4>
+                  {% for power_full in power_list.0 %}
+                    {{power_full|safe}}
+                    <br>
+                  {% endfor %}
                 {% endif %}
                 {% if power_list.1 %}
-                <h4 class="text-muted">
-                  Legendary Artifacts
-                  <small data-toggle="tooltip"
-                         title='These are unique items that can be lost or stolen. Each item may have multiple Gifts on it. Customizing one of their Gifts will create a new Legendary Artifact for your Contractor.'>
+                  <h4 class="text-muted">
+                    Consumable Crafting
                     <small>
-                      <i class="fa fa-question-circle fa-lg"></i>
+                      <button type="button"  class="btn btn-xs btn-default" data-toggle="modal" data-target="#tutorialModalcraftable-consumable">
+                        <i class="fa fa-question-circle fa-lg text-muted"></i>
+                      </button>
                     </small>
-                  </small>
-                </h4>
-                {% for item in power_list.1 %}
-                  {% render_sig_item item request.user None rewarding_character True %}
-                  <br>
-                {% endfor %}
+                  </h4>
+                  {% for power_full in power_list.1 %}
+                    {{power_full|safe}}
+                    <br>
+                  {% endfor %}
+                {% endif %}
+                {% if power_list.2 %}
+                  <h4 class="text-muted">
+                    Artifact Crafting
+                    <small>
+                      <button type="button"  class="btn btn-xs btn-default" data-toggle="modal" data-target="#tutorialModalcraftable-artifact">
+                        <i class="fa fa-question-circle fa-lg text-muted"></i>
+                      </button>
+                    </small>
+                  </h4>
+                  {% for power_full in power_list.2 %}
+                    {{power_full|safe}}
+                    <br>
+                  {% endfor %}
+                {% endif %}
+                {% if power_list.3 %}
+                  <h4 class="text-muted">
+                    Legendary Artifacts
+                    <small>
+                      <button type="button"  class="btn btn-xs btn-default" data-toggle="modal" data-target="#tutorialModalsignature-item-mod">
+                        <i class="fa fa-question-circle fa-lg text-muted"></i>
+                      </button>
+                    </small>
+                  </h4>
+                  {% for item in power_list.3 %}
+                    {% render_sig_item item request.user None rewarding_character True %}
+                    <br>
+                  {% endfor %}
                 {% endif %}
               </div>
             </div>

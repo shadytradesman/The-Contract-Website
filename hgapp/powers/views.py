@@ -367,16 +367,23 @@ def stock(request, character_id=None):
             .prefetch_related(Prefetch("artifacts", queryset=artifacts_query)) \
             .order_by("-stock_order", "name") \
             .all()
-        non_artifact_powers = []
+        powers = []
+        consumables = []
+        artifact_crafting = []
         artifacts = set()
         for power in all_powers:
             total_gift_count += 1
-            item = power.artifacts.filter(is_signature=True).first()
-            if item:
-                artifacts.add(item)
-            else:
-                non_artifact_powers.append(get_stock_gift_display(request, character, power, use_cache))
-        generic_powers_by_category[cat] = (non_artifact_powers, artifacts)
+            if power.is_signature():
+                item = power.artifacts.filter(is_signature=True).first()
+                if item:
+                    artifacts.add(item)
+            elif power.is_consumable_crafting():
+                consumables.append(get_stock_gift_display(request, character, power, use_cache))
+            elif power.is_artifact_crafting():
+                artifact_crafting.append(get_stock_gift_display(request, character, power, use_cache))
+            elif power.is_power():
+                powers.append(get_stock_gift_display(request, character, power, use_cache))
+        generic_powers_by_category[cat] = (powers, consumables, artifact_crafting, artifacts)
     context = {
         "generic_powers_by_category": generic_powers_by_category,
         'main_modal_art_url': static('overrides/art/mime.jpeg'),
@@ -384,6 +391,14 @@ def stock(request, character_id=None):
         "show_tutorial": (not request.user) or (not request.user.is_authenticated) or (
             not request.user.power_full_set.exists()),
         "total_gift_count": total_gift_count,
+        'powers_modal_art_url': static('overrides/art/grace.png'),
+        'sig_item_modal_art_url': static('overrides/art/lady_lake_sm.jpg'),
+        'art_craft_modal_art_url': static('overrides/art/front-music.jpg'),
+        'consumable_craft_modal_art_url': static('overrides/art/sushi.jpg'),
+        'mod_power': get_object_or_404(Base_Power, slug='power'),
+        'mod_sig_item': get_object_or_404(Base_Power, slug='signature-item-mod'),
+        'mod_consumable': get_object_or_404(Base_Power, slug='craftable-consumable'),
+        'mod_artifacts': get_object_or_404(Base_Power, slug='craftable-artifact'),
     }
     return render(request, 'powers/stock_powers.html', context)
 

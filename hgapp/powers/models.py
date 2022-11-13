@@ -874,6 +874,15 @@ class Power_Full(models.Model):
     def is_signature(self):
         return self.crafting_type == CRAFTING_SIGNATURE
 
+    def is_artifact_crafting(self):
+        return self.crafting_type == CRAFTING_ARTIFACT
+
+    def is_consumable_crafting(self):
+        return self.crafting_type == CRAFTING_CONSUMABLE
+
+    def is_power(self):
+        return self.crafting_type == CRAFTING_NONE
+
     def delete(self):
         self.character = None
         for reward in self.reward_list():

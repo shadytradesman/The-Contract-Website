@@ -1,9 +1,0 @@
-{% load cache %}
-
-{% if rewarding_character or request.user.is_superuser %}
-    {% include "powers/stock_powers_content.html" %}
-{% else %}
-    {% cache 8000 stockPowers %}
-        {% include "powers/stock_powers_content.html" %}
-    {% endcache %}
-{% endif %}

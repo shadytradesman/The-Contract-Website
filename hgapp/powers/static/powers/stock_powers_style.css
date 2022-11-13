@@ -191,6 +191,7 @@ h3 {
 .nav>li>a h4 {
     margin-top: 0px;
     margin-bottom: 0px;
+    font-size: 20px;
 }
 
 .panel-body {
@@ -241,4 +242,96 @@ h3 {
     position: static;
     height: 82vh;
     overflow: auto;
+}
+
+.panel-body .btn-xs {
+    position: relative;
+    bottom: 3px;
+}
+
+.css-subcat-header {
+    font-size: 20px;
+}
+
+
+@media (min-width: 992px) {
+    .css-big-modal-body {
+        width:598px;
+        position:relative;
+        left:300px;
+    }
+
+    .css-big-modal-header {
+        width:598px;
+        position:relative;
+        left:300px;
+    }
+
+    .css-big-modal-footer {
+     width:598px;
+     position:relative;
+     left:300px;
+    }
+
+    .css-big-modal-image {
+        height: 100%;
+        float:right;
+        position: absolute;
+        right: 600px;
+    }
+
+    .css-big-modal-lg {
+        position: relative;
+        left: 75px;
+    }
+
+    .modal-content-lg {
+        display: flex;
+    }
+
+    .modal-content-lg .css-modal-image-cont {
+        overflow: hidden;
+        width: 100%;
+        position: relative;
+        flex-shrink: 1;
+        flex-grow: 1;
+    }
+
+   .modal-content-lg .css-big-modal-image {
+       height: 100%;
+        width: 100%;
+        position: absolute;
+        object-fit: cover;
+        left: 0px;
+    }
+
+   .modal-lg-long {
+       width: 100%;
+       padding-left: 100px;
+       padding-right: 100px;
+       overflow: hidden;
+       left: 0px;
+   }
+
+    .modal-content-lg .css-big-modal-body, .modal-content-lg .css-big-modal-header, .modal-content-lg .css-big-modal-footer{
+        left:0px;
+    }
+
+}
+
+#tutorialModal {
+    z-index: 9999;
+}
+
+.css-sm-modal-image {
+    max-height: 60vh;
+    max-width: 100%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 10px;
+}
+
+.css-tut-header {
+    margin-top: 10px;
 }

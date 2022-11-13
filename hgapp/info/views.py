@@ -112,13 +112,5 @@ def how_to_play(request):
         "tutorial": character_tutorial,
         "expand_step": expand_step,
         "five_power": Power_Full.objects.filter(tags__in=["splash1"]).first(),
-        'powers_modal_art_url': static('overrides/art/grace.png'),
-        'sig_item_modal_art_url': static('overrides/art/lady_lake_sm.jpg'),
-        'art_craft_modal_art_url': static('overrides/art/front-music.jpg'),
-        'consumable_craft_modal_art_url': static('overrides/art/sushi.jpg'),
-        'mod_power': get_object_or_404(Base_Power, slug='power'),
-        'mod_sig_item': get_object_or_404(Base_Power, slug='signature-item-mod'),
-        'mod_consumable': get_object_or_404(Base_Power, slug='craftable-consumable'),
-        'mod_artifacts': get_object_or_404(Base_Power, slug='craftable-artifact'),
     }
     return render(request, 'info/new_player_guide/quickstart.html', context)
