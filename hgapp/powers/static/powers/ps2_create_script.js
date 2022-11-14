@@ -483,11 +483,13 @@ function getDisabledModifiers(modType, availModifiers, selectedModifiers, active
     // given a modType ("enhancement"), available modifiers, and selected modifiers.
     // return a mapping of disabled modifiers of that type to an array of reasons they are disabled.
     const powerBlobFieldName = modType + "s";
-    const requiredFieldName = "required_" + modType + "s";
+    const allModifiers = Object.assign(powerBlob["enhancements"], powerBlob["drawbacks"]);
+    const requiredEnhancements = "required_enhancements";
+    const requiredDrawbacks = "required_drawbacks";
     unfulfilledModifiers = availModifiers
           .filter(modifier => {
-              let required = powerBlob[powerBlobFieldName][modifier.slug][requiredFieldName];
-              let secondOrderReq = required.flatMap(mod => powerBlob[powerBlobFieldName][mod][requiredFieldName]);
+              let required = powerBlob[powerBlobFieldName][modifier.slug][requiredEnhancements].concat(powerBlob[powerBlobFieldName][modifier.slug][requiredDrawbacks]);
+              let secondOrderReq = required.flatMap(mod => allModifiers[mod][requiredEnhancements].concat(allModifiers[mod][requiredDrawbacks]));
               let allRequired = new Set(required.concat(secondOrderReq));
 
               if (allRequired.length == 0) {
@@ -505,9 +507,9 @@ function getDisabledModifiers(modType, availModifiers, selectedModifiers, active
        if (!(mod.slug in disabledModifiers)) {
            disabledModifiers[mod.slug] = [];
        }
-       requiredSlugs = powerBlob[powerBlobFieldName][mod.slug][requiredFieldName];
+       requiredSlugs = allModifiers[mod.slug][requiredEnhancements].concat(powerBlob[powerBlobFieldName][mod.slug][requiredDrawbacks]);
        requiredSlugs.forEach(reqSlug => {
-           disabledModifiers[mod.slug].push("Requires: " + powerBlob[powerBlobFieldName][reqSlug]["name"]);
+           disabledModifiers[mod.slug].push("Requires: " + allModifiers[reqSlug]["name"]);
        });
     });
     availModifiers.forEach(modifier => {
