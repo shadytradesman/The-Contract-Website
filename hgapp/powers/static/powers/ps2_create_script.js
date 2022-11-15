@@ -189,7 +189,7 @@ const keywordHighlights = [
     // Other
     {
         "regex": regexFromKeyword("Concentration"),
-        "tooltip": "While concentrating you can only take Free Actions and a single Quick Action per Round. Disrupting events (like taking damage) cause the effect to end, and you cannot Concentrate again until the end of the next Round."
+        "tooltip": "While concentrating you can only take Free Actions, a single Quick Action, and move 10 feet per Round. Disrupting events (like taking damage) cause the effect to end, and you cannot Concentrate again until the end of the next Round."
     },
     {
         "regex": regexFromKeyword("Resist"),
