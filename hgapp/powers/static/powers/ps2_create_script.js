@@ -181,6 +181,10 @@ const keywordHighlights = [
         "regex": regexFromKeyword("Non-Alien"),
         "tooltip": "Something that is of this world or known by this world. For example, in a modern setting, anything that exists in real life.",
     },
+    {
+        "regex": regexFromKeyword("non-Alien"),
+        "tooltip": "Something that is of this world or known by this world. For example, in a modern setting, anything that exists in real life.",
+    },
 
     // Other
     {
