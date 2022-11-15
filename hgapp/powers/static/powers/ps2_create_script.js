@@ -487,7 +487,8 @@ function getDisabledModifiers(modType, availModifiers, selectedModifiers, active
     // given a modType ("enhancement"), available modifiers, and selected modifiers.
     // return a mapping of disabled modifiers of that type to an array of reasons they are disabled.
     const powerBlobFieldName = modType + "s";
-    const allModifiers = Object.assign(powerBlob["enhancements"], powerBlob["drawbacks"]);
+    const otherFieldName = modType == "enhancement" ? "drawbacks" : "enhancements";
+    const allModifiers = {...powerBlob[otherFieldName], ...powerBlob[powerBlobFieldName]};
     const requiredEnhancements = "required_enhancements";
     const requiredDrawbacks = "required_drawbacks";
     unfulfilledModifiers = availModifiers
