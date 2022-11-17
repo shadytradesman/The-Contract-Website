@@ -72,6 +72,7 @@ def activity(request):
         list_in_lfg=True,
         scheduled_start_time__lte=two_hours_ago)
     past_games = past_games_query.order_by('-scheduled_start_time','-actual_start_time').prefetch_related('gm', 'cell', 'scenario').all()
+    num_scenarios_with_valid_writeups = Scenario.objects.filter(num_words__gte=1000).count()
     context = {
         "num_total_games": num_total_games,
         "num_finished_games": num_finished_games,
@@ -80,6 +81,7 @@ def activity(request):
         "num_contractors_played": num_contractors_played,
         "upcoming_games": upcoming_games,
         "past_games": past_games,
+        "num_scenarios_with_valid_writeups": num_scenarios_with_valid_writeups,
     }
     return render(request, 'games/activity.html', context)
 
