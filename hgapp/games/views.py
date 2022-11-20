@@ -33,7 +33,7 @@ from cells.forms import EditWorldEventForm
 from cells.models import WorldEvent
 
 from games.models import Scenario, Game, DISCOVERY_REASON, Game_Invite, Game_Attendance, Reward, REQUIRED_HIGH_ROLLER_STATUS, \
-    Move, GameChangeStartTime, GameEnded
+    Move, GameChangeStartTime, GameEnded, ScenarioWriteup
 
 from profiles.models import Profile
 
@@ -131,21 +131,27 @@ def edit_scenario(request, scenario_id):
         raise PermissionDenied("You don't have permission to edit this scenario")
     if not request.user.profile.confirmed_agreements:
         return HttpResponseRedirect(reverse('profiles:profiles_terms'))
+    writeup = scenario.get_players_writeup(request.user)
     if request.method == 'POST':
         form = CreateScenarioForm(request.POST)
         if form.is_valid():
-            scenario.title=form.cleaned_data['title']
-            scenario.summary=form.cleaned_data['summary']
-            scenario.description=form.cleaned_data['description']
-            scenario.max_players=form.cleaned_data['max_players']
-            scenario.min_players=form.cleaned_data['min_players']
-            scenario.suggested_status=form.cleaned_data['suggested_character_status']
-            scenario.is_highlander=form.cleaned_data['is_highlander']
-            scenario.is_rivalry=form.cleaned_data['is_rivalry']
-            scenario.requires_ringer=form.cleaned_data['requires_ringer']
-            scenario.pub_date=timezone.now()
+            if not writeup:
+                writeup = ScenarioWriteup(writer=request.user, relevant_scenario=scenario)
+            if scenario.creator == writeup.writer:
+                scenario.title=form.cleaned_data['title']
+            writeup.summary=form.cleaned_data['summary']
+            writeup.section_mission=form.cleaned_data['description']
+            writeup.max_players=form.cleaned_data['max_players']
+            writeup.min_players=form.cleaned_data['min_players']
+            writeup.suggested_status=form.cleaned_data['suggested_character_status']
+            writeup.is_highlander=form.cleaned_data['is_highlander']
+            writeup.is_rivalry=form.cleaned_data['is_rivalry']
+            writeup.requires_ringer=form.cleaned_data['requires_ringer']
+            writeup.edited_date=timezone.now()
             with transaction.atomic():
-                scenario.save()
+                if scenario.creator == writeup.writer:
+                    scenario.save()
+                writeup.save()
                 if request.user.is_superuser:
                     scenario.tags.set(form.cleaned_data["tags"])
             return HttpResponseRedirect(reverse('games:games_view_scenario', args=(scenario.id,)))
@@ -153,16 +159,18 @@ def edit_scenario(request, scenario_id):
             logger.error("Invalid scenario form. Errors: %s", str(form.errors))
             raise ValueError("Invalid scenario form")
     else:
+        if not writeup:
+            writeup = scenario.get_primary_writeup()
         # Build a scenario form.
         form = CreateScenarioForm(initial={'title': scenario.title,
-                                            'summary': scenario.summary,
-                                            'description': scenario.description,
-                                            'max_players': scenario.max_players,
-                                            'min_players': scenario.min_players,
-                                            'suggested_character_status': scenario.suggested_status,
-                                            'is_highlander': scenario.is_highlander,
-                                            'is_rivalry': scenario.is_rivalry,
-                                            'requires_ringer': scenario.requires_ringer,
+                                            'summary': writeup.summary,
+                                            'description': writeup.section_mission,
+                                            'max_players': writeup.max_players,
+                                            'min_players': writeup.min_players,
+                                            'suggested_character_status': writeup.suggested_status,
+                                            'is_highlander': writeup.is_highlander,
+                                            'is_rivalry': writeup.is_rivalry,
+                                            'requires_ringer': writeup.requires_ringer,
                                             'tags': scenario.tags.all(),
                                            })
         context = {
@@ -206,6 +214,7 @@ def view_scenario(request, scenario_id, game_id=None):
         context = {
             'show_spoiler_warning': show_spoiler_warning,
             'scenario': scenario,
+            'scenario_writeup': scenario.get_primary_writeup(),
             'is_public': is_public,
             'viewer_can_edit': viewer_can_edit,
             'games_run_by_viewer': games_run_by_viewer,

@@ -86,19 +86,19 @@
                 </h1>
                 <h4 class="text-center" style="margin-top: 5px; margin-bottom: 5px;">
                     A
-                    {% if scenario.is_rivalry or scenario.is_highlander %}
-                        {% if scenario.is_rivalry %}Rivalry{% endif %} {% if scenario.is_highlander %}Highlander{% endif %}
+                    {% if scenario_writeup.is_rivalry or scenario_writeup.is_highlander %}
+                        {% if scenario_writeup.is_rivalry %}Rivalry{% endif %} {% if scenario_writeup.is_highlander %}Highlander{% endif %}
                     {% endif %}
                     Scenario written by
                     <a href="{% url 'profiles:profiles_view_profile' scenario.creator.profile.id %}">{% user_display scenario.creator %}</a>
                 </h4>
                     <h5 style="margin-top: 0px;">
                         Suggested for
-                        <b>{{scenario.min_players}}</b>
+                        <b>{{scenario_writeup.min_players}}</b>
                         to
-                        <b>{{scenario.max_players}}</b>
-                        <b>{{scenario.get_suggested_status_display}}</b>
-                        {% if scenario.requires_ringer %}
+                        <b>{{scenario_writeup.max_players}}</b>
+                        <b>{{scenario_writeup.get_suggested_status_display}}</b>
+                        {% if scenario_writeup.requires_ringer %}
                              Contractors and a Ringer.
                         {% else %}
                             Contractors.
@@ -149,10 +149,10 @@
                             >
                                 Writeup
                             </h2>
-                            {% if scenario.summary %}
+                            {% if scenario_writeup.summary %}
                                 <h3 style="margin-top: 0px;">
                                     <small>
-                                        {{ scenario.summary }}
+                                        {{ scenario_writeup.summary }}
                                     </small>
                                 </h3>
                             {% endif %}
@@ -160,7 +160,7 @@
                 </div>
                 <div class="panel-body">
                     <div id="collapseWriteup" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="writeupHeading">
-                        {{scenario.description|safe}}
+                        {{scenario_writeup.section_mission|safe}}
                     </div>
                 </div>
             </div>
