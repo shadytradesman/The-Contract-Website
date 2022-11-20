@@ -904,12 +904,7 @@ class Scenario(models.Model):
     def is_stock(self):
         return self.tags.count() > 0
 
-    def __update_word_count(self):
-        soup = BeautifulSoup(self.description, features="html5lib")
-        self.num_words = len(soup.text.split())
-
     def save(self, *args, **kwargs):
-        self.__update_word_count()
         if self.pk is None:
             super(Scenario, self).save(*args, **kwargs)
             discovery = Scenario_Discovery (
@@ -964,6 +959,9 @@ class ScenarioWriteup(models.Model):
 
     def save(self, *args, **kwargs):
         self.__update_word_count()
+        if self.is_primary_writeup():
+            self.relevant_scenario.num_words = self.num_words
+            self.relevant_scenario.save()
         super(ScenarioWriteup, self).save(*args, **kwargs)
 
     def __update_word_count(self):
