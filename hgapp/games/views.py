@@ -98,17 +98,29 @@ def create_scenario(request):
             scenario = Scenario(
                 title = form.cleaned_data['title'],
                 creator = request.user,
-                summary = form.cleaned_data['summary'],
-                description = form.cleaned_data['description'],
-                max_players = form.cleaned_data['max_players'],
-                min_players = form.cleaned_data['min_players'],
-                suggested_status = form.cleaned_data['suggested_character_status'],
-                is_highlander = form.cleaned_data['is_highlander'],
-                requires_ringer= form.cleaned_data['requires_ringer'],
-                is_rivalry = form.cleaned_data['is_rivalry']
+                description = "legacy",
+                summary=form.cleaned_data['summary'],
+                max_players=form.cleaned_data['max_players'],
+                min_players=form.cleaned_data['min_players'],
+                suggested_status=form.cleaned_data['suggested_character_status'],
+                is_highlander=form.cleaned_data['is_highlander'],
+                requires_ringer=form.cleaned_data['requires_ringer'],
+                is_rivalry=form.cleaned_data['is_rivalry']
             )
             with transaction.atomic():
                 scenario.save()
+                writeup = ScenarioWriteup(
+                    writer=request.user,
+                    relevant_scenario=scenario,
+                    summary=form.cleaned_data['summary'],
+                    section_mission=form.cleaned_data['description'],
+                    max_players=form.cleaned_data['max_players'],
+                    min_players=form.cleaned_data['min_players'],
+                    suggested_status=form.cleaned_data['suggested_character_status'],
+                    is_highlander=form.cleaned_data['is_highlander'],
+                    requires_ringer=form.cleaned_data['requires_ringer'],
+                    is_rivalry=form.cleaned_data['is_rivalry'])
+                writeup.save()
                 if request.user.is_superuser:
                     scenario.tags.set(form.cleaned_data["tags"])
             return HttpResponseRedirect(reverse('games:games_view_scenario', args=(scenario.id,)))

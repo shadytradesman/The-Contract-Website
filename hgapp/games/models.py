@@ -450,11 +450,18 @@ class Game(models.Model):
         if not hasattr(self, 'scenario') or not self.scenario:
             scenario = Scenario(creator=self.gm,
                                 title=str(self.title),
-                                description="Put details of the scenario here",
+                                description="Put the details of the Scenario here",
                                 suggested_status=HIGH_ROLLER_STATUS[0][0],
                                 max_players=5,
                                 min_players=2)
             scenario.save()
+            writeup = ScenarioWriteup(writer=self.gm,
+                                      relevant_scenario=scenario,
+                                      section_mission="Put the details of the Scenario here",
+                                      suggested_status=HIGH_ROLLER_STATUS[0][0],
+                                      max_players=5,
+                                      min_players=2)
+            writeup.save()
             self.scenario = scenario
         if self.pk is None:
             super(Game, self).save(*args, **kwargs)
