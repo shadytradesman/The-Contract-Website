@@ -138,10 +138,10 @@ def make_character_form(user, existing_character=None, supplied_cell=None):
                                       empty_label="No Playgroup",
                                       required=False,
                                       )
-        if supplied_cell:
-            cell.initial = supplied_cell
         if existing_character:
             cell.initial = existing_character.cell
+        elif supplied_cell:
+            cell.initial = supplied_cell
         elif queryset.first():
             cell.initial = queryset.first()
     else:

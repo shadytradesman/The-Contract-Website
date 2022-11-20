@@ -97,7 +97,7 @@ def make_game_form(user):
                                       empty_label="Select a Playgroup",
                                       help_text="Select a Playgroup for this Contract. This generally defines the setting of "
                                                 "the Contract, although some Scenarios may see the Contractors spirited away "
-                                                "to other dimensions, pocket realms, or similar. "
+                                                "to pocket realms, other planets, or similar. "
                                                 "Playgroup leaders have the power to edit or void Contracts "
                                                 "run in their Playgroup.",
                                       required=True)
