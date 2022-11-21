@@ -874,7 +874,7 @@ class Scenario(models.Model):
         return "{} ({} words, {}-{} {} Contractors)".format(self.title, self.num_words, self.min_players, self.max_players, self.get_suggested_status_display())
 
     def finished_games(self):
-        return self.game_set.filter(status__in=[GAME_STATUS[2][0], GAME_STATUS[3][0], GAME_STATUS[6][0]]).all()
+        return self.game_set.exclude(get_completed_game_excludes_query())
 
     def num_finished_games(self):
         return self.finished_games().count()
