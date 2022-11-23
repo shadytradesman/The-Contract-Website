@@ -223,15 +223,19 @@ def view_scenario(request, scenario_id, game_id=None):
         context = {
             'show_spoiler_warning': show_spoiler_warning,
             'scenario': scenario,
-            'scenario_writeup': scenario.get_primary_writeup(),
             'is_public': is_public,
             'viewer_can_edit': viewer_can_edit,
             'games_completed': games_completed,
             'game_feedback_form': game_feedback_form,
         }
         if request.user.is_superuser or (request.user.profile and request.user.profile.early_access_user):
+            player_writeup = scenario.get_players_writeup(request.user)
+            context["player_writeup"] = player_writeup
+            scenario_writeup = player_writeup if player_writeup else scenario.get_primary_writeup()
+            context["scenario_writeup"] = scenario_writeup
             return render(request, 'games/scenarios/view_scenario.html', context)
         else:
+            context["scenario_writeup"] = scenario.get_primary_writeup()
             return render(request, 'games/view_scenario.html', context)
 
 

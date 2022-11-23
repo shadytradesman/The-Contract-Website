@@ -2,63 +2,59 @@
 {% load account_tags %}
 
 <div>
-    <ul>
-        {% for game in games_completed %}
-            <li>
-                <h5>
-                <a href="{% url 'games:games_view_game' game.id %}">
-                        {% if game.end_time %}
-                            Finished {{ game.end_time }}
-                        {% elif game.actual_start_time %}
-                            Started {{game.actual_start_time}} but never finished
-                        {% else %}
-                            Never finished
-                        {% endif %}
-                </a>
+    {% for game in games_completed %}
+        <div>
+            <h4 style="margin-bottom: 5px;">
+            <a href="{% url 'games:games_view_game' game.id %}">
+                Run by {{game.gm.username}}
+            </a>
                 {% if game.cell %}
                     in <a href="{% url 'cells:cells_view_cell' game.cell.id %}">{{ game.cell.name }}</a>
                 {% endif %}
-                </h5>
-                <div style="margin-left: 20px;">
-                    {% if game.get_journaled_attendances %}
-                    <div>
-                        <b>Journals Written:</b>
-                    </div>
-                    {% endif %}
-                    <ul>
-                        {% for attendance in game.get_journaled_attendances %}
-                        <li>
-                            <a href="{% url 'journals:journal_read_game' attendance.attending_character.id game.id %}"
-                               class="">
-                                {{attendance.attending_character.name}}
-                            </a>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                    {% if game.gm == request.user and not game.scenario_notes %}
-                        <div>
-                            <form action="{% url 'games:games_view_scenario_feedback' scenario.id game.id %}" method="post">
-                                <div class="alert alert-info" >
-                                    <h4>
-                                        Leave Feedback
-                                    </h4>
-                                    {{ game_feedback_form.non_field_errors }}
-                                    {{ game_feedback_form.management_form }}
-                                    {% csrf_token %}
-                                    {% if game_feedback_form %}
-                                    {{ game_feedback_form | bootstrap }}
-                                    {% endif %}
-                                    <input class="btn btn-primary" type="submit" value="Submit" />
-                                </div>
-                            </form>
+            </h4>
+            <div class="text-muted" style="margin-bottom:5px;">
+                {{ game.end_time|date:"b d Y"|capfirst}}
+            </div>
+            <div style="margin-left: 25px; margin-bottom: 25px;">
+                {% if game.gm == request.user and not game.scenario_notes %}
+                <div>
+                    <form action="{% url 'games:games_view_scenario_feedback' scenario.id game.id %}" method="post">
+                        <div class="alert alert-info" >
+                            <h4>
+                                Leave Feedback
+                            </h4>
+                            {{ game_feedback_form.non_field_errors }}
+                            {{ game_feedback_form.management_form }}
+                            {% csrf_token %}
+                            {% if game_feedback_form %}
+                            {{ game_feedback_form | bootstrap }}
+                            {% endif %}
+                            <input class="btn btn-primary" type="submit" value="Submit" />
                         </div>
-                    {% elif game.scenario_notes %}
-                        <div class="thumbnail">
-                            {{game.scenario_notes|linebreaks}}
-                        </div>
-                    {% endif %}
+                    </form>
                 </div>
-            </li>
-        {% endfor %}
-    </ul>
+                {% elif game.scenario_notes %}
+                <div class="thumbnail" style="padding-bottom: 0px; margin-bottom: 0px;">
+                    <b>GM Notes:</b>
+                    {{game.scenario_notes|linebreaks}}
+                </div>
+                {% endif %}
+                {% if game.get_journaled_attendances %}
+                <div style="margin-top: 10px;">
+                    <b>Journals Written:</b>
+                </div>
+                {% endif %}
+                <ul>
+                    {% for attendance in game.get_journaled_attendances %}
+                    <li>
+                        <a href="{% url 'journals:journal_read_game' attendance.attending_character.id game.id %}"
+                           class="">
+                            {{attendance.attending_character.name}}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endfor %}
 </div>

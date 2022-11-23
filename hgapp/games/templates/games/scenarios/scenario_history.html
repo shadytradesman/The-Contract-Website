@@ -1,0 +1,36 @@
+<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <div id="scenario-history" class="css-guide-section"></div>
+            {% if games_completed %}
+            <a role="button" data-toggle="collapse" href="#collapseActivity" aria-expanded="true" aria-controls="collapseActivity">
+                <div class="" role="tab" id="summaryHeading">
+                    <h2>
+                        Scenario History
+                    </h2>
+                    <div class="css-scenario-subheader">
+                        Run {{scenario.times_run}} time{{scenario.times_run|pluralize}} by {{scenario.num_gms_run}} GM{{scenario.times_run|pluralize}}.
+                        {{scenario.num_victories}} victories and {{scenario.num_deaths}} deaths.
+                        <div>
+                            <small>
+                                (Click to expand history)
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </a>
+            {% else %}
+            <h3>
+                This Scenario has never been run as a Contract
+            </h3>
+            {% endif %}
+        </div>
+        {% if games_completed %}
+        <div id="collapseActivity" class="panel-collapse collapse" role="tabpanel" aria-labelledby="activityHeading">
+            <div class="panel-body">
+                {% include "games/view_scenario_history.html" %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>

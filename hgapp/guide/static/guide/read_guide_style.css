@@ -113,15 +113,15 @@
         min-height: 450px;
     }
 
-    p {
+    .css-section-body p {
         padding-left: 25px;
     }
 
-    h5 {
+    .css-section-body h5 {
         padding-left: 15px;
     }
 
-    ul, ol {
+    .css-section-body ul, ol {
         padding-left: 55px;
     }
 }
@@ -193,6 +193,7 @@ body {position:relative;}
 .css-section-body {
     background-color: #353e4b !important;
     padding: 10px;
+    padding-top: 15px;
     padding-left: 20px;
     padding-right: 20px;
     border-radius: 4px;
