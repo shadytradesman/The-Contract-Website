@@ -3,15 +3,7 @@
         {% if request.user.is_authenticated %}
             <li>
                 <a class="btn-primary" href="{% url 'games:games_scenario_edit' scenario.id %}">
-                    {% if player_writeup %}
-                        {% if player_writeup.writer == scenario.creator %}
-                            Edit Scenario
-                        {% else %}
-                            Edit My Writeup
-                        {% endif %}
-                    {% else %}
-                            Create Personal Edit
-                    {% endif %}
+                    Edit Scenario
                 </a>
             </li>
         {% endif %}

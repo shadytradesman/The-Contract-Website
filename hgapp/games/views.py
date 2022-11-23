@@ -192,9 +192,10 @@ def edit_scenario(request, scenario_id):
         return render(request, 'games/edit_scenario.html', context)
 
 
-@login_required
 def view_scenario(request, scenario_id, game_id=None):
     scenario = get_object_or_404(Scenario, id=scenario_id)
+    if not scenario.is_public() and not request.user.is_authenticated:
+        raise PermissionDenied("You don't have permission to view this scenario")
     if not scenario.is_public() and not scenario.player_discovered(request.user):
         raise PermissionDenied("You don't have permission to view this scenario")
     show_spoiler_warning = scenario.is_public() \
@@ -227,15 +228,11 @@ def view_scenario(request, scenario_id, game_id=None):
             'viewer_can_edit': viewer_can_edit,
             'games_completed': games_completed,
             'game_feedback_form': game_feedback_form,
+            'writeup_sections': scenario.get_latest_of_all_writeup_sections(),
         }
-        if request.user.is_superuser or (request.user.profile and request.user.profile.early_access_user):
-            player_writeup = scenario.get_players_writeup(request.user)
-            context["player_writeup"] = player_writeup
-            scenario_writeup = player_writeup if player_writeup else scenario.get_primary_writeup()
-            context["scenario_writeup"] = scenario_writeup
+        if request.user.is_superuser or (hasattr(request.user, "profile") and request.user.profile and request.user.profile.early_access_user):
             return render(request, 'games/scenarios/view_scenario.html', context)
         else:
-            context["scenario_writeup"] = scenario.get_primary_writeup()
             return render(request, 'games/view_scenario.html', context)
 
 

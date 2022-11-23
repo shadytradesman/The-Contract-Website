@@ -7,12 +7,14 @@
                 </a>
             </li>
             <ol class="nav nav-pills nav-stacked css-inner-nav-list"></ol>
-            <li role="presentation" class="js-toc-section" data-toc-contents="js-scenario-mission-contents">
-                <a href="#scenario-mission">
-                    Mission
-                </a>
-            </li>
-            <ol class="nav nav-pills nav-stacked css-inner-nav-list"></ol>
+            {% for section in writeup_sections %}
+                <li role="presentation" class="js-toc-section" data-toc-contents="js-scenario-{{section.section}}-contents">
+                    <a href="#scenario-{{section.section}}">
+                        {{section.get_section_display}}
+                    </a>
+                </li>
+                <ol class="nav nav-pills nav-stacked css-inner-nav-list"></ol>
+            {% endfor %}
         </ol>
     </li>
 </ul>

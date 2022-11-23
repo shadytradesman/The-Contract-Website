@@ -70,6 +70,19 @@ INVITE_MODE = (
     (CLOSED, 'Closed for RSVPs'),
 )
 
+OVERVIEW = "OVERVIEW"
+BACKSTORY = "BACKSTORY"
+INTRODUCTION = "INTRODUCTION"
+MISSION = "MISSION"
+AFTERMATH = "AFTERMATH"
+WRITEUP_SECTION = (
+    (OVERVIEW, "Overview"),
+    (BACKSTORY, "Backstory"),
+    (INTRODUCTION, "Intro and Briefing"),
+    (MISSION, "Mission"),
+    (AFTERMATH, "Aftermath"),
+)
+
 def migrate_add_gms(apps, schema_editor):
     Game = apps.get_model('games', 'Game')
     for game in Game.objects.all().iterator():
@@ -750,10 +763,11 @@ class Scenario(models.Model):
         related_name='scenario_creator',
         on_delete=models.PROTECT)
     title = models.CharField(max_length=130)
-    summary = models.TextField(max_length=5000,
-                               blank=True,
-                               null=True)
-    description = models.TextField(max_length=74000)
+    summary = models.TextField(max_length=5000, blank=True, null=True)
+    description = models.TextField(max_length=74000, blank=True)
+    is_wiki_editable = models.BooleanField(default=True)
+    created_date = models.DateTimeField('date created', auto_now_add=True)
+
     suggested_status = models.CharField(choices=HIGH_ROLLER_STATUS,
                                        max_length=25,
                                        default=HIGH_ROLLER_STATUS[0][0])
@@ -797,12 +811,6 @@ class Scenario(models.Model):
 
     def __str__(self):
         return self.title
-
-    def get_primary_writeup(self):
-        return get_object_or_none(ScenarioWriteup, relevant_scenario=self, writer=self.creator)
-
-    def get_players_writeup(self, player):
-        return get_object_or_none(ScenarioWriteup, relevant_scenario=self, writer=player)
 
     def is_valid(self):
         return self.num_words > 1000
@@ -904,6 +912,27 @@ class Scenario(models.Model):
     def is_stock(self):
         return self.tags.count() > 0
 
+    def __update_word_count(self):
+        total_words = 0
+        all_sections = self.get_latest_of_all_writeup_sections()
+        for section in all_sections:
+            total_words += section.num_words
+        self.num_words = total_words
+
+    def get_latest_of_section(self, section):
+        return ScenarioWriteup.objects\
+            .filter(relevant_scenario=self, section=section, is_deleted=False)\
+            .order_by("-created_date")\
+            .first()
+
+    def get_latest_of_all_writeup_sections(self):
+        sections = []
+        for section_type in WRITEUP_SECTION:
+            section = self.get_latest_of_section(section_type[0])
+            if section:
+                sections.append(section)
+        return sections
+
     def save(self, *args, **kwargs):
         if self.pk is None:
             super(Scenario, self).save(*args, **kwargs)
@@ -924,58 +953,38 @@ class ScenarioWriteup(models.Model):
         settings.AUTH_USER_MODEL,
         related_name='scenario_writer',
         on_delete=models.PROTECT)
-    summary = models.TextField(max_length=5000,
-                               blank=True,
-                               null=True)
-    section_forward = models.TextField(max_length=74000, blank=True)
-    section_backstory = models.TextField(max_length=74000, blank=True)
-    section_intro = models.TextField(max_length=74000, blank=True)
-    section_mission = models.TextField(max_length=74000)
-    suggested_status = models.CharField(choices=HIGH_ROLLER_STATUS,
-                                        max_length=25,
-                                        default=HIGH_ROLLER_STATUS[0][0])
-    max_players = models.IntegerField("Suggested Maximum number of players")
-    min_players = models.IntegerField("Suggested Minimum number of players")
-    is_highlander = models.BooleanField(default=False)
-    requires_ringer = models.BooleanField(default=False)
-    is_rivalry = models.BooleanField(default=False)
+    section = models.CharField(choices=WRITEUP_SECTION,
+                               max_length=55,
+                               default=MISSION)
+    content = models.TextField(max_length=74000)
     relevant_scenario = models.ForeignKey(Scenario, on_delete=models.CASCADE)
-
     created_date = models.DateTimeField('date created', auto_now_add=True)
-    edited_date = models.DateTimeField('date edited', auto_now_add=True)
-
     num_words = models.IntegerField("Number of Words", default=0)
+    is_deleted = models.BooleanField(default=False)
 
     class Meta:
         indexes = [
-            models.Index(fields=['relevant_scenario']),
+            models.Index(fields=['relevant_scenario', 'section', 'is_deleted', 'created_date']),
+            models.Index(fields=['relevant_scenario', 'section', 'created_date']),
+            models.Index(fields=['relevant_scenario', 'created_date']),
             models.Index(fields=['writer']),
         ]
-        unique_together = ("relevant_scenario", "writer")
 
     def __str__(self):
-        return "{}{}".format(self.relevant_scenario.title,
-                             "(edited by: {})".format(self.writer.username) if not self.is_primary_writeup() else "")
+        return "Section: {} by {} for {}".format(
+            self.get_section_display(),
+            self.writer.username,
+            self.relevant_scenario.title,)
 
     def save(self, *args, **kwargs):
         self.__update_word_count()
-        if self.is_primary_writeup():
-            self.relevant_scenario.num_words = self.num_words
-            self.relevant_scenario.save()
         super(ScenarioWriteup, self).save(*args, **kwargs)
+        self.relevant_scenario.__update_word_count()
+        self.relevant_scenario.save()
 
     def __update_word_count(self):
-        total_words = 0
-        for section in self.__sections():
-            soup = BeautifulSoup(section, features="html5lib")
-            total_words += len(soup.text.split())
-        self.num_words = total_words
-
-    def __sections(self):
-        return [self.section_intro, self.section_backstory, self.section_forward, self.section_mission]
-
-    def is_primary_writeup(self):
-        return self.relevant_scenario.creator == self.writer
+        soup = BeautifulSoup(self.content, features="html5lib")
+        self.num_words = len(soup.text.split())
 
 
 class Scenario_Discovery(models.Model):

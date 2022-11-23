@@ -68,13 +68,13 @@
                     Scenario written by
                     <a href="{% url 'profiles:profiles_view_profile' scenario.creator.profile.id %}">{% user_display scenario.creator %}</a>
                 </h4>
-                <h5 style="margin-top: 0px;">
+                <h5 style="margin-top: 0px; margin-bottom:5px;">
                     Suggested for
-                    <b>{{scenario_writeup.min_players}}</b>
+                    <b>{{scenario.min_players}}</b>
                     to
-                    <b>{{scenario_writeup.max_players}}</b>
-                    <b>{{scenario_writeup.get_suggested_status_display}}</b>
-                    {% if scenario_writeup.requires_ringer %}
+                    <b>{{scenario.max_players}}</b>
+                    <b>{{scenario.get_suggested_status_display}}</b>
+                    {% if scenario.requires_ringer %}
                     Contractors and a Ringer.
                     {% else %}
                     Contractors.
@@ -83,6 +83,11 @@
                         {% include "games/view_scenario_writeup_stats.html" %}
                     </div>
                 </h5>
+                {% if scenario.summary %}
+                <div class="css-scenario-subheader">
+                    {{ scenario.summary }}
+                </div>
+                {% endif %}
             </div>
 
             {% include "games/scenarios/view_scenario_header.html" %}
@@ -90,30 +95,23 @@
             <div class="panel panel-default css-scenario-section-panel">
                     {% include "games/scenarios/scenario_history.html" %}
             </div>
-            <div class="panel panel-default css-scenario-section-panel">
+            {% for section in writeup_sections %}
+                <div class="panel panel-default css-scenario-section-panel">
                     <div class="panel-heading">
                         <div id="scenario-mission" class="css-guide-section"></div>
-                        <div role="tab" id="writeupHeading">
+                        <div role="tab" id="writeup{{section.section}}">
                             <h2>
-                                Mission
+                                {{section.get_section_display}}
                             </h2>
-                            {% if scenario_writeup.summary %}
-                                <div class="css-scenario-subheader">
-                                    {{ scenario_writeup.summary }}
-                                </div>
-                                <h3 style="margin-top: 0px;">
-                                    <small>
-                                    </small>
-                                </h3>
-                            {% endif %}
                         </div>
                     </div>
                     <div class="panel-body" style="overflow: hidden">
-                        <div class="css-writeup-contents" id="js-scenario-mission-contents">
-                            {{scenario_writeup.section_mission|safe}}
+                        <div class="css-writeup-contents" id="js-scenario-{{section.section}}-contents">
+                            {{section.content|safe}}
                         </div>
                     </div>
-            </div>
+                </div>
+            {% endfor %}
         </div>
     </div>
 </div>

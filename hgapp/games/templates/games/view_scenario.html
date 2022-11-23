@@ -94,11 +94,11 @@
                 </h4>
                     <h5 style="margin-top: 0px;">
                         Suggested for
-                        <b>{{scenario_writeup.min_players}}</b>
+                        <b>{{scenario.min_players}}</b>
                         to
-                        <b>{{scenario_writeup.max_players}}</b>
-                        <b>{{scenario_writeup.get_suggested_status_display}}</b>
-                        {% if scenario_writeup.requires_ringer %}
+                        <b>{{scenario.max_players}}</b>
+                        <b>{{scenario.get_suggested_status_display}}</b>
+                        {% if scenario.requires_ringer %}
                              Contractors and a Ringer.
                         {% else %}
                             Contractors.
@@ -107,6 +107,13 @@
                             {% include "games/view_scenario_writeup_stats.html" %}
                         </div>
                     </h5>
+                    {% if scenario.summary %}
+                        <h3 style="margin-top: 0px;">
+                            <small>
+                                {{ scenario.summary }}
+                            </small>
+                        </h3>
+                    {% endif %}
             </div>
             <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                 <div class="panel panel-default">
@@ -141,29 +148,24 @@
                     {% endif %}
                 </div>
             </div>
-            <div class="panel panel-default">
-                <div class="panel-heading text-center">
-                        <div class="panel-heading text-center" role="tab" id="writeupHeading">
-                            <h2
-                                    style="margin-top: 0px; margin-bottom: 0px;"
-                            >
-                                Writeup
-                            </h2>
-                            {% if scenario_writeup.summary %}
-                                <h3 style="margin-top: 0px;">
-                                    <small>
-                                        {{ scenario_writeup.summary }}
-                                    </small>
-                                </h3>
-                            {% endif %}
+            {% for section in writeup_sections %}
+                <div class="panel panel-default">
+                    <div class="panel-heading text-center">
+                            <div class="panel-heading text-center" role="tab" >
+                                <h2
+                                        style="margin-top: 0px; margin-bottom: 0px;"
+                                >
+                                    {{section.get_section_display}}
+                                </h2>
+                            </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="panel-collapse collapse in" role="tabpanel" aria-labelledby="writeupHeading">
+                            {{section.content|safe}}
                         </div>
-                </div>
-                <div class="panel-body">
-                    <div id="collapseWriteup" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="writeupHeading">
-                        {{scenario_writeup.section_mission|safe}}
                     </div>
                 </div>
-            </div>
+            {% endfor %}
         {% endif %}
     </span>
 </div>
