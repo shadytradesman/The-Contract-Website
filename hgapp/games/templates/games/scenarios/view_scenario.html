@@ -98,7 +98,7 @@
             {% for section in writeup_sections %}
                 <div class="panel panel-default css-scenario-section-panel">
                     <div class="panel-heading">
-                        <div id="scenario-mission" class="css-guide-section"></div>
+                        <div id="scenario-{{section.section}}" class="css-guide-section"></div>
                         <div role="tab" id="writeup{{section.section}}">
                             <h2>
                                 {{section.get_section_display}}

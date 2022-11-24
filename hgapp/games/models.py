@@ -912,7 +912,7 @@ class Scenario(models.Model):
     def is_stock(self):
         return self.tags.count() > 0
 
-    def __update_word_count(self):
+    def update_word_count(self):
         total_words = 0
         all_sections = self.get_latest_of_all_writeup_sections()
         for section in all_sections:
@@ -929,7 +929,7 @@ class Scenario(models.Model):
         sections = []
         for section_type in WRITEUP_SECTION:
             section = self.get_latest_of_section(section_type[0])
-            if section:
+            if section and section.content:
                 sections.append(section)
         return sections
 
@@ -979,8 +979,6 @@ class ScenarioWriteup(models.Model):
     def save(self, *args, **kwargs):
         self.__update_word_count()
         super(ScenarioWriteup, self).save(*args, **kwargs)
-        self.relevant_scenario.__update_word_count()
-        self.relevant_scenario.save()
 
     def __update_word_count(self):
         soup = BeautifulSoup(self.content, features="html5lib")

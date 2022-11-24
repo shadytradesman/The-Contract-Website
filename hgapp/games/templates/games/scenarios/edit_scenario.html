@@ -5,7 +5,8 @@
 {% load static %}
 
 {% block extra_head %}
-    {{ form.media }}
+    {{ scenario_form.media }}
+    {{ writeup_form.media }}
 {% endblock %}
 
 {% block head_title %}Editing Scenario{% endblock %}
@@ -14,6 +15,10 @@
 
 {% block extra_scripts %}
     <script src="{% static 'games/edit_scenario.js' %}"></script>
+{% endblock %}
+
+{% block extra_styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'games/edit_scenario_style.css' %}" />
 {% endblock %}
 
 {% block body_base %}
@@ -25,55 +30,129 @@
             <h1>Create a new Scenario</h1>
         {% endif %}
     </div>
-    {% if scenario %}
-        <form action="{% url 'games:games_scenario_edit' scenario.id %}" method="post" onsubmit="setFormSubmitting()">
-    {% else %}
-        <form action="{% url 'games:games_create_scenario' %}" method="post" onsubmit="setFormSubmitting()">
-    {% endif %}
+    <form
+            {% if scenario %}
+                action="{% url 'games:games_scenario_edit' scenario.id %}"
+            {% else %}
+                action="{% url 'games:games_create_scenario' %}"
+            {% endif %}
+            method="post" onsubmit="setFormSubmitting()"
+    >
         <div class="panel panel-default">
             <div class="panel-body">
-                <div class="row text-center">
-                    <div class="alert alert-info col-md-6 col-md-offset-3">
-                        For tips on writing Scenarios, <a href="/guide/gm-manual/#writing-scenarios" style="text-decoration: underline;">read the Guide!</a>
-                    </div>
-                </div>
-                {{ form.about.errors }}
-                {{ form.non_field_errors }}
+                {{ scenario_form.about.errors }}
+                {{ scenario_form.non_field_errors }}
                 {% csrf_token %}
                 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-                {{ form.title | bootstrap}}
-                {{ form.summary | bootstrap}}
-                {{ form.description | bootstrap}}
+                {{ scenario_form.title | bootstrap}}
+                {{ scenario_form.summary | bootstrap}}
                 <div class="row">
                     <div class="col-sm-4">
-                        {{ form.suggested_character_status | bootstrap }}
+                        {{ scenario_form.suggested_character_status | bootstrap }}
                     </div>
                     <div class="col-sm-4">
-                        {{ form.min_players | bootstrap }}
+                        {{ scenario_form.min_players | bootstrap }}
                     </div>
                     <div class="col-sm-4">
-                        {{ form.max_players | bootstrap }}
+                        {{ scenario_form.max_players | bootstrap }}
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-sm-4">
-                        {{ form.is_highlander | bootstrap }}
+                        {{ scenario_form.is_highlander | bootstrap }}
                     </div>
                     <div class="col-sm-4">
-                        {{ form.is_rivalry | bootstrap }}
+                        {{ scenario_form.is_rivalry | bootstrap }}
                     </div>
                     <div class="col-sm-4">
-                        {{ form.requires_ringer | bootstrap }}
+                        {{ scenario_form.requires_ringer | bootstrap }}
                     </div>
                 </div>
                 {% if request.user.is_superuser %}
-                    <br>
-                    <h3>Scenario Tags (Admin only)</h3>
-                    {{form.tags}}
-                    <br>
+                    <div>
+                        <h3>Scenario Tags (Admin only)</h3>
+                        {{scenario_form.tags}}
+                    </div>
                 {% endif %}
-                <input class="btn btn-primary" type="submit" value="Done!" />
-            </br>
+                <h2 class="text-center">Scenario Writeup</h2>
+                <div class="row">
+                    <div class="alert alert-info col-md-6 col-md-offset-3">
+                        <ul>
+                            <li>
+                                For tips on writing Scenarios, <a href="/guide/gm-manual/#writing-scenarios" style="text-decoration: underline;" target="_blank" rel="noopener noreferrer">read the Guide!</a>
+                            </li>
+                            <li>
+                                The Scenario's Writeup is divided into several sections.
+                                <ul>
+                                    <li>
+                                        Use heading levels within each section to automatically create sub-section links
+                                        in the completed Scenario's index.
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                The writeup is editable by anyone who has spoiled the Scenario, like a wiki page.
+                            </li>
+                            <li>
+                                <b>Save often.</b> You can always edit your Scenario.
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+                <div class="css-writeup-section">
+                    <h3 class="css-scenario-section-header">
+                        Overview Section
+                        <small>(Optional)</small>
+                    </h3>
+                    <div class="css-writeup-section-help">
+                        {{ writeup_form.overview.help_text |safe}}
+                    </div>
+                    {{ writeup_form.overview}}
+                </div>
+                <div class="css-writeup-section">
+                    <h3 class="css-scenario-section-header">
+                        Backstory Section
+                        <small>(Optional)</small>
+                    </h3>
+                    <div class="css-writeup-section-help">
+                        {{ writeup_form.backstory.help_text|safe}}
+                    </div>
+                    {{ writeup_form.backstory}}
+                </div>
+                <div class="css-writeup-section">
+                    <h3 class="css-scenario-section-header">
+                        Introduction and Briefing Section
+                    </h3>
+                    <div class="css-writeup-section-help">
+                        {{ writeup_form.introduction.help_text|safe}}
+                    </div>
+                    {{ writeup_form.introduction}}
+                </div>
+                <div class="css-writeup-section">
+                    <h3 class="css-scenario-section-header">
+                        Mission Section
+                    </h3>
+                    <div class="css-writeup-section-help">
+                        {{ writeup_form.mission.help_text|safe}}
+                    </div>
+                    {{ writeup_form.mission}}
+                </div>
+                <div class="css-writeup-section">
+                    <h3 class="css-scenario-section-header">
+                        Aftermath Section
+                        <small>(Optional)</small>
+                    </h3>
+                    <div class="css-writeup-section-help">
+                        {{ writeup_form.aftermath.help_text|safe}}
+                    </div>
+                    {{ writeup_form.aftermath}}
+                </div>
+
+                <div class="text-center" style="margin-top: 25px;">
+                    <input class="btn btn-lg btn-primary" type="submit" value="Save Scenario" />
+                </div>
+            </div>
         </div>
     </form>
 </div>

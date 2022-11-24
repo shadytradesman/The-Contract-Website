@@ -22,6 +22,60 @@ class ScenarioModelChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
          return obj.choice_txt()
 
+SCENARIO_TINYMCE_SETTINGS = {
+    "theme": "silver",
+    "height": 500,
+    "menubar": False,
+    "plugins": "advlist,autolink,lists,link,image,charmap,print,preview,anchor,"
+               "searchreplace,visualblocks,code,fullscreen,insertdatetime,media,table,paste,"
+               "code,help,wordcount",
+    "toolbar": "formatselect fontselect fontsizeselect | "
+               "bold italic strikethrough underline removeformat | backcolor forecolor | alignleft aligncenter "
+               "| bullist numlist link unlink | table | image"
+               " | help ",
+    "toolbar_mode": 'wrap',
+    'content_css': "/static/css/site.css,/static/games/scenario_widget.css",
+}
+
+new_scenario_widget = TinyMCE(
+    attrs={
+        'cols': 80,
+        'rows': 20
+    },
+    mce_attrs=SCENARIO_TINYMCE_SETTINGS,
+)
+class ScenarioWriteupForm(forms.Form):
+    overview = forms.CharField(label='Overview',
+                               required=False,
+                               widget=new_scenario_widget,
+                               max_length=70000,
+                               help_text='Provide a high-level outline of the Scenario that gives GMs a clear idea of how it runs.')
+    backstory = forms.CharField(label='Backstory',
+                                required=False,
+                                widget=new_scenario_widget,
+                                max_length=70000,
+                                help_text='This is GM pre-reading. Describe the characters and events that led to the '
+                                          'situation the Contractors encounter.')
+    introduction = forms.CharField(label='Intro and Briefing',
+                                   required=False,
+                                   widget=new_scenario_widget,
+                                   max_length=70000,
+                                   help_text='How are the Contractors gathered? How are they briefed? <b>What is the '
+                                             'Contract\'s objective?</b>')
+    mission = forms.CharField(label='Mission',
+                              required=False,
+                              widget=new_scenario_widget,
+                              max_length=70000,
+                              help_text='This is the bulk of the Contract. Include guidance on scenes, characters, and '
+                                        'rolls. Remember to use heading levels in the editor '
+                                        'to split it into easy-to-navigate sub-sections.')
+    aftermath = forms.CharField(label='Aftermath',
+                                required=False,
+                                widget=new_scenario_widget,
+                                max_length=70000,
+                                help_text='What happens after the Contract is over? What if Contractors return to the scene of the crime? '
+                                          'Provide guidance for Loose Ends or Moves.')
+
 class CreateScenarioForm(forms.Form):
     title = forms.CharField(label='Title',
                            max_length=130,
@@ -31,6 +85,7 @@ class CreateScenarioForm(forms.Form):
                               required=False,
                               help_text="Summarize the Scenario so that people who have already played it can recognize it.")
     description = forms.CharField(label='Write-up',
+                                  required=False,
                             widget=TinyMCE(attrs={'cols': 80, 'rows': 30}),
                             max_length=70000,
                             help_text='Describe the Scenario in detail. Win conditions, enemies, background, etc.')
