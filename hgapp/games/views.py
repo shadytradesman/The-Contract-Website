@@ -155,10 +155,10 @@ def edit_scenario_new(request, scenario):
     mission = scenario.get_latest_of_section(MISSION)
     aftermath = scenario.get_latest_of_section(AFTERMATH)
     writeup_form_initial = {"overview": overview.content if overview else None,
-                                      "backstory": backstory.content if backstory else None,
-                                      "introduction": introduction.content if introduction else None,
-                                      "mission": mission.content if mission else None,
-                                      "aftermath": aftermath.content if aftermath else None, }
+                            "backstory": backstory.content if backstory else None,
+                            "introduction": introduction.content if introduction else None,
+                            "mission": mission.content if mission else None,
+                            "aftermath": aftermath.content if aftermath else None, }
     if request.method == 'POST':
         scenario_form = None
         if can_edit_scenario:
