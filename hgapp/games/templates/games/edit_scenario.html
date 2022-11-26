@@ -20,7 +20,13 @@
 <div class="container">
     <div class="text-center">
         {% if scenario %}
-            <h1>Editing Scenario {{scenario.title}}</h1>
+            <h1>
+                Editing Scenario
+                {% if not scenario_form %}
+                    Writeup for
+                {% endif %}
+                {{scenario.title}}
+            </h1>
         {% else %}
             <h1>Create a new Scenario</h1>
         {% endif %}
@@ -43,6 +49,7 @@
                 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
                 {{ form.title | bootstrap}}
                 {{ form.summary | bootstrap}}
+                {{ form.objective | bootstrap}}
                 {{ form.description | bootstrap}}
                 <div class="row">
                     <div class="col-sm-4">

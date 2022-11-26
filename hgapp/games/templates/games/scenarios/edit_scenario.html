@@ -25,7 +25,13 @@
 <div class="container">
     <div class="text-center">
         {% if scenario %}
-            <h1>Editing Scenario {{scenario.title}}</h1>
+            <h1>
+                Editing Scenario
+                {% if not scenario_form %}
+                    Writeup for
+                {% endif %}
+                {{scenario.title}}
+            </h1>
         {% else %}
             <h1>Create a new Scenario</h1>
         {% endif %}
@@ -40,43 +46,52 @@
     >
         <div class="panel panel-default">
             <div class="panel-body">
-                {{ scenario_form.about.errors }}
-                {{ scenario_form.non_field_errors }}
                 {% csrf_token %}
-                {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-                {{ scenario_form.title | bootstrap}}
-                {{ scenario_form.summary | bootstrap}}
-                <div class="row">
-                    <div class="col-sm-4">
-                        {{ scenario_form.suggested_character_status | bootstrap }}
+                {% if scenario_form %}
+                    {{ scenario_form.about.errors }}
+                    {{ scenario_form.non_field_errors }}
+                    {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+                    {{ scenario_form.title | bootstrap}}
+                    {{ scenario_form.summary | bootstrap}}
+                    {{ scenario_form.objective | bootstrap}}
+                    <div class="row">
+                        <div class="col-sm-4">
+                            {{ scenario_form.suggested_character_status | bootstrap }}
+                        </div>
+                        <div class="col-sm-4">
+                            {{ scenario_form.min_players | bootstrap }}
+                        </div>
+                        <div class="col-sm-4">
+                            {{ scenario_form.max_players | bootstrap }}
+                        </div>
                     </div>
-                    <div class="col-sm-4">
-                        {{ scenario_form.min_players | bootstrap }}
+                    <div class="row">
+                        <div class="col-sm-4">
+                            {{ scenario_form.is_highlander | bootstrap }}
+                        </div>
+                        <div class="col-sm-4">
+                            {{ scenario_form.is_rivalry | bootstrap }}
+                        </div>
+                        <div class="col-sm-4">
+                            {{ scenario_form.requires_ringer | bootstrap }}
+                        </div>
                     </div>
-                    <div class="col-sm-4">
-                        {{ scenario_form.max_players | bootstrap }}
+                    {% if request.user.is_superuser %}
+                        <div>
+                            <h3>Scenario Tags (Admin only)</h3>
+                            {{scenario_form.tags}}
+                        </div>
+                    {% endif %}
+                    <div class="col-md-10 col-md-offset-1">
+                        {{scenario_form.is_wiki_editable |bootstrap}}
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-4">
-                        {{ scenario_form.is_highlander | bootstrap }}
-                    </div>
-                    <div class="col-sm-4">
-                        {{ scenario_form.is_rivalry | bootstrap }}
-                    </div>
-                    <div class="col-sm-4">
-                        {{ scenario_form.requires_ringer | bootstrap }}
-                    </div>
-                </div>
-                {% if request.user.is_superuser %}
-                    <div>
-                        <h3>Scenario Tags (Admin only)</h3>
-                        {{scenario_form.tags}}
-                    </div>
+                    <div style="margin-top: 15px;"></div>
                 {% endif %}
-                <h2 class="text-center">Scenario Writeup</h2>
+                {% if scenario_form %}
+                    <h2 class="text-center" style="margin-top: 0px;">Scenario Writeup</h2>
+                {% endif %}
                 <div class="row">
-                    <div class="alert alert-info col-md-6 col-md-offset-3">
+                    <div class="alert alert-info col-md-8 col-md-offset-2">
                         <ul>
                             <li>
                                 For tips on writing Scenarios, <a href="/guide/gm-manual/#writing-scenarios" style="text-decoration: underline;" target="_blank" rel="noopener noreferrer">read the Guide!</a>
@@ -90,11 +105,14 @@
                                     </li>
                                 </ul>
                             </li>
+                            {% if scenario_form %}
+                                <li>
+                                    If you've selected "Allow Community Edits" this writeup is editable by anyone who has
+                                    spoiled the Scenario, like a wiki page. You can revert any edits you'd like.
+                                </li>
+                            {% endif %}
                             <li>
-                                The writeup is editable by anyone who has spoiled the Scenario, like a wiki page.
-                            </li>
-                            <li>
-                                <b>Save often.</b> You can always edit your Scenario.
+                                <b>Save often.</b> You can always return to this page.
                             </li>
                         </ul>
                     </div>

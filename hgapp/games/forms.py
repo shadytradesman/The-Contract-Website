@@ -60,8 +60,8 @@ class ScenarioWriteupForm(forms.Form):
                                    required=False,
                                    widget=new_scenario_widget,
                                    max_length=70000,
-                                   help_text='How are the Contractors gathered? How are they briefed? <b>What is the '
-                                             'Contract\'s objective?</b>')
+                                   help_text='How are the Contractors gathered? How are they briefed? <b>What counts'
+                                             ' as a Victory, and what causes Failure?</b>')
     mission = forms.CharField(label='Mission',
                               required=False,
                               widget=new_scenario_widget,
@@ -89,6 +89,10 @@ class CreateScenarioForm(forms.Form):
                             widget=TinyMCE(attrs={'cols': 80, 'rows': 30}),
                             max_length=70000,
                             help_text='Describe the Scenario in detail. Win conditions, enemies, background, etc.')
+    objective = forms.CharField(label='Objective',
+                              max_length=400,
+                              required=True,
+                              help_text="What is the Contractors' goal in this Scenario? Be very careful with your wording.")
     max_players = forms.IntegerField(label = "Max Players", initial=4)
     min_players = forms.IntegerField(label = "Minimum Players", initial=2)
     suggested_character_status = forms.ChoiceField(label = "Required Status",
@@ -97,6 +101,15 @@ class CreateScenarioForm(forms.Form):
     is_highlander = forms.BooleanField(label = "Highlander",
                                        required=False,
                                        help_text = "Only one Contractor can achieve victory")
+    is_wiki_editable = forms.BooleanField(label = "Allow Community Edits",
+                                          required=False,
+                                          initial=True,
+                                          help_text = "If selected, anyone who has spoiled this Scenario can edit its "
+                                                      "writeup ala a wiki page. Only you, the Scenario's original "
+                                                      "creator, can edit the primary details of the Scenario such as "
+                                                      "its summary, objective, required status, and title. A full "
+                                                      "revision history is kept, and you may revert any edits at will.")
+
     is_rivalry = forms.BooleanField(label = "Rivalry",
                                     required=False,
                                     help_text="The Contractors may have different or opposing goals")

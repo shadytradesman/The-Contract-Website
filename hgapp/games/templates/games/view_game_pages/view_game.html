@@ -49,10 +49,10 @@
                 {% endif %}
                 {% render_scenario_title_check_for_link game.scenario %}
                 {% if scenario_spoiled %}
-                    {% if game.scenario.summary %}
+                    {% if game.scenario.objective%}
                         <div style="padding-left: 10px; padding-right: 10px;">
                             <small>
-                                {{game.scenario.summary}}
+                                {{game.scenario.objective}}
                             </small>
                         </div>
                     {% endif %}

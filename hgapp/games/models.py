@@ -766,6 +766,7 @@ class Scenario(models.Model):
     summary = models.TextField(max_length=5000, blank=True, null=True)
     description = models.TextField(max_length=74000, blank=True)
     is_wiki_editable = models.BooleanField(default=True)
+    objective = models.TextField(max_length=5000, blank=True)
     created_date = models.DateTimeField('date created', auto_now_add=True)
 
     suggested_status = models.CharField(choices=HIGH_ROLLER_STATUS,
@@ -811,6 +812,16 @@ class Scenario(models.Model):
 
     def __str__(self):
         return self.title
+
+    def player_can_edit_writeup(self, user):
+        if user == self.creator:
+            return True
+        elif not self.is_wiki_editable:
+            return False
+        if user.is_superuser or user.profile.early_access_user:
+            return self.creator.is_superuser or self.creator.profile.early_access_user
+        return False
+
 
     def is_valid(self):
         return self.num_words > 1000
@@ -980,6 +991,8 @@ class ScenarioWriteup(models.Model):
         self.__update_word_count()
         super(ScenarioWriteup, self).save(*args, **kwargs)
 
+    def should_display_objective(self):
+        return self.section in [OVERVIEW, INTRODUCTION]
     def __update_word_count(self):
         soup = BeautifulSoup(self.content, features="html5lib")
         self.num_words = len(soup.text.split())

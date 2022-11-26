@@ -164,15 +164,17 @@ def edit_scenario_new(request, scenario):
         if can_edit_scenario:
             scenario_form = CreateScenarioForm(request.POST)
         writeup_form = ScenarioWriteupForm(request.POST, initial=writeup_form_initial)
-        if not scenario_form or (scenario_form and scenario_form.is_valid()) and writeup_form.is_valid():
+        if (not scenario_form or (scenario_form and scenario_form.is_valid())) and writeup_form.is_valid():
             if can_edit_scenario:
                 scenario.title = scenario_form.cleaned_data['title']
                 scenario.summary = scenario_form.cleaned_data['summary']
+                scenario.objective = scenario_form.cleaned_data['objective']
                 scenario.max_players = scenario_form.cleaned_data['max_players']
                 scenario.min_players = scenario_form.cleaned_data['min_players']
                 scenario.suggested_status = scenario_form.cleaned_data['suggested_character_status']
                 scenario.is_highlander = scenario_form.cleaned_data['is_highlander']
                 scenario.is_rivalry = scenario_form.cleaned_data['is_rivalry']
+                scenario.is_wiki_editable = scenario_form.cleaned_data['is_wiki_editable']
                 scenario.requires_ringer = scenario_form.cleaned_data['requires_ringer']
                 if request.user.is_superuser:
                     scenario.tags.set(scenario_form.cleaned_data["tags"])
@@ -222,11 +224,13 @@ def edit_scenario_new(request, scenario):
             scenario_form = CreateScenarioForm(initial={
                 'title': scenario.title,
                 'summary': scenario.summary,
+                'objective': scenario.objective,
                 'max_players': scenario.max_players,
                 'min_players': scenario.min_players,
                 'suggested_character_status': scenario.suggested_status,
                 'is_highlander': scenario.is_highlander,
                 'is_rivalry': scenario.is_rivalry,
+                'is_wiki_editable': scenario.is_wiki_editable,
                 'requires_ringer': scenario.requires_ringer,
                 'tags': scenario.tags.all(),
             })
@@ -252,11 +256,13 @@ def edit_scenario_old(request, scenario):
             writeup.content = form.cleaned_data['description']
             scenario.title = form.cleaned_data['title']
             scenario.summary = form.cleaned_data['summary']
+            scenario.objective= form.cleaned_data['objective']
             scenario.max_players=form.cleaned_data['max_players']
             scenario.min_players=form.cleaned_data['min_players']
             scenario.suggested_status=form.cleaned_data['suggested_character_status']
             scenario.is_highlander=form.cleaned_data['is_highlander']
             scenario.is_rivalry=form.cleaned_data['is_rivalry']
+            scenario.is_wiki_editable=form.cleaned_data['is_wiki_editable']
             scenario.requires_ringer=form.cleaned_data['requires_ringer']
             with transaction.atomic():
                 if scenario.creator == writeup.writer:
@@ -271,15 +277,17 @@ def edit_scenario_old(request, scenario):
     else:
         # Build a scenario form.
         form = CreateScenarioForm(initial={'title': scenario.title,
-                                            'summary': scenario.summary,
-                                            'description': writeup.content,
-                                            'max_players': scenario.max_players,
-                                            'min_players': scenario.min_players,
-                                            'suggested_character_status': scenario.suggested_status,
-                                            'is_highlander': scenario.is_highlander,
-                                            'is_rivalry': scenario.is_rivalry,
-                                            'requires_ringer': scenario.requires_ringer,
-                                            'tags': scenario.tags.all(),
+                                           'summary': scenario.summary,
+                                           'objective': scenario.objective,
+                                           'description': writeup.content,
+                                           'max_players': scenario.max_players,
+                                           'min_players': scenario.min_players,
+                                           'suggested_character_status': scenario.suggested_status,
+                                           'is_highlander': scenario.is_highlander,
+                                           'is_rivalry': scenario.is_rivalry,
+                                           'is_wiki_editable': scenario.is_wiki_editable,
+                                           'requires_ringer': scenario.requires_ringer,
+                                           'tags': scenario.tags.all(),
                                            })
         context = {
             'scenario': scenario,
@@ -312,8 +320,9 @@ def view_scenario(request, scenario_id, game_id=None):
                 raise ValueError("Invalid Game for feedback")
         return HttpResponseRedirect(reverse('games:games_view_scenario', args=(scenario.id,)))
     else:
-        viewer_can_edit = request.user.is_superuser \
-                          or (request.user.is_authenticated and request.user.id == scenario.creator.id)
+        viewer_can_edit = False
+        if request.user.is_authenticated:
+            viewer_can_edit = scenario.player_can_edit_writeup(request.user)
         games_completed = scenario.finished_games().order_by("-end_time")
         game_feedback_form = GameFeedbackForm()
         is_public = scenario.is_public()

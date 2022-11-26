@@ -104,6 +104,11 @@
                                 {{section.get_section_display}}
                             </h2>
                         </div>
+                        {% if section.should_display_objective and scenario.objective %}
+                            <div class="css-scenario-subheader">
+                                Objective:  {{scenario.objective}}
+                            </div>
+                        {% endif %}
                     </div>
                     <div class="panel-body" style="overflow: hidden">
                         <div class="css-writeup-contents" id="js-scenario-{{section.section}}-contents">
