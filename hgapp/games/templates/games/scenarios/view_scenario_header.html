@@ -6,6 +6,11 @@
                     Edit Scenario
                 </a>
             </li>
+        <li>
+            <a class="btn-default" href="{% url 'games:scenario_history' scenario.id %}">
+                View Edit History
+            </a>
+        </li>
         {% endif %}
         <li>
             <a class="btn-default" href="{% url 'games:games_view_scenario_gallery' %}">My Scenario Gallery</a>

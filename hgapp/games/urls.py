@@ -28,6 +28,8 @@ urlpatterns = [
     url(r'^view/s/(?P<scenario_id>[\d]+)/$',
         RedirectView.as_view(pattern_name='games:games_view_scenario', query_string=True, permanent=True)),
 
+    path('scenario/history/<int:scenario_id>/', views.view_scenario_history, name='scenario_history'),
+
     # ex: .com/contract/view/s/110/g/1231
     url(r'^view/s/(?P<scenario_id>[\d]+)/g/(?P<game_id>[\d]+)/$', views.view_scenario, name='games_view_scenario_feedback'),
 

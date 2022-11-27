@@ -326,6 +326,7 @@ def view_scenario(request, scenario_id, game_id=None):
         games_completed = scenario.finished_games().order_by("-end_time")
         game_feedback_form = GameFeedbackForm()
         is_public = scenario.is_public()
+        sections = scenario.get_latest_of_all_writeup_sections()
         context = {
             'show_spoiler_warning': show_spoiler_warning,
             'scenario': scenario,
@@ -333,12 +334,29 @@ def view_scenario(request, scenario_id, game_id=None):
             'viewer_can_edit': viewer_can_edit,
             'games_completed': games_completed,
             'game_feedback_form': game_feedback_form,
-            'writeup_sections': scenario.get_latest_of_all_writeup_sections(),
+            'writeup_sections': sections,
+            'last_edit': scenario.get_last_edit(),
         }
         if request.user.is_superuser or (hasattr(request.user, "profile") and request.user.profile and request.user.profile.early_access_user):
             return render(request, 'games/scenarios/view_scenario.html', context)
         else:
             return render(request, 'games/view_scenario.html', context)
+
+
+def view_scenario_history(request, scenario_id):
+    scenario = get_object_or_404(Scenario, id=scenario_id)
+    if not scenario.is_public() and not request.user.is_authenticated:
+        raise PermissionDenied("You don't have permission to view this scenario")
+    if not scenario.is_public() and not scenario.player_discovered(request.user):
+        raise PermissionDenied("You don't have permission to view this scenario")
+    edits = ScenarioWriteup.objects.filter(relevant_scenario=scenario).order_by("-created_date").all()
+    context = {
+        "scenario": scenario,
+        "page_data": {
+            "edits": [x.to_blob(request) for x in edits],
+        },
+    }
+    return render(request, 'games/scenarios/scenario_edit_history.html', context)
 
 
 @login_required

@@ -3,6 +3,8 @@ import logging
 from django.db import models
 from django.db.models import Count
 from django.conf import settings
+from django.forms.models import model_to_dict
+
 from characters.models import Character, HIGH_ROLLER_STATUS, Character_Death, ExperienceReward, AssetDetails, EXP_GM, \
     EXP_LOSS_V2, EXP_WIN_V2, EXP_LOSS_RINGER_V2, EXP_WIN_RINGER_V2, EXP_LOSS_IN_WORLD_V2, EXP_WIN_IN_WORLD_V2, EXP_MVP,\
     EXP_WIN_V1, EXP_LOSS_V1, Artifact, EXP_GM_MOVE, EXP_GM_RATIO, EXP_GM_NEW_PLAYER
@@ -822,7 +824,6 @@ class Scenario(models.Model):
             return self.creator.is_superuser or self.creator.profile.early_access_user
         return False
 
-
     def is_valid(self):
         return self.num_words > 1000
 
@@ -944,6 +945,12 @@ class Scenario(models.Model):
                 sections.append(section)
         return sections
 
+    def get_last_edit(self):
+        return ScenarioWriteup.objects \
+            .filter(relevant_scenario=self, is_deleted=False) \
+            .order_by("-created_date") \
+            .first()
+
     def save(self, *args, **kwargs):
         if self.pk is None:
             super(Scenario, self).save(*args, **kwargs)
@@ -991,8 +998,20 @@ class ScenarioWriteup(models.Model):
         self.__update_word_count()
         super(ScenarioWriteup, self).save(*args, **kwargs)
 
+    def to_blob(self, request):
+        blob = model_to_dict(self)
+        blob["created_date"] = self.created_date
+        blob["section_display"] = self.get_section_display()
+        blob["writer_url"] = request.build_absolute_uri(reverse('profiles:profiles_view_profile', args=(self.writer.id,)))
+        blob["writer_username"] = self.writer.username
+        return blob
+
     def should_display_objective(self):
-        return self.section in [OVERVIEW, INTRODUCTION]
+        return self.section in [INTRODUCTION, MISSION, AFTERMATH]
+
+    def is_overview(self):
+        return self.section in [OVERVIEW]
+
     def __update_word_count(self):
         soup = BeautifulSoup(self.content, features="html5lib")
         self.num_words = len(soup.text.split())

@@ -1,22 +1,49 @@
 <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
     <div class="panel panel-default">
         <div class="panel-heading">
-            <div id="scenario-history" class="css-guide-section"></div>
+            {% if scenario.summary %}
+            <div class="text-center">
+                <h4 style="font-size: 16px;">
+                    {{ scenario.summary }}
+                </h4>
+            </div>
+            <hr>
+            {% endif %}
+            <div class="ext-muted" style="margin-top: 8px;">
+                <div class="">
+                    <b>
+                        Objective:
+                    </b>
+                    {{scenario.objective}}
+                </div>
+            </div>
+            <div>
+                <h5 style="margin-top: 10px; margin-bottom:5px;">
+                    Suggested for
+                    <b>{{scenario.min_players}}</b>
+                    to
+                    <b>{{scenario.max_players}}</b>
+                    <b>{{scenario.get_suggested_status_display}}</b>
+                    {% if scenario.requires_ringer %}
+                    Contractors and a Ringer.
+                    {% else %}
+                    Contractors.
+                    {% endif %}
+                </h5>
+            </div>
             {% if games_completed %}
             <a role="button" data-toggle="collapse" href="#collapseActivity" aria-expanded="true" aria-controls="collapseActivity">
-                <div class="" role="tab" id="summaryHeading">
-                    <h2>
-                        Scenario History
-                    </h2>
-                    <div class="css-scenario-subheader">
+                <b>
+                    Contract Record:
+                </b>
+                <span class="" role="tab" id="summaryHeading">
                         Run {{scenario.times_run}} time{{scenario.times_run|pluralize}} by {{scenario.num_gms_run}} GM{{scenario.times_run|pluralize}}.
                         {{scenario.num_victories}} victories and {{scenario.num_deaths}} deaths.
-                        <div>
-                            <small>
-                                (Click to expand history)
-                            </small>
-                        </div>
-                    </div>
+                </span>
+                <div>
+                    <small>
+                        (Click to expand)
+                    </small>
                 </div>
             </a>
             {% else %}

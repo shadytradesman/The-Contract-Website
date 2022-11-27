@@ -438,3 +438,10 @@ $(function(){
         }
     }
 });
+
+
+/* TABLE STYLING */
+$(document).ready(function()
+{
+    $("tr:odd").addClass("css-even-row");
+});

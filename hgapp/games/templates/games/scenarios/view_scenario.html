@@ -50,51 +50,39 @@
                 </div>
             </div>
         </div>
-        <div class="visible-xs-block" style="height: 20px;"></div>
+        <div class="visible-xs-block" style="height: 40px;"></div>
         <div class="css-guidebook-col">
+            {% include "games/scenarios/view_scenario_header.html" %}
             <div class="text-center"
-                 {% if scenario.is_valid %}
-                 class="css-scenario-with-writeup-title"
-                 {% endif %}
-            >
+                 style="margin-bottom: 15px;">
+                <div id="scenario-history" class="css-guide-section"></div>
                 <h1 style="margin-bottom: 5px;">
                     {{ scenario.title }}
                 </h1>
                 <h4 class="text-center" style="margin-top: 5px; margin-bottom: 5px;">
                     A
-                    {% if scenario_writeup.is_rivalry or scenario_writeup.is_highlander %}
                     {% if scenario_writeup.is_rivalry %}Rivalry{% endif %} {% if scenario_writeup.is_highlander %}Highlander{% endif %}
-                    {% endif %}
                     Scenario written by
                     <a href="{% url 'profiles:profiles_view_profile' scenario.creator.profile.id %}">{% user_display scenario.creator %}</a>
                 </h4>
-                <h5 style="margin-top: 0px; margin-bottom:5px;">
-                    Suggested for
-                    <b>{{scenario.min_players}}</b>
-                    to
-                    <b>{{scenario.max_players}}</b>
-                    <b>{{scenario.get_suggested_status_display}}</b>
-                    {% if scenario.requires_ringer %}
-                    Contractors and a Ringer.
-                    {% else %}
-                    Contractors.
-                    {% endif %}
-                    <div class="text-muted">
-                        {% include "games/view_scenario_writeup_stats.html" %}
-                    </div>
+                {% if last_edit %}
+                <h5  class="text-muted" style="margin-top: 0px; margin-bottom:5px;">
+                    Last edited by
+                    <a href="{% url 'profiles:profiles_view_profile' last_edit.writer.id %}">
+                        {{last_edit.writer.username}}
+                    </a>
+                    on {{last_edit.created_date}}
                 </h5>
-                {% if scenario.summary %}
-                <div class="css-scenario-subheader">
-                    {{ scenario.summary }}
-                </div>
                 {% endif %}
+                <div class="text-muted">
+                    {% include "games/view_scenario_writeup_stats.html" %}
+                </div>
             </div>
-
-            {% include "games/scenarios/view_scenario_header.html" %}
 
             <div class="panel panel-default css-scenario-section-panel">
-                    {% include "games/scenarios/scenario_history.html" %}
+                {% include "games/scenarios/scenario_history.html" %}
             </div>
+
             {% for section in writeup_sections %}
                 <div class="panel panel-default css-scenario-section-panel">
                     <div class="panel-heading">
