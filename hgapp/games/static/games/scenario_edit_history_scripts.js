@@ -7,11 +7,13 @@ const HistoryRendering = {
         edits: [],
         diffPrevEdit: null,
         diffNextEdit: null,
+        viewerCanEdit: false,
     }
   },
   methods: {
       setInitial() {
         this.edits = pageData["edits"];
+        this.viewerCanEdit = pageData["can_edit"];
       },
       getLastEdit(edit) {
         return this.edits.filter(ed => ed["section"] == edit["section"]).find(ed => new Date(ed["created_date"]) < new Date(edit["created_date"]));
@@ -40,6 +42,10 @@ const HistoryRendering = {
       },
       getEditDiffHeader(edit) {
         return  edit['writer_username'] + " on " + new Date(edit['created_date']).toLocaleString();
+      },
+      updateFormId(editId) {
+        $("#id_writeup_id").val(editId);
+        console.log("blah");
       }
   }
 

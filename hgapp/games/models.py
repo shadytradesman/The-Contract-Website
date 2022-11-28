@@ -1006,6 +1006,10 @@ class ScenarioWriteup(models.Model):
         blob["writer_username"] = self.writer.username
         return blob
 
+    def is_most_recent_for_section(self):
+        most_recent = ScenarioWriteup.objects.filter(relevant_scenario=self.relevant_scenario, section=self.section).order_by("-created_date").first()
+        return most_recent == self
+
     def should_display_objective(self):
         return self.section in [INTRODUCTION, MISSION, AFTERMATH]
 

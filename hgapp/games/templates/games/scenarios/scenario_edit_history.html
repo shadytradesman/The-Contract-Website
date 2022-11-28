@@ -21,9 +21,15 @@
 
 {% block body_base %}
 <div class="container" id="vue-app">
+    <form action="{% url 'games:scenario_history' scenario.id %}" method="post">
+    {% csrf_token %}
+    {{form.writeup_id}}
     <div class="text-center">
         <h1>
-            Edit History for {{scenario.title}}
+            Edit History for
+            <a href="{% url 'games:games_view_scenario' scenario.id %}">
+                {{scenario.title}}
+            </a>
         </h1>
     </div>
     <div class="panel panel-default">
@@ -73,9 +79,9 @@
                 </tr>
             </table>
             <div v-if="diffPrevEdit">
-                <h3 class="text-center">Viewing Edit Difference</h3>
+                <h2 class="text-center">Viewing Edit Difference</h2>
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-sm-6">
                         <div class="css-edit-header">
                             <b>
                                 Previous Edit:
@@ -85,12 +91,10 @@
                             </span>
                         </div>
                         <div  class="css-edit-subheader" v-if="!isLatestEdit(diffPrevEdit)">
-                            <a class="btn btn-default">
-                                Revert to this Edit
-                            </a>
+                            <input type="submit" @click="updateFormId(diffPrevEdit['id'])" value="Revert to this Edit" v-if="viewerCanEdit" class="btn btn-default" />
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-sm-6 hidden-xs">
                         <div class="css-edit-header">
                             <b>
                                 Selected Edit:
@@ -100,9 +104,7 @@
                             </span>
                         </div>
                         <div class="css-edit-subheader" v-if="!isLatestEdit(diffNextEdit)">
-                            <a class="btn btn-default ">
-                                Revert to this Edit
-                            </a>
+                            <input type="submit" @click="updateFormId(diffNextEdit['id'])"  value="Revert to this Edit" v-if="viewerCanEdit" class="btn btn-default" />
                         </div>
                         <div class="css-edit-subheader" v-if="isLatestEdit(diffNextEdit)">
                             (This is the current version of this section)
@@ -110,7 +112,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-sm-6">
                         <h2 class="css-section-header" v-text="diffPrevEdit['section_display']">
                         </h2>
                         <div class="css-edit-content css-writeup-contents">
@@ -118,7 +120,24 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <hr class="visible-xs-block">
+                    <div class="col-sm-6 visible-xs-block">
+                        <div class="css-edit-header">
+                            <b>
+                                Selected Edit:
+                            </b>
+                            <span  v-text="getEditDiffHeader(diffNextEdit)">
+
+                            </span>
+                        </div>
+                        <div class="css-edit-subheader" v-if="!isLatestEdit(diffNextEdit)">
+                            <input type="submit" @click="updateFormId(diffNextEdit['id'])" value="Revert to this Edit" v-if="viewerCanEdit" class="btn btn-default" />
+                        </div>
+                        <div class="css-edit-subheader" v-if="isLatestEdit(diffNextEdit)">
+                            (This is the current version of this section)
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
                         <h2 class="css-section-header" v-text="diffPrevEdit['section_display']">
                         </h2>
                         <div class="css-edit-content css-writeup-contents">
@@ -130,5 +149,6 @@
             </div>
         </div>
     </div>
+    </form>
 </div>
 {% endblock %}

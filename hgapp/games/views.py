@@ -23,7 +23,7 @@ logger = logging.getLogger("app." + __name__)
 from games.forms import CreateScenarioForm, CellMemberAttendedForm, make_game_form, make_allocate_improvement_form, \
     CustomInviteForm, make_accept_invite_form, ValidateAttendanceForm, DeclareOutcomeForm, GameFeedbackForm, \
     OutsiderAttendedForm, make_who_was_gm_form,make_archive_game_general_info_form, get_archival_outcome_form, \
-    RsvpAttendanceForm, make_edit_move_form, ScenarioWriteupForm
+    RsvpAttendanceForm, make_edit_move_form, ScenarioWriteupForm, RevertToEditForm
 from .game_form_utilities import get_context_for_create_finished_game, change_time_to_current_timezone, convert_to_localtime, \
     create_archival_game, get_context_for_completed_edit, handle_edit_completed_game, get_context_for_choose_attending, \
     get_gm_form, get_outsider_formset, get_member_formset, get_players_for_new_attendances
@@ -349,14 +349,38 @@ def view_scenario_history(request, scenario_id):
         raise PermissionDenied("You don't have permission to view this scenario")
     if not scenario.is_public() and not scenario.player_discovered(request.user):
         raise PermissionDenied("You don't have permission to view this scenario")
-    edits = ScenarioWriteup.objects.filter(relevant_scenario=scenario).order_by("-created_date").all()
-    context = {
-        "scenario": scenario,
-        "page_data": {
-            "edits": [x.to_blob(request) for x in edits],
-        },
-    }
-    return render(request, 'games/scenarios/scenario_edit_history.html', context)
+    if request.method == 'POST':
+        if not scenario.player_can_edit_writeup(request.user):
+            raise PermissionDenied("You don't have permission to edit this scenario")
+        form = RevertToEditForm(request.POST)
+        if form.is_valid():
+            writeup = get_object_or_404(ScenarioWriteup, id=form.cleaned_data["writeup_id"])
+            if writeup.relevant_scenario != scenario:
+                raise ValueError("Writeup is not for this scenario.")
+            if writeup.is_most_recent_for_section():
+                raise ValueError("Writeup is most recent for the given section.")
+            new_writeup = ScenarioWriteup(relevant_scenario=scenario,
+                                          writer=request.user,
+                                          content=writeup.content,
+                                          section=writeup.section)
+            with transaction.atomic():
+                new_writeup.save()
+            return HttpResponseRedirect(reverse('games:games_view_scenario', args=(scenario.id,)))
+        else:
+            raise ValueError("Invalid writeup revert form.")
+    else:
+        edits = ScenarioWriteup.objects.filter(relevant_scenario=scenario).order_by("-created_date").all()
+        form = RevertToEditForm()
+        viewer_can_edit = scenario.player_can_edit_writeup(request.user)
+        context = {
+            "scenario": scenario,
+            "form": form,
+            "page_data": {
+                "edits": [x.to_blob(request) for x in edits],
+                "can_edit": viewer_can_edit,
+            },
+        }
+        return render(request, 'games/scenarios/scenario_edit_history.html', context)
 
 
 @login_required

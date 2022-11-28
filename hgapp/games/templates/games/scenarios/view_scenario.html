@@ -71,7 +71,14 @@
                     <a href="{% url 'profiles:profiles_view_profile' last_edit.writer.id %}">
                         {{last_edit.writer.username}}
                     </a>
-                    on {{last_edit.created_date}}
+                    on
+                    {% if viewer_can_edit %}
+                    <a href="{% url 'games:scenario_history' scenario.id %}">
+                        {{last_edit.created_date}}
+                    </a>
+                    {% else %}
+                    {{last_edit.created_date}}
+                    {% endif %}
                 </h5>
                 {% endif %}
                 <div class="text-muted">

@@ -120,6 +120,13 @@ class CreateScenarioForm(forms.Form):
                                           required=False,
                                           widget=forms.CheckboxSelectMultiple)
 
+
+class RevertToEditForm(forms.Form):
+    writeup_id = forms.IntegerField(label=None,
+                                    widget=forms.HiddenInput(),
+                                    required=True,)
+
+
 class CustomInviteForm(forms.Form):
     username = forms.CharField(label='Player\'s Username',
                                 max_length=200)
