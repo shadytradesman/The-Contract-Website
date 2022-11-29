@@ -163,6 +163,34 @@ class Game(models.Model):
             ('edit_game', 'Edit game'),
         )
 
+    def save(self, *args, **kwargs):
+        if not hasattr(self, 'gm'):
+            self.gm = self.creator
+        if not hasattr(self, 'scenario') or not self.scenario:
+            scenario = Scenario(creator=self.gm,
+                                title=str(self.title),
+                                description="Put the details of the Scenario here",
+                                suggested_status=HIGH_ROLLER_STATUS[0][0],
+                                max_players=5,
+                                min_players=2)
+            scenario.save()
+            writeup = ScenarioWriteup(writer=self.gm,
+                                      relevant_scenario=scenario,
+                                      content="Put the details of the Scenario here",
+                                      section=MISSION)
+            writeup.save()
+            self.scenario = scenario
+        if self.pk is None:
+            super(Game, self).save(*args, **kwargs)
+            assign_perm('view_game', self.creator, self)
+            assign_perm('view_game', self.gm, self)
+            assign_perm('edit_game', self.creator, self)
+        else:
+            super(Game, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return "[" + self.status + "] " + self.scenario.title + " run by: " + self.gm.username
+
     def player_can_edit(self, player):
         if player.is_superuser:
             return True
@@ -459,35 +487,6 @@ class Game(models.Model):
                     for scenario in die_in_contract_scenarios:
                         scenario.unlocked_discovery(player)
 
-    def save(self, *args, **kwargs):
-        if not hasattr(self, 'gm'):
-            self.gm = self.creator
-        if not hasattr(self, 'scenario') or not self.scenario:
-            scenario = Scenario(creator=self.gm,
-                                title=str(self.title),
-                                description="Put the details of the Scenario here",
-                                suggested_status=HIGH_ROLLER_STATUS[0][0],
-                                max_players=5,
-                                min_players=2)
-            scenario.save()
-            writeup = ScenarioWriteup(writer=self.gm,
-                                      relevant_scenario=scenario,
-                                      section_mission="Put the details of the Scenario here",
-                                      suggested_status=HIGH_ROLLER_STATUS[0][0],
-                                      max_players=5,
-                                      min_players=2)
-            writeup.save()
-            self.scenario = scenario
-        if self.pk is None:
-            super(Game, self).save(*args, **kwargs)
-            assign_perm('view_game', self.creator, self)
-            assign_perm('view_game', self.gm, self)
-            assign_perm('edit_game', self.creator, self)
-        else:
-            super(Game, self).save(*args, **kwargs)
-
-    def __str__(self):
-        return "[" + self.status + "] " + self.scenario.title + " run by: " + self.gm.username
 
 
 class Game_Attendance(models.Model):
@@ -989,7 +988,7 @@ class ScenarioWriteup(models.Model):
         ]
 
     def __str__(self):
-        return "Section: {} by {} for {}".format(
+        return "[{}] (by {}) {}".format(
             self.get_section_display(),
             self.writer.username,
             self.relevant_scenario.title,)

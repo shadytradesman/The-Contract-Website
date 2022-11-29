@@ -11,25 +11,30 @@
 
 {% block modal_body %}
 <p>
-    In The Contract, each Contractor's Gifts are custom-made to fit their concept.
-    However, using the Gift Builder to create Gifts from scratch can be daunting for newbies and is a skill in its own right.
+    In The Contract, each Contractor's Gifts (powers, supernatural items, etc.) are tailor-made to fit their character
+    concept. However, using the
+    <a href="{% url 'powers:powers_create_ps2' %}"  target="_blank" rel="noopener noreferrer">
+        Gift Builder
+    </a>
+    to create custom Gifts can be a skill in its own right.
 </p>
 <p>
-    To make things easier, you can use these Stock Gifts as starting points.
+    New Players may use these {{total_gift_count}} Stock Gifts as inspiration and starting points for their own Contractors'
+    custom Gifts. The Stock Gifts are arranged by character theme and cover a wide range of concepts.
 </p>
 <p>
-    These {{total_gift_count}} Stock Gifts cover many popular power and item
-    concepts. Although they are arranged by character theme, there are no classes in The Contract. Any Contractor may
-    select Gifts from any category, and Players are encouraged to customize their Gifts to match their Contractor’s concept.
+    There are no character classes in The Contract. Any Contractor may
+    select Gifts from any category, and Players are encouraged to customize their Gifts to match their Contractor’s unique flavor.
+</p>
+<h4>Obtaining and Improving Gifts</h4>
+<p>
+    When a Contractor claims victory on a Contract, they receive a Gift Credit. All Stock Gifts can be purchased with a
+    single Gift Credit and improved in the future with additional Gift Credits. Many powerful enhancements can be
+    purchased via the “customize” page for each Gift, so don't mistake these starting points as the end-all of Contractor
+    advancement.
 </p>
 <p>
-    Contractors receive a Gift Credit when they claim victory on a Contract. All Stock Gifts can be purchased with a
-    single Gift Credit and improved in the future with additional Gift Credits or Improvements. Many powerful
-    enhancements can be purchased via the “customize” page for each Gift, so don't mistake these starting-points as the
-    end-all of Contractor advancement.
-</p>
-<p>
-    All of these Stock Gifts were created with the Gift Builder, and each one's system text was automatically generated.
+    All of the Stock Gifts were created using the Gift Builder, and each one's system text was automatically generated.
     Their systems are simple but specific. While such precise systems can be verbose, they focus gameplay on <i>using</i> Gifts
     creatively rather than <i>interpreting</i> them, and they ensure your Contractor plays the same no matter
     who is acting as GM.

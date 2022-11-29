@@ -21,11 +21,13 @@ class Command(BaseCommand):
 
                     assets = character.stats_snapshot.assetdetails_set.all()
                     for asset in assets:
-                        asset.relevant_asset.grant_element_if_needed(new_stats_rev, asset.details)
+                        elem = asset.relevant_asset.grant_element_if_needed(new_stats_rev, asset.details)
+                        elem.save()
 
                     liabilities = character.stats_snapshot.liabilitydetails_set.all()
                     for liability in liabilities:
-                        liability.relevant_liability.grant_element_if_needed(new_stats_rev, liability.details)
+                        elem = liability.relevant_liability.grant_element_if_needed(new_stats_rev, liability.details)
+                        elem.save()
 
                     new_stats_rev.save()
                     character.regen_stats_snapshot()

@@ -2351,34 +2351,42 @@ class QuirkDetails(models.Model):
             return self.relevant_loose_end
         return None
 
+    def grant_quirk_element(self):
+        element = self.relevant_quirk().grant_element_if_needed(self.relevant_stats, self.details)
+        if element:
+            if isinstance(element, Condition):
+                self.relevant_condition = element
+            if isinstance(element, Circumstance):
+                self.relevant_circumstance = element
+            if isinstance(element, LooseEnd):
+                self.relevant_loose_end = element
+        super().save()
+
 
 class AssetDetails(QuirkDetails):
     relevant_asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        if self.previous_revision and self.is_deleted:
-            if self.relevant_asset.grants_gift:
-                VoidAssetGifts.send_robust(sender=self.__class__,
-                                           assetDetail=self,
-                                           character=self.relevant_stats.assigned_character)
+        if self.previous_revision:
             elem = self.previous_revision.relevant_element()
-            if elem:
-                elem.mark_deleted("Asset refunded", True)
+            if self.is_deleted:
+                if self.relevant_asset.grants_gift:
+                    VoidAssetGifts.send_robust(sender=self.__class__,
+                                               assetDetail=self,
+                                               character=self.relevant_stats.assigned_character)
+                if elem:
+                    elem.mark_deleted("Asset refunded", True)
+            elif self.details != self.previous_revision.details:
+                elem.mark_deleted("Asset edited", True)
+                self.grant_quirk_element()
+
         if not self.previous_revision and not self.is_deleted:
             if self.relevant_asset.grants_gift:
                 GrantAssetGift.send_robust(sender=self.__class__,
                                       assetDetail=self,
                                       character=self.relevant_stats.assigned_character)
-            element = self.relevant_quirk().grant_element_if_needed(self.relevant_stats, self.details)
-            if element:
-                if isinstance(element, Condition):
-                    self.relevant_condition = element
-                if isinstance(element, Circumstance):
-                    self.relevant_circumstance = element
-                if isinstance(element, LooseEnd):
-                    self.relevant_loose_end = element
-                super().save(*args, **kwargs)
+            self.grant_quirk_element()
 
     class Meta:
         indexes = [
@@ -2400,32 +2408,29 @@ class LiabilityDetails(QuirkDetails):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         if not self.previous_revision and not self.is_deleted:
-            element = self.relevant_quirk().grant_element_if_needed(self.relevant_stats, self.details)
-            if element:
-                if isinstance(element, Condition):
-                    self.relevant_condition = element
-                if isinstance(element, Circumstance):
-                    self.relevant_circumstance = element
-                if isinstance(element, LooseEnd):
-                    self.relevant_loose_end = element
-                super().save(*args, **kwargs)
-        if self.previous_revision and self.is_deleted:
+            self.grant_quirk_element()
+        if self.previous_revision:
             elem = self.previous_revision.relevant_element()
             if elem:
-                elem.mark_deleted("Liability bought off", True)
+                if self.is_deleted:
+                    elem.mark_deleted("Liability bought off", True)
+                elif self.details != self.previous_revision.details:
+                    elem.mark_deleted("Liability edited", True)
+                    self.grant_quirk_element()
+
 
     def relevant_quirk(self):
         return self.relevant_liability
 
 
 class TraitValue(models.Model):
-    relevant_stats = models.ForeignKey(ContractStats,
-                                             on_delete=models.CASCADE)
+    relevant_stats = models.ForeignKey(ContractStats, on_delete=models.CASCADE)
     value = models.PositiveIntegerField()
     previous_revision = models.ForeignKey('self',
                                            null=True,
                                            blank=True,
                                            on_delete=models.CASCADE) # Used in revisioning to determine value change.
+
     class Meta:
         abstract = True
 
@@ -2446,8 +2451,7 @@ class TraitValue(models.Model):
 
 
 class AttributeValue(TraitValue):
-    relevant_attribute = models.ForeignKey(Attribute,
-                                       on_delete=models.CASCADE)
+    relevant_attribute = models.ForeignKey(Attribute, on_delete=models.CASCADE)
 
     class Meta:
         unique_together = (("relevant_attribute", "relevant_stats"))
@@ -2492,6 +2496,7 @@ class LimitRevision(models.Model):
         indexes = [
             models.Index(fields=['relevant_stats']),
         ]
+
 
 class TraumaRevision(models.Model):
     relevant_trauma = models.ForeignKey(Trauma,
