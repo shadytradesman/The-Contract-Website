@@ -44,6 +44,12 @@
     font-size: 16px;
 }
 
+.css-writeup-contents img {
+    max-width:100%;
+    object-fit: cover;
+    object-fit: contain;
+}
+
 .css-scenario-header-container {
     margin: 10px;
 }

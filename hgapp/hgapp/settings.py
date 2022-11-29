@@ -83,7 +83,7 @@ FILE_UPLOAD_HANDLERS = [
     "django.core.files.uploadhandler.MemoryFileUploadHandler",
     "django.core.files.uploadhandler.TemporaryFileUploadHandler"
 ]
-if DEBUG:
+if DEBUG and 'AWS_ACCESS_KEY_ID' not in os.environ:
     MEDIA_ROOT = os.path.join(BASE_DIR, 'media-root')
 else:
     AWS_DEFAULT_ACL = None
@@ -124,6 +124,7 @@ INSTALLED_APPS = [
     'guide.apps.GuideConfig',
     'crafting.apps.CraftingConfig',
     'emails.apps.EmailsConfig',
+    'images.apps.ImagesConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

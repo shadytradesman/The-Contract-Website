@@ -26,13 +26,59 @@ SCENARIO_TINYMCE_SETTINGS = {
     "theme": "silver",
     "height": 500,
     "menubar": False,
+    "images_upload_handler": """
+    function (blobInfo, success, failure) {
+    var xhr, formData;
+
+    xhr = new XMLHttpRequest();
+    xhr.withCredentials = false;
+    xhr.open('POST', "/image/tiny_upload/");
+
+    xhr.onload = function() {
+        var json;
+
+        if (xhr.status != 200) {
+            failure('HTTP Error: ' + xhr.status);
+            return;
+        }
+
+        json = JSON.parse(xhr.responseText);
+
+        if (!json || typeof json.location != 'string') {
+            failure('Invalid JSON: ' + xhr.responseText);
+            return;
+        }
+
+        success(json.location);
+    };
+
+    formData = new FormData();
+    formData.append('file', blobInfo.blob(), blobInfo.filename());
+    // append CSRF token in the form data
+    function getCookie(name) {
+    var nameEQ = name + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0;i < ca.length;i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') c = c.substring(1,c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+    }
+    return null;
+    }
+    let csrfValue = getCookie("csrftoken");
+    formData.append('csrfmiddlewaretoken', csrfValue);
+
+    xhr.send(formData);
+}
+    """,
     "plugins": "advlist,autolink,lists,link,image,charmap,print,preview,anchor,"
                "searchreplace,visualblocks,code,fullscreen,insertdatetime,media,table,paste,"
                "code,help,wordcount",
     "toolbar": "formatselect fontselect fontsizeselect | "
                "bold italic strikethrough underline removeformat | backcolor forecolor | alignleft aligncenter "
-               "| bullist numlist link unlink | table | image"
+               "| bullist numlist link unlink | table | image uploadimage"
                " | help ",
+    "paste_data_images": True,
     "toolbar_mode": 'wrap',
     'content_css': "/static/css/site.css,/static/games/scenario_widget.css",
 }

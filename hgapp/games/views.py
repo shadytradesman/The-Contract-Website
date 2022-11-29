@@ -86,12 +86,53 @@ def activity(request):
     return render(request, 'games/activity.html', context)
 
 
+def create_scenario_new(request):
+    if request.method == 'POST':
+        scenario_form = CreateScenarioForm(request.POST)
+        writeup_form = ScenarioWriteupForm(request.POST)
+        if scenario_form.is_valid() and writeup_form.is_valid():
+            scenario = Scenario(
+                title = scenario_form.cleaned_data['title'],
+                creator = request.user,
+                description = "legacy",
+                objective=scenario_form.cleaned_data["objective"],
+                summary=scenario_form.cleaned_data['summary'],
+                max_players=scenario_form.cleaned_data['max_players'],
+                min_players=scenario_form.cleaned_data['min_players'],
+                suggested_status=scenario_form.cleaned_data['suggested_character_status'],
+                is_highlander=scenario_form.cleaned_data['is_highlander'],
+                requires_ringer=scenario_form.cleaned_data['requires_ringer'],
+                is_rivalry=scenario_form.cleaned_data['is_rivalry']
+            )
+            if request.user.is_superuser:
+                scenario.tags.set(scenario_form.cleaned_data["tags"])
+            new_writeups = get_writeups_from_form(request, scenario,writeup_form)
+            with transaction.atomic():
+                scenario.save()
+                for writeup in new_writeups:
+                    writeup.save()
+            return HttpResponseRedirect(reverse('games:games_view_scenario', args=(scenario.id,)))
+        else:
+            print(scenario_form.errors)
+            return None
+    else:
+        scenario_form = CreateScenarioForm()
+        writeup_form = ScenarioWriteupForm()
+        context = {
+            'scenario_form': scenario_form,
+            'writeup_form': writeup_form,
+        }
+        return render(request, 'games/scenarios/edit_scenario.html', context)
+
+
 @login_required
 def create_scenario(request):
     if not request.user.is_authenticated:
         raise PermissionDenied("You must be logged in to create a Scenario")
     if not request.user.profile.confirmed_agreements:
         return HttpResponseRedirect(reverse('profiles:profiles_terms'))
+    if request.user.is_superuser or request.user.profile.early_access_user:
+        return create_scenario_new(request)
     if request.method == 'POST':
         form = CreateScenarioForm(request.POST)
         if form.is_valid():
@@ -100,6 +141,7 @@ def create_scenario(request):
                 creator = request.user,
                 description = "legacy",
                 summary=form.cleaned_data['summary'],
+                objective=form.cleaned_data["objective"],
                 max_players=form.cleaned_data['max_players'],
                 min_players=form.cleaned_data['min_players'],
                 suggested_status=form.cleaned_data['suggested_character_status'],
@@ -112,14 +154,8 @@ def create_scenario(request):
                 writeup = ScenarioWriteup(
                     writer=request.user,
                     relevant_scenario=scenario,
-                    summary=form.cleaned_data['summary'],
-                    section_mission=form.cleaned_data['description'],
-                    max_players=form.cleaned_data['max_players'],
-                    min_players=form.cleaned_data['min_players'],
-                    suggested_status=form.cleaned_data['suggested_character_status'],
-                    is_highlander=form.cleaned_data['is_highlander'],
-                    requires_ringer=form.cleaned_data['requires_ringer'],
-                    is_rivalry=form.cleaned_data['is_rivalry'])
+                    content=form.cleaned_data['description'],
+                    section=MISSION)
                 writeup.save()
                 if request.user.is_superuser:
                     scenario.tags.set(form.cleaned_data["tags"])
@@ -131,7 +167,7 @@ def create_scenario(request):
         # Build a scenario form.
         form = CreateScenarioForm()
         context = {
-            'form' : form,
+            'form': form,
         }
         return render(request, 'games/edit_scenario.html', context)
 
@@ -178,38 +214,7 @@ def edit_scenario_new(request, scenario):
                 scenario.requires_ringer = scenario_form.cleaned_data['requires_ringer']
                 if request.user.is_superuser:
                     scenario.tags.set(scenario_form.cleaned_data["tags"])
-            writeup_time = timezone.now()
-            new_writeups = []
-            if "overview" in writeup_form.changed_data:
-                new_writeups.append(ScenarioWriteup(created_date=writeup_time,
-                                                    writer=request.user,
-                                                    relevant_scenario=scenario,
-                                                    section=OVERVIEW,
-                                                    content=writeup_form.cleaned_data["overview"]))
-            if "backstory" in writeup_form.changed_data:
-                new_writeups.append(ScenarioWriteup(created_date=writeup_time,
-                                                    writer=request.user,
-                                                    relevant_scenario=scenario,
-                                                    section=BACKSTORY,
-                                                    content=writeup_form.cleaned_data["backstory"]))
-            if "introduction" in writeup_form.changed_data:
-                new_writeups.append(ScenarioWriteup(created_date=writeup_time,
-                                                    writer=request.user,
-                                                    relevant_scenario=scenario,
-                                                    section=INTRODUCTION,
-                                                    content=writeup_form.cleaned_data["introduction"]))
-            if "mission" in writeup_form.changed_data:
-                new_writeups.append(ScenarioWriteup(created_date=writeup_time,
-                                                    writer=request.user,
-                                                    relevant_scenario=scenario,
-                                                    section=MISSION,
-                                                    content=writeup_form.cleaned_data["mission"]))
-            if "aftermath" in writeup_form.changed_data:
-                new_writeups.append(ScenarioWriteup(created_date=writeup_time,
-                                                    writer=request.user,
-                                                    relevant_scenario=scenario,
-                                                    section=AFTERMATH,
-                                                    content=writeup_form.cleaned_data["aftermath"]))
+            new_writeups = get_writeups_from_form(request, scenario, writeup_form)
             with transaction.atomic():
                 for writeup in new_writeups:
                     writeup.save()
@@ -243,6 +248,40 @@ def edit_scenario_new(request, scenario):
         return render(request, 'games/scenarios/edit_scenario.html', context)
 
 
+def get_writeups_from_form(request, scenario, writeup_form):
+    writeup_time = timezone.now()
+    new_writeups = []
+    if "overview" in writeup_form.changed_data:
+        new_writeups.append(ScenarioWriteup(created_date=writeup_time,
+                                            writer=request.user,
+                                            relevant_scenario=scenario,
+                                            section=OVERVIEW,
+                                            content=writeup_form.cleaned_data["overview"]))
+    if "backstory" in writeup_form.changed_data:
+        new_writeups.append(ScenarioWriteup(created_date=writeup_time,
+                                            writer=request.user,
+                                            relevant_scenario=scenario,
+                                            section=BACKSTORY,
+                                            content=writeup_form.cleaned_data["backstory"]))
+    if "introduction" in writeup_form.changed_data:
+        new_writeups.append(ScenarioWriteup(created_date=writeup_time,
+                                            writer=request.user,
+                                            relevant_scenario=scenario,
+                                            section=INTRODUCTION,
+                                            content=writeup_form.cleaned_data["introduction"]))
+    if "mission" in writeup_form.changed_data:
+        new_writeups.append(ScenarioWriteup(created_date=writeup_time,
+                                            writer=request.user,
+                                            relevant_scenario=scenario,
+                                            section=MISSION,
+                                            content=writeup_form.cleaned_data["mission"]))
+    if "aftermath" in writeup_form.changed_data:
+        new_writeups.append(ScenarioWriteup(created_date=writeup_time,
+                                            writer=request.user,
+                                            relevant_scenario=scenario,
+                                            section=AFTERMATH,
+                                            content=writeup_form.cleaned_data["aftermath"]))
+    return new_writeups
 
 
 def edit_scenario_old(request, scenario):
