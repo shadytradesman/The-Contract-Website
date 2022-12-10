@@ -4,6 +4,7 @@
 {% load i18n %}
 {% load bootstrap %}
 {% load static %}
+{% load character_game_tags %}
 
 {% block extra_head %}
     {{ world_event_form.media }}
@@ -67,11 +68,25 @@
                         {{feedback_form | bootstrap}}
                     </div>
                 </div>
+
+                {% if element_formset %}
+                    {{ element_formset.management_form }}
+                    <h2>Contractor Handouts</h2>
+                    {% for form in element_formset %}
+                        <div class="thumbnail">
+                            {% render_element form.initial.element None False True %}
+                            <div style="margin-top: 5px;">
+                                {{ form | bootstrap }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
                 {% if world_event_form %}
                     <div class="row">
                         <div class="col-xs-12">
                             <div class="clearfix">
-                                <h4>Post new World Event to {{game.cell.name}}</h4>
+                                <h2>Post a new World Event to {{game.cell.name}}</h2>
                                 {{ world_event_form.headline | bootstrap }}
                                 {{ world_event_form.event_description | bootstrap}}
                             </div>

@@ -989,6 +989,12 @@ class Scenario(models.Model):
             .distinct("designation")\
             .select_related("relevant_element")
 
+    def get_latest_of_all_elements(self):
+        return self.scenarioelement_set \
+            .order_by().order_by("designation", "-created_date") \
+            .distinct("designation") \
+            .select_related("relevant_element")
+
     def get_latest_of_all_elements_of_type(self, element_type):
         return self.scenarioelement_set.filter(type=element_type)\
             .order_by().order_by("designation", "-created_date")\

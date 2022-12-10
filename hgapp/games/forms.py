@@ -426,6 +426,21 @@ class ValidateAttendanceForm(forms.Form):
     def attendance(self):
         return self.initial['game_attendance']
 
+
+def make_grant_element_form(character_queryset):
+    class GrantElementForm(forms.Form):
+        grant_to_characters = forms.ModelMultipleChoiceField(
+            queryset=character_queryset,
+            widget=forms.CheckboxSelectMultiple(),
+            label="Grant to Contractors"
+        )
+        element_id = forms.CharField(label=None,
+                                     max_length=200,
+                                     widget=forms.HiddenInput(),
+                                     required=True,)
+    return GrantElementForm
+
+
 class DeclareOutcomeForm(forms.Form):
     def __init__(self, *args, **kwargs):
         # self.initial is set in super

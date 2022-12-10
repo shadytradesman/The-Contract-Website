@@ -24,7 +24,8 @@ logger = logging.getLogger("app." + __name__)
 from games.forms import CreateScenarioForm, CellMemberAttendedForm, make_game_form, make_allocate_improvement_form, \
     CustomInviteForm, make_accept_invite_form, ValidateAttendanceForm, DeclareOutcomeForm, GameFeedbackForm, \
     OutsiderAttendedForm, make_who_was_gm_form,make_archive_game_general_info_form, get_archival_outcome_form, \
-    RsvpAttendanceForm, make_edit_move_form, ScenarioWriteupForm, RevertToEditForm, make_grant_stock_element_form
+    RsvpAttendanceForm, make_edit_move_form, ScenarioWriteupForm, RevertToEditForm, make_grant_stock_element_form, \
+    make_grant_element_form
 from .game_form_utilities import get_context_for_create_finished_game, change_time_to_current_timezone, convert_to_localtime, \
     create_archival_game, get_context_for_completed_edit, handle_edit_completed_game, get_context_for_choose_attending, \
     get_gm_form, get_outsider_formset, get_member_formset, get_players_for_new_attendances, get_element_formset, \
@@ -939,6 +940,7 @@ def end_game(request, game_id):
     DeclareOutcomeFormset = formset_factory(DeclareOutcomeForm, extra=0)
     game_attendances = game.game_attendance_set.all()
     initial_data = []
+    character_ids = []
     for game_attendance in game_attendances:
         initial = {
             'player': game_attendance.game_invite.invited_player.id,
@@ -946,14 +948,29 @@ def end_game(request, game_id):
             'hidden_attendance': game_attendance.id,
         }
         initial_data.append(initial)
+        if game_attendance.attending_character:
+            character_ids.append(game_attendance.attending_character.pk)
+    character_queryset = Character.objects.filter(pk__in=character_ids)
+    GrantElementForm = make_grant_element_form(character_queryset)
+    GrantElementFormset = formset_factory(GrantElementForm, extra=0)
+    scenario = game.scenario
+    initial_elements = [{
+        "element_id": x.pk,
+        "element": x
+    } for x in scenario.get_latest_of_all_elements() if not x.is_deleted]
     if request.method == 'POST':
         declare_outcome_formset = DeclareOutcomeFormset(request.POST, initial=initial_data)
         game_feedback_form = GameFeedbackForm(request.POST)
         world_event_form = None
+        if initial_elements:
+            element_formset = GrantElementFormset(request.POST, initial=initial_elements)
+        else:
+            element_formset = None
         if game.cell.player_can_post_world_events(request.user):
             world_event_form = EditWorldEventForm(request.POST)
         if declare_outcome_formset.is_valid() and game_feedback_form.is_valid() \
-                and (not world_event_form or world_event_form.is_valid()):
+                and (not world_event_form or world_event_form.is_valid())\
+                and (not element_formset or element_formset.is_valid()):
             if len([x for x in declare_outcome_formset if x.cleaned_data["MVP"]]) > 1:
                 raise ValueError("More than one MVP in completed edit")
             with transaction.atomic():
@@ -979,6 +996,11 @@ def end_game(request, game_id):
                     webhooks = game.cell.webhook_cell.filter(send_for_events=True).all()
                     for webhook in webhooks:
                         webhook.post_for_event(world_event, request)
+                if element_formset:
+                    for form in element_formset:
+                        element = form.initial["element"]
+                        for character in form.cleaned_data["grant_to_characters"]:
+                            element.relevant_element.grant_to_character(character, request.user)
                 game.save()
                 game.transition_to_finished()
                 GameEnded.send_robust(sender=None, game=game, request=request)
@@ -990,15 +1012,17 @@ def end_game(request, game_id):
             raise ValueError("Invalid form")
     else:
         formset = DeclareOutcomeFormset(initial=initial_data)
+        element_formset = GrantElementFormset(initial=initial_elements)
         game_feedback = GameFeedbackForm()
         world_event_form = None
         if game.cell.player_can_post_world_events(request.user):
             world_event_form = EditWorldEventForm()
         context = {
-            'formset':formset,
-            'feedback_form':game_feedback,
+            'formset': formset,
+            'feedback_form': game_feedback,
             'world_event_form': world_event_form,
-            'game':game,
+            'game': game,
+            'element_formset': element_formset if len(initial_elements) > 0 else None,
         }
         return render(request, 'games/end_game.html', context)
 

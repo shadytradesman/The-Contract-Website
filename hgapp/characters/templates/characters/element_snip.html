@@ -2,7 +2,12 @@
 
 <div class="css-scenario-element">
 {% if is_loose_end %}
-  <h4>{{element.name}}</h4>
+  <h4>
+    {% if render_type %}
+      {{element.get_type_display}}:
+    {% endif %}
+    {{element.name}}
+  </h4>
   <div>
     <h5>
       Description
@@ -24,7 +29,12 @@
     </div>
   </div>
 {% else %}
-  <h4>{{element.name}}</h4>
+  <h4>
+    {% if render_type %}
+      {{element.get_type_display}}:
+    {% endif %}
+    {{element.name}}
+  </h4>
   <div>
     {{element.description}}
     {% if element.system %}
