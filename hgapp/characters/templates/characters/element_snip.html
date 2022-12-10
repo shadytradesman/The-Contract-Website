@@ -34,6 +34,7 @@
     {% endif %}
   </div>
 {% endif %}
+  {% if show_grant_form %}
   <div style="margin-top: 10px;">
   {% if grant_element_form %}
       <form class="js-world-element-form"
@@ -53,4 +54,5 @@
     <div class="text-muted">You must schedule or run a Contract using this Scenario to grant its handouts to Contractors</div>
   {% endif %}
   </div>
+  {% endif %}
 </div>

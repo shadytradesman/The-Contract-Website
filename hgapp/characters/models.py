@@ -1452,6 +1452,13 @@ class StockWorldElement(models.Model):
     def __str__(self):
         return "[{}] {} - {}".format(self.get_type_display(), self.category.name, self.name)
 
+    def count_words(self):
+        return len(self.name.split(" ")) + \
+               len(self.description.split(" ")) + \
+               len(self.system.split(" ")) + \
+               len(self.how_to_tie_up.split(" "))
+
+
     def grant_to_character(self, stats, name_override=None):
         name = name_override if name_override is not None else self.name
         if self.type in [CONDITION, CIRCUMSTANCE, TROPHY]:

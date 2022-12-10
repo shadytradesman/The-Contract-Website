@@ -15,10 +15,12 @@ from django.utils import timezone
 from bs4 import BeautifulSoup
 from .games_constants import EXP_V1_V2_GAME_ID
 from guardian.shortcuts import assign_perm
+
 from postman.api import pm_write
 from django.urls import reverse
 from django.utils.safestring import SafeText
 from games.games_constants import GAME_STATUS, get_completed_game_excludes_query, get_scheduled_game_excludes_query
+from characters.templatetags.character_game_tags import render_scenario_element
 from functools import reduce
 
 from hgapp.utilities import get_object_or_none
@@ -1052,6 +1054,7 @@ class ScenarioWriteup(models.Model):
         blob["section_display"] = self.get_section_display()
         blob["writer_url"] = request.build_absolute_uri(reverse('profiles:profiles_view_profile', args=(self.writer.id,)))
         blob["writer_username"] = self.writer.username
+        blob["is_element"] = False
         return blob
 
     def is_most_recent_for_section(self):
@@ -1094,6 +1097,18 @@ class ScenarioElement(models.Model):
             return "Circumstances"
         if self.type == TROPHY:
             return "Trophies"
+
+    def to_blob(self, request):
+        blob = model_to_dict(self)
+        blob["created_date"] = self.created_date
+        blob["section_display"] = "{}: {}".format(self.designation, self.relevant_element.name)
+        blob["section"] = self.designation
+        blob["writer_url"] = request.build_absolute_uri(reverse('profiles:profiles_view_profile', args=(self.creator.id,)))
+        blob["writer_username"] = self.creator.username
+        blob["num_words"] = self.relevant_element.count_words()
+        blob["content"] = render_scenario_element(self, request)
+        blob["is_element"] = True
+        return blob
 
 class Scenario_Discovery(models.Model):
     discovering_player = models.ForeignKey(settings.AUTH_USER_MODEL,

@@ -4,6 +4,7 @@ from characters.forms import make_world_element_form, make_transfer_artifact_for
     make_consumable_use_form
 from characters.models import LOST, DESTROYED, RECOVERED, REPAIRED, AT_HOME, LOOSE_END
 from django.urls import reverse
+from django.template.loader import render_to_string
 
 register = template.Library()
 
@@ -100,12 +101,3 @@ def render_sig_item(artifact, user, viewing_character=None, rewarding_character=
         "is_preview": is_preview,
     }
 
-
-@register.inclusion_tag('characters/element_snip.html')
-def render_element(scenario_element, grant_element_form):
-    return {
-        "element": scenario_element.relevant_element,
-        "is_loose_end": scenario_element.relevant_element.type == LOOSE_END,
-        "scenario_element": scenario_element,
-        "grant_element_form":  grant_element_form,
-    }

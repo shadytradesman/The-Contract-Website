@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from heapq import merge
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.forms import formset_factory
@@ -442,13 +443,17 @@ def view_scenario_history(request, scenario_id):
             raise ValueError("Invalid writeup revert form.")
     else:
         edits = ScenarioWriteup.objects.filter(relevant_scenario=scenario).order_by("-created_date").all()
+        element_edits = ScenarioElement.objects.filter(relevant_scenario=scenario).order_by("-created_date").all()
+        writeup_edit_blobs = [x.to_blob(request) for x in edits]
+        element_edit_blobs = [x.to_blob(request) for x in element_edits]
+        edit_blobs = merge(writeup_edit_blobs, element_edit_blobs, key=lambda x: x["created_date"], reverse=True)
         form = RevertToEditForm()
         viewer_can_edit = scenario.player_can_edit_writeup(request.user)
         context = {
             "scenario": scenario,
             "form": form,
             "page_data": {
-                "edits": [x.to_blob(request) for x in edits],
+                "edits": list(edit_blobs),
                 "can_edit": viewer_can_edit,
             },
         }
@@ -466,6 +471,8 @@ def grant_element(request, element_id):
         if grant_element_form.is_valid():
             with transaction.atomic():
                 character = grant_element_form.cleaned_data["contractor"]
+                if not character.player_can_edit(request.user):
+                    raise PermissionDenied("do not have permissions to edit character")
                 element.relevant_element.grant_to_character(character, request.user)
             return JsonResponse({"name": character.name}, status=200)
     return JsonResponse({"error": ""}, status=400)

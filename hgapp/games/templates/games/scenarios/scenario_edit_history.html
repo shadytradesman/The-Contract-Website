@@ -43,7 +43,7 @@
                         Editor
                     </th>
                     <th>
-                        Section
+                        Section / Handout
                     </th>
                     <th>
                         Words
@@ -59,7 +59,10 @@
                     </td>
                     <td >
                         <span v-text="edit['section_display']"></span>
-                        <span class="css-diff-text" v-if="isLatestEdit(edit)">
+                        <span class="css-diff-text" v-if="isLatestEdit(edit) && edit['is_deleted']">
+                            (Deleted)
+                        </span>
+                        <span class="css-diff-text" v-if="isLatestEdit(edit) && !edit['is_deleted']">
                             (Current)
                         </span>
                     </td>
@@ -70,7 +73,7 @@
                                 (<span v-text="getEditDiff(edit)"></span>)
                             </span>
                         </div>
-                        <div v-if="getLastEdit(edit)">
+                        <div v-if="getLastEdit(edit) && ! edit['is_deleted']">
                             <a @click="viewEditDiff" v-bind:data-edit-id="edit['id']">
                                 View Edit Difference
                             </a>
@@ -90,7 +93,7 @@
 
                             </span>
                         </div>
-                        <div  class="css-edit-subheader" v-if="!isLatestEdit(diffPrevEdit)">
+                        <div  class="css-edit-subheader" v-if="!isLatestEdit(diffPrevEdit) && !diffPrevEdit['is_element']">
                             <input type="submit" @click="updateFormId(diffPrevEdit['id'])" value="Revert to this Edit" v-if="viewerCanEdit" class="btn btn-default" />
                         </div>
                     </div>
@@ -103,11 +106,11 @@
 
                             </span>
                         </div>
-                        <div class="css-edit-subheader" v-if="!isLatestEdit(diffNextEdit)">
+                        <div class="css-edit-subheader" v-if="!isLatestEdit(diffNextEdit) && !diffNextEdit['is_element']">
                             <input type="submit" @click="updateFormId(diffNextEdit['id'])"  value="Revert to this Edit" v-if="viewerCanEdit" class="btn btn-default" />
                         </div>
                         <div class="css-edit-subheader" v-if="isLatestEdit(diffNextEdit)">
-                            (This is the current version of this section)
+                            (This is the current version of this section/handout)
                         </div>
                     </div>
                 </div>
@@ -130,15 +133,15 @@
 
                             </span>
                         </div>
-                        <div class="css-edit-subheader" v-if="!isLatestEdit(diffNextEdit)">
+                        <div class="css-edit-subheader" v-if="!isLatestEdit(diffNextEdit) && !diffNextEdit['is_element']">
                             <input type="submit" @click="updateFormId(diffNextEdit['id'])" value="Revert to this Edit" v-if="viewerCanEdit" class="btn btn-default" />
                         </div>
                         <div class="css-edit-subheader" v-if="isLatestEdit(diffNextEdit)">
-                            (This is the current version of this section)
+                            (This is the current version of this section/handout)
                         </div>
                     </div>
                     <div class="col-sm-6">
-                        <h2 class="css-section-header" v-text="diffPrevEdit['section_display']">
+                        <h2 class="css-section-header" v-text="diffNextEdit['section_display']">
                         </h2>
                         <div class="css-edit-content css-writeup-contents">
                             <div v-html="diffNextEdit['content']">

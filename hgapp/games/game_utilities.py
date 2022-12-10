@@ -1,7 +1,7 @@
 from collections import defaultdict
 from django.core.cache import cache
 
-from games.models import Game_Attendance
+from .models import Game_Attendance
 
 
 # Get the contractor's contacts. Returns a mapping from contractor to a list of tuples of games they were encountered on
