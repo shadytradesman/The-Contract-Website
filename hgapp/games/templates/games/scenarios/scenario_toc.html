@@ -15,6 +15,27 @@
                 </li>
                 <ol class="nav nav-pills nav-stacked css-inner-nav-list"></ol>
             {% endfor %}
+            {% if elements %}
+                <li role="presentation">
+                    <a href="#scenario-elements" class="">
+                        Contractor Handouts
+                    </a>
+                </li>
+                <ol class="nav nav-pills nav-stacked css-inner-nav-list">
+                    {% for type, element_list in elements.items %}
+                        <li role="presentation" class="css-li-H1">
+                            <a href="#element-{{type}}">{{type}}</a>
+                        </li>
+                        <ol class="nav nav-pills nav-stacked css-inner-nav-list">
+                            {% for element in element_list %}
+                                <li role="presentation" class="css-li-H2">
+                                    <a href="#element-{{element.id}}">{{element.relevant_element.name}}</a>
+                                </li>
+                            {% endfor %}
+                        </ol>
+                    {% endfor %}
+                </ol>
+            {% endif %}
         </ol>
     </li>
 </ul>

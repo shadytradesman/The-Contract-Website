@@ -3,6 +3,8 @@
 {% load static %}
 {% load account_tags %}
 {% load games_tags %}
+{% load character_tags %}
+{% load bootstrap %}
 
 
 {% block head_title %}Viewing Scenario{% endblock %}
@@ -29,6 +31,7 @@
     </script>
     <script src="{% static 'games/new_view_scenario_scripts.js' %}"></script>
     <script src="{% static 'guide/read_guide_scripts.js' %}"></script>
+    <script src="{% static 'overrides/wiki-macro-scripts.js' %}"></script>
 {% endblock %}
 
 {% block body_base %}
@@ -112,6 +115,28 @@
                     </div>
                 </div>
             {% endfor %}
+            {% if elements %}
+                <div class="panel panel-default css-scenario-section-panel">
+                    <div class="panel-heading">
+                        <div id="scenario-elements" class="css-guide-section"></div>
+                        <div role="tab">
+                            <h2>
+                                Contractor Handouts
+                            </h2>
+                        </div>
+                    </div>
+                    <div class="panel-body" style="overflow: hidden">
+                        {% for type, element_list in elements.items %}
+                            <div id="element-{{type}}" class="css-guide-section"></div>
+                            <h3>{{type}}</h3>
+                            {% for element in element_list %}
+                                <div id="element-{{element.id}}" class="css-guide-section"></div>
+                                {% render_element element grant_element_form %}
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>

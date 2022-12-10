@@ -1,0 +1,86 @@
+{% load bootstrap %}
+
+{{condition_formset.management_form}}
+{{circumstance_formset.management_form}}
+{{loose_end_formset.management_form}}
+{{trophy_formset.management_form}}
+
+<div>
+    <h2 class="text-center">
+        Contractor Handouts
+    </h2>
+    <div class="row">
+        <div class="alert alert-info col-md-8 col-md-offset-2">
+            <ul>
+                <li>
+                    GMs can grant these Loose Ends, Conditions, Circumstances, and Trophies to Contractors who
+                    play in this Scenario.
+                </li>
+                <li>
+                    At game-time, the GM can add them via the Contractor's character sheet.
+                </li>
+                <li>
+                    At the end of the Contract, the GM may grant them when declaring winners and losers.
+                </li>
+            </ul>
+        </div>
+
+    </div>
+    <h3>Loose Ends</h3>
+    <div class="js-element-form-container">
+        {% for form in loose_end_formset %}
+                {% include "games/scenarios/loose_end_form.html" %}
+        {% endfor %}
+    </div>
+    <div>
+        <a class="btn btn-default js-add-element" data-template-id="loose-end-form-template" data-management-form-id="#id_loose-end-TOTAL_FORMS">
+            Add Loose End
+         </a>
+    </div>
+
+    <h3>Conditions</h3>
+    <div class="js-element-form-container">
+        {% for form in condition_formset %}
+            <div class="css-scenario-element">
+                <h4>{{form.initial.designation}}</h4>
+                {{ form|bootstrap }}
+            </div>
+        {% endfor %}
+    </div>
+    <div>
+        <a class="btn btn-default js-add-element" data-template-id="condition-form-template" data-management-form-id="#id_Condition-TOTAL_FORMS">
+            Add Condition
+        </a>
+    </div>
+
+    <h3>Circumstances</h3>
+    <div class="js-element-form-container">
+        {% for form in circumstance_formset %}
+            <div class="css-scenario-element">
+                <h4>{{form.initial.designation}}</h4>
+                {{ form|bootstrap }}
+            </div>
+        {% endfor %}
+    </div>
+    <div>
+        <a class="btn btn-default js-add-element" data-template-id="circumstance-form-template" data-management-form-id="#id_Circumstance-TOTAL_FORMS">
+            Add Circumstance
+        </a>
+    </div>
+
+    <h3>Trophies</h3>
+    <div class="js-element-form-container">
+        {% for form in trophy_formset %}
+            <div class="css-scenario-element">
+                <h4>{{form.initial.designation}}</h4>
+                {{ form|bootstrap }}
+            </div>
+        {% endfor %}
+    </div>
+    <div>
+        <a class="btn btn-default js-add-element" data-template-id="trophy-form-template" data-management-form-id="#id_Trophy-TOTAL_FORMS">
+            Add Trophy
+        </a>
+    </div>
+</div>
+

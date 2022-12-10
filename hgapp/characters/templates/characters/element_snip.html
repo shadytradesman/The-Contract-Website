@@ -1,0 +1,56 @@
+{% load bootstrap %}
+
+<div class="css-scenario-element">
+{% if is_loose_end %}
+  <h4>{{element.name}}</h4>
+  <div>
+    <h5>
+      Description
+    </h5>
+    <div class="css-loose-end-subsection">
+      {{element.description}}
+    </div>
+    <h5>
+      Threat ({{element.get_threat_level_display}})
+    </h5>
+    <div class="css-loose-end-subsection">
+      {{element.system}}
+    </div>
+    <h5>
+      How to tie up
+    </h5>
+    <div class="css-loose-end-subsection">
+      {{element.how_to_tie_up}}
+    </div>
+  </div>
+{% else %}
+  <h4>{{element.name}}</h4>
+  <div>
+    {{element.description}}
+    {% if element.system %}
+      <i>
+        ({{element.system}})
+      </i>
+    {% endif %}
+  </div>
+{% endif %}
+  <div style="margin-top: 10px;">
+  {% if grant_element_form %}
+      <form class="js-world-element-form"
+            data-grant-stock-element-url="{% url 'games:games_grant_element' scenario_element.id %}">
+        {% csrf_token %}
+        <a class="btn btn-default btn-sm wiki-entry-collapsible">Grant to Contractor</a>
+        <div class="collapse-content clearfix" style="display:none; padding-top: 10px;">
+          <div class="">
+            {{grant_element_form|bootstrap}}
+          </div>
+          <input type="submit" class="btn btn-primary" value="Grant" />
+        </div>
+        <span class="js-granted-banner text-info"></span>
+      </form>
+  {% else %}
+    <a class="btn btn-default btn-sm wiki-entry-collapsible disabled">Grant to Contractor</a>
+    <div class="text-muted">You must schedule or run a Contract using this Scenario to grant its handouts to Contractors</div>
+  {% endif %}
+  </div>
+</div>

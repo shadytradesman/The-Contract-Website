@@ -1,0 +1,46 @@
+{% load bootstrap %}
+<div class="thumbnail js-loose-end-form">
+
+{% if form.initial %}
+    <h4>{{form.initial.designation}}</h4>
+{% else %}
+    <h4>New Loose End</h4>
+{% endif %}
+
+{{form.designation}}
+
+{% if form.initial %}
+    {{form.is_deleted |bootstrap }}
+{% else %}
+    <div style="display: none;">
+        {{form.is_deleted |bootstrap }}
+    </div>
+{% endif %}
+
+<div class="text-center">
+    <i>
+        <h4>
+            Visible to the Player
+        </h4>
+    </i>
+</div>
+<div class="row">
+    <div class="col-xs-12 col-md-6">
+        {{form.name|bootstrap}}
+    </div>
+    <div class="col-xs-12 col-md-6">
+        {{form.threat_level|bootstrap}}
+    </div>
+</div>
+<div class="text-center">
+    <i>
+        <h4>
+            Hidden from the Player
+        </h4>
+    </i>
+</div>
+{{form.threat|bootstrap}}
+{{form.cutoff|bootstrap}}
+{{form.details|bootstrap}}
+{{form.how_to_tie_up|bootstrap}}
+</div>

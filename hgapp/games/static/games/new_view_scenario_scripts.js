@@ -65,3 +65,27 @@ $(function(){
         scrollToc();
     })
 });
+
+// add world element
+$(".js-world-element-form").submit(function (e) {
+    e.preventDefault();
+    var serializedData = $(this).serialize();
+    var form = $(this);
+
+    $.ajax({
+        type: 'POST',
+        url: $(this).attr("data-grant-stock-element-url"),
+        data: serializedData,
+        success: function (response) {
+            form.trigger('reset');
+            let name = response["name"];
+            form.find(".js-granted-banner").text("Granted to " + name);
+            form.find(".wiki-entry-collapsible")[0].click();
+            setTimeout(() => {form.find(".js-granted-banner").text("")}, 8000);
+        },
+        error: function (response) {
+            console.log(response);
+            alert(response["responseJSON"]["error"]);
+        }
+    })
+})

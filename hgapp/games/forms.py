@@ -12,7 +12,8 @@ from django.db.models import Q
 
 from games.models import OUTCOME, ScenarioTag, REQUIRED_HIGH_ROLLER_STATUS, INVITE_MODE, GameMedium
 from .games_constants import EXP_V1_V2_GAME_ID
-from characters.models import Character
+from characters.models import Character, ELEMENT_TYPE
+from characters.forms import LooseEndForm
 
 from bootstrap3_datetime.widgets import DateTimePicker
 
@@ -167,6 +168,23 @@ class CreateScenarioForm(forms.Form):
                                           widget=forms.CheckboxSelectMultiple)
 
 
+class ScenarioElementForm(forms.Form):
+    designation = forms.CharField(max_length=120,
+                                  widget=forms.HiddenInput(),
+                                  required=False)
+    is_deleted = forms.BooleanField(required=False, label="Delete")
+
+
+class ScenarioConditionCircumstanceForm(ScenarioElementForm):
+    name = forms.CharField(max_length=150, required=True)
+    description = forms.CharField(max_length=5000, required=True)
+    system = forms.CharField(max_length=1000, required=True)
+
+
+class ScenarioLooseEndForm(LooseEndForm, ScenarioElementForm):
+    pass
+
+
 class RevertToEditForm(forms.Form):
     writeup_id = forms.IntegerField(label=None,
                                     widget=forms.HiddenInput(),
@@ -304,13 +322,40 @@ def buildContractorChoiceIterator(game_cell=None):
                 ]
     return ContractorChoiceIterator
 
-class CharDisplayModelChoiceField(ModelChoiceField):
+class CharDisplayByCellModelChoiceField(ModelChoiceField):
     def __init__(self, world=None, *args, **kwargs):
         self.iterator = buildContractorChoiceIterator(world)
         super().__init__(*args, **kwargs)
 
     def label_from_instance(self, character):
         return "{} ({} Victories)".format(character.name, character.number_of_victories())
+
+
+def buildContractorChoiceByActiveIterator(active_characters, previous_characters):
+    class ContractorChoiceIterator(ModelChoiceIterator):
+        def __len__(self):
+            return self.queryset.count()
+
+        def __iter__(self):
+            queryset = chain(active_characters, previous_characters)
+            groups = groupby(queryset, key=lambda x: x in active_characters)
+            for active, contractors in groups:
+                yield [
+                    "Active Contractors" if active else "Previous Contractors",
+                    [
+                        (contractor.id, contractor.name)
+                        for contractor in contractors
+                    ]
+                ]
+    return ContractorChoiceIterator
+
+class CharDisplayByActiveModelChoiceField(ModelChoiceField):
+    def __init__(self, active_characters, previous_characters, *args, **kwargs):
+        self.iterator = buildContractorChoiceByActiveIterator(active_characters, previous_characters)
+        super().__init__(*args, **kwargs)
+
+    def label_from_instance(self, character):
+        return "{}".format(character.name)
 
 
 def make_accept_invite_form(invitation):
@@ -332,23 +377,35 @@ def make_accept_invite_form(invitation):
         else:
             raise ValueError("unanticipated required roller status")
         if invitation.as_ringer or invitation.relevant_game.allow_ringers:
-            attending_character = CharDisplayModelChoiceField(
+            attending_character = CharDisplayByCellModelChoiceField(
                 world=invitation.relevant_game.cell,
                 queryset=queryset,
                 empty_label="Play an NPC Ringer",
                 required=False)
 
         else:
-            attending_character = CharDisplayModelChoiceField(
+            attending_character = CharDisplayByCellModelChoiceField(
                 world=invitation.relevant_game.cell,
                 queryset=queryset,
                 empty_label=None,
                 help_text="Declare which character you're attending with. Private "
                            "Characters and their Gifts will be revealed to the "
-                           "Contract creator if selected.",
+                           "GM if selected.",
                 required=True,)
     return AcceptInviteForm
 
+
+def make_grant_stock_element_form(scenario, gm):
+    class GrantStockElementForm(forms.Form):
+        active_characters = scenario.get_active_characters_for_gm(gm)
+        previous_characters = scenario.get_finished_characters_for_gm(gm)
+        contractor = CharDisplayByActiveModelChoiceField(
+            active_characters=active_characters,
+            previous_characters=previous_characters,
+            queryset=active_characters | previous_characters,
+            empty_label=None,
+            required=True,)
+    return GrantStockElementForm
 
 class ValidateAttendanceForm(forms.Form):
     attending = forms.BooleanField(label="",
@@ -481,7 +538,7 @@ def get_archival_outcome_form(game_id):
                                 widget=forms.HiddenInput(),
                                 required=False,)
 
-        attending_character = CharDisplayModelChoiceField(queryset=Character.objects.all(),
+        attending_character = CharDisplayByCellModelChoiceField(queryset=Character.objects.all(),
                                                         empty_label="Played a Ringer",
                                                         help_text="Declare which character this player brought.",
                                                         required=False)

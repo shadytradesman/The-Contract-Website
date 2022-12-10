@@ -23,21 +23,25 @@ logger = logging.getLogger("app." + __name__)
 from games.forms import CreateScenarioForm, CellMemberAttendedForm, make_game_form, make_allocate_improvement_form, \
     CustomInviteForm, make_accept_invite_form, ValidateAttendanceForm, DeclareOutcomeForm, GameFeedbackForm, \
     OutsiderAttendedForm, make_who_was_gm_form,make_archive_game_general_info_form, get_archival_outcome_form, \
-    RsvpAttendanceForm, make_edit_move_form, ScenarioWriteupForm, RevertToEditForm
+    RsvpAttendanceForm, make_edit_move_form, ScenarioWriteupForm, RevertToEditForm, make_grant_stock_element_form
 from .game_form_utilities import get_context_for_create_finished_game, change_time_to_current_timezone, convert_to_localtime, \
     create_archival_game, get_context_for_completed_edit, handle_edit_completed_game, get_context_for_choose_attending, \
-    get_gm_form, get_outsider_formset, get_member_formset, get_players_for_new_attendances
+    get_gm_form, get_outsider_formset, get_member_formset, get_players_for_new_attendances, get_element_formset, \
+    save_new_elements_from_formsets
 from .games_constants import GAME_STATUS, EXP_V1_V2_GAME_ID, get_completed_game_excludes_query
 
 from cells.forms import EditWorldEventForm
 from cells.models import WorldEvent
 
 from games.models import Scenario, Game, DISCOVERY_REASON, Game_Invite, Game_Attendance, Reward, REQUIRED_HIGH_ROLLER_STATUS, \
-    Move, GameChangeStartTime, GameEnded, ScenarioWriteup, MISSION, OVERVIEW, BACKSTORY, INTRODUCTION, AFTERMATH
+    Move, GameChangeStartTime, GameEnded, ScenarioWriteup, MISSION, OVERVIEW, BACKSTORY, INTRODUCTION, AFTERMATH, \
+    ScenarioElement
 
 from profiles.models import Profile
 
-from characters.models import Character
+from characters.models import Character, LOOSE_END, CONDITION, TROPHY, CIRCUMSTANCE, StockWorldElement
+
+from characters.forms import get_default_world_element_choice_form
 
 from hgapp.utilities import get_queryset_size, get_object_or_none
 
@@ -195,12 +199,22 @@ def edit_scenario_new(request, scenario):
                             "introduction": introduction.content if introduction else None,
                             "mission": mission.content if mission else None,
                             "aftermath": aftermath.content if aftermath else None, }
+    POST = request.POST if request.method == "POST" else None;
+    condition_formset = get_element_formset(scenario, POST, CONDITION)
+    circumstance_formset = get_element_formset(scenario, POST, CIRCUMSTANCE)
+    loose_end_formset = get_element_formset(scenario, POST, LOOSE_END)
+    trophy_formset = get_element_formset(scenario, POST, TROPHY)
     if request.method == 'POST':
         scenario_form = None
         if can_edit_scenario:
             scenario_form = CreateScenarioForm(request.POST)
         writeup_form = ScenarioWriteupForm(request.POST, initial=writeup_form_initial)
-        if (not scenario_form or (scenario_form and scenario_form.is_valid())) and writeup_form.is_valid():
+        if (not scenario_form or (scenario_form and scenario_form.is_valid())) \
+                and writeup_form.is_valid() \
+                and condition_formset.is_valid() \
+                and circumstance_formset.is_valid() \
+                and loose_end_formset.is_valid() \
+                and trophy_formset.is_valid():
             if can_edit_scenario:
                 scenario.title = scenario_form.cleaned_data['title']
                 scenario.summary = scenario_form.cleaned_data['summary']
@@ -220,6 +234,10 @@ def edit_scenario_new(request, scenario):
                     writeup.save()
                 scenario.update_word_count()
                 scenario.save()
+                save_new_elements_from_formsets(request, scenario, condition_formset, CONDITION)
+                save_new_elements_from_formsets(request, scenario, circumstance_formset, CIRCUMSTANCE)
+                save_new_elements_from_formsets(request, scenario, loose_end_formset, LOOSE_END)
+                save_new_elements_from_formsets(request, scenario, trophy_formset, TROPHY)
             return HttpResponseRedirect(reverse('games:games_view_scenario', args=(scenario.id,)))
         else:
             raise ValueError("Invalid form " + str(writeup_form.errors) + " scenario: " + str(scenario_form.errors))
@@ -244,6 +262,10 @@ def edit_scenario_new(request, scenario):
             'scenario': scenario,
             'scenario_form': scenario_form,
             'writeup_form': writeup_form,
+            'condition_formset': condition_formset,
+            'circumstance_formset': circumstance_formset,
+            'trophy_formset': trophy_formset,
+            'loose_end_formset': loose_end_formset,
         }
         return render(request, 'games/scenarios/edit_scenario.html', context)
 
@@ -307,6 +329,7 @@ def edit_scenario_old(request, scenario):
                 if scenario.creator == writeup.writer:
                     scenario.save()
                 writeup.save()
+                scenario.update_word_count()
                 if request.user.is_superuser:
                     scenario.tags.set(form.cleaned_data["tags"])
             return HttpResponseRedirect(reverse('games:games_view_scenario', args=(scenario.id,)))
@@ -359,6 +382,10 @@ def view_scenario(request, scenario_id, game_id=None):
                 raise ValueError("Invalid Game for feedback")
         return HttpResponseRedirect(reverse('games:games_view_scenario', args=(scenario.id,)))
     else:
+        if request.user.is_authenticated and scenario.player_has_gmed(request.user):
+            grant_element_form = make_grant_stock_element_form(scenario, request.user)
+        else:
+            grant_element_form = None
         viewer_can_edit = False
         if request.user.is_authenticated:
             viewer_can_edit = scenario.player_can_edit_writeup(request.user)
@@ -366,6 +393,10 @@ def view_scenario(request, scenario_id, game_id=None):
         game_feedback_form = GameFeedbackForm()
         is_public = scenario.is_public()
         sections = scenario.get_latest_of_all_writeup_sections()
+        elements = defaultdict(list)
+        for element in scenario.get_latest_of_all_elements():
+            if not element.is_deleted:
+                elements[element.get_type_plural()].append(element)
         context = {
             'show_spoiler_warning': show_spoiler_warning,
             'scenario': scenario,
@@ -375,6 +406,8 @@ def view_scenario(request, scenario_id, game_id=None):
             'game_feedback_form': game_feedback_form,
             'writeup_sections': sections,
             'last_edit': scenario.get_last_edit(),
+            "elements": dict(elements),
+            "grant_element_form": grant_element_form,
         }
         if request.user.is_superuser or (hasattr(request.user, "profile") and request.user.profile and request.user.profile.early_access_user):
             return render(request, 'games/scenarios/view_scenario.html', context)
@@ -421,6 +454,21 @@ def view_scenario_history(request, scenario_id):
         }
         return render(request, 'games/scenarios/scenario_edit_history.html', context)
 
+@login_required
+def grant_element(request, element_id):
+    if request.is_ajax and request.method == "POST":
+        element = get_object_or_404(ScenarioElement, id=element_id)
+        scenario = element.relevant_scenario
+        if not scenario.player_is_spoiled(request.user):
+            return JsonResponse({"error": "forbidden"}, status=403)
+
+        grant_element_form = make_grant_stock_element_form(scenario, request.user)(request.POST)
+        if grant_element_form.is_valid():
+            with transaction.atomic():
+                character = grant_element_form.cleaned_data["contractor"]
+                element.relevant_element.grant_to_character(character, request.user)
+            return JsonResponse({"name": character.name}, status=200)
+    return JsonResponse({"error": ""}, status=400)
 
 @login_required
 def view_scenario_gallery(request):

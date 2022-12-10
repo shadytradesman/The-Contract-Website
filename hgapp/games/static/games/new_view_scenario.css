@@ -82,3 +82,25 @@
     line-height: 1.2;
     color: #939286;
 }
+
+.css-scenario-element {
+    margin: 10px;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-bottom: 15px;
+    padding-top: 1px;
+    background-color: #2c323d;
+}
+
+.css-loose-end-subsection {
+    padding-left: 15px;
+}
+
+.css-scenario-element h5 {
+    margin-bottom: 5px;
+}
+
+.css-scenario-element h4 {
+    margin-bottom: 15px;
+    font-weight: 700;
+}

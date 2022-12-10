@@ -14,7 +14,32 @@
 {% block body_class %}home{% endblock %}
 
 {% block extra_scripts %}
+    {{stock_loose_end.element_data_by_name|json_script:"elementData"}}
     <script src="{% static 'games/edit_scenario.js' %}"></script>
+    <script type="text/html" id="condition-form-template">
+        <div class="js-condition-form css-scenario-element ">
+            <h4>New Condition</h4>
+            {{condition_formset.empty_form|bootstrap}}
+        </div>
+    </script>
+    <script type="text/html" id="circumstance-form-template">
+        <div class="js-circumstance-form css-scenario-element ">
+            <h4>New Circumstance</h4>
+            {{circumstance_formset.empty_form|bootstrap}}
+        </div>
+    </script>
+    <script type="text/html" id="loose-end-form-template">
+        {% with loose_end_formset.empty_form as form %}
+            {% include "games/scenarios/loose_end_form.html" %}
+        {% endwith %}
+    </script>
+    <script type="text/html" id="trophy-form-template">
+        <div class="js-trophy-form css-scenario-element">
+            <h4>New Trophy</h4>
+            {{trophy_formset.empty_form|bootstrap}}
+        </div>
+    </script>
+
 {% endblock %}
 
 {% block extra_styles %}
@@ -166,6 +191,9 @@
                     </div>
                     {{ writeup_form.aftermath}}
                 </div>
+
+                {% include "games/scenarios/world_elements.html" %}
+
 
                 <div class="text-center" style="margin-top: 25px;">
                     <input class="btn btn-lg btn-primary" type="submit" value="Save Scenario" />

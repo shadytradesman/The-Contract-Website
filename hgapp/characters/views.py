@@ -357,7 +357,7 @@ def view_character(request, character_id, secret_key=None):
         default_circumstance_form = get_default_world_element_choice_form(CIRCUMSTANCE)
         default_trauma_form = get_default_world_element_choice_form(TRAUMA)
         default_trophy_form = get_default_world_element_choice_form(TROPHY)
-        element_descriptions = StockWorldElement.objects.values_list('name', 'description')
+        element_descriptions = StockWorldElement.objects.filter(is_user_created=False).values_list('name', 'description')
         element_description_by_name = {x[0]: x[1] for x in element_descriptions}
 
     char_artifacts = CharacterArtifacts(character, world_element_cell_choices)

@@ -1442,6 +1442,12 @@ class StockWorldElement(models.Model):
     cutoff = models.PositiveIntegerField("cutoff (for loose ends)", default=1)
     how_to_tie_up = models.CharField(max_length=1000, blank=True, help_text="For Loose Ends only")
     threat_level = models.CharField(choices=LOOSE_END_THREAT, max_length=45, default=THREAT_DANGEROUS, help_text="for loose ends only")
+    is_user_created = models.BooleanField(default=False)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['is_user_created']),
+        ]
 
     def __str__(self):
         return "[{}] {} - {}".format(self.get_type_display(), self.category.name, self.name)
@@ -1468,6 +1474,28 @@ class StockWorldElement(models.Model):
                 threat_level=self.threat_level,
                 how_to_tie_up=self.how_to_tie_up,
                 granting_gm=stats.assigned_character.player)
+        raise ValueError("Could not grant element to contractor")
+
+    def grant_to_character(self, character, granting_player):
+        name = self.name
+        if self.type in [CONDITION, CIRCUMSTANCE, TROPHY]:
+            ElementClass = Condition if self.type == CONDITION else Artifact if self.type == TROPHY else Circumstance
+            return ElementClass.objects.create(character=character,
+                                               name=name,
+                                               description=self.description,
+                                               system=self.system,)
+        if self.type == TRAUMA:
+            raise ValueError("Cannot grant a trauma without specifying stats revision")
+        if self.type == LOOSE_END:
+            return LooseEnd.objects.create(
+                character=character,
+                name=name,
+                description=self.description,
+                system=self.system,
+                cutoff=self.cutoff,
+                threat_level=self.threat_level,
+                how_to_tie_up=self.how_to_tie_up,
+                granting_gm=granting_player)
         raise ValueError("Could not grant element to contractor")
 
 

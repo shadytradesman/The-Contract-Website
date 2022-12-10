@@ -7,7 +7,8 @@ from django.forms.models import model_to_dict
 
 from characters.models import Character, HIGH_ROLLER_STATUS, Character_Death, ExperienceReward, AssetDetails, EXP_GM, \
     EXP_LOSS_V2, EXP_WIN_V2, EXP_LOSS_RINGER_V2, EXP_WIN_RINGER_V2, EXP_LOSS_IN_WORLD_V2, EXP_WIN_IN_WORLD_V2, EXP_MVP,\
-    EXP_WIN_V1, EXP_LOSS_V1, Artifact, EXP_GM_MOVE, EXP_GM_RATIO, EXP_GM_NEW_PLAYER
+    EXP_WIN_V1, EXP_LOSS_V1, Artifact, EXP_GM_MOVE, EXP_GM_RATIO, EXP_GM_NEW_PLAYER, StockWorldElement, ELEMENT_TYPE, \
+    CONDITION, CIRCUMSTANCE, TROPHY, LOOSE_END
 from powers.models import Power, Power_Full
 from cells.models import Cell, WorldEvent
 from django.utils import timezone
@@ -17,7 +18,8 @@ from guardian.shortcuts import assign_perm
 from postman.api import pm_write
 from django.urls import reverse
 from django.utils.safestring import SafeText
-from games.games_constants import GAME_STATUS, get_completed_game_excludes_query
+from games.games_constants import GAME_STATUS, get_completed_game_excludes_query, get_scheduled_game_excludes_query
+from functools import reduce
 
 from hgapp.utilities import get_object_or_none
 import django.dispatch
@@ -788,8 +790,12 @@ class Scenario(models.Model):
                                          through_fields=('relevant_scenario', 'discovering_player'),
                                          default=None,
                                          blank=True)
-    tags = models.ManyToManyField("ScenarioTag",
-                                   blank=True)
+    stock_elements = models.ManyToManyField(StockWorldElement,
+                                          through="ScenarioElement",
+                                          through_fields=('relevant_scenario', 'relevant_element'),
+                                          default=None,
+                                          blank=True)
+    tags = models.ManyToManyField("ScenarioTag", blank=True)
 
     num_words = models.IntegerField("Number of Words", default=0)
     times_run = models.IntegerField("Number of times Scenario has been run", default=0)
@@ -813,6 +819,37 @@ class Scenario(models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_scheduled_or_active_game_for_gm(self, gm):
+        return Game.objects.filter(scenario=self, gm=gm)\
+            .exclude(get_scheduled_game_excludes_query())\
+            .prefetch_related("attended_by").all()
+
+    def get_active_characters_for_gm(self, gm):
+        games = self.get_scheduled_or_active_game_for_gm(gm)
+        if games:
+            characters = reduce(lambda a, b: a.union(b), [x.attended_by.all() for x in games])
+            return characters
+        else:
+            return Character.objects.none()
+
+
+    def player_has_gmed(self, gm):
+        return Game.objects.filter(scenario=self, gm=gm).exists()
+
+    def get_completed_games_for_gm(self, gm):
+        return Game.objects.filter(scenario=self, gm=gm) \
+            .exclude(get_completed_game_excludes_query()) \
+            .prefetch_related("attended_by").all()
+
+
+    def get_finished_characters_for_gm(self, gm):
+        games = self.get_completed_games_for_gm(gm)
+        if games:
+            characters = reduce(lambda a, b: a.union(b), [x.attended_by.all() for x in games])
+            return characters
+        else:
+            return Character.objects.none()
 
     def player_can_edit_writeup(self, user):
         if user == self.creator:
@@ -944,6 +981,18 @@ class Scenario(models.Model):
                 sections.append(section)
         return sections
 
+    def get_latest_of_all_elements(self):
+        return self.scenarioelement_set\
+            .order_by().order_by("designation", "-created_date")\
+            .distinct("designation")\
+            .select_related("relevant_element")
+
+    def get_latest_of_all_elements_of_type(self, element_type):
+        return self.scenarioelement_set.filter(type=element_type)\
+            .order_by().order_by("designation", "-created_date")\
+            .distinct("designation")\
+            .select_related("relevant_element")
+
     def get_last_edit(self):
         return ScenarioWriteup.objects \
             .filter(relevant_scenario=self, is_deleted=False) \
@@ -1019,6 +1068,32 @@ class ScenarioWriteup(models.Model):
         soup = BeautifulSoup(self.content, features="html5lib")
         self.num_words = len(soup.text.split())
 
+
+class ScenarioElement(models.Model):
+    creator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    designation = models.CharField(max_length=130) # e.g. "Condition 1"
+    relevant_element = models.ForeignKey(StockWorldElement, on_delete=models.CASCADE)
+    relevant_scenario = models.ForeignKey(Scenario, on_delete=models.CASCADE)
+    type = models.CharField(choices=ELEMENT_TYPE, max_length=45, default=CONDITION)
+    created_date = models.DateTimeField('date created', auto_now_add=True)
+    is_deleted = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ("relevant_element", "relevant_scenario")
+        indexes = [
+            models.Index(fields=['relevant_scenario', 'designation', 'created_date']),
+            models.Index(fields=['relevant_scenario', 'created_date']),
+        ]
+
+    def get_type_plural(self):
+        if self.type == LOOSE_END:
+            return "Loose Ends"
+        if self.type == CONDITION:
+            return "Conditions"
+        if self.type == CIRCUMSTANCE:
+            return "Circumstances"
+        if self.type == TROPHY:
+            return "Trophies"
 
 class Scenario_Discovery(models.Model):
     discovering_player = models.ForeignKey(settings.AUTH_USER_MODEL,

@@ -9,9 +9,11 @@ from django.db import transaction
 from django.contrib.auth.models import User
 
 from .forms import make_archive_game_general_info_form, get_archival_outcome_form, CellMemberAttendedForm, OutsiderAttendedForm, \
-    make_who_was_gm_form
-from .models import Game, Game_Invite, Game_Attendance, GameEnded
+    make_who_was_gm_form, ScenarioConditionCircumstanceForm, ScenarioLooseEndForm
+from .models import Game, Game_Invite, Game_Attendance, GameEnded, ScenarioElement
 from .games_constants import GAME_STATUS
+
+from characters.models import LOOSE_END, StockWorldElement, StockElementCategory
 
 def convert_to_localtime(utctime):
   utc = utctime.replace(tzinfo=pytz.UTC)
@@ -280,3 +282,76 @@ def get_players_for_new_attendances(member_formset, outsider_formset):
             user = get_object_or_404(User, username=form.cleaned_data['username'])
             players.append(str(user.id))
     return players
+
+
+def get_element_formset(scenario, POST, element_type):
+    elements = scenario.get_latest_of_all_elements_of_type(element_type)
+    if element_type == LOOSE_END:
+        initial = [{
+            "designation": x.designation,
+            "name": x.relevant_element.name,
+            "threat": x.relevant_element.system,
+            "details": x.relevant_element.description,
+            "cutoff": x.relevant_element.cutoff,
+            "how_to_tie_up": x.relevant_element.how_to_tie_up,
+            "threat_level": x.relevant_element.threat_level,
+        } for x in elements if not x.is_deleted]
+        return formset_factory(ScenarioLooseEndForm, extra=0)(POST, prefix="loose-end", initial=initial)
+    else:
+        initial = [{
+            "designation": x.designation,
+            "type": x.type,
+            "name": x.relevant_element.name,
+            "system": x.relevant_element.system,
+            "description": x.relevant_element.description,
+        } for x in elements if not x.is_deleted]
+        return formset_factory(ScenarioConditionCircumstanceForm, extra=0)(POST, prefix=element_type, initial=initial)
+
+
+def save_new_elements_from_formsets(request, scenario, formset, element_type):
+    scenario_category = StockElementCategory.objects.filter(name="Scenario").first()
+    if not scenario_category:
+        scenario_category = StockElementCategory.objects.create(name="Scenario")
+    is_loose_end = element_type == LOOSE_END
+    for form in formset:
+        if "designation" in form.cleaned_data and len(form.cleaned_data["designation"]) > 0:
+            # edit
+            if not form.changed_data:
+                continue # nothing changed
+            save_element_from_form(form, is_loose_end, request, scenario, form.cleaned_data["designation"], element_type, scenario_category)
+        else:
+            # new
+            if "is_deleted" in form.cleaned_data and form.cleaned_data["is_deleted"]:
+                # don't need to persist anything for new + deleted forms.
+                continue
+            new_designation = "{} {}".format(
+                element_type,
+                scenario.scenarioelement_set.filter(type=element_type).distinct("designation").count() + 1)
+            save_element_from_form(form, is_loose_end, request, scenario, new_designation, element_type, scenario_category)
+
+
+def save_element_from_form(form, is_loose_end, request, scenario, designation, element_type, scenario_category):
+    description = form.cleaned_data["details"] if is_loose_end else form.cleaned_data["description"]
+    system = form.cleaned_data["threat"] if is_loose_end else form.cleaned_data["system"]
+    new_element = StockWorldElement(
+        name=form.cleaned_data["name"],
+        description=description,
+        system=system,
+        type=element_type,
+        is_user_created=True,
+        category=scenario_category
+    )
+    if is_loose_end:
+        new_element.cutoff = form.cleaned_data["cutoff"]
+        new_element.how_to_tie_up = form.cleaned_data["how_to_tie_up"]
+        new_element.threat_level = form.cleaned_data["threat_level"]
+    new_element.save()
+    new_scenario_element = ScenarioElement(creator=request.user,
+                                           designation=designation,
+                                           relevant_element=new_element,
+                                           relevant_scenario=scenario,
+                                           type=element_type,
+                                           is_deleted=form.cleaned_data["is_deleted"])
+    new_scenario_element.save()
+
+

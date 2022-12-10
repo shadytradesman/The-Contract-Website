@@ -125,5 +125,7 @@ urlpatterns = [
     ##################
     url(r'^post/ajax/spoil-scenario/s/(?P<scenario_id>[\d]+)/$', views.spoil_scenario,
         name="games_spoil_scenario"),
-    #
+
+    url(r'^post/ajax/grant-element/e/(?P<element_id>[\d]+)/$', views.grant_element,
+        name="games_grant_element"),
 ]
