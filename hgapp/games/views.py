@@ -474,7 +474,7 @@ def grant_element(request, element_id):
                 character = grant_element_form.cleaned_data["contractor"]
                 if not character.player_can_edit(request.user):
                     raise PermissionDenied("do not have permissions to edit character")
-                element.relevant_element.grant_to_character(character, request.user)
+                element.relevant_element.grant_to_character_no_trauma(character, request.user)
             return JsonResponse({"name": character.name}, status=200)
     return JsonResponse({"error": ""}, status=400)
 
@@ -1000,7 +1000,7 @@ def end_game(request, game_id):
                     for form in element_formset:
                         element = form.initial["element"]
                         for character in form.cleaned_data["grant_to_characters"]:
-                            element.relevant_element.grant_to_character(character, request.user)
+                            element.relevant_element.grant_to_character_no_trauma(character, request.user)
                 game.save()
                 game.transition_to_finished()
                 GameEnded.send_robust(sender=None, game=game, request=request)

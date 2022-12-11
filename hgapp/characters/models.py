@@ -1483,7 +1483,7 @@ class StockWorldElement(models.Model):
                 granting_gm=stats.assigned_character.player)
         raise ValueError("Could not grant element to contractor")
 
-    def grant_to_character(self, character, granting_player):
+    def grant_to_character_no_trauma(self, character, granting_player):
         name = self.name
         if self.type in [CONDITION, CIRCUMSTANCE, TROPHY]:
             ElementClass = Condition if self.type == CONDITION else Artifact if self.type == TROPHY else Circumstance
