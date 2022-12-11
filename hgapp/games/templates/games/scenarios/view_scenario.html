@@ -102,11 +102,18 @@
                                 {{section.get_section_display}}
                             </h2>
                         </div>
-                        {% if section.should_display_objective and scenario.objective %}
-                            <div class="css-scenario-subheader">
-                                Objective:  {{scenario.objective}}
-                            </div>
-                        {% endif %}
+                        <div class="css-scenario-subheader">
+                            {% if section.get_section_subheader %}
+                                <p>
+                                    {{section.get_section_subheader|safe}}
+                                </p>
+                            {% endif %}
+                            {% if section.should_display_objective and scenario.objective %}
+                                <p>
+                                    Objective:  {{scenario.objective}}
+                                </p>
+                            {% endif %}
+                        </div>
                     </div>
                     <div class="panel-body" style="overflow: hidden">
                         <div class="css-writeup-contents" id="js-scenario-{{section.section}}-contents">
@@ -123,6 +130,13 @@
                             <h2>
                                 Contractor Handouts
                             </h2>
+                            <div class="css-scenario-subheader">
+                                <p>
+                                    You can grant these Conditions, Circumstances, Loose Ends, and Trophies to
+                                    Contractors you have run this scenario for by clicking the "Grant to Contractor"
+                                    button below. You may also grant them as you are declaring the Contract's winners and losers.
+                                </p>
+                            </div>
                         </div>
                     </div>
                     <div class="panel-body" style="overflow: hidden">

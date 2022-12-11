@@ -1063,6 +1063,18 @@ class ScenarioWriteup(models.Model):
         blob["is_element"] = False
         return blob
 
+
+    def get_section_subheader(self):
+        if self.section == OVERVIEW:
+            return ""
+        if self.section == BACKSTORY:
+            return "GM Pre-reading. Understand the situation."
+        if self.section == INTRODUCTION:
+            return "Try to finish introductions within the first hour of the session. " \
+                   "Read more about GMing introductions " \
+                   "<a href=\"https://thecontractrpg.com/guide/gm-manual/#contractor-introductions\" target=\"_blank\" rel=\"noopener noreferrer\">here.</a>"
+        return ""
+
     def is_most_recent_for_section(self):
         most_recent = ScenarioWriteup.objects.filter(relevant_scenario=self.relevant_scenario, section=self.section).order_by("-created_date").first()
         return most_recent == self
