@@ -894,7 +894,7 @@ class Scenario(models.Model):
                 self._grant_reward()
         else:
             # shouldn't have improvement
-            if active_improvement:
+            if active_improvement and not self.is_wiki_editable:
                 active_improvement.mark_void()
 
     def update_stats(self):

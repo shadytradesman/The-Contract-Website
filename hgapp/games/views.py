@@ -165,6 +165,8 @@ def create_scenario(request):
                 writeup.save()
                 if request.user.is_superuser:
                     scenario.tags.set(form.cleaned_data["tags"])
+                scenario.update_word_count()
+                scenario.save()
             return HttpResponseRedirect(reverse('games:games_view_scenario', args=(scenario.id,)))
         else:
             print(form.errors)
@@ -334,6 +336,7 @@ def edit_scenario_old(request, scenario):
                 scenario.update_word_count()
                 if request.user.is_superuser:
                     scenario.tags.set(form.cleaned_data["tags"])
+                scenario.save()
             return HttpResponseRedirect(reverse('games:games_view_scenario', args=(scenario.id,)))
         else:
             logger.error("Invalid scenario form. Errors: %s", str(form.errors))
@@ -841,6 +844,7 @@ def decline_invite(request, game_id):
             with transaction.atomic():
                 invite.save()
     return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
+
 
 #TODO: Pull some of this into helper functions
 #TODO: Enforce or advise on number of players constraints

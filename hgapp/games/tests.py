@@ -6,8 +6,7 @@ from characters.models import Character, ContractStats, Asset, Liability, AssetD
     AttributeValue, Ability, AbilityValue, ExperienceReward, EXP_NEW_CHAR, EXP_REWARD_VALUES, EXP_WIN_V2, EXP_LOSS_V2, \
     EXP_LOSS_IN_WORLD_V2, EXP_WIN_IN_WORLD_V2, EXP_GM_NEW_PLAYER, EXP_GM_RATIO
 from games.models import Game, Game_Attendance, Reward, Game_Invite, GAME_STATUS, OUTCOME, WIN, LOSS, DEATH, DECLINED, \
-    RINGER_VICTORY, RINGER_FAILURE, Scenario
-
+    RINGER_VICTORY, RINGER_FAILURE, Scenario, ScenarioWriteup
 from cells.models import Cell
 from profiles.signals import make_profile_for_new_user
 from django.utils import timezone
@@ -1152,6 +1151,11 @@ class GameModelTests(TestCase):
     def test_give_scenario_rewards(self):
         with transaction.atomic():
             self.scenario.description = " ".join([str(x) for x in range(10000)])
+            ScenarioWriteup.objects.create(
+                relevant_scenario=self.scenario,
+                writer=self.scenario.creator,
+                content=self.scenario.description,)
+            self.scenario.update_word_count()
             self.scenario.save()
             game = Game(
                 scenario=self.scenario,
@@ -1186,7 +1190,16 @@ class GameModelTests(TestCase):
             self.assertEquals(self.user1.profile.get_avail_improvements().count(), 1) #valid scenario writeup
             self.assertIsNotNone(self.scenario.get_active_improvement()) #valid scenario writeup
 
-            self.scenario.description = "blah blah"
+            ScenarioWriteup.objects.create(
+                relevant_scenario=self.scenario,
+                writer=self.scenario.creator,
+                content="blah blah")
+            self.scenario.update_word_count()
+            self.scenario.save()
+            self.assertEquals(self.user1.profile.get_avail_improvements().count(), 1) #invalid scenario writeup, but wiki editable
+            self.assertIsNotNone(self.scenario.get_active_improvement()) #valid scenario writeup
+
+            self.scenario.is_wiki_editable = False
             self.scenario.save()
             self.assertEquals(self.user1.profile.get_avail_improvements().count(), 0) # invalid scenario writeup
             self.assertIsNone(self.scenario.get_active_improvement()) # invalid scenario writeup
