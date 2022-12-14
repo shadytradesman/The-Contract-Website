@@ -1706,6 +1706,9 @@ class ExperienceReward(models.Model):
             models.Index(fields=['rewarded_player', 'rewarded_character']),
         ]
 
+    def __str__(self):
+        return "{} for {} ({})".format(self.get_value(), self.rewarded_player.username, self.source_blurb())
+
     def mark_void(self):
         self.is_void = True
         self.save()
