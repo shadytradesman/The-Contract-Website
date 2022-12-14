@@ -1707,7 +1707,7 @@ class ExperienceReward(models.Model):
         ]
 
     def __str__(self):
-        return "{} for {} ({})".format(self.get_value(), self.rewarded_player.username, self.source_blurb())
+        return "{} for {} ({})".format(self.get_value(), self.rewarded_player.username, self.type)
 
     def mark_void(self):
         self.is_void = True
