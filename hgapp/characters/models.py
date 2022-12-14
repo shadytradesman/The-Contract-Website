@@ -1716,6 +1716,8 @@ class ExperienceReward(models.Model):
         reason = "from {}".format(self.get_type_display())
         if self.type == EXP_GM:
             return "{} {}".format(reason, self.game.scenario.title)
+        if self.type in [EXP_GM_NEW_PLAYER, EXP_GM_RATIO]:
+            return "{} in {}".format(reason, self.game.scenario.title)
         if self.type == EXP_GM_MOVE:
             return "{} in {}: {}".format(reason, self.move.cell, self.move.title)
         if self.type == EXP_JOURNAL:
