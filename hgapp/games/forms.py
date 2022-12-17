@@ -397,12 +397,12 @@ def make_accept_invite_form(invitation):
 
 def make_grant_stock_element_form(scenario, gm):
     class GrantStockElementForm(forms.Form):
-        active_characters = scenario.get_active_characters_for_gm(gm)
-        previous_characters = scenario.get_finished_characters_for_gm(gm)
+        active_characters = [x for x in scenario.get_active_characters_for_gm(gm) if x.player_can_edit(gm)]
+        previous_characters = [x for x in scenario.get_finished_characters_for_gm(gm) if x.player_can_edit(gm)]
         contractor = CharDisplayByActiveModelChoiceField(
             active_characters=active_characters,
             previous_characters=previous_characters,
-            queryset=active_characters | previous_characters,
+            queryset=Character.objects.filter(pk__in=[x.pk for x in chain(active_characters,previous_characters)]),
             empty_label=None,
             required=True,)
     return GrantStockElementForm

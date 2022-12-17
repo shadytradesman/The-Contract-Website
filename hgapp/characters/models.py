@@ -661,6 +661,9 @@ class Character(models.Model):
     def get_current_downtime_attendance(self):
         return self.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).order_by("-relevant_game__end_time").first()
 
+    def get_scenario_attendance(self, scenario):
+        return self.game_attendance_set.filter(relevant_game__scenario=scenario).first()
+
     def assigned_coin(self):
         coins = self.reward_set.filter(is_void=False, is_charon_coin=True).all()
         return coins[0] if coins else None
@@ -1483,12 +1486,13 @@ class StockWorldElement(models.Model):
                 granting_gm=stats.assigned_character.player)
         raise ValueError("Could not grant element to contractor")
 
-    def grant_to_character_no_trauma(self, character, granting_player):
+    def grant_to_character_no_trauma(self, character, granting_player, cell):
         name = self.name
         if self.type in [CONDITION, CIRCUMSTANCE, TROPHY]:
             ElementClass = Condition if self.type == CONDITION else Artifact if self.type == TROPHY else Circumstance
             return ElementClass.objects.create(character=character,
                                                name=name,
+                                               cell=cell,
                                                description=self.description,
                                                system=self.system,)
         if self.type == TRAUMA:
@@ -1497,6 +1501,7 @@ class StockWorldElement(models.Model):
             return LooseEnd.objects.create(
                 character=character,
                 name=name,
+                cell=cell,
                 description=self.description,
                 system=self.system,
                 cutoff=self.cutoff,
@@ -1682,6 +1687,7 @@ class BasicStats(models.Model):
     armor = models.CharField(max_length=300,
                                 null=True,
                                 blank=True)
+
 
 ## EXPERIENCE
 class ExperienceReward(models.Model):

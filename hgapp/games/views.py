@@ -477,7 +477,12 @@ def grant_element(request, element_id):
                 character = grant_element_form.cleaned_data["contractor"]
                 if not character.player_can_edit(request.user):
                     raise PermissionDenied("do not have permissions to edit character")
-                element.relevant_element.grant_to_character_no_trauma(character, request.user)
+                game = character.get_scenario_attendance(scenario)
+                if game and game.relevant_game.cell:
+                    cell = game.relevant_game.cell
+                else:
+                    cell=None
+                element.relevant_element.grant_to_character_no_trauma(character, request.user, cell)
             return JsonResponse({"name": character.name}, status=200)
     return JsonResponse({"error": ""}, status=400)
 
