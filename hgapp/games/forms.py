@@ -432,7 +432,8 @@ def make_grant_element_form(character_queryset):
         grant_to_characters = forms.ModelMultipleChoiceField(
             queryset=character_queryset,
             widget=forms.CheckboxSelectMultiple(),
-            label="Grant to Contractors"
+            label="Grant to Contractors",
+            required=False,
         )
         element_id = forms.CharField(label=None,
                                      max_length=200,

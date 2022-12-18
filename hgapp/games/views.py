@@ -968,11 +968,11 @@ def end_game(request, game_id):
         "element": x
     } for x in scenario.get_latest_of_all_elements() if not x.is_deleted]
     if request.method == 'POST':
-        declare_outcome_formset = DeclareOutcomeFormset(request.POST, initial=initial_data)
+        declare_outcome_formset = DeclareOutcomeFormset(request.POST, initial=initial_data, prefix="outcome")
         game_feedback_form = GameFeedbackForm(request.POST)
         world_event_form = None
         if initial_elements:
-            element_formset = GrantElementFormset(request.POST, initial=initial_elements)
+            element_formset = GrantElementFormset(request.POST, initial=initial_elements, prefix="elements")
         else:
             element_formset = None
         if game.cell.player_can_post_world_events(request.user):
@@ -1009,7 +1009,7 @@ def end_game(request, game_id):
                     for form in element_formset:
                         element = form.initial["element"]
                         for character in form.cleaned_data["grant_to_characters"]:
-                            element.relevant_element.grant_to_character_no_trauma(character, request.user)
+                            element.relevant_element.grant_to_character_no_trauma(character, request.user, game.cell)
                 game.save()
                 game.transition_to_finished()
                 GameEnded.send_robust(sender=None, game=game, request=request)
@@ -1020,8 +1020,8 @@ def end_game(request, game_id):
                          str(game_feedback_form.errors))
             raise ValueError("Invalid form")
     else:
-        formset = DeclareOutcomeFormset(initial=initial_data)
-        element_formset = GrantElementFormset(initial=initial_elements)
+        formset = DeclareOutcomeFormset(initial=initial_data, prefix="outcome")
+        element_formset = GrantElementFormset(initial=initial_elements, prefix="elements")
         game_feedback = GameFeedbackForm()
         world_event_form = None
         if game.cell.player_can_post_world_events(request.user):
@@ -1112,7 +1112,6 @@ def finalize_create_ex_game_for_cell(request, cell_id, gm_user_id, players):
     GenInfoForm = make_archive_game_general_info_form(gm)
     ArchivalOutcomeFormSet = formset_factory(get_archival_outcome_form(EXP_V1_V2_GAME_ID+1), extra=0)
     if request.method == 'POST':
-        general_form = GenInfoForm(request.POST, prefix="general")
         outcome_formset = ArchivalOutcomeFormSet(request.POST, prefix="outcome", initial=[{'player_id': x.id,
                                                            'invited_player': x}
                                                           for x in player_list])
