@@ -514,6 +514,11 @@ class OutsiderAttendedForm(forms.Form):
                                max_length=200,
                                required=False,)
 
+
+class SpoilScenarioForm(forms.Form):
+    pass
+
+
 def make_archive_game_general_info_form(gm):
     class ArchiveGeneralInfoForm(forms.Form):
         gm_id = forms.CharField(label=None,

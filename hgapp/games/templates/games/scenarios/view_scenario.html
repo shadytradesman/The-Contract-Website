@@ -89,11 +89,45 @@
                 </div>
             </div>
 
+            {% if not aftermath_spoiled %}
+            <div style="margin-bottom: 15px;">
+                <div class="alert alert-info" style="margin: auto; width: 90%;">
+                    <h3 class="text-center" style="margin-top: 0px;">
+                        Note: Some Scenario content is hidden
+                    </h3>
+                    <ul>
+                        <li>
+                            You discovered this Scenario by playing it as a Contract.
+                        </li>
+                        <li>
+                            Because your Contractor may still be dealing with the fallout of the Contract, we have hidden
+                            the following sections in this Scenario:
+                            <ul>
+                                <li>
+                                    Aftermath Writeup
+                                </li>
+                                <li>
+                                    Contractor Handouts
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            To spoil yourself on those elements,
+                            <a href="{% url 'games:spoil_scenario_aftermath' scenario.id 'view' %}">
+                                click here
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+
             <div class="panel panel-default css-scenario-section-panel">
                 {% include "games/scenarios/scenario_history.html" %}
             </div>
 
             {% for section in writeup_sections %}
+                {% if not section.is_aftermath or aftermath_spoiled %}
                 <div class="panel panel-default css-scenario-section-panel">
                     <div class="panel-heading">
                         <div id="scenario-{{section.section}}" class="css-guide-section"></div>
@@ -117,12 +151,13 @@
                     </div>
                     <div class="panel-body" style="overflow: hidden">
                         <div class="css-writeup-contents" id="js-scenario-{{section.section}}-contents">
-                            {{section.content|safe}}
+                                {{section.content|safe}}
                         </div>
                     </div>
                 </div>
+            {% endif %}
             {% endfor %}
-            {% if elements %}
+            {% if elements and aftermath_spoiled %}
                 <div class="panel panel-default css-scenario-section-panel">
                     <div class="panel-heading">
                         <div id="scenario-elements" class="css-guide-section"></div>
@@ -151,6 +186,7 @@
                     </div>
                 </div>
             {% endif %}
+
         </div>
     </div>
 </div>

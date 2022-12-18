@@ -30,6 +30,8 @@ urlpatterns = [
 
     path('scenario/history/<int:scenario_id>/', views.view_scenario_history, name='scenario_history'),
 
+    path('scenario/spoil-aftermath/<int:scenario_id>/<str:reason>/', views.spoil_aftermath, name='spoil_scenario_aftermath'),
+
     # ex: .com/contract/view/s/110/g/1231
     url(r'^view/s/(?P<scenario_id>[\d]+)/g/(?P<game_id>[\d]+)/$', views.view_scenario, name='games_view_scenario_feedback'),
 

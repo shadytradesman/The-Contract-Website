@@ -25,11 +25,11 @@ from games.forms import CreateScenarioForm, CellMemberAttendedForm, make_game_fo
     CustomInviteForm, make_accept_invite_form, ValidateAttendanceForm, DeclareOutcomeForm, GameFeedbackForm, \
     OutsiderAttendedForm, make_who_was_gm_form,make_archive_game_general_info_form, get_archival_outcome_form, \
     RsvpAttendanceForm, make_edit_move_form, ScenarioWriteupForm, RevertToEditForm, make_grant_stock_element_form, \
-    make_grant_element_form
+    make_grant_element_form, SpoilScenarioForm
 from .game_form_utilities import get_context_for_create_finished_game, change_time_to_current_timezone, convert_to_localtime, \
     create_archival_game, get_context_for_completed_edit, handle_edit_completed_game, get_context_for_choose_attending, \
     get_gm_form, get_outsider_formset, get_member_formset, get_players_for_new_attendances, get_element_formset, \
-    save_new_elements_from_formsets
+    save_new_elements_from_formsets, get_element_formset_empty
 from .games_constants import GAME_STATUS, EXP_V1_V2_GAME_ID, get_completed_game_excludes_query
 
 from cells.forms import EditWorldEventForm
@@ -93,10 +93,19 @@ def activity(request):
 
 
 def create_scenario_new(request):
+    POST = request.POST if request.method == "POST" else None;
+    condition_formset = get_element_formset_empty(POST, CONDITION)
+    circumstance_formset = get_element_formset_empty(POST, CIRCUMSTANCE)
+    loose_end_formset = get_element_formset_empty(POST, LOOSE_END)
+    trophy_formset = get_element_formset_empty(POST, TROPHY)
     if request.method == 'POST':
         scenario_form = CreateScenarioForm(request.POST)
         writeup_form = ScenarioWriteupForm(request.POST)
-        if scenario_form.is_valid() and writeup_form.is_valid():
+        if scenario_form.is_valid() and writeup_form.is_valid() \
+                and condition_formset.is_valid() \
+                and circumstance_formset.is_valid() \
+                and loose_end_formset.is_valid() \
+                and trophy_formset.is_valid():
             scenario = Scenario(
                 title = scenario_form.cleaned_data['title'],
                 creator = request.user,
@@ -117,6 +126,10 @@ def create_scenario_new(request):
                 scenario.save()
                 for writeup in new_writeups:
                     writeup.save()
+                save_new_elements_from_formsets(request, scenario, condition_formset, CONDITION)
+                save_new_elements_from_formsets(request, scenario, circumstance_formset, CIRCUMSTANCE)
+                save_new_elements_from_formsets(request, scenario, loose_end_formset, LOOSE_END)
+                save_new_elements_from_formsets(request, scenario, trophy_formset, TROPHY)
             return HttpResponseRedirect(reverse('games:games_view_scenario', args=(scenario.id,)))
         else:
             print(scenario_form.errors)
@@ -127,6 +140,10 @@ def create_scenario_new(request):
         context = {
             'scenario_form': scenario_form,
             'writeup_form': writeup_form,
+            'condition_formset': condition_formset,
+            'circumstance_formset': circumstance_formset,
+            'trophy_formset': trophy_formset,
+            'loose_end_formset': loose_end_formset,
         }
         return render(request, 'games/scenarios/edit_scenario.html', context)
 
@@ -192,6 +209,9 @@ def edit_scenario(request, scenario_id):
 
 
 def edit_scenario_new(request, scenario):
+    aftermath_spoiled = scenario.is_player_aftermath_spoiled(request.user)
+    if not aftermath_spoiled:
+        return HttpResponseRedirect(reverse('games:spoil_scenario_aftermath', args=(scenario.id, "edit")))
     can_edit_scenario = request.user.has_perm('edit_scenario', scenario)
     overview = scenario.get_latest_of_section(OVERVIEW)
     backstory = scenario.get_latest_of_section(BACKSTORY)
@@ -402,8 +422,10 @@ def view_scenario(request, scenario_id, game_id=None):
         for element in scenario.get_latest_of_all_elements():
             if not element.is_deleted:
                 elements[element.get_type_plural()].append(element)
+        aftermath_spoiled = scenario.is_player_aftermath_spoiled(request.user)
         context = {
             'show_spoiler_warning': show_spoiler_warning,
+            'aftermath_spoiled': aftermath_spoiled,
             'scenario': scenario,
             'is_public': is_public,
             'viewer_can_edit': viewer_can_edit,
@@ -448,8 +470,9 @@ def view_scenario_history(request, scenario_id):
     else:
         edits = ScenarioWriteup.objects.filter(relevant_scenario=scenario).order_by("-created_date").all()
         element_edits = ScenarioElement.objects.filter(relevant_scenario=scenario).order_by("-created_date").all()
-        writeup_edit_blobs = [x.to_blob(request) for x in edits]
-        element_edit_blobs = [x.to_blob(request) for x in element_edits]
+        aftermath_spoiled = scenario.is_player_aftermath_spoiled(request.user)
+        writeup_edit_blobs = [x.to_blob(request, aftermath_spoiled) for x in edits]
+        element_edit_blobs = [x.to_blob(request, aftermath_spoiled) for x in element_edits]
         edit_blobs = merge(writeup_edit_blobs, element_edit_blobs, key=lambda x: x["created_date"], reverse=True)
         form = RevertToEditForm()
         viewer_can_edit = scenario.player_can_edit_writeup(request.user)
@@ -462,6 +485,31 @@ def view_scenario_history(request, scenario_id):
             },
         }
         return render(request, 'games/scenarios/scenario_edit_history.html', context)
+
+
+@login_required
+def spoil_aftermath(request, scenario_id, reason):
+    scenario = get_object_or_404(Scenario, id=scenario_id)
+    if not scenario.player_is_spoiled(request.user):
+        raise PermissionDenied("You cannot spoil this Scenario's aftermath if you can't yet view the Scenario.")
+    if request.method == 'POST':
+        form = SpoilScenarioForm(request.POST)
+        if form.is_valid():
+            with transaction.atomic():
+                scenario.spoil_aftermath(request.user)
+            return HttpResponseRedirect(reverse('games:games_view_scenario', args=(scenario.id,)))
+        else:
+            raise ValueError("Invalid aftermath spoil form")
+    else:
+        context = {
+            "scenario": scenario,
+            "spoil_form": SpoilScenarioForm(),
+            "for_edit": reason == "edit",
+            "dest": reason,
+        }
+        return render(request, 'games/scenarios/spoil_aftermath.html', context)
+
+
 
 @login_required
 def grant_element(request, element_id):

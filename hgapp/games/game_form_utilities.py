@@ -284,6 +284,13 @@ def get_players_for_new_attendances(member_formset, outsider_formset):
     return players
 
 
+def get_element_formset_empty(POST, element_type):
+    if element_type == LOOSE_END:
+        return formset_factory(ScenarioLooseEndForm, extra=0)(POST, prefix="loose-end", initial=[])
+    else:
+        return formset_factory(ScenarioConditionCircumstanceForm, extra=0)(POST, prefix=element_type, initial=[])
+
+
 def get_element_formset(scenario, POST, element_type):
     elements = scenario.get_latest_of_all_elements_of_type(element_type)
     if element_type == LOOSE_END:

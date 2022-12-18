@@ -915,6 +915,13 @@ class Scenario(models.Model):
     def player_is_spoiled(self, player):
         return player.has_perm("view_scenario", self)
 
+    def is_player_aftermath_spoiled(self, player):
+        if player.is_anonymous:
+            return False
+        if player.has_perm("view_scenario", self):
+            return Scenario_Discovery.objects.filter(relevant_scenario=self, discovering_player=player, is_aftermath_spoiled=True).exists()
+        return False
+
     def is_spoilable_for_player(self, player):
         if player.is_anonymous:
             return False
@@ -924,6 +931,9 @@ class Scenario(models.Model):
         if player.is_anonymous:
             return False
         return Scenario_Discovery.objects.filter(relevant_scenario=self, discovering_player=player).exists()
+
+    def spoil_aftermath(self, player):
+        Scenario_Discovery.objects.filter(relevant_scenario=self, discovering_player=player).first().spoil_aftermath()
 
     def discovery_for_player(self, player):
         return get_object_or_none(Scenario_Discovery, relevant_scenario=self, discovering_player=player)
@@ -943,7 +953,8 @@ class Scenario(models.Model):
                 discovering_player=player,
                 relevant_scenario=self,
                 reason=DISCOVERY_REASON[0][0],
-                is_spoiled=True
+                is_spoiled=True,
+                is_aftermath_spoiled=False,
             )
             discovery.save()
 
@@ -1054,13 +1065,18 @@ class ScenarioWriteup(models.Model):
         self.__update_word_count()
         super(ScenarioWriteup, self).save(*args, **kwargs)
 
-    def to_blob(self, request):
+    def to_blob(self, request, aftermath_spoiled):
         blob = model_to_dict(self)
         blob["created_date"] = self.created_date
         blob["section_display"] = self.get_section_display()
         blob["writer_url"] = request.build_absolute_uri(reverse('profiles:profiles_view_profile', args=(self.writer.id,)))
         blob["writer_username"] = self.writer.username
         blob["is_element"] = False
+        if not aftermath_spoiled and self.is_aftermath():
+            spoil_aftermath_url = request.build_absolute_uri(reverse('games:spoil_scenario_aftermath', args=(self.relevant_scenario.id, "view")))
+            spoil_aftermath_link = '<a href="{}">Click Here</a> to spoil the aftermath'.format(spoil_aftermath_url)
+            content = "<i>Section hidden because you have not yet spoiled this Scenario's aftermath. {}</i>".format(spoil_aftermath_link)
+            blob["content"] = content
         return blob
 
 
@@ -1084,6 +1100,9 @@ class ScenarioWriteup(models.Model):
 
     def is_overview(self):
         return self.section in [OVERVIEW]
+
+    def is_aftermath(self):
+        return self.section == AFTERMATH
 
     def __update_word_count(self):
         soup = BeautifulSoup(self.content, features="html5lib")
@@ -1116,7 +1135,7 @@ class ScenarioElement(models.Model):
         if self.type == TROPHY:
             return "Trophies"
 
-    def to_blob(self, request):
+    def to_blob(self, request, aftermath_spoiled):
         blob = model_to_dict(self)
         blob["created_date"] = self.created_date
         blob["section_display"] = "{}: {}".format(self.designation, self.relevant_element.name)
@@ -1124,7 +1143,13 @@ class ScenarioElement(models.Model):
         blob["writer_url"] = request.build_absolute_uri(reverse('profiles:profiles_view_profile', args=(self.creator.id,)))
         blob["writer_username"] = self.creator.username
         blob["num_words"] = self.relevant_element.count_words()
-        blob["content"] = render_scenario_element(self, request)
+        if aftermath_spoiled:
+            blob["content"] = render_scenario_element(self, request)
+        else:
+            spoil_aftermath_url = request.build_absolute_uri(reverse('games:spoil_scenario_aftermath', args=(self.relevant_scenario.id, "view")))
+            spoil_aftermath_link = '<a href="{}">Click Here</a> to spoil the aftermath'.format(spoil_aftermath_url)
+            content = "<i>Handout hidden because you have not yet spoiled this Scenario's aftermath. {}</i>".format(spoil_aftermath_link)
+            blob["content"] = content
         blob["is_element"] = True
         return blob
 
@@ -1136,6 +1161,7 @@ class Scenario_Discovery(models.Model):
     reason = models.CharField(choices=DISCOVERY_REASON,
                               max_length=25)
     is_spoiled = models.BooleanField(default=True)
+    is_aftermath_spoiled = models.BooleanField(default=True)
 
     # prevent double discoveries.
     class Meta:
@@ -1149,12 +1175,19 @@ class Scenario_Discovery(models.Model):
         self.save()
         assign_perm('view_scenario', self.discovering_player, self.relevant_scenario)
 
+    def spoil_aftermath(self):
+        if self.is_spoiled:
+            self.is_aftermath_spoiled = True
+            self.save()
+        else:
+            raise ValueError("Need to spoil scenario to spoil aftermath")
+
     def save(self, *args, **kwargs):
         if self.pk is None:
             super(Scenario_Discovery, self).save(*args, **kwargs)
             if self.is_spoiled:
                 assign_perm('view_scenario', self.discovering_player, self.relevant_scenario)
-            if self.reason == DISCOVERY_REASON[1][0]:
+            if self.reason == DISCOVERY_REASON[1][0]: # created
                 assign_perm('edit_scenario', self.discovering_player, self.relevant_scenario)
         else:
             super(Scenario_Discovery, self).save(*args, **kwargs)
