@@ -174,6 +174,13 @@ class ScenarioElementForm(forms.Form):
                                   required=False)
     is_deleted = forms.BooleanField(required=False, label="Delete")
 
+    def clean(self):
+        if self.cleaned_data["is_deleted"]:
+            # we don't care about other field validations if we are deleting it.
+            self._errors = []
+        else:
+            return super().clean()
+
 
 class ScenarioConditionCircumstanceForm(ScenarioElementForm):
     name = forms.CharField(max_length=150, required=True)

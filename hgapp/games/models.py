@@ -853,6 +853,14 @@ class Scenario(models.Model):
         else:
             return Character.objects.none()
 
+    def get_players_gmed_for(self, gm):
+        games = self.get_completed_games_for_gm(gm)
+        if games:
+            players = reduce(lambda a, b: a.union(b), [x.invitations.all() for x in games])
+            return players
+        else:
+            return settings.AUTH_USER_MODEL.objects.none()
+
     def player_can_edit_writeup(self, user):
         if user == self.creator:
             return True

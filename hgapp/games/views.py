@@ -423,6 +423,15 @@ def view_scenario(request, scenario_id, game_id=None):
             if not element.is_deleted:
                 elements[element.get_type_plural()].append(element)
         aftermath_spoiled = scenario.is_player_aftermath_spoiled(request.user)
+        if aftermath_spoiled:
+            players_gmed_for = scenario.get_players_gmed_for(request.user).values_list("pk", flat=True)
+            query = scenario.scenario_discovery_set.filter(
+                reason=DISCOVERY_REASON[0][0],
+                is_aftermath_spoiled=True,
+                discovering_player__id__in=players_gmed_for)
+            players_aftermath_spoiled = [x.discovering_player.username for x in query]
+        else:
+            players_aftermath_spoiled = []
         context = {
             'show_spoiler_warning': show_spoiler_warning,
             'aftermath_spoiled': aftermath_spoiled,
@@ -435,6 +444,7 @@ def view_scenario(request, scenario_id, game_id=None):
             'last_edit': scenario.get_last_edit(),
             "elements": dict(elements),
             "grant_element_form": grant_element_form,
+            'players_aftermath_spoiled': players_aftermath_spoiled,
         }
         if request.user.is_superuser or (hasattr(request.user, "profile") and request.user.profile and request.user.profile.early_access_user):
             return render(request, 'games/scenarios/view_scenario.html', context)

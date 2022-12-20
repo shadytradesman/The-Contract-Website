@@ -147,6 +147,22 @@
                                     Objective:  {{scenario.objective}}
                                 </p>
                             {% endif %}
+                            {% if section.is_aftermath %}
+                                <p>
+                                    Players who discover this Scenario by playing in it must manually spoil
+                                    this section, as it may have impact after the session.
+                                </p>
+                                {% if players_aftermath_spoiled %}
+                                    <b>Spoiled for the following Players you GMed for:</b>
+                                    <ul>
+                                        {% for user in players_aftermath_spoiled %}
+                                            <li>{{user}}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <b>No Players you've GMed for have spoiled this section.</b>
+                                {% endif %}
+                            {% endif %}
                         </div>
                     </div>
                     <div class="panel-body" style="overflow: hidden">
@@ -171,6 +187,20 @@
                                     Contractors you have run this scenario for by clicking the "Grant to Contractor"
                                     button below. You may also grant them as you are declaring the Contract's winners and losers.
                                 </p>
+                                <p>
+                                    Players who discover this Scenario by playing in it must manually spoil these
+                                    handouts, as they may have impact after the session.
+                                </p>
+                                {% if players_aftermath_spoiled %}
+                                    <b>Spoiled for the following Players you GMed for:</b>
+                                    <ul>
+                                        {% for user in players_aftermath_spoiled %}
+                                            <li>{{user}}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <b>No Players you've GMed for have spoiled this section.</b>
+                                {% endif %}
                             </div>
                         </div>
                     </div>

@@ -9,13 +9,8 @@
 
 {{form.designation}}
 
-{% if form.initial %}
-    {{form.is_deleted |bootstrap }}
-{% else %}
-    <div style="display: none;">
-        {{form.is_deleted |bootstrap }}
-    </div>
-{% endif %}
+
+{{form.is_deleted |bootstrap }}
 
 <div class="text-center">
     <i>

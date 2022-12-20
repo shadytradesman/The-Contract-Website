@@ -234,7 +234,7 @@ class QuirkForm(forms.Form):
     details_id = forms.IntegerField(label=None, widget=forms.HiddenInput(),required=False)
     is_selected = forms.BooleanField(required=False)
     details = forms.CharField(max_length=600,
-                           widget=forms.TextInput(attrs={'class': 'form-control'}),
+                              widget=forms.TextInput(attrs={'class': 'form-control'}),
                               required=False)
 
     def __init__(self, *args, **kwargs):
@@ -465,11 +465,14 @@ def make_world_element_form(cell_choices=None, initial_cell=None, for_new=True):
                                       )
     return WorldElementForm
 
+
 class LooseEndDeleteForm(forms.Form):
-    resolution = forms.CharField(max_length=5000,
-                           label="Resolution",
-                           help_text="A quick summary of what happened and any new Conditions or Circumstances for the Contractor.",
-                           widget=forms.TextInput(attrs={'class': 'form-control'}))
+    resolution = forms.CharField(
+        max_length=5000,
+        label="Resolution",
+        help_text="A quick summary of what happened and any new Conditions or Circumstances for the Contractor.",
+        widget=forms.TextInput(attrs={'class': 'form-control'}))
+
 
 class LooseEndForm(forms.Form):
     name = forms.CharField(max_length=500,
@@ -477,7 +480,7 @@ class LooseEndForm(forms.Form):
                            widget=forms.TextInput(attrs={'class': 'form-control'}))
     details = forms.CharField(max_length=5000,
                               label="Details",
-                              help_text="Background information about this Loose End. Where it came from, how to get rid of it, etc.",
+                              help_text="A summary about the Loose End. What does the Contractor know about it?",
                               widget=forms.TextInput(attrs={'class': 'form-control'}))
     cutoff = forms.IntegerField(validators=[MaxValueValidator(20), MinValueValidator(0)],
                                 widget=forms.NumberInput(attrs={'class': 'js-injury-value-input form-control'}),
@@ -494,9 +497,9 @@ class LooseEndForm(forms.Form):
         help_text="How dangerous is this Loose End's Threat? Shown to the Player.")
     how_to_tie_up = forms.CharField(max_length=5000,
                                     required=False,
-                             label="How to Tie Up",
-                             help_text="(Optional) Record some ideas on the Moves the Contractor may be able to make to tie up this Loose End.",
-                             widget=forms.TextInput(attrs={'class': 'form-control'}))
+                                    label="How to Tie Up",
+                                    help_text="(Optional) Record some ideas on the Moves the Contractor may be able to make to tie up this Loose End.",
+                                    widget=forms.TextInput(attrs={'class': 'form-control'}))
 
 
 def make_artifact_status_form(current_status=None):
