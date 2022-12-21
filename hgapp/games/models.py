@@ -4,6 +4,7 @@ from django.db import models
 from django.db.models import Count
 from django.conf import settings
 from django.forms.models import model_to_dict
+from django.contrib.auth import get_user_model
 
 from characters.models import Character, HIGH_ROLLER_STATUS, Character_Death, ExperienceReward, AssetDetails, EXP_GM, \
     EXP_LOSS_V2, EXP_WIN_V2, EXP_LOSS_RINGER_V2, EXP_WIN_RINGER_V2, EXP_LOSS_IN_WORLD_V2, EXP_WIN_IN_WORLD_V2, EXP_MVP,\
@@ -859,7 +860,7 @@ class Scenario(models.Model):
             players = reduce(lambda a, b: a.union(b), [x.invitations.all() for x in games])
             return players
         else:
-            return settings.AUTH_USER_MODEL.objects.none()
+            return get_user_model().objects.none()
 
     def player_can_edit_writeup(self, user):
         if user == self.creator:
