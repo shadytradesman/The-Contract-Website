@@ -1170,6 +1170,7 @@ def finalize_create_ex_game_for_cell(request, cell_id, gm_user_id, players):
     GenInfoForm = make_archive_game_general_info_form(gm)
     ArchivalOutcomeFormSet = formset_factory(get_archival_outcome_form(EXP_V1_V2_GAME_ID+1), extra=0)
     if request.method == 'POST':
+        general_form = GenInfoForm(request.POST, prefix="general")
         outcome_formset = ArchivalOutcomeFormSet(request.POST, prefix="outcome", initial=[{'player_id': x.id,
                                                            'invited_player': x}
                                                           for x in player_list])
