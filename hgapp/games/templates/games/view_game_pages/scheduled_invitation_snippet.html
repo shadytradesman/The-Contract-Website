@@ -3,51 +3,95 @@
 
 <div class="panel-body">
     {% if user.is_authenticated and user == game.gm %}
-        <h3>
+        <h3 class="text-center" style="margin-top: 5px;">
             Invitations
+            <div>
+                <small>
+                        <b>This Contract's RSVP mode:</b> {{game.get_invitation_mode_display}}.
+                </small>
+            </div>
+            <div>
+                <small>
+                    {{game.invite_instructions|safe}}
+                </small>
+            </div>
         </h3>
-        <ul>
-            {% for invitation in game.game_invite_set.all %}
-            <li>
-                <a href="{% url 'profiles:profiles_view_profile' invitation.invited_player.id %}">
-                    <b>{% user_display invitation.invited_player %}</b> the {{invitation.invited_player.profile.get_player_prefix_display}} {{invitation.invited_player.profile.get_player_suffix_display}}
-                </a>
-                <br>
-                {% if invitation.attendance %}
-                        {% if invitation.attendance.attending_character %}
-                            <b>Playing</b>
-                            <a href="{% url 'characters:characters_view' invitation.attendance.attending_character.id %}">
-                                {{invitation.attendance.attending_character.name}}
-                            </a>
-                            {% if invitation.attendance.attending_character.has_due_loose_end %}
-                                <div class="text-danger">
-                                    This Contractor has Loose Ends due. <b>They must suffer the Threat of these Loose Ends before they play in a Contract.</b>
-                                </div>
+
+        {% if game.get_accepted_invites %}
+            <h4>Accepted Invites</h4>
+            <ul>
+                {% for invitation in game.get_accepted_invites %}
+                <li>
+                    <a href="{% url 'profiles:profiles_view_profile' invitation.invited_player.id %}">
+                        <b>{% user_display invitation.invited_player %}</b> the {{invitation.invited_player.profile.get_player_prefix_display}} {{invitation.invited_player.profile.get_player_suffix_display}}
+                    </a>
+                    <br>
+                    {% if invitation.attendance %}
+                            {% if invitation.attendance.attending_character %}
+                                <b>Playing</b>
+                                <a href="{% url 'characters:characters_view' invitation.attendance.attending_character.id %}">
+                                    {{invitation.attendance.attending_character.name}}
+                                </a>
+                                {% if invitation.attendance.attending_character.has_due_loose_end %}
+                                    <div class="text-danger">
+                                        This Contractor has Loose Ends due. <b>They must suffer the Threat of these Loose Ends before they play in a Contract.</b>
+                                    </div>
+                                {% endif %}
+                            {% else %}
+                                Playing an NPC ringer
                             {% endif %}
-                        {% else %}
-                            Playing an NPC ringer
-                        {% endif %}
-                {% elif invitation.is_declined %}
-                    Declined.
-                {% else %}
-                    Awaiting response.
-                {% endif %}
-                {% if invitation.invitee_is_spoiled_on_scenario %}
-                    <div class="text-danger">
-                        This Player is already spoiled for this Scenario and should only play an NPC Ringer.
-                    </div>
-                {% endif %}
-            </li>
-            {% empty %}
-                <p> No players invited yet.</p>
-            {% endfor %}
-        </ul>
-        <p>
-            <b>This Contract's RSVP mode:</b> {{game.get_invitation_mode_display}}.
-        </p>
-        <p>
-            {{game.invite_instructions|safe}}
-        </p>
+                    {% elif invitation.is_declined %}
+                        Declined.
+                    {% else %}
+                        Awaiting response.
+                    {% endif %}
+                    {% if invitation.invitee_is_spoiled_on_scenario %}
+                        <div class="text-danger">
+                            This Player is already spoiled for this Scenario and should only play an NPC Ringer.
+                        </div>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+    {% if game.get_open_invites %}
+    <h4>Open Invites</h4>
+    <ul>
+        {% for invitation in game.get_open_invites %}
+        <li>
+            <a href="{% url 'profiles:profiles_view_profile' invitation.invited_player.id %}">
+                <b>{% user_display invitation.invited_player %}</b> the {{invitation.invited_player.profile.get_player_prefix_display}} {{invitation.invited_player.profile.get_player_suffix_display}}
+            </a>
+            <br>
+            {% if invitation.attendance %}
+            {% if invitation.attendance.attending_character %}
+            <b>Playing</b>
+            <a href="{% url 'characters:characters_view' invitation.attendance.attending_character.id %}">
+                {{invitation.attendance.attending_character.name}}
+            </a>
+            {% if invitation.attendance.attending_character.has_due_loose_end %}
+            <div class="text-danger">
+                This Contractor has Loose Ends due. <b>They must suffer the Threat of these Loose Ends before they play in a Contract.</b>
+            </div>
+            {% endif %}
+            {% else %}
+            Playing an NPC ringer
+            {% endif %}
+            {% elif invitation.is_declined %}
+            Declined.
+            {% else %}
+            Awaiting response.
+            {% endif %}
+            {% if invitation.invitee_is_spoiled_on_scenario %}
+            <div class="text-danger">
+                This Player is already spoiled for this Scenario and should only play an NPC Ringer.
+            </div>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
         {% if invite_form %}
             <hr>
             <h3>

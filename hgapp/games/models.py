@@ -215,6 +215,12 @@ class Game(models.Model):
     def player_can_rsvp(self, player):
         return not self.reason_player_cannot_rsvp(player)
 
+    def get_accepted_invites(self):
+        return self.game_invite_set.filter(is_declined=False, attendance__isnull=False).all()
+
+    def get_open_invites(self):
+        return self.game_invite_set.filter(attendance__isnull=True).all()
+
     def reason_player_cannot_rsvp(self, player):
         if not player.is_authenticated or player.is_anonymous:
             return "You must log in to accept this Contract invite."
