@@ -55,6 +55,26 @@ class EditWorldForm(forms.Form):
                                                            'throughout the site.')
 
 
+def make_add_characters_form(character_queryset):
+    class AddCharactersForm(forms.Form):
+        added_characters = forms.ModelMultipleChoiceField(
+            queryset=character_queryset,
+            widget=forms.CheckboxSelectMultiple(),
+            label="",
+            required=False,
+        )
+
+        def __init__(self, *args, **kwargs):
+            super(AddCharactersForm, self).__init__(*args, **kwargs)
+            self.fields['added_characters'].label_from_instance = self.label_from_instance
+
+        @staticmethod
+        def label_from_instance(obj):
+            return obj.name
+
+    return AddCharactersForm
+
+
 class CustomInviteForm(forms.Form):
     username = forms.CharField(label=None,
                             max_length=200,

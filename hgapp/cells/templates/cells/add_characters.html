@@ -1,0 +1,65 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+{% load bootstrap %}
+{% load static %}
+
+{% block extra_styles %}
+<link rel="stylesheet" type="text/css" href="{% static 'cells/edit_setting.css' %}" />
+{% endblock %}
+
+{% block extra_scripts %}
+{% endblock %}
+
+{% block head_title %}
+    Add Contractors to Playgroup
+{% endblock %}
+
+{% block extra_head %}
+{{ form.media }}
+{% endblock %}
+
+{% block body_class %}
+home
+{% endblock %}
+
+{% block body_base %}
+<div class="container">
+    {{ form.about.errors }}
+    <h1 class="text-center">
+        Add Contractors to
+        <a href="{% url 'cells:cells_view_cell' cell.id %}">{{ cell.name }}</a>
+    </h1>
+    {% if game %}
+        <form action="{% url 'cells:add_characters_to_cell'  cell.id game.id %}" method="post">
+    {% else %}
+        <form action="{% url 'cells:add_characters_to_cell' cell.id %}" method="post">
+    {% endif %}
+    {{ form.non_field_errors }}
+    {% csrf_token %}
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <h3>Some of your Contractors do not have a home Playgroup</h3>
+                    <h4>Select the ones you'd like to home in
+                        <a href="{% url 'cells:cells_view_cell' cell.id %}">{{ cell.name }}</a>
+                    </h4>
+                    {{form|bootstrap}}
+                    <div class="text-center">
+                        <input class="btn btn-primary btn-lg" type="submit" value="Add Contractors" />
+                    </div>
+                    <div class="text-center text-muted" style="margin-top: 15px;">
+                        <p>
+                            Or move no Contractors and instead
+                            <a href="{% url 'cells:cells_view_cell' cell.id %}">view {{cell.name}}</a>
+                            {% if game %}
+                                or
+                                <a href="{% url 'cells:cells_view_cell' cell.id %}">return to scheduled Contract for {{game.title}}</a>
+                            {% endif %}
+
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </form>
+</div>
+{% endblock %}

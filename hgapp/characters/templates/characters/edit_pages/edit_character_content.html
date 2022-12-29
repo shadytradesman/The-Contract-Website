@@ -105,20 +105,22 @@
                         Playgroups are Player groups with a shared setting.
                         Contractors without a Playgroup cannot interact with other Contractors on their Downtimes.
                         Most GMs will not allow Contractors without an active Playgroup to participate in their Contracts.
-                        <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#worldTutorialModal">
-                            More about Playgroups
-                        </button>
                     </p>
                     <div class="text-center" style="margin-top: 5px;">
                         When you are finished creating your Contractor, you can
-                        <a href="{% url 'cells:cells_find_world' %}" >
+                        <a href="{% url 'cells:cells_find_world' %}" target="_blank" rel="noopener noreferrer">
                             find a Playgroup
                         </a>
                         or
-                        <a href="{% url 'cells:cells_create' %}" >
+                        <a href="{% url 'cells:cells_create' %}" target="_blank" rel="noopener noreferrer">
                             create your own
                         </a>
                         and then edit your Contractor to add them to it.
+                    </div>
+                    <div class="text-center" style="margin-top: 10px;">
+                            <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#worldTutorialModal">
+                                More about Playgroups
+                            </button>
                     </div>
                 </div>
             </div>

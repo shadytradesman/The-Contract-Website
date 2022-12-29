@@ -3,7 +3,9 @@ from django.views import View
 from django.shortcuts import render
 from django.db import transaction
 from cells.forms import CustomInviteForm, RsvpForm, PlayerRoleForm, KickForm, EditWorldForm, EditWorldEventForm, \
-    RecruitmentForm, RolePermissionForm
+    RecruitmentForm, RolePermissionForm, make_add_characters_form
+from games.models import Game
+from characters.models import Character
 from cells.models import CELL_PERMISSIONS, WebHook
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
@@ -342,13 +344,17 @@ def invite_players(request, cell_id):
         return render(request, 'cells/invite_players.html', context)
 
 
-def rsvp_invite(request, cell_id, secret_key = None, accept = None):
+def rsvp_invite(request, cell_id, secret_key=None, accept=None, game_id=None):
     if not request.user.is_authenticated:
         raise PermissionDenied("You must be logged in to RSVP to a Cell invitation")
     if accept:
         is_accepted = accept == 'y'
     else:
         is_accepted = False
+    if game_id:
+        game = get_object_or_404(Game, id=game_id)
+    else:
+        game = None
     cell = get_object_or_404(Cell, id=cell_id)
     if cell.get_player_membership(request.user):
         return HttpResponseRedirect(reverse('cells:cells_view_cell', args=(cell.id,)))
@@ -370,7 +376,12 @@ def rsvp_invite(request, cell_id, secret_key = None, accept = None):
                 webhooks = cell.webhook_cell.filter(send_for_new_members=True).all()
                 for webhook in webhooks:
                     webhook.post_new_membership(request.user, cell, request)
-            return HttpResponseRedirect(reverse('cells:cells_view_cell', args=(cell.id,)))
+            if is_accepted:
+                if Character.objects.filter(player=request.user, cell__isnull=True).exists():
+                    return HttpResponseRedirect(reverse('cells:add_characters_to_cell', args=(cell.id, game_id)))
+                return HttpResponseRedirect(reverse('games:games_view_game', args=(game_id,)))
+            else:
+                return HttpResponseRedirect(reverse('cells:cells_view_cell', args=(cell.id,)))
         else:
             print(form.errors)
             return None
@@ -380,8 +391,43 @@ def rsvp_invite(request, cell_id, secret_key = None, accept = None):
             'form': form,
             'cell': cell,
             'secret_key': secret_key,
+            'game': game,
         }
         return render(request, 'cells/rsvp_invite.html', context)
+
+
+def add_characters(request, cell_id, game_id=None):
+    if not request.user.is_authenticated:
+        raise PermissionDenied("You must be logged in")
+    cell = get_object_or_404(Cell, id=cell_id)
+    if game_id:
+        game = get_object_or_404(Game, id=game_id)
+    else:
+        game = None
+    membership = cell.get_player_membership(request.user)
+    if not membership:
+        raise PermissionDenied("You must be a member of this Playgroup to add Contractors")
+    homeless_characters = Character.objects.filter(player=request.user, cell__isnull=True, is_dead=False)
+    form = make_add_characters_form(homeless_characters)(request.POST)
+    if request.method == 'POST':
+        if form.is_valid():
+            with transaction.atomic():
+                for character in form.cleaned_data["added_characters"]:
+                    character.cell = cell
+                    character.save()
+            if game:
+                return HttpResponseRedirect(reverse('games:games_view_game', args=(game_id,)))
+            else:
+                return HttpResponseRedirect(reverse('cells:cells_view_cell', args=(cell.id,)))
+    else:
+        context = {
+            "cell": cell,
+            "game": game,
+            "form": form,
+        }
+        return render(request, 'cells/add_characters.html', context)
+
+
 
 
 #TODO: use a form like in rsvp_invite to prevent cross site scripting attacks

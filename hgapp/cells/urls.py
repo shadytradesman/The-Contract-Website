@@ -37,6 +37,12 @@ urlpatterns = [
     # ex: .com/playgroup/invite/rsvp/123
     url(r'^invite/rsvp/(?P<cell_id>[\d]+)/$', views.rsvp_invite, name='cells_rsvp_invite'),
 
+    # ex: .com/playgroup/invite/rsvp/123/c/21
+    url(r'^invite/rsvp/(?P<cell_id>[\d]+)/c/(?P<game_id>[\d]+)/$', views.rsvp_invite, name='cells_rsvp_invite_contract'),
+
+    # ex: .com/playgroup/invite/rsvp/123/c/21/y
+    url(r'^invite/rsvp/(?P<cell_id>[\d]+)/c/(?P<game_id>[\d]+)/(?P<accept>[yn])/$', views.rsvp_invite, name='cells_rsvp_invite_contract'),
+
     # ex: .com/playgroup/invite/rsvp/123/y
     url(r'^invite/rsvp/(?P<cell_id>[\d]+)/(?P<accept>[yn])/$', views.rsvp_invite, name='cells_rsvp_invite'),
 
@@ -46,6 +52,12 @@ urlpatterns = [
     # ex: .com/playgroup/invite/rsvp/123/code/6db20aef104038d363eca31985142c08daa82be57e29e53ad3c8171b9d46083f/n
     url(r'^invite/rsvp/(?P<cell_id>[\d]+)/code/(?P<secret_key>[\da-z]+)/(?P<accept>[yn])$', views.rsvp_invite,
         name='cells_rsvp_invite'),
+
+    # ex: .com/playgroup/add-contractors/123/
+    url(r'^add-contractors/(?P<cell_id>[\d]+)/$', views.add_characters, name='add_characters_to_cell'),
+
+    # ex: .com/playgroup/add-contractors/123/
+    url(r'^add-contractors/(?P<cell_id>[\d]+)/(?P<game_id>[\d]+)/$', views.add_characters, name='add_characters_to_cell'),
 
     # ex: .com/playgroup/members/123
     url(r'^members/(?P<cell_id>[\d]+)/$', views.manage_members, name='cells_manage_members'),

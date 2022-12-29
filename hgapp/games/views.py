@@ -869,6 +869,10 @@ def accept_invite(request, game_id):
                     if invite.as_ringer and not form.cleaned_data['attending_character']:
                         #Reveal scenario to ringer
                         game.scenario.played_discovery(request.user)
+            cell_membership = game.cell.get_player_membership(request.user)
+            cell_invite = get_object_or_none(game.cell.open_invitations().filter(invited_player=request.user))
+            if game.cell and not cell_membership and (game.cell.allow_self_invites or cell_invite):
+                return HttpResponseRedirect(reverse('cells:cells_rsvp_invite_contract', args=(game.cell.id, game.id,)))
             return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
         else:
             logger.error('Error: invalid accept_invite_form. Errors: %s', str(form.errors))
