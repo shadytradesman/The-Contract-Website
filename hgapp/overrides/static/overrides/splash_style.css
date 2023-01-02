@@ -1,67 +1,86 @@
-body {
-  position: relative;
-  bottom: 50px;
-}
-
-iframe {
-    border: none;
+.css-main-section {
+    height: 80vh;
     width: 100%;
-    height: 100%;
-    overflow: visible;
-}
-html, body {
-    height: 100%;
-    margin: 0;         /* Reset default margin on the body element */
 }
 
-
-.css-main-container {
+.css-main-slideshow {
+  position: relative;
+  overflow: hidden;
+    height: 80vh;
+    z-index: -50;
 }
 
-.nav>li>a {
-    padding-left: 5px;
-    padding-right: 5px;
+.css-main-images {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 3653vh;
+  animation: slideshow 480s linear infinite;
+  transform: translate3d(0, 0, 0);
+  background-size: contain;
 }
 
-/* anchor links fix */
-.css-nav-section::before {
-  display: block;
-  content: "";
-  height: 50px;
+@keyframes slideshow {
+  0%    { left: 0; }
+  100%  {
+    -webkit-transform: translateX(-3653vh);
+  }
 }
 
-
-.css-nav-section {
-  min-height:100vh;
-  width: 100%;
+.css-main-logo {
+    position: relative;
+    width: 50%;
+    min-width: 370px;
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
 }
 
-.css-backdropped-text {
-    background-color: rgba(17, 20, 24, 0.5);
-    padding: 15px;
+.css-logo-cont {
+    position: absolute;
+    top: 30vh;
+    width: 100%;
 }
 
-@media (max-width: 768px) {
-    .css-backdropped-text {
-        background-color: rgba(17, 20, 24, 0.8);
-    }
+.css-main-text {
+    position: relative;
+    top: 25vh;
+    text-shadow:
+   -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+     1px 1px 0 #000;
 }
 
-/* HOME SECTION */
+.css-main-text .btn {
+    text-shadow: none;
+    font-size: 28px;
+}
+
+.css-main-text {
+    position: relative;
+    width: 50%;
+    max-width: 900px;
+    min-width: 375px;
+    margin: 0;
+    position: absolute;
+    top: 35vh;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    font-size: 20px;
+}
 
 .css-art-front-punk {
-    height: 95vh;
-    position: absolute;
+    height: 92vh;
     width: 100%;
-    float: right;
     background-position: top right;
     background-size: contain;
     background-repeat: no-repeat;
-}
-
-.css-art-front-punk.affix {
-    top: 50px;
-    position: fixed;
 }
 
 @media(max-width: 768px) {
@@ -71,334 +90,72 @@ html, body {
     }
 }
 
-.css-front-bg-logo {
-    width: 100%;
-    height: 155px;
-    top: 150px;
-    display: block;
-    position: absolute;
-    background-position: center;
-    background-size: contain;
-    background-repeat: no-repeat;
-}
-
-#css-front-text {
-    width: 66%;
+.css-punk-text {
     position: relative;
-    margin-top: 250px;
-    left: 40px;
-    background-color: rgba(17, 20, 24, 0.3);
-}
-
-@media (max-width: 768px) {
-    #css-front-text {
-        width: 100%;
-        left: 0px;
-        padding: 15px;
-        background-color: rgba(17, 20, 24, 0.7);
-
-    }
-}
-
-.css-front-text-bullets>.lead {
-    font-size: 18px;
-}
-
-#css-front-bullets-section {
-    margin-top: 00px;
-    position: relative;
-    margin-left: 60px;
-    width: 60%;
-    padding: 10px;
-    background-color: rgba(17, 20, 24, 0.5);
-}
-
-.css-front-text-bullets>h4 {
-    margin-top: 15px;
-}
-
-.css-subtitle {
-    font-size: 18px;
-}
-
-@media (max-width: 768px) {
-    #css-front-bullets-section {
-        margin-top: 10px;
-        position: relative;
-        margin-left: 0px;
-        width: 100%;
-        padding: 15px;
-        background-color: rgba(17, 20, 24, 0.7);
-    }
-}
-
-/* CALL TO ACTION */
-
-.btn-lg {
-    font-size: 30px;
-}
-
-#get-started.affix {
-    z-index: 9998 !important;
-    width: 100vw;
-    right: 0px;
-}
-
-@media (min-width: 768px) {
-    #get-started.affix {
-        -webkit-transition: all .3s ease-in;
-        transition: all .3s ease-in;
-        top: 60px;
-    }
-}
-@media (max-width: 768px) {
-    #get-started.affix {
-        bottom: 10px;
-    }
-}
-
-#get-started {
-    right: 13vw;
-}
-
-.css-affix-wrapper {
-    min-height: 75px;
-}
-
-
-/* CONTRACTORS SECTION */
-
-#css-art-front-time {
-    height: 95vh;
-    position: absolute;
-    width: 100%;
-    background-position: top left;
-    background-size: contain;
-    background-repeat: no-repeat;
-}
-
-@media (max-width: 768px) {
-    #css-art-front-time {
-        background-size: cover, 100%;
-        background-position: top center;
-    }
-}
-
-#css-art-front-time.affix {
-    top: 50px;
-    position: fixed;
-}
-
-.css-affix-spacer {
-    height: 80px;
-}
-
-@media (max-width: 768px) {
-    .css-affix-spacer {
-        height: 30vh;
-    }
-}
-
-@media (max-width: 768px) {
-    .css-head-spacer {
-        height: 40vh;
-    }
-    .css-head-spacer-sm {
-        height: 30vh;
-    }
-}
-
-#css-contractors-text {
-    width: 66%;
-    position: relative;
-    left: 33vw;
-}
-
-@media (max-width: 768px) {
-    #css-contractors-text {
-            width: 100%;
-            left: 0px;
-    }
-}
-
-#css-contractors-text>.lead {
-    font-size: 18px;
-}
-
-.css-contractors-first-para {
+    color: #e1b276;
+    top: 25vh;
     font-size: 24px;
+    font-family: Prompt, Helvetica, sans-serif;
+    width: 60%;
+    float: left;
+    left: 20%;
+    -ms-transform: translate(-20%, -20%);
+    transform: translate(-20%, -20%);
 }
 
-.css-bases {
-  margin: auto;
+.css-punk-text p {
+    margin-top: 3vh;
 }
 
-.css-disabled {
-    background-color: rgba(53, 62, 75, 0.5);
-    color: rgba(90, 90, 90, 1.0);
-}
-.tab-content {
-    border-bottom: 1px solid #a6763a;
-    border-left: 1px solid #a6763a;
-    border-right: 1px solid #a6763a;
-    background-color: rgba(17, 20, 24, 1.0);
-}
-
-.css-power-container {
-    padding: 10px;
-}
-
-.thumbnail {
-    margin: 5px;
-}
-
-.tab-pane>.lead {
-    margin-bottom: 5px;
-    margin-top: 15px;
-}
-
-/* GAMES SECTION */
-
-#css-art-front-doors {
-    height: 95vh;
-    position: absolute;
-    width: 100%;
-    background-position: center;
-    background-size: cover, 100%;
-    background-repeat: no-repeat;
-}
-
-@media (max-width: 768px) {
-    #css-art-front-doors {
-    background-position: left top;
+@media(min-width: 1600px) {
+    .css-punk-text {
+        font-size: 30px;
+        left: 30%;
     }
 }
 
-#css-art-front-doors.affix {
-    top: 50px;
-    position: fixed;
+.punk-bold {
+    font-weight: 500;
+    margin-bottom: 5vh;
+    text-align: center;
 }
 
-#css-games-text {
-    width: 66%;
+.css-talent-section {
+    background-color: #20252d;
+}
+
+.css-art-front-talent {
+    height: 90vh;
+    width: 80vw;
+    top: 1vh;
     position: relative;
-    margin: auto;
-}
-
-@media (max-width: 768px) {
-    #css-games-text {
-        width: 100%;
-    }
-}
-
-/* DICE SECTION */
-
-#css-art-front-bamboo {
-    height: 95vh;
-    position: absolute;
-    width: 100%;
-    background-position: top right;
+    left: 2vw;
+    background-position: bottom left;
     background-size: contain;
     background-repeat: no-repeat;
+
 }
 
-@media (max-width: 768px) {
-    #css-art-front-bamboo {
-        width: 100%;
-        left: 0px;
-        background-position: top center;
-        background-size: cover, 100%;
-    }
-}
-
-#css-art-front-bamboo.affix {
+.affix {
     top: 50px;
-    position: fixed;
+    left: 0px;
 }
 
-#css-dice-text {
-    width: 66%;
+.css-talent-section-text {
+    width: 55%;
     position: relative;
+    left: 45%;
+    padding-right: 50px;
+    padding-top: 50px;
 }
 
-@media (max-width: 768px) {
-    #css-dice-text {
-        width: 100%;
-    }
+
+.css-talent-narrative {
+    color: #e1b276;
+    padding: 25px;
+    font-size: 16px;
+    font-family: PT sans, Helvetica,Arial,sans-serif;
 }
-
-/* WEBSITE SECTION */
-
-
-#css-art-front-music {
-    height: 95vh;
-    position: absolute;
-    width: 100%;
-    background-position: top left;
-    background-size: contain;
-    background-repeat: no-repeat;
-}
-
-@media (max-width: 768px) {
-    #css-art-front-music {
-        width: 100%;
-        left: 0px;
-        background-position: top center;
-        background-size: cover, 100%;
-    }
-}
-
-#css-art-front-music.affix {
-    top: 50px;
-    position: fixed;
-}
-
-#css-website-text {
-    width: 66%;
-    position: relative;
-    left: 33vw;
-    padding-bottom: 150px;
-}
-
-@media (max-width: 768px) {
-    #css-website-text {
-        width: 100%;
-        left: 0px;
-    }
-}
-
-/* OTHER STUFF */
-.css-art-credit {
-    position: fixed;
-    bottom: 10px;
-    right: 10px;
-    z-index: 9999;
-    background-color: rgba(17, 20, 24, .8);
-    padding: 3px;
-}
-
-@media (max-width: 768px) {
-    .css-art-credit {
-        position: absolute;
-        top: 110px;
-        left: 10px;
-        bottom: inherit;
-        right: inherit;
-        z-index: 2;
-    }
-}
-
-.css-contractor-fiction {
-    font-family: Helvetica, sans-serif !important;
-    font-size: 16px !important;
-    font-weight: 300 !important;
-    line-height: 1.4;
-}
-
-.css-contractor-fiction>p {
-    margin-bottom: 20px;
-}
-
-.css-contractor-fiction>p>span {
-    font-weight: 300 !important;
+.css-talent-narrative b {
+    font-size: 20px;
 }

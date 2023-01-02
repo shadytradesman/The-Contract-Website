@@ -6,7 +6,11 @@
 }
 
 .css-section-body strong, .css-section-body h4, .css-section-body h5, .css-section-body h3{
-    font-family: Helvetica Neue,Helvetica,Arial,sans-serif;
+    font-family: Prompt,Helvetica,Arial,sans-serif;
+}
+
+.css-section-body strong {
+    font-weight: 600;
 }
 
 .css-section-body ul {

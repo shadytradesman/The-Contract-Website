@@ -28,93 +28,163 @@
 {% block body_base %}
 {% cache 50000 loggedouthome3 %}
 <div class="css-main-container">
-    <span class="css-art-credit"><small>Art by <a href="https://www.artstation.com/tavaresart">Gwynn Tavares</a></small></span>
-
-    <div id="home" class="css-nav-section">
-        <span class="css-art-front-punk" style='background-image:url("{% static 'overrides/art/front-punk.jpg' %}")'></span>
-        <span class="css-front-bg-logo" style='background-image:url("{% static 'overrides/branding/logobone_big_alpha.png' %}")'></span>
-        <div class="css-head-spacer-sm"></div>
-
-        <div id="css-front-text" class="css-backdropped-text">
-            <span class="lead">
-                <b>The Contract</b> is a TableTop Role Playing Game about ambitious individuals who agree to go on deadly
-                missions for fantastic powers. Those who survive are forged into the most fearsome beings in the multiverse.
-            </span>
-        </div>
-        <div id="css-front-bullets-section" class="css-backdropped-text">
-            <div class="text-center">
-                <span class="css-subtitle">
-                    A modern take on TTRPGs featuring gritty action and custom powers in an urban fantasy setting.
-                </span>
-            </div>
-            <hr>
-            <div class="css-front-text-bullets">
-                <h4>Test your wits and resourcefulness.</h4>
-                <ul>
-                    <li>Face challenges that demand outside-the-box problem solving, not min-maxed stats.</li>
-                    <li>
-                        Will your Contractor rise to the top or end up in the
-                        <a href="{% url 'characters:characters_graveyard' %}">
-                            the Graveyard?
-                        </a>
-                    </li>
-                    <li>Streamlined rules and online tools empower GMs to support creative tactics instead of playing calculator. </li>
-                </ul>
-
-                <h4>“Adult-schedule-friendly” is an understatement. </h4>
-                <ul>
-                    <li>Each session is a self-contained mission with great risks and rewards.</li>
-                    <li>Play your favorite Contractors no matter who shows up to game night.</li>
-                    <li>No more "forever GM." A different player may act as GameMaster (GM) each session.</li>
-                    <li>
-                        No in-person group? Join an active online community like
-                        <a href="https://discord.gg/xUZZegYNNy">
-                            our Discord
-                        </a>
-                        and play as often as you’d like.
-                    </li>
-                </ul>
-
-                <h4>Play Characters you care about.</h4>
-                <ul>
-                    <li>
-                        Build custom, flavorful Powers for any character concept you can imagine using The Contract's revolutionary
-                        <a href="{% url 'powers:powers_create_ps2' %}">
-                            Gift Builder.
-                        </a>
-                    </li>
-                    <li>Play and advance your Contractors session after session.</li>
-                    <li>Contractors’ strong, individual ambitions spur exciting interactions and relationships. </li>
-                </ul>
-
-                <h4>The easiest full-sized RPG to pick up and play.</h4>
-                <ul>
-                    <li>The Contract is available 100% free online via this website.</li>
-                    <li>Online character sheets and integrated rules mean less memorization and fewer trips to the rulebook.</li>
-                    <li>An active online community runs drop-in-friendly sessions almost every day for new and seasoned Players alike. </li>
-                </ul>
-                <div id="get-started-wrapper" class="text-center">
-                    <div id="get-started" class="text-center">
-                        <div class="css-subtitle">
-                            You don’t need to enter a credit card, read a hefty rulebook,
-                            or even assemble your own group.
-                            <br>
-                            You can play The Contract <b>today</b>.
-                        </div>
-                        <br>
-                        <a class="btn btn-lg btn-warning" href="{% url 'info:how-to-play' %}">Start Playing</a>
-                    </div>
-                    <div style="margin-top: 15px;">
-                        <a class="btn btn-default" href="https://www.patreon.com/ContractRpg">
-                            <div>
-                                <img class="float-left" src="/static/overrides/other_graphics/Digital-Patreon-Logo_FieryCoral.png" style="width: 30px; height: 30px; position: absolute;">
-                                <span style="padding-left: 35px;"> Support us on Patreon</span>
-                            </div>
-                        </a>
-                    </div>
+    <div class="css-main-section">
+        <div class="css-logo-cont">
+            <img class="css-main-logo" src="{% static 'overrides/branding/contractrpgbonestroke.svg' %}">
+            <div class="css-main-text header-font">
+                <div>
+                    The Contract is a gritty tabletop roleplaying game about ambitious people who go on deadly missions to earn fantastic powers.
+                </div>
+                <div style="margin-top: 2vh;">
+                    Those who survive are forged into the most formidable beings on earth.
+                </div>
+                <div class="text-center" style="margin-top: 5vh;">
+                    <a href="{% url 'info:how-to-play' %}" class="btn btn-lg btn-warning">Play for Free</a>
                 </div>
             </div>
         </div>
+        <div class="css-main-slideshow">
+            <div class="css-main-images" style="background-image: url({% static 'overrides/art/mainscroller.webp' %});">
+            </div>
+        </div>
+    </div>
+
+
+    <div class="css-punk-text">
+        <p class="punk-bold">
+            What price would you pay to achieve your wildest dreams?
+        </p>
+        <p class="punk-bold">
+            What risks would you take to change the world?
+        </p>
+        <p style="margin-top: 8vh;">
+            For a select few, these questions aren’t hypothetical. They’re an offer.
+        </p>
+        <p>
+            We wager everything in the Contracts, our morals, our humanity, our very lives.
+        </p>
+        <p>
+            But the Harbingers pay, and pay well.
+        </p>
+        <p style="margin-top: 8vh;">
+            Think you’ve got what it takes? No judgment if you chicken out.
+        </p>
+        <p style="margin-top: 8vh;">
+            Who wants super powers?
+        </p>
+    </div>
+    <div class="css-art-front-punk" style='background-image:url({% static "overrides/art/front-punk.jpg" %})'></div>
+
+
+
+    <div class="css-talent-section" >
+        <span id="js-talent-affix" data-spy="affix" data-offset-top="2000">
+            <div style="position:absolute;">
+            <div class="css-art-front-talent" style='background-image:url({% static "overrides/art/talent-front.webp" %})'></div>
+            </div>
+        </span>
+        <div class="css-talent-section-text">
+
+
+        <div class="css-front-text-bullets">
+            <h4>Test your wits and resourcefulness.</h4>
+            <ul>
+                <li>Face challenges that demand outside-the-box problem solving, not min-maxed stats.</li>
+                <li>
+                    Will your Contractor rise to the top or end up in the
+                    <a href="{% url 'characters:characters_graveyard' %}">
+                        the Graveyard?
+                    </a>
+                </li>
+                <li>Streamlined rules and online tools empower GMs to support creative tactics instead of playing calculator. </li>
+            </ul>
+
+            <h4>“Adult-schedule-friendly” is an understatement. </h4>
+            <ul>
+                <li>Each session is a self-contained mission with great risks and rewards.</li>
+                <li>Play your favorite Contractors no matter who shows up to game night.</li>
+                <li>No more "forever GM." A different player may act as GameMaster (GM) each session.</li>
+                <li>
+                    No in-person group? Join an active online community like
+                    <a href="https://discord.gg/xUZZegYNNy">
+                        our Discord
+                    </a>
+                    and play as often as you’d like.
+                </li>
+            </ul>
+
+            <h4>Play Characters you care about.</h4>
+            <ul>
+                <li>
+                    Build custom, flavorful Powers for any character concept you can imagine using The Contract's revolutionary
+                    <a href="{% url 'powers:powers_create_ps2' %}">
+                        Gift Builder.
+                    </a>
+                </li>
+                <li>Play and advance your Contractors session after session.</li>
+                <li>Contractors’ strong, individual ambitions spur exciting interactions and relationships. </li>
+            </ul>
+
+            <h4>The easiest full-sized RPG to pick up and play.</h4>
+            <ul>
+                <li>The Contract is available 100% free online via this website.</li>
+                <li>Online character sheets and integrated rules mean less memorization and fewer trips to the rulebook.</li>
+                <li>An active online community runs drop-in-friendly sessions almost every day for new and seasoned Players alike. </li>
+            </ul>
+            <div id="get-started-wrapper" class="text-center">
+                <div id="get-started" class="text-center">
+                    <div class="css-subtitle">
+                        You don’t need to enter a credit card, read a hefty rulebook,
+                        or even assemble your own group.
+                        <br>
+                        You can play The Contract <b>today</b>.
+                    </div>
+                    <br>
+                    <a class="btn btn-lg btn-warning" href="{% url 'info:how-to-play' %}">Start Playing</a>
+                </div>
+            </div>
+        </div>
+
+        <hr>
+        <div class="css-talent-narrative">
+            <p>
+                Yesterday I went on online and watched this bartender, Alex, light a cigarette with a snap of his fingers, no lighter. Did it under the observation of a buncha scientists too, so that’s that. He’s officially Illuminated.
+            </p>
+            <p>
+                “Magic” has always been around, of course. It wasn’t a secret. All those myths, legends, religions, and folktales; they’re all true. Well, sorta. Some of them are make-believe. The rest of them have been told and retold countless times, twisted and embellished into something that suits the monarchy or Disney or what-have-you.
+            </p>
+            <p>
+                Nowadays it’s different. Now you’ve got a cell phone with a 4K camera in your pocket. All you’ve gotta do is snap the video, post it to CryptoLeak, and you’ve got millions of views. And while the ambitious and greedy scramble to capitalize, you can sit back and watch all the debunkers and conspiracy theorists debate whether or not the whole thing is a hoax.
+            </p>
+            <p>
+                Never ceases to amaze me. All this technology and people still can’t tell what’s real and what’s a scam.
+            </p>
+            <p>
+                I hear fire-finger Alex’s bar is doing good business now, but it won’t last. What can he do that anyone with a lighter can’t? No, it won’t be long before the novelty wears off and no one cares about Alex’s little party trick. If he’s lucky some aristocrat or senator will hire him as a Jafar, pay him to stand nearby at parties and press conferences.
+            </p>
+            <p>
+                The truth is, even if people like Alex are one-in-fifty-thousand, they’re still a dime a dozen.
+            </p>
+            <p>
+                People like you are different. You’re hungry, curious, a little vicious. Your untapped potential is off the charts-- if you play your cards right.
+            </p>
+            <p>
+                What I'm saying, friend, is you’ve got talent. Real talent. Trust me, I’ve got a knack for spotting that kind of thing.
+            </p>
+            <p>
+                So, what do you say?
+            </p>
+            <p class="text-center" style="margin-top: 15px;">
+                <b>
+                    Shake my hand.
+                </b>
+            </p>
+        </div>
+
+
+
+
+
     </div>
 </div>
 {% endcache %}

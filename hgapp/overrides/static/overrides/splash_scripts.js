@@ -3,10 +3,13 @@ function setAffix() {
     const $home = $('#home');
     const homeEnd =  document.body.scrollHeight - $home.position().top - $home.outerHeight(true);
 
-    $('.css-art-front-punk').affix({
+}
+
+function setAffix() {
+    const container = $("#js-talent-affix");
+    $('#js-talent-affix').affix({
       offset: {
-        top: -50,
-        bottom:  homeEnd - 50,
+        top: container.position().top - 50
       }
     })
 }
