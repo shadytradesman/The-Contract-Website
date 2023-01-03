@@ -924,7 +924,8 @@ def timeline_context(character_id, request):
                 CraftingTimelineBlock(current_crafting_list))
         )
     character_edit_history = [(x.created_time, "edit", x) for x in
-                              character.contractstats_set.filter(is_snapshot=False).order_by("-created_time").all()[:1]]
+                              character.contractstats_set.filter(is_snapshot=False).order_by("-created_time").all()]
+    character_edit_history = character_edit_history[:-1]
     exp_rewards = [(x.created_time + timedelta(seconds=2), "exp_reward", x) for x in
                    character.experiencereward_set.filter(is_void=False).order_by("-created_time").all()]
     moves = [(x.created_date, "move", x) for x in character.move_set.order_by("-created_date").all()]
