@@ -1,15 +1,9 @@
 function setAffix() {
-    const $window = $(window);
-    const $home = $('#home');
-    const homeEnd =  document.body.scrollHeight - $home.position().top - $home.outerHeight(true);
-
-}
-
-function setAffix() {
-    const container = $("#js-talent-affix");
+    const container = $("#js-talent-section");
     $('#js-talent-affix').affix({
       offset: {
-        top: container.position().top - 50
+        top: container.position().top - 50,
+        bottom: 0
       }
     })
 }
@@ -17,6 +11,9 @@ function setAffix() {
 $(document).ready(function(){
     setAffix();
     $(window).scroll();
+ setTimeout(() => {
+    setAffix();
+    }, 280);
 });
 
 $( window ).resize(function() {

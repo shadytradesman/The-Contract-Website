@@ -5,6 +5,7 @@ from django.db import models
 from django.urls import reverse
 from guardian.shortcuts import assign_perm, remove_perm
 import requests
+from urllib.parse import urlparse
 import random
 import hashlib
 
@@ -125,6 +126,13 @@ class Cell(models.Model):
         self.game_death = num_died
         self.save()
 
+    def community_link_is_discord(self):
+        if self.community_link:
+            try:
+                return urlparse(self.community_link).hostname in ["discord.gg", "www.discord.gg", "discord.com"]
+            except Exception as inst:
+                return False
+        return False
     def get_danger_tooltip(self):
         return "Victories: {} <br>Losses: {} <br>Deaths: {}".format(self.game_victory, self.game_loss, self.game_death)
 

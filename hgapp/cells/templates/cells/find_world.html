@@ -80,11 +80,18 @@
                                 <div class="expandable-outer js-expandable-collapsed">
                                     {{cell.cell_sell|linebreaks}}
                                     {% if cell.is_community_link_public and cell.community_link %}
-                                        <div>
-                                            <a href="{{cell.community_link}}">
-                                                <b>Visit this Playgroup's off-site community.</b>
+                                        {% if cell.community_link_is_discord %}
+                                            <a class="btn btn-default btn" href="{{cell.community_link}}">
+                                                <img class="float-left" src="/static/overrides/other_graphics/Discord-Logo-Color.svg" style="width: 25px; height: 25px; position: absolute;">
+                                                <span style="padding-left: 25px;">Visit {{cell.name}}'s Discord Server</span>
                                             </a>
-                                        </div>
+                                        {% else %}
+                                            <div>
+                                                <a href="{{cell.community_link}}">
+                                                    <b>Visit this Playgroup's off-site community.</b>
+                                                </a>
+                                            </div>
+                                        {% endif %}
                                     {% endif %}
                                 </div>
                             {% endif %}

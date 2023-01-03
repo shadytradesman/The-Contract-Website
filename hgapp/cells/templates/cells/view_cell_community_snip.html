@@ -1,12 +1,19 @@
 {% load account_tags %}
 {% if community_link %}
-<h4 class="text-center">
-    <br>
-    Connect with this Playgroup's Community:
-    <a href="{{community_link}}">
-        {{community_link}}
-    </a>
-</h4>
+    {% if cell.community_link_is_discord %}
+        <a class="btn btn-default btn" href="{{cell.community_link}}">
+            <img class="float-left" src="/static/overrides/other_graphics/Discord-Logo-Color.svg" style="width: 25px; height: 25px; position: absolute;">
+            <span style="padding-left: 25px;">Visit {{cell.name}}'s Discord Server</span>
+        </a>
+    {% else %}
+        <h4 class="text-center">
+            <br>
+            Connect with this Playgroup's Community:
+            <a href="{{community_link}}">
+                {{community_link}}
+            </a>
+        </h4>
+    {% endif %}
 {% endif %}
 {% if not user_membership %}
 <div class="thumbnail">

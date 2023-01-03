@@ -753,9 +753,12 @@ def view_game(request, game_id):
         user_membership = game.cell.get_player_membership(request.user)
         my_invitation = get_object_or_none(request.user.game_invite_set.filter(relevant_game=game_id))
     community_link = None
+    discord_link = False
     if game.cell:
         can_view_community_link = game.cell.is_community_link_public or user_membership
         community_link = game.cell.community_link if can_view_community_link else None
+        if community_link:
+            discord_link = game.cell.community_link_is_discord()
     scenario_spoiled = game.scenario.player_is_spoiled(request.user)
     invite_form = None
     can_edit = game.player_can_edit(request.user)
@@ -778,6 +781,7 @@ def view_game(request, game_id):
         'nsfw_blocked': nsfw_blocked,
         'gametime_url': gametime_url,
         'community_link': community_link,
+        'is_discord_link': discord_link,
     }
     return render(request, 'games/view_game_pages/view_game.html', context)
 

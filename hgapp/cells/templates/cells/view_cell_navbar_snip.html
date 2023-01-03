@@ -1,9 +1,16 @@
 {% if not user_membership and community_link %}
     <ul class="nav nav-pills nav-justified navbar-default">
         <li>
-            <a class="btn-primary" href="{{community_link}}">
-                Visit {{cell.name}}'s off-site Community
-            </a>
+            {% if cell.community_link_is_discord %}
+                <a class="btn btn-default btn" href="{{cell.community_link}}">
+                    <img class="float-left" src="/static/overrides/other_graphics/Discord-Logo-Color.svg" style="width: 25px; height: 25px; position: absolute;">
+                    <span style="padding-left: 25px;">Visit {{cell.name}}'s Discord Server</span>
+                </a>
+            {% else %}
+                <a class="btn-primary" href="{{community_link}}">
+                    Visit {{cell.name}}'s off-site Community
+                </a>
+            {% endif %}
         </li>
     </ul>
 <br>

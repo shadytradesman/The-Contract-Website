@@ -100,10 +100,17 @@
                                     {{gametime_url}}
                                 </a>
                             {% elif community_link %}
-                                {{game.cell.name}}'s off-site community:
-                                <a href="{{community_link}}">
-                                    {{community_link}}
-                                </a>
+                                {% if is_discord_link %}
+                                    <a class="btn btn-default btn" href="{{community_link}}">
+                                        <img class="float-left" src="/static/overrides/other_graphics/Discord-Logo-Color.svg" style="width: 25px; height: 25px; position: absolute;">
+                                        <span style="padding-left: 25px;">Visit {{game.cell.name}}'s Discord Server</span>
+                                    </a>
+                                {% else %}
+                                    {{game.cell.name}}'s off-site community:
+                                    <a href="{{community_link}}">
+                                        {{community_link}}
+                                    </a>
+                                {% endif %}
                             {% endif %}
                             </b>
                         </div>
