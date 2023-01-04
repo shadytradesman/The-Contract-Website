@@ -357,9 +357,9 @@ def _handle_sig_artifact(request, SignatureArtifactForm, power_full, new_power, 
                 character=power_full.character,
                 creating_player=power_full.owner,
                 is_signature=True,
+                deleted_by_quirk_removal=False,
             )
             new_artifact.save()
-            print(new_artifact)
     else:
         new_artifact = None
 

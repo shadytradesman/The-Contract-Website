@@ -495,7 +495,7 @@ def choose_powers(request, character_id):
     assigned_powers = character.power_full_set.exclude(crafting_type=CRAFTING_SIGNATURE).all()
     unassigned_powers = request.user.power_full_set.filter(character=None, is_deleted=False).exclude(crafting_type=CRAFTING_SIGNATURE).order_by('-pub_date').all()
     assigned_items = character.get_signature_items_crafted()
-    unassigned_items = character.player.artifact_set.filter(cell=None, is_signature=True, crafting_character__isnull=True).all()
+    unassigned_items = Artifact.objects.filter(creating_player=character.player, cell=None, is_signature=True, is_deleted=False, crafting_character__isnull=True)
     context = {
         'character': character,
         'assigned_powers': assigned_powers,

@@ -60,6 +60,7 @@ class CraftingEvent(models.Model):
     def refund_all(self):
         if self.relevant_power_full.crafting_type == CRAFTING_CONSUMABLE:
             num_to_refund = self.craftedartifact_set.aggregate(Sum('quantity'))['quantity__sum']
+            num_to_refund = num_to_refund if num_to_refund is not None else 0
             self.refund_crafted_consumables(number_to_refund=num_to_refund)
         self.artifacts.clear()
 
