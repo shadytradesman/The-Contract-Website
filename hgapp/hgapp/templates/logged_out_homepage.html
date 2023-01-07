@@ -32,14 +32,16 @@
         <div class="css-logo-cont">
             <img class="css-main-logo" src="{% static 'overrides/branding/contractrpgbonestroke.svg' %}">
             <div class="css-main-text header-font">
-                <div>
-                    The Contract is a gritty tabletop roleplaying game about ambitious people who go on deadly missions to earn fantastic powers.
-                </div>
-                <div style="margin-top: 2vh;">
-                    Those who survive are forged into the most formidable beings on earth.
-                </div>
-                <div class="text-center" style="margin-top: 5vh;">
-                    <a href="{% url 'info:how-to-play' %}" class="btn btn-lg btn-warning">Play for Free</a>
+                <div class="css-backdropped-text">
+                    <div>
+                        The Contract is a gritty tabletop roleplaying game about ambitious people who go on deadly missions to earn fantastic powers.
+                    </div>
+                    <div style="margin-top: 2vh;">
+                        Those who survive are forged into the most formidable beings on earth.
+                    </div>
+                    <div class="text-center" style="margin-top: 5vh;">
+                        <a href="{% url 'info:how-to-play' %}" class="btn btn-lg btn-warning">Play for Free</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -49,9 +51,10 @@
         </div>
     </div>
 
-    <div class="js-affix-container">
+    <div class="js-affix-container" >
         <div class="css-art-front-punk js-affix-image" style='background-image:url({% static "overrides/art/front-punk.jpg" %})'></div>
         <div class="css-punk-text ">
+            <div class="css-backdropped-text">
             <p class="punk-bold">
                 What price would you pay to achieve your wildest dreams?
             </p>
@@ -73,21 +76,22 @@
             <p style="margin-top: 8vh;">
                 Who wants super powers?
             </p>
+            </div>
         </div>
     </div>
 
 
 
     <div class="css-talent-section js-affix-container" >
-        <span class="js-affix-image">
+        <div class="js-affix-image">
             <div style="position:absolute;">
                 <div class="css-art-front-talent" style='background-image:url({% static "overrides/art/talent-front.webp" %})'></div>
             </div>
-        </span>
+        </div>
         <div class="css-talent-section-text">
 
 
-        <div class="css-front-text-bullets">
+        <div class="css-front-text-bullets css-backdropped-text">
             <h4>Test your wits and resourcefulness.</h4>
             <ul>
                 <li>Face challenges that demand outside-the-box problem solving, not min-maxed stats.</li>
@@ -141,7 +145,7 @@
         </div>
 
         <hr>
-        <div class="css-talent-narrative">
+        <div class="css-talent-narrative css-backdropped-text">
             <p>
                 Yesterday I went on online and watched this bartender, Alex, light a cigarette with a snap of his fingers, no lighter. Did it under the observation of a buncha scientists too, so that’s that. He’s officially Illuminated.
             </p>
@@ -169,7 +173,7 @@
             <p>
                 So, what do you say?
             </p>
-            <p class="text-center" style="margin-top: 15px; margin-bottom: 80px;">
+            <p class="text-center hidden-xs" style="margin-top: 15px; margin-bottom: 80px;">
                 <b>
                     Shake my hand.
                 </b>

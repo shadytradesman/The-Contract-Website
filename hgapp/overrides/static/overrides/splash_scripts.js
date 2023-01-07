@@ -7,7 +7,7 @@ function setAffix() {
                 return (this.top = container.position().top - 50)
              },
             bottom: function () {
-                return (this.bottom = document.body.scrollHeight - container.position().top - container.outerHeight() - 50)
+                return (this.bottom = document.body.scrollHeight - container.position().top - container.outerHeight())
             }
           }
         });
@@ -16,10 +16,9 @@ function setAffix() {
 }
 
 $(document).ready(function(){
-    setAffix();
-    $(window).scroll();
     setTimeout(() => {
        setAffix();
+        $(window).scroll();
     }, 280);
 });
 

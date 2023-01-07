@@ -29,7 +29,8 @@
 }
 
 .css-main-slideshow {
-  position: relative;
+  position: absolute;
+  top: 50px;
   overflow: hidden;
   height: 80vh;
   z-index: -50;
@@ -38,9 +39,7 @@
 
 @media (max-width: 768px) {
     .css-main-slideshow {
-        height: 95vh;
-        position: fixed;
-        top: 50px;
+        height: 100%;
     }
 }
 
@@ -82,21 +81,20 @@
 @media (max-width: 768px) {
     .css-main-logo {
         padding: 10px;
+        padding-top: 150px;
     }
 }
 
 .css-logo-cont {
-    position: absolute;
-    top: 30vh;
     width: 100%;
+    position: relative;
+    top: 0px;
+    top: 150px;
 }
 
 @media (max-width: 768px) {
     .css-logo-cont {
-        position: relative;
-        top: 0px;
-        padding-top: 150px;
-        width: 100%;
+        padding-top: 0px;
     }
 }
 
@@ -111,8 +109,8 @@
     max-width: 900px;
     min-width: 375px;
     margin: 0;
-    position: absolute;
-    top: 35vh;
+    position: relative;
+    margin-top: 15vh;
     left: 50%;
     -ms-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
@@ -126,19 +124,19 @@
 
 @media (max-width: 768px) {
     .css-main-text {
+        margin-top: 35vh;
         padding: 15px;
-        position: relative;
-        background-color: rgba(17, 20, 24, 0.5);
-        top: 10vh;
+        padding: 15px;
     }
 }
 
 .css-art-front-punk {
-    height: 92vh;
+    height: 95vh;
     width: 100%;
     background-position: top right;
-    background-size: contain;
+    background-size: contain, 100%;
     background-repeat: no-repeat;
+    background-color: #111418;
     position: absolute;
     z-index: -2;
 }
@@ -156,23 +154,29 @@
     font-size: 24px;
     font-family: Prompt, Helvetica, sans-serif;
     width: 60%;
+    padding-bottom: 20vh;
 }
+
 @media(min-width: 769px) {
     .css-punk-text {
-        position: relative;
-        left: 20%;
-        -ms-transform: translate(-20%, -20%);
-        transform: translate(-20%, -20%);
-        top: 25vh;
-    }
-}
-@media(max-width: 768px) {
-    .css-punk-text {
+        padding-top: 150px;
+        padding-left: 10vh;
     }
 }
 
+@media(max-width: 768px) {
+    .css-punk-text {
+        padding-top: 50vh;
+        width: 100%;
+    }
+    .css-backdropped-text {
+        background-color: rgba(17, 20, 24, 0.5);
+        padding: 15px;
+    }
+}
+
+
 .css-punk-text p {
-    margin-top: 3vh;
 }
 
 @media(min-width: 1600px) {
@@ -201,7 +205,16 @@
     background-position: bottom left;
     background-size: contain;
     background-repeat: no-repeat;
+}
 
+@media(max-width: 768px) {
+    .css-art-front-talent {
+        background-position: top center;
+        background-size: cover, 100%;
+        width: 100vw;
+        left: 0px;
+
+    }
 }
 
 .affix {
@@ -220,6 +233,15 @@
     left: 45%;
     padding-right: 50px;
     padding-top: 50px;
+}
+
+@media(max-width: 768px) {
+.css-talent-section-text {
+    left: 0px;
+    width: 100%;
+    padding: 15px;
+    padding-top: 70vh;
+    }
 }
 
 
