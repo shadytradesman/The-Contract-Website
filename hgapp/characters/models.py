@@ -329,7 +329,7 @@ PORTED_EXP_ADJUSTMENT = {
 
 
 def random_string():
-    return hashlib.sha224(bytes(random.randint(1, 99999999))).hexdigest()
+    return hashlib.sha224(bytes(random.randint(1, 999999))).hexdigest()
 
 
 class Character(models.Model):
@@ -338,7 +338,7 @@ class Character(models.Model):
     player = models.ForeignKey(settings.AUTH_USER_MODEL,
                               on_delete=models.CASCADE,
                               null=True)
-    edit_secret_key = models.CharField(default = random_string,
+    edit_secret_key = models.CharField(default=random_string,
                                               max_length=64)
     status = models.CharField(choices=HIGH_ROLLER_STATUS,
                               max_length=25,

@@ -35,7 +35,7 @@ CELL_PERMISSIONS = (
 )
 
 def random_string():
-    return hashlib.sha224(bytes(random.randint(1, 99999999))).hexdigest()
+    return hashlib.sha224(bytes(random.randint(1, 999999))).hexdigest()
 
 class Cell(models.Model):
     name = models.CharField(max_length=200)
