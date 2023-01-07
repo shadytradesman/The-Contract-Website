@@ -9,14 +9,14 @@
 
 {% block extra_styles %}
     <link rel="stylesheet" type="text/css" href="{% static 'guide/read_guide_style.css' %}" />
+{% endblock %}
+
+{% block extra_scripts %}
     {{tutorial.professions|json_script:"professions"}}
     {{tutorial.archetypes|json_script:"archetypes"}}
     {{tutorial.personality_traits|json_script:"personalityTraits"}}
     {{tutorial.paradigms|json_script:"paradigms"}}
     {{tutorial.ambitions|json_script:"ambitions"}}
-{% endblock %}
-
-{% block extra_scripts %}
     <script src="{% static 'guide/read_guide_scripts.js' %}"></script>
     <script src="{% static 'overrides/wiki-macro-scripts.js' %}"></script>
 {% endblock %}

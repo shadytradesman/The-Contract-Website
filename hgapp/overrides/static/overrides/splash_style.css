@@ -213,7 +213,6 @@
         background-size: cover, 100%;
         width: 100vw;
         left: 0px;
-
     }
 }
 
@@ -235,6 +234,16 @@
     padding-top: 50px;
 }
 
+.css-talent-section-text .css-backdropped-text {
+    background-color: rgba(32, 37, 45, 0.7);
+    padding: 15px;
+}
+
+.css-punk-text .css-backdropped-text {
+    background-color: rgba(17, 20, 24, 0.5);
+    padding: 15px;
+}
+
 @media(max-width: 768px) {
 .css-talent-section-text {
     left: 0px;
@@ -250,8 +259,56 @@
     padding: 25px;
     font-size: 16px;
     font-family: PT sans, Helvetica,Arial,sans-serif;
+    letter-spacing: 0.05em;
 }
 
 .css-talent-narrative b {
     font-size: 20px;
 }
+
+.css-talent-section-text li {
+    font-size: 16px;
+}
+
+#js-concept {
+    color: #e1b276;
+    transform: translateX(-200%);
+	opacity: 0;
+	animation: slide-in-anim .5s ease-out forwards;
+    height: 24px;
+}
+
+.css-padded-header {
+    height: 25px;
+}
+
+@media(max-width:768px) {
+    #js-concept {
+	    position:relative;
+	    left: 50%;
+	    margin-top: 5px;
+	    font-size: 15px;
+	    height: 25px;
+	    overflow: hidden;
+	}
+	.css-padded-header {
+	    height: 35px;
+	}
+}
+
+@keyframes slide-in-anim {
+	20% {
+		opacity: 0;
+	}
+	60% {
+		transform: translateX(-45%);
+	}
+	75% {
+		transform: translateX(-52%);
+	}
+	100% {
+		opacity: 1;
+		transform: translateX(-50%);
+	}
+}
+

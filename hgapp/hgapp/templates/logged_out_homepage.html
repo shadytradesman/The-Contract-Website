@@ -13,12 +13,12 @@
 {% endblock %}
 
 {% block extra_scripts %}
-    <script src="{% static 'overrides/splash_scripts.js' %}"></script>
     {{tutorial.professions|json_script:"professions"}}
     {{tutorial.archetypes|json_script:"archetypes"}}
     {{tutorial.personality_traits|json_script:"personalityTraits"}}
     {{tutorial.paradigms|json_script:"paradigms"}}
     {{tutorial.ambitions|json_script:"ambitions"}}
+    <script src="{% static 'overrides/splash_scripts.js' %}"></script>
 {% endblock %}
 
 
@@ -80,8 +80,6 @@
         </div>
     </div>
 
-
-
     <div class="css-talent-section js-affix-container" >
         <div class="js-affix-image">
             <div style="position:absolute;">
@@ -89,101 +87,115 @@
             </div>
         </div>
         <div class="css-talent-section-text">
+            <div class="css-front-text-bullets css-backdropped-text">
+                <h4 class="css-padded-header">
+                    Be anything, even a:
+                    <span id="js-concept" class="css-concept-text visible-xs-block visible-sm-inline visible-md-inline visible-lg-inline">
+                        stoner magical girl
+                    </span>
+                </h4>
+                <ul>
+                    <li>
+                        Create custom powers and equipment for any concept with The Contract’s revolutionary
+                        <a href="{% url 'powers:powers_create_ps2' %}">
+                            Gift Builder.
+                        </a>
+                    </li>
+                    <li>
+                        Contractors have strong, individual ambitions that spur exciting interactions and relationships.
+                    </li>
+                </ul>
 
 
-        <div class="css-front-text-bullets css-backdropped-text">
-            <h4>Test your wits and resourcefulness.</h4>
-            <ul>
-                <li>Face challenges that demand outside-the-box problem solving, not min-maxed stats.</li>
-                <li>Streamlined rules and online tools empower GMs to support creative tactics instead of playing calculator. </li>
-            </ul>
 
-            <h4>“Adult-schedule-friendly” is an understatement. </h4>
-            <ul>
-                <li>Each session is a self-contained mission with great risks and rewards.</li>
-                <li>Play your favorite Contractors no matter who shows up to game night.</li>
-                <li>No more "forever GM." A different player may act as GameMaster (GM) each session.</li>
+                <h4>Test your wits and resourcefulness.</h4>
+                <ul>
+                    <li>Face challenges that demand outside-the-box problem solving, not min-maxed stats.</li>
+                    <li>Violence is one tactic of many, not the assumed solution. Combat is risky, brutal, and quick.</li>
+                </ul>
+
+                <h4>Say goodbye to scheduling woes</h4>
+                <ul>
+                    <li>Each play session is a self-contained mission with great risks and rewards.</li>
+                    <li>Play your favorite Contractor no matter who shows up to game night.</li>
+                    <li>No more "forever GM." A different player may act as GameMaster (GM) each session.</li>
+                </ul>
+
+                <h4>
+                    Play a TTRPG that’s more than a coffee table book
+                </h4>
+                <ul>
+                    <li>
+                        The Contract is available 100% free online via this website.
+                    </li>
+                    <li>
+                        Extensive online tools make it easy to administer a Playgroup of any size, even massive online communities.
+                    </li>
+                    <li>
+                        Enjoy regular balance and content updates based on community feedback.
+                    </li>
+                    <li>
+                        Play hundreds of community-written Scenarios.
+                    </li>
+                </ul>
+
+
                 <li>
-                    No in-person group? Join an active online community like
-                    <a href="https://discord.gg/xUZZegYNNy">
-                        our Discord
-                    </a>
-                    and play as often as you’d like.
-                </li>
-            </ul>
+                        No in-person group? Join an active online community like
+                        <a href="https://discord.gg/xUZZegYNNy">
+                            our Discord
+                        </a>
+                        and play as often as you’d like.
+                    </li>
 
-            <h4>Play Characters you care about.</h4>
-            <ul>
-                <li>
-                    Build custom, flavorful Powers for any character concept you can imagine using The Contract's revolutionary
-                    <a href="{% url 'powers:powers_create_ps2' %}">
-                        Gift Builder.
-                    </a>
-                </li>
-                <li>Play and advance your Contractors session after session.</li>
-                <li>Contractors’ strong, individual ambitions spur exciting interactions and relationships. </li>
-            </ul>
-
-            <h4>The easiest full-sized RPG to pick up and play.</h4>
-            <ul>
-                <li>The Contract is available 100% free online via this website.</li>
-                <li>Online character sheets and integrated rules mean less memorization and fewer trips to the rulebook.</li>
-                <li>An active online community runs drop-in-friendly sessions almost every day for new and seasoned Players alike. </li>
-            </ul>
-            <div id="get-started-wrapper" class="text-center">
-                <div id="get-started" class="text-center">
-                    <div class="css-subtitle">
-                        You don’t need to enter a credit card, read a hefty rulebook,
-                        or even assemble your own group.
+                <div id="get-started-wrapper" class="text-center">
+                    <div id="get-started" class="text-center">
+                        <div class="css-subtitle">
+                            You don’t need to enter a credit card, read a hefty rulebook,
+                            or even assemble your own group.
+                            <br>
+                            You can play The Contract <b>today</b>.
+                        </div>
                         <br>
-                        You can play The Contract <b>today</b>.
+                        <a class="btn btn-lg btn-warning" href="{% url 'info:how-to-play' %}">Start Playing</a>
                     </div>
-                    <br>
-                    <a class="btn btn-lg btn-warning" href="{% url 'info:how-to-play' %}">Start Playing</a>
+                </div>
+            </div>
+
+            <hr>
+            <div class="css-talent-narrative css-backdropped-text">
+                <p>
+                    Yesterday I went on online and watched this bartender, Alex, light a cigarette with a snap of his fingers, no lighter. Did it under the observation of a bunch of scientists too, so that’s that. He’s officially Illuminated.
+                </p>
+                <p>
+                    Of course “magic” has always been around. It wasn’t a secret. All those myths, legends, religions, and folktales; they’re all true. Well, sorta. Some of them are make-believe. The rest of them have been told and retold countless times, twisted and embellished into something that suits the monarchy or Disney or what-have-you.
+                </p>
+                <p>
+                    Nowadays it’s different. Now you’ve got a cell phone with a 4K camera in your pocket. All you’ve gotta do is snap the video, post it to CryptoLeak, and you’ve got millions of views. And while the ambitious and greedy scramble to capitalize, you can sit back and watch all the debunkers and conspiracy theorists debate whether or not the whole thing is a hoax.
+                </p>
+                <p>
+                    Never ceases to amaze me. All this technology and people still can’t tell what’s real and what’s a scam.
+                </p>
+                <p>
+                    I hear fire-finger Alex’s bar is doing good business now, but it won’t last. What can he do that anyone with a lighter can’t? No, it won’t be long before the novelty wears off and no one cares about Alex’s little party trick. If he’s lucky some aristocrat or senator will hire him as a Jafar, pay him to stand nearby at parties and press conferences.
+                </p>
+                <p>
+                    The truth is, even if people like Alex are one-in-fifty-thousand, they’re still a dime a dozen.
+                </p>
+                <p>
+                    People like you are different. You’re hungry, curious, a little vicious. Your untapped potential is off the charts-- if you play your cards right.
+                </p>
+                <p>
+                    What I'm saying, friend, is you’ve got talent. Real talent. Trust me, I’ve got a knack for spotting that kind of thing.
+                </p>
+                <p>
+                    So, what do you say?
+                </p>
+                <div class="text-center" style="margin-top: 25px;">
+                    <a class="btn btn-lg btn-warning text-center" href="{% url 'info:how-to-play' %}">Let's shake on it.</a>
                 </div>
             </div>
         </div>
-
-        <hr>
-        <div class="css-talent-narrative css-backdropped-text">
-            <p>
-                Yesterday I went on online and watched this bartender, Alex, light a cigarette with a snap of his fingers, no lighter. Did it under the observation of a buncha scientists too, so that’s that. He’s officially Illuminated.
-            </p>
-            <p>
-                “Magic” has always been around, of course. It wasn’t a secret. All those myths, legends, religions, and folktales; they’re all true. Well, sorta. Some of them are make-believe. The rest of them have been told and retold countless times, twisted and embellished into something that suits the monarchy or Disney or what-have-you.
-            </p>
-            <p>
-                Nowadays it’s different. Now you’ve got a cell phone with a 4K camera in your pocket. All you’ve gotta do is snap the video, post it to CryptoLeak, and you’ve got millions of views. And while the ambitious and greedy scramble to capitalize, you can sit back and watch all the debunkers and conspiracy theorists debate whether or not the whole thing is a hoax.
-            </p>
-            <p>
-                Never ceases to amaze me. All this technology and people still can’t tell what’s real and what’s a scam.
-            </p>
-            <p>
-                I hear fire-finger Alex’s bar is doing good business now, but it won’t last. What can he do that anyone with a lighter can’t? No, it won’t be long before the novelty wears off and no one cares about Alex’s little party trick. If he’s lucky some aristocrat or senator will hire him as a Jafar, pay him to stand nearby at parties and press conferences.
-            </p>
-            <p>
-                The truth is, even if people like Alex are one-in-fifty-thousand, they’re still a dime a dozen.
-            </p>
-            <p>
-                People like you are different. You’re hungry, curious, a little vicious. Your untapped potential is off the charts-- if you play your cards right.
-            </p>
-            <p>
-                What I'm saying, friend, is you’ve got talent. Real talent. Trust me, I’ve got a knack for spotting that kind of thing.
-            </p>
-            <p>
-                So, what do you say?
-            </p>
-            <p class="text-center hidden-xs" style="margin-top: 15px; margin-bottom: 80px;">
-                <b>
-                    Shake my hand.
-                </b>
-            </p>
-        </div>
-
-
-
-
-
     </div>
 </div>
 {% endcache %}

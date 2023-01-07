@@ -424,7 +424,16 @@ $(function(){
             if (Math.random() < 0.5 || !extra) {
                 output = output + " " + randomFromList(paradigms);
             }
-            $("#id_concept_summary").val(output.trim().toLowerCase());
+            let out = output.trim().toLowerCase();
+            if (document.getElementById('id_concept_summary')) {
+                $("#id_concept_summary").val(out);
+            } else {
+                $("#js-concept").text(out);
+                var el = document.getElementById('js-concept');
+                el.style.animation = 'none';
+                el.offsetHeight; /* trigger reflow */
+                el.style.animation = null;
+            }
         }
 
         function randomAmbition() {
@@ -435,6 +444,9 @@ $(function(){
         if (document.getElementById('js-random-archetype-button')) {
             document.getElementById("js-random-archetype-button").addEventListener("click", randomArchetype);
             document.getElementById("js-random-ambition-button").addEventListener("click", randomAmbition);
+        }
+        if (document.getElementById('js-concept')) {
+            window.setInterval(randomArchetype, 2400);
         }
     }
 });
