@@ -28,7 +28,7 @@
 {% block body_base %}
 {% cache 50000 loggedouthome3 %}
 <div class="css-main-container">
-    <div class="css-main-section">
+    <div class="css-main-section js-affix-container">
         <div class="css-logo-cont">
             <img class="css-main-logo" src="{% static 'overrides/branding/contractrpgbonestroke.svg' %}">
             <div class="css-main-text header-font">
@@ -44,43 +44,44 @@
             </div>
         </div>
         <div class="css-main-slideshow">
-            <div class="css-main-images" style="background-image: url({% static 'overrides/art/mainscroller.webp' %});">
+            <div class="css-main-images js-affix-image" style="background-image: url({% static 'overrides/art/mainscroller.webp' %});">
             </div>
         </div>
     </div>
 
-
-    <div class="css-punk-text">
-        <p class="punk-bold">
-            What price would you pay to achieve your wildest dreams?
-        </p>
-        <p class="punk-bold">
-            What risks would you take to change the world?
-        </p>
-        <p style="margin-top: 8vh;">
-            For a select few, these questions aren’t hypothetical. They’re an offer.
-        </p>
-        <p>
-            We wager everything in the Contracts, our morals, our humanity, our very lives.
-        </p>
-        <p>
-            But the Harbingers pay, and pay well.
-        </p>
-        <p style="margin-top: 8vh;">
-            Think you’ve got what it takes? No judgment if you chicken out.
-        </p>
-        <p style="margin-top: 8vh;">
-            Who wants super powers?
-        </p>
+    <div class="js-affix-container">
+        <div class="css-art-front-punk js-affix-image" style='background-image:url({% static "overrides/art/front-punk.jpg" %})'></div>
+        <div class="css-punk-text ">
+            <p class="punk-bold">
+                What price would you pay to achieve your wildest dreams?
+            </p>
+            <p class="punk-bold">
+                What risks would you take to change the world?
+            </p>
+            <p style="margin-top: 8vh;">
+                For a select few, these questions aren’t hypothetical. They’re an offer.
+            </p>
+            <p>
+                We wager everything in the Contracts, our morals, our humanity, our very lives.
+            </p>
+            <p>
+                But the Harbingers pay, and pay well.
+            </p>
+            <p style="margin-top: 8vh;">
+                Think you’ve got what it takes? No judgment if you chicken out.
+            </p>
+            <p style="margin-top: 8vh;">
+                Who wants super powers?
+            </p>
+        </div>
     </div>
-    <div class="css-art-front-punk" style='background-image:url({% static "overrides/art/front-punk.jpg" %})'></div>
 
 
 
-    <div id="js-talent-section" class="css-talent-section" >
-        <span id="js-talent-affix">
+    <div class="css-talent-section js-affix-container" >
+        <span class="js-affix-image">
             <div style="position:absolute;">
-            <div class="css-art-front-talent" style='background-image:url({% static "overrides/art/talent-front.webp" %})'></div>
+                <div class="css-art-front-talent" style='background-image:url({% static "overrides/art/talent-front.webp" %})'></div>
             </div>
         </span>
         <div class="css-talent-section-text">
