@@ -17,30 +17,20 @@
     {% block extra_head %}{% endblock %}
     <link rel="shortcut icon" href="{% static 'overrides/branding/favicon.jpg' %}" />
 
-    {% if not debug %}
-        <!-- Global site tag (gtag.js) - Google Analytics -->
-        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-193028736-1">
-        </script>
-        <script>
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-
-          gtag('config', 'UA-193028736-1');
-        </script>
-        <!-- Global site tag (gtag.js) - Google Analytics -->
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-48E3C4RNYE"></script>
-        <script>
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-
-          gtag('config', 'G-48E3C4RNYE');
-        </script>
-    {% endif %}
     {% guidebook_search_blob %}
     <script src="https://unpkg.com/vue@3.2.26/dist/vue.global.prod.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    {% if not debug and not request.user.is_superuser %}
+        <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-YNYS07F3ZC"></script>
+        <script>
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+
+                  gtag('config', 'G-YNYS07F3ZC');
+        </script>
+    {% endif %}
 {% endblock %}
 
 
