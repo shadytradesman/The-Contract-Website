@@ -280,6 +280,7 @@
 
 .css-padded-header {
     height: 25px;
+    marign-top: 40px;
 }
 
 @media(max-width:768px) {
