@@ -1,4 +1,5 @@
 from itertools import chain
+import datetime
 
 from account.models import Account
 from django.contrib.auth.models import User
@@ -136,6 +137,19 @@ def home(request):
         num_victories = Game_Attendance.objects.filter(outcome=WIN, is_confirmed=True).count()
         num_losses = Game_Attendance.objects.filter(outcome=LOSS, is_confirmed=True).count()
         num_deaths = Game_Attendance.objects.filter(outcome=DEATH, is_confirmed=True).count()
+        now = datetime.datetime.now()
+        two_hours_ago = now - datetime.timedelta(hours=2)
+        games = Game.objects.filter(
+            list_in_lfg=True,
+            status=GAME_STATUS[0][0],
+            scheduled_start_time__gte=two_hours_ago)\
+            .exclude(is_nsfw=True)\
+            .select_related("scenario")\
+            .order_by('scheduled_start_time')[:3]
+        num_games = Game.objects.filter(
+            list_in_lfg=True,
+            status=GAME_STATUS[0][0],
+            scheduled_start_time__gte=two_hours_ago).exclude(is_nsfw=True).count()
         context = {
             'info': info,
             'tutorial': tutorial,
@@ -144,7 +158,9 @@ def home(request):
             "num_scenarios_with_valid_writeups": num_scenarios_with_valid_writeups,
             "num_victories":  num_victories,
             "num_losses": num_losses,
-            "num_deaths": num_deaths
+            "num_deaths": num_deaths,
+            "games": games,
+            "num_games": num_games,
         }
         return render(request, 'logged_out_homepage.html', context)
     else:

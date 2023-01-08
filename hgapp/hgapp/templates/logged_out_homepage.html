@@ -147,22 +147,56 @@
                 </ul>
 
                 <h4>
-                    More than a PDF
+                    Much more than a PDF
                 </h4>
                 <ul>
                     <li>
                         The Contract is available 100% free online via this website.
                     </li>
                     <li>
-                        Frequent patches add content and fix balance issues based on community feedback.
+                        Extensive integrated tools make learning, playing, and running The Contract a breeze.
                     </li>
                     <li>
-                        Play <b>4</b> free Stock Scenarios and <b>{{num_scenarios_with_valid_writeups}}</b> community-written Scenarios.
+                        Frequent patches fix balance issues and add content based on community feedback.
                     </li>
                     <li>
-                        Extensive tools make leading Playgroups a breeze, whether they're a few friends or a massive online setting.
+                        Play <b>5</b> free Stock Scenarios and <b>{{num_scenarios_with_valid_writeups}}</b> community-written Scenarios.
+                    </li>
+                    <li>
+                        Lead Playgroups of any size, whether they're just a few friends or a massive online setting.
                     </li>
                 </ul>
+
+                {% if games %}
+                    <h3>
+                        {{num_games}} GM{{num_games|pluralize}} currently looking for Players
+                        <div >
+                            <small>
+                                Upcoming online Contract{{num_games|pluralize}}
+                            </small>
+                        </div>
+                    </h3>
+                    <ul>
+                        {% for game in games %}
+                            <li>
+                                <a href="{% url 'games:games_view_game' game.id %}" target="_blank" rel="noopener noreferrer">
+                                    {{game.gm.username}} will run {{game.scenario.title}} in
+                                    {{game.scheduled_start_time|timeuntil}}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    {% if num_games > 3 %}
+                        <div>
+                            Find the rest on the
+                            <a href="{% url 'games:games_looking_for_game' %}">
+                                Looking for Game
+                            </a>
+                            page.
+                        </div>
+                    {% endif %}
+
+                {% endif %}
 
 
 
@@ -182,7 +216,7 @@
             <hr>
             <div class="css-talent-narrative css-backdropped-text">
                 <p>
-                    Yesterday I went on online and watched this bartender, Alex, light a cigarette with a snap of his fingers, no lighter. Did it under the observation of a bunch of scientists too, so that’s that. He’s officially Illuminated.
+                    Yesterday I went on online and watched this bartender Alex light a cigarette with a snap of his fingers, no lighter. Did it under the observation of a bunch of scientists too, so that’s that. He’s officially Illuminated.
                 </p>
                 <p>
                     Of course “magic” has always been around. It wasn’t a secret. All those myths, legends, religions, and folktales; they’re all true. Well, sorta. Some of them are make-believe. The rest have been told and retold, twisted each time to suit the monarchy or Disney or what-have-you.
@@ -200,7 +234,7 @@
                     The truth is, even if people like Alex are one-in-fifty-thousand, they’re still a dime a dozen.
                 </p>
                 <p>
-                    People like you are different. You’re hungry, curious, a little vicious. Your untapped potential is off the charts-- if you play your cards right.
+                    But you— people like you are different. You’re hungry, curious, a little vicious. Your untapped potential is off the charts. If you play your cards right.
                 </p>
                 <p>
                     What I'm saying, friend, is you’ve got talent. Real talent. Trust me, I’ve got a knack for spotting that kind of thing.
@@ -208,7 +242,7 @@
                 <p>
                     So, what do you say?
                 </p>
-                <div class="text-center" style="margin-top: 25px;">
+                <div class="text-center" style="margin-top: 25px; margin-bottom: 30px;">
                     <a class="btn btn-lg btn-warning text-center" href="{% url 'info:how-to-play' %}">Let's shake on it.</a>
                 </div>
             </div>
