@@ -23,12 +23,14 @@ from django.urls import reverse
 from characters.models import Character, CharacterTutorial
 from powers.models import Power_Full, Enhancement, Drawback, Parameter, Base_Power, SYS_LEGACY_POWERS, SYS_PS2
 
-from games.models import GAME_STATUS, Scenario
+from games.models import GAME_STATUS, Scenario, Game, Game_Attendance, WIN, LOSS, DEATH
 from hgapp.forms import SignupForm, ResendEmailConfirmation
 from blog.models import Post
 from info.models import FrontPageInfo
 from cells.models import WorldEvent
 from profiles.forms import EmailSettingsForm
+from profiles.models import Profile
+from games.games_constants import get_completed_game_excludes_query
 
 
 class SignupView(account.views.SignupView):
@@ -128,9 +130,21 @@ def home(request):
     if request.user.is_anonymous:
         info = FrontPageInfo.objects.first()
         tutorial = CharacterTutorial.objects.first()
+        num_players = Profile.objects.count()
+        num_scenarios_with_valid_writeups = Scenario.objects.filter(num_words__gte=1000).count()
+        num_contractors = Character.objects.count()
+        num_victories = Game_Attendance.objects.filter(outcome=WIN, is_confirmed=True).count()
+        num_losses = Game_Attendance.objects.filter(outcome=LOSS, is_confirmed=True).count()
+        num_deaths = Game_Attendance.objects.filter(outcome=DEATH, is_confirmed=True).count()
         context = {
             'info': info,
             'tutorial': tutorial,
+            "num_players": num_players,
+            "num_contractors": num_contractors,
+            "num_scenarios_with_valid_writeups": num_scenarios_with_valid_writeups,
+            "num_victories":  num_victories,
+            "num_losses": num_losses,
+            "num_deaths": num_deaths
         }
         return render(request, 'logged_out_homepage.html', context)
     else:

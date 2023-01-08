@@ -68,7 +68,7 @@
                 We wager everything in the Contracts, our morals, our humanity, our very lives.
             </p>
             <p>
-                But the Harbingers pay, and pay well.
+                But the Harbingers pay, and their Gifts transcend cash and coin.
             </p>
             <p style="margin-top: 8vh;">
                 Think you’ve got what it takes? No judgment if you chicken out.
@@ -82,14 +82,39 @@
 
     <div class="css-talent-section js-affix-container" >
         <div class="js-affix-image">
-            <div style="position:absolute;">
-                <div class="css-art-front-talent" style='background-image:url({% static "overrides/art/talent-front.webp" %})'></div>
-            </div>
+            <a href="{% url 'info:how-to-play' %}">
+                <div style="position:absolute;">
+                    <div class="css-art-front-talent" style='background-image:url({% static "overrides/art/talent-front.webp" %})'></div>
+                </div>
+            </a>
         </div>
         <div class="css-talent-section-text">
             <div class="css-front-text-bullets css-backdropped-text">
+                <div class="">
+                    <h3 style="margin-bottom: 30px;">
+                        {{num_players}} Players
+                        <span class="css-weak-head">
+                                have created
+                        </span>
+                        {{num_contractors}} Contractors
+                        <span class="css-weak-head">
+                                and earned
+                        </span>
+                        <div>
+                            <span>
+                                {{num_victories}} Victories,
+                            </span>
+                            <span>
+                                {{num_losses }} Failures,
+                            </span>
+                            <span>
+                                and {{num_deaths}} Deaths
+                            </span>
+                        </div>
+                    </h3>
+                </div>
                 <h4 class="css-padded-header">
-                    Be anything, even a:
+                    Be anything, even a<span class="visible-xs-inline">:</span>
                     <span id="js-concept" class="css-concept-text visible-xs-block visible-sm-inline visible-md-inline visible-lg-inline">
                         stoner magical girl
                     </span>
@@ -116,47 +141,39 @@
 
                 <h4>Say goodbye to scheduling woes</h4>
                 <ul>
-                    <li>Each play session is a self-contained mission with great risks and rewards.</li>
+                    <li>Each session is a self-contained mission with great risks and rewards.</li>
                     <li>Play your favorite Contractor no matter who shows up to game night.</li>
-                    <li>No more "forever GM." A different player may act as GameMaster (GM) each session.</li>
+                    <li>No more "forever GM." A different person may act as GameMaster (GM) each session.</li>
                 </ul>
 
                 <h4>
-                    Play a TTRPG that’s more than a coffee table book
+                    More than a PDF
                 </h4>
                 <ul>
                     <li>
                         The Contract is available 100% free online via this website.
                     </li>
                     <li>
-                        Extensive online tools make it easy to administer a Playgroup of any size, even massive online communities.
+                        Frequent patches add content and fix balance issues based on community feedback.
                     </li>
                     <li>
-                        Enjoy regular balance and content updates based on community feedback.
+                        Play <b>4</b> free Stock Scenarios and <b>{{num_scenarios_with_valid_writeups}}</b> community-written Scenarios.
                     </li>
                     <li>
-                        Play hundreds of community-written Scenarios.
+                        Extensive tools make leading Playgroups a breeze, whether they're a few friends or a massive online setting.
                     </li>
                 </ul>
 
 
-                <li>
-                        No in-person group? Join an active online community like
-                        <a href="https://discord.gg/xUZZegYNNy">
-                            our Discord
-                        </a>
-                        and play as often as you’d like.
-                    </li>
 
                 <div id="get-started-wrapper" class="text-center">
                     <div id="get-started" class="text-center">
-                        <div class="css-subtitle">
-                            You don’t need to enter a credit card, read a hefty rulebook,
-                            or even assemble your own group.
-                            <br>
-                            You can play The Contract <b>today</b>.
-                        </div>
-                        <br>
+                        <a class="btn btn-lg btn-default css-discord-button" href="https://discord.gg/xUZZegYNNy">
+                            <img class="float-left" src="{% static '/overrides/other_graphics/Discord-Logo-Color.svg' %}" style="width: 25px; height: 25px; position: absolute;">
+                            <span style="margin-left: 30px;">
+                                Our Discord
+                            </span>
+                        </a>
                         <a class="btn btn-lg btn-warning" href="{% url 'info:how-to-play' %}">Start Playing</a>
                     </div>
                 </div>
@@ -168,7 +185,7 @@
                     Yesterday I went on online and watched this bartender, Alex, light a cigarette with a snap of his fingers, no lighter. Did it under the observation of a bunch of scientists too, so that’s that. He’s officially Illuminated.
                 </p>
                 <p>
-                    Of course “magic” has always been around. It wasn’t a secret. All those myths, legends, religions, and folktales; they’re all true. Well, sorta. Some of them are make-believe. The rest of them have been told and retold countless times, twisted and embellished into something that suits the monarchy or Disney or what-have-you.
+                    Of course “magic” has always been around. It wasn’t a secret. All those myths, legends, religions, and folktales; they’re all true. Well, sorta. Some of them are make-believe. The rest have been told and retold, twisted each time to suit the monarchy or Disney or what-have-you.
                 </p>
                 <p>
                     Nowadays it’s different. Now you’ve got a cell phone with a 4K camera in your pocket. All you’ve gotta do is snap the video, post it to CryptoLeak, and you’ve got millions of views. And while the ambitious and greedy scramble to capitalize, you can sit back and watch all the debunkers and conspiracy theorists debate whether or not the whole thing is a hoax.

@@ -85,9 +85,9 @@ def activity(request):
         "num_players": num_players,
         "num_contractors": num_contractors,
         "num_contractors_played": num_contractors_played,
+        "num_scenarios_with_valid_writeups": num_scenarios_with_valid_writeups,
         "upcoming_games": upcoming_games,
         "past_games": past_games,
-        "num_scenarios_with_valid_writeups": num_scenarios_with_valid_writeups,
     }
     return render(request, 'games/activity.html', context)
 

@@ -231,7 +231,7 @@
     position: relative;
     left: 45%;
     padding-right: 50px;
-    padding-top: 50px;
+    padding-top: 10px;
 }
 
 .css-talent-section-text .css-backdropped-text {
@@ -312,3 +312,15 @@
 	}
 }
 
+.css-weak-head {
+    font-weight: 300;
+    font-size: 22px;
+}
+
+#get-started-wrapper {
+    margin-top: 40px;
+}
+
+.css-discord-button {
+    margin-right: 20px;
+}
