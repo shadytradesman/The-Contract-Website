@@ -53,6 +53,14 @@
                     </a>
                 </div>
             {% endif %}
+            {% if guidebook.is_under_construction %}
+                <div class="alert alert-info" style="margin-left: 25px; margin-right: 25px;">
+                        <img src="{% static 'guide/graphics/pencil-ruler.svg' %}" height="35" width="35" style="display: inline-block; float: left; margin-right: 10px; width: 35px; height: 35px;"/>
+                        <h4 class="css-under-construction-text" style=" margin-bottom: 0px;">
+                            This Guidebook is under construction
+                        </h4>
+                </div>
+            {% endif %}
             <div class="panel panel-default" style="margin-right: 10px; margin-left: 10px; z-index: 4;">
                 <div class="panel-body css-guide-content">
                     <div class="css-section-body" style="margin-top: 15px; background-color: #28313f !important; padding-bottom: 1px;">

@@ -20,6 +20,7 @@ class GuideBook(models.Model):
     redirect_url = models.CharField(max_length=400, blank=True, null=True) # redirect to here instead of being viewable as a guidebook
     content = models.TextField(max_length=74000) # tinymce html content for editing
     rendered_content = models.TextField(max_length=74000)  # content that is rendered for display
+    is_under_construction = models.BooleanField(default=False) # should we show an "under construction" banner at the top?
 
     def save(self, *args, **kwargs):
         self.rendered_content = render_content(self.content, get_pics_by_slug())

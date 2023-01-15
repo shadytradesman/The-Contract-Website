@@ -373,3 +373,9 @@ body {position:relative;}
 .css-examples-content {
     padding-top: 5px;
 }
+
+@media (min-width: 991px) {
+    .css-under-construction-text {
+        margin-top: 5px !important;
+    }
+}

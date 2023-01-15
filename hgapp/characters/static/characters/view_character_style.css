@@ -511,3 +511,7 @@ input[type="number"] {
         padding-left: 20px;
     }
 }
+
+.css-combat-ref-text {
+    color: #e1b276;
+}
