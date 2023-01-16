@@ -379,6 +379,7 @@ def rsvp_invite(request, cell_id, secret_key=None, accept=None, game_id=None):
             if is_accepted:
                 if Character.objects.filter(player=request.user, cell__isnull=True).exists():
                     return HttpResponseRedirect(reverse('cells:add_characters_to_cell', args=(cell.id, game_id)))
+            if game_id is not None:
                 return HttpResponseRedirect(reverse('games:games_view_game', args=(game_id,)))
             else:
                 return HttpResponseRedirect(reverse('cells:cells_view_cell', args=(cell.id,)))

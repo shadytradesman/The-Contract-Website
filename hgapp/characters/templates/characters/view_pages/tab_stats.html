@@ -74,7 +74,13 @@
                        {% endif %}
                     >
                         <div class="panel-heading css-circumstance-heading" role="tab" id="circumstance-heading-{{cell.id}}">
-                            <h5 class="panel-title">In {{cell.name}}</h5>
+                            <h5 class="panel-title">
+                                {% if cell %}
+                                    In {{cell.name}}
+                                {% else %}
+                                    From Assets and Liabilities
+                                {% endif %}
+                            </h5>
                         </div>
                     </a>
                     <div id="collapse-circumstance-{{cell.id}}"
