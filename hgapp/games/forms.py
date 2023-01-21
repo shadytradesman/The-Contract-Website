@@ -55,6 +55,7 @@ SCENARIO_TINYMCE_SETTINGS = {
 
     formData = new FormData();
     formData.append('file', blobInfo.blob(), blobInfo.filename());
+    formData.append('scenario', JSON.parse(document.getElementById('scenarioId').textContent));
     // append CSRF token in the form data
     function getCookie(name) {
     var nameEQ = name + "=";

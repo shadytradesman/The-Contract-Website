@@ -3,6 +3,7 @@ from django.db import models
 import uuid
 import os
 
+from games.models import Scenario
 
 def image_upload_name(instance, filename):
     ext = filename.split('.')[-1]
@@ -15,11 +16,14 @@ class UserImage(models.Model):
     file_size = models.IntegerField()
     uploader = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
     created_date = models.DateTimeField('date created', auto_now_add=True)
+    scenario = models.ForeignKey(Scenario, on_delete=models.PROTECT, null=True)
+
 
     class Meta:
         indexes = [
             models.Index(fields=['uploader']),
             models.Index(fields=['uploader', 'file_size']),
+            models.Index(fields=['scenario']),
         ]
 
     def save(self, *args, **kwargs):
