@@ -869,12 +869,10 @@ class Scenario(models.Model):
             return get_user_model().objects.none()
 
     def player_can_edit_writeup(self, user):
-        if user == self.creator:
+        if user == self.creator or user.is_superuser:
             return True
-        elif not self.is_wiki_editable:
-            return False
-        if user.is_superuser or user.profile.early_access_user:
-            return self.creator.is_superuser or self.creator.profile.early_access_user
+        if self.is_wiki_editable and self.player_is_spoiled(user):
+            return True
         return False
 
     def is_valid(self):
