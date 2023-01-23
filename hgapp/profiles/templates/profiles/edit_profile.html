@@ -23,6 +23,7 @@
                  {% csrf_token %}
                  {{ form.about | bootstrap }}
                  {{form.view_adult | bootstrap }}
+                 {{form.private_profile | bootstrap }}
                  <input class="btn btn-primary" type="submit" value="Done!" />
             </form>
         </div>

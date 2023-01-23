@@ -22,6 +22,15 @@
     <div class="text-center">
         <h1 class="text-center">{{profile.user.username}}</h1>
     </div>
+    {% if not profile_viewable %}
+        <div class="thumbnail text-center">
+            <h3>You cannot view this Profile.</h3>
+            <div>
+                To view this profile, you must be in a Playgroup with {{profile.user.username}}
+            </div>
+        </div>
+    {% else %}
+
     <div class="panel panel-default">
         <div class="panel-body">
             <div class="row">
@@ -34,6 +43,15 @@
                             Member Since {{profile.user.date_joined|date}}
                             {% if profile.user == request.user %}
                                 <br>
+                                    Profile is
+                            <b>
+                                {% if profile.is_private %}
+                                Private
+                                {% else %}
+                                Public
+                                {% endif %}
+                                </b>
+                                |
                                 {% if profile.view_adult_content %}
                                     <b>
                                         18+ content enabled
@@ -330,6 +348,7 @@
             </div>
         </div>
     </div>
+    {% endif %}
 </div>
 
 {% endblock %}

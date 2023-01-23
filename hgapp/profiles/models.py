@@ -122,6 +122,7 @@ class Profile(models.Model):
     num_player_survivals = models.IntegerField(default=0)
 
     view_adult_content = models.BooleanField(default=False)
+    is_private = models.BooleanField(default=False)
     date_set_adult_content = models.DateTimeField(blank=True, null=True)
 
     # Email prefs
@@ -144,6 +145,17 @@ class Profile(models.Model):
             models.Index(fields=['num_player_survivals']),
             models.Index(fields=['num_moves_gmed']),
         ]
+
+    def player_can_view(self, player):
+        if player == self.user:
+            return True
+        if self.is_private:
+            members = set()
+            for cell in self.user.cell_set.all():
+                members.union(set(cell.members.values_list("pk", flat=True)))
+            return player.pk in members
+        else:
+            return True
 
     def get_confirmed_email(self):
         email = EmailAddress.objects.get_primary(self.user)

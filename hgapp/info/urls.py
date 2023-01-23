@@ -11,8 +11,11 @@ urlpatterns = [
     # ex: .com/info/probability/
     url(r"^probability/$", views.probability, name="probability"),
 
+    # ex: .com/info/hall-of-fame
+    url(r"^hall-of-fame/$", views.leaderboard, name="leaderboard"),
+
     # ex: .com/info/community-records/
-    url(r"^community-records/$", views.leaderboard, name="leaderboard"),
+    url(r"^community-records/$", RedirectView.as_view(pattern_name='info:leaderboard', permanent=True)),
 
     # ex: .com/info/statistics/
     url(r"^statistics/$",

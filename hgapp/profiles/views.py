@@ -51,6 +51,7 @@ class ProfileView(generic.DetailView):
         context['scenarios'] = self.scenarios
         context['attended_games'] = self.attended_games
         context['profile_view'] = True
+        context['profile_viewable'] = self.profile.player_can_view(self.request.user)
         return context
 
     def populate_contractor_stats_context(self, context):
@@ -114,6 +115,7 @@ def profile_edit(request):
         if form.is_valid():
             profile.about = form.cleaned_data['about']
             with transaction.atomic():
+                profile.is_private = form.cleaned_data['private_profile']
                 profile.save()
                 profile.update_view_adult_content(form.cleaned_data['view_adult'])
             return HttpResponseRedirect(reverse('profiles:profiles_view_profile', args=(profile.id,)))
@@ -125,11 +127,12 @@ def profile_edit(request):
             initial={
                 'about': profile.about,
                 'view_adult': profile.view_adult_content,
+                'private_profile': profile.is_private,
             }
         )
         context = {
-            'profile' : profile,
-            'form' : form,
+            'profile': profile,
+            'form': form,
         }
         return render(request, 'profiles/edit_profile.html', context)
 

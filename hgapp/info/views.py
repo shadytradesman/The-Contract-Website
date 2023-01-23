@@ -33,17 +33,17 @@ def fiction(request):
 
 def leaderboard(request):
     num_to_fetch = 10
-    top_gms = Profile.objects.order_by('-num_games_gmed')[:num_to_fetch]
-    deadliest_gms = Profile.objects.order_by('-num_gm_kills')[:num_to_fetch]
-    most_social_gms = Profile.objects.order_by('-num_gmed_players')[:num_to_fetch]
+    top_gms = Profile.objects.order_by('-num_games_gmed').filter(is_private=False)[:num_to_fetch]
+    deadliest_gms = Profile.objects.order_by('-num_gm_kills').filter(is_private=False)[:num_to_fetch]
+    most_social_gms = Profile.objects.order_by('-num_gmed_players').filter(is_private=False)[:num_to_fetch]
 
-    top_players = Profile.objects.order_by('-num_player_games')[:num_to_fetch]
-    top_ringer_players = Profile.objects.order_by('-num_played_ringers')[:num_to_fetch]
-    top_survivors = Profile.objects.order_by('-num_player_survivals')[:num_to_fetch]
+    top_players = Profile.objects.order_by('-num_player_games').filter(is_private=False)[:num_to_fetch]
+    top_ringer_players = Profile.objects.order_by('-num_played_ringers').filter(is_private=False)[:num_to_fetch]
+    top_survivors = Profile.objects.order_by('-num_player_survivals').filter(is_private=False)[:num_to_fetch]
 
-    top_contractor_wins = Character.objects.order_by('-num_victories')[:num_to_fetch]
-    top_contractor_losses = Character.objects.order_by('-num_losses')[:num_to_fetch]
-    top_contractor_journals = Character.objects.order_by('-num_journals')[:num_to_fetch]
+    top_contractor_wins = Character.objects.order_by('-num_victories').filter(player__profile__is_private=False)[:num_to_fetch]
+    top_contractor_losses = Character.objects.order_by('-num_losses').filter(player__profile__is_private=False)[:num_to_fetch]
+    top_contractor_journals = Character.objects.order_by('-num_journals').filter(player__profile__is_private=False)[:num_to_fetch]
 
     top_scenario_runs = Scenario.objects.order_by('-times_run', '-num_gms_run')[:num_to_fetch]
     top_scenario_gms = Scenario.objects.order_by('-num_gms_run', '-times_run')[:num_to_fetch]

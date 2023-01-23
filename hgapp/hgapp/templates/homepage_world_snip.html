@@ -21,7 +21,12 @@
             {% if not cell_invites and not cells %}
             <div class="alert alert-warning text-center">
                 <h3>You aren't a member of any Playgroups</h3>
-                <p>Ask your friends to invite you or</p>
+                <p>
+                    <a href="{% url 'cells:cells_find_world' %}" >
+                        Find a Playgroup,
+                    </a>
+                    ask your friends to invite you to theirs or
+                </p>
                 <br>
                 <a href="{% url 'cells:cells_create' %}" class="btn btn-info btn-lg">Start your own</a>
             </div>

@@ -278,7 +278,7 @@ class CommunityJournals(View):
         return render(request, self.template_name, self.__get_context_data())
 
     def __get_context_data(self):
-        journal_query = Journal.objects.filter(game_attendance__attending_character__private=False)
+        journal_query = Journal.objects.filter(game_attendance__attending_character__private=False, writer__profile__is_private=False)
         if self.request.user.is_anonymous:
             journal_query.filter(contains_spoilers=False, is_nsfw=False)
         public_journals = journal_query.order_by('-created_date').all()[:100]
