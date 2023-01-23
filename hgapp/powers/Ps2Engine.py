@@ -349,7 +349,7 @@ class SystemTextRenderer:
             raise ValueError("too many marker strings for non-list sub starting at: " + start + "for text " + system_text)
         default_value = None
         if default_content_start_index:
-            default_value = system_text[default_content_start_index + 1 : end - 1]
+            default_value = system_text[default_content_start_index + 1 : end_paren_index]
             default_value = default_value.strip()
         return ReplacementCandidate(marker_starts[0], capitalize, markers, default_value, start, end)
 

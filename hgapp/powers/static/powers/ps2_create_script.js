@@ -862,7 +862,7 @@ function findReplacementCandidate(systemText) {
     // default values
     var defaultValue = null;
     if (defaultContentStartIndex != null) {
-        defaultValue = systemText.slice(defaultContentStartIndex + 1, end - 1);
+        defaultValue = systemText.slice(defaultContentStartIndex + 1, endParenIndex);
         defaultValue = defaultValue.trim();
     }
 
