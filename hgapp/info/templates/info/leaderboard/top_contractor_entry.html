@@ -1,7 +1,14 @@
 {% extends "info/leaderboard/leaderboard_entry_template.html" %}
+{% load static %}
 
 {% block entry_content %}
 <a href="{% url 'characters:characters_view' character.id %}" class="css-contractor-sub">
+    {% if character.is_dead %}
+    <img data-title="This Contractor is dead."
+         data-toggle="tooltip"
+         class="css-dead-img"
+         src="{% static 'characters/skull.svg' %}" width="25" height="25"/>
+    {% endif %}
     <b>{{character.name}}</b>
     <p class="main-subtitle">
         the {{character.concept_summary}}
