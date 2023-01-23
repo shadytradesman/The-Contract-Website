@@ -1037,7 +1037,7 @@ def post_trauma(request, character_id, secret_key = None):
         __check_edit_perms(request, character, secret_key)
         if form.is_valid():
             with transaction.atomic():
-                character = Character.objects.select_for_update().get(pk=character.pk)
+                character = Character.objects.select_for_update(nowait=True).get(pk=character.pk)
                 trauma_rev = grant_trauma_to_character(form, character)
             return JsonResponse({"id": trauma_rev.id,
                                  "system": trauma_rev.relevant_trauma.description,
@@ -1054,7 +1054,7 @@ def delete_trauma(request, trauma_rev_id, used_xp, secret_key = None):
         character = trauma_rev.relevant_stats.assigned_character
         __check_edit_perms(request, character, secret_key)
         with transaction.atomic():
-            character = Character.objects.select_for_update().get(pk=character.pk)
+            character = Character.objects.select_for_update(nowait=True).get(pk=character.pk)
             delete_trauma_rev(character, trauma_rev, True if used_xp == "T" else False)
         return JsonResponse({}, status=200)
     return JsonResponse({"error": ""}, status=400)
