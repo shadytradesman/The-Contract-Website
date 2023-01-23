@@ -39,5 +39,5 @@ def get_weapons_by_type():
     weapons = Weapon.objects.order_by("type", "bonus_damage").all()
     weapons_by_type = defaultdict(list)
     for weapon in weapons:
-        weapons_by_type[(weapon.type, weapon.get_type_display())].append(weapon)
+        weapons_by_type[weapon.get_type_cat()].append(weapon)
     return dict(weapons_by_type)

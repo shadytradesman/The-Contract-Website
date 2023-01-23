@@ -25,6 +25,7 @@ from characters.signals import GrantAssetGift, VoidAssetGifts, AlterPortedReward
 import random
 import hashlib
 
+
 logger = logging.getLogger("app." + __name__)
 
 STATUS_ANY = 'ANY'
@@ -166,13 +167,16 @@ WEAPON_MELEE = "MELEE" # swords, clubs, axes
 WEAPON_UNARMED = "UNARMED" # swords, clubs, axes
 WEAPON_FIREARM = "FIREARM" # guns
 WEAPON_THROWN = "THROWN" # javalins, slings, shurikens
+WEAPON_THROWN_DISPLAY = "Thrown"
+WEAPON_THROWN_OTHER = "THROWN_2" # doesn't show up on special thrown weapon gift
 WEAPON_PROJECTILE = "PROJECTILE" # bows, slingshots, crossbows
 WEAPON_OTHER = "OTHER" # Stun guns, caltrops, etc.
 WEAPON_TYPE = (
     (WEAPON_MELEE, "Melee"),
     (WEAPON_UNARMED, "Unarmed"),
     (WEAPON_FIREARM, "Firearm"),
-    (WEAPON_THROWN, "Thrown"),
+    (WEAPON_THROWN, WEAPON_THROWN_DISPLAY),
+    (WEAPON_THROWN_OTHER,"Thrown other"),
     (WEAPON_PROJECTILE, "Projectile"),
     (WEAPON_OTHER, "Other")
 )
@@ -2010,6 +2014,12 @@ class Weapon(models.Model):
 
     def __str__(self):
         return self.name + "(" + self.type + ")"
+
+    def get_type_cat(self):
+        if self.type == WEAPON_THROWN_OTHER:
+            return WEAPON_THROWN, WEAPON_THROWN_DISPLAY
+        else:
+            return self.type, self.get_type_display()
 
     def attack_roll_replacement(self):
         if self.attack_roll:
