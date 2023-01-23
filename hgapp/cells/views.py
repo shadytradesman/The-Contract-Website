@@ -459,7 +459,7 @@ def leave_cell(request, cell_id):
         raise PermissionDenied("You must be logged in to leave a Cell")
     cell = get_object_or_404(Cell, id=cell_id)
     if not cell.get_player_membership(request.user):
-        raise PermissionDenied("You can't leave a Cell you're not a member of")
+        raise PermissionDenied("You can't leave a Playgroup you're not a member of")
     if request.method == 'POST':
         form = RsvpForm(request.POST)
         if form.is_valid():

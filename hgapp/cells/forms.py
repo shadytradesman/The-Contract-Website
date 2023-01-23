@@ -89,7 +89,7 @@ class CustomInviteForm(forms.Form):
 class RecruitmentForm(forms.Form):
     list_publicly = forms.BooleanField(label='List Publicly',
                                        required=False,
-                                       help_text='If you check this box and provide a link to a community below, your Playgroup will appear on the "Find Playgroups" page.')
+                                       help_text='If you check this box <b>and provide a community link below,</b> your Playgroup will appear on the "Find Playgroups" page.')
     allow_self_invites = forms.BooleanField(label='Open Memberships',
                                             required=False,
                                             help_text='If checked, anyone with an account may join your Playgroup. '

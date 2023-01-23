@@ -198,7 +198,14 @@ class Cell(models.Model):
         if not membership:
             raise ValueError("player not in cell")
         if self.player_is_only_leader(player):
-            raise ValueError("Cannot remove only leader")
+            if self.player_is_only_member(player):
+                self.is_listed_publicly = False
+                self.allow_self_invites = False
+                self.invitations.clear()
+                self.resetShareLink()
+                self.save()
+            else:
+                raise ValueError("Cannot remove only leader unless there are no other members.")
         membership = self.cellmembership_set.get(member_player=player)
         membership.remove_user_from_all_groups()
         membership.remove_characters_from_cell()
@@ -209,7 +216,7 @@ class Cell(models.Model):
         if not membership:
             raise ValueError("player not in cell")
         if self.player_is_only_leader(player):
-            raise ValueError("Cannot remove only leader")
+            raise ValueError("Cannot ban only leader.")
         membership = self.cellmembership_set.get(member_player=player)
         membership.remove_user_from_all_groups()
         membership.remove_characters_from_cell()
@@ -223,6 +230,12 @@ class Cell(models.Model):
         if not membership:
             return False
         return membership.role == ROLE[0][0] and get_queryset_size(self.cellmembership_set.filter(role=ROLE[0][0], is_banned=False)) == 1
+
+    def player_is_only_member(self, player):
+        membership = get_object_or_none(self.cellmembership_set.filter(member_player=player, is_banned=False))
+        if not membership:
+            return False
+        return get_queryset_size(self.cellmembership_set.filter(is_banned=False)) == 1
 
     def invitePlayer(self, player, text):
         extant_invite = get_object_or_none(self.cellinvite_set.filter(invited_player=player))
@@ -405,8 +418,8 @@ class CellMembership(models.Model):
         if self.pk is None:
             super(CellMembership, self).save(*args, **kwargs)
         else:
-            if self.role != ROLE[0][0] and self.relevant_cell.player_is_only_leader(self.member_player):
-                raise ValueError("Cannot remove only leader")
+            if self.role != ROLE[0][0] and self.relevant_cell.player_is_only_leader(self.member_player) and not self.relevant_cell.player_is_only_member(self.member_player):
+                raise ValueError("Cannot remove only leader unless there are no other members.")
             self.remove_user_from_all_groups()
             super(CellMembership, self).save(*args, **kwargs)
         if not self.is_banned:

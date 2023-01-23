@@ -19,7 +19,7 @@
         </h4>
     {% endif %}
 {% endif %}
-{% if not user_membership %}
+{% if not user_membership and cell.cell_sell %}
 <div class="thumbnail">
     <div class="expandable-outer js-expandable-collapsed">
         <h3>Curious about joining {{cell.name}}?</h3>
@@ -29,12 +29,19 @@
 {% endif %}
 <div class="text-center">
     {{cell.name}} was created by
-<a href="{% url 'profiles:profiles_view_profile' cell.creator.profile.id %}">
-    {% user_display cell.creator %}
-</a>
-{{cell.created_date|timesince}} ago
+    <a href="{% url 'profiles:profiles_view_profile' cell.creator.profile.id %}">
+        {% user_display cell.creator %}
+    </a>
+    {{cell.created_date|timesince}} ago
 </div>
 <div class="row">
+    {% if not memberships_and_characters %}
+    <div class="thumbnail text-center">
+        <div class="expandable-outer js-expandable-collapsed">
+            <h3 class="text-danger">{{cell.name}} has no members and is closed.</h3>
+        </div>
+    </div>
+    {% endif %}
     {% for membership_and_characters in memberships_and_characters %}
         <div class="col-md-6">
             <div class="thumbnail">
