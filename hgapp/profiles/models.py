@@ -147,7 +147,7 @@ class Profile(models.Model):
         ]
 
     def player_can_view(self, player):
-        if player == self.user:
+        if player == self.user or player.is_superuser:
             return True
         if self.is_private:
             members = set()
