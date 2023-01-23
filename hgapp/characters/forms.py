@@ -234,7 +234,10 @@ class QuirkForm(forms.Form):
     details_id = forms.IntegerField(label=None, widget=forms.HiddenInput(),required=False)
     is_selected = forms.BooleanField(required=False)
     details = forms.CharField(max_length=600,
-                              widget=forms.TextInput(attrs={'class': 'form-control'}),
+                              widget=forms.TextInput(attrs={
+                                  'class': 'form-control',
+                                  'maxlength':'1000'
+                              }),
                               required=False)
 
     def __init__(self, *args, **kwargs):
@@ -482,7 +485,7 @@ class LooseEndForm(forms.Form):
                               label="Details",
                               help_text="A summary about the Loose End. What does the Contractor know about it?",
                               widget=forms.TextInput(attrs={'class': 'form-control'}))
-    cutoff = forms.IntegerField(validators=[MaxValueValidator(20), MinValueValidator(0)],
+    cutoff = forms.IntegerField(validators=[MaxValueValidator(999), MinValueValidator(0)],
                                 widget=forms.NumberInput(attrs={'class': 'js-injury-value-input form-control'}),
                                 help_text="How many Contracts until this Loose End's Threat manifests?",
                                 initial=1)

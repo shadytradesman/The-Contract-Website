@@ -1326,15 +1326,15 @@ class StockBattleScar(models.Model):
 class BattleScar(models.Model):
     character = models.ForeignKey(Character,
                                    on_delete=models.CASCADE)
-    description = models.CharField(max_length=500)
-    system = models.CharField(max_length=500, blank=True)
+    description = models.CharField(max_length=5000)
+    system = models.CharField(max_length=5000, blank=True)
 
 
 class WorldElement(models.Model):
     # owning character
     # null for sig items without owners
     character = models.ForeignKey(Character, on_delete=models.CASCADE, null=True)
-    name = models.CharField(max_length=500)
+    name = models.CharField(max_length=5000)
     description = models.CharField(max_length=5000)
     origin = models.CharField(max_length=2000, blank=True)
     system = models.CharField(max_length=5000, blank=True, help_text="Threat for Loose Ends")
@@ -2144,8 +2144,8 @@ class Liability(Quirk):
 
 
 class Trauma(models.Model):
-    name = models.CharField(max_length=500, blank=True)
-    description = models.CharField(max_length=500)
+    name = models.CharField(max_length=5000, blank=True)
+    description = models.CharField(max_length=5000)
 
 
 class Source(models.Model):
