@@ -1,27 +1,121 @@
 {% load account_tags %}
 
 <div class="panel-body">
-    {% if request.user.is_authenticated and request.user.id == game.creator.id %}
-            <h4>
-                Attending Players
-            </h4>
-            <ul>
-                {% for invitation in game.game_invite_set.all %}
-                    <li>
+    {% if request.user.is_authenticated and request.user.id == game.gm.id %}
+            <h3>
+                Attending Contractors
+            </h3>
+            {% for invitation in game.game_invite_set.all %}
+                <div class="css-attending-contractor-badge">
+                    <h4>
                         <a href="{% url 'profiles:profiles_view_profile' invitation.invited_player.id %}"><b>{% user_display invitation.invited_player %}</b></a>
                         {% if invitation.attendance.attending_character %}
                             Playing <a href="{% url 'characters:characters_view' invitation.attendance.attending_character.id %}">{{invitation.attendance.attending_character.name}}</a>
                         {% else %}
                             Playing a ringer
                         {% endif %}
-                    </li>
-                {% empty %}
-                    <p>
-                        No players attending this Contract?!??!?! <br>
-                        Maybe <a href="{% url 'games:games_cancel_game' game.id %}">Cancel Contract</a> and try re-making?
-                    </p>
-                {% endfor %}
-            </ul>
+                    </h4>
+                    {% if invitation.attendance.attending_character %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul>
+                                <li>
+                                    <b>Limits</b>
+                                    <ul>
+                                        {% for limit_rev in invitation.attendance.attending_character.stats_snapshot.limitrevision_set.all %}
+                                        <li data-title="{{limit_rev.relevant_limit.description}}" data-toggle="tooltip" >
+                                            {{limit_rev.relevant_limit.name}}
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                </li>
+                                {% if invitation.attendance.attending_character.condition_set.count != 0 %}
+                                    <li>
+                                        <b>Conditions</b>
+                                        <ul>
+                                            {% for condition in invitation.attendance.attending_character.condition_set.all %}
+                                            <li data-title="{{condition.system}}" data-toggle="tooltip" >
+                                                {{condition.name}}
+                                            </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </li>
+                                {% endif %}
+                                {% if invitation.attendance.attending_character.circumstance_set.count != 0 %}
+                                    <li>
+                                        <b>Circumstances</b>
+                                        <ul>
+                                            {% for circumstance in invitation.attendance.attending_character.circumstance_set.all %}
+                                            <li data-title="{{circumstance.system}}" data-toggle="tooltip" >
+                                            {{circumstance.name}}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul>
+                                {% if invitation.attendance.attending_character.get_noteworthy_attributes %}
+                                <li>
+                                    <b>Noteworthy Attributes</b>
+                                    <ul>
+                                        {% for val in invitation.attendance.attending_character.get_noteworthy_attributes %}
+                                        <li><b>
+                                                {{val.0}}:
+                                            </b>
+                                            {{val.1}}
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                </li>
+                                {% endif %}
+                                {% if invitation.attendance.attending_character.stats_snapshot.traumarevision_set.all %}
+                                <li>
+                                    <b>Traumas</b>
+                                    <ul>
+                                        {% for trauma in invitation.attendance.attending_character.stats_snapshot.traumarevision_set.all %}
+                                        <li
+                                                data-title="{{trauma.relevant_trauma.description}}"
+                                                data-toggle="tooltip">
+                                            {{trauma.relevant_trauma.name}}
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                </li>
+                                {% endif %}
+                                {% if invitation.attendance.attending_character.battlescar_set.all %}
+                                <li>
+                                    <b>Battle Scars</b>
+                                    <ul>
+                                        {% for scar in invitation.attendance.attending_character.battlescar_set.all %}
+                                        <li
+                                        data-title="{{scar.system}}"
+                                        data-toggle="tooltip">
+                                            {{scar.description}}
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                </li>
+                                {% endif %}
+                                <li>
+                                    <b>Body: </b> {{invitation.attendance.attending_character.num_body_levels}}
+                                </li>
+                                <li>
+                                    <b>Mind: </b> {{invitation.attendance.attending_character.num_mind_levels}}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            {% empty %}
+                <p>
+                    No players attending this Contract?!??!?!
+                    <br>
+                    Maybe <a href="{% url 'games:games_cancel_game' game.id %}">Cancel Contract</a> and try re-making it. Maybe people will RSVP next time.
+                </p>
+            {% endfor %}
     {% elif request.user.is_authenticated %}
         {% if  my_invitation.attendance %}
             <h4>

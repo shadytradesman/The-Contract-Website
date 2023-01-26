@@ -12,6 +12,11 @@
 {% load games_tags %}
 {% load markdown_deux_tags %}
 
+{% block extra_styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'games/view_game_style.css' %}" />
+{% endblock %}
+
+
 {% block body_base %}
 <div class="container">
     <br>

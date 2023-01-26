@@ -461,6 +461,13 @@ class Character(models.Model):
             models.Index(fields=['player']),
         ]
 
+    def get_noteworthy_attributes(self):
+        values = []
+        for attribute_value in self.stats_snapshot.attributevalue_set.all():
+            if attribute_value.value == 1 or attribute_value.value > 4:
+                values.append((attribute_value.relevant_attribute.name, attribute_value.value))
+        return values
+
     def is_editable_with_key(self, key):
         if hasattr(self, 'player') and self.player:
             return False
