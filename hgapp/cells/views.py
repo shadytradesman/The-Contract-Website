@@ -324,7 +324,7 @@ def invite_players(request, cell_id):
             with transaction.atomic():
                 pm_write(sender=request.user,
                          recipient=player,
-                         subject="You have been invited to join a Cell",
+                         subject="You have been invited to join a Playgroup",
                          body=message_body,
                          skip_notification=False,
                          auto_archive=True,
