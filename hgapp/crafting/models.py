@@ -107,7 +107,7 @@ class CraftingEvent(models.Model):
         self.save()
 
     def set_crafted_artifacts(self, artifacts, allowed_number_free):
-        existing_artifacts = self.craftedartifact_set.filter(relevant_artifact__is_deleted=False).all()
+        existing_artifacts = self.craftedartifact_set.filter(relevant_artifact__is_deleted=False, relevant_artifact__is_consumable=False).all()
         craftings_by_art_id = {x.relevant_artifact_id: x for x in existing_artifacts}
         new_art_ids = set([x.pk for x in artifacts])
         artifacts_to_refund = set([x.relevant_artifact_id for x in existing_artifacts if x.relevant_artifact_id not in new_art_ids])

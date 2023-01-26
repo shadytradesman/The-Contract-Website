@@ -183,7 +183,7 @@ class ReadJournal(View):
         else:
             character = get_object_or_404(Character, id=self.kwargs['character_id'])
             game_id = self.kwargs['game_id'] if 'game_id' in self.kwargs else None
-        viewer_can_write = character.player_can_edit(self.request.user)
+        viewer_can_write = character.player_can_edit(self.request.user) if self.request.user else False
         completed_attendances = character.completed_games()
         cover = get_object_or_none(JournalCover, character=character)
         journal_pages = []

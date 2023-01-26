@@ -70,12 +70,10 @@ def activity(request):
     now = datetime.datetime.now()
     two_hours_ago = now - datetime.timedelta(hours=2)
     games_query = Game.objects.filter(
-        list_in_lfg=True,
         status=GAME_STATUS[0][0],
         scheduled_start_time__gte=two_hours_ago)
     upcoming_games = games_query.order_by('-scheduled_start_time').all()
     past_games_query = Game.objects.filter(
-        list_in_lfg=True,
         scheduled_start_time__lte=two_hours_ago)
     past_games = past_games_query.order_by('-scheduled_start_time','-actual_start_time').prefetch_related('gm', 'cell', 'scenario').all()
     num_scenarios_with_valid_writeups = Scenario.objects.filter(num_words__gte=1000).count()

@@ -113,6 +113,15 @@
         {% if game.max_rsvp %}
             {{ game.gm.username}} has set a maximum of {{game.max_rsvp}} RSVPs.
         {% endif %}
+        <div>
+            <ul>
+                {% for invite in game.get_attended_players %}
+                    <li>
+                        {{invite}}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
         {% if request.user.is_authenticated %}
             {% if my_invitation %}
                 {% if my_invitation.attendance %}
