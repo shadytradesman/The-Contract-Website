@@ -371,6 +371,12 @@ input[type="number"] {
     }
 }
 
+.css-attributes .stat-value {
+    min-width: 23px;
+    position: absolute;
+    display: inline-block;
+}
+
 
 .css-physical-ability {
     text-align: right;

@@ -178,6 +178,7 @@ def graveyard(request):
         .filter(relevant_character__private=False)\
         .exclude(relevant_character__status='ANY') \
         .exclude(relevant_character__num_games=0) \
+        .exclude(relevant_character__player__profile__is_private=True) \
         .order_by('-date_of_death')\
         .all()
     tombstones = {

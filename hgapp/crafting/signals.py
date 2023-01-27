@@ -3,7 +3,7 @@ from django.dispatch import receiver
 from characters.signals import transfer_consumables
 from powers.signals import gift_revision, gift_major_revision, gift_adjustment
 
-from .models import CraftedArtifact
+from crafting.models import CraftedArtifact
 
 
 @receiver(gift_adjustment)
@@ -52,7 +52,7 @@ def handle_gift_major_revision(sender, **kwargs):
         artifact.save()
 
 
-@receiver(transfer_consumables)
+@receiver(transfer_consumables, weak=False, dispatch_uid="abc123")
 def handle_transfer_consumables(sender, **kwargs):
     original_artifact = kwargs["original_artifact"]
     new_artifact = kwargs["new_artifact"]

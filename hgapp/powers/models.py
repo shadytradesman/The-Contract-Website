@@ -178,8 +178,9 @@ class FieldSubstitution(models.Model):
         return "[[{}]] {} ({})".format(self.relevant_marker, self.get_mode_display(), self.replacement)
 
     def save(self, *args, **kwargs):
+        if get_object_or_none(FieldSubstitution.objects.filter(pk=self.pk)) is not None:
+            PowerSystem.mark_all_dirty()
         super(FieldSubstitution, self).save(*args, **kwargs)
-        PowerSystem.mark_all_dirty()
 
     def to_blob(self):
         return {
@@ -225,8 +226,9 @@ class EnhancementGroup(models.Model):
         return self.label
 
     def save(self, *args, **kwargs):
+        if get_object_or_none(EnhancementGroup.objects.filter(pk=self.pk)) is not None:
+            PowerSystem.mark_all_dirty()
         super(EnhancementGroup, self).save(*args, **kwargs)
-        PowerSystem.mark_all_dirty()
 
     def to_blob(self):
         return {
@@ -279,8 +281,9 @@ class Modifier(models.Model):
         return self.name + " [" + self.slug + "] " + self.get_system_display() + " (" + self.description + ")"
 
     def save(self, *args, **kwargs):
+        if get_object_or_none(Modifier.objects.filter(pk=self.pk)) is not None:
+            PowerSystem.mark_all_dirty()
         super(Modifier, self).save(*args, **kwargs)
-        PowerSystem.mark_all_dirty()
 
     def display(self):
         return self.name + " (" + self.description + ")"
@@ -420,8 +423,9 @@ class Parameter(models.Model):
         return " ".join([self.name]) + " [" +self.slug + "]"
 
     def save(self, *args, **kwargs):
+        if get_object_or_none(Parameter.objects.filter(pk=self.pk)) is not None:
+            PowerSystem.mark_all_dirty()
         super(Parameter, self).save(*args, **kwargs)
-        PowerSystem.mark_all_dirty()
 
     def get_levels(self):
         levels = []
@@ -496,8 +500,9 @@ class Base_Power_Category(models.Model):
         return " ".join([self.name])
 
     def save(self, *args, **kwargs):
+        if get_object_or_none(Base_Power_Category.objects.filter(pk=self.pk)) is not None:
+            PowerSystem.mark_all_dirty()
         super(Base_Power_Category, self).save(*args, **kwargs)
-        PowerSystem.mark_all_dirty()
 
     def container_class(self):
         return "css-cat-container-" + self.slug
@@ -589,8 +594,9 @@ class Base_Power(models.Model):
         return self.name + " (" + self.summary + ")"
 
     def save(self, *args, **kwargs):
+        if get_object_or_none(Base_Power.objects.filter(pk=self.pk)) is not None:
+            PowerSystem.mark_all_dirty()
         super(Base_Power, self).save(*args, **kwargs)
-        PowerSystem.mark_all_dirty()
 
     def get_absolute_url(self):
         return reverse('powers:powers_create_power', kwargs={'base_power_slug': self.slug})
@@ -658,8 +664,9 @@ class VectorCostCredit(models.Model):
         return ":".join([self.relevant_vector.name, self.relevant_effect.name, str(self.gift_credit)])
 
     def save(self, *args, **kwargs):
+        if get_object_or_none(VectorCostCredit.objects.filter(pk=self.pk)) is not None:
+            PowerSystem.mark_all_dirty()
         super(VectorCostCredit, self).save(*args, **kwargs)
-        PowerSystem.mark_all_dirty()
 
     def to_blob(self):
         return {
@@ -693,8 +700,9 @@ class Base_Power_System(models.Model):
         unique_together = (("base_power", "dice_system"))
 
     def save(self, *args, **kwargs):
+        if get_object_or_none(Base_Power_System.objects.filter(pk=self.pk)) is not None:
+            PowerSystem.mark_all_dirty()
         super(Base_Power_System, self).save(*args, **kwargs)
-        PowerSystem.mark_all_dirty()
 
     def __str__(self):
         return ":".join([self.base_power.name, str(self.dice_system)])
@@ -749,8 +757,9 @@ class Power_Param(models.Model):
         return ":".join([str(self.relevant_parameter), self.relevant_base_power.name])
 
     def save(self, *args, **kwargs):
+        if get_object_or_none(Power_Param.objects.filter(pk=self.pk)) is not None:
+            PowerSystem.mark_all_dirty()
         super(Power_Param, self).save(*args, **kwargs)
-        PowerSystem.mark_all_dirty()
 
     def to_blob(self):
         return {
@@ -1400,8 +1409,9 @@ class SystemField(models.Model):
         abstract = True
 
     def save(self, *args, **kwargs):
+        if get_object_or_none(SystemField.objects.filter(pk=self.pk)) is not None:
+            PowerSystem.mark_all_dirty()
         super(SystemField, self).save(*args, **kwargs)
-        PowerSystem.mark_all_dirty()
 
     def to_blob(self):
         return {

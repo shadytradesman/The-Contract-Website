@@ -67,6 +67,7 @@ class CraftingEvent(models.Model):
         for art in arts:
             if art.power_full_set.count() == 0:
                 art.delete()
+        self.artifacts.clear()
 
     def refund_crafted_consumables(self, number_to_refund):
         remaining_to_refund = number_to_refund
@@ -107,7 +108,7 @@ class CraftingEvent(models.Model):
         self.save()
 
     def set_crafted_artifacts(self, artifacts, allowed_number_free):
-        existing_artifacts = self.craftedartifact_set.filter(relevant_artifact__is_deleted=False, relevant_artifact__is_consumable=False).all()
+        existing_artifacts = self.craftedartifact_set.filter(relevant_artifact__is_deleted=False, relevant_artifact__is_crafted_artifact=True).all()
         craftings_by_art_id = {x.relevant_artifact_id: x for x in existing_artifacts}
         new_art_ids = set([x.pk for x in artifacts])
         artifacts_to_refund = set([x.relevant_artifact_id for x in existing_artifacts if x.relevant_artifact_id not in new_art_ids])
@@ -118,7 +119,6 @@ class CraftingEvent(models.Model):
                 current_num_free += 1
         num_free_refunded = 0
         for art_id in artifacts_to_refund:
-            print("refunding " + str(art_id))
             crafting = craftings_by_art_id[art_id]
             artifact = existing_artifacts_by_id[art_id]
             self.relevant_power.artifacts.remove(artifact)
@@ -127,10 +127,12 @@ class CraftingEvent(models.Model):
                 self.total_exp_spent -= self.get_exp_cost_per_artifact()
             else:
                 num_free_refunded += 1
+            self.artifacts.remove(artifact)
             crafting.delete()
+            if artifact.power_full_set.count() == 0:
+                artifact.delete()
         num_avail_free = allowed_number_free - current_num_free + num_free_refunded
         for artifact in artifacts:
-            print("carftin " + str(artifact.pk))
             if artifact.crafting_character != self.relevant_character:
                 raise ValueError("cannot craft artifact crafted by someone else.")
             if artifact.pk not in craftings_by_art_id:

@@ -25,7 +25,13 @@
     </div>
     <div class="container">
         <div class="text-center">
-            <h3 style="margin-top: 0px; margin-bottom: 0px;"><small>Population: {{num_deaths}}</small></h3>
+            <h3 style="margin-top: 0px; margin-bottom: 0px;"><small>Population: {{num_deaths}}<div>
+                <i><small>
+
+                    (Excludes Contractors marked as private or made by private profiles)
+                </small>
+                </i>
+            </div></small></h3>
         </div>
         <div class="panel-group" id="accordion">
             {% if tombstones.Veteran %}

@@ -1618,6 +1618,7 @@ class Artifact(WorldElement):
                 quantity=quantity
             )
         self.quantity -= quantity
+        self.save()
         # create another transfer event for the new artifact stack.
         ArtifactTransferEvent.objects.create(
             from_character=self.character,
