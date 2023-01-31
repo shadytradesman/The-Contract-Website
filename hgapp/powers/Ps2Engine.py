@@ -1,6 +1,8 @@
 import json, logging
 from collections import defaultdict, Counter
 from django.urls import reverse
+from functools import reduce
+import operator
 
 from django.db.models import Prefetch
 from .models import PowerSystem, EPHEMERAL, UNIQUE, ADDITIVE, SUB_JOINING_AND, SUB_JOINING_OR, SUB_ALL, \
@@ -249,6 +251,7 @@ class SystemTextRenderer:
         '[': ']',
         '{': '}',
         '#': '+',
+        '!': '*',
         ';': '/',
     }
     paren_join_string = {
@@ -256,7 +259,8 @@ class SystemTextRenderer:
         '@': ', ',
         '[': ' ',
         '{': '</p><p>',
-        '+': '',
+        '#': '',
+        '!': '',
         ';': "</li><li>",
     }
 
@@ -292,7 +296,7 @@ class SystemTextRenderer:
 
     @staticmethod
     def _find_replacement_candidate(system_text):
-        marker_starts = ['(', '[', '{', '@', '#', ';']
+        marker_starts = ['(', '[', '{', '@', '#', ';', '!']
         end_marker = None
         paren_depth = 0
         start = None
@@ -345,7 +349,7 @@ class SystemTextRenderer:
         marker_section = system_text[start+2 : marker_end]
         marker_section = marker_section.strip()
         markers = marker_section.split(',')
-        if marker_starts[0] not in ['(', '@', '#'] and len(markers) > 1:
+        if marker_starts[0] not in ['(', '@', '#', '!'] and len(markers) > 1:
             raise ValueError("too many marker strings for non-list sub starting at: " + start + "for text " + system_text)
         default_value = None
         if default_content_start_index:
@@ -569,6 +573,8 @@ class SystemTextRenderer:
                 return ""
         if to_replace.replacement_type == '#':
             return str(sum([int(x) for x in replacements]))
+        if to_replace.replacement_type == '!':
+            return str(reduce(operator.mul, [int(x) for x in replacements]))
         replacements = [x for x in replacements if len(x) > 0]
         if len(replacements) == 0:
             return ""

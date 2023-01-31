@@ -249,6 +249,8 @@ html_replace_map = {
     '+': '&#43;',
     '#': '&#35;',
     ';': '&#59;',
+    '!': '&#33;',
+    '*': '&#42;',
 }
 
 def clean_user_input_field(user_input):

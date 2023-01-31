@@ -688,6 +688,7 @@ class Base_Power_System(models.Model):
                                              "[[marker]] : replace marker or blank if no replacement.<br>"
                                              ";;marker// : replace marker with bulleted list.<br>"
                                              "##marker1,marker2++ : sum the markers together and display the result.<br>"
+                                             "!!marker1,marker2** : multiply the markers together and display the result.<br>"
                                              "{{marker}} : replace marker, paragraph breaks between multiple entries.")
     eratta = models.TextField(blank=True,
                               null=True)

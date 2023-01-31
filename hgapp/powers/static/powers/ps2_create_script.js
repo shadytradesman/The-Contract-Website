@@ -564,7 +564,9 @@ const htmlReplaceMap = {
     '$': '&#36;',
     '+': '&#43;',
     '#': '&#35;',
-    ';': '&#59;'
+    ';': '&#59;',
+    '!': '&#33;',
+    '*': '&#42;'
 }
 
 function cleanUserInputField(userInput){
@@ -737,7 +739,8 @@ const parenJoinString = {
     '@': ', ',
     '[': ' ',
     '{': '</p><p>',
-    '+': '',
+    '#': '',
+    '!': '',
     ';': "</li><li>",
 }
 
@@ -747,6 +750,7 @@ const parenEndByStart = {
     '[': ']',
     '{': '}',
     '#': '+',
+    '!': '*',
     ';': '/',
 }
 function getReplacementText(replacements, toReplace) {
@@ -760,6 +764,9 @@ function getReplacementText(replacements, toReplace) {
     }
     if (toReplace.type === '#') {
         return replacements.reduce((a,b) => parseInt(a) + parseInt(b)).toString();
+    }
+    if (toReplace.type === '!') {
+        return replacements.reduce((a,b) => parseInt(a) * parseInt(b)).toString();
     }
     replacements = replacements.filter(rep => rep.length != 0);
     if (replacements.length === 0) {
@@ -797,7 +804,7 @@ function findReplacementCandidate(systemText) {
     // Finds the first pair of opening parenthesis, indicating a replacement substring.
     // Proceeds to the matching closure of the parens, skipping any nested replacements
     // returns a little replacement candidate object.
-    let markerStarts = ['(', '[', '{', '@', '#', ';'];
+    let markerStarts = ['(', '[', '{', '@', '#', ';', '!'];
     let endMarker = null;
     let parenDepth = 0;
     let start = null;
@@ -856,7 +863,7 @@ function findReplacementCandidate(systemText) {
     var markerSection = systemText.slice(start + 2, markerEnd);
     markerSection = markerSection.trim();
     const markers = markerSection.split(',');
-    if (!['(', '@', '#'].includes(markerStarts[0]) && markers.length > 1) {
+    if (!['(', '@', '#', '!'].includes(markerStarts[0]) && markers.length > 1) {
         // only list sub markers allow multiple marker strings.
         throw "Too many marker strings for non-list sub starting at: " + start;
     }
