@@ -495,7 +495,9 @@ function getDisabledModifiers(modType, availModifiers, selectedModifiers, active
           .filter(modifier => {
               let required = powerBlob[powerBlobFieldName][modifier.slug][requiredEnhancements].concat(powerBlob[powerBlobFieldName][modifier.slug][requiredDrawbacks]);
               let secondOrderReq = required.flatMap(mod => allModifiers[mod][requiredEnhancements].concat(allModifiers[mod][requiredDrawbacks]));
-              let allRequired = new Set(required.concat(secondOrderReq));
+              let allRequired = new Set(required.concat(secondOrderReq).filter(req => {
+                return availModifiers.map(mod=>mod.slug).includes(req);
+              }));
 
               if (allRequired.length == 0) {
                   return false;

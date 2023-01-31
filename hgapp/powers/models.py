@@ -281,8 +281,7 @@ class Modifier(models.Model):
         return self.name + " [" + self.slug + "] " + self.get_system_display() + " (" + self.description + ")"
 
     def save(self, *args, **kwargs):
-        if get_object_or_none(Modifier.objects.filter(pk=self.pk)) is not None:
-            PowerSystem.mark_all_dirty()
+        PowerSystem.mark_all_dirty()
         super(Modifier, self).save(*args, **kwargs)
 
     def display(self):
