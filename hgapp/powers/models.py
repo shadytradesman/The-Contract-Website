@@ -178,8 +178,7 @@ class FieldSubstitution(models.Model):
         return "[[{}]] {} ({})".format(self.relevant_marker, self.get_mode_display(), self.replacement)
 
     def save(self, *args, **kwargs):
-        if get_object_or_none(FieldSubstitution.objects.filter(pk=self.pk)) is not None:
-            PowerSystem.mark_all_dirty()
+        PowerSystem.mark_all_dirty()
         super(FieldSubstitution, self).save(*args, **kwargs)
 
     def to_blob(self):
@@ -1409,8 +1408,7 @@ class SystemField(models.Model):
         abstract = True
 
     def save(self, *args, **kwargs):
-        if get_object_or_none(SystemField.objects.filter(pk=self.pk)) is not None:
-            PowerSystem.mark_all_dirty()
+        PowerSystem.mark_all_dirty()
         super(SystemField, self).save(*args, **kwargs)
 
     def to_blob(self):
