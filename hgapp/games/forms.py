@@ -484,18 +484,20 @@ class GameFeedbackForm(forms.Form):
                             required=False,
                             help_text='Notes about your experience running this Scenario. Geared toward other GMs. Spoilers A-OK')
 
+
 def make_allocate_improvement_form(user):
     class AllocateImprovementForm(forms.Form):
         users_living_character_ids = [char.id for char in user.character_set.filter(is_deleted=False, is_dead=False).all() if char.improvement_ok()]
         queryset = Character.objects.filter(id__in=users_living_character_ids)
         chosen_character = forms.ModelChoiceField(queryset=queryset,
                                                   label="Chosen Contractor",
-                                                     empty_label=None,
-                                                     help_text="Declare which Contractor should recieve the Improvement. "
-                                                               "Once confirmed, this action cannot be undone. "
-                                                               "Only living Contractors that have fewer than one Improvement for every two Victories appear in this list.",
-                                                     required=True)
+                                                  empty_label=None,
+                                                  help_text="Declare which Contractor should recieve the Improvement. "
+                                                            "Once confirmed, this action cannot be undone. "
+                                                            "Only living Contractors with total Gifts and Improvements totaling fewer than for every Contrct victories appear in this list.",
+                                                  required=True)
     return AllocateImprovementForm
+
 
 def make_who_was_gm_form(cell):
     class WhoWasGMForm(forms.Form):

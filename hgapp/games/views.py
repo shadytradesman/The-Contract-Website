@@ -989,9 +989,8 @@ def end_game(request, game_id):
         return render(request, 'games/end_game.html', context)
 
 
+@login_required
 def allocate_improvement_generic(request):
-    if not request.user.is_authenticated:
-        raise PermissionDenied("You must be logged in to allocate improvements")
     avail_improvements = request.user.profile.get_avail_improvements()
     if len(avail_improvements) > 0:
         return HttpResponseRedirect(reverse('games:games_allocate_improvement', args=(avail_improvements.first().id,)))

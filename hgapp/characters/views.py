@@ -646,8 +646,6 @@ def spend_reward(request, character_id):
 
 @login_required
 def allocate_gm_exp(request, secret_key = None):
-    if not request.user.is_authenticated:
-        raise PermissionDenied("You must be logged in to allocate exp")
     valid_character_ids = [char.id for char in request.user.character_set.filter(is_deleted=False).all() if char.can_get_bonus_exp()]
     queryset = Character.objects.filter(id__in=valid_character_ids)
     RewardForm = make_allocate_gm_exp_form(queryset)

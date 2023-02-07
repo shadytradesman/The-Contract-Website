@@ -770,7 +770,7 @@ class Character(models.Model):
         return self.reward_set.filter(is_void=False).filter(relevant_power=None).filter(is_improvement=True).count()
 
     def num_improvements(self):
-        return self.reward_set.filter(is_void=False).filter(is_improvement=True).count()
+        return self.reward_set.filter(is_void=False, is_improvement=True).count()
 
     def reward_cost_for_item(self, sig_item):
         unspent_gifts = self.unspent_gifts()
@@ -798,7 +798,6 @@ class Character(models.Model):
             "item_cost": improvements_required + gifts_required,
         }
 
-
     def reward_cost_for_power(self, power_full):
         rewards_to_be_spent = []
         unspent_gifts = self.unspent_gifts()
@@ -819,7 +818,7 @@ class Character(models.Model):
 
     def improvement_ok(self):
         ported_adjustment = PORTED_IMPROVEMENT_ADJUSTMENT[self.ported] + PORTED_GIFT_ADJUSTMENT[self.ported]
-        return self.number_of_victories() * 2 >= (self.active_rewards().count() - ported_adjustment)
+        return self.number_of_victories() * 2 > (self.num_active_rewards() - ported_adjustment)
 
     def get_powers_for_render(self):
         return self.power_full_set.all()
