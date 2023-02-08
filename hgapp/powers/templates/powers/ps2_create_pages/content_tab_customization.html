@@ -192,8 +192,30 @@
                 </span>
             </small>
         </div>
-        <div id="js-enhancements-container" v-if="enhancements.length > 0">
-            <div v-for="(modifier, modIndex) in enhancements"
+        <div v-if="getRequiredStatusEnhancements('ANY').length > 0">
+            <div v-for="(modifier, modIndex) in getRequiredStatusEnhancements('ANY')"
+                 :key="modifier.id" >
+                {% with 'Enhancements' as vue_model_name %}
+                    {% with 'clickEnhancement' as vue_on_click %}
+                        {% include "powers/ps2_create_pages/snip_modifier_template.html" %}
+                    {% endwith %}
+                {% endwith %}
+            </div>
+        </div>
+        <div v-if="getRequiredStatusEnhancements('SEASONED').length > 0">
+            <h5 class="text-muted">Seasoned Enhancements</h5>
+            <div v-for="(modifier, modIndex) in getRequiredStatusEnhancements('SEASONED')"
+                 :key="modifier.id" >
+                {% with 'Enhancements' as vue_model_name %}
+                {% with 'clickEnhancement' as vue_on_click %}
+                {% include "powers/ps2_create_pages/snip_modifier_template.html" %}
+                {% endwith %}
+                {% endwith %}
+            </div>
+        </div>
+        <div v-if="getRequiredStatusEnhancements('VETERAN').length > 0">
+            <h5 class="text-muted">Veteran Enhancements</h5>
+            <div v-for="(modifier, modIndex) in getRequiredStatusEnhancements('VETERAN')"
                  :key="modifier.id" >
                 {% with 'Enhancements' as vue_model_name %}
                 {% with 'clickEnhancement' as vue_on_click %}

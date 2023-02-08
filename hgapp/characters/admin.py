@@ -30,7 +30,10 @@ class TraumaRevisionTabular(admin.TabularInline):
 class ContractStatsAdmin(admin.ModelAdmin):
     inlines = [AbilityValueTabular, AttributeValueTabular, AssetDetailsTabular, LiabilitiesDetailsTabular, TraumaRevisionTabular]
 
-admin.site.register(Character)
+@admin.register(Character)
+class CharacterAdmin(admin.ModelAdmin):
+    list_display = ('__str__', 'pub_date', 'private', 'is_dead')
+
 admin.site.register(Character_Death)
 admin.site.register(Graveyard_Header)
 admin.site.register(Attribute)

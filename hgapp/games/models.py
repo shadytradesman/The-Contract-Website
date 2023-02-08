@@ -1078,6 +1078,12 @@ class ScenarioWriteup(models.Model):
         self.__update_word_count()
         super(ScenarioWriteup, self).save(*args, **kwargs)
 
+    def scenario_writer(self):
+        return self.relevant_scenario.creator
+
+    def is_community_edit(self):
+        return self.relevant_scenario.creator != self.writer
+
     def to_blob(self, request, aftermath_spoiled):
         blob = model_to_dict(self)
         blob["created_date"] = self.created_date

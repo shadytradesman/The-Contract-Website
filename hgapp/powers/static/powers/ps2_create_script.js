@@ -1788,6 +1788,12 @@ const ComponentRendering = {
       getSelectedAndActiveDrawbacks() {
           return this.drawbacks.filter(drawb => this.selectedDrawbacks.map(mod => mod.id).includes(drawb["id"]));
       },
+      getRequiredStatusEnhancements(status) {
+        return this.enhancements.filter(enh => enh.requiredStatus[0] == status);
+      },
+      getRequiredStatusDrawbacks(status) {
+        return this.drawbacks.filter(drb => drb.requiredStatus[0] == status);
+      },
       buildReplacementMap() {
           // replacement marker to list of substitution objects
           replacements = {}

@@ -26,6 +26,9 @@ class UserImage(models.Model):
             models.Index(fields=['scenario']),
         ]
 
+    def __str__(self):
+        return "Uploaded by {} for {}".format(self.uploader.username, self.scenario.title if self.scenario else "an unknown Scenario")
+
     def save(self, *args, **kwargs):
         self.file_size = self.image.size
         if self.file_size > 3_000_000:
