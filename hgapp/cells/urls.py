@@ -56,7 +56,7 @@ urlpatterns = [
     # ex: .com/playgroup/add-contractors/123/
     url(r'^add-contractors/(?P<cell_id>[\d]+)/$', views.add_characters, name='add_characters_to_cell'),
 
-    # ex: .com/playgroup/add-contractors/123/
+    # ex: .com/playgroup/add-contractors/123/341
     url(r'^add-contractors/(?P<cell_id>[\d]+)/(?P<game_id>[\d]+)/$', views.add_characters, name='add_characters_to_cell'),
 
     # ex: .com/playgroup/members/123

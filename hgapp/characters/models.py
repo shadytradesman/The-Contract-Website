@@ -1576,6 +1576,8 @@ class Artifact(WorldElement):
             raise ValueError("Cannot transfer non-gift artifacts")
         if self.is_deleted:
             raise ValueError("Cannot transfer deleted artifact")
+        if to_character.is_deleted:
+            raise ValueError("Cannot transfer to deleted contractor")
         if quantity > self.quantity:
             raise ValueError("Cannot transfer more than you have.")
         if quantity == 0:

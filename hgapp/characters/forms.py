@@ -541,7 +541,7 @@ def make_transfer_artifact_form(character=None, cell=None, max_quantity=0, user=
         character_options = get_character_contacts(character)
         character_options = set([x.pk for x in character_options.keys()])
         if character.cell:
-            character_options.update(cell.character_set.exclude(player=character.player).values_list('id', flat=True))
+            character_options.update(cell.character_set.exclude(player=character.player).exclude(is_deleted=True).values_list('id', flat=True))
         if character.pk in character_options:
             character_options.remove(character.pk)
     elif user:

@@ -26,7 +26,7 @@ def __inner_get_character_contacts(character):
     games_by_character = defaultdict(list)
     for attendance in attendances:
         if hasattr(attendance, "attending_character") and attendance.attending_character:
-            if not attendance.attending_character == character:
+            if not attendance.attending_character == character and not attendance.attending_character.is_deleted:
                 games_by_character[attendance.attending_character].append((game_number[attendance.relevant_game.id], attendance.relevant_game))
     return games_by_character
 
