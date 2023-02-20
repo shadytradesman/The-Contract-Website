@@ -255,7 +255,7 @@ def get_gm_form(cell, POST=None):
 
 
 def get_member_formset(cell, game=None, POST=None):
-    cell_members = cell.cellmembership_set.all()
+    cell_members = cell.get_unbanned_members()
     MemberFormSet = formset_factory(CellMemberAttendedForm, extra=0)
     attended_players = set()
     if game:

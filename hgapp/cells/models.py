@@ -256,6 +256,9 @@ class Cell(models.Model):
             invite.save()
             return invite
 
+    def get_unbanned_members(self):
+        return self.cellmembership_set.filter(is_banned=False).all()
+
     def number_of_members(self):
         return self.cellmembership_set.filter(is_banned=False).count()
 

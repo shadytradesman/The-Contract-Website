@@ -499,7 +499,7 @@ def create_game(request, cell_id=None):
                 game.save()
                 game.mediums.set(form.cleaned_data['mediums'])
                 if form.cleaned_data['invite_all_members']:
-                    for member in game.cell.cellmembership_set.exclude(member_player = game.gm):
+                    for member in game.cell.get_unbanned_members().exclude(member_player = game.gm):
                         game_invite = Game_Invite(invited_player=member.member_player,
                                                   relevant_game=game,
                                                   invite_text=game.hook,
@@ -606,7 +606,7 @@ def edit_game(request, game_id):
                 game.save()
                 game.mediums.set(form.cleaned_data['mediums'])
                 if hasattr(form.changed_data, 'invite_all_members') and form.cleaned_data['invite_all_members']:
-                    for member in game.cell.cellmembership_set.exclude(member_player=game.gm):
+                    for member in game.cell.get_unbanned_members().exclude(member_player=game.gm):
                         game_invite = Game_Invite(invited_player=member.member_player,
                                                   relevant_game=game,
                                                   invite_text=game.hook,
