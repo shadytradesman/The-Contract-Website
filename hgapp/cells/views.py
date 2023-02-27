@@ -26,6 +26,7 @@ from django.core.exceptions import PermissionDenied
 from postman.api import pm_write
 from django.utils.safestring import SafeText
 from django.forms import formset_factory, modelformset_factory
+from notifications.models import Notification, PLAYGROUP_NOTIF, WORLD_NOTIF
 
 
 @method_decorator(login_required(login_url='account_login'), name='dispatch')
@@ -197,6 +198,13 @@ class PostWorldEvent(View):
                     webhooks = self.cell.webhook_cell.filter(send_for_events=True).all()
                     for webhook in webhooks:
                         webhook.post_for_event(self.world_event, request)
+                    for membership in self.cell.get_unbanned_members().exclude(member_player=self.request.user):
+                        Notification.objects.create(
+                            user=membership.member_player,
+                            headline="New World Event",
+                            content="In {}".format(self.cell.name),
+                            url=self.world_event.get_permalink(request),
+                            notif_type=WORLD_NOTIF)
             return HttpResponseRedirect(reverse('cells:cells_view_cell', args=(self.cell.id,)))
         raise ValueError("Invalid edit setting form")
 
@@ -330,6 +338,11 @@ def invite_players(request, cell_id):
                          auto_archive=True,
                          auto_delete=False,
                          auto_moderators=None)
+                Notification.objects.create(user=player,
+                                            headline="You've been invited to a Playgroup",
+                                            content="{} awaits".format(cell.name),
+                                            url=request.build_absolute_uri(reverse("cells:cells_view_cell", args=[cell.id])),
+                                            notif_type=PLAYGROUP_NOTIF)
             return HttpResponseRedirect(reverse('cells:cells_invite_players', args=(cell.id,)))
         else:
             print(form.errors)
@@ -537,6 +550,12 @@ def manage_members(request, cell_id):
                             raise PermissionDenied("Coup averted: You must be a Cell leader to promote a Cell leader")
                         membership.role = form.cleaned_data['role']
                         membership.save()
+                        Notification.objects.create(
+                            user=player,
+                            headline="New role in " + cell.name,
+                            content="You are now a {}".format(form_role),
+                            url=reverse('cells:cells_view_cell', args=(cell.id,)),
+                            notif_type=PLAYGROUP_NOTIF)
             return HttpResponseRedirect(reverse('cells:cells_manage_members', args=(cell.id,)))
         else:
             print(membership_formset.errors)
@@ -570,14 +589,15 @@ def ban_player(request, cell_id, user_id):
         raise PermissionDenied("You don't have permission to manage the memberships of this Cell")
     if request.method == 'POST':
         form = KickForm(request.POST)
-        print(request.POST)
         if form.is_valid():
-            print(form.cleaned_data)
             with transaction.atomic():
                 cell.ban_player(player, form.cleaned_data["reason_banned"])
-        else:
-            print(form.errors)
-        return HttpResponseRedirect(reverse('cells:cells_manage_members', args=(cell.id,)))
+                Notification.objects.create(user=player,
+                                            headline="Banned from Playgroup",
+                                            content="{} says goodbye".format(cell.name),
+                                            url=reverse('cells:cells_view_cell', args=(cell.id,)),
+                                            notif_type=PLAYGROUP_NOTIF)
+            return HttpResponseRedirect(reverse('cells:cells_manage_members', args=(cell.id,)))
     else:
         return HttpResponseRedirect(reverse('cells:cells_manage_members', args=(cell.id,)))
 

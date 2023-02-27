@@ -20,6 +20,7 @@ from django.http import HttpResponseRedirect
 from django.middleware.csrf import rotate_token
 from django.templatetags.static import static
 from django.template.loader import render_to_string
+from notifications.models import Notification, CONTRACTOR_NOTIF
 
 
 from characters.models import Character, BasicStats, Character_Death, Graveyard_Header, Attribute, Ability, \
@@ -100,6 +101,13 @@ def edit_character(request, character_id, secret_key = None):
         with transaction.atomic():
             character = Character.objects.select_for_update(nowait=True).get(pk=character.pk)
             update_character_from_post(request.user, existing_character=character, POST=request.POST)
+            if character.player != request.user:
+                Notification.objects.create(
+                    user=character.player,
+                    headline="Contractor edited",
+                    content="{} edited {}".format(request.user.username, character.name),
+                    url=reverse('characters:characters_view', args=(character.id,)),
+                    notif_type=CONTRACTOR_NOTIF)
         url_args = (character.id,) if request.user.is_authenticated else (character.id, character.edit_secret_key,)
         return HttpResponseRedirect(reverse('characters:characters_view', args=url_args))
     else:

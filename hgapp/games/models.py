@@ -17,7 +17,6 @@ from bs4 import BeautifulSoup
 from .games_constants import EXP_V1_V2_GAME_ID
 from guardian.shortcuts import assign_perm
 
-from postman.api import pm_write
 from django.urls import reverse
 from django.utils.safestring import SafeText
 from games.games_constants import GAME_STATUS, get_completed_game_excludes_query, get_scheduled_game_excludes_query

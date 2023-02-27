@@ -49,6 +49,7 @@ from hgapp.utilities import get_queryset_size, get_object_or_none
 
 from cells.models import Cell
 
+from notifications.models import Notification, SCENARIO_NOTIF, WORLD_NOTIF
 
 @login_required
 def enter_game(request):
@@ -207,6 +208,12 @@ def edit_scenario(request, scenario_id):
                 save_new_elements_from_formsets(request, scenario, circumstance_formset, CIRCUMSTANCE)
                 save_new_elements_from_formsets(request, scenario, loose_end_formset, LOOSE_END)
                 save_new_elements_from_formsets(request, scenario, trophy_formset, TROPHY)
+                if request.user != scenario.creator:
+                    Notification.objects.create(user=scenario.creator,
+                                                headline="New edit on your Scenario",
+                                                content=scenario.title,
+                                                url=reverse('games:scenario_history', args=(scenario.id,)),
+                                                notif_type=SCENARIO_NOTIF)
             return HttpResponseRedirect(reverse('games:games_view_scenario', args=(scenario.id,)))
         else:
             raise ValueError("Invalid form " + str(writeup_form.errors) + " scenario: " + str(scenario_form.errors))
@@ -966,6 +973,13 @@ def end_game(request, game_id):
                 game.save()
                 game.transition_to_finished()
                 GameEnded.send_robust(sender=None, game=game, request=request)
+                if game.gm != game.scenario.creator:
+                    Notification.objects.create(
+                        user=game.scenario.creator,
+                        headline="Someone ran your Scenario",
+                        content=game.scenario.title,
+                        url=reverse('games:games_view_scenario', args=(game.scenario.id,)),
+                        notif_type=SCENARIO_NOTIF)
             return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
         else:
             logger.error('Error: invalid declare_outcome_formset or game_feedback_form. declare_outcome_formset errors: %s\n\n game_feedback_form errors: %s',
@@ -1307,6 +1321,13 @@ class EnterMove(View):
                     webhooks = self.cell.webhook_cell.filter(send_for_events=True).all()
                     for webhook in webhooks:
                         webhook.post_for_event(self.world_event, request, self.move)
+                    for membership in self.cell.get_unbanned_members().exclude(member_player=self.request.user):
+                        Notification.objects.create(
+                            user=membership.member_player,
+                            headline="A Contractor made a Move",
+                            content="In {}".format(self.cell.name),
+                            url=reverse('games:view_move', args=(self.move.id,)),
+                            notif_type=WORLD_NOTIF)
             return HttpResponseRedirect(reverse('games:view_move', args=(self.move.id,)))
         raise ValueError("Invalid Move or event form")
 

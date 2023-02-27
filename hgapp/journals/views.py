@@ -19,6 +19,7 @@ from hgapp.utilities import get_object_or_none
 from games.models import Game, Game_Attendance
 from characters.models import Character
 from characters.view_utilities import get_characters_next_journal_credit
+from notifications.models import Notification, JOURNAL_NOTIF
 
 @method_decorator(login_required(login_url='account_login'), name='dispatch')
 class WriteJournal(View):
@@ -52,6 +53,23 @@ class WriteJournal(View):
                                   contains_spoilers=form.cleaned_data['contains_spoilers'])
                 journal.save()
                 journal.set_content(form.cleaned_data['content'])
+                if not self.is_downtime:
+                    gm = self.game_attendance.relevant_game.gm
+                    scenario = self.game_attendance.relevant_game.scenario
+                    if gm:
+                        Notification.objects.create(
+                            user=gm,
+                            headline="New Journal of your Contract",
+                            content="{} wrote about {}".format(self.character.name, scenario.title),
+                            url=reverse('journals:journal_read_game', args=(self.character.id, self.game.id)),
+                            notif_type=JOURNAL_NOTIF)
+                    if scenario.creator != gm and self.character.player_can_view(scenario.creator):
+                        Notification.objects.create(
+                            user=scenario.creator,
+                            headline="New Journal of your Scenario",
+                            content="{} wrote about {}".format(self.character.name, scenario.title),
+                            url=reverse('journals:journal_read_game', args=(self.character.id, self.game.id)),
+                            notif_type=JOURNAL_NOTIF)
             return HttpResponseRedirect(reverse('journals:journal_read_game', args=(self.character.id, self.game.id)))
         raise ValueError("Invalid journal form")
 

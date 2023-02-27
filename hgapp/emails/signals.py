@@ -8,6 +8,8 @@ from django.urls import reverse
 from django.utils.safestring import SafeText
 from django.conf import settings
 
+from notifications.models import Notification, CONTRACT_NOTIF, REWARD_NOTIF
+
 import logging
 
 logger = logging.getLogger("app." + __name__)
@@ -21,6 +23,11 @@ def notify_changed_start(**kwargs):
     game_url = request.build_absolute_uri(reverse("games:games_view_game", args=[game.id]))
     for invite in game.game_invite_set.all():
         profile = invite.invited_player.profile
+        Notification.objects.create(user=invite.invited_player,
+                                    headline="Start time changed",
+                                    content="New start time for " + invite.relevant_game.title,
+                                    url=game_url,
+                                    notif_type=CONTRACT_NOTIF)
         if profile.contract_updates:
             email = invite.invited_player.profile.get_confirmed_email()
             if email:
@@ -35,16 +42,23 @@ def notify_game_ended(**kwargs):
     for invite in game.game_invite_set.all():
         profile = invite.invited_player.profile
         if profile.contract_updates and hasattr(invite, "attendance") and invite.attendance:
+            if invite.attendance.attending_character:
+                reward_url = request.build_absolute_uri(reverse("characters:characters_spend_reward", args=[invite.attendance.attending_character.id]))
+            else:
+                reward_url = request.build_absolute_uri(reverse("characters:characters_allocate_gm_exp"))
+            if game.scenario.is_valid():
+                scenario_url = request.build_absolute_uri(reverse("games:games_view_scenario", args=[game.scenario.id]))
+            else:
+                scenario_url = None
+            attendance = invite.attendance
+            character_name = attendance.attending_character.name if attendance.attending_character else "ringer"
+            Notification.objects.create(user=invite.invited_player,
+                                        headline="You've done well.",
+                                        content="{} earned Rewards".format(character_name),
+                                        url=reward_url,
+                                        notif_type=REWARD_NOTIF)
             email = invite.invited_player.profile.get_confirmed_email()
             if email:
-                if invite.attendance.attending_character:
-                    reward_url = request.build_absolute_uri(reverse("characters:characters_spend_reward", args=[invite.attendance.attending_character.id]))
-                else:
-                    reward_url = request.build_absolute_uri(reverse("characters:characters_allocate_gm_exp"))
-                if game.scenario.is_valid():
-                    scenario_url = request.build_absolute_uri(reverse("games:games_view_scenario", args=[game.scenario.id]))
-                else:
-                    scenario_url = None
                 send_email_for_game_ended(email, invite, game_url, reward_url, scenario_url)
 
 @receiver(NotifyGameInvitee)
@@ -53,6 +67,11 @@ def notify_game_invitee(sender, **kwargs):
     request = kwargs["request"]
     # This string is considered "safe" only because the markdown renderer will escape malicious HTML and scripts.
     game_url = request.build_absolute_uri(reverse("games:games_view_game", args=[invite.relevant_game.id]))
+    Notification.objects.create(user=invite.invited_player,
+                                headline="A Harbinger Calls. . .",
+                                content="Upcoming Contract: " + invite.relevant_game.title,
+                                url=game_url,
+                                notif_type=CONTRACT_NOTIF)
     message_body = SafeText('###{0} has invited you to an upcoming Game in {1}\n\n{2}\n\n [Click Here]({3}) to respond.'
                             .format(invite.relevant_game.creator.get_username(),
                                     invite.relevant_game.cell.name,
