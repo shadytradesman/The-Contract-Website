@@ -70,6 +70,14 @@ class WriteJournal(View):
                             content="{} wrote about {}".format(self.character.name, scenario.title),
                             url=reverse('journals:journal_read_game', args=(self.character.id, self.game.id)),
                             notif_type=JOURNAL_NOTIF)
+                    for player in self.game_attendance.relevant_game.get_attended_players():
+                        if player != request.user:
+                            Notification.objects.create(
+                                user=player,
+                                headline="New Journal for Contract",
+                                content="{} wrote about {}".format(self.character.name, scenario.title),
+                                url=reverse('journals:journal_read_game', args=(self.character.id, self.game.id)),
+                                notif_type=JOURNAL_NOTIF)
             return HttpResponseRedirect(reverse('journals:journal_read_game', args=(self.character.id, self.game.id)))
         raise ValueError("Invalid journal form")
 

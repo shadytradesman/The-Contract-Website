@@ -78,7 +78,8 @@ def notify_game_invitee(sender, **kwargs):
                                     invite.invite_text,
                                     game_url,
                                     ))
-    pm_write(sender=invite.relevant_game.creator,
+    if not invite.invited_player.profile.early_access_user:
+        pm_write(sender=invite.relevant_game.creator,
              recipient=invite.invited_player,
              subject=invite.relevant_game.creator.get_username() + " has invited you to join " + invite.relevant_game.title,
              body=message_body,

@@ -5,6 +5,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 
 from account.models import EmailAddress
+from notifications.models import Notification, MESSAGE_NOTIF
 
 
 logger = logging.getLogger("app." + __name__)
@@ -17,6 +18,11 @@ from_email = settings.DEFAULT_FROM_EMAIL
 def send(users=None, label=None, extra_context=None):
     if label in ("postman_reply", "postman_message"):
         for user in users:
+            Notification.objects.create(user=user,
+                                        headline="New private message.",
+                                        content="From {}".format(extra_context["pm_message"].obfuscated_sender),
+                                        url=extra_context["pm_message"].get_absolute_url(),
+                                        notif_type=MESSAGE_NOTIF)
             email = EmailAddress.objects.get_primary(user)
             is_verified = email and email.verified
             if is_verified and hasattr(user, "profile") and user.profile and user.profile.direct_messages:

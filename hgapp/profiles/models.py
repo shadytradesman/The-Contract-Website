@@ -152,7 +152,7 @@ class Profile(models.Model):
         if self.is_private:
             members = set()
             for cell in self.user.cell_set.all():
-                members.union(set(cell.members.values_list("pk", flat=True)))
+                members = members.union(set(cell.members.values_list("pk", flat=True)))
             return player.pk in members
         else:
             return True
