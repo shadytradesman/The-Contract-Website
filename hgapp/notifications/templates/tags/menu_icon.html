@@ -1,0 +1,21 @@
+{% if not empty %}
+<li class="dropdown" id="js-notif-nav-element" >
+    <a
+       id="js-notif-nav-button"
+       href="#"
+       role="button"
+       hx-get="{% url 'notifications:notifications_nav_read' %}"
+       hx-trigger="click"
+       hx-target="#hx-notif-content"
+       hx-swap="innerHTML"
+       class="{% if num_unread > 0 %}css-unread-notifs-icon{% endif %}"
+       style="padding-top: 15px;"
+    >
+        <i class="fa fa-bell fa-lg"></i>
+    </a>
+    <div  id="js-notification-popdown" class="css-notification-popdown">
+        <div id="hx-notif-content">
+        </div>
+    </div>
+</li>
+{% endif %}

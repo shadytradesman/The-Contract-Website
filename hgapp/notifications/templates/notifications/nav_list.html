@@ -1,0 +1,10 @@
+{% load notification_tags %}
+
+<ul class="nav navlist">
+    {% for notif in new_notifs %}
+        {% render_notification notif True %}
+    {% endfor %}
+    {% for notif in read_notifs %}
+        {% render_notification notif False %}
+    {% endfor %}
+</ul>

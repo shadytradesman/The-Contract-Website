@@ -30,21 +30,18 @@
                 <header>
                     <div class="navbar navbar-default {% block navbar_class %}navbar-fixed-top{% endblock %}">
                         <div class="container">
-                        {% block topbar %}
-                            <div class="navbar-header">
-                                <button class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                                    <span class="fa fa-bars"></span>
-                                </button>
-                                <ul class="nav navbar-nav pull-left css-nav-unhidden">
-                                    {% block unhidden_navbar %}<a class="navbar-brand" href="{% url "home" %}">{{ SITE_NAME }}</a>{% endblock %}
-                                </ul>
-                            </div>
-                            <div class="collapse navbar-collapse navbar-responsive-collapse">
-                                {% block nav %}
-                                    {% include "_account_bar.html" %}
-                                {% endblock %}
-                            </div>
-                        {% endblock %}
+                            {% block topbar %}
+                                <div class="nvbar-header">
+                                    <ul class="nav navbar-nav pull-left css-nav-unhidden">
+                                        {% block unhidden_navbar %}<a class="navbar-brand" href="{% url "home" %}">{{ SITE_NAME }}</a>{% endblock %}
+                                    </ul>
+                                    <ul class="nav navbar-nav css-nav-unhidden pull-right">
+                                        {% include "_account_bar.html" %}
+                                    </ul>
+                                </div>
+                            {% block nav %}
+                                    {% endblock %}
+                            {% endblock %}
                         </div>
                     </div>
                 </header>

@@ -5,6 +5,34 @@ $(document).ready(function(){
     });
 });
 
+/* notification collapse */
+let navCollapsed = true;
+$(document).on("click", "#js-notif-nav-button", function(e) {
+    let navPopdown = $('#js-notification-popdown');
+    if (navCollapsed === true) {
+        navPopdown.show();
+        navCollapsed = false;
+        $("#js-notif-nav-button").removeClass("css-unread-notifs-icon");
+    } else {
+        navPopdown.hide();
+        navCollapsed = true;
+    }
+});
+
+window.addEventListener('click', function(e){
+    if (!document.getElementById('js-notif-nav-element').contains(e.target)){
+    let navPopdown = $('#js-notification-popdown');
+    navPopdown.hide();
+    navCollapsed = true;
+  }
+})
+
+$(document).on('click', '.js-notification-link', function (e) {
+  e.stopPropagation();
+});
+
+
+
 /* Consumable action menus */
 function resetPopoverContents() {
     $('.js-popover-button').each(function(){

@@ -125,6 +125,7 @@ INSTALLED_APPS = [
     'crafting.apps.CraftingConfig',
     'emails.apps.EmailsConfig',
     'images.apps.ImagesConfig',
+    'notifications.apps.NotificationsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

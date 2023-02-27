@@ -3,33 +3,51 @@
 {% load postman_tags %}
 {% load hgapp_tags %}
 {% load cache %}
+{% load notification_tags %}
 
 {% postman_unread as unread_count %}
-<ul class="nav navbar-nav pull-right">
     {% if request.user.is_authenticated %}
-        <li>
-            <a href="{% url 'profiles:profiles_view_profile' request.user.id %}"><i class="fa fa-user"></i> {% user_display request.user %}</a>
-        </li>
-        <li>
-            <a href="{% url 'account_settings' %}"><i class="fa fa-cog"></i> <span class="visible-xs-inline">Account Settings</span></a>
-        </li>
-        <li>
-            {% if unread_count %}
-                <a href="{% url 'postman:inbox' %}"><i class="fa fa-envelope"></i> ({{ unread_count }}) <span class="visible-xs-inline">Messages</span></a>
-            {% else %}
-                <a href="{% url 'postman:inbox' %}"><i class="fa fa-envelope-o"></i> <span class="visible-xs-inline">Messages</span></a>
-            {% endif %}
-        </li>
-        <li>
-            <a id="account_logout" href="{% url 'account_logout' %}"><i class="fa fa-power-off"></i> {% trans "Log out" %}</a>
-        </li>
+    {% notif_menu_icon request.user %}
+     <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+              <span class="visible-xs-inline">
+                    <span class="fa fa-bars" style="padding-top: 8px !important;"></span>
+              </span>
+              <span class="hidden-xs">
+                {% user_display request.user %}<span class="caret"></span>
+              </span>
+          </a>
+          <ul class="dropdown-menu" style="position: absolute; background-color: #20252d; width: 175px; left:inherit; right: 0px; top: 50px;">
+              <li>
+                  <a href="{% url 'profiles:profiles_view_profile' request.user.id %}"><i class="fa fa-user"></i>
+                      <span class="">
+                        View my Profile
+                      </span>
+                  </a>
+              </li>
+              <li>
+                  <a href="{% url 'account_settings' %}"><i class="fa fa-cog"></i>
+                      <span class="">Account Settings</span>
+                  </a>
+              </li>
+              <li>
+                  {% if unread_count %}
+                  <a href="{% url 'postman:inbox' %}"><i class="fa fa-envelope"></i> ({{ unread_count }}) <span class="">Messages</span></a>
+                  {% else %}
+                  <a href="{% url 'postman:inbox' %}"><i class="fa fa-envelope-o"></i> <span class="">Messages</span></a>
+                  {% endif %}
+              </li>
+              <li>
+                  <a id="account_logout" href="{% url 'account_logout' %}"><i class="fa fa-power-off"></i> {% trans "Log out" %}</a>
+              </li>
+          </ul>
+    </li>
     {% else %}
         <li><a href="{% url 'account_login' %}">{% trans "Log in" %}</a></li>
         {% if ACCOUNT_OPEN_SIGNUP %}
             <li><a href="{% url 'account_signup' %}" class="btn-primary">{% trans "Sign up" %}</a></li>
         {% endif %}
     {% endif %}
-</ul>
 
 <form id="accountLogOutForm" style="display: none;" action="{% url 'account_logout' %}" method="POST">
     {% csrf_token %}
