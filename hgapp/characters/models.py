@@ -21,6 +21,7 @@ from heapq import merge
 from hgapp.utilities import get_queryset_size, get_object_or_none
 from cells.models import Cell
 from characters.signals import GrantAssetGift, VoidAssetGifts, AlterPortedRewards, transfer_consumables
+from notifications.models import Notification, CONTRACTOR_NOTIF
 
 import random
 import hashlib
@@ -861,6 +862,15 @@ class Character(models.Model):
         new_death.save()
         self.is_dead = True
         self.save()
+        if self.number_of_victories() > 0 and self.cell:
+            for membership in self.cell.get_unbanned_members():
+                if membership.member_player != self.player:
+                    Notification.objects.create(
+                        user=membership.member_player,
+                        headline="{} died".format(self.name),
+                        content="{} victories, {} journals".format(self.number_of_victories(), self.num_journals),
+                        url=reverse('characters:characters_view', args=(self.id,)),
+                        notif_type=CONTRACTOR_NOTIF)
 
     def source_name_values(self):
         values = []
@@ -1596,6 +1606,12 @@ class Artifact(WorldElement):
         else:
             self.character = to_character
         self.save()
+        Notification.objects.create(
+            user=to_character.player,
+            headline="Received Artifact".format(self.name),
+            content="{} acquired {} {}".format(to_character.name, quantity, self.name),
+            url=reverse('characters:characters_artifact_view', args=(self.id,)),
+            notif_type=CONTRACTOR_NOTIF)
 
     def __transfer_consumables_to_character(self, transfer_type, to_character, notes, quantity):
         power = self.power_set.first()

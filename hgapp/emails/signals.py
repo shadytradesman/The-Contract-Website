@@ -39,7 +39,9 @@ def notify_game_ended(**kwargs):
     game = kwargs["game"]
     request = kwargs["request"]
     game_url = request.build_absolute_uri(reverse("games:games_view_game", args=[game.id]))
+    players = []
     for invite in game.game_invite_set.all():
+        players.append(invite.invited_player)
         profile = invite.invited_player.profile
         if profile.contract_updates and hasattr(invite, "attendance") and invite.attendance:
             if invite.attendance.attending_character:
@@ -61,6 +63,24 @@ def notify_game_ended(**kwargs):
             if email:
                 send_email_for_game_ended(email, invite, game_url, reward_url, scenario_url)
 
+    # notify GM
+    gm_exp_earned = game.is_introductory_game() or (game.achieves_golden_ratio() and game.cell.use_golden_ratio)
+    gm_message = "One Improvement" if gm_exp_earned else "One Improvement and 6 Exp"
+    Notification.objects.create(user=game.gm,
+                                headline="You've earned Rewards for GMing",
+                                content=gm_message,
+                                url=reverse("games:games_allocate_improvement_generic"),
+                                notif_type=REWARD_NOTIF)
+    # Notify other Players in playgroup
+    for membership in game.cell.get_unbanned_members():
+        if membership.member_player != game.gm and membership.member_player not in players:
+            Notification.objects.create(user=membership.member_player,
+                                        headline="Contract Completed in {}".format(game.cell.name),
+                                        content=game.scenario.title,
+                                        url=game_url,
+                                        notif_type=CONTRACT_NOTIF)
+
+
 @receiver(NotifyGameInvitee)
 def notify_game_invitee(sender, **kwargs):
     invite = kwargs["game_invite"]
@@ -72,15 +92,16 @@ def notify_game_invitee(sender, **kwargs):
                                 content="Upcoming Contract: " + invite.relevant_game.title,
                                 url=game_url,
                                 notif_type=CONTRACT_NOTIF)
-    message_body = SafeText('###{0} has invited you to an upcoming Game in {1}\n\n{2}\n\n [Click Here]({3}) to respond.'
-                            .format(invite.relevant_game.creator.get_username(),
-                                    invite.relevant_game.cell.name,
-                                    invite.invite_text,
-                                    game_url,
-                                    ))
     if not invite.invited_player.profile.early_access_user:
+        message_body = SafeText(
+            '###{0} has invited you to an upcoming Game in {1}\n\n{2}\n\n [Click Here]({3}) to respond.'
+            .format(invite.relevant_game.creator.get_username(),
+                    invite.relevant_game.cell.name,
+                    invite.invite_text,
+                    game_url,
+                    ))
         pm_write(sender=invite.relevant_game.creator,
-             recipient=invite.invited_player,
+                 recipient=invite.invited_player,
              subject=invite.relevant_game.creator.get_username() + " has invited you to join " + invite.relevant_game.title,
              body=message_body,
              skip_notification=True,

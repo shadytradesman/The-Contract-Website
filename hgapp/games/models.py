@@ -25,6 +25,7 @@ from functools import reduce
 
 from hgapp.utilities import get_object_or_none
 import django.dispatch
+from notifications.models import Notification, REWARD_NOTIF
 
 NotifyGameInvitee = django.dispatch.Signal(providing_args=['game_invite', 'request'])
 GameChangeStartTime = django.dispatch.Signal(providing_args=['game', 'request'])
@@ -841,7 +842,6 @@ class Scenario(models.Model):
         else:
             return Character.objects.none()
 
-
     def player_has_gmed(self, gm):
         return Game.objects.filter(scenario=self, gm=gm).exists()
 
@@ -849,7 +849,6 @@ class Scenario(models.Model):
         return Game.objects.filter(scenario=self, gm=gm) \
             .exclude(get_completed_game_excludes_query()) \
             .prefetch_related("attended_by").all()
-
 
     def get_finished_characters_for_gm(self, gm):
         games = self.get_completed_games_for_gm(gm)
@@ -896,6 +895,12 @@ class Scenario(models.Model):
                         rewarded_player=self.creator,
                         is_improvement=True)
         reward.save()
+        Notification.objects.create(
+            user=self.creator,
+            headline="You've earned an Improvement",
+            content="From writing up {}".format(self.title),
+            url=reverse("games:games_allocate_improvement_generic"),
+            notif_type=REWARD_NOTIF)
 
     def grant_or_void_reward_as_necessary(self):
         improvement_steps = self.get_steps_to_receive_improvement()

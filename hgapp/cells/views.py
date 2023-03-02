@@ -390,7 +390,14 @@ def rsvp_invite(request, cell_id, secret_key=None, accept=None, game_id=None):
                 webhooks = cell.webhook_cell.filter(send_for_new_members=True).all()
                 for webhook in webhooks:
                     webhook.post_new_membership(request.user, cell, request)
-            if is_accepted:
+                for membership in game.cell.get_unbanned_members():
+                    if membership.member_player != request.user:
+                        Notification.objects.create(
+                            user=membership.member_player,
+                            headline="{} joined {}".format(request.user.username, cell.name),
+                            content="Welcome, {}".format(request.user.profile.get_gm_title()),
+                            url=reverse('profiles:profiles_view_profile', args=(request.user.id,)),
+                            notif_type=PLAYGROUP_NOTIF)
                 if Character.objects.filter(player=request.user, cell__isnull=True).exists():
                     if game_id:
                         return HttpResponseRedirect(reverse('cells:add_characters_to_cell', args=(cell.id, game_id)))

@@ -296,6 +296,12 @@ class Profile(models.Model):
                                                     num_killed_contractors=self.num_gm_kills_novice)
         self.save()
 
+    def get_gm_title(self):
+        if self.gm_prefix:
+            return "{} {}".format(self.get_gm_prefix_display(), self.get_gm_suffix_display())
+        else:
+            return self.get_gm_suffix_display()
+
     def completed_game_invites(self):
         return self.user.game_invite_set \
             .exclude(get_completed_game_invite_excludes_query()) \
