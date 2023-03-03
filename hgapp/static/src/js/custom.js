@@ -13,6 +13,7 @@ $(document).on("click", "#js-notif-nav-button", function(e) {
         navPopdown.show();
         navCollapsed = false;
         $("#js-notif-nav-button").removeClass("css-unread-notifs-icon");
+        $(".css-notif-alert").hide();
     } else {
         navPopdown.hide();
         navCollapsed = true;

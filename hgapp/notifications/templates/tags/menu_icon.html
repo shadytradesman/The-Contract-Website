@@ -8,10 +8,13 @@
        hx-trigger="click"
        hx-target="#hx-notif-content"
        hx-swap="innerHTML"
-       class="{% if num_unread > 0 %}css-unread-notifs-icon{% endif %}"
+       class=""
        style="padding-top: 15px;"
     >
         <i class="fa fa-bell fa-lg"></i>
+        {% if num_unread > 0 %}
+            <span class="css-notif-alert">{{num_unread}}</span>
+        {% endif %}
     </a>
     <div  id="js-notification-popdown" class="css-notification-popdown">
         <div id="hx-notif-content">

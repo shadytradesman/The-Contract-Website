@@ -928,6 +928,20 @@ h1, h2, h3, h4, h5, .header-font, .nav, .lead {
     overflow: auto;
 }
 
+/* Make the badge float in the top right corner of the button */
+.css-notif-alert {
+  background-color: @brand-danger;
+  border-radius: 2px;
+  color: @text-color;
+
+  padding: 1px 4px;
+  font-size: 10px;
+
+  position: absolute; /* Position the badge within the relatively positioned button */
+  top: 4px;
+  left: 5px;
+}
+
 @media (min-width: 767px) {
     .css-notification-popdown a {
         color: @text-color !important;
@@ -935,15 +949,23 @@ h1, h2, h3, h4, h5, .header-font, .nav, .lead {
 }
 
 .css-unread-notifs-icon {
-    color: lighten(@brand-success, 10%) !important;
+    color: lighten(@brand-danger, 0%) !important;
 }
 
 .css-notif-unread {
     background-color: lighten(#20252d, 10%);
 }
 
-.css-notif-unread img{
-    filter: invert(51%) sepia(37%) saturate(458%) hue-rotate(100deg) brightness(95%) contrast(95%);;
+.css-notif-unread :after{
+    content: " ";
+    width: 8px;
+    height: 8px;
+    border-radius: 4px;
+    border: 2px solid #bb3b35;
+    background-color: #bb3b35;
+    position: absolute;
+    top: 9px;
+    left: 9px;
 }
 
 .js-notification-link {
