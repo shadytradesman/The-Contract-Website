@@ -21,7 +21,7 @@ from heapq import merge
 from hgapp.utilities import get_queryset_size, get_object_or_none
 from cells.models import Cell
 from characters.signals import GrantAssetGift, VoidAssetGifts, AlterPortedRewards, transfer_consumables
-from notifications.models import Notification, CONTRACTOR_NOTIF
+from notifications.models import Notification, ARTIFACT_NOTIF, CONTRACTOR_NOTIF
 
 import random
 import hashlib
@@ -555,8 +555,17 @@ class Character(models.Model):
         self._update_loss_count()
         self._update_victory_count()
         self._update_game_count()
+        curr_status = self.status
         self.status = self.calculate_status()
         self.save()
+        if self.status != curr_status and self.cell:
+            for membership in self.cell.get_unbanned_members():
+                Notification.objects.create(
+                    user=membership.member_player,
+                    headline="Contractor earned new Status",
+                    content="{} is now {}".format(self.name, self.get_contractor_status_display()),
+                    url=reverse('characters:characters_view', args=(self.id,)),
+                    notif_type=CONTRACTOR_NOTIF)
 
     def number_completed_games(self):
         return self.num_games if self.num_games else 0
@@ -1611,7 +1620,7 @@ class Artifact(WorldElement):
             headline="Received Artifact".format(self.name),
             content="{} acquired {} {}".format(to_character.name, quantity, self.name),
             url=reverse('characters:characters_artifact_view', args=(self.id,)),
-            notif_type=CONTRACTOR_NOTIF)
+            notif_type=ARTIFACT_NOTIF)
 
     def __transfer_consumables_to_character(self, transfer_type, to_character, notes, quantity):
         power = self.power_set.first()

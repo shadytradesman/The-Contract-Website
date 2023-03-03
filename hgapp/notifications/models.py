@@ -14,6 +14,7 @@ CONTRACTOR_NOTIF = "CONTRACTOR"
 PROMOTIONAL_NOTIF = "PROMO"
 WORLD_NOTIF = "WORLD"
 MESSAGE_NOTIF = "MESSAGE"
+ARTIFACT_NOTIF = "ARTIFACT"
 NOTIFICATION_TYPE = (
     (PLAYGROUP_NOTIF, "Playgroup"),
     (CONTRACT_NOTIF, "Contract"),
@@ -24,6 +25,7 @@ NOTIFICATION_TYPE = (
     (PROMOTIONAL_NOTIF, "Promotional"),
     (WORLD_NOTIF, "World"),
     (MESSAGE_NOTIF, "Message"),
+    (ARTIFACT_NOTIF, "Artifact"),
 )
 
 
@@ -83,6 +85,8 @@ class Notification(models.Model):
             return static("overrides/notif_icons/wireframe-globe.svg")
         if notif_type == MESSAGE_NOTIF:
             return static("overrides/notif_icons/envelope.svg")
+        if notif_type == ARTIFACT_NOTIF:
+            return static("overrides/notif_icons/power-ring.svg")
 
 
 class PlayerLastReadTime(models.Model):

@@ -12,6 +12,8 @@ from characters.models import Character, ExperienceReward, EXP_JOURNAL
 
 from hgapp.utilities import get_object_or_none
 
+from notifications.models import Notification, REWARD_NOTIF
+
 NUM_JOURNALS_PER_IMPROVEMENT = 4
 
 class Journal(models.Model):
@@ -94,6 +96,12 @@ class Journal(models.Model):
                                    is_improvement=True,
                                    is_journal=True)
             reward.save()
+            Notification.objects.create(
+                user=self.writer,
+                headline="Improvement earned from Journal",
+                content="{} earned an Improvement".format(character.name),
+                url=reverse("characters:characters_spend_reward", args=[character.id]),
+                notif_type=REWARD_NOTIF)
         else:
             if self.experience_reward and not self.experience_reward.is_void:
                 raise ValueError("journal is granting exp reward when it already has one.",
@@ -108,6 +116,12 @@ class Journal(models.Model):
             exp_reward.save()
             self.experience_reward = exp_reward
             self.save()
+            Notification.objects.create(
+                user=self.writer,
+                headline="Exp earned from Journal",
+                content="{} earned 1 Exp".format(character.name),
+                url=reverse("characters:characters_spend_reward", args=[character.id]),
+                notif_type=REWARD_NOTIF)
 
     @staticmethod
     def get_num_journals_until_improvement(character):

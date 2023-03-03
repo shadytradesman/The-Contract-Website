@@ -6,6 +6,8 @@ from django.db.models import Q, Sum
 from characters.models import Artifact, Character
 from games.models import Game_Attendance
 from powers.models import Power, Power_Full, CRAFTING_CONSUMABLE
+from django.urls import reverse
+from notifications.models import Notification, ARTIFACT_NOTIF
 
 # Crafting Constants
 NUM_FREE_CONSUMABLES_PER_DOWNTIME = 1
@@ -104,6 +106,12 @@ class CraftingEvent(models.Model):
                 # they may have used some
                 crafted_artifact.relevant_artifact.quantity = max(0, curr_quantity - num_refunded)
                 crafted_artifact.relevant_artifact.save()
+                Notification.objects.create(
+                    user=crafted_artifact.relevant_artifact.character.player,
+                    headline="Consumables refunded",
+                    content="{} affected by Gift edit".format(crafted_artifact.relevant_artifact.name),
+                    url=reverse('characters:characters_artifact_view', args=(crafted_artifact.relevant_artifact.pk,)),
+                    notif_type=ARTIFACT_NOTIF)
             crafted_artifact.save()
         self.save()
 
@@ -128,6 +136,12 @@ class CraftingEvent(models.Model):
             else:
                 num_free_refunded += 1
             self.artifacts.remove(artifact)
+            Notification.objects.create(
+                user=artifact.character.player,
+                headline="Artifact Effect refunded",
+                content="{} affected by Gift edit".format(artifact.name),
+                url=reverse("characters:characters_view", args=[artifact.character]),
+                notif_type=ARTIFACT_NOTIF)
             crafting.delete()
             if artifact.power_full_set.count() == 0:
                 artifact.delete()
