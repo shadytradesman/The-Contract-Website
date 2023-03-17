@@ -76,6 +76,11 @@
                             {{cell.character_set.count}} Contractor{{cell.character_set.count|pluralize}}
                             |
                             {{cell.num_completed_games}} completed Contract{{cell.num_completed_games|pluralize}}
+                            {% if cell.find_world_date %}
+                                <div class="text-center" style="margin-top: -5px; margin-bottom: 5px;">
+                                    Last activity: {{cell.find_world_date|timesince}} ago
+                                </div>
+                            {% endif %}
                             {% if cell.cell_sell %}
                                 <div class="expandable-outer js-expandable-collapsed">
                                     {% if cell.is_community_link_public and cell.community_link %}

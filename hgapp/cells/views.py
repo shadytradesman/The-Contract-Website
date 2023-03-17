@@ -390,7 +390,7 @@ def rsvp_invite(request, cell_id, secret_key=None, accept=None, game_id=None):
                 webhooks = cell.webhook_cell.filter(send_for_new_members=True).all()
                 for webhook in webhooks:
                     webhook.post_new_membership(request.user, cell, request)
-                for membership in game.cell.get_unbanned_members():
+                for membership in cell.get_unbanned_members():
                     if membership.member_player != request.user:
                         Notification.objects.create(
                             user=membership.member_player,

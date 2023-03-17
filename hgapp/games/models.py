@@ -25,7 +25,7 @@ from functools import reduce
 
 from hgapp.utilities import get_object_or_none
 import django.dispatch
-from notifications.models import Notification, REWARD_NOTIF
+from notifications.models import Notification, REWARD_NOTIF, CONTRACTOR_NOTIF
 
 NotifyGameInvitee = django.dispatch.Signal(providing_args=['game_invite', 'request'])
 GameChangeStartTime = django.dispatch.Signal(providing_args=['game', 'request'])
@@ -471,7 +471,17 @@ class Game(models.Model):
             invite.profile.recompute_titles()
         for character in self.attended_by.all():
             character.refresh_from_db()
+            curr_status = character.status
             character.update_contractor_game_stats()
+            character.refresh_from_db()
+            if character.status != curr_status and character.cell:
+                for membership in character.cell.get_unbanned_members():
+                    Notification.objects.create(
+                        user=membership.member_player,
+                        headline="Contractor earned new Status",
+                        content="{} is now {}".format(character.name, character.get_contractor_status_display()),
+                        url=reverse('characters:characters_view', args=(character.id,)),
+                        notif_type=CONTRACTOR_NOTIF)
 
     def update_profile_stats(self):
         self.update_participant_titles()
