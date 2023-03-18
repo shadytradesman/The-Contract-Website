@@ -152,7 +152,7 @@ form .nav-tabs > li, form .nav-pills > li {
 }
 
 .css-essential-field {
-    float: left;
+    display: inline-block;
 }
 
 .css-essential-field input {
@@ -166,14 +166,18 @@ form .nav-tabs > li, form .nav-pills > li {
     max-width: 270px;
 }
 #css-ambition-field {
-    max-width: 945px;
+    max-width: 95%;
 }
 #css-age-field {
     max-width: 90px;
 }
 #css-appearance-field {
-    max-width: 830px;
+    max-width: 95%;
     min-width: 300px;
+}
+
+#css-appearance-field input:after{
+    content:".";
 }
 
 @media (min-width: 500px) {
@@ -186,6 +190,9 @@ form .nav-tabs > li, form .nav-pills > li {
     #css-tagline-field {
         max-width: 300px;
     }
+    #css-concept-field, #css-paradigm-field {
+        max-width: 300px;
+    }
 }
 @media (min-width: 700px) {
    #css-appearance-field {
@@ -194,27 +201,40 @@ form .nav-tabs > li, form .nav-pills > li {
 }
 @media (min-width: 991px) {
     #css-appearance-field {
-        min-width: 660px;
-    }
-    #css-concept-field {
-        max-width: 500px;
+        min-width: 650px;
     }
     #css-name-field {
-    min-width: 200px;
+        min-width: 200px;
+    }
+    #css-ambition-field {
+        max-width: 650px;
     }
 }
 
 .css-new-row {
-    height: 90px;
+    height: 40px;
+    width: 100%;
 }
+
+.css-essentials-container {
+    display: flex;
+    flex-wrap: wrap;
+}
+
 .css-essential-text {
     padding-left: 5px;
     padding-right: 5px;
-    float: left;
+    display: inline-block;
     font-size: 16px;
     position:relative;
     top: 7px;
     margin-bottom: 22px;
+}
+
+.css-essential-period {
+    padding-left: 2px;
+    padding-right: 0px;
+    float: right;
 }
 
 .css-essential-help {

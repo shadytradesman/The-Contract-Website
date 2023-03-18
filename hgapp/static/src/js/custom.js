@@ -438,7 +438,8 @@ $(function(){
         const personalityTraits = JSON.parse(document.getElementById('personalityTraits').textContent);
         const paradigms = JSON.parse(document.getElementById('paradigms').textContent);
         const ambitions = JSON.parse(document.getElementById('ambitions').textContent);
-        function randomArchetype() {
+
+        function randomConcept() {
             var extra = false;
             var output = "";
             if (Math.random() < 0.4) {
@@ -454,14 +455,37 @@ $(function(){
                 output = output + " " + randomFromList(paradigms);
             }
             let out = output.trim().toLowerCase();
-            if (document.getElementById('id_concept_summary')) {
-                $("#id_concept_summary").val(out);
-            } else {
+            if (document.getElementById('js-concept')) {
                 $("#js-concept").text(out);
                 var el = document.getElementById('js-concept');
                 el.style.animation = 'none';
                 el.offsetHeight; /* trigger reflow */
                 el.style.animation = null;
+            }
+        }
+
+        function randomArchetype() {
+            var output = "";
+            if (Math.random() < 0.5) {
+                output = randomFromList(personalityTraits);
+            }
+            if (Math.random() < 0.4) {
+                output = output + " " + randomFromList(archetypes);
+            } else {
+                output = output + " " + randomFromList(professions);
+            }
+            let out = output.trim().toLowerCase();
+            if (document.getElementById('id_concept_summary')) {
+                $("#id_concept_summary").val(out);
+            }
+        }
+
+        function randomParadigm() {
+            var extra = false;
+            let output = randomFromList(paradigms);
+            let out = output.trim().toLowerCase();
+            if (document.getElementById('id_paradigm')) {
+                $("#id_paradigm").val(out);
             }
         }
 
@@ -472,10 +496,11 @@ $(function(){
 
         if (document.getElementById('js-random-archetype-button')) {
             document.getElementById("js-random-archetype-button").addEventListener("click", randomArchetype);
+            document.getElementById("js-random-paradigm-button").addEventListener("click", randomParadigm);
             document.getElementById("js-random-ambition-button").addEventListener("click", randomAmbition);
         }
         if (document.getElementById('js-concept')) {
-            window.setInterval(randomArchetype, 2400);
+            window.setInterval(randomConcept, 2400);
         }
     }
 });

@@ -10,16 +10,15 @@
     </h2>
 
     <div class="panel-body">
-        <div class="row">
-            <div class="col-xs-12">
-                <div id="css-name-field" class="css-essential-field">
-                    {{ char_form.name}}
-                    <figcaption class="help-block">
-                        {{ char_form.name.help_text|safe}}
-                    </figcaption>
-                </div>
-                <span class="css-essential-text"> is a </span>
-                <div class="clearfix visible-xs-block"></div>
+        <div class="css-essentials-container">
+            <div id="css-name-field" class="css-essential-field">
+                {{ char_form.name}}
+                <figcaption class="help-block">
+                    {{ char_form.name.help_text|safe}}
+                </figcaption>
+            </div>
+            <div>
+                <div class="css-essential-text" style="float: left;"> is a </div>
                 <div id="css-concept-field" class="css-essential-field">
                     {{ char_form.concept_summary}}
                     <figcaption class="help-block">
@@ -31,14 +30,39 @@
                         {% endif %}
                     </figcaption>
                 </div>
-                <div class="clearfix visible-xs-block visible-sm-block visible-md-block"></div>
-                <span class="css-essential-text"> who will risk </span>
+            </div>
+            <div>
+                <div class="css-essential-text" style="float: left;"> who will risk </div>
                 <div id="css-pronoun-field" class="css-essential-field">
                     {{char_form.pronoun}}
                 </div>
-                <span class="css-essential-text"> life in the Contracts </span>
-                <div class="visible-lg-block css-new-row"></div>
-                <span class="css-essential-text"> for a chance to </span>
+            </div>
+            <div class="css-essential-text">
+                life in the Contracts
+            </div>
+            <div>
+                <div class="css-essential-text" style="float: left;">
+                    to
+                    <span id="js-paradigm-text">
+                            become a
+                        </span>
+                </div>
+                <div id="css-paradigm-field" class="css-essential-field">
+                    {{ char_form.paradigm}}
+                    <figcaption class="help-block">
+                        {{ char_form.paradigm.help_text|safe}}
+                        {% if not character %}
+                        <a id="js-random-paradigm-button" class="btn btn-default btn-xs" style="display:inline;">
+                            Inspire Me!
+                        </a>
+                        {% endif %}
+                    </figcaption>
+                </div>
+            </div>
+            <div>
+                <div class="css-essential-text" style="float:left;">
+                    and
+                </div>
                 <div id="css-ambition-field" class="css-essential-field">
                     {{ char_form.ambition}}
                     <figcaption class="help-block">
@@ -50,45 +74,45 @@
                         {% endif %}
                     </figcaption>
                 </div>
-                <span class="css-essential-text visible-lg-block"> .</span>
+                <div class="css-essential-text css-essential-period">.</div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-xs-12">
-                <span class="css-essential-text"> They are </span>
-                <div id="css-age-field" class="css-essential-field">
-                    {{ char_form.age}}
-                    <figcaption class="help-block">
-                        {{ char_form.age.help_text|safe}}
-                    </figcaption>
-                </div>
-                <span class="css-essential-text"> years old, and usually appear as</span>
-                <div class="visible-sm-block visible-md-block visible-xs-block css-new-row"></div>
+
+            <div class="css-new-row"></div>
+
+            <div class="css-essential-text"> They are </div>
+            <div id="css-age-field" class="css-essential-field">
+                {{ char_form.age}}
+                <figcaption class="help-block">
+                    {{ char_form.age.help_text|safe}}
+                </figcaption>
+            </div>
+            <div class="css-essential-text"> years old, and usually appear as</div>
+            <div>
                 <div id="css-appearance-field" class="css-essential-field">
                     {{ char_form.appearance}}
                     <figcaption class="help-block">
                         {{ char_form.appearance.help_text|safe}}
                     </figcaption>
                 </div>
-                <span class="css-essential-text visible-md-block visible-lg-block"> .</span>
+                <div class="css-essential-text css-essential-period">.</div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-xs-12 css-essential-cell-setting text-center" style="margin-top: 5px;">
-                They are from
-                <span class="form-inline">
-                    {{char_form.cell}}
-                </span>
-                <span id="js-a-world-phrase">
-                    <span class="visible-sm-inline visible-md-inline visible-lg-inline">,</span>
-                    a world <span id="js-cell-setting-blurb">{{cell.setting_sheet_blurb}}</span>.
-                </span>
-            </div>
-        </div>
-        <div id="js-setting-container" class="row" style="margin-top: 10px;{% if not cell %} display: none;{% endif %}">
-            <div class="col-xs-12">
-                <div id="js-setting-content" class="col-xs-12 thumbnail expandable-outer js-expandable-collapsed" >
-                    {{cell.setting_create_char_info|safe}}
+        <div class="css-new-row"></div>
+
+        <div class="css-essential-cell-setting text-center" style="margin-top: 5px;">
+            They are based in
+            <span class="form-inline">
+                {{char_form.cell}}
+            </span>
+            <span id="js-a-world-phrase">
+                <span class="visible-sm-inline visible-md-inline visible-lg-inline">,</span>
+                a world <span id="js-cell-setting-blurb">{{cell.setting_sheet_blurb}}</span>.
+            </span>
+            <div id="js-setting-container" class="row" style="margin-top: 10px;{% if not cell %} display: none;{% endif %}">
+                <div class="col-xs-12">
+                    <div id="js-setting-content" class="col-xs-12 thumbnail expandable-outer js-expandable-collapsed" >
+                        {{cell.setting_create_char_info|safe}}
+                    </div>
                 </div>
             </div>
         </div>

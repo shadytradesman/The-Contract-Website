@@ -298,7 +298,7 @@ def view_character(request, character_id, secret_key=None):
     if character.player and secret_key:
         return HttpResponseRedirect(reverse('characters:characters_view', args=(character_id,)))
     if not character.player_can_view(request.user):
-        raise PermissionDenied("You do not have permission to view this Character")
+        raise PermissionDenied("You do not have permission to view this Contractor")
     secret_key_valid = False
     if secret_key:
         secret_key_valid = character.is_editable_with_key(secret_key)
@@ -307,7 +307,10 @@ def view_character(request, character_id, secret_key=None):
     user_can_edit = (request.user.is_authenticated and character.player_can_edit(request.user)) or secret_key_valid
     user_can_gm = character.player_can_gm(request.user)
     user_posts_moves = (request.user.is_authenticated and character.cell) \
-                       and (character.cell.player_can_post_world_events(request.user) and character.cell.player_can_run_games(request.user))
+                       and not (request.user == character.player) \
+                       and (character.cell.player_can_post_world_events(request.user)
+                            and character.cell.player_can_run_games(request.user)) \
+
     early_access = request.user and hasattr(request.user, "profile") and request.user.profile.early_access_user
     if not character.stats_snapshot:
         context={"character": character,

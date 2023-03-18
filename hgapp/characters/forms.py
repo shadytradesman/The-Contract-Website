@@ -82,11 +82,11 @@ def make_character_form(user, existing_character=None, supplied_cell=None):
                 'pronoun': _(""),
                 'tagline': _('(Optional) A subtitle that introduces your Contractor in a flavorful way'),
                 'appearance': _('A brief description of your Contractor\'s outward appearance.'),
-                'concept_summary': _('Archetype Summary (ex: "skater punk werewolf", "cannibal chef", or "golden-age comic book hero")'),
+                'concept_summary': _('Non-supernatural archetype (e.g. "skater punk", "chef", "frat bro")'),
                 'ambition': _('Ambition. Why does this Contractor risk their life for power? Focus outward: how do they want to '
                               'change the world?'),
                 'age': _("Age"),
-                'paradigm': _('How do the character\'s powers work?'),
+                'paradigm': _('Supernatural paradigm.'),
                 'residence': _('Where the character lives'),
                 'languages': _('List of languages the character speaks'),
                 'insanities': _('List of instabilities and insanities the character possesses'),
@@ -104,6 +104,12 @@ def make_character_form(user, existing_character=None, supplied_cell=None):
             widgets = {
                 'name': forms.TextInput(attrs={'class': 'form-control'}),
             'concept_summary':forms.TextInput(attrs={
+                'class': 'form-control',
+                "autocorrect": "off",
+                "autocapitalize": "none",
+                "autocomplete": "off",
+            }),
+            'paradigm':forms.TextInput(attrs={
                 'class': 'form-control',
                 "autocorrect": "off",
                 "autocapitalize": "none",
