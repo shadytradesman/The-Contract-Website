@@ -1,19 +1,16 @@
-<link rel="preload" as="image" href="{{ modal_art_url }}" />
-<div class="modal fade" id="{%block modal_id%}{%endblock%}" tabindex="-1" role="dialog" aria-labelledby="tutorialModalLabel">
-    <div class="modal-dialog modal-lg css-big-modal-lg" role="document">
+<div class="modal fade" id="{%block modal_id%}{%endblock%}" tabindex="-1" role="dialog" aria-labelledby="tutorialModalLabel" style="z-index: 9999!important;">
+    <div class="modal-dialog modal-lg css-big-modal-no-image" role="document">
         <div class="modal-content">
-            <img src="{{ modal_art_url }}" class="css-big-modal-image hidden-xs hidden-sm">
-            <div class="modal-header text-center css-big-modal-header">
+            <div class="modal-header text-center ">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true" class="text-primary">&times;</span></button>
                 <h2 class="modal-title">{% block modal_title %}{%endblock%}</h2>
             </div>
-            <div class="modal-body css-big-modal-body" >
+            <div class="modal-body " >
                 <div class="text-center" style="margin-bottom: 10px;">
                     <span class="lead">
                       {% block modal_header %}
                       {% endblock %}
                     </span>
-
                 </div>
                 <img class="css-sm-modal-image hidden-md hidden-lg" src="{{ modal_art_url }}">
                 <div>
@@ -21,7 +18,7 @@
                     {% endblock %}
                 </div>
             </div>
-            <div class="modal-footer css-big-modal-footer">
+            <div class="modal-footer ">
                 <div class="text-center">
                     <button type="button" class="btn btn-default" data-dismiss="modal" role="button">Okay</button>
                 </div>

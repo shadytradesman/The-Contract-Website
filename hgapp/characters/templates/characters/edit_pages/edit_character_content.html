@@ -2,13 +2,82 @@
 {% load cache %}
 
 
-<div class="panel panel-default">
-    <h2 class = "text-center" data-toggle="tooltip" title='{{tutorial.core_info|safe}}'>
-        <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#tutorialModal">
-            What Makes a Contractor?
-        </button>
-    </h2>
+<h2 class = "text-center" data-toggle="tooltip" title='{{tutorial.core_info|safe}}' style="margin-top: 0px;">
+</h2>
 
+<div class="text-muted">
+    <small>
+        <i>
+            Select one
+        </i>
+        <div>
+            <button type="button" class="btn btn-primary btn-xs css-section-help" data-toggle="modal" data-target="#tutorialModalSupernatural">
+                ?
+            </button>
+        </div>
+    </small>
+</div>
+<div class="panel panel-default">
+    <div class="panel-body" style="margin-top: 15px;">
+        <div class="row">
+            <div class="col-xs-12 col-md-6">
+                <label id="js-supernatural-no" class=" btn btn-outline thumbnail btn-block quirk-btn
+                {% if not char_form.started_supernatural.initial %} active {% endif %}"
+                       data-toggle="button"
+               {% if char_form.started_supernatural.initial %} aria-pressed="true"{% endif %}
+                       style="margin-bottom: 5px;"
+                >
+                    <div class=" text-center" style="white-space: normal;">
+                        Start human and become something more
+                        <div>
+                            <small class="text-muted">
+                                (Recommended)
+                            </small>
+                        </div>
+                    </div>
+                </label>
+            </div>
+
+            <div class="col-xs-12 col-md-6">
+                <label id="js-supernatural-yes"  class="btn btn-outline thumbnail btn-block quirk-btn
+                {% if char_form.started_supernatural.initial %} active {% endif %}"
+                       data-toggle="button"
+                   {% if not char_form.started_supernatural.initial %} aria-pressed="true"{% endif %}
+                       style="margin-bottom: 5px;"
+                >
+                    <div class=" text-center" style="white-space: normal;">
+                        Start unusual and unlock your full potential
+                        <div>
+                            <small class="text-muted">
+                                (Advanced)
+                            </small>
+                        </div>
+                    </div>
+                </label>
+            </div>
+        </div>
+        <div style="">
+            {{char_form.started_supernatural}}
+        </div>
+    </div>
+</div>
+
+
+
+
+<div class="text-muted">
+    <small>
+        <i>
+            Fill in the blanks
+        </i>
+        <div>
+            <button type="button" class="btn btn-primary btn-xs css-section-help" data-toggle="modal" data-target="#tutorialModal">
+                ?
+            </button>
+        </div>
+    </small>
+</div>
+<div class="panel panel-default">
     <div class="panel-body">
         <div class="css-essentials-container">
             <div id="css-name-field" class="css-essential-field">
@@ -76,25 +145,36 @@
                 </div>
                 <div class="css-essential-text css-essential-period">.</div>
             </div>
-
             <div class="css-new-row"></div>
-
-            <div class="css-essential-text"> They are </div>
-            <div id="css-age-field" class="css-essential-field">
-                {{ char_form.age}}
-                <figcaption class="help-block">
-                    {{ char_form.age.help_text|safe}}
-                </figcaption>
-            </div>
-            <div class="css-essential-text"> years old, and usually appear as</div>
             <div>
-                <div id="css-appearance-field" class="css-essential-field">
-                    {{ char_form.appearance}}
+                <div class="css-essential-text" style="float:left;"> They are </div>
+                <div id="css-age-field" class="css-essential-field">
+                    {{ char_form.age}}
                     <figcaption class="help-block">
-                        {{ char_form.appearance.help_text|safe}}
+                        {{ char_form.age.help_text|safe}}
                     </figcaption>
                 </div>
-                <div class="css-essential-text css-essential-period">.</div>
+                <div class="css-essential-text" style="float:right;"> years old, </div>
+            </div>
+            <div>
+                <div class="css-essential-text" style="float:left;">live in </div>
+                <div id="css-residence-field" class="css-essential-field">
+                    {{ char_form.residence}}
+                    <figcaption class="help-block">
+                        {{ char_form.residence.help_text|safe}}
+                    </figcaption>
+                </div>
+                <div class="css-essential-text css-essential-period">,</div>
+            </div>
+            <div>
+                <div class="css-essential-text" style="float:left;"> and usually appear as</div>
+                    <div id="css-appearance-field" class="css-essential-field">
+                        {{ char_form.appearance}}
+                        <figcaption class="help-block">
+                            {{ char_form.appearance.help_text|safe}}
+                        </figcaption>
+                    </div>
+                    <div class="css-essential-text css-essential-period">.</div>
             </div>
         </div>
         <div class="css-new-row"></div>
@@ -142,45 +222,12 @@
                         and then edit your Contractor to add them to it.
                     </div>
                     <div class="text-center" style="margin-top: 10px;">
-                            <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#worldTutorialModal">
-                                More about Playgroups
-                            </button>
+                        <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#worldTutorialModal">
+                            More about Playgroups
+                        </button>
                     </div>
                 </div>
             </div>
-        </div>
-        <hr>
-        <div class="row">
-            {% if user.is_authenticated %}
-                <div class="col-md-4 col-xs-6">
-                    <div class="css-essential-field" style="margin-top: 15px;">
-                        {{ char_form.private | bootstrap}}
-                    </div>
-                </div>
-            {% endif %}
-            <div class="col-md-4 col-xs-6">
-                <div id="css-tagline-field" class="css-essential-field">
-                    {{ char_form.tagline | bootstrap}}
-                </div>
-            </div>
-                {% if charon_coin_form %}
-                    <div class="col-md-4 col-xs-12 text-center" style="margin-top: 15px;">
-                        <div class="alert alert-info ">
-                            <label data-toggle="tooltip" data-placement="bottom" title='{{tutorial.charon_coin}}'>
-                                {{ charon_coin_form.spend_coin }} Spend a Charon Coin on this Character
-                            </label>
-                        </div>
-                    </div>
-                {% endif %}
-                {% if ported_character_form %}
-                    <div class="col-md-4 col-xs-12 text-center" style="margin-top: 15px;">
-                        <div class="alert alert-info ">
-                            <label data-toggle="tooltip" data-placement="bottom" title='Is this Contractor ported from House Games?'>
-                                {{ ported_character_form|bootstrap }}
-                            </label>
-                        </div>
-                    </div>
-                {% endif %}
         </div>
     </div>
 </div>
@@ -191,3 +238,95 @@
         {% include "characters/edit_pages/edit_character_stats.html" %}
     {% endcache %}
 {% endif %}
+
+<div class="text-muted">
+    <small>
+        <i>
+            Finishing touches
+        </i>
+        <div>
+            <button type="button" class="btn btn-primary btn-xs css-section-help" data-toggle="modal" data-target="#tutorialModal">
+                ?
+            </button>
+        </div>
+    </small>
+</div>
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div class="row">
+            {% if user.is_authenticated %}
+            <div class="col-md-4 col-xs-6">
+                <div class="css-essential-field" style="margin-top: 15px;">
+                    {{ char_form.private | bootstrap}}
+                </div>
+            </div>
+            {% endif %}
+            <div class="col-md-4 col-xs-6">
+                <div id="css-tagline-field" class="css-essential-field">
+                    {{ char_form.tagline | bootstrap}}
+                </div>
+            </div>
+            {% if charon_coin_form %}
+            <div class="col-md-4 col-xs-12 text-center" style="margin-top: 15px;">
+                <div class="alert alert-info ">
+                    <label data-toggle="tooltip" data-placement="bottom" title='{{tutorial.charon_coin}}'>
+                        {{ charon_coin_form.spend_coin }} Spend a Charon Coin on this Character
+                    </label>
+                </div>
+            </div>
+            {% endif %}
+            {% if ported_character_form %}
+            <div class="col-md-4 col-xs-12 text-center" style="margin-top: 15px;">
+                <div class="alert alert-info ">
+                    <label data-toggle="tooltip" data-placement="bottom" title='Is this Contractor ported from House Games?'>
+                        {{ ported_character_form|bootstrap }}
+                    </label>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+
+<div class="thumbnail">
+    <div class="row">
+        <div class="col-xs-12 col-md-10 col-md-offset-1 text-center">
+            <div class="alert alert-warning limit-warn" role="alert" style="display:none;">
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 col-md-10 col-md-offset-1 text-center">
+            <div class="alert alert-warning liability-warn" role="alert" style="display:none;">
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 col-md-10 col-md-offset-1">
+            <div class="alert alert-danger js-exp-warn text-center" role="alert" style="display:none;">
+                Your Character does not have enough Experience to purchase the desired stats.
+                <br>
+                <b>Remaining Exp: <span class="js-remaining-exp">150</span></b>
+                <br>
+                <a class="btn btn-default btn-sm wiki-entry-collapsible">Why can I still save?</a>
+                <div class="collapse-content clearfix"  style="display:none;">
+                    In order to support custom house rules, The Contract's website does not strictly enforce the
+                    official format.
+                    <br>
+                    Instead, we merely flag when actions deviate from the official rules.
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row text-center">
+        <div class="col-xs-12">
+            <input id="char-submit" class="btn btn-primary btn-lg" type="submit" value="Save"/>
+            <br>
+            <small>
+                You may return to this page at any time.
+                Any unused Experience will be saved.
+            </small>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,27 @@
+{% extends "characters/edit_pages/tutorial_modals/modal_template.html" %}
+
+{% block modal_id %}tutorialModal{% endblock %}
+
+{% block modal_title %}
+  What Makes a Contractor?
+{% endblock %}
+
+{% block modal_header %}
+{% endblock %}
+
+{% block modal_body %}
+<span class="lead">You are exceptional.</span>
+<p>
+  {{tutorial.modal_1|safe}}
+</p>
+<br>
+<span class="lead">You will sign The Contract.</span>
+<p>
+  {{tutorial.modal_2|safe}}
+</p>
+<br>
+<span class="lead">Incredible power sleeps within you.</span>
+<p>
+  {{tutorial.modal_3|safe}}
+</p>
+{% endblock %}

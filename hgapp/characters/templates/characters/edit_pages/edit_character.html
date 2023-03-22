@@ -47,9 +47,9 @@
 {% include "characters/edit_pages/secondary_ability_script_snippet.html" %}
 {% include "characters/edit_pages/asset_script_snippet.html" %}
 {% include "characters/edit_pages/liability_script_snippet.html" %}
+{% include "characters/edit_pages/tutorial_modals/tutorial_modals.html" %}
 <div class="container">
     {% include "characters/edit_pages/choose_world_modal.html" %}
-    {% include "characters/edit_pages/what_is_contractor_modal.html" %}
 
     {{ attribute_formset.about.errors }}
     {{ char_form.about.errors }}
@@ -67,7 +67,6 @@
                 New Contractor
             </span>
         </h1>
-        <div class="visible-sm-block visible-xs-block text-center"><small>Tap on any element for more information.</small></div>
         <form action="{% url 'characters:characters_create' %}" method="post" onsubmit="setFormSubmitting()">
     {% endif %}
     <div class="row">
@@ -86,8 +85,9 @@
                     </span>
                 </div>
             </span>
-            <div class="css-fake-height-div">
-            </div>
+            <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#tutorialModalExperience" style="position: relative; left: 295px; top: 1px; height: 29px">
+                ?
+            </button>
         </div>
     </div>
     {% if character %}
@@ -95,6 +95,8 @@
             <a href="{% url 'characters:characters_power_picker' character.id %}">Click Here</a>
             to manage Powers
         </h4>
+    {% else %}
+        <div class="visible-sm-block visible-xs-block text-center"><small>Tap on any element for more information.</small></div>
     {% endif %}
 
     {{ char_form.non_field_errors }}

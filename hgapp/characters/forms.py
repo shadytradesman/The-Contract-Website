@@ -74,7 +74,7 @@ def make_character_form(user, existing_character=None, supplied_cell=None):
             fields = ('name', 'private', 'tagline', 'appearance', 'age', 'concept_summary', 'ambition', 'paradigm',
                       'residence', 'languages', 'insanities', 'disabilities', 'current_alias', 'previous_aliases',
                       'resources', 'contacts', 'equipment', 'total_encumbrance', 'max_encumbrance', 'wish_list',
-                      'to_do_list', 'contracts', 'pronoun')
+                      'to_do_list', 'contracts', 'pronoun', 'started_supernatural')
             help_texts = {
                 'name': _('Name'),
                 'private': _("If checked, this Contractor will only be viewable by their Playgroup's leaders and any GMs "
@@ -82,12 +82,12 @@ def make_character_form(user, existing_character=None, supplied_cell=None):
                 'pronoun': _(""),
                 'tagline': _('(Optional) A subtitle that introduces your Contractor in a flavorful way'),
                 'appearance': _('A brief description of your Contractor\'s outward appearance.'),
-                'concept_summary': _('Non-supernatural archetype (e.g. "skater punk", "chef", "frat bro")'),
+                'concept_summary': _('Non-supernatural archetype'),
                 'ambition': _('Ambition. Why does this Contractor risk their life for power? Focus outward: how do they want to '
                               'change the world?'),
                 'age': _("Age"),
                 'paradigm': _('Supernatural paradigm.'),
-                'residence': _('Where the character lives'),
+                'residence': _('Where do they live?'),
                 'languages': _('List of languages the character speaks'),
                 'insanities': _('List of instabilities and insanities the character possesses'),
                 'disabilities': _('List of disabilities and battle scars the character possesses'),
@@ -115,6 +115,12 @@ def make_character_form(user, existing_character=None, supplied_cell=None):
                 "autocapitalize": "none",
                 "autocomplete": "off",
             }),
+            'residence':forms.TextInput(attrs={
+                'class': 'form-control',
+                "autocorrect": "off",
+                "autocapitalize": "none",
+                "autocomplete": "off",
+            }),
             'pronoun': forms.Select(attrs={'class': 'form-control '}),
             'ambition': forms.TextInput(attrs={
                 'class': 'form-control ',
@@ -131,9 +137,11 @@ def make_character_form(user, existing_character=None, supplied_cell=None):
             }),
             'equipment': CustomStylePagedown(),
             'notes': CustomStylePagedown(),
+            'started_supernatural': forms.HiddenInput()
             }
 
     form = CharacterForm
+
     if user.is_authenticated:
         if existing_character:
             queryset = existing_character.player.cell_set.filter(cellmembership__is_banned=False).all()
@@ -157,6 +165,7 @@ def make_character_form(user, existing_character=None, supplied_cell=None):
                                       required=False,
                                       )
     form.base_fields["cell"] = cell
+    form.base_fields["started_supernatural"].initial = existing_character.started_supernatural if existing_character else False
 
     return form
 

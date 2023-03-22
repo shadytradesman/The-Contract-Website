@@ -127,6 +127,7 @@ form .nav-tabs > li, form .nav-pills > li {
 
 .css-remaining-exp {
     width: 290px;
+    position: absolute;
     margin: auto;
     border-color: black;
     border-radius: 4px;
@@ -134,6 +135,10 @@ form .nav-tabs > li, form .nav-pills > li {
     border-style: solid;
     padding: 5px;
     background-color: #5a5f6c;
+}
+
+.css-section-help {
+    float: right;
 }
 
 .css-fake-height-div {
@@ -207,7 +212,28 @@ form .nav-tabs > li, form .nav-pills > li {
         min-width: 200px;
     }
     #css-ambition-field {
-        max-width: 650px;
+        max-width: 550px;
+    }
+}
+
+@media (min-width: 1200px) {
+    #css-name-field {
+        min-width: 250px;
+    }
+    #css-appearance-field {
+        min-width: 850px;
+    }
+    #css-residence-field {
+        min-width: 600px;
+    }
+    #css-ambition-field {
+        max-width: 570px;
+    }
+    #css-concept-field {
+        min-width: 300px;
+    }
+    #css-paradigm-field {
+        min-width: 220px;
     }
 }
 
@@ -261,45 +287,79 @@ form .nav-tabs > li, form .nav-pills > li {
     top: 8px;
 }
 
-/* MODAL */
 
-.css-big-modal-body {
-    width:598px;
-    position:relative;
-    left:300px;
+@media (min-width: 992px) {
+    .css-big-modal-body {
+        width:598px;
+        position:relative;
+        left:300px;
+    }
+
+    .css-big-modal-header {
+        width:598px;
+        position:relative;
+        left:300px;
+    }
+
+    .css-big-modal-footer {
+     width:598px;
+     position:relative;
+     left:300px;
+    }
+
+    .css-big-modal-image {
+        height: 100%;
+        float:right;
+        position: absolute;
+        right: 600px;
+    }
+
+    .css-big-modal-lg {
+        position: relative;
+        left: 75px;
+    }
+
+    .modal-content-lg {
+        display: flex;
+    }
+
+    .modal-content-lg .css-modal-image-cont {
+        overflow: hidden;
+        width: 100%;
+        position: relative;
+        flex-shrink: 1;
+        flex-grow: 1;
+    }
+
+   .modal-content-lg .css-big-modal-image {
+       height: 100%;
+        width: 100%;
+        position: absolute;
+        object-fit: cover;
+        left: 0px;
+    }
+
+   .modal-lg-long {
+       width: 100%;
+       padding-left: 100px;
+       padding-right: 100px;
+       overflow: hidden;
+       left: 0px;
+   }
+
+    .modal-content-lg .css-big-modal-body, .modal-content-lg .css-big-modal-header, .modal-content-lg .css-big-modal-footer{
+        left:0px;
+    }
+
 }
 
-.css-big-modal-header {
-    width:598px;
-    position:relative;
-    left:300px;
+.css-big-modal-lg .modal-content {
+    min-height: 60vh;
 }
 
-.css-big-modal-image {
-    height: 100%;
-    float:right;
-    position: absolute;
-    right: 600px;
-}
-
-.css-big-modal-carousel {
-    width:100%;
-    position: absolute;
-    height: 100%;
-    right:620px;
-}
-
-#tutorialModal {
-    z-index: 9999;
-}
-
-#worldTutorialModal {
-    z-index: 9999;
-}
-
-.css-big-modal-lg {
-    position: relative;
-    left: 70px;
+.css-big-modal-no-image .modal-body {
+    max-width: 650px;
+    margin: auto;
 }
 
 .css-sm-modal-image {
@@ -310,5 +370,3 @@ form .nav-tabs > li, form .nav-pills > li {
     margin-right: auto;
     margin-bottom: 10px;
 }
-
-

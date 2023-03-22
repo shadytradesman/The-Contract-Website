@@ -116,6 +116,9 @@ def get_edit_context(user, existing_character=None, secret_key=None, cell=None):
         'show_tutorial': show_tutorial,
         'cell': cell,
         'cell_info': cell_info,
+        'concept_modal_art_url': static('overrides/art/front-time.jpg'),
+        'experience_modal_art_url': static('overrides/art/front-bamboo.jpg'),
+        'supernatural_modal_art_url': static('overrides/art/otakucharacter-bg.jpg'),
     }
     return context
 

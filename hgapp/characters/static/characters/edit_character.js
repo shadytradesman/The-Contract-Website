@@ -371,3 +371,31 @@ $(function(){
     }
     $("#id_name").keyup(handleNameChange);
 });
+
+$(document).on("click", "#js-supernatural-yes", function() {
+    console.log("triggered");
+    let button_on = $(this).attr("aria-pressed");
+    if (button_on == "true") {
+        $("#js-supernatural-no").button('toggle');
+        $("#id_started_supernatural").prop("checked", true);
+        $("#id_started_supernatural").val(true);
+        $("#js-paradigm-text").text("become the ultimate");
+    } else {
+        $("#js-supernatural-yes").button('toggle');
+    }
+});
+
+$(document).on("click", "#js-supernatural-no", function() {
+    console.log("triggered");
+    let button_on = $(this).attr("aria-pressed");
+    console.log($(this));
+    if (button_on == "true") {
+        $("#js-supernatural-yes").button('toggle');
+        $("#id_started_supernatural").prop("checked", false);
+        $("#id_started_supernatural").val(false);
+        $("#id_started_supernatural").removeProp("checked");
+        $("#js-paradigm-text").text("become a");
+    } else {
+        $("#js-supernatural-no").button('toggle');
+    }
+});

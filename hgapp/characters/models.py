@@ -377,6 +377,7 @@ class Character(models.Model):
     highlight_crafting = models.BooleanField(default=False)
 
     # Optional fields
+    started_supernatural = models.BooleanField(default=False)
     cell = models.ForeignKey(Cell,
                               blank=True,
                               null=True,

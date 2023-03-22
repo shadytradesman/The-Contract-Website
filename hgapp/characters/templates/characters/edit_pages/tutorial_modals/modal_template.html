@@ -1,5 +1,5 @@
 <link rel="preload" as="image" href="{{ modal_art_url }}" />
-<div class="modal fade" id="{%block modal_id%}{%endblock%}" tabindex="-1" role="dialog" aria-labelledby="tutorialModalLabel">
+<div class="modal fade" id="{%block modal_id%}{%endblock%}" tabindex="-1" role="dialog" aria-labelledby="tutorialModalLabel" style="z-index: 9999!important;">
     <div class="modal-dialog modal-lg css-big-modal-lg" role="document">
         <div class="modal-content">
             <img src="{{ modal_art_url }}" class="css-big-modal-image hidden-xs hidden-sm">
@@ -13,7 +13,6 @@
                       {% block modal_header %}
                       {% endblock %}
                     </span>
-
                 </div>
                 <img class="css-sm-modal-image hidden-md hidden-lg" src="{{ modal_art_url }}">
                 <div>
