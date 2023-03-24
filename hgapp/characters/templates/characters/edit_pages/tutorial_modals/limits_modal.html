@@ -1,4 +1,4 @@
-{% extends "characters/edit_pages/tutorial_modals/modal_template_imageless.html" %}
+{% extends "characters/edit_pages/tutorial_modals/modal_template.html" %}
 
 {% block modal_id %}tutorialModalLimits{% endblock %}
 
@@ -10,29 +10,21 @@ Limits
 {% endblock %}
 
 {% block modal_body %}
-
-Limits describe your Contractor's deepest boundaries. These are the actions and experiences that harm your Contractor's mental health.
-
-When one of your Contractor's Limits, you must succeed a Trauma roll.
-
 <p>
-  When you create a Contractor, you receive 150 Experience (Exp) to spend defining their stats and background.
+  Limits describe your Contractor's deepest boundaries. These are the choices and experiences that have the potential to
+  harm their mental health.
 </p>
 <p>
-  Contractors can earn additional Exp in various ways after they're created, primarily by attending and claiming victory on Contracts.
+  When one of your Contractor's Limits is violated, you must make a Trauma roll (Mind, Difficulty 8). Failure causes a
+  point of Mind damage or the formation of a new Trauma such as a phobia, compulsion, or delusion.
 </p>
 <p>
-  Exp earned on Contracts is spent in the same way as during Contractor creation. It represents a Contractor training a skill or conditioning themselves between Contracts.
+  Normal humans share the same three Limits: Anguish, Atrocities, and Murder. However, you're free to swap these for other
+  pre-made Limits or create your own with the help of your Playgroup Leader.
 </p>
-
 <p>
-  This page automatically calculates your remaining Exp as you fill out the character sheet.
-</p>
-
-<p>
-  If you'd like to learn more, read about
-  <a href="/guide/rules/#experience" target="_blank" rel="noopener noreferrer">
-    Experience in the Player's Guide
-  </a>
+  Some Limits don't fit certain character concepts. For example, a Contractor who has suffered their entire life shouldn't
+  have the Anguish Limit; a soldier or trauma doctor may be hardened against Atrocities; and an unrepentant,
+  psychopathic killer wouldn't have the Murder Limit.
 </p>
 {% endblock %}

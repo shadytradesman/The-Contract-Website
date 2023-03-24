@@ -139,7 +139,7 @@ $(document).on('change','[id$=-checked]', function(ev){
     if (numLimitsSelected == 3) {
         warnDiv.css("display","none");
     } else {
-        warnDiv.html("<p>All Characters must select exactly <b>3</b> Limits unless they have an Asset or "
+        warnDiv.html("<p>All Contractors must select exactly <b>3</b> Limits unless they have an Asset or "
                             + "Liability that states otherwise.</p>"
                             + "<p>Number currently selected: <b>" + numLimitsSelected + "</b></p>");
         warnDiv.css("display","block");

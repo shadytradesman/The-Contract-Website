@@ -242,13 +242,12 @@
 <div class="text-muted">
     <small>
         <i>
-            Finishing touches
+            {%if character %}
+                Options
+            {% else %}
+                Finishing touches
+            {% endif %}
         </i>
-        <div>
-            <button type="button" class="btn btn-primary btn-xs css-section-help" data-toggle="modal" data-target="#tutorialModal">
-                ?
-            </button>
-        </div>
     </small>
 </div>
 <div class="panel panel-default">

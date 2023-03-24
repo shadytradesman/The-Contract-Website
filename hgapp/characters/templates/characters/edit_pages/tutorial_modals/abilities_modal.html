@@ -1,0 +1,41 @@
+{% extends "characters/edit_pages/tutorial_modals/modal_template_imageless.html" %}
+
+{% block modal_id %}tutorialModalAbilities{% endblock %}
+
+{% block modal_title %}
+  Abilities
+{% endblock %}
+
+{% block modal_header %}
+{% endblock %}
+
+{% block modal_body %}
+<p>
+  Abilities describe your Contractor's special skills and training.
+</p>
+<p>
+  Raising an Ability's rank is cheap (current rating x2 Exp), but it only improves your odds of success at actions
+  involving that specific Ability.
+</p>
+<p>
+  An Ability rank of 0 indicates that your Contractor has negligible training or experience in that field. Full-time
+  professionals tend to have a rank of 2-3 in relevant Abilities, and those who are among the best in the world have rank 5.
+</p>
+<p>
+  Learn more about each Ability by <span class="visible-xs-inline">tapping on</span><span class="hidden-xs">mousing over</span>
+  its name. You can also read the
+  <a href="/guide/rules/#abilities" target="_blank" rel="noopener noreferrer">
+    Abilities article in the Player's Guide
+  </a> for more information.
+</p>
+
+<h4>Secondary Abilities</h4>
+<p>
+  If you're having a difficult time representing a particular skill with the set of Primary Abilities, you can invent
+  your own Ability called a Secondary Ability. Secondary Abilities must be more limited in scope than the primary
+  Abilities, but you receive a Difficulty reduction to any roll that utilizes one.
+</p>
+<p>
+  Examples include visual art, security, internet sleuthing, japanese mythology, cooking, jujitsu, and security systems.
+</p>
+{% endblock %}

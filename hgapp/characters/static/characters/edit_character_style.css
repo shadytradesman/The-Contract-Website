@@ -370,3 +370,11 @@ form .nav-tabs > li, form .nav-pills > li {
     margin-right: auto;
     margin-bottom: 10px;
 }
+
+.css-section-header {
+    margin-top: 25px;
+}
+
+.css-modal-list>li {
+    margin-bottom: 15px;
+}

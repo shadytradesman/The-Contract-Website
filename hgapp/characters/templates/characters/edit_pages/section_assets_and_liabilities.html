@@ -1,13 +1,21 @@
+<div class="text-muted">
+  <small>
+    <i>
+      Any other quirks we should know about?
+    </i>
+    <div>
+      <button type="button" class="btn btn-primary btn-xs css-section-help" data-toggle="modal" data-target="#tutorialModalAssets">
+        ?
+      </button>
+    </div>
+  </small>
+</div>
 <div class="panel panel-default">
-  <h2 class = "row text-center" data-toggle="tooltip" title='{{tutorial.assets_and_liabilities|safe}}'>
+  <h2 class = "css-section-header text-center" data-toggle="tooltip" title='{{tutorial.assets_and_liabilities|safe}}'>
     Assets and Liabilities
-    <small>
-      <small>
-        <i class="fa fa-question-circle fa-1x"></i>
-      </small>
-    </small>
-    <br>
-    <small>"You play the hand you're dealt, good and bad."</small>
+    <div>
+      <small>"You play the hand you're dealt, good and bad."</small>
+    </div>
   </h2>
   {% if character and character.num_games > 0 %}
     <div class="text-center" style="padding:5px;">
