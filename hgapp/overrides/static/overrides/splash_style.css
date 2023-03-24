@@ -71,11 +71,8 @@
     position: relative;
     width: 50%;
     min-width: 370px;
-    margin: 0;
+    margin: auto;
     top: 50%;
-    left: 50%;
-    -ms-transform: translate(-50%, -50%);
-    transform: translate(-50%, -50%);
 }
 
 @media (max-width: 768px) {
@@ -88,8 +85,8 @@
 .css-logo-cont {
     width: 100%;
     position: relative;
-    top: 0px;
     top: 150px;
+    text-align: center;
 }
 
 @media (max-width: 768px) {
