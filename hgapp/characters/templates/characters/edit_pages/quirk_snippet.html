@@ -2,7 +2,7 @@
     {% if quirk.details_field_name %}
         <div class="wiki-entry-collapsible">
     {% else %}
-            <div>
+        <div>
     {% endif %}
     <label class="btn btn-outline btn-block quirk-btn btn-{{quirk.is_liability}}-{{quirk.id}}
                  js-quirk-selected
@@ -28,7 +28,17 @@
             </h4>
             <p>
                 {% if quirk.grants_element %}
-                    <b>{{quirk.grants_element.get_type_display}}:</b>
+                    <b data-toggle="tooltip"
+                        title="
+                            {% if quirk.grants_element.type == 'Condition' %}
+                                {{tutorial.conditions}}
+                            {% elif quirk.grants_element.type == 'Circumstance' %}
+                                {{tutorial.circumstances}}
+                            {% elif quirk.grants_element.type == 'Loose End' %}
+                                {{tutorial.loose_ends}}
+                            {% endif %}">
+                        {{quirk.grants_element.get_type_display}}:
+                    </b>
                     {{quirk.grants_element.description}}
                     {% if quirk.grants_element.system and not quirk.grants_element.type == 'Loose End' %}
                         <span class="css-system-text-user-input">
@@ -38,7 +48,10 @@
                         </span>
                     {% endif %}
                 {% elif quirk.grants_scar %}
-                    <b>Battle Scar:</b>
+                    <b data-toggle="tooltip"
+                        title="{{tutorial.battle_scars}}">
+                        Battle Scar:
+                    </b>
                     {{quirk.description}}
                     <span class="css-system-text-user-input">
                             <i>
