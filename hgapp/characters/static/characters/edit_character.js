@@ -155,12 +155,12 @@ $(document).on('change','input[id^=id_liability-]', function(ev){
         liabilityVal += parseInt($(liabilities[liab]).next().children(".js-quirk-value").text());
     });
     var warnDiv = $('[class~=liability-warn]');
-    if (liabilityVal < 8) {
+    if (liabilityVal < 22) {
         warnDiv.css("display","none");
     } else {
-        warnDiv.html("<p>We recommend Contractors take a maximum of <b>7</b> points of Liabilities. Taking more "
+        warnDiv.html("<p>We recommend Contractors take a maximum of <b>21</b> Exp worth of Liabilities. Taking more "
                             + "requires Playgroup Leader approval.</p>"
-                            + "<p>Currently Liability value: <b>" + liabilityVal + "</b></p>");
+                            + "<p>Currently Liability value: <b>" + liabilityVal + "</b> Exp</p>");
         warnDiv.css("display","block");
     }
 });

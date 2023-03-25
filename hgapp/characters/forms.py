@@ -74,7 +74,7 @@ def make_character_form(user, existing_character=None, supplied_cell=None):
 
             for field in self.Meta.required:
                 self.fields[field].required = True
-                
+
         class Meta:
             model = Character
             fields = ('name', 'private', 'tagline', 'appearance', 'age', 'concept_summary', 'ambition', 'paradigm',
