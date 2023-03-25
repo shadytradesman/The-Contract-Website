@@ -141,6 +141,16 @@
                             <input type="submit" value="+" class=" btn btn-default btn-sm css-source-button">
                         </form>
                     {% endif %}
+                {% if character.get_source_refill_cooldown %}
+                <div>
+                    Whenever
+                    <i class="text-muted">
+                        <span class="js-source-refill text-muted"></span>,
+                    </i>
+                    regain one Source. Cooldown: one {{ character.get_source_refill_cooldown}}
+
+                </div>
+                {% endif %}
             </div>
         {% endfor %}
     </div>

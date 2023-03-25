@@ -180,6 +180,10 @@ form .nav-tabs > li, form .nav-pills > li {
     max-width: 95%;
     min-width: 300px;
 }
+#css-refill-field {
+    max-width: 80%;
+    min-width: 300px;
+}
 
 #css-appearance-field input:after{
     content:".";

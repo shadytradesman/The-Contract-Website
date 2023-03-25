@@ -484,6 +484,7 @@ function updateSourceDisplay() {
             content = content + sourceEmptyIcon;
         }
         $("#js-source-" + key).find(".js-source-display").html(content);
+        $("#js-source-" + key).find(".js-source-refill").text(sourceValues[key][2]);
         console.log(key, sourceValues[key]);
     });
 }

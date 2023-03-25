@@ -559,6 +559,16 @@ class Character(models.Model):
         self.status = self.calculate_status()
         self.save()
 
+    def get_source_refill_cooldown(self):
+        if not self.status:
+            return None
+        elif self.status == STATUS_NOVICE:
+            return "day"
+        elif self.status in [STATUS_SEASONED, STATUS_VETERAN]:
+            return "hour"
+        else:
+            return None
+
     def number_completed_games(self):
         return self.num_games if self.num_games else 0
 
@@ -884,7 +894,7 @@ class Character(models.Model):
         values = {}
         for rev in self.stats_snapshot.sourcerevision_set.all():
             source = rev.relevant_source
-            values[source.id] = (source.current_val, rev.max)
+            values[source.id] = (source.current_val, rev.max, rev.refill_condition)
         return values
 
     def grant_initial_source_if_required(self):
@@ -1212,6 +1222,7 @@ Archived on: {}
                 relevant_stats=self.stats_snapshot,
                 relevant_source=rev.relevant_source,
                 previous_revision=rev,
+                refill_condition=rev.refill_condition,
                 max=rev.max,
             )
             snapshot_rev.save()
@@ -2615,6 +2626,7 @@ class SourceRevision(models.Model):
                                           blank=True,
                                           on_delete=models.CASCADE)  # Used in revisioning to determine value change.
     max = models.PositiveIntegerField()
+    refill_condition = models.CharField(max_length=10000, null=True)
 
     class Meta:
         indexes = [

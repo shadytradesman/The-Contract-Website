@@ -292,6 +292,8 @@ def __save_edit_sources_from_formset(formset, stats, user):
                         max=form.cleaned_data['value'],
                         previous_revision=prev_val,
                     )
+                    if 'refill_condition' in form.cleaned_data:
+                        new_revision.refill_condition = form.cleaned_data['refill_condition']
                     new_revision.save()
                     if "name" in form.cleaned_data:
                         source.name=form.cleaned_data['name']
@@ -617,9 +619,10 @@ def __get_source_formset_for_edit(existing_character, POST = None):
     SourceFormSet = formset_factory(SourceForm, extra=0)
     source_revs = existing_character.stats_snapshot.sourcerevision_set.all()
     initial_sources = [{'source_id': x.relevant_source.id,
-                          'value': x.max,
-                          'source': x.relevant_source,
-                          'rev_id': x.previous_revision.id}
+                        'value': x.max,
+                        'refill_condition': x.refill_condition,
+                        'source': x.relevant_source,
+                        'rev_id': x.previous_revision.id}
                          for x in source_revs]
     return SourceFormSet(POST,
                          initial=initial_sources,

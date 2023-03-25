@@ -401,6 +401,9 @@ class SourceForm(forms.Form):
     rev_id = forms.IntegerField(label=None, widget=forms.HiddenInput(), required=False)
     name = forms.CharField(max_length=50,
                            widget=forms.TextInput(attrs={'class': 'form-control source-name'}))
+    refill_condition = forms.CharField(max_length=500,
+                                       widget=forms.TextInput(attrs={'class': 'form-control css-refill-condition'}),
+                                       required=False)
 
     def __init__(self, *args, **kwargs):
         super(SourceForm, self).__init__(*args, **kwargs)
