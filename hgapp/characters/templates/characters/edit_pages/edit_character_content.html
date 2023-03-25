@@ -1,67 +1,64 @@
 {% load bootstrap %}
 {% load cache %}
 
-
-<h2 class = "text-center" data-toggle="tooltip" title='{{tutorial.core_info|safe}}' style="margin-top: 0px;">
-</h2>
-
-<div class="text-muted">
-    <small>
-        <i>
-            Select one
-        </i>
-        <div>
-            <button type="button" class="btn btn-primary btn-xs css-section-help" data-toggle="modal" data-target="#tutorialModalSupernatural">
-                ?
-            </button>
-        </div>
-    </small>
-</div>
-<div class="panel panel-default">
-    <div class="panel-body" style="margin-top: 15px;">
-        <div class="row">
-            <div class="col-xs-12 col-md-6">
-                <label id="js-supernatural-no" class=" btn btn-outline thumbnail btn-block quirk-btn
-                {% if not char_form.started_supernatural.initial %} active {% endif %}"
-                       data-toggle="button"
-               {% if char_form.started_supernatural.initial %} aria-pressed="true"{% endif %}
-                       style="margin-bottom: 5px;"
-                >
-                    <div class=" text-center" style="white-space: normal;">
-                        Start human and become something more
-                        <div>
-                            <small class="text-muted">
-                                (Recommended)
-                            </small>
-                        </div>
-                    </div>
-                </label>
+{% if not character or character.number_of_victories < 1 %}
+    <div class="text-muted">
+        <small>
+            <i>
+                Select one
+            </i>
+            <div>
+                <button type="button" class="btn btn-primary btn-xs css-section-help" data-toggle="modal" data-target="#tutorialModalSupernatural">
+                    ?
+                </button>
             </div>
-
-            <div class="col-xs-12 col-md-6">
-                <label id="js-supernatural-yes"  class="btn btn-outline thumbnail btn-block quirk-btn
-                {% if char_form.started_supernatural.initial %} active {% endif %}"
-                       data-toggle="button"
-                   {% if not char_form.started_supernatural.initial %} aria-pressed="true"{% endif %}
-                       style="margin-bottom: 5px;"
-                >
-                    <div class=" text-center" style="white-space: normal;">
-                        Start unusual and unlock your full potential
-                        <div>
-                            <small class="text-muted">
-                                (Advanced)
-                            </small>
+        </small>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-body" style="margin-top: 15px;">
+            <div class="row">
+                <div class="col-xs-12 col-md-6">
+                    <label id="js-supernatural-no" class=" btn btn-outline thumbnail btn-block quirk-btn
+                    {% if not char_form.started_supernatural.initial %} active {% endif %}"
+                           data-toggle="button"
+                   {% if char_form.started_supernatural.initial %} aria-pressed="true"{% endif %}
+                           style="margin-bottom: 5px;"
+                    >
+                        <div class=" text-center" style="white-space: normal;">
+                            Start human and become something more
+                            <div>
+                                <small class="text-muted">
+                                    (Recommended)
+                                </small>
+                            </div>
                         </div>
-                    </div>
-                </label>
+                    </label>
+                </div>
+
+                <div class="col-xs-12 col-md-6">
+                    <label id="js-supernatural-yes"  class="btn btn-outline thumbnail btn-block quirk-btn
+                    {% if char_form.started_supernatural.initial %} active {% endif %}"
+                           data-toggle="button"
+                       {% if not char_form.started_supernatural.initial %} aria-pressed="true"{% endif %}
+                           style="margin-bottom: 5px;"
+                    >
+                        <div class=" text-center" style="white-space: normal;">
+                            Start unusual and unlock your full potential
+                            <div>
+                                <small class="text-muted">
+                                    (Advanced)
+                                </small>
+                            </div>
+                        </div>
+                    </label>
+                </div>
             </div>
-        </div>
-        <div style="">
-            {{char_form.started_supernatural}}
+            <div style="">
+                {{char_form.started_supernatural}}
+            </div>
         </div>
     </div>
-</div>
-
+{% endif %}
 
 
 
@@ -113,8 +110,12 @@
                 <div class="css-essential-text" style="float: left;">
                     to
                     <span id="js-paradigm-text">
+                    {% if not character or character.number_of_victories < 1 %}
                             become a
-                        </span>
+                    {% else %}
+                        become the ultimate
+                    {% endif %}
+                    </span>
                 </div>
                 <div id="css-paradigm-field" class="css-essential-field">
                     {{ char_form.paradigm}}
