@@ -1,18 +1,20 @@
 <li class="{% if is_unread %}css-notif-unread{% else %}css-notif-read {%endif %}">
   <a href="{{notif.url}}" class="js-notification-link">
-    <div class="">
-      <div class="pull-left" style="margin-right: 10px; width: 25px; height: 100%; padding-top: 5px; ">
+    <div style="display: flex;">
+      <div style="margin-right: 10px; width: 25px; height: 100%; padding-top: 5px; ">
         <img src="{{notif.get_icon}}" width=25 height="25">
       </div>
-      <strong>{{notif.headline}}</strong>
-    </div>
-    <div class="text-muted" style="padding-left: 20px;">
-      {{notif.content}}
-    </div>
-    <div class="text-muted">
-      <small>
-        {{notif.created_date|timesince}} ago
-      </small>
+      <div>
+        <strong>{{notif.headline}}</strong>
+        <div class="text-muted">
+          {{notif.content}}
+        </div>
+        <div class="text-muted">
+          <small>
+            {{notif.created_date|timesince}} ago
+          </small>
+        </div>
+      </div>
     </div>
   </a>
 </li>

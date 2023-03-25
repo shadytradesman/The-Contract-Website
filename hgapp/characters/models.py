@@ -1607,10 +1607,11 @@ class Artifact(WorldElement):
         else:
             self.character = to_character
         self.save()
+        quantity_phrase = "the" if self.is_signature else "one" if quantity == 1 else quantity
         Notification.objects.create(
             user=to_character.player,
             headline="Received Artifact".format(self.name),
-            content="{} acquired {} {}".format(to_character.name, quantity, self.name),
+            content="{} acquired {} {}".format(to_character.name, quantity_phrase, self.name),
             url=reverse('characters:characters_artifact_view', args=(self.id,)),
             notif_type=ARTIFACT_NOTIF)
 

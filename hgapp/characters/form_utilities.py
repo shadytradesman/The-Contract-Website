@@ -119,8 +119,6 @@ def get_edit_context(user, existing_character=None, secret_key=None, cell=None):
         'concept_modal_art_url': static('overrides/art/front-time.jpg'),
         'experience_modal_art_url': static('overrides/art/front-bamboo.jpg'),
         'supernatural_modal_art_url': static('overrides/art/otakucharacter-bg.jpg'),
-        'limits_modal_art_url': static('overrides/art/freeman.jpeg'),
-        'assets_modal_art_url': static('overrides/art/illuminated-and-sponsored.jpg'),
         'source_modal_art_url': static('overrides/art/ocean-lg-modal.jpg'),
     }
     return context

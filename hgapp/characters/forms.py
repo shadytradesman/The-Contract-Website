@@ -69,12 +69,26 @@ PHYS_MENTAL = (
 
 def make_character_form(user, existing_character=None, supplied_cell=None):
     class CharacterForm(ModelForm):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+
+            for field in self.Meta.required:
+                self.fields[field].required = True
+                
         class Meta:
             model = Character
             fields = ('name', 'private', 'tagline', 'appearance', 'age', 'concept_summary', 'ambition', 'paradigm',
                       'residence', 'languages', 'insanities', 'disabilities', 'current_alias', 'previous_aliases',
                       'resources', 'contacts', 'equipment', 'total_encumbrance', 'max_encumbrance', 'wish_list',
                       'to_do_list', 'contracts', 'pronoun', 'started_supernatural')
+            required = (
+                'name',
+                'appearance',
+                'age',
+                'ambition',
+                'paradigm',
+                'residence'
+            )
             help_texts = {
                 'name': _('Name'),
                 'private': _("If checked, this Contractor will only be viewable by their Playgroup's leaders and any GMs "
