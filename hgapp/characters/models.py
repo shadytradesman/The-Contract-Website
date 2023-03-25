@@ -564,8 +564,10 @@ class Character(models.Model):
             return None
         elif self.status == STATUS_NOVICE:
             return "day"
-        elif self.status in [STATUS_SEASONED, STATUS_VETERAN]:
+        elif self.status == STATUS_SEASONED:
             return "hour"
+        elif self.status == STATUS_VETERAN:
+            return "minute"
         else:
             return None
 
