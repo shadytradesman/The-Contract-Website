@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 from django.db import transaction
+from django.urls import reverse
 from django.contrib.auth.models import User
 
 from .forms import make_archive_game_general_info_form, get_archival_outcome_form, CellMemberAttendedForm, OutsiderAttendedForm, \
@@ -14,6 +15,7 @@ from .models import Game, Game_Invite, Game_Attendance, GameEnded, ScenarioEleme
 from .games_constants import GAME_STATUS
 
 from characters.models import LOOSE_END, StockWorldElement, StockElementCategory
+from notifications.models import Notification, CONTRACT_NOTIF
 
 def convert_to_localtime(utctime):
   utc = utctime.replace(tzinfo=pytz.UTC)
@@ -157,6 +159,14 @@ def _update_or_add_attendance(request, form, game):
         game_invite.attendance = attendance
         game_invite.save()
         attendance.give_reward()
+    if not is_confirmed:
+        Notification.objects.create(
+            user=player,
+            headline="{} says you attended a Contract".format(game.gm.username),
+            content="Click here to confirm or deny your attendance",
+            url=reverse('games:games_view_game', args=(game.id,)),
+            notif_type=CONTRACT_NOTIF)
+
 
 def _get_general_completed_form_for_edit(game, POST=None):
     GenInfoForm = make_archive_game_general_info_form(game.gm)

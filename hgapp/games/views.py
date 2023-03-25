@@ -49,7 +49,7 @@ from hgapp.utilities import get_queryset_size, get_object_or_none
 
 from cells.models import Cell
 
-from notifications.models import Notification, SCENARIO_NOTIF, WORLD_NOTIF
+from notifications.models import Notification, SCENARIO_NOTIF, WORLD_NOTIF, CONTRACT_NOTIF
 
 @login_required
 def enter_game(request):
@@ -753,8 +753,17 @@ def accept_invite(request, game_id):
             with transaction.atomic():
                 invite.save()
                 if game_attendance:
-                    game_attendance.attending_character=form.cleaned_data['attending_character']
+                    changed_character = 'attending_character' in form.cleaned_data and form.cleaned_data['attending_character'] is not None \
+                                        and game_attendance.attending_character != form.cleaned_data['attending_character']
+                    game_attendance.attending_character = form.cleaned_data['attending_character']
                     game_attendance.save()
+                    if changed_character:
+                        Notification.objects.create(
+                            user=game.gm,
+                            headline="Player changed Contractor",
+                            content="{} will play {}".format(request.user.username, game.attending_character.name),
+                            url=reverse('games:games_view_game', args=(game.id,)),
+                            notif_type=CONTRACT_NOTIF)
                 else:
                     game_attendance = Game_Attendance(
                         attending_character=form.cleaned_data['attending_character'],
@@ -767,6 +776,12 @@ def accept_invite(request, game_id):
                     if invite.as_ringer and not form.cleaned_data['attending_character']:
                         #Reveal scenario to ringer
                         game.scenario.played_discovery(request.user)
+                    Notification.objects.create(
+                        user=game.gm,
+                        headline="Player RSVPed to your Contract",
+                        content="{} wants to attend {}".format(request.user.username, game.scenario.title),
+                        url=reverse('games:games_view_game', args=(game.id,)),
+                        notif_type=CONTRACT_NOTIF)
             cell_membership = game.cell.get_player_membership(request.user)
             cell_invite = get_object_or_none(game.cell.open_invitations().filter(invited_player=request.user))
             if game.cell and not cell_membership and (game.cell.allow_self_invites or cell_invite):
