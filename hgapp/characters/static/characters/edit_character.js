@@ -111,7 +111,7 @@ $(document).on('change','[id$=-is_selected]', function(ev) {
     var visibleCount =  allThisQuirksButtons
             .filter(function() {return !$(this.parentElement).is(":hidden");})
             .length;
-    if (this.checked && visibleCount < 4) {
+    if (this.checked && visibleCount < 15) {
         if (isLiability) {
             var tmplMarkup = $('#liability-'+quirkId+"-template").html();
         } else {
@@ -273,7 +273,8 @@ function updateQuirkExp(quirkButtonDiv) {
         cost = active == quirkIsLiability ? expVal : -expVal;
     }
     var expCostDiv = quirkButtonDiv.find(".css-experience-cost")
-    quirkButtonDiv.find(".js-experience-cost-value").text(cost);
+    let cost_text = cost < 0 ? cost : "+" + cost;
+    quirkButtonDiv.find(".js-experience-cost-value").text(cost_text);
     if (cost != 0) {
         expCostDiv.css("display","inline");
     } else {
