@@ -135,10 +135,6 @@ input[type="number"] {
     padding-top: 0px;
 }
 
-.css-limit-compact {
-    margin: 5px;
-}
-
 .js-source-form {
     display: inline;
 }
@@ -521,3 +517,9 @@ input[type="number"] {
 .css-combat-ref-text {
     color: #e1b276;
 }
+
+.css-limit-compact {
+    margin: 5px;
+    display: block;
+}
+

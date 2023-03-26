@@ -16,7 +16,7 @@ var limitsVisible = false;
 $(document).on("click", "#limits-toggle", function() {
     var button = $(this);
     if (limitsVisible) {
-        $("#js-limits-compact").css("display","block");
+        $("#js-limits-compact").css("display","flex");
         $("#js-limits-full").css("display","none");
         limitsVisible = false;
     } else {
@@ -32,7 +32,7 @@ function updateLimitVisibility() {
          $("#js-limits-full").css("display","block");
          limitsVisible = true;
     } else {
-        $("#js-limits-compact").css("display","block");
+        $("#js-limits-compact").css("display","flex");
         $("#js-limits-full").css("display","none");
         limitsVisible = false;
     }
