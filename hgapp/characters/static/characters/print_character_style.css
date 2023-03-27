@@ -400,10 +400,10 @@ h3 {
 .css-field-label {
     text-align: center;
     font-size: 9px;
-    color: grey;
+    color: #B1B1B1;
     font-style: italic;
     position: relative;
-    top: 2.3em;
+    top: 2.0em;
 }
 
 .css-field-label-contract {
@@ -416,7 +416,7 @@ h3 {
 }
 
 .css-user-fill {
-    line-height: 1.8em;
+    line-height: 1.3em;
 }
 
 .css-blank-field-margin {
@@ -463,6 +463,10 @@ h3 {
 
 .css-blank-field-len3 {
     width: 3in;
+}
+
+.css-blank-field-len4 {
+    width: 4in;
 }
 
 .css-blank-field-len6 {

@@ -18,10 +18,17 @@
     <i>
         <div>
             {character.name} is a <b>{character.concept_summary}</b> who will risk {character.pronoun} life to
+            {% if character.paradigm %}
+                become the ultimate <b>{{character.paradigm }}</b> and
+            {% endif %}
             <b>{character.ambition}</b>.
         </div>
         <div style="margin-top: 5px;">
-            {character.pronoun_pres} <b>{character.age}</b> years old and often appears as <b>{character.appearance}</b>.
+            {character.pronoun_pres} <b>{character.age}</b> years old,
+            {% if character.residence %}
+                live in <b>{{character.residence}}</b>,
+            {% endif %}
+            and often appears as <b>{character.appearance}</b>.
         </div>
     </i>
 </div>

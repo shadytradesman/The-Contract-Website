@@ -18,7 +18,11 @@
         <b>{{character.ambition}}</b>.
     </h5>
     <p>
-        {{character.pres_tense_to_be}} <b>{{character.age}}</b> years old, and often appears as <b>{{character.appearance}}</b>.
+        {{character.pres_tense_to_be}} <b>{{character.age}}</b> years old,
+        {% if character.residence %}
+            live in <b>{{character.residence}}</b>,
+        {% endif %}
+        and often appears as <b>{{character.appearance}}</b>.
     </p>
     {% if character.cell or num_journal_entries %}
     <p style="margin-bottom: 5px;">

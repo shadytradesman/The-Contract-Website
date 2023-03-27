@@ -107,6 +107,15 @@
                     <div class="css-empty-box">
                     </div>
                 </span>
+                    <div v-if="source[1][2]" class="css-field-system">
+                        <small>
+                            Refills when
+                            <i>
+                                {source[1][2]}.
+                            </i>
+                            Max once per {source[1][3]}
+                        </small>
+                    </div>
                 </div>
             </div>
 

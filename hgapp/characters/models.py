@@ -889,7 +889,7 @@ class Character(models.Model):
         values = []
         for rev in self.stats_snapshot.sourcerevision_set.all():
             source = rev.relevant_source
-            values.append((source.name, (source.current_val, rev.max)),)
+            values.append((source.name, (source.current_val, rev.max, rev.refill_condition, self.get_source_refill_cooldown())),)
         return values
 
     def source_values(self):
@@ -920,12 +920,12 @@ Played by: {}
 Archived on: {}
 {} Contractor with {} victories and {} losses
 
-**{} is a {} who will risk {} life to {}.**
-{} is {} years old, and often appears as {}.
+**{} is a {} who will risk {} life to become the ultimate {} and {}.**
+{} is {} years old, lives in {}, and often appears as {}.
 {} 
         """
         if self.cell:
-            location_blurb = "{} lives in {}, a setting {}.".format(self.name, self.cell.name,
+            location_blurb = "{} is from {}, a setting {}.".format(self.name, self.cell.name,
                                                                     self.cell.setting_sheet_blurb)
         else:
             location_blurb = ""
@@ -940,9 +940,11 @@ Archived on: {}
             self.name,
             self.concept_summary,
             self.get_pronoun_display(),
+            self.paradigm,
             self.ambition,
             self.pres_tense_to_be(),
             self.age,
+            self.residence,
             self.appearance,
             location_blurb
         )
