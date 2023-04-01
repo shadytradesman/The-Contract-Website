@@ -91,6 +91,8 @@ def __fancy_battle_scars():
 def __fancy_archetypes():
     return render_to_string("guide/rendered-sections/archetype.html", {})
 
+def __fancy_paradigms():
+    return render_to_string("guide/rendered-sections/paradigm.html", {})
 
 def __fancy_ambitions():
     return render_to_string("guide/rendered-sections/ambition.html", {})
@@ -138,6 +140,7 @@ content_methods = {
     "trophies": __fancy_trophies,
     "archetypes": __fancy_archetypes,
     "ambitions": __fancy_ambitions,
+    "paradigms": __fancy_paradigms,
 }
 
 def __render_fancy_sections(content):
