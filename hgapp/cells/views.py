@@ -330,15 +330,6 @@ def invite_players(request, cell_id):
                                             request.build_absolute_uri(reverse("cells:cells_rsvp_invite", args=[cell.id])),
                                             ))
             with transaction.atomic():
-                if not player.profile.early_access_user:
-                    pm_write(sender=request.user,
-                             recipient=player,
-                             subject="You have been invited to join a Playgroup",
-                             body=message_body,
-                             skip_notification=False,
-                             auto_archive=True,
-                             auto_delete=False,
-                             auto_moderators=None)
                 Notification.objects.create(user=player,
                                             headline="You've been invited to a Playgroup",
                                             content="{} awaits".format(cell.name),

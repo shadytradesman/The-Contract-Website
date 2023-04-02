@@ -28,12 +28,14 @@
 
                 <div class="text-center">
                     <h3>
-                        After spoiling this Scenario, you will be able to view the entire Scenario writeup and run it
+                        After spoiling this Scenario, you will be able to view the Scenario writeup and run it
                         as a Contract for other Players.
+                        <small>
+                            <div style="margin-top: 10px; margin-bottom: 10px;">
+                                However, you will no longer be able to play in as a Contractor.
+                            </div>
+                        </small>
                     </h3>
-                    <a class="btn btn-default" href="{% url 'games:games_view_scenario' scenario.id %}">
-                        Go Back
-                    </a>
                     <input type="submit" class="btn btn-primary" value="Spoil Away!" />
                 </div>
             </form>

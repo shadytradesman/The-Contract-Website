@@ -311,7 +311,6 @@ def view_character(request, character_id, secret_key=None):
                        and (character.cell.player_can_post_world_events(request.user)
                             and character.cell.player_can_run_games(request.user)) \
 
-    early_access = request.user and hasattr(request.user, "profile") and request.user.profile.early_access_user
     if not character.stats_snapshot:
         context={"character": character,
                  "user_can_edit": user_can_edit}
@@ -409,7 +408,6 @@ def view_character(request, character_id, secret_key=None):
         'user_can_edit': user_can_edit,
         'user_can_gm': user_can_gm,
         'user_posts_moves': user_posts_moves,
-        'early_access': early_access,
         'health_display': character.get_health_display(),
         'ability_value_by_name': ability_value_by_name,
         'ability_value_by_id': ability_value_by_id,

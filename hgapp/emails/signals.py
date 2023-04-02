@@ -92,22 +92,6 @@ def notify_game_invitee(sender, **kwargs):
                                 content="Upcoming Contract: " + invite.relevant_game.title,
                                 url=game_url,
                                 notif_type=CONTRACT_NOTIF)
-    if not invite.invited_player.profile.early_access_user:
-        message_body = SafeText(
-            '###{0} has invited you to an upcoming Game in {1}\n\n{2}\n\n [Click Here]({3}) to respond.'
-            .format(invite.relevant_game.creator.get_username(),
-                    invite.relevant_game.cell.name,
-                    invite.invite_text,
-                    game_url,
-                    ))
-        pm_write(sender=invite.relevant_game.creator,
-                 recipient=invite.invited_player,
-             subject=invite.relevant_game.creator.get_username() + " has invited you to join " + invite.relevant_game.title,
-             body=message_body,
-             skip_notification=True,
-             auto_archive=True,
-             auto_delete=False,
-             auto_moderators=None)
     if invite.invited_player.profile.contract_invitations:
         email = invite.invited_player.profile.get_confirmed_email()
         if email:
