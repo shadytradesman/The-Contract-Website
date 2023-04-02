@@ -140,7 +140,7 @@ class CraftingEvent(models.Model):
                 user=artifact.character.player,
                 headline="Artifact Effect refunded",
                 content="{} affected by Gift edit".format(artifact.name),
-                url=reverse("characters:characters_view", args=(artifact.character,)),
+                url=reverse("characters:characters_view", args=(artifact.character.pk,)),
                 notif_type=ARTIFACT_NOTIF)
             crafting.delete()
             if artifact.power_full_set.count() == 0:
