@@ -1,8 +1,17 @@
 
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
-from .models import Game_Attendance, Reward
+from .models import Game_Attendance, Reward, ScenarioTag
 from characters.signals import GrantAssetGift, VoidAssetGifts, AlterPortedRewards
+from account.signals import user_signed_up
+
+
+@receiver(user_signed_up)
+def unlock_scenarios_for_new_users(sender, user, **kwargs):
+    for tag in ScenarioTag.objects.filter(tag="public"):
+        for scenario in tag.scenario_set.all():
+            scenario.unlocked_discovery(user)
+
 
 # This is done as a signal instead of model override due to django doc recommendation
 @receiver(pre_delete, sender=Game_Attendance, dispatch_uid="delete_attendance")

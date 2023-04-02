@@ -28,6 +28,8 @@ urlpatterns = [
     url(r'^view/s/(?P<scenario_id>[\d]+)/$',
         RedirectView.as_view(pattern_name='games:games_view_scenario', query_string=True, permanent=True)),
 
+    url(r'^scenario/(?P<scenario_id>[\d]+)/spoil$', views.spoil_scenario, name='games_spoil_scenario'),
+
     path('scenario/history/<int:scenario_id>/', views.view_scenario_history, name='scenario_history'),
 
     path('scenario/spoil-aftermath/<int:scenario_id>/<str:reason>/', views.spoil_aftermath, name='spoil_scenario_aftermath'),
@@ -125,9 +127,6 @@ urlpatterns = [
     ##################
     # AJAX endpoints
     ##################
-    url(r'^post/ajax/spoil-scenario/s/(?P<scenario_id>[\d]+)/$', views.spoil_scenario,
-        name="games_spoil_scenario"),
-
     url(r'^post/ajax/grant-element/e/(?P<element_id>[\d]+)/$', views.grant_element,
         name="games_grant_element"),
 ]

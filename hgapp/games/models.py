@@ -25,7 +25,7 @@ from functools import reduce
 
 from hgapp.utilities import get_object_or_none
 import django.dispatch
-from notifications.models import Notification, REWARD_NOTIF, CONTRACTOR_NOTIF
+from notifications.models import Notification, REWARD_NOTIF, CONTRACTOR_NOTIF, SCENARIO_NOTIF
 
 NotifyGameInvitee = django.dispatch.Signal(providing_args=['game_invite', 'request'])
 GameChangeStartTime = django.dispatch.Signal(providing_args=['game', 'request'])
@@ -962,6 +962,9 @@ class Scenario(models.Model):
     def spoil_aftermath(self, player):
         Scenario_Discovery.objects.filter(relevant_scenario=self, discovering_player=player).first().spoil_aftermath()
 
+    def spoil_already_discovered(self, player):
+        Scenario_Discovery.objects.filter(relevant_scenario=self, discovering_player=player).get().spoil()
+
     def discovery_for_player(self, player):
         return get_object_or_none(Scenario_Discovery, relevant_scenario=self, discovering_player=player)
 
@@ -987,13 +990,19 @@ class Scenario(models.Model):
 
     def unlocked_discovery(self, player):
         if not player.scenario_set.filter(id=self.id).exists():
-            discovery = Scenario_Discovery (
+            discovery = Scenario_Discovery(
                 discovering_player=player,
                 relevant_scenario=self,
                 reason=DISCOVERY_REASON[3][0],
                 is_spoiled=False,
             )
             discovery.save()
+            Notification.objects.create(
+                user=player,
+                headline="You've unlocked a Scenario",
+                content="{}".format(self.title),
+                url=reverse("games:games_view_scenario", args=(self.pk,)),
+                notif_type=SCENARIO_NOTIF)
             return discovery
         return None
 

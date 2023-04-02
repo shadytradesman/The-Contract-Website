@@ -287,9 +287,9 @@ def view_scenario(request, scenario_id, game_id=None):
         raise PermissionDenied("You don't have permission to view this scenario")
     if not scenario.is_public() and not scenario.player_discovered(request.user):
         raise PermissionDenied("You don't have permission to view this scenario")
-    show_spoiler_warning = scenario.is_public() \
-                           and not (request.user.is_authenticated and scenario.player_discovered(request.user)) \
-                            or scenario.is_spoilable_for_player(request.user)
+
+    if request.user.is_authenticated and scenario.is_spoilable_for_player(request.user):
+        return HttpResponseRedirect(reverse('games:games_spoil_scenario', args=(scenario.id,)))
 
     if request.method == 'POST':
         form = GameFeedbackForm(request.POST)
@@ -331,7 +331,6 @@ def view_scenario(request, scenario_id, game_id=None):
         else:
             players_aftermath_spoiled = []
         context = {
-            'show_spoiler_warning': show_spoiler_warning,
             'aftermath_spoiled': aftermath_spoiled,
             'scenario': scenario,
             'is_public': is_public,
@@ -1199,21 +1198,25 @@ def render_confirm_attendance_page(request, attendance):
     return render(request, 'games/confirm_attendance.html', context)
 
 
+@login_required
 def spoil_scenario(request, scenario_id):
-    if not request.user.is_authenticated:
-        return JsonResponse({}, status=200)
-    else:
-        if request.is_ajax and request.method == "POST":
-            scenario = get_object_or_404(Scenario, id=scenario_id)
+    scenario = get_object_or_404(Scenario, id=scenario_id)
+    if not scenario.is_spoilable_for_player(request.user):
+        return HttpResponseRedirect(reverse('games:games_view_scenario', args=(scenario.id,)))
+    if request.method == 'POST':
+        form = SpoilScenarioForm(request.POST)
+        if form.is_valid():
             with transaction.atomic():
-                discovery = None
-                if not scenario.player_discovered(request.user):
-                    discovery = scenario.unlocked_discovery(request.user)
-                elif scenario.is_spoilable_for_player(request.user):
-                    discovery = scenario.discovery_for_player(request.user)
-                discovery.spoil()
-            return JsonResponse({}, status=200)
-        return JsonResponse({"error": ""}, status=400)
+                scenario.spoil_already_discovered(request.user)
+            return HttpResponseRedirect(reverse('games:games_view_scenario', args=(scenario.id,)))
+        else:
+            raise ValueError("Invalid aftermath spoil form")
+    else:
+        context = {
+            "scenario": scenario,
+            "spoil_form": SpoilScenarioForm(),
+        }
+        return render(request, 'games/scenarios/spoil_scenario.html', context)
 
 
 class LookingForGame(View):

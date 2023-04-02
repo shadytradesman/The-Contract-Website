@@ -19,21 +19,22 @@
             </span>
         {% endif %}
         {% render_scenario_title_with_link scenario %}
-        <br>
-        <small>
-            A
-            {% if scenario.is_stock %}
-                <span class="text-success">
-                    stock
-                </span>
-            {% endif %}
-            Scenario written by
-            <a href="{% url 'profiles:profiles_view_profile' scenario.creator.id %}">
-                <b>{% user_display scenario.creator %}</b>
-            </a>
-            for {{scenario.min_players}} to {{ scenario.max_players }} {{ scenario.get_suggested_status_display }} Contractors.
-            Run {{scenario.num_finished_games}} time{{scenario.num_finished_games|pluralize}}.
-        </small>
+        <div style="margin-top: 10px;">
+            <small>
+                A
+                {% if scenario.is_stock %}
+                    <span class="text-success">
+                        stock
+                    </span>
+                {% endif %}
+                Scenario written by
+                <a href="{% url 'profiles:profiles_view_profile' scenario.creator.id %}">
+                    <b>{% user_display scenario.creator %}</b>
+                </a>
+                for {{scenario.min_players}} to {{ scenario.max_players }} {{ scenario.get_suggested_status_display }} Contractors.
+                Run {{scenario.num_finished_games}} time{{scenario.num_finished_games|pluralize}}.
+            </small>
+        </div>
     </h4>
     {% if not hide_spoilers and scenario.summary %}
         <p>{{scenario.summary}}</p>
