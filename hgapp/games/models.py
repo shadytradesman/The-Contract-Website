@@ -1214,6 +1214,7 @@ class Scenario_Discovery(models.Model):
 
     def spoil(self):
         self.is_spoiled = True
+        self.is_aftermath_spoiled = True
         self.save()
         assign_perm('view_scenario', self.discovering_player, self.relevant_scenario)
 

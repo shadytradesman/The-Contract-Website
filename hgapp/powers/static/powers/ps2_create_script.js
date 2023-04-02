@@ -483,7 +483,7 @@ function getDisabledParameters(availParameters, activeUniqueReplacementsByMarker
     return disabledModifiers;
 }
 
-function getDisabledModifiers(modType, availModifiers, selectedModifiers, activeUniqueReplacementsByMarker) {
+function getDisabledModifiers(modType, availModifiers, selectedModifiers, activeUniqueReplacementsByMarker, allAvailModifiers) {
     // given a modType ("enhancement"), available modifiers, and selected modifiers.
     // return a mapping of disabled modifiers of that type to an array of reasons they are disabled.
     const powerBlobFieldName = modType + "s";
@@ -493,10 +493,11 @@ function getDisabledModifiers(modType, availModifiers, selectedModifiers, active
     const requiredDrawbacks = "required_drawbacks";
     unfulfilledModifiers = availModifiers
           .filter(modifier => {
-              let required = powerBlob[powerBlobFieldName][modifier.slug][requiredEnhancements].concat(powerBlob[powerBlobFieldName][modifier.slug][requiredDrawbacks]);
+              let required = powerBlob[powerBlobFieldName][modifier.slug][requiredEnhancements]
+                     .concat(powerBlob[powerBlobFieldName][modifier.slug][requiredDrawbacks]);
               let secondOrderReq = required.flatMap(mod => allModifiers[mod][requiredEnhancements].concat(allModifiers[mod][requiredDrawbacks]));
               let allRequired = new Set(required.concat(secondOrderReq).filter(req => {
-                return availModifiers.map(mod=>mod.slug).includes(req);
+                return allAvailModifiers.map(mod=>mod.slug).includes(req);
               }));
 
               if (allRequired.length == 0) {
@@ -704,11 +705,12 @@ function collapseSubstitutions(replacements) {
     return cleanedReplacements;
 }
 
-function performSystemTextReplacements(unrenderedSystem, replacementMap) {
+function performSystemTextReplacements(unrenderedSystem, replacementMap, usedMarkers) {
     var systemText = unrenderedSystem;
     var toReplace = findReplacementCandidate(systemText);
     var replacementCount = 0;
     while (toReplace != null) {
+        usedMarkers.push.apply(usedMarkers, toReplace.markers);
         systemText = replaceInSystemText(systemText, replacementMap, toReplace);
         var toReplace = findReplacementCandidate(systemText);
         replacementCount ++;
@@ -965,6 +967,7 @@ const ComponentRendering = {
       currentExamplePreview: "",
       currentExampleBlob: null,
       exampleEffectDisplay: "",
+      lastUsedMarkers: [],
     }
   },
   methods: {
@@ -1703,9 +1706,10 @@ const ComponentRendering = {
           this.disabledEnhancements = {};
           this.disabledDrawbacks = {};
           let selectedAndActiveSlugs = this.getSelectedAndActiveEnhancements().concat(this.getSelectedAndActiveDrawbacks()).map(mod => mod.slug);
-          this.disabledEnhancements = getDisabledModifiers("enhancement", this.enhancements, selectedAndActiveSlugs, this.activeUniqueReplacementsByMarker);
+          let allAvailModifiers = this.enhancements.concat(this.drawbacks);
+          this.disabledEnhancements = getDisabledModifiers("enhancement", this.enhancements, selectedAndActiveSlugs, this.activeUniqueReplacementsByMarker, allAvailModifiers);
           this.selectedEnhancements = this.selectedEnhancements.filter(mod => !(mod.slug in this.disabledEnhancements));
-          this.disabledDrawbacks = getDisabledModifiers("drawback", this.drawbacks, selectedAndActiveSlugs, this.activeUniqueReplacementsByMarker);
+          this.disabledDrawbacks = getDisabledModifiers("drawback", this.drawbacks, selectedAndActiveSlugs, this.activeUniqueReplacementsByMarker, allAvailModifiers);
           this.selectedDrawbacks = this.selectedDrawbacks.filter(mod => !(mod.slug in this.disabledDrawbacks));
           this.disabledParameters = {};
           this.disabledParameters = getDisabledParameters(this.parameters, this.activeUniqueReplacementsByMarker);
@@ -1749,12 +1753,13 @@ const ComponentRendering = {
       },
       reRenderSystemText() {
           const replacementMap = this.buildReplacementMap();
-          this.renderedDescription = performSystemTextReplacements(this.unrenderedDescription, replacementMap);
-          let partiallyRenderedSystem = performSystemTextReplacements(this.unrenderedSystem, replacementMap);
+          let usedMarkers = [];
+          this.renderedDescription = performSystemTextReplacements(this.unrenderedDescription, replacementMap, usedMarkers);
+          let partiallyRenderedSystem = performSystemTextReplacements(this.unrenderedSystem, replacementMap, usedMarkers);
           this.renderedSystem = replaceHoverText(partiallyRenderedSystem);
-          this.giftErrata = performSystemTextReplacements(";;gift-errata//", replacementMap);
+          this.giftErrata = performSystemTextReplacements(";;gift-errata//", replacementMap, usedMarkers);
           if (this.selectedEffect && this.selectedEffect.visibility) {
-            this.renderedVisual = performSystemTextReplacements(this.selectedEffect.visibility, replacementMap);
+            this.renderedVisual = performSystemTextReplacements(this.selectedEffect.visibility, replacementMap, usedMarkers);
           } else {
             this.renderedVisual = "";
           }
@@ -1765,6 +1770,7 @@ const ComponentRendering = {
 		        $("#js-preview-gift-button").removeClass("flashing");
 	          }, 100);
           });
+          this.lastUsedMarkers = usedMarkers;
           this.updateModifierList();
       },
       updateModifierList() {
