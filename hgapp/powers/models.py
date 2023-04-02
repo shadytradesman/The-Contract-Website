@@ -1314,7 +1314,10 @@ class Power(models.Model):
         if self.modality.crafting_type != CRAFTING_NONE and artifact is None:
             # sometimes we display badges that aren't attached to artifacts. They shouldn't be togglable
             return False
-        return len(self.get_attribute_bonuses()) > 0
+        return self.parameter_value_set \
+            .select_related('relevant_power_param__relevant_parameter')\
+            .filter(relevant_power_param__relevant_parameter__attribute_bonus__isnull=False)\
+            .count() > 0
 
     def set_is_active(self, is_active, artifact=None):
         if self.base_id not in EFFECTS_THAT_GIVE_STAT_BONUSES:

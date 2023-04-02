@@ -317,9 +317,9 @@ def view_character(request, character_id, secret_key=None):
         return render(request, 'characters/legacy_character.html', context)
 
     legacy_powers = character.power_full_set.filter(dice_system=SYS_LEGACY_POWERS).all()
-    new_powers = character.power_full_set.filter(dice_system=SYS_PS2, crafting_type=CRAFTING_NONE).all()
-    crafting_artifact_gifts = character.power_full_set.filter(dice_system=SYS_PS2, crafting_type=CRAFTING_ARTIFACT).all()
-    crafting_consumable_gifts = character.power_full_set.filter(dice_system=SYS_PS2, crafting_type=CRAFTING_CONSUMABLE).all()
+    new_powers = character.power_full_set.filter(dice_system=SYS_PS2, crafting_type=CRAFTING_NONE).select_related("latest_rev__modality").select_related("latest_rev__vector").select_related("latest_rev__base").all()
+    crafting_artifact_gifts = character.power_full_set.filter(dice_system=SYS_PS2, crafting_type=CRAFTING_ARTIFACT).select_related("latest_rev__modality").select_related("latest_rev__vector").select_related("latest_rev__base").all()
+    crafting_consumable_gifts = character.power_full_set.filter(dice_system=SYS_PS2, crafting_type=CRAFTING_CONSUMABLE).select_related("latest_rev__modality").select_related("latest_rev__vector").select_related("latest_rev__base").all()
 
     ability_value_by_name, ability_value_by_id = character.get_abilities_by_name_and_id()
     unspent_experience = character.unspent_experience()

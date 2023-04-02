@@ -591,7 +591,7 @@ def make_transfer_artifact_form(character=None, cell=None, max_quantity=0, user=
                 (LOOTED, "Looted by"),),
             required=True,)
         to_character = forms.ModelChoiceField(label="Contractor",
-                                      queryset=Character.objects.filter(id__in=[x for x in character_options]).order_by("name"),
+                                      queryset=Character.objects.filter(id__in=[x for x in character_options]).select_related("player").order_by("name"),
                                       widget=forms.Select(attrs={'class': 'form-control'}),
                                               empty_label=None,
                                       required=True)
