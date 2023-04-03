@@ -9,7 +9,7 @@
             Email Not Verified
         </span>
         <a href="{% url 'account_resend_confirmation' %}">
-            Resend Verification email
+            Resend Verification email to {{email.email}}
         </a>
     {% endif %}
 </div>

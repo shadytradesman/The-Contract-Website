@@ -9,6 +9,8 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.db import transaction
+from django.contrib import messages
+from django.utils.safestring import mark_safe
 
 from characters.models import Artifact, Character
 from powers.models import Power, Power_Full, CRAFTING_ARTIFACT, CRAFTING_CONSUMABLE
@@ -31,6 +33,11 @@ class Craft(View):
     free_crafts_by_power_full = None
 
     def dispatch(self, *args, **kwargs):
+        if self.request.user.profile.get_confirmed_email() is None:
+            messages.add_message(self.request, messages.WARNING,
+                                 mark_safe(
+                                     "<h4 class=\"text-center\" style=\"margin-bottom:5px;\">You must validate your email address to craft</h4>"))
+            return HttpResponseRedirect(reverse('account_resend_confirmation'))
         self.character = get_object_or_404(Character, pk=self.kwargs["character_id"])
         if not self.character.player_can_edit(self.request.user):
             raise PermissionDenied("You do not have permission to craft for this character")

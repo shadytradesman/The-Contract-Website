@@ -55,6 +55,10 @@ from notifications.models import Notification, SCENARIO_NOTIF, WORLD_NOTIF, CONT
 def enter_game(request):
     if not request.user.is_authenticated:
         raise PermissionDenied("You must be logged in to enter a Game")
+    if request.user.profile.get_confirmed_email() is None:
+        messages.add_message(request, messages.WARNING,
+                             mark_safe("<h4 class=\"text-center\" style=\"margin-bottom:5px;\">You must validate your email address to schedule a Contract</h4>"))
+        return HttpResponseRedirect(reverse('account_resend_confirmation'))
     cells = [cell for cell in request.user.cell_set.filter(cellmembership__is_banned=False).all() if cell.player_can_manage_games(request.user)]
     context = {
         'cells' : cells,
@@ -155,6 +159,10 @@ def edit_scenario(request, scenario_id):
     scenario = get_object_or_404(Scenario, id=scenario_id)
     if not request.user.profile.confirmed_agreements:
         return HttpResponseRedirect(reverse('profiles:profiles_terms'))
+    if request.user.profile.get_confirmed_email() is None:
+        messages.add_message(request, messages.WARNING,
+                             mark_safe("<h4 class=\"text-center\" style=\"margin-bottom:5px;\">You must validate your email address to edit Scenarios</h4>"))
+        return HttpResponseRedirect(reverse('account_resend_confirmation'))
     aftermath_spoiled = scenario.is_player_aftermath_spoiled(request.user)
     if not aftermath_spoiled:
         return HttpResponseRedirect(reverse('games:spoil_scenario_aftermath', args=(scenario.id, "edit")))
@@ -461,6 +469,10 @@ def view_scenario_gallery(request):
 def create_game(request, cell_id=None):
     if not request.user.is_authenticated:
         raise PermissionDenied("You must be logged in to schedule a Contract")
+    if request.user.profile.get_confirmed_email() is None:
+        messages.add_message(request, messages.WARNING,
+                             mark_safe("<h4 class=\"text-center\" style=\"margin-bottom:5px;\">You must validate your email address to schedule a Contract</h4>"))
+        return HttpResponseRedirect(reverse('account_resend_confirmation'))
     cell = None
     if cell_id:
         cell = get_object_or_404(Cell, id=cell_id)

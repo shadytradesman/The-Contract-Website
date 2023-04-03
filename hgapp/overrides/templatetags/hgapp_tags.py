@@ -60,7 +60,8 @@ def _get_guide_index_blob():
 def email_verified(user):
     email = EmailAddress.objects.get_primary(user)
     return {
-        "verified": email and email.verified
+        "verified": email and email.verified,
+        "email": email
     }
 
 
