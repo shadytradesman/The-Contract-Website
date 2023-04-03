@@ -77,7 +77,7 @@ def characters_nav_list(user):
 def guide_toc(context, guidebook=None):
     guidebooks = GuideBook.objects.order_by('position').all()
 
-    highlight_how_to_play = context["request"].user.game_set.count() == 0 if "request" in context else True
+    highlight_how_to_play = context["request"].user.game_set.count() == 0 if "request" in context and context["request"].user.is_authenticated else True
 
     can_edit = context["request"].user.is_superuser if "request" in context and context["request"].user else False
     sections_by_book = []
