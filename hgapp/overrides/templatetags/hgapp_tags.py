@@ -77,7 +77,8 @@ def characters_nav_list(user):
 def guide_toc(context, guidebook=None):
     guidebooks = GuideBook.objects.order_by('position').all()
 
-    logged_in = context["request"].user.is_authenticated if "request" in context else False
+    highlight_how_to_play = context["request"].user.game_set.count() == 0 if "request" in context else True
+
     can_edit = context["request"].user.is_superuser if "request" in context and context["request"].user else False
     sections_by_book = []
     for book in guidebooks:
@@ -86,19 +87,19 @@ def guide_toc(context, guidebook=None):
         sections_by_book.append((book, book.get_sections_in_order(is_admin=can_edit),))
     if guidebook:
         sections_by_book.append((guidebook, guidebook.get_sections_in_order(is_admin=can_edit),))
-    nav_list = __get_nav_list(sections_by_book, active_book=guidebook, logged_in=logged_in)
+    nav_list = __get_nav_list(sections_by_book, active_book=guidebook, highlight_how_to_play=highlight_how_to_play)
     context["nav_list"] = nav_list
     return context
 
 
-def __get_nav_list(sections_by_book, active_book=None, logged_in=False):
+def __get_nav_list(sections_by_book, active_book=None, highlight_how_to_play=False):
     nav_list = '<ul class="nav nav-pills nav-stacked {}">'.format("" if not active_book else "")
     for guidebook, sections in sections_by_book:
         guidebook_active = guidebook == active_book if active_book else False
         url = guidebook.redirect_url if hasattr(guidebook, "redirect_url") and guidebook.redirect_url \
             else "#" if guidebook_active else reverse('guide:read_guidebook', args=(guidebook.slug,))
         guidebook_expanded = guidebook.expanded if not active_book else guidebook_active
-        book_class = "css-how-to-play-link" if not logged_in and guidebook.redirect_url else "css-active-book" if guidebook_active else ""
+        book_class = "css-how-to-play-link" if highlight_how_to_play and guidebook.redirect_url else "css-active-book" if guidebook_active else ""
         nav_list = nav_list + '<li class="{}"><a href="{}" class="css-guide-index-book">{}</a>' \
             .format(book_class, url, guidebook.title)
         if guidebook_expanded:

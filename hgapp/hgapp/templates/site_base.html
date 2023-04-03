@@ -60,7 +60,7 @@
             <a class="css-nav-butt btn-warning" href="{% url 'info:how-to-play' %}">Play</a>
         </li>
     {% endif%}
-    {% cache 500 nav-rules-toc1 guidebook.slug request.user.is_authenticated %}
+    {% cache 500 nav-rules-toc1 guidebook.slug request.user.is_authenticated  %}
     <li class="dropdown">
         <a href="#" class="dropdown-toggle css-nav-butt" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
             Guide <span class="caret"></span>
@@ -74,11 +74,7 @@
         </div>
     </li>
     {% endcache %}
-        {% if request.user.is_authenticated and not request.user.game_set.all %}
-            <li>
-                <a class="css-nav-butt btn-primary" href="{% url 'info:how-to-play' %}">Play</a>
-            </li>
-        {% elif request.user.is_authenticated %}
+        {% if request.user.is_authenticated %}
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="padding-top: 15px !important;">
                     Quick Nav<span class="caret"></span>
