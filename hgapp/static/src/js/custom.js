@@ -21,12 +21,14 @@ $(document).on("click", "#js-notif-nav-button", function(e) {
 });
 
 window.addEventListener('click', function(e){
-    if (!document.getElementById('js-notif-nav-element').contains(e.target)){
-    let navPopdown = $('#js-notification-popdown');
-    navPopdown.hide();
-    navCollapsed = true;
-  }
-})
+    if (document.getElementById('js-notif-nav-element')) {
+        if (!document.getElementById('js-notif-nav-element').contains(e.target)){
+            let navPopdown = $('#js-notification-popdown');
+            navPopdown.hide();
+            navCollapsed = true;
+        }
+    }
+});
 
 $(document).on('click', '.js-notification-link', function (e) {
   e.stopPropagation();
@@ -422,14 +424,29 @@ const mountedApp2 = app2.mount('#js-guide-sidebar');
 
 /* Archetype Generator */
 
+let usedArchetypes = new Set();
+
 $(function(){
 
-    function randomFromList(items) {
+    function randomFromListInner(items) {
         var selected = items[Math.floor(Math.random()*items.length)];
         if (selected instanceof Array) {
-            return randomFromList(selected);
+            return randomFromListInner(selected);
         }
         return selected;
+    }
+
+    // anti birthday problem wrapper function
+    function randomFromList(items) {
+        for (let i = 0; i < 15; i++) {
+            let selected = randomFromListInner(items);
+            if (!usedArchetypes.has(selected)) {
+                usedArchetypes.add(selected);
+                return selected;
+            }
+        }
+        usedArchetypes.clear();
+        return randomFromList(items);
     }
 
     if (document.getElementById('professions')) {
