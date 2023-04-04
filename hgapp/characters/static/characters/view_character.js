@@ -204,6 +204,7 @@ $("#js-trauma-container").on("submit",".js-delete-trauma-form", function (e) {
     e.preventDefault();
     var serializedData = $(this).serialize();
     var traumaForm = $(this);
+    traumaForm.parent().find("input").prop("disabled", true);
     $.ajax({
         type: 'POST',
         url: $(this).attr("data-del-trauma-url"),

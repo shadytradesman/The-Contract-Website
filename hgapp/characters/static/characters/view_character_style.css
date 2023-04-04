@@ -521,5 +521,6 @@ input[type="number"] {
 .css-limit-compact {
     margin: 5px;
     display: block;
+    flex: 1;
 }
 

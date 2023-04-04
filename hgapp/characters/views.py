@@ -101,7 +101,7 @@ def edit_character(request, character_id, secret_key = None):
         with transaction.atomic():
             character = Character.objects.select_for_update(nowait=True).get(pk=character.pk)
             update_character_from_post(request.user, existing_character=character, POST=request.POST)
-            if character.player != request.user:
+            if character.player is not None and character.player != request.user:
                 Notification.objects.create(
                     user=character.player,
                     headline="Contractor edited",
