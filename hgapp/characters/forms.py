@@ -16,23 +16,23 @@ ATTRIBUTE_VALUES = {
         ('2', '2 - Average'),
         ('3', '3 - Solid'),
         ('4', '4 - Musclebound'),
-        ('5', '5 - Giant'),
+        ('5', '5 - Champion Power Lifter'),
     ),
     "Charisma": (
         ('1', '1 - Off-putting'),
         ('2', '2 - Average'),
         ('3', '3 - Outgoing'),
         ('4', '4 - Magnetic'),
-        ('5', '5 - Unhatable'),
+        ('5', '5 - Unhateable'),
     ),
     "Dexterity": (
         ('1', '1 - Clumsy'),
         ('2', '2 - Average'),
         ('3', '3 - Nimble'),
-        ('4', '4 - Quick'),
-        ('5', '5 - Lightning-fast'),
+        ('4', '4 - Deft'),
+        ('5', '5 - Masterful'),
     ),
-    "Intelligence": (
+    "Intellect": (
         ('1', '1 - Simple'),
         ('2', '2 - Average'),
         ('3', '3 - Bright'),
