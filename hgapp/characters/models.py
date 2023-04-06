@@ -859,6 +859,11 @@ class Character(models.Model):
         else:
             return "They are"
 
+    def pres_tense_pluralize(self):
+        if self.pronoun == PRONOUN[2][0]:
+            return ""
+        return "s"
+
     def pronoun_possessive_capitalized(self):
         if self.pronoun == PRONOUN[0][0]:
             return "His"

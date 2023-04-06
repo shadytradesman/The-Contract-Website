@@ -77,8 +77,7 @@
             </label>
         </div>
     </div>
-    <div class="css-customization-field" v-if="systemFields.length > 0">
-        <span v-for="(field, fieldIndex) in systemFields.filter(field=> field.isText)"
+        <span class="css-customization-field" v-for="(field, fieldIndex) in systemFields.filter(field=> field.isText)"
              :key="field.id"
             :class="{'css-hidden': !lastUsedMarkers.includes(field.marker)}">
             <h5 style="margin-bottom: 5px;">
@@ -95,7 +94,7 @@
                 </small>
             </div>
         </span>
-        <span v-for="(field, fieldIndex) in systemFields.filter(field => field.isRoll )"
+        <span class="css-customization-field" v-for="(field, fieldIndex) in systemFields.filter(field => field.isRoll )"
              :key="field.id"
             :class="{'css-hidden': !lastUsedMarkers.includes(field.marker)}">
             <h5 style="margin-bottom: 5px;">
@@ -120,9 +119,8 @@
                 </small>
             </div>
         </span>
-        <span v-for="(field, fieldIndex) in systemFields.filter(field => field.isWeapon)"
-             :key="field.id"
-            :class="{'css-hidden': !lastUsedMarkers.includes(field.marker)}">
+        <span class="css-customization-field" v-for="(field, fieldIndex) in systemFields.filter(field => field.isWeapon)"
+             :key="field.id">
             <h5 style="margin-bottom: 5px;">
                 {field.name}
             </h5>
@@ -140,7 +138,6 @@
                 </small>
             </div>
         </span>
-    </div>
     <div v-for="(param, p_index) in parameters"
          :key="param.id"
          class="css-customization-field">

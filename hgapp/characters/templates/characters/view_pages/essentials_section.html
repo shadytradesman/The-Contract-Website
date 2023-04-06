@@ -20,7 +20,8 @@
     <p>
         {{character.pres_tense_to_be}} <b>{{character.age}}</b> years old,
         {% if character.residence %}
-            live in <b>{{character.residence}}</b>,
+            live{{character.pres_tense_pluralize}}
+            in <b>{{character.residence}}</b>,
         {% endif %}
         and often appears as <b>{{character.appearance}}</b>.
     </p>
