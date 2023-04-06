@@ -65,7 +65,7 @@ def notify_game_ended(**kwargs):
 
     # notify GM
     gm_exp_earned = game.is_introductory_game() or (game.achieves_golden_ratio() and game.cell.use_golden_ratio)
-    gm_message = "One Improvement" if gm_exp_earned else "One Improvement and 6 Exp"
+    gm_message = "One Improvement and 6 Exp" if gm_exp_earned else "One Improvement"
     Notification.objects.create(user=game.gm,
                                 headline="You've earned Rewards for GMing",
                                 content=gm_message,
