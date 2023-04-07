@@ -772,7 +772,7 @@ def accept_invite(request, game_id):
                         Notification.objects.create(
                             user=game.gm,
                             headline="Player changed Contractor",
-                            content="{} will play {}".format(request.user.username, game.attending_character.name),
+                            content="{} will play {}".format(request.user.username, game_attendance.attending_character.name),
                             url=reverse('games:games_view_game', args=(game.id,)),
                             notif_type=CONTRACT_NOTIF)
                 else:

@@ -158,7 +158,7 @@ $(document).on('change','input[id^=id_liability-]', function(ev){
     if (liabilityVal < 22) {
         warnDiv.css("display","none");
     } else {
-        warnDiv.html("<p>We recommend Contractors take a maximum of <b>21</b> Exp worth of Liabilities. Taking more "
+        warnDiv.html("<p>Contractors may take a maximum of <b>21</b> Exp worth of Liabilities. Taking more "
                             + "requires Playgroup Leader approval.</p>"
                             + "<p>Currently Liability value: <b>" + liabilityVal + "</b> Exp</p>");
         warnDiv.css("display","block");
