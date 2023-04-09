@@ -295,6 +295,7 @@ class CharacterArtifacts:
 
 def view_character(request, character_id, secret_key=None):
     character = get_object_or_404(Character, id=character_id)
+    character = Character.objects.filter(id=character.id).select_related("stats_snapshot").first()
     if character.player and secret_key:
         return HttpResponseRedirect(reverse('characters:characters_view', args=(character_id,)))
     if not character.player_can_view(request.user):
