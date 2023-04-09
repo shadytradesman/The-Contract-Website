@@ -39,10 +39,12 @@ def handle_gift_revision(sender, **kwargs):
 @receiver(gift_major_revision)
 def handle_gift_major_revision(sender, **kwargs):
     power_full = kwargs["power_full"]
-    old_power = kwargs["old_power"]
     new_power = kwargs["new_power"]
-    current_attendance = power_full.character.get_current_downtime_attendance()
-    current_crafting_event = power_full.craftingevent_set.filter(relevant_attendance=current_attendance).first()
+    if power_full.character:
+        current_attendance = power_full.character.get_current_downtime_attendance()
+        current_crafting_event = power_full.craftingevent_set.filter(relevant_attendance=current_attendance).first()
+    else:
+        current_crafting_event = power_full.craftingevent_set.order_by("relevant_attendance__relevant_game__end_time").first()
     if current_crafting_event:
         current_crafting_event.refund_all()
         current_crafting_event.relevant_power = new_power

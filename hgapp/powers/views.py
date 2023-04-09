@@ -15,6 +15,7 @@ from django.utils.decorators import method_decorator
 from django.forms import formset_factory
 from django.db import transaction
 from django.db.models import Prefetch
+from .signals import gift_major_revision
 
 from characters.models import Character, Artifact
 from .createPowerFormUtilities import get_create_power_context_from_base, \
@@ -240,6 +241,8 @@ def delete_power(request, power_id):
         char = power_full.character
         if DeletePowerForm(request.POST).is_valid():
             with transaction.atomic():
+                gift_major_revision.send(sender=Power.__class__, old_power=None, new_power=power_full.latest_rev,
+                                         power_full=power_full)
                 power_full.delete()
         else:
             raise ValueError("could not delete power")
