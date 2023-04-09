@@ -68,7 +68,7 @@
         <small>
             {% if power_full.character %}
             Used by <a href="{% url 'characters:characters_view' power_full.character_id %}">
-            <b>{{ power_full.character.name }}</b>, the {{  power_full.character.concept_summary }} {{  power_full.character.paradigm }}</a>
+            <b>{{ power_full.character.name }}</b>, the {{  power_full.character.concept_summary }} {% if power_full.character.paradigm %} {{  power_full.character.paradigm }} {% endif %}</a>
             {% endif %}
         </small>
     </div>

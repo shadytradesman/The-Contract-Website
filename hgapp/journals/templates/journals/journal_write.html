@@ -69,7 +69,9 @@
                         <b>Attending Contractors:</b>
                         <ul>
                             {% for character in game.attended_by.all %}
-                                <li>{{character.name}} the {{character.concept_summary}} {{ character.paradigm}}</li>
+                                <li>{{character.name}} the {{character.concept_summary}}
+                                    {% if character.paradigm %} {{ character.paradigm}} {% endif %}
+                                </li>
                             {% endfor %}
                         </ul>
                     {% endif %}

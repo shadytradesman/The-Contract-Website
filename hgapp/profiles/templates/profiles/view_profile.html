@@ -194,7 +194,8 @@
                     <div class="col-md-6">
                         <div class="thumbnail">
                             <h4>
-                                <a href="{% url 'characters:characters_view' character.id %}">{{ character.name }}</a> <small>The {{character.concept_summary}} {{character.paradigm}}</small>
+                                <a href="{% url 'characters:characters_view' character.id %}">{{ character.name }}</a>
+                                <small>The {{character.concept_summary}} {% if character.paradigm %} {{character.paradigm}} {% endif %}</small>
                             </h4>
                             A
                             {% if character.number_of_victories %}
@@ -233,7 +234,11 @@
                         <div class="thumbnail">
                             <h4>
                                 <a href="{% url 'characters:characters_view' character.id %}">{{ character.name }}</a>
-                                <small>The {{character.concept_summary}} {{character.paradigm}}</small>
+                                <small>The {{character.concept_summary}}
+                                    {% if character.paradigm %}
+                                        {{character.paradigm}}
+                                    {% endif %}
+                                </small>
                             </h4>
                             A
                             {% if character.number_of_victories %}

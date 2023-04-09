@@ -231,6 +231,7 @@ def edit_power(request, power_id):
         context = get_edit_power_context_from_power(extant_power)
         return render(request, 'powers/create_power_pages/edit_power.html', context)
 
+
 def delete_power(request, power_id):
     power_full = get_object_or_404(Power_Full, pk=power_id)
     if not power_full.player_can_edit(request.user):

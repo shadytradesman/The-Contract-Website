@@ -60,7 +60,7 @@
                                 <b>
                                     {{character.name}}
                                 </b>
-                                 the {{character.concept_summary}} {{character.paradigm}}
+                                 the {{character.concept_summary}}  {% if character.paradigm %} {{ character.paradigm}} {% endif %}
                             </a>
                             <br>
                             <small>

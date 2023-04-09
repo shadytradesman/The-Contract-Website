@@ -40,9 +40,14 @@ class Notification(models.Model):
     url = models.CharField(max_length=3000)
     notif_type = models.CharField(choices=NOTIFICATION_TYPE, max_length=20)
 
+    cell_id = models.CharField(max_length=3000, null=True)
+    is_feed = models.BooleanField(default=False)
+    content_url = models.CharField(max_length=3000, null=True)
+
     class Meta:
         indexes = [
             models.Index(fields=['user', 'created_date']),
+            models.Index(fields=['user', 'created_date', 'is_feed']),
         ]
 
     @staticmethod
