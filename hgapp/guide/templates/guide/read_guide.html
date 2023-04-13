@@ -2,6 +2,7 @@
 
 {% load static %}
 {% load hgapp_tags %}
+{% load ad_tags %}
 
 {% block head_title %}
     {{guidebook.title}}
@@ -67,6 +68,11 @@
                         {{guidebook.rendered_content|safe}}
                     </div>
                     {% for section in sections %}
+                        {% if forloop.counter|divisibleby:10 %}
+                            <div style="margin-top: 10px; margin-bottom: 10px;">
+                                {% render_fake_ad request.user %}
+                            </div>
+                        {% endif %}
                         <div class="{% if section.is_hidden %} css-hidden-section {% endif %}">
                             {% if section.header_level > 1 %}
                                 <div class="css-section-backdrop">

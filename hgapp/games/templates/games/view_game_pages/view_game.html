@@ -2,6 +2,7 @@
 
 {% load i18n %}
 {% load static %}
+{% load ad_tags %}
 
 
 {% block head_title %}Viewing Contract{% endblock %}
@@ -193,4 +194,5 @@
         </div>
     </div>
 </div>
+{% render_fake_ad request.user %}
 {% endblock %}

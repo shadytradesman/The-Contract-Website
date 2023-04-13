@@ -3,6 +3,7 @@
 {% load i18n %}
 {% load static %}
 {% load account_tags %}
+{% load ad_tags %}
 
 {% block head_title %}Hall of Fame{% endblock %}
 
@@ -249,5 +250,5 @@
         </div>
     </div>
 </div>
-
+{% render_fake_ad request.user %}
 {% endblock %}

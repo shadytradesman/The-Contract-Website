@@ -8,6 +8,7 @@
 
 {% load account_tags %}
 {% load static %}
+{% load ad_tags %}
 
 {% block extra_styles %}
     <link rel="stylesheet" type="text/css" href="{% static 'characters/graveyard_style.css' %}" />
@@ -64,4 +65,5 @@
             {% endfor %}
         </div>
     </div>
+{% render_fake_ad request.user %}
 {% endblock %}

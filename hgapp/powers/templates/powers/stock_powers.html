@@ -4,6 +4,8 @@
 {% block head_title %}Stock Gifts{% endblock %}
 
 {% load static %}
+{% load ad_tags %}
+
 {% block extra_styles %}
     <link rel="stylesheet" type="text/css" href="{% static 'powers/stock_powers_style.css' %}" />
 {% endblock %}
@@ -20,4 +22,5 @@
 
 {% block body_base %}
     {% include "powers/stock_powers_content.html" %}
+    {% render_fake_ad request.user %}
 {% endblock %}

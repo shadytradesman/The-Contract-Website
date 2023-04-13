@@ -8,6 +8,7 @@
 
 {% load account_tags %}
 {% load markdown_deux_tags %}
+{% load ad_tags %}
 
 {% block body_base %}
 <div class="container">
@@ -141,4 +142,5 @@
         </div>
     </div>
 </div>
+{% render_fake_ad request.user %}
 {% endblock %}

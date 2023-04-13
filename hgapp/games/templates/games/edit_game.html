@@ -4,6 +4,7 @@
 {% load i18n %}
 {% load bootstrap %}
 {% load static %}
+{% load ad_tags %}
 
 {% block extra_head %}
     {{ form.media }}
@@ -231,4 +232,5 @@
         </div>
     </div>
 </div>
+{% render_fake_ad request.user %}
 {% endblock %}

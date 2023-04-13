@@ -10,6 +10,7 @@
 
 {% load account_tags %}
 {% load power_tags %}
+{% load ad_tags %}
 {% load static %}
 
 {% block extra_scripts %}
@@ -194,6 +195,7 @@
         </div>
     </div>
     <div class="row css-no-print">
+        {% render_fake_ad request.user %}
     {% if related_gifts %}
         <div class="col-xs-12 col-md-6">
             <h2 class="text-center" style="margin-top: 10px;">

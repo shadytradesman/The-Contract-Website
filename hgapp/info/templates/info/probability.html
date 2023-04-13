@@ -3,6 +3,7 @@
 {% load i18n %}
 {% load static %}
 {% load account_tags %}
+{% load ad_tags %}
 
 {% block head_title %}Dice Pool Probability Calculator{% endblock %}
 
@@ -22,16 +23,17 @@
 <h1 class="text-center">
     Dice Pools Probability Calculator
 </h1>
+{% render_fake_ad request.user %}
 <div class="container">
     <div class="panel panel-default">
         <div class="panel-body">
             <p>
-                When a Character attempts an action that is risky or has an unclear outcome, the GM will call for a roll.
-                They name an Attribute, an Ability, and a Difficulty, and the Player rolls a number of ten-sided dice
+                When a character attempts an action that is risky or unsure, the GM will call for a roll.
+                They name an Attribute, an Ability, and a Difficulty. The Player rolls a number of ten-sided dice
                 (d10s) equal to the sum of their Character's ratings in the named Attribute and Ability. Each die that lands on
-                a number equal to or greater than the Difficulty is considered a Success. The Player adds up how many Successes
-                they scored. A die showing '1' is called a "botch" and subtracts a Success. A die showing a '10' is called
-                a "double" and is worth two Successes instead of one. The total number of Successes is called the Outcome
+                a number equal to or greater than the Difficulty is considered a success. The Player adds up how many successes
+                they scored. A die showing '1' is called a "botch" and subtracts a success. A die showing a '10' is called
+                a "double" and is worth two successes instead of one. The total number of successes is called the Outcome
                 and determines the result.
             </p>
             <h4>
@@ -148,19 +150,15 @@
                 desired.
             </p>
             <p>
-                When you call for a roll, you are not judging the difficulty of the task at hand so much as <b>you are
-                entering an agreement with the Player about how much discretion you will have over the outcome.</b>
+                When the you as the GM call for a roll, <b>you are
+                entering an agreement with the Player about how to determine the action's Outcome.</b>
                 Notice that botches, partial successes, and exceptional successes all allow the GM to determine the
                 specifics of the outcome. A partial success (the most common Outcome) can be anything from a near-failure
-                to a success with a complication. The Contract's emphasis on outside-the-box problem solving
-                necessitates putting such trust and power in the hands of the GM. A more rigid resolution system would
-                feel restrictive and arbitrary when things inevitably go off the rails. GMs should use the leeway
-                afforded to guide the action of the Contract. Tastes vary from GM to GM and World to World, but Players should
-                never feel cheated. A complete success is a complete success.
+                to a success with a complication. Players should never feel cheated. A complete success is a complete success.
             </p>
             <p>
-                This system gives the GM some control over the "tone" of the game during the standard play,
-                however, <b>during Combat-- when Contractors' lives are on the line-- the GM's discretion is greatly
+                This system gives the GM more control game during the standard play.
+                However, <b>during Combat-- when Contractors' lives are on the line-- the GM's discretion is greatly
                 reduced.</b> Partial and exceptional successes have specific outcomes determined by the
                 <a href="/guide/rules/#combat">Combat rules.</a> This makes The Contract's quick, deadly Combat more
                 tactical and fair.
@@ -190,5 +188,4 @@
         </div>
     </div>
 </div>
-
 {% endblock %}
