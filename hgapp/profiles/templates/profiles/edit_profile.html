@@ -24,6 +24,9 @@
                  {{ form.about | bootstrap }}
                  {{form.view_adult | bootstrap }}
                  {{form.private_profile | bootstrap }}
+                 {% if profile.early_access_user %}
+                    {{form.hide_fake_ads | bootstrap }}
+                 {% endif %}
                  <input class="btn btn-primary" type="submit" value="Done!" />
             </form>
         </div>

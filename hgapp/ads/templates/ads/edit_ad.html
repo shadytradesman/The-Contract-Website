@@ -1,0 +1,42 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+{% load bootstrap %}
+{% load static %}
+
+{% block extra_styles %}
+{% endblock %}
+
+{% block extra_scripts %}
+{% endblock %}
+
+{% block head_title %}
+    Editing Ad
+{% endblock %}
+
+{% block extra_head %}
+{{ form.media }}
+{% endblock %}
+
+{% block body_class %}
+home
+{% endblock %}
+
+{% block body_base %}
+    <div class="container">
+        {{ form.about.errors }}
+        <h1 class="text-center">
+            Editing Ad
+        </h1>
+        <form action="{% url 'ads:edit_ad' ad.id %}" method="post">
+            {{ form.non_field_errors }}
+            {% csrf_token %}
+            <div>
+                {{form}}
+            </div>
+            <div>
+                <input class="btn btn-primary btn-lg" type="submit" value="Done!" />
+            </div>
+        </form>
+    </div>
+{% endblock %}

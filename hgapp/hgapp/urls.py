@@ -38,6 +38,7 @@ urlpatterns = [
     url(r"^journals/*", views.RedirectRootUrlView.as_view(new_root="/journal", permanent="true")),
     url(r"^crafting/", include("crafting.urls"), name="crafting"),
     url(r"^notification/", include("notifications.urls"), name="notifications"),
+    url(r"^ad/", include("ads.urls"), name="ads"),
     url(r"^tinymce/", include("tinymce.urls")),
     url(r"^news/", include("blog.urls", namespace="pinax_blog")),
     url(r"^ajax/images/", include("pinax.images.urls", namespace="pinax_images")),

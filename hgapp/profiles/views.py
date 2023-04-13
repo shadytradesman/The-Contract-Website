@@ -116,6 +116,7 @@ def profile_edit(request):
             profile.about = form.cleaned_data['about']
             with transaction.atomic():
                 profile.is_private = form.cleaned_data['private_profile']
+                profile.hide_fake_ads = form.cleaned_data['hide_fake_ads']
                 profile.save()
                 profile.update_view_adult_content(form.cleaned_data['view_adult'])
             return HttpResponseRedirect(reverse('profiles:profiles_view_profile', args=(profile.id,)))
@@ -127,6 +128,7 @@ def profile_edit(request):
             initial={
                 'about': profile.about,
                 'view_adult': profile.view_adult_content,
+                'hide_fake_ads': profile.hide_fake_ads,
                 'private_profile': profile.is_private,
             }
         )

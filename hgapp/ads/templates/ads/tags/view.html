@@ -1,0 +1,59 @@
+{% if not empty %}
+<div class="css-ad-container">
+    <a type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#fakeAdModal" style="padding:0px;">
+        <img src="{{ad.banner.url }}" style="width:100%; max-height: 14vh;">
+    </a>
+    <figcaption>
+        <small>
+            <a type="button" data-toggle="modal" data-target="#fakeAdModal" href="">
+                Learn about {{ad.subject}}
+            </a>
+            -
+            <a href="{% url 'profiles:profiles_edit' %}">
+                Hide fake ads
+            </a>
+        </small>
+    </figcaption>
+</div>
+
+
+
+{% if ad.picture %}
+    <link rel="preload" as="image" href="{{ ad.picture.url }}" />
+{% endif %}
+
+<div class="modal fade" id="fakeAdModal" tabindex="-1" role="dialog" aria-labelledby="tutorialModalLabel" style="z-index: 9999!important;">
+    <div class="modal-dialog modal-lg css-big-modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-center css-big-modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true" class="text-primary" style="position: absolute; right: 20px; ">&times;</span></button>
+                <h1 class="modal-title">{{ad.headline}}</h1>
+            </div>
+            <div class="modal-body css-big-modal-body" >
+                <div class="text-center" style="margin-bottom: 10px;">
+                    <span class="lead">
+                      {% block modal_header %}
+                      {% endblock %}
+                    </span>
+                </div>
+                {% if ad.picture %}
+                    <img class="css-sm-modal-image" src="{{ ad.picture.url }}" style="width: 100%; margin-bottom: 15px;">
+                {% endif %}
+                <div>
+                    {{ad.content|safe}}
+                </div>
+            </div>
+            <div class="modal-footer css-big-modal-footer">
+                <div class="text-center">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" role="button">Cool!</button>
+                    {% if show_edit %}
+                        <a href="{% url 'ads:edit_ad' ad.pk %}">
+                            Edit
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}

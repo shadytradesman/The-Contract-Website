@@ -31,6 +31,7 @@ def fiction(request):
     }
     return render(request, 'info/fiction.html', context)
 
+
 def leaderboard(request):
     num_to_fetch = 10
     top_gms = Profile.objects.order_by('-num_games_gmed').filter(is_private=False)[:num_to_fetch]

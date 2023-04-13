@@ -126,6 +126,7 @@ INSTALLED_APPS = [
     'emails.apps.EmailsConfig',
     'images.apps.ImagesConfig',
     'notifications.apps.NotificationsConfig',
+    'ads.apps.AdsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -164,9 +165,9 @@ MIDDLEWARE = [
 if DEBUG:
     pass
     # COMMENT BELOW TO DISABLE DEBUG TOOLBAR
-    INSTALLED_APPS.append("debug_toolbar")
-    MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
-    RESULTS_CACHE_SIZE=4000
+    # INSTALLED_APPS.append("debug_toolbar")
+    # MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
+    # RESULTS_CACHE_SIZE=4000
 
 ACCOUNT_REMEMBER_ME_EXPIRY = 60 * 60 * 24 * 365 * 10
 SESSION_COOKIE_AGE = ACCOUNT_REMEMBER_ME_EXPIRY

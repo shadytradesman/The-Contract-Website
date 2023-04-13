@@ -14,6 +14,9 @@ class EditProfileForm(forms.Form):
                                     required=False,
                                     help_text="By selecting this box, you certify that you are age 18 or older and wish "
                                               "to view content marked as adult. Lying about your age is a bannable offense.")
+    hide_fake_ads = forms.BooleanField(label="Hide fake ads",
+                                       required=False,
+                                       help_text="If checked, hides the fake Illumination ads across the website.")
     private_profile = forms.BooleanField(
         label="Profile is private",
         required=False,

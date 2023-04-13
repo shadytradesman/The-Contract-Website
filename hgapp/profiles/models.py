@@ -132,6 +132,9 @@ class Profile(models.Model):
     intro_contracts = models.BooleanField(default=True)
     site_announcements = models.BooleanField(default=True)
 
+    # Other Preferences
+    hide_fake_ads = models.BooleanField(default=False)
+
     def __str__(self):
         return self.user.username
 
