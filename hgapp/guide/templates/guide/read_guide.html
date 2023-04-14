@@ -68,7 +68,7 @@
                         {{guidebook.rendered_content|safe}}
                     </div>
                     {% for section in sections %}
-                        {% if forloop.counter|divisibleby:10 %}
+                        {% if forloop.counter|divisibleby:8 %}
                             <div style="margin-top: 10px; margin-bottom: 10px;">
                                 {% render_fake_ad request.user %}
                             </div>
