@@ -23,13 +23,13 @@
 {% endif %}
 
 <div class="modal fade" id="fakeAdModal" tabindex="-1" role="dialog" aria-labelledby="tutorialModalLabel" style="z-index: 9999!important;">
-    <div class="modal-dialog modal-lg css-big-modal-lg" role="document">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
-            <div class="modal-header text-center css-big-modal-header">
+            <div class="modal-header text-center ">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true" class="text-primary" style="position: absolute; right: 20px; ">&times;</span></button>
                 <h1 class="modal-title">{{ad.headline}}</h1>
             </div>
-            <div class="modal-body css-big-modal-body" >
+            <div class="modal-body " >
                 <div class="text-center" style="margin-bottom: 10px;">
                     <span class="lead">
                       {% block modal_header %}
@@ -43,7 +43,7 @@
                     {{ad.content|safe}}
                 </div>
             </div>
-            <div class="modal-footer css-big-modal-footer">
+            <div class="modal-footer ">
                 <div class="text-center">
                     <button type="button" class="btn btn-default" data-dismiss="modal" role="button">Cool!</button>
                     {% if show_edit %}
