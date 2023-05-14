@@ -33,12 +33,14 @@ STATUS_ANY = 'ANY'
 STATUS_NEWBIE = 'NEWBIE'
 STATUS_NOVICE = 'NOVICE'
 STATUS_SEASONED = 'SEASONED'
+STATUS_PROFESSIONAL = 'PROFESSIONAL'
 STATUS_VETERAN = 'VETERAN'
 HIGH_ROLLER_STATUS = (
     (STATUS_ANY, 'Any'),
     (STATUS_NEWBIE, 'Newbie'),
     (STATUS_NOVICE, 'Novice'),
     (STATUS_SEASONED, 'Seasoned'),
+    (STATUS_PROFESSIONAL, 'Professional'),
     (STATUS_VETERAN, 'Veteran'),
 )
 
@@ -347,7 +349,7 @@ class Character(models.Model):
                                               max_length=64)
     status = models.CharField(choices=HIGH_ROLLER_STATUS,
                               max_length=25,
-                              default=HIGH_ROLLER_STATUS[1][0])
+                              default=STATUS_NEWBIE)
     appearance = models.TextField(max_length=3000)
     age = models.CharField(max_length=50)
     sex = models.CharField(max_length=15, default="Unknown")
@@ -609,13 +611,15 @@ class Character(models.Model):
     def calculate_status(self):
         num_victories = self.number_of_victories()
         if num_victories < 4:
-            return HIGH_ROLLER_STATUS[1][0]
+            return STATUS_NEWBIE
         elif num_victories < 10:
-            return HIGH_ROLLER_STATUS[2][0]
-        elif num_victories < 30:
-            return HIGH_ROLLER_STATUS[3][0]
+            return STATUS_NOVICE
+        elif num_victories < 17:
+            return STATUS_SEASONED
+        elif num_victories < 25:
+            return STATUS_PROFESSIONAL
         else:
-            return HIGH_ROLLER_STATUS[4][0]
+            return STATUS_VETERAN
 
     def save(self, *args, **kwargs):
         if self.ambition and self.ambition[-1] == '.':
@@ -1026,7 +1030,7 @@ Archived on: {}
         return self.stats_snapshot.exp_cost + crafting_cost if crafting_cost else self.stats_snapshot.exp_cost
 
     def ability_maximum(self):
-        if self.status == HIGH_ROLLER_STATUS[3][0] or self.status == HIGH_ROLLER_STATUS[4][0] or self.ported != NOT_PORTED:
+        if self.status in [STATUS_SEASONED, STATUS_PROFESSIONAL, STATUS_VETERAN] or self.ported != NOT_PORTED:
             return 6
         else:
             return 5

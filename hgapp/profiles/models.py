@@ -4,9 +4,17 @@ from django.contrib.auth.models import Permission
 from .apps import ProfilesConfig
 
 from django.utils import timezone
-from games.models import Game, Move, REQUIRED_HIGH_ROLLER_STATUS
+from games.models import Game, Move, REQUIRED_HIGH_ROLLER_STATUS, REQ_STATUS_ANY, REQ_STATUS_NEWBIE_OR_NOVICE, \
+    REQ_STATUS_NEWBIE, REQ_STATUS_NOVICE
+
 from games.games_constants import get_completed_game_invite_excludes_query, get_completed_game_excludes_query
 from account.models import EmailAddress
+
+NEWBIE_NOVICE_STATUSES = [
+    REQ_STATUS_ANY,
+    REQ_STATUS_NEWBIE,
+    REQ_STATUS_NOVICE,
+    REQ_STATUS_NEWBIE_OR_NOVICE]
 
 UNTESTED = 'UNTESTED'
 SHELTERED = 'SHELTERED'
@@ -197,10 +205,7 @@ class Profile(models.Model):
             game_kills = game.number_deaths()
             game_victories = game.number_victories()
             game_losses = game.number_losses()
-            if game.required_character_status in (REQUIRED_HIGH_ROLLER_STATUS[0][0],
-                                                  REQUIRED_HIGH_ROLLER_STATUS[1][0],
-                                                  REQUIRED_HIGH_ROLLER_STATUS[2][0],
-                                                  REQUIRED_HIGH_ROLLER_STATUS[3][0]):
+            if game.required_character_status in NEWBIE_NOVICE_STATUSES:
                 num_gm_kills_novice = num_gm_kills_novice + game_kills
                 num_gm_victories_novice = num_gm_victories_novice + game_victories
                 num_gm_losses_novice = num_gm_losses_novice + game_losses
@@ -415,10 +420,7 @@ class Profile(models.Model):
     def _get_novice_game_count(self, completed_game_invites):
         count = 0
         for invite in completed_game_invites:
-            if invite.relevant_game.required_character_status in (REQUIRED_HIGH_ROLLER_STATUS[0][0],
-                                                                  REQUIRED_HIGH_ROLLER_STATUS[1][0],
-                                                                  REQUIRED_HIGH_ROLLER_STATUS[2][0],
-                                                                  REQUIRED_HIGH_ROLLER_STATUS[3][0]):
+            if invite.relevant_game.required_character_status in NEWBIE_NOVICE_STATUSES:
                 count = count + 1
         return count
 

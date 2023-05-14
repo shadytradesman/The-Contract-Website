@@ -42,6 +42,13 @@
                 {% include 'characters/tombstone_snippet.html' %}
             {% endfor %}
 
+            {% if tombstones.Professional %}
+            <h2>Professional</h2>
+            {% endif %}
+            {% for tombstone in tombstones.Professional %}
+            {% include 'characters/tombstone_snippet.html' %}
+            {% endfor %}
+
             {% if tombstones.Seasoned %}
                 <h2>Seasoned</h2>
             {% endif %}

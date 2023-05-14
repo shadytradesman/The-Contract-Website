@@ -9,7 +9,7 @@ from django.contrib.auth import get_user_model
 from characters.models import Character, HIGH_ROLLER_STATUS, Character_Death, ExperienceReward, AssetDetails, EXP_GM, \
     EXP_LOSS_V2, EXP_WIN_V2, EXP_LOSS_RINGER_V2, EXP_WIN_RINGER_V2, EXP_LOSS_IN_WORLD_V2, EXP_WIN_IN_WORLD_V2, EXP_MVP,\
     EXP_WIN_V1, EXP_LOSS_V1, Artifact, EXP_GM_MOVE, EXP_GM_RATIO, EXP_GM_NEW_PLAYER, StockWorldElement, ELEMENT_TYPE, \
-    CONDITION, CIRCUMSTANCE, TROPHY, LOOSE_END
+    CONDITION, CIRCUMSTANCE, TROPHY, LOOSE_END, STATUS_ANY
 from powers.models import Power, Power_Full
 from cells.models import Cell, WorldEvent
 from django.utils import timezone
@@ -27,6 +27,7 @@ from hgapp.utilities import get_object_or_none
 import django.dispatch
 from notifications.models import Notification, REWARD_NOTIF, CONTRACTOR_NOTIF, SCENARIO_NOTIF
 
+
 NotifyGameInvitee = django.dispatch.Signal(providing_args=['game_invite', 'request'])
 GameChangeStartTime = django.dispatch.Signal(providing_args=['game', 'request'])
 GameEnded = django.dispatch.Signal(providing_args=['game', 'request'])
@@ -34,22 +35,30 @@ GameEnded = django.dispatch.Signal(providing_args=['game', 'request'])
 
 logger = logging.getLogger("app." + __name__)
 
+
+REQ_STATUS_VETERAN = 'VETERAN'
+REQ_STATUS_PROFESSIONAL = 'PROFESSIONAL'
+REQ_STATUS_SEASONED = 'SEASONED'
+REQ_STATUS_NOVICE = 'NOVICE'
+REQ_STATUS_NEWBIE = 'NEWBIE'
+REQ_STATUS_NEWBIE_OR_NOVICE = 'NEWBIE_OR_NOVICE'
+REQ_STATUS_ANY = 'ANY'
+REQUIRED_HIGH_ROLLER_STATUS = (
+    (REQ_STATUS_ANY, 'Any'),
+    (REQ_STATUS_NEWBIE_OR_NOVICE, 'Newbie or Novice'),
+    (REQ_STATUS_NEWBIE, 'Newbie'),
+    (REQ_STATUS_NOVICE, 'Novice'),
+    (REQ_STATUS_SEASONED, 'Seasoned'),
+    (REQ_STATUS_PROFESSIONAL, 'Professional'),
+    (REQ_STATUS_VETERAN, 'Veteran'),
+)
+
 WIN = 'WIN'
 LOSS = 'LOSS'
 DEATH = 'DEATH'
 DECLINED = 'DECLINED'
 RINGER_VICTORY = 'RINGER_VICTORY'
 RINGER_FAILURE = 'RINGER_FAILURE'
-
-REQUIRED_HIGH_ROLLER_STATUS = (
-    ('ANY', 'Any'),
-    ('NEWBIE_OR_NOVICE', 'Newbie or Novice'),
-    ('NEWBIE', 'Newbie'),
-    ('NOVICE', 'Novice'),
-    ('SEASONED', 'Seasoned'),
-    ('VETERAN', 'Veteran'),
-)
-
 OUTCOME = (
     (WIN, 'Victory'),
     (LOSS, 'Loss'),
@@ -113,7 +122,7 @@ class Game(models.Model):
         on_delete=models.PROTECT)
     required_character_status = models.CharField(choices=REQUIRED_HIGH_ROLLER_STATUS,
                                        max_length=25,
-                                       default=REQUIRED_HIGH_ROLLER_STATUS[0][0])
+                                       default=REQ_STATUS_ANY)
     title = models.CharField(max_length=130)
     created_date = models.DateTimeField('date created',
                                         auto_now_add=True)
@@ -175,7 +184,7 @@ class Game(models.Model):
             scenario = Scenario(creator=self.gm,
                                 title=str(self.title),
                                 description="Put the details of the Scenario here",
-                                suggested_status=HIGH_ROLLER_STATUS[0][0],
+                                suggested_status=STATUS_ANY,
                                 max_players=5,
                                 min_players=2)
             scenario.save()
@@ -793,7 +802,7 @@ class Scenario(models.Model):
 
     suggested_status = models.CharField(choices=HIGH_ROLLER_STATUS,
                                        max_length=25,
-                                       default=HIGH_ROLLER_STATUS[0][0])
+                                       default=STATUS_ANY)
     max_players = models.IntegerField("Suggested Maximum number of players")
     min_players = models.IntegerField("Suggested Minimum number of players")
     cycle = models.ForeignKey("Cycle",

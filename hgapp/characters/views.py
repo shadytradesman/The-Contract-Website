@@ -194,6 +194,7 @@ def graveyard(request):
         'Newbie': [],
         'Novice': [],
         'Seasoned': [],
+        'Professional': [],
         'Veteran': [],
         'Ported as Seasoned': [],
         'Ported as Veteran': []

@@ -1,7 +1,7 @@
 from django import forms
 
 from .models import HIGH_ROLLER_STATUS, Enhancement, Drawback, CREATION_REASON, Power_Full, PowerTag
-from characters.models import Attribute, Ability
+from characters.models import Attribute, Ability, STATUS_SEASONED, STATUS_VETERAN, STATUS_ANY
 
 def set_field_html_name(cls, new_name):
     """
@@ -47,7 +47,7 @@ def make_enhancement_form(enhancement, enhancement_instance=None):
             requirements = ""
             required_status = {}
             for status in HIGH_ROLLER_STATUS: required_status[status[0]] = status[1]
-            if enhancement.required_status in [HIGH_ROLLER_STATUS[3][0], HIGH_ROLLER_STATUS[4][0]]:
+            if enhancement.required_status in [STATUS_SEASONED, STATUS_VETERAN]:
                 requirements = "requires: {}".format(required_status[enhancement.required_status])
             return '{} ({}) {}'.format(enhancement.name, enhancement.description, requirements)
 
@@ -79,7 +79,7 @@ def make_drawback_form(drawback):
             requirements = ""
             required_status = {}
             for status in HIGH_ROLLER_STATUS: required_status[status[0]] = status[1]
-            if drawback.required_status in [HIGH_ROLLER_STATUS[3][0], HIGH_ROLLER_STATUS[4][0]]:
+            if drawback.required_status in [STATUS_SEASONED, STATUS_VETERAN]:
                 requirements = "requires: {}".format(required_status[drawback.required_status])
             return '{} ({}) {}'.format(drawback.name, drawback.description, requirements)
 
