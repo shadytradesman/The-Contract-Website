@@ -16,8 +16,13 @@ def render_fake_ad(user, counter=1):
         return {
             "empty": True
         }
+    if hasattr(ad, "picture") and ad.picture is not None:
+        is_vertical = ad.picture.height > ad.picture.width
+    else:
+        is_vertical = False
     return {
         "ad": ad,
         "counter": counter,
         "show_edit": user.is_authenticated and user.is_superuser,
+        "is_vertical": is_vertical
     }

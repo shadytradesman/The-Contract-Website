@@ -1,11 +1,11 @@
 {% if not empty %}
-<div class="css-ad-container">
+<div class="css-ad-container css-no-print">
     <a type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#fakeAdModal{{counter}}" style="padding:0px;">
         <img src="{{ad.banner.url }}" class="css-fake-ad-banner">
     </a>
     <figcaption>
         <small>
-            <a type="button" data-toggle="modal" data-target="#fakeAdModal" href="">
+            <a type="button" data-toggle="modal" data-target="#fakeAdModal{{counter}}" href="">
                 Learn about {{ad.subject}}
             </a>
             -
@@ -23,12 +23,18 @@
 {% endif %}
 
 <div class="modal fade" id="fakeAdModal{{counter}}" tabindex="-1" role="dialog" aria-labelledby="tutorialModalLabel" style="z-index: 9999!important;">
-    <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-dialog modal-lg {% if is_vertical %}css-tut-modal-vert{%endif%}" role="document">
         <div class="modal-content">
+            {% if ad.picture and is_vertical %}
+                <img src="{{ ad.picture.url }}" class="css-fake-ad-image hidden-xs hidden-sm">
+            {% endif %}
             <div class="modal-header text-center ">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true" class="text-primary" style="position: absolute; right: 20px; ">&times;</span></button>
                 <h1 class="modal-title">{{ad.headline}}</h1>
             </div>
+            {% if ad.picture and not is_vertical %}
+                <img src="{{ ad.picture.url }}" class="css-fake-ad-image hidden-xs hidden-sm">
+            {% endif %}
             <div class="modal-body" >
                 <div class="text-center" style="margin-bottom: 10px;">
                     <span class="lead">
@@ -38,7 +44,7 @@
                 </div>
                 {% if ad.picture %}
                     <div style="text-align: center;">
-                        <img class="css-fake-ad-image" src="{{ ad.picture.url }}">
+                        <img class="css-fake-ad-image hidden-md hidden-lg" src="{{ ad.picture.url }}">
                     </div>
                 {% endif %}
                 <div>
