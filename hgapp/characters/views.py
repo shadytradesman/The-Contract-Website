@@ -222,7 +222,7 @@ def graveyard(request):
 
 def view_artifact(request, artifact_id):
     artifact = get_object_or_404(Artifact, id=artifact_id)
-    if not (artifact.is_crafted_artifact or artifact.is_signature):
+    if not (artifact.is_crafted_artifact or artifact.is_signature or artifact.is_consumable):
         raise ValueError("Tried to view non-signature non-crafted artifact")
     characters = [artifact.character] if artifact.character else []
 

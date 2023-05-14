@@ -1,7 +1,7 @@
 {% if not empty %}
 <div class="css-ad-container">
-    <a type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#fakeAdModal" style="padding:0px;">
-        <img src="{{ad.banner.url }}" style="width:100%; max-height: 14vh;">
+    <a type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#fakeAdModal{{counter}}" style="padding:0px;">
+        <img src="{{ad.banner.url }}" class="css-fake-ad-banner">
     </a>
     <figcaption>
         <small>
@@ -22,14 +22,14 @@
     <link rel="preload" as="image" href="{{ ad.picture.url }}" />
 {% endif %}
 
-<div class="modal fade" id="fakeAdModal" tabindex="-1" role="dialog" aria-labelledby="tutorialModalLabel" style="z-index: 9999!important;">
+<div class="modal fade" id="fakeAdModal{{counter}}" tabindex="-1" role="dialog" aria-labelledby="tutorialModalLabel" style="z-index: 9999!important;">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header text-center ">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true" class="text-primary" style="position: absolute; right: 20px; ">&times;</span></button>
                 <h1 class="modal-title">{{ad.headline}}</h1>
             </div>
-            <div class="modal-body " >
+            <div class="modal-body" >
                 <div class="text-center" style="margin-bottom: 10px;">
                     <span class="lead">
                       {% block modal_header %}
@@ -37,7 +37,9 @@
                     </span>
                 </div>
                 {% if ad.picture %}
-                    <img class="css-sm-modal-image" src="{{ ad.picture.url }}" style="width: 100%; margin-bottom: 15px;">
+                    <div style="text-align: center;">
+                        <img class="css-fake-ad-image" src="{{ ad.picture.url }}">
+                    </div>
                 {% endif %}
                 <div>
                     {{ad.content|safe}}

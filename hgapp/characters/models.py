@@ -1577,6 +1577,35 @@ class Artifact(WorldElement):
     def after_use_quantity(self):
         return self.quantity - 1
 
+    def get_status_blurb(self):
+        latest_transfer = self.get_latest_transfer()
+        is_held_by_creator = self.character and (self.character == self.crafting_character)
+        if is_held_by_creator:
+            status_blurb = 'Created and held by <a href="{}">{}</a>.'.format(
+                reverse('characters:characters_view', args=(self.crafting_character.id,)),
+                self.crafting_character.name,)
+        elif self.crafting_character:
+            # if not held by creator, it should have a transfer.
+            status_blurb = 'Created by <a href="{}">{}</a>, {} <a href="{}">{}</a>.'.format(
+                reverse('characters:characters_view', args=(self.crafting_character.id,)),
+                self.crafting_character.name,
+                latest_transfer.get_transfer_type_display(),
+                reverse('characters:characters_view', args=(self.character.id,)),
+                self.character.name)
+        elif self.character:
+            status_blurb = 'Created by <a href="{}">{}</a> and orphaned. Held by <a href="{}">{}</a>'.format(
+                reverse('profiles:profiles_view_profile', args=(self.creating_player.id,)),
+                self.creating_player.username,
+                reverse('characters:characters_view', args=(self.character.id,)),
+                self.character.name)
+        elif self.creating_player:
+            status_blurb = 'Created by <a href="{}">{}</a> and orphaned.'.format(
+                reverse('profiles:profiles_view_profile', args=(self.creating_player.id,)),
+                self.creating_player.username)
+        else:
+            status_blurb = 'Created by an anonymous user.'.format()
+        return status_blurb
+
     def get_assigned_rewards(self):
         rewards = []
         for power in self.power_full_set.all():

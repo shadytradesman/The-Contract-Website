@@ -12,6 +12,7 @@
 {% load power_tags %}
 {% load static %}
 {% load character_tags %}
+{% load ad_tags %}
 
 {% block extra_scripts %}
   {% if artifact.character %}
@@ -31,6 +32,8 @@
   <h1 class="text-center css-no-print">
     {% if artifact.is_signature %}
       Legendary Artifact
+    {% elif artifact.is_consumable %}
+      Crafted Consumable{{artifact.quantity|pluralize}}
     {% elif artifact.is_crafted_artifact %}
       Crafted Artifact
     {% endif %}
@@ -39,6 +42,8 @@
     <div class="col-xs-12 col-sm-8 col-sm-offset-2">
       {% if artifact.is_signature %}
         {% render_sig_item artifact request.user %}
+      {% elif artifact.is_consumable %}
+        {% render_consumable artifact request.user %}
       {% elif artifact.is_crafted_artifact %}
         {% render_sig_item artifact request.user %}
       {% endif %}
@@ -49,6 +54,7 @@
   </div>
 
   <div class="row css-no-print">
+    {% render_fake_ad request.user %}
     {% if related_artifacts %}
     <div class="col-xs-12 col-md-6">
       <h2 class="text-center" style="margin-top: 10px;">
