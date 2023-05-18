@@ -131,8 +131,8 @@ MIND_ = ("MIND", "Mind")
 PARRY_ = ("PARRY", "Dodge or Defend")
 
 # listed here for simplicity and performance
-EFFECTS_THAT_GIVE_STAT_BONUSES = {"alternate-form", "augmentation", "mythic-brawn", "mythic-charisma",
-                                  "mythic-dexterity", "mythic-intelligence", "mythic-perception"}
+EFFECTS_THAT_GIVE_STAT_BONUSES = ["alternate-form", "augmentation", "mythic-brawn", "mythic-charisma",
+                                  "mythic-dexterity", "mythic-intelligence", "mythic-perception"]
 
 
 class PowerTag(models.Model):

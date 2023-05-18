@@ -142,7 +142,7 @@ const keywordHighlights = [
 	},
 	{
 	    "regex": regexFromKeyword("Object"),
-	    "tooltip": "Anything that is non-living, inanimate, and is not a critical component of a larger structure or device (i.e. a spark plug is not an object unless it is removed from the engine).",
+	    "tooltip": "Anything that is non-living, inanimate, and also free-standing, loose, or otherwise not currently a part of another structure or device.",
 	},
     {
         "regex": regexFromKeyword("Device"),

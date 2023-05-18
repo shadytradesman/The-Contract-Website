@@ -132,6 +132,8 @@ def create_scenario(request):
                 scenario.save()
                 for writeup in new_writeups:
                     writeup.save()
+                scenario.update_word_count()
+                scenario.save()
                 save_new_elements_from_formsets(request, scenario, condition_formset, CONDITION)
                 save_new_elements_from_formsets(request, scenario, circumstance_formset, CIRCUMSTANCE)
                 save_new_elements_from_formsets(request, scenario, loose_end_formset, LOOSE_END)
