@@ -1037,7 +1037,7 @@ def allocate_improvement_generic(request):
     if len(avail_improvements) > 0:
         return HttpResponseRedirect(reverse('games:games_allocate_improvement', args=(avail_improvements.first().id,)))
     else:
-        return HttpResponseRedirect(reverse('hgapp:home', args=()))
+        return HttpResponseRedirect(reverse('home', args=()))
 
 
 @login_required

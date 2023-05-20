@@ -1848,6 +1848,9 @@ const ComponentRendering = {
       addReplacementsForParameters(replacements) {
           this.parameters.filter(param => !(param.id in this.disabledParameters)).forEach(parameter => {
               const selection = this.parameterSelections[parameter.id];
+              if (selection === undefined) {
+                return;
+              }
               let blobParam = powerBlob["parameters"][parameter.id];
               if (blobParam["render_lvl_zero"] || selectedLevelOfParam(parameter, selection) > 0) {
                 blobParam["substitutions"].forEach(sub => {
