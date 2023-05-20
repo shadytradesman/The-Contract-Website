@@ -994,11 +994,15 @@ class Power_Full(models.Model):
         return count
 
     def reward_list(self):
-        rewards = []
+        gifts = []
+        improvements = []
         for power in self.power_set.order_by("-pub_date").all():
-            for reward in power.relevant_power.filter(is_void = False).order_by("-awarded_on").all():
-                rewards.append(reward)
-        return rewards
+            for reward in power.relevant_power.filter(is_void=False).order_by("-awarded_on").all():
+                if reward.is_improvement:
+                    improvements.append(reward)
+                else:
+                    gifts.append(reward)
+        return improvements + gifts
 
     def at_least_one_gift_assigned(self):
         return self.reward_count(include_gifts=True) > 0
@@ -1162,7 +1166,8 @@ class Power(models.Model):
             has_crafted = self.modality.crafting_type in [CRAFTING_CONSUMABLE, CRAFTING_ARTIFACT] and self.parent_power.artifacts.count()
 
         spent_rewards = []
-        for reward in self.parent_power.reward_list():
+        rewards = self.parent_power.reward_list()
+        for reward in rewards:
             spent_rewards.append("{} from {}".format(reward.type_text(), reward.reason_text()))
         initial_artifact = None
         if self.parent_power.crafting_type == CRAFTING_SIGNATURE:
@@ -1299,14 +1304,15 @@ class Power(models.Model):
         )
 
     def creation_reason_action_text(self):
-        if self.creation_reason == CREATION_REASON[0][0]:
+        if self.creation_reason == CREATION_NEW:
             return "new"
-        if self.creation_reason == CREATION_REASON[1][0]:
+        if self.creation_reason == CREATION_IMPROVEMENT:
             return "improving"
-        if self.creation_reason == CREATION_REASON[2][0]:
+        if self.creation_reason in [CREATION_REVISION, CREATION_MAJOR_REVISION]:
             return "revising"
-        if self.creation_reason == CREATION_REASON[3][0]:
+        if self.creation_reason == CREATION_ADJUSTMENT:
             return "adjusting"
+        return "changing"
 
     def show_status_toggle(self, artifact=None):
         if self.base_id not in EFFECTS_THAT_GIVE_STAT_BONUSES:
