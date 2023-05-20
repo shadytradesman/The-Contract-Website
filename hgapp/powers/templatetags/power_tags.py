@@ -30,6 +30,12 @@ def power_rev_badge(power, force_show_warnings=False, crafter_blurb=None, artifa
     if show_active_toggle:
         is_active = power.get_is_active(artifact)
     art_id = artifact.id if artifact else None
+    if character or force_show_warnings:
+        reward_count = power_full.reward_count()
+        at_least_one_gift = power_full.reward_count(include_improvements=False)
+    else:
+        reward_count = 0
+        at_least_one_gift = True
     return {
         'discovery_page': False,
         'force_show_warnings': force_show_warnings,
@@ -41,6 +47,8 @@ def power_rev_badge(power, force_show_warnings=False, crafter_blurb=None, artifa
         'show_active_toggle': show_active_toggle,
         'is_active': is_active,
         'art_id': art_id,
+        'reward_count': reward_count,
+        'at_least_one_gift': at_least_one_gift,
     }
 
 @register.inclusion_tag('powers/power_badge_snippet.html')
@@ -59,8 +67,10 @@ def power_badge(power_full, force_show_warnings=False, artifact=None, can_edit=F
     gift_cost = power_full.get_gift_cost()
     if not is_stock and (character or force_show_warnings):
         reward_count = power_full.reward_count()
+        at_least_one_gift = power_full.reward_count(include_improvements=False)
     else:
         reward_count = 0
+        at_least_one_gift = True
     return {
         'discovery_page': False,
         'force_show_warnings': force_show_warnings,
@@ -74,6 +84,7 @@ def power_badge(power_full, force_show_warnings=False, artifact=None, can_edit=F
         'art_id': art_id,
         'is_stock': is_stock,
         'reward_count': reward_count,
+        'at_least_one_gift': at_least_one_gift,
         'gift_cost': gift_cost,
     }
 

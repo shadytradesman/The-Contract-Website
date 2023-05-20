@@ -90,6 +90,11 @@
                     {% if gift_cost > reward_count %}
                         Insufficient Rewards assigned! ({{reward_count }} assigned, {{gift_cost}} required)
                     {% endif %}
+                    {% if not at_least_one_gift %}
+                        <div>
+                            No Gifts assigned. {{reward_count}} Improvements assigned.
+                        </div>
+                    {% endif %}
                 {% endif %}
             </small>
         </div>

@@ -990,7 +990,7 @@ class Power_Full(models.Model):
             if include_improvements:
                 count += power.relevant_power.filter(is_void=False).count()
             else:
-                count += power.relevant_power.filter(is_void=False, is_gift=True).count()
+                count += power.relevant_power.filter(is_void=False, is_improvement=False).count()
         return count
 
     def reward_list(self):
