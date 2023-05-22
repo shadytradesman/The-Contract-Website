@@ -1109,44 +1109,55 @@ const ComponentRendering = {
         this.selectedEnhancements =  [];
         this.selectedDrawbacks = [];
 
-        powerEditBlob["enhancements"].forEach(mod => {
-            let availEnhancements = this.enhancements.filter(enh =>
-                !(enh.slug in this.disabledEnhancements)
-                && !(this.selectedEnhancements.map(e => e.id).includes(enh.id)));
+        function applyEnhancement(state, mod) {
+            let availEnhancements = state.enhancements.filter(enh =>
+                !(enh.slug in state.disabledEnhancements)
+                && !(state.selectedEnhancements.map(e => e.id).includes(enh.id)));
             let selectedEnhancement = availEnhancements.find(enh => enh.slug === mod["enhancement_slug"]);
             if (selectedEnhancement) {
                 if (mod["is_advancement"]) {
-                    this.advancementEnhancements.push(selectedEnhancement);
+                    state.advancementEnhancements.push(selectedEnhancement);
                 } else {
                     if (mod["detail"] != null) {
                         selectedEnhancement.details = mod["detail"].decodeHTML();
                     }
-                    this.selectedEnhancements.push(selectedEnhancement);
-                    this.enhancements = handleModifierMultiplicity(selectedEnhancement.slug, selectedEnhancement.id, "enhancements", this.enhancements, this.getSelectedAndActiveEnhancements());
-                    this.calculateRestrictedElements();
+                    state.selectedEnhancements.push(selectedEnhancement);
+                    state.enhancements = handleModifierMultiplicity(selectedEnhancement.slug, selectedEnhancement.id, "enhancements", state.enhancements, state.getSelectedAndActiveEnhancements());
+                    state.calculateRestrictedElements();
+                    return true;
                 }
             }
-        });
-        console.log("Enhancements assigned");
+            return false;
+        }
 
-        powerEditBlob["drawbacks"].forEach(mod => {
-            let availDrawbacks = this.drawbacks.filter(drawback =>
-                !(drawback.slug in this.disabledDrawbacks)
-                && !(this.selectedDrawbacks.map(d => d.id).includes(drawback.id)));
+        function applyDrawback(state, mod) {
+            let availDrawbacks = state.drawbacks.filter(drawback =>
+                !(drawback.slug in state.disabledDrawbacks)
+                && !(state.selectedDrawbacks.map(d => d.id).includes(drawback.id)));
             let selectedDrawback = availDrawbacks.find(drawback => drawback.slug === mod["drawback_slug"]);
             if (selectedDrawback) {
                 if (mod["detail"] != null) {
                     selectedDrawback.details = mod["detail"].decodeHTML();
                 }
-                this.selectedDrawbacks.push(selectedDrawback);
                 if (mod["is_advancement"]) {
-                    this.advancementDrawbacks.push(selectedDrawback);
+                    state.advancementDrawbacks.push(selectedDrawback);
+                    return false;
                 }
-                this.drawbacks = handleModifierMultiplicity(selectedDrawback.slug, selectedDrawback.id, "drawbacks", this.drawbacks, this.getSelectedAndActiveDrawbacks());
-                this.calculateRestrictedElements();
+                state.selectedDrawbacks.push(selectedDrawback);
+                state.drawbacks = handleModifierMultiplicity(selectedDrawback.slug, selectedDrawback.id, "drawbacks", state.drawbacks, state.getSelectedAndActiveDrawbacks());
+                state.calculateRestrictedElements();
+                return true;
             }
-        });
-        console.log("Drawbacks assigned");
+            return false;
+        }
+        let enhancementsToApply = powerEditBlob["enhancements"];
+        let drawbacksToApply = powerEditBlob["drawbacks"];
+        for (let i = 0; i < 5; i++) {
+            // this is a hacky way to deal with enhancement and drawback prerequisites without building a
+            // dependency tree.
+            enhancementsToApply = enhancementsToApply.filter(mod => !applyEnhancement(this, mod));
+            drawbacksToApply = drawbacksToApply.filter(mod => !applyDrawback(this, mod));
+        }
 
         powerEditBlob["text_fields"].forEach(editField => {
             this.systemFields.forEach(sysField => {
