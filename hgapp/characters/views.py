@@ -737,6 +737,12 @@ class EnterLooseEnd(View):
                         granting_gm=self.request.user,
                         original_cutoff=form.cleaned_data["cutoff"]
                     )
+                    Notification.objects.create(
+                        user=self.character.player,
+                        headline="New Loose End",
+                        content="{} gave {} a Loose End".format(request.user.username, self.character.name),
+                        url=reverse('characters:characters_view', args=(self.character.id,)),
+                        notif_type=CONTRACTOR_NOTIF)
                 self.loose_end.name = form.cleaned_data["name"]
                 self.loose_end.description = form.cleaned_data["details"]
                 self.loose_end.system = form.cleaned_data["threat"]
