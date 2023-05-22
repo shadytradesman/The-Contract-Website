@@ -994,15 +994,11 @@ class Power_Full(models.Model):
         return count
 
     def reward_list(self):
-        gifts = []
-        improvements = []
+        rewards = []
         for power in self.power_set.order_by("-pub_date").all():
-            for reward in power.relevant_power.filter(is_void=False).order_by("-awarded_on").all():
-                if reward.is_improvement:
-                    improvements.append(reward)
-                else:
-                    gifts.append(reward)
-        return improvements + gifts
+            for reward in power.relevant_power.filter(is_void=False).order_by("-is_improvement").all():
+                rewards.append(reward)
+        return rewards
 
     def at_least_one_gift_assigned(self):
         return self.reward_count(include_gifts=True) > 0
