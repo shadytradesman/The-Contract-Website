@@ -84,7 +84,8 @@ class WriteJournal(View):
                             received_notif.add(player)
                     if hasattr(self.character, "cell") and self.character.cell:
                         members = self.character.cell.get_unbanned_members()
-                        for player in members:
+                        for player_membership in members:
+                            player = player_membership.member_player
                             if player not in received_notif and journal.player_can_view(player):
                                 Notification.objects.create(
                                     user=player,
@@ -94,7 +95,8 @@ class WriteJournal(View):
                                     notif_type=JOURNAL_NOTIF)
                 if self.is_downtime and hasattr(self.character, "cell") and self.character.cell:
                     members = self.character.cell.get_unbanned_members()
-                    for player in members:
+                    for player_membership in members:
+                        player = player_membership.member_player
                         if journal.player_can_view(player):
                             Notification.objects.create(
                                 user=player,
