@@ -33,7 +33,9 @@
                 <h1 class="modal-title">{{ad.headline}}</h1>
             </div>
             {% if ad.picture and not is_vertical %}
+            <div style="text-align: center;">
                 <img src="{{ ad.picture.url }}" class="css-fake-ad-image hidden-xs hidden-sm">
+            </div>
             {% endif %}
             <div class="modal-body" >
                 <div class="text-center" style="margin-bottom: 10px;">
