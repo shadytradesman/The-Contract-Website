@@ -1240,6 +1240,13 @@ def post_world_element(request, character_id, element, secret_key = None):
             )
             with transaction.atomic():
                 new_element.save()
+                if request.user != character.player:
+                    Notification.objects.create(
+                        user=character.player,
+                        headline="New {}".format(new_element.get_type_display()),
+                        content="{} gave {} a {}".format(request.user.username, character.name, new_element.get_type_display()),
+                        url=reverse('characters:characters_view', args=(character.id,)),
+                        notif_type=CONTRACTOR_NOTIF)
             ser_instance = serializers.serialize('json', [new_element, ])
             return JsonResponse({"instance": ser_instance, "id": new_element.id, "cellId": new_element.cell.id}, status=200)
         else:

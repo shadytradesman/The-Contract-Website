@@ -56,6 +56,7 @@ class WriteJournal(View):
                 if not self.is_downtime:
                     gm = self.game_attendance.relevant_game.gm
                     scenario = self.game_attendance.relevant_game.scenario
+                    received_notif = set()
                     if gm:
                         Notification.objects.create(
                             user=gm,
@@ -63,6 +64,7 @@ class WriteJournal(View):
                             content="{} wrote about {}".format(self.character.name, scenario.title),
                             url=reverse('journals:journal_read_game', args=(self.character.id, self.game.id)),
                             notif_type=JOURNAL_NOTIF)
+                        received_notif.add(gm)
                     if scenario.creator != gm and self.character.player_can_view(scenario.creator):
                         Notification.objects.create(
                             user=scenario.creator,
@@ -70,12 +72,34 @@ class WriteJournal(View):
                             content="{} wrote about {}".format(self.character.name, scenario.title),
                             url=reverse('journals:journal_read_game', args=(self.character.id, self.game.id)),
                             notif_type=JOURNAL_NOTIF)
+                        received_notif.add(scenario.creator)
                     for player in self.game_attendance.relevant_game.get_attended_players():
                         if player != request.user:
                             Notification.objects.create(
                                 user=player,
                                 headline="New Journal for Contract",
                                 content="{} wrote about {}".format(self.character.name, scenario.title),
+                                url=reverse('journals:journal_read_game', args=(self.character.id, self.game.id)),
+                                notif_type=JOURNAL_NOTIF)
+                            received_notif.add(player)
+                    if hasattr(self.character, "cell") and self.character.cell:
+                        members = self.character.cell.get_unbanned_members()
+                        for player in members:
+                            if player not in received_notif and journal.player_can_view(player):
+                                Notification.objects.create(
+                                    user=player,
+                                    headline="New Journal for Contract",
+                                    content="{} wrote about {}".format(self.character.name, scenario.title),
+                                    url=reverse('journals:journal_read_game', args=(self.character.id, self.game.id)),
+                                    notif_type=JOURNAL_NOTIF)
+                if self.is_downtime and hasattr(self.character, "cell") and self.character.cell:
+                    members = self.character.cell.get_unbanned_members()
+                    for player in members:
+                        if journal.player_can_view(player):
+                            Notification.objects.create(
+                                user=player,
+                                headline="New Downtime Journal",
+                                content="{} wrote about the downtime following {}".format(self.character.name, scenario.title),
                                 url=reverse('journals:journal_read_game', args=(self.character.id, self.game.id)),
                                 notif_type=JOURNAL_NOTIF)
             return HttpResponseRedirect(reverse('journals:journal_read_game', args=(self.character.id, self.game.id)))

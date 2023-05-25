@@ -2,6 +2,7 @@
 
 {% load i18n %}
 {% load static %}
+{% load ad_tags %}
 
 {% block head_title %}
     {{character.name}}'s Journal
@@ -56,4 +57,5 @@
         </div>
     </div>
 </div>
+{% render_fake_ad request.user %}
 {% endblock %}
