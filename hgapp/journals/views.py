@@ -53,9 +53,9 @@ class WriteJournal(View):
                                   contains_spoilers=form.cleaned_data['contains_spoilers'])
                 journal.save()
                 journal.set_content(form.cleaned_data['content'])
+                gm = self.game_attendance.relevant_game.gm
+                scenario = self.game_attendance.relevant_game.scenario
                 if not self.is_downtime:
-                    gm = self.game_attendance.relevant_game.gm
-                    scenario = self.game_attendance.relevant_game.scenario
                     received_notif = set()
                     if gm:
                         Notification.objects.create(
