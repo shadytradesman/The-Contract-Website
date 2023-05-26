@@ -1581,6 +1581,9 @@ class Artifact(WorldElement):
     def after_use_quantity(self):
         return self.quantity - 1
 
+    def get_type_display(self):
+        return "Trophy"
+
     def get_status_blurb(self):
         latest_transfer = self.get_latest_transfer()
         is_held_by_creator = self.character and (self.character == self.crafting_character)
