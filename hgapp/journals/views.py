@@ -92,7 +92,9 @@ class WriteJournal(View):
                                     headline="New Journal for Contract",
                                     content="{} wrote about {}".format(self.character.name, scenario.title),
                                     url=reverse('journals:journal_read_game', args=(self.character.id, self.game.id)),
-                                    notif_type=JOURNAL_NOTIF)
+                                    notif_type=JOURNAL_NOTIF,
+                                    is_timeline=True,
+                                    article=journal)
                 if self.is_downtime and hasattr(self.character, "cell") and self.character.cell:
                     members = self.character.cell.get_unbanned_members()
                     for player_membership in members:
@@ -103,7 +105,9 @@ class WriteJournal(View):
                                 headline="New Downtime Journal",
                                 content="{} wrote about the downtime following {}".format(self.character.name, scenario.title),
                                 url=reverse('journals:journal_read_game', args=(self.character.id, self.game.id)),
-                                notif_type=JOURNAL_NOTIF)
+                                notif_type=JOURNAL_NOTIF,
+                                is_timeline=True,
+                                article=journal)
             return HttpResponseRedirect(reverse('journals:journal_read_game', args=(self.character.id, self.game.id)))
         raise ValueError("Invalid journal form")
 

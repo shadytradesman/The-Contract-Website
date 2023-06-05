@@ -57,7 +57,7 @@
             {% endfor %}
 
             {% if tombstones.Novice %}
-                <h3>Novices</h3>
+                <h2>Novice</h2>
             {% endif %}
             {% for tombstone in tombstones.Novice %}
                 {% include 'characters/tombstone_snippet.html' %}
@@ -65,7 +65,7 @@
 
 
             {% if tombstones.Newbie %}
-                <h4>Newbies</h4>
+                <h2>Newbie</h2>
             {% endif %}
             {% for tombstone in tombstones.Newbie %}
                 {% include 'characters/tombstone_snippet.html' %}
