@@ -214,8 +214,15 @@ def home(request):
             'avail_exp_rewards': avail_exp_rewards,
             'latest_blog_post': latest_blog_post,
             'email_verified': email_verified,
-            'timeline_notifications': timeline_notifications
+            'timeline_notifications': timeline_notifications,
+            'expand_contractors': True,
+            'expand_playgroups': cells.count() < 5,
+            'expand_gifts': my_powers.count() < 3,
+            'expand_contracts': True,
         }
+        if hasattr(request.user, 'profile'):
+            if request.user.profile.early_access_user:
+                return render(request, 'new_logged_in_homepage.html', context)
         return render(request, 'logged_in_homepage.html', context)
 
 def csrf_failure(request, reason=""):

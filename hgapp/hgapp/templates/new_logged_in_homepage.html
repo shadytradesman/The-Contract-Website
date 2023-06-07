@@ -1,0 +1,512 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+{% load static %}
+{% load account_tags %}
+{% load power_tags %}
+{% load ad_tags %}
+{% load notification_tags %}
+
+{% block head_title %}Home{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% block extra_styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'overrides/homepage_style.css' %}" />
+{% endblock %}
+
+{% block extra_scripts %}
+    <script src="{% static 'overrides/wiki-macro-scripts.js' %}"></script>
+{% endblock %}
+
+{% block body_base %}
+<div class="container">
+    <br>
+     <div class="upper-section css-backgrounded" style="background-image: url({% static 'overrides/art/doors_bg.jpg' %});">
+         <br>
+    <div class="text-center">
+        <h1>Welcome, {% user_display request.user %} </h1>
+        <br>
+        {% include "_messages.html" %}
+        {% if not email_verified %}
+            <div class="alert alert-info text-center css-contractor-alert">
+                <h4>Your Email Address is not verified.</h4>
+                <p>Your email address {{request.user.email}} is not verified.</p>
+                <a href="{% url 'account_resend_confirmation' %}" class="btn btn-primary btn-sm">Resend Confirmation Email</a>
+                <a href="{% url 'account_settings' %}" class="btn btn-primary btn-sm">Change Email Address</a>
+            </div>
+        {% endif %}
+    </div>
+    <div class="css-transparent-overlay-dark" style="padding-top: 5px; padding-left: 10px; padding-bottom: 10px;">
+        {% with latest_blog_post as post %}
+        <h4 class="css-blog-header" style="margin-bottom: 0px;">
+            <a href="{%url 'pinax_blog:blog' %}">
+                Site News
+            </a>
+            <small>
+                {{ post.published|date:"jS F Y" }}
+            </small>
+            : <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+        </h4>
+        {% endwith %}
+    </div>
+ </div>
+</div>
+<div class="container">
+    <div id="" class="row">
+        <div class="col-xs-12 col-md-4" style="margin-top: 0px;">
+            <div class="panel-group" id="accordion1">
+
+
+                <div class="panel panel-default css-start-play-section" style="margin-top: 10px;">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse-play-3" class="css-accordion-header-button {% if not expand_contracts %}collapsed{%endif%}">
+                        <div class="">
+                            <div class="panel-heading css-accordion-header" >
+                                <h2 style="text-align: center;">
+                                    Contracts
+                                </h2>
+                            </div>
+                        </div>
+                    </a>
+                    <div id="collapse-play-3" class="panel-collapse  collapse
+                                {% if expand_contracts %} in {% endif %}
+">
+                        <div class="css-accordion-body">
+                            <ul class="nav nav-pills nav-justified">
+                                <li>
+                                    <a href="{% url 'games:games_enter_game' %}" class="btn btn-primary">
+                                        Enter Contract
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'games:games_looking_for_game' %}" class="btn btn-default">
+                                        LFG
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="btn btn-default" href="{% url 'games:games_view_scenario_gallery' %}">
+                                        Scenarios
+                                    </a>
+                                </li>
+                            </ul>
+
+                            <div class="row css-home-row">
+                                {% if active_games or attendance_invites_to_confirm or upcoming_games_running or upcoming_games_invited %}
+                                <br>
+                                {% endif %}
+                                <div class="col-md-10 col-md-offset-1">
+                                    {% if active_games %}
+                                    <div class="alert alert-warning text-center css-home-alert">
+                                        <h4>Ongoing Contract!</h4>
+                                        <ul class="nav nav-pills nav-stacked">
+                                            {% for game in active_games %}
+                                            <li>
+                                                <a href="{% url 'games:games_view_game' game.id %}"><b>{{game.title}}</b> at {{game.scheduled_start_time}}</a>
+                                            </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                    {% endif %}
+                                    {% if attendance_invites_to_confirm %}
+                                    <div class="alert alert-warning text-center css-home-alert">
+                                        <b>A GM has declared that you attended a Contract</b>
+                                        <p>
+                                            Confirm or deny your attendance
+                                        </p>
+                                        <ul class="nav nav-pills nav-stacked">
+                                            {% for invite in attendance_invites_to_confirm %}
+                                            <li>
+                                                <a href="{% url 'games:games_confirm_attendance' invite.attendance.id %}">
+                                                    <b>{{invite.attendance.relevant_game.title}}</b> at {{invite.attendance.relevant_game.scheduled_start_time}}
+                                                </a>
+                                            </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                    {% endif %}
+                                    {% if upcoming_games_running %}
+                                    <div class="alert alert-info text-center css-home-alert">
+                                        <b>Upcoming Contracts you're running</b>
+                                        <ul class="nav nav-pills nav-stacked">
+                                            {% for game in upcoming_games_running %}
+                                            <li>
+                                                <a href="{% url 'games:games_view_game' game.id %}"><b>{{game.title}}</b> at {{game.scheduled_start_time}}</a>
+                                            </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                    {% endif %}
+                                    {% if upcoming_games_invited %}
+                                    <div class="alert alert-success text-center css-home-alert">
+                                        <b>Upcoming Contracts you can attend</b>
+                                        <ul class="nav nav-pills nav-stacked">
+                                            {% for game_invite in upcoming_games_invited %}
+                                            <li>
+                                                <a href="{% url 'games:games_view_game' game_invite.relevant_game.id %}">
+                                                    {% if game_invite.attendance %}
+                                                    <b>Attending - </b>
+                                                    {% else %}
+                                                    <b>Awaiting RSVP - </b>
+                                                    {% endif %}
+                                                    <b>
+                                                        {{game_invite.relevant_game.title}}
+                                                    </b> at {{game_invite.relevant_game.scheduled_start_time}}
+                                                </a>
+                                            </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="panel panel-default css-start-play-section" style="margin-top: 10px;">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse-play-2" class="css-accordion-header-button {% if not expand_playgroups %} collapsed {% endif %}">
+                        <div class="">
+                            <div class="panel-heading css-accordion-header" >
+                                <h2 style="text-align: center;">
+                                    Playgroups
+                                </h2>
+                            </div>
+                        </div>
+                    </a>
+                    <div id="collapse-play-2" class="panel-collapse collapse {% if expand_playgroups %} in {% endif %}">
+                        <div class="css-accordion-body">
+
+                            <ul class="nav nav-pills nav-justified">
+                                <li>
+                                    <a href="{% url 'cells:cells_create' %}" class="btn btn-primary">
+                                        Create Playgroup
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'cells:cells_find_world' %}" class="btn btn-default">
+                                        Find Playgroup
+                                    </a>
+                                </li>
+                            </ul>
+                            <div class="row css-home-row">
+                                <div class="col-md-10 col-md-offset-1">
+                                    {% if not cell_invites and not cells %}
+                                    <div class="alert alert-warning text-center">
+                                        <h3>You aren't a member of any Playgroups</h3>
+                                        <p>
+                                            <a href="{% url 'cells:cells_find_world' %}" >
+                                                Find a Playgroup,
+                                            </a>
+                                            ask your friends to invite you to theirs or
+                                        </p>
+                                        <br>
+                                        <a href="{% url 'cells:cells_create' %}" class="btn btn-info btn-lg">Start your own</a>
+                                    </div>
+                                    {% endif %}
+                                    {% if cell_invites %}
+                                    <div class="alert alert-success text-center css-home-alert">
+                                        <h4>
+                                            <p>
+                                                You've been invited!
+                                            </p>
+                                            {% for invite in cell_invites %}
+                                            <p>
+                                                <a href="{% url 'cells:cells_view_cell' invite.relevant_cell.id %}">
+                                                    {{ invite.relevant_cell }}
+                                                </a>
+                                            </p>
+                                            {% endfor %}
+                                        </h4>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% if cells %}
+                            <div class="">
+                                {% for cell in cells %}
+                                <div class="">
+                                    <a href="{% url 'cells:cells_view_cell' cell.id %}">
+                                        <div class="">
+                                            <b class="visible-xs-block">{{cell.name}}</b>
+                                            <h4 class="hidden-xs">
+                                                {{cell.name}}
+                                                <div>
+                                                    <small>A world {{cell.setting_sheet_blurb}}.</small>
+                                                </div>
+                                            </h4>
+                                        </div>
+                                    </a>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel panel-default css-start-play-section" style="margin-top: 10px;">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse-play-4" class="css-accordion-header-button {% if not expand_gifts %}collapsed{%endif%}">
+                        <div class="">
+                            <div class="panel-heading css-accordion-header" >
+                                <h2 style="text-align: center;">
+                                    Gifts
+                                </h2>
+                            </div>
+                        </div>
+                    </a>
+                    <div id="collapse-play-4" class="panel-collapse  collapse {% if expand_gifts %}in{%endif%}">
+                        <div class="css-accordion-body">
+                            <ul class="nav nav-pills nav-justified">
+                                <li>
+                                    <a href="{% url 'powers:powers_create_ps2' %}" class="btn btn-primary">
+                                        Create Gift
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'powers:powers_stock' %}" class="btn btn-default">
+                                        Stock Gifts
+                                    </a>
+                                </li>
+                            </ul>
+                            <div>
+                                {% if powers %}
+                                    <div class="row css-home-row" style="margin-top: 5px; margin-bottom: 5px;">
+                                            <h4 class="text-center">Unassigned Gifts</h4>
+                                    </div>
+                                    <div class="row css-home-row">
+                                        {% for power_full in powers %}
+                                        {% if not power_full.character %}
+                                        <a href="{% url 'powers:powers_view_power_full' power_full.id %}">
+                                            <div >
+                                                {% power_heading power_full.latest_rev %}
+                                            </div>
+                                        </a>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                  <h4 class="text-center">You have not yet created any Gifts.</h4>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel panel-default css-start-play-section" style="margin-top: 20px; margin-bottom: 5px;">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse-play-1" class="css-accordion-header-button {% if not expand_contractors %}collapsed{%endif%}">
+                        <div class="">
+                            <div class="panel-heading css-accordion-header" >
+                                <h2 style="text-align: center;">
+                                    Contractors
+                                </h2>
+                            </div>
+                        </div>
+                    </a>
+                    <div id="collapse-play-1" class="panel-collapse collapse {% if expand_contractors%}in{%endif%}">
+                        <div class="css-accordion-body ">
+
+                            <ul class="nav nav-pills nav-justified">
+                                <li>
+                                    <a href="{% url 'characters:characters_create' %}" class="btn btn-primary">
+                                        Create Contractor
+                                        {% if avail_charon_coins %}
+                                        <small class="text-center">
+                                            Charon Coin{{avail_charon_coins|pluralize}}: <b>{{avail_charon_coins | length}}</b>
+                                        </small>
+                                        {% endif %}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'characters:characters_graveyard' %}" class="btn btn-default">Graveyard</a>
+                                </li>
+                            </ul>
+                            {% if not living_characters and not dead_characters %}
+                            <div >
+                                <div class="alert alert-warning text-center css-contractor-alert" style="margin-top:10px;">
+                                    <h3>Who are you?</h3>
+                                    <p>You haven't made any Contractors yet.</p>
+                                    <div>
+                                        <a href="{% url 'characters:characters_create' %}" class="btn btn-primary btn-lg">Time to change that</a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            {% if avail_exp_rewards or avail_improvements %}
+                            <div class="alert alert-success text-center css-home-alert css-contractor-alert" style="margin-top:10px;">
+                                <h4>
+                                    Allocate Rewards to your Contractors
+                                </h4>
+                                {% if avail_exp_rewards %}
+                                <a href="{% url 'characters:characters_allocate_gm_exp' %}" class="btn btn-primary">
+                                    Grant {{avail_exp_rewards|length}} Exp Reward{{avail_exp_rewards|pluralize}}
+                                </a>
+                                {% endif %}
+                                {% if avail_improvements %}
+                                <a href="{% url 'games:games_allocate_improvement_generic' %}" class="btn btn-primary">
+                                    Grant {{avail_improvements|length}} Improvement{{avail_improvements|pluralize}}
+                                </a>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            <div>
+
+                                {% if living_characters or dead_characters%}
+                                {% if living_characters %}
+                                <div class="">
+                                    {% for character in living_characters %}
+                                    {% include "new_homepage_contractor_badge_snip.html" %}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                {% if dead_characters %}
+                                <a class="wiki-entry-collapsible">
+                                    <div class=" css-transparent-overlay">
+                                        <h4 style="padding: 10px;">View Deceased Contractors</h4>
+                                    </div>
+                                </a>
+                                <div class="collapse-content clearfix" style="display:none;">
+                                    {% for character in dead_characters %}
+                                    {% include "new_homepage_contractor_badge_snip.html" %}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-8" style="margin-top: 15px;">
+            {% for notif in timeline_notifications %}
+                <div>
+                    {% render_timeline_notif notif %}
+                </div>
+            {% endfor %}
+            {% if timeline_notifications|length < 15 %}
+                <div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading" style="display: flex;">
+                            <div style="margin-right: 10px; width: 25px; height: 100%; padding-top: 5px; ">
+                                <img src="{% static 'overrides/notif_icons/falling-star.svg' %}" width=25 height="25">
+                            </div>
+                            <h3 style="margin-top: 5px; margin-bottom: 0px;">Welcome to The Contract!</h3>
+                        </div>
+                        <div class="panel-body" >
+                            <h4>This is your news feed.</h4>
+                            <p>
+                                After you
+                                <a href="{% url 'cells:cells_create' %}" class="">
+                                    create
+                                </a>
+                                or
+                                <a href="{% url 'cells:cells_find_world' %}" class="">
+                                    join
+                                </a>
+                                a Playgroup, this feed will start to fill with your Playgroups' activity, including
+                                upcoming Contracts, World Events that impact the setting, new Journals written by your fellow Contractors, and more.
+                            </p>
+                            <p>
+                                The news feed helps you stay up-to-date, no matter how many Players are in your Playgroup, how many Contracts you miss,
+                                or how many Playgroups you're in.
+                            </p>
+                            <h4>
+                                Navigate using the collapsible sections on the left.
+                            </h4>
+                            <p>
+                                These nav sections provide easy access to most of the website's features as well as your Playgroups,
+                                Contractors, and any Gifts you may have created but not assigned to any Contractors.
+                            </p>
+                            <p>
+                                Also be sure to check out the "Guide" and "Quick Nav" dropdowns at the top of every page.
+                            </p>
+                            <p>
+                                You can return to this page at any time by visiting
+                                <a href="https://www.thecontractrpg.com">
+                                    TheContractRPG.com
+                                </a>
+                                or
+                                by hitting the d10 "home" button in the upper left corner of each page.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    {% render_fake_ad request.user %}
+<section>
+        <hr>
+        <h1 class="text-center">{% blocktrans %}Community{% endblocktrans %}</h1>
+        <p class="lead text-center">
+            <div class="text-center">
+                <a class="btn btn-default btn-lg" href="https://discord.gg/xUZZegYNNy">
+                    <div>
+                        <img class="float-left" src="{% static 'overrides/other_graphics/Discord-Logo-Color.svg' %}" style="width: 30px; height: 30px; position: absolute;">
+                        <span style="padding-left: 35px;"> Join Our Discord Server</span>
+                    </div>
+                </a>
+                <br class="visible-xs-block ">
+                <br class="visible-xs-block ">
+                <a href="{% url 'journals:community_journals' %}" class="btn btn-default btn-lg">
+                    Recent Journals
+                </a>
+                <br class="visible-xs-block ">
+                <br class="visible-xs-block ">
+                <a href="{% url 'info:leaderboard' %}" class="btn btn-default btn-lg">
+                    Hall of Fame
+                </a>
+            </div>
+        </p>
+        <div class="feature-columns">
+            <div>
+                <h3>New Players</h3>
+                 {% if new_players %}
+                    <ul class="nav nav-pills nav-stacked">
+                        {% for player in new_players %}
+                            <li><a href="{% url 'profiles:profiles_view_profile' player.id %}">{{ player.username }}</a></li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            <div>
+                <h3>New Contractors</h3>
+                 {% if new_characters %}
+                    <ul class="nav nav-pills nav-stacked">
+                        {% for character in new_characters %}
+                            <li><a href="{% url 'characters:characters_view' character.id %}">{{ character.name }}</a></li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            <div>
+                <h3>New Gifts</h3>
+                 {% if new_powers %}
+                    <ul class="nav nav-pills nav-stacked">
+                        {% for power in new_powers %}
+                            <li><a href="{% url 'powers:powers_view_power_full' power.id %}">({{power.base.name}}) - {{ power.name }}</a></li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+</section>
+<section>
+    <div class="text-center">
+        <a class="btn btn-default btn-lg" href="https://forms.gle/JjpWcz8QpfurrK8A7">Send Feedback or Report a Bug</a>
+        <br class="visible-xs-block ">
+        <br class="visible-xs-block ">
+        <a class="btn btn-default btn-lg" href="https://www.patreon.com/ContractRpg">
+            <div>
+                <img class="float-left" src="/static/overrides/other_graphics/Digital-Patreon-Logo_FieryCoral.png" style="width: 30px; height: 30px; position: absolute;">
+                <span style="padding-left: 35px;"> Support us on Patreon</span>
+            </div>
+        </a>
+    </div>
+</section>
+</div>
+{% endblock %}
