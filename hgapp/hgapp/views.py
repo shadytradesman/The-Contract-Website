@@ -31,6 +31,7 @@ from info.models import FrontPageInfo
 from cells.models import WorldEvent
 from profiles.forms import EmailSettingsForm
 from profiles.models import Profile
+from notifications.models import Notification
 from games.games_constants import get_completed_game_excludes_query
 
 
@@ -191,6 +192,8 @@ def home(request):
         attendance_invites_to_confirm = request.user.game_invite_set.filter(attendance__is_confirmed=False).exclude(is_declined=True).all()
         email = EmailAddress.objects.get_primary(request.user)
         email_verified = email and email.verified
+
+        timeline_notifications = Notification.get_timeline_notifications_for_player_queryset(request.user)
         context = {
             'living_characters': living_characters,
             'dead_characters': dead_characters,
@@ -211,7 +214,15 @@ def home(request):
             'avail_exp_rewards': avail_exp_rewards,
             'latest_blog_post': latest_blog_post,
             'email_verified': email_verified,
+            'timeline_notifications': timeline_notifications,
+            'expand_contractors': True,
+            'expand_playgroups': cells.count() < 5,
+            'expand_gifts': my_powers.count() < 3,
+            'expand_contracts': True,
         }
+        if hasattr(request.user, 'profile'):
+            if request.user.profile.early_access_user:
+                return render(request, 'new_logged_in_homepage.html', context)
         return render(request, 'logged_in_homepage.html', context)
 
 def csrf_failure(request, reason=""):

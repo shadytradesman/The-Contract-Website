@@ -1,0 +1,21 @@
+<div class="text-center">
+    <div class="lead" style="margin-bottom:5px;">
+        Died {{tombstone.death.date_of_death|date:"F d, Y"}}
+    </div>
+    {% if tombstone.death.cause_of_death %}
+    <div>
+        Cause of death: {{tombstone.death.cause_of_death}}
+    </div>
+    {% else %}
+    <div>
+        Died trying to
+        {{tombstone.death.relevant_character.ambition}}
+    </div>
+    {% endif %}
+    <br>
+</div>
+{% if tombstone.death.obituary %}
+<i>
+    {{tombstone.death.obituary|linebreaks}}
+</i>
+{% endif %}

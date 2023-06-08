@@ -1359,7 +1359,9 @@ class EnterMove(View):
                             headline="A Contractor made a Move",
                             content="In {}".format(self.cell.name),
                             url=reverse('games:view_move', args=(self.move.id,)),
-                            notif_type=WORLD_NOTIF)
+                            notif_type=WORLD_NOTIF,
+                            is_timeline=True,
+                            article=self.world_event)
             return HttpResponseRedirect(reverse('games:view_move', args=(self.move.id,)))
         raise ValueError("Invalid Move or event form")
 

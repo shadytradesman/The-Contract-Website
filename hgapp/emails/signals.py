@@ -16,6 +16,9 @@ logger = logging.getLogger("app." + __name__)
 
 from_email = settings.DEFAULT_FROM_EMAIL
 
+NOTIF_VAR_UPCOMING = "upcoming"
+NOTIF_VAR_FINISHED = "finished"
+
 @receiver(GameChangeStartTime)
 def notify_changed_start(**kwargs):
     game = kwargs["game"]
@@ -73,12 +76,15 @@ def notify_game_ended(**kwargs):
                                 notif_type=REWARD_NOTIF)
     # Notify other Players in playgroup
     for membership in game.cell.get_unbanned_members():
-        if membership.member_player != game.gm and membership.member_player not in players:
+        if membership.member_player:
             Notification.objects.create(user=membership.member_player,
                                         headline="Contract Completed in {}".format(game.cell.name),
                                         content=game.scenario.title,
                                         url=game_url,
-                                        notif_type=CONTRACT_NOTIF)
+                                        notif_type=CONTRACT_NOTIF,
+                                        is_timeline=True,
+                                        article=game,
+                                        variety=NOTIF_VAR_FINISHED)
 
 
 @receiver(NotifyGameInvitee)
@@ -91,7 +97,10 @@ def notify_game_invitee(sender, **kwargs):
                                 headline="A Harbinger Calls. . .",
                                 content="Upcoming Contract: " + invite.relevant_game.title,
                                 url=game_url,
-                                notif_type=CONTRACT_NOTIF)
+                                notif_type=CONTRACT_NOTIF,
+                                is_timeline=True,
+                                article=invite.relevant_game,
+                                variety=NOTIF_VAR_UPCOMING)
     if invite.invited_player.profile.contract_invitations:
         email = invite.invited_player.profile.get_confirmed_email()
         if email:

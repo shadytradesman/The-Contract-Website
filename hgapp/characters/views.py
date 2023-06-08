@@ -165,6 +165,17 @@ def edit_obituary(request, character_id, secret_key = None):
                     new_character_death.save()
                     character.is_dead = True
                     character.save()
+                    if character.number_of_victories() > 0 and character.cell:
+                        for membership in character.cell.get_unbanned_members():
+                            Notification.objects.create(
+                                user=membership.member_player,
+                                headline="{} died".format(character.name),
+                                content="{} victories, {} journals".format(character.number_of_victories(),
+                                                                           character.num_journals),
+                                url=reverse('characters:characters_view', args=(character.id,)),
+                                notif_type=CONTRACTOR_NOTIF,
+                                is_timeline=True,
+                                article=new_character_death)
             else:
                 return None
         url_args = (character.id,) if request.user.is_authenticated else (character.id, character.edit_secret_key,)

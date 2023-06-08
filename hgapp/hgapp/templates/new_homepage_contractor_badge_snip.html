@@ -1,0 +1,37 @@
+<div class="" style="display:flex; margin-top: 5px;">
+    {% if not character.is_dead %}
+    {% if character.num_unspent_rewards > 0 or character.unspent_experience > 2 %}
+    <a class="btn btn-success btn-xs" href="{% url 'characters:characters_spend_reward' character.id %}" style="height: 40px; margin-top: 2px;">
+        <i class="fa fa-plus-square fa-3x"></i>
+    </a>
+    {% endif %}
+    {% endif %}
+    <a href="{% url 'characters:characters_view' character.id %}" style="flex:1;">
+        <div >
+            <div>
+                <div class="visible-xs-block">
+                    <b>
+                        {{character.name}}
+                    </b>
+                    <small>The {{ character.concept_summary}} {% if character.paradigm %} {{ character.paradigm}} {% endif %}</small>
+                </div>
+                <h4 class="hidden-xs" style="display:inline-block; margin-bottom:0px; margin-top: 4px; margin-left: 5px;">
+                    {{character.name}}
+                    <div>
+                        <small>The {{ character.concept_summary}} {% if character.paradigm %} {{ character.paradigm}} {% endif %}</small>
+                    </div>
+                </h4>
+                <div style="padding-top: 5px;">
+                    {% if character.is_dead %}
+                        {% if character.needs_obit %}
+                        <a href="{%url 'characters:characters_obituary' character.id %}" class="btn btn-info btn-xs">
+                            Write Epitaph
+                        </a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+    </a>
+</div>

@@ -198,13 +198,15 @@ class PostWorldEvent(View):
                     webhooks = self.cell.webhook_cell.filter(send_for_events=True).all()
                     for webhook in webhooks:
                         webhook.post_for_event(self.world_event, request)
-                    for membership in self.cell.get_unbanned_members().exclude(member_player=self.request.user):
+                    for membership in self.cell.get_unbanned_members():
                         Notification.objects.create(
                             user=membership.member_player,
                             headline="New World Event",
                             content="In {}".format(self.cell.name),
                             url=self.world_event.get_permalink(request),
-                            notif_type=WORLD_NOTIF)
+                            notif_type=WORLD_NOTIF,
+                            is_timeline=True,
+                            article=self.world_event)
             return HttpResponseRedirect(reverse('cells:cells_view_cell', args=(self.cell.id,)))
         raise ValueError("Invalid edit setting form")
 

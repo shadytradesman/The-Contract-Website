@@ -4,6 +4,9 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 from django.templatetags.static import static
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+
 
 PLAYGROUP_NOTIF = "PLAYGROUP"
 CONTRACT_NOTIF = "CONTRACT"
@@ -40,15 +43,28 @@ class Notification(models.Model):
     url = models.CharField(max_length=3000)
     notif_type = models.CharField(choices=NOTIFICATION_TYPE, max_length=20)
 
+    is_timeline = models.BooleanField(default=False)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
+    object_id = models.CharField(max_length=2000, blank=True)
+    article = GenericForeignKey() # the world event, journal, etc. Must implement render_timeline_display()
+
+    # an optional string for differentiating between two sorts of notifications for the same object.
+    variety = models.CharField(max_length=2000, blank=True)
+
     class Meta:
         indexes = [
             models.Index(fields=['user', 'created_date']),
+            models.Index(fields=['user', 'is_timeline', 'created_date']),
         ]
 
     @staticmethod
     def set(player):
         time = PlayerLastReadTime.get_last_read_for_player(player)
         return Notification.objects.filter(user=player, created_date__gt=time).order_by('-created_date')
+
+    @staticmethod
+    def get_timeline_notifications_for_player_queryset(player, max=20):
+        return Notification.objects.filter(user=player, is_timeline=True).order_by('-created_date')[:max]
 
     @staticmethod
     def get_unread_notifications_for_player_queryset(player):

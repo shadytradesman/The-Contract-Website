@@ -1,0 +1,28 @@
+{% if not blank %}
+    <small class="text-muted">
+        {{notif.created_date|timesince}} ago
+    </small>
+    <div class="panel panel-default">
+        <div class="panel-heading" style="display: flex;">
+            <div style="margin-right: 10px; width: 25px; height: 100%; padding-top: 5px; ">
+                <img src="{{notif.get_icon}}" width=25 height="25">
+            </div>
+            <a href="{{notif.url}}" class="">
+                <strong>{{notif.headline}}</strong>
+                <div class="text-muted">
+                    {{notif.content}}
+                </div>
+            </a>
+        </div>
+        <div class="panel-body">
+            {% if header %}
+            <h3 style="margin-top: 5px;">
+                {{header}}
+            </h3>
+            {% endif %}
+            <div>
+                {{content}}
+            </div>
+        </div>
+    </div>
+{% endif %}

@@ -1,4 +1,6 @@
 import math
+from django.utils.safestring import mark_safe
+from django.template.loader import render_to_string
 
 import logging
 
@@ -886,13 +888,14 @@ class Character(models.Model):
         self.save()
         if self.number_of_victories() > 0 and self.cell:
             for membership in self.cell.get_unbanned_members():
-                if membership.member_player != self.player:
-                    Notification.objects.create(
-                        user=membership.member_player,
-                        headline="{} died".format(self.name),
-                        content="{} victories, {} journals".format(self.number_of_victories(), self.num_journals),
-                        url=reverse('characters:characters_view', args=(self.id,)),
-                        notif_type=CONTRACTOR_NOTIF)
+                Notification.objects.create(
+                    user=membership.member_player,
+                    headline="{} died".format(self.name),
+                    content="{} victories, {} journals".format(self.number_of_victories(), self.num_journals),
+                    url=reverse('characters:characters_view', args=(self.id,)),
+                    notif_type=CONTRACTOR_NOTIF,
+                    is_timeline=True,
+                    article=new_death)
 
     def source_name_values(self):
         values = []
@@ -2697,6 +2700,18 @@ class Character_Death(models.Model):
         char.is_dead = char.character_death_set.filter(is_void=False).exists()
         char.save()
 
+    def render_timeline_display(self, user, variety):
+        if self.is_void:
+            return None
+        context = {
+            "tombstone": {"death":self},
+        }
+        return render_to_string("characters/tombstone_content_snippet.html", context)
+
+    def render_timeline_header(self, user, variety):
+        if self.is_void:
+            return None
+        return mark_safe('<div class="text-center">{}</div>'.format(self.relevant_character.name))
 
 class Graveyard_Header(models.Model):
     header = models.TextField()
