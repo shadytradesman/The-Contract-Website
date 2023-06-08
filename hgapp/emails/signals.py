@@ -78,7 +78,9 @@ def notify_game_ended(**kwargs):
                                         headline="Contract Completed in {}".format(game.cell.name),
                                         content=game.scenario.title,
                                         url=game_url,
-                                        notif_type=CONTRACT_NOTIF)
+                                        notif_type=CONTRACT_NOTIF,
+                                        is_timeline=True,
+                                        article=game)
 
 
 @receiver(NotifyGameInvitee)

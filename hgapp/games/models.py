@@ -211,6 +211,13 @@ class Game(models.Model):
         return player.is_authenticated and (player.has_perm('edit_game', self) \
                                             or self.cell.player_can_manage_games(player))
 
+    def render_timeline_display(self, user):
+        return render_to_string("characters/tombstone_content_snippet.html", {"tombstone": {"death":self}})
+
+    def render_timeline_header(self, user):
+        return "{} victory".format(self.get_header_display())
+        mark_safe('<div class="text-center">{}</div>'.format(self.relevant_character.name))
+
     def invite_instructions(self):
         if self.invitation_mode == CLOSED:
             return "Edit the Game to open it for RSVPs."

@@ -63,7 +63,9 @@ class WriteJournal(View):
                             headline="New Journal of your Contract",
                             content="{} wrote about {}".format(self.character.name, scenario.title),
                             url=reverse('journals:journal_read_game', args=(self.character.id, self.game.id)),
-                            notif_type=JOURNAL_NOTIF)
+                            notif_type=JOURNAL_NOTIF,
+                            is_timeline=True,
+                            article=journal)
                         received_notif.add(gm)
                     if scenario.creator != gm and self.character.player_can_view(scenario.creator):
                         Notification.objects.create(
@@ -71,7 +73,9 @@ class WriteJournal(View):
                             headline="New Journal of your Scenario",
                             content="{} wrote about {}".format(self.character.name, scenario.title),
                             url=reverse('journals:journal_read_game', args=(self.character.id, self.game.id)),
-                            notif_type=JOURNAL_NOTIF)
+                            notif_type=JOURNAL_NOTIF,
+                            is_timeline=True,
+                            article=journal)
                         received_notif.add(scenario.creator)
                     for player in self.game_attendance.relevant_game.get_attended_players():
                         if player != request.user:
@@ -80,7 +84,9 @@ class WriteJournal(View):
                                 headline="New Journal for Contract",
                                 content="{} wrote about {}".format(self.character.name, scenario.title),
                                 url=reverse('journals:journal_read_game', args=(self.character.id, self.game.id)),
-                                notif_type=JOURNAL_NOTIF)
+                                notif_type=JOURNAL_NOTIF,
+                                is_timeline=True,
+                                article=journal)
                             received_notif.add(player)
                     if hasattr(self.character, "cell") and self.character.cell:
                         members = self.character.cell.get_unbanned_members()
@@ -92,9 +98,7 @@ class WriteJournal(View):
                                     headline="New Journal for Contract",
                                     content="{} wrote about {}".format(self.character.name, scenario.title),
                                     url=reverse('journals:journal_read_game', args=(self.character.id, self.game.id)),
-                                    notif_type=JOURNAL_NOTIF,
-                                    is_timeline=True,
-                                    article=journal)
+                                    notif_type=JOURNAL_NOTIF)
                 if self.is_downtime and hasattr(self.character, "cell") and self.character.cell:
                     members = self.character.cell.get_unbanned_members()
                     for player_membership in members:
@@ -105,9 +109,7 @@ class WriteJournal(View):
                                 headline="New Downtime Journal",
                                 content="{} wrote about the downtime following {}".format(self.character.name, scenario.title),
                                 url=reverse('journals:journal_read_game', args=(self.character.id, self.game.id)),
-                                notif_type=JOURNAL_NOTIF,
-                                is_timeline=True,
-                                article=journal)
+                                notif_type=JOURNAL_NOTIF)
             return HttpResponseRedirect(reverse('journals:journal_read_game', args=(self.character.id, self.game.id)))
         raise ValueError("Invalid journal form")
 

@@ -90,7 +90,7 @@
                                 </li>
                             </ul>
 
-                            <div class="row css-home-row">
+                            <div class="row css-home-row css-nav-section-content">
                                 {% if active_games or attendance_invites_to_confirm or upcoming_games_running or upcoming_games_invited %}
                                 <br>
                                 {% endif %}
@@ -190,59 +190,61 @@
                                     </a>
                                 </li>
                             </ul>
-                            <div class="row css-home-row">
-                                <div class="col-md-10 col-md-offset-1">
-                                    {% if not cell_invites and not cells %}
-                                    <div class="alert alert-warning text-center">
-                                        <h3>You aren't a member of any Playgroups</h3>
-                                        <p>
-                                            <a href="{% url 'cells:cells_find_world' %}" >
-                                                Find a Playgroup,
-                                            </a>
-                                            ask your friends to invite you to theirs or
-                                        </p>
-                                        <br>
-                                        <a href="{% url 'cells:cells_create' %}" class="btn btn-info btn-lg">Start your own</a>
-                                    </div>
-                                    {% endif %}
-                                    {% if cell_invites %}
-                                    <div class="alert alert-success text-center css-home-alert">
-                                        <h4>
+                            <div  class="css-nav-section-content" >
+
+                                <div class="row css-home-row">
+                                    <div class="col-md-10 col-md-offset-1">
+                                        {% if not cell_invites and not cells %}
+                                        <div class="alert alert-warning text-center">
+                                            <h3>You aren't a member of any Playgroups</h3>
                                             <p>
-                                                You've been invited!
-                                            </p>
-                                            {% for invite in cell_invites %}
-                                            <p>
-                                                <a href="{% url 'cells:cells_view_cell' invite.relevant_cell.id %}">
-                                                    {{ invite.relevant_cell }}
+                                                <a href="{% url 'cells:cells_find_world' %}" >
+                                                    Find a Playgroup,
                                                 </a>
+                                                ask your friends to invite you to theirs or
                                             </p>
-                                            {% endfor %}
-                                        </h4>
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            {% if cells %}
-                            <div class="">
-                                {% for cell in cells %}
-                                <div class="">
-                                    <a href="{% url 'cells:cells_view_cell' cell.id %}">
-                                        <div class="">
-                                            <b class="visible-xs-block">{{cell.name}}</b>
-                                            <h4 class="hidden-xs">
-                                                {{cell.name}}
-                                                <div>
-                                                    <small>A world {{cell.setting_sheet_blurb}}.</small>
-                                                </div>
+                                            <br>
+                                            <a href="{% url 'cells:cells_create' %}" class="btn btn-info btn-lg">Start your own</a>
+                                        </div>
+                                        {% endif %}
+                                        {% if cell_invites %}
+                                        <div class="alert alert-success text-center css-home-alert">
+                                            <h4>
+                                                <p>
+                                                    You've been invited!
+                                                </p>
+                                                {% for invite in cell_invites %}
+                                                <p>
+                                                    <a href="{% url 'cells:cells_view_cell' invite.relevant_cell.id %}">
+                                                        {{ invite.relevant_cell }}
+                                                    </a>
+                                                </p>
+                                                {% endfor %}
                                             </h4>
                                         </div>
-                                    </a>
+                                        {% endif %}
+                                    </div>
                                 </div>
-                                {% endfor %}
+                                {% if cells %}
+                                <div class="">
+                                    {% for cell in cells %}
+                                    <div class="">
+                                        <a href="{% url 'cells:cells_view_cell' cell.id %}">
+                                            <div class="">
+                                                <b class="visible-xs-block">{{cell.name}}</b>
+                                                <h4 class="hidden-xs">
+                                                    {{cell.name}}
+                                                    <div>
+                                                        <small>A world {{cell.setting_sheet_blurb}}.</small>
+                                                    </div>
+                                                </h4>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
                             </div>
-                            {% endif %}
-
                         </div>
                     </div>
                 </div>
@@ -323,57 +325,60 @@
                                     <a href="{% url 'characters:characters_graveyard' %}" class="btn btn-default">Graveyard</a>
                                 </li>
                             </ul>
-                            {% if not living_characters and not dead_characters %}
-                            <div >
-                                <div class="alert alert-warning text-center css-contractor-alert" style="margin-top:10px;">
-                                    <h3>Who are you?</h3>
-                                    <p>You haven't made any Contractors yet.</p>
-                                    <div>
-                                        <a href="{% url 'characters:characters_create' %}" class="btn btn-primary btn-lg">Time to change that</a>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endif %}
-                            {% if avail_exp_rewards or avail_improvements %}
-                            <div class="alert alert-success text-center css-home-alert css-contractor-alert" style="margin-top:10px;">
-                                <h4>
-                                    Allocate Rewards to your Contractors
-                                </h4>
-                                {% if avail_exp_rewards %}
-                                <a href="{% url 'characters:characters_allocate_gm_exp' %}" class="btn btn-primary">
-                                    Grant {{avail_exp_rewards|length}} Exp Reward{{avail_exp_rewards|pluralize}}
-                                </a>
-                                {% endif %}
-                                {% if avail_improvements %}
-                                <a href="{% url 'games:games_allocate_improvement_generic' %}" class="btn btn-primary">
-                                    Grant {{avail_improvements|length}} Improvement{{avail_improvements|pluralize}}
-                                </a>
-                                {% endif %}
-                            </div>
-                            {% endif %}
-                            <div>
+                            <div class="css-nav-section-content">
 
-                                {% if living_characters or dead_characters%}
-                                {% if living_characters %}
-                                <div class="">
-                                    {% for character in living_characters %}
-                                    {% include "new_homepage_contractor_badge_snip.html" %}
-                                    {% endfor %}
-                                </div>
-                                {% endif %}
-                                {% if dead_characters %}
-                                <a class="wiki-entry-collapsible">
-                                    <div class=" css-transparent-overlay">
-                                        <h4 style="padding: 10px;">View Deceased Contractors</h4>
+                                {% if not living_characters and not dead_characters %}
+                                <div>
+                                    <div class="alert alert-warning text-center css-contractor-alert" style="margin-top:10px;">
+                                        <h3>Who are you?</h3>
+                                        <p>You haven't made any Contractors yet.</p>
+                                        <div>
+                                            <a href="{% url 'characters:characters_create' %}" class="btn btn-primary btn-lg">Time to change that</a>
+                                        </div>
                                     </div>
-                                </a>
-                                <div class="collapse-content clearfix" style="display:none;">
-                                    {% for character in dead_characters %}
-                                    {% include "new_homepage_contractor_badge_snip.html" %}
-                                    {% endfor %}
                                 </div>
                                 {% endif %}
+                                {% if avail_exp_rewards or avail_improvements %}
+                                <div class="alert alert-success text-center css-home-alert css-contractor-alert" style="margin-top:10px;">
+                                    <h4>
+                                        Allocate Rewards to your Contractors
+                                    </h4>
+                                    {% if avail_exp_rewards %}
+                                    <a href="{% url 'characters:characters_allocate_gm_exp' %}" class="btn btn-primary">
+                                        Grant {{avail_exp_rewards|length}} Exp Reward{{avail_exp_rewards|pluralize}}
+                                    </a>
+                                    {% endif %}
+                                    {% if avail_improvements %}
+                                    <a href="{% url 'games:games_allocate_improvement_generic' %}" class="btn btn-primary">
+                                        Grant {{avail_improvements|length}} Improvement{{avail_improvements|pluralize}}
+                                    </a>
+                                    {% endif %}
+                                </div>
                                 {% endif %}
+                                <div>
+
+                                    {% if living_characters or dead_characters%}
+                                    {% if living_characters %}
+                                    <div class="">
+                                        {% for character in living_characters %}
+                                        {% include "new_homepage_contractor_badge_snip.html" %}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                    {% if dead_characters %}
+                                    <a class="wiki-entry-collapsible">
+                                        <div class=" css-transparent-overlay">
+                                            <h4 style="padding: 10px;">View Deceased Contractors</h4>
+                                        </div>
+                                    </a>
+                                    <div class="collapse-content clearfix" style="display:none;">
+                                        {% for character in dead_characters %}
+                                            {% include "new_homepage_contractor_badge_snip.html" %}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -386,6 +391,9 @@
                 <div>
                     {% render_timeline_notif notif %}
                 </div>
+                {% if forloop.counter|divisibleby:6 %}
+                    {% render_fake_ad request.user %}
+                {% endif %}
             {% endfor %}
             {% if timeline_notifications|length < 15 %}
                 <div>
@@ -436,9 +444,11 @@
                     </div>
                 </div>
             {% endif %}
+            {% if timeline_notifications|length < 5 %}
+                {% render_fake_ad request.user %}
+            {% endif %}
         </div>
     </div>
-    {% render_fake_ad request.user %}
 <section>
         <hr>
         <h1 class="text-center">{% blocktrans %}Community{% endblocktrans %}</h1>

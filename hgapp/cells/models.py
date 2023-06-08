@@ -1,4 +1,6 @@
 from django.conf import settings
+from django.utils.safestring import mark_safe
+from django.template.loader import render_to_string
 from django.utils import timezone
 from django.contrib.auth.models import Group
 from django.db import models
@@ -331,6 +333,12 @@ class WorldEvent(models.Model):
 
     def get_permalink(self, request):
         return "{}#event-{}".format(request.build_absolute_uri(reverse('cells:cells_view_cell', args=(self.parent_cell.id,))), self.id)
+
+    def render_timeline_display(self, user):
+        return mark_safe(self.event_description)
+
+    def render_timeline_header(self, user):
+        return self.headline
 
 
 class WebHook(models.Model):

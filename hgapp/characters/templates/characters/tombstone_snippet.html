@@ -37,37 +37,7 @@
     </a>
     <div id="collapse{{tombstone.death.id}}" class="panel-collapse collapse">
         <div class="panel-body">
-            <div class="text-center">
-                <div class="lead" style="margin-bottom:5px;">
-                    Died {{tombstone.death.date_of_death|date:"F d, Y"}}
-                </div>
-                {% if tombstone.death.cause_of_death %}
-                    <div>
-                        Cause of death: {{tombstone.death.cause_of_death}}
-                    </div>
-                {% else %}
-                    <div>
-                        Died trying to
-                        {{tombstone.death.relevant_character.ambition}}
-                    </div>
-                {% endif %}
-                <br>
-            </div>
-            {% if tombstone.death.obituary %}
-                {{tombstone.death.obituary|linebreaks}}
-            {% endif %}
-            <hr>
-            <small>
-                <a href="{% url 'characters:characters_view' tombstone.death.relevant_character.id %}">
-                    View Sheet
-                </a>
-                {% if tombstone.num_journals %}
-                -
-                <a href="{% url 'journals:journal_read' tombstone.death.relevant_character.id %}">
-                    Read {{tombstone.death.relevant_character.name}}'s Journal ({{tombstone.num_journals}} pages)
-                </a>
-                {% endif %}
-            </small>
+            {% include 'characters/tombstone_content_snippet.html' %}
         </div>
     </div>
 </div>
