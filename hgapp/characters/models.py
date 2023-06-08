@@ -2700,10 +2700,17 @@ class Character_Death(models.Model):
         char.is_dead = char.character_death_set.filter(is_void=False).exists()
         char.save()
 
-    def render_timeline_display(self, user):
-        return render_to_string("characters/tombstone_content_snippet.html", {"tombstone": {"death":self}})
+    def render_timeline_display(self, user, variety):
+        if self.is_void:
+            return None
+        context = {
+            "tombstone": {"death":self},
+        }
+        return render_to_string("characters/tombstone_content_snippet.html", context)
 
-    def render_timeline_header(self, user):
+    def render_timeline_header(self, user, variety):
+        if self.is_void:
+            return None
         return mark_safe('<div class="text-center">{}</div>'.format(self.relevant_character.name))
 
 class Graveyard_Header(models.Model):

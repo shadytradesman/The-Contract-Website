@@ -14,11 +14,13 @@
                 </div>
             </a>
         </div>
-        <div class="panel-body expandable-outer js-expandable-collapsed" role="button">
+        <div class="panel-body">
+            {% if header %}
             <h3 style="margin-top: 5px;">
                 {{header}}
             </h3>
-            <div class="" role="button">
+            {% endif %}
+            <div>
                 {{content}}
             </div>
         </div>

@@ -20,8 +20,8 @@ def render_notification(notif, is_unread):
 @register.inclusion_tag('tags/notif_timeline_item.html', takes_context=True)
 def render_timeline_notif(context, notif):
     request = context["request"] if "request" in context else None
-    header = notif.article.render_timeline_header(request.user)
-    content = notif.article.render_timeline_display(request.user)
+    header = notif.article.render_timeline_header(request.user, notif.variety)
+    content = notif.article.render_timeline_display(request.user, notif.variety)
     if content is not None:
         return {
             "notif": notif,

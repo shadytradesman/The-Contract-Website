@@ -124,17 +124,18 @@ class Journal(models.Model):
                 url=reverse("characters:characters_spend_reward", args=[character.id]),
                 notif_type=REWARD_NOTIF)
 
-    def render_timeline_display(self, user):
+    def render_timeline_display(self, user, variety):
         if self.player_can_view(user):
             return render_to_string("journals/journal_timeline_snippet.html", {"journal": self})
         else:
             return None
 
-    def render_timeline_header(self, user):
+    def render_timeline_header(self, user, variety):
         if self.player_can_view(user):
             return self.title
         else:
             return None
+
     @staticmethod
     def get_num_journals_until_improvement(character):
         num_valid = Journal.objects.filter(game_attendance__attending_character=character.id,

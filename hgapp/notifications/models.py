@@ -48,6 +48,9 @@ class Notification(models.Model):
     object_id = models.CharField(max_length=2000, blank=True)
     article = GenericForeignKey() # the world event, journal, etc. Must implement render_timeline_display()
 
+    # an optional string for differentiating between two sorts of notifications for the same object.
+    variety = models.CharField(max_length=2000, blank=True)
+
     class Meta:
         indexes = [
             models.Index(fields=['user', 'created_date']),

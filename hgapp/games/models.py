@@ -10,9 +10,11 @@ from characters.models import Character, HIGH_ROLLER_STATUS, Character_Death, Ex
     EXP_LOSS_V2, EXP_WIN_V2, EXP_LOSS_RINGER_V2, EXP_WIN_RINGER_V2, EXP_LOSS_IN_WORLD_V2, EXP_WIN_IN_WORLD_V2, EXP_MVP,\
     EXP_WIN_V1, EXP_LOSS_V1, Artifact, EXP_GM_MOVE, EXP_GM_RATIO, EXP_GM_NEW_PLAYER, StockWorldElement, ELEMENT_TYPE, \
     CONDITION, CIRCUMSTANCE, TROPHY, LOOSE_END, STATUS_ANY
+from django.template.loader import render_to_string
 from powers.models import Power, Power_Full
 from cells.models import Cell, WorldEvent
 from django.utils import timezone
+from django.utils.safestring import mark_safe
 from bs4 import BeautifulSoup
 from .games_constants import EXP_V1_V2_GAME_ID
 from guardian.shortcuts import assign_perm
@@ -99,6 +101,9 @@ WRITEUP_SECTION = (
     (AFTERMATH, "Aftermath"),
 )
 
+
+NOTIF_VAR_UPCOMING = "upcoming"
+NOTIF_VAR_FINISHED = "finished"
 def migrate_add_gms(apps, schema_editor):
     Game = apps.get_model('games', 'Game')
     for game in Game.objects.all().iterator():
@@ -211,12 +216,26 @@ class Game(models.Model):
         return player.is_authenticated and (player.has_perm('edit_game', self) \
                                             or self.cell.player_can_manage_games(player))
 
-    def render_timeline_display(self, user):
-        return render_to_string("characters/tombstone_content_snippet.html", {"tombstone": {"death":self}})
+    def render_timeline_display(self, user, variety):
+        if variety == NOTIF_VAR_UPCOMING:
+            return render_to_string("games/timeline/timeline_upcoming_game.html", {
+                "game": self,
+                "user": user,
+                "my_invitation": get_object_or_none(user.game_invite_set.filter(relevant_game=self.pk))})
+        if variety == NOTIF_VAR_FINISHED:
+            return render_to_string("games/timeline/timeline_completed_game.html", {"game": self})
+        raise ValueError("invalid variety of game timeline: " + variety)
 
-    def render_timeline_header(self, user):
-        return "{} victory".format(self.get_header_display())
-        mark_safe('<div class="text-center">{}</div>'.format(self.relevant_character.name))
+
+    def render_timeline_header(self, user, variety):
+        if variety == NOTIF_VAR_UPCOMING:
+            if not self.is_scheduled():
+                return mark_safe("Invitations closed")
+            else:
+                return "You've been invited to join a Contract"
+        if variety == NOTIF_VAR_FINISHED:
+            return "{} ran {}".format(self.gm.username, self.scenario.title)
+        raise ValueError("invalid variety of game timeline: " + variety)
 
     def invite_instructions(self):
         if self.invitation_mode == CLOSED:
@@ -245,7 +264,8 @@ class Game(models.Model):
         if player.is_superuser:
             return None
         if hasattr(self, "max_rsvp") and self.max_rsvp and self.get_attended_players().count() >= self.max_rsvp:
-            return "This Contract is full."
+            if player not in self.get_attended_players():
+                return "This Contract is full."
         if self.invitation_mode == CLOSED or not self.is_scheduled():
             return "This Contract is closed for RSVPs."
         if self.is_nsfw and not player.profile.view_adult_content:

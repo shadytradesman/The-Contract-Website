@@ -1,0 +1,12 @@
+<div>
+    Victories: {{ game.number_victories }}
+</div>
+<div>
+    Losses: {{ game.number_losses }}
+</div>
+<div>
+    Deaths: {{ game.number_deaths }}
+</div>
+ <a href="{% url 'games:games_view_game' game.id%}" class="">
+     Click Here
+</a> for more details

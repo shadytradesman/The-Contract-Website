@@ -1,0 +1,92 @@
+{% load games_tags %}
+
+{% if game.is_scheduled %}
+<div>
+    <h4 style="margin-top: 15px;">
+        {{game.gm.username}} will run {{game.scenario.title}} in <a href="{% url 'cells:cells_view_cell' game.cell.id %}">{{game.cell.name}}</a>
+    </h4>
+
+    This Contract
+    {% if game.is_scheduled %}
+    will take place
+    {% elif game.is_active%}
+    is taking place
+    {% elif game.is_canceled%}
+    would have taken place
+    {% else %}
+    took place
+    {% endif %}
+    <b>
+    {% if game.is_scheduled %}
+    in {{ game.scheduled_start_time|timeuntil }}:
+    on {{ game.scheduled_start_time|date:'M d, Y' }} at {{ game.scheduled_start_time|date:'g:iA' }}
+    {% if request.user.account %}
+    {{request.user.account.timezone}}
+    {% endif %}
+    {% elif game.is_active%}
+    {% elif game.is_canceled%}
+    but was canceled and never occurred
+    {% else %}
+    on {{ game.end_time|date:'M d, Y' }} at {{ game.end_time|date:'g:iA' }}
+    {% if request.user.account %}
+    {{request.user.account.timezone}}
+    {% endif %}
+    {% endif %}
+    </b>
+    <div class="thumbnail" style="margin-top: 10px;">
+        {% if user.is_authenticated and my_invitation %}
+            {{ my_invitation.invite_text }}
+        {% else %}
+        {{ game.hook|linebreaks }}
+        {% endif %}
+    </div>
+    <div>
+        Bring your favorite
+        {% if not game.get_required_character_status_display == "Any" %}
+        <b>
+            {{game.get_required_character_status_display}}
+        </b>
+        Contractor
+        {% else %}
+        Contractor, regardless of Status.
+        {% endif %}
+        So far, <b>{{ game.get_attended_players.count }} Player{{game.get_attended_players.count|pluralize}}</b>
+        RSVPed that they will attend.
+        {% if game.max_rsvp %}
+        {{ game.gm.username}} has set a maximum of {{game.max_rsvp}} RSVPs.
+        {% endif %}
+    </div>
+    <div style="margin-top: 10px;">
+        <b>{{game.gm.username}}'s GM title: </b> {% render_gm_title game.gm %}
+        {% if game.mediums.all|length %}
+        <br>
+        <b>Medium:</b>
+        {% render_game_mediums game %}
+        {% endif %}
+    </div>
+    <div class="text-center">
+
+        <a href="{% url 'games:games_view_game' game.id%}" class="btn btn-lg btn-primary">
+            {% if my_invitation %}
+                {% if my_invitation.attendance %}
+                    View or Change Attendance
+                {% else %}
+                    View and RSVP
+                {% endif %}
+            {% else %}
+                View
+            {% endif %}
+        </a>
+    </div>
+</div>
+{% else %}
+<div>
+    <h4>
+        {{game.gm.username}}'s run of
+        <a href="{% url 'games:games_view_game' game.id%}" class="">
+            {{game.scenario.title}}
+        </a>
+        is {{game.get_status_display}}
+    </h4>
+</div>
+{% endif %}
