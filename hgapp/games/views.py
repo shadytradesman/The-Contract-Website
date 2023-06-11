@@ -1353,7 +1353,7 @@ class EnterMove(View):
                     webhooks = self.cell.webhook_cell.filter(send_for_events=True).all()
                     for webhook in webhooks:
                         webhook.post_for_event(self.world_event, request, self.move)
-                    for membership in self.cell.get_unbanned_members().exclude(member_player=self.request.user):
+                    for membership in self.cell.get_unbanned_members():
                         Notification.objects.create(
                             user=membership.member_player,
                             headline="A Contractor made a Move",

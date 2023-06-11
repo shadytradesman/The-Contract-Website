@@ -59,7 +59,7 @@
 .css-accordion-body {
     border-radius: 3px;
     border-radius-top: 0px;
-    border: 1px solid #a6763a;
+    border: 1px solid #454e5b;
     border-top: 0px solid transparent;
     -webkit-border-radius: 0 0 4px 4px;
      -moz-border-radius: 0 0 4px 4px;
@@ -79,7 +79,7 @@
 
 .css-accordion-header-button>div{
     border-radius: 3px;
-    border: 1px solid #a6763a;
+    border: 1px solid #454e5b;
     border-bottom: 0px solid transparent;
     -webkit-border-radius: 3px 3px 0px 0px;
      -moz-border-radius: 3px 3px 0px 0px;
