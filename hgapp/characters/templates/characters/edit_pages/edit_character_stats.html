@@ -189,24 +189,44 @@
                         </span>
                     </div>
                 </div>
-                {% if character.get_source_refill_cooldown %}
-            <div style="display: flex; margin-top: 10px; flex-wrap: wrap; justify-content: center;" class="text-center">
-                <div>
-                    <div class="css-essential-text" style="float:left;">You recover one point of Source whenever</div>
-                    <div id="css-refill-field" class="css-essential-field">
-                        {{form.refill_condition}}
-                        <figcaption class="help-block">
-                            Some unusual circumstance or event that empowers you. For example, killing someone,
-                            receiving an Injury Severity 2 or greater, howling at the full moon, or converting someone to your ideology.
-                        </figcaption>
+                {% if character.get_num_source_refill_conditions > 0 %}
+                    <div style="display: flex; margin-top: 10px; flex-wrap: wrap; justify-content: center;" class="text-center">
+                        <div>
+                            <div class="css-essential-text" style="float:left;">You recover one point of Source whenever</div>
+                            <div class="css-refill-field css-essential-field">
+                                {{form.refill_condition}}
+                                <figcaption class="help-block">
+                                    Some unusual circumstance or event that empowers you. For example, killing someone,
+                                    receiving an Injury Severity 2 or greater, howling at the full moon, or converting someone to your ideology.
+                                </figcaption>
+                            </div>
+                            {% if character.get_num_source_refill_conditions > 1 %}
+                            <div style="display:flex;">
+                                <div class="css-essential-text">
+                                    Or
+                                </div>
+                                <div class="css-refill-field css-essential-field" style="width:90%; margin-left: 10px;">
+                                    {{form.refill_condition_professional}}
+                                </div>
+                            </div>
+                            {% endif %}
+                            {% if character.get_num_source_refill_conditions > 2 %}
+                            <div style="display:flex;">
+                                <div class="css-essential-text">
+                                    Or
+                                </div>
+                                <div class="css-refill-field css-essential-field" style="width:90%; margin-left: 10px;">
+                                    {{form.refill_condition_veteran}}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <div class="css-essential-text" >
+                                 Cooldown: one {{character.get_source_refill_cooldown}}
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div>
-                    <div class="css-essential-text" >
-                         Cooldown: one {{character.get_source_refill_cooldown}}
-                    </div>
-                </div>
-            </div>
                 {% endif %}
             {% endfor %}
         </div>

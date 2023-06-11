@@ -568,12 +568,20 @@ class Character(models.Model):
             return None
         elif self.status == STATUS_NOVICE:
             return "day"
-        elif self.status == STATUS_SEASONED:
+        elif self.status in [STATUS_VETERAN, STATUS_SEASONED, STATUS_PROFESSIONAL]:
             return "hour"
-        elif self.status == STATUS_VETERAN:
-            return "minute"
         else:
             return None
+
+    def get_num_source_refill_conditions(self):
+        if self.status in [STATUS_NEWBIE]:
+            return 0
+        if self.status in [STATUS_NOVICE, STATUS_SEASONED]:
+            return 1
+        if self.status == STATUS_PROFESSIONAL:
+            return 2
+        if self.status == STATUS_VETERAN:
+            return 3
 
     def number_completed_games(self):
         return self.num_games if self.num_games else 0
@@ -901,14 +909,14 @@ class Character(models.Model):
         values = []
         for rev in self.stats_snapshot.sourcerevision_set.all():
             source = rev.relevant_source
-            values.append((source.name, (source.current_val, rev.max, rev.refill_condition, self.get_source_refill_cooldown())),)
+            values.append((source.name, (source.current_val, rev.max, self.get_source_refill_cooldown(), rev.refill_condition,  rev.refill_condition_professional, rev.refill_condition_veteran)),)
         return values
 
     def source_values(self):
         values = {}
         for rev in self.stats_snapshot.sourcerevision_set.all():
             source = rev.relevant_source
-            values[source.id] = (source.current_val, rev.max, rev.refill_condition)
+            values[source.id] = (source.current_val, rev.max, rev.refill_condition, rev.refill_condition_professional, rev.refill_condition_veteran)
         return values
 
     def grant_initial_source_if_required(self):
@@ -1239,6 +1247,8 @@ Archived on: {}
                 relevant_source=rev.relevant_source,
                 previous_revision=rev,
                 refill_condition=rev.refill_condition,
+                refill_condition_professional=rev.refill_condition_professional,
+                refill_condition_veteran=rev.refill_condition_veteran,
                 max=rev.max,
             )
             snapshot_rev.save()
@@ -2675,6 +2685,8 @@ class SourceRevision(models.Model):
                                           on_delete=models.CASCADE)  # Used in revisioning to determine value change.
     max = models.PositiveIntegerField()
     refill_condition = models.CharField(max_length=10000, null=True)
+    refill_condition_professional = models.CharField(max_length=10000, null=True)
+    refill_condition_veteran = models.CharField(max_length=10000, null=True)
 
     class Meta:
         indexes = [

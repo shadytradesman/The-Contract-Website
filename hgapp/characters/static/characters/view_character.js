@@ -486,6 +486,14 @@ function updateSourceDisplay() {
         }
         $("#js-source-" + key).find(".js-source-display").html(content);
         $("#js-source-" + key).find(".js-source-refill").text(sourceValues[key][2]);
+        if (sourceValues[key][3]) {
+            $("#js-source-" + key).find(".js-source-refill-cont-professional").show();
+            $("#js-source-" + key).find(".js-source-refill-professional").text(sourceValues[key][3]);
+        }
+        if (sourceValues[key][4]) {
+            $("#js-source-" + key).find(".js-source-refill-cont-veteran").show();
+            $("#js-source-" + key).find(".js-source-refill-veteran").text(sourceValues[key][4]);
+        }
         console.log(key, sourceValues[key]);
     });
 }

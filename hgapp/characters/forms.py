@@ -404,6 +404,12 @@ class SourceForm(forms.Form):
     refill_condition = forms.CharField(max_length=500,
                                        widget=forms.TextInput(attrs={'class': 'form-control css-refill-condition'}),
                                        required=False)
+    refill_condition_professional = forms.CharField(max_length=500,
+                                       widget=forms.TextInput(attrs={'class': 'form-control css-refill-condition'}),
+                                       required=False)
+    refill_condition_veteran = forms.CharField(max_length=500,
+                                                widget=forms.TextInput(attrs={'class': 'form-control css-refill-condition'}),
+                                                required=False)
 
     def __init__(self, *args, **kwargs):
         super(SourceForm, self).__init__(*args, **kwargs)

@@ -111,9 +111,21 @@
                         <small>
                             Refills when
                             <i>
-                                {source[1][2]}.
+                                {source[1][3]}
                             </i>
-                            Max once per {source[1][3]}
+                            <div v-if="source[1][4]">
+                                or
+                                <i>
+                                    {source[1][4]}
+                                </i>
+                            </div>
+                            <div v-if="source[1][5]">
+                                or
+                                <i>
+                                    {source[1][5]}
+                                </i>
+                            </div>
+                            Max once per {source[1][2]}
                         </small>
                     </div>
                 </div>
