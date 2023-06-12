@@ -199,6 +199,7 @@ body {position:relative;}
     padding-left: 20px;
     padding-right: 20px;
     border-radius: 4px;
+    overflow: auto;
 }
 
 .css-section-body>p, .css-section-body>h3, .css-section-body>ul {

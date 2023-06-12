@@ -11,6 +11,10 @@ function setAffix() {
 
 $(document).ready(function(){
     $(window).scroll();
+    // correct scroll when all images loaded.
+    Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))).then(() => {
+        $(window).scroll();
+    });
 });
 
 var oddSpy = false;

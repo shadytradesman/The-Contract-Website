@@ -499,7 +499,7 @@ def make_allocate_improvement_form(user):
                                                   empty_label=None,
                                                   help_text="Declare which Contractor should receive the Improvement. "
                                                             "Once confirmed, this action cannot be undone. "
-                                                            "Only living Contractors with total Gifts and Improvements totaling fewer than for every Contrct victories appear in this list.",
+                                                            "Only living Contractors with total Gifts and Improvements totaling fewer than 2 for every Contrct victory appear in this list.",
                                                   required=True)
     return AllocateImprovementForm
 
