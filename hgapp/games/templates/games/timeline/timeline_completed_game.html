@@ -1,12 +1,34 @@
-<div>
-    Victories: {{ game.number_victories }}
-</div>
-<div>
-    Losses: {{ game.number_losses }}
-</div>
-<div>
-    Deaths: {{ game.number_deaths }}
-</div>
- <a href="{% url 'games:games_view_game' game.id%}" class="">
-     Click Here
-</a> for more details
+<ul>
+    {% for invitation in game.game_invite_set.all %}
+    <li>
+        <b>
+            {% if invitation.attendance.attending_character %}
+                <a href="{% url 'characters:characters_view' invitation.attendance.attending_character.id %}">{{invitation.attendance.attending_character.name}}</a>
+            {% else %}
+                An NPC ringer
+            {% endif %}
+        </b>
+        -
+        {{ invitation.attendance.get_outcome_display }}
+        {% if invitation.attendance.is_mvp %}
+            <span class="glyphicon glyphicon-star css-scenario-rewarded-star" aria-hidden="true"
+                  data-toggle="tooltip"
+                  title='This Contractor earned bonus Commission. +2 Exp.'>
+            </span>
+        {% endif %}
+        <div>
+            <small>
+                Played by
+                <a href="{% url 'profiles:profiles_view_profile' invitation.invited_player.id %}">
+                    <b>{{ invitation.invited_player.username }}</b>
+                </a>
+            </small>
+        </div>
+    </li>
+    {% endfor%}
+</ul>
+<p>
+    <a href="{% url 'games:games_view_game' game.id%}" class="">
+        Click Here
+    </a> for more details
+</p>
