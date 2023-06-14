@@ -339,11 +339,8 @@ class Game(models.Model):
         for game_attendance in self.game_attendance_set.all():
             game_attendance.delete()
 
-    def transition_to_active(self, lock_characters):
+    def transition_to_active(self):
         assert(self.is_scheduled())
-        if lock_characters:
-            for character in self.attended_by.all():
-                character.lock_edits()
         for invite in self.game_invite_set.all():
             if not invite.attendance:
                 invite.delete()

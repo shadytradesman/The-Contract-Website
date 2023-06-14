@@ -914,6 +914,8 @@ class Power_Full(models.Model):
         return False
 
     def player_can_edit(self, player):
+        if player.is_superuser:
+            return True
         if self.is_deleted:
             return False
         is_owner = player == self.owner
@@ -922,6 +924,8 @@ class Power_Full(models.Model):
                (player.has_perm("edit_power_full", self) and self.player_can_view(player))
 
     def player_can_view(self, player):
+        if player.is_superuser:
+            return True
         if self.is_deleted:
             return False
         is_owner = player == self.owner
@@ -959,9 +963,6 @@ class Power_Full(models.Model):
         assign_perm('view_private_power_full', player, self)
         for power in self.power_set.all():
             power.reveal_to_player(player)
-
-    def lock_edits(self):
-        remove_perm('powers.edit_power_full', self.owner)
 
     def is_ps2(self):
         return self.dice_system == SYS_PS2

@@ -502,12 +502,6 @@ class Character(models.Model):
         else:
             assign_perm('edit_character', player, self)
 
-    def lock_edits(self):
-        if hasattr(self, 'player') and self.player:
-            remove_perm('characters.edit_character', self.player)
-        for power in self.power_full_set.all():
-            power.lock_edits()
-
     def default_perms_powers_to_player(self, player):
         for power in self.power_full_set.all():
             power.default_perms_history_to_player(player)

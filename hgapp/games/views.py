@@ -899,7 +899,7 @@ def start_game(request, game_id, char_error="", player_error=""):
                 for character in game.attended_by.all():
                     if character.id not in attending_characters:
                         game.not_attending(character.player)
-                game.transition_to_active(lock_characters=False)
+                game.transition_to_active()
             return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
         else:
             logger.error('Error: invalid ValidateAttendanceFormSet. Errors: %s', str(formset.errors))
