@@ -969,8 +969,9 @@ class Power_Full(models.Model):
 
     def default_perms_history_to_player(self, player):
         assign_perm('view_power_full', player, self)
-        assign_perm('edit_power_full', player, self)
-        if player != self.owner:
+        if self.owner == player:
+            assign_perm('edit_power_full', player, self)
+        else:
             remove_perm('view_private_power_full', player, self)
         for power in self.power_set.all():
             power.default_perms_to_player(player)
