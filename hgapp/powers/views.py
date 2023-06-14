@@ -75,7 +75,6 @@ class CreatePower(EditPower):
     def __check_permissions(self):
         if self.character and not self.character.player_can_edit(self.request.user):
             raise PermissionDenied("You can't give Gifts to a Character you can't edit.")
-        return super().__check_permissions()
 
 
 class EditExistingPower(EditPower):
@@ -91,7 +90,8 @@ class EditExistingPower(EditPower):
     def __check_permissions(self):
         if not self.existing_power.player_can_edit(self.request.user):
             raise PermissionDenied("This Power has been deleted, or you're not allowed to view it")
-        return super().__check_permissions()
+        if self.character and not self.character.player_can_edit(self.request.user):
+            raise PermissionDenied("You can't give Gifts to a Character you can't edit.")
 
 
 def create(request, character_id=None):
@@ -362,7 +362,7 @@ def stock(request, character_id=None):
         character = get_object_or_404(Character, id=character_id)
     else:
         character = None
-    use_cache = character_id or request.user.is_superuser
+    use_cache = character_id is None
     generic_categories = PremadeCategory.objects.order_by("name").all()
     generic_powers_by_category = {}
     total_gift_count = 0
