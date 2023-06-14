@@ -336,6 +336,7 @@ class ViewPower(View):
         context['ability_value_by_id'] = ability_val_by_id
         context['attribute_value_by_id'] = attribute_val_by_id
         context['sig_artifacts'] = sig_artifacts
+        context['can_edit'] = self.power.player_can_edit(self.request.user)
         return context
 
 

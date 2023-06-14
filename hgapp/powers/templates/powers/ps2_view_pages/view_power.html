@@ -35,12 +35,12 @@
                     {% player_can_edit_power power request.user as can_edit %}
                     {% if can_edit %}
                     <li>
-                        <a href="{% url 'powers:powers_edit_ps2' power.parent_power.id %}" class="btn btn-primary">Edit Power</a>
+                        <a href="{% url 'powers:powers_edit_ps2' power.parent_power.id %}" class="btn btn-primary">Edit Gift</a>
                     </li>
                     {% endif %}
                     {% if request.user == power.parent_power.owner %}
                     <li>
-                        <a href="{% url 'powers:powers_delete_power' power.parent_power.id %}" class="btn btn-default">Delete Power</a>
+                        <a href="{% url 'powers:powers_delete_power' power.parent_power.id %}" class="btn btn-default">Delete Gift</a>
                     </li>
                     {% endif %}
                     {% endif %}
