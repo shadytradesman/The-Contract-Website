@@ -69,6 +69,7 @@ class CreatePower(EditPower):
             self.existing_power = get_object_or_404(Power_Full, id=self.kwargs['power_full_id'])
             if not self.existing_power.player_can_view(self.request.user):
                 raise PermissionDenied("This Power has been deleted, or you're not allowed to view it")
+        self.__check_permissions()
         return super().dispatch(*args, **kwargs)
 
     def __check_permissions(self):
@@ -84,6 +85,7 @@ class EditExistingPower(EditPower):
         self.power_to_edit = self.existing_power
         if self.existing_power.character:
             self.character = self.existing_power.character
+        self.__check_permissions()
         return super().dispatch(*args, **kwargs)
 
     def __check_permissions(self):

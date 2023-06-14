@@ -112,13 +112,7 @@ class ResendConfirmation(View):
             self.email.send_confirmation()
             messages.add_message(self.request, messages.INFO, "Resent Confirmation email to {}".format(self.email.email))
             return HttpResponseRedirect(reverse('account_settings'))
-        raise ValueError("Invalid journal form")
-
-    def __check_permissions(self):
-        if not self.character.player_can_edit(self.request.user):
-            raise PermissionDenied("You cannot edit this Contractor's Journal")
-        if not (self.game.is_recorded() or self.game.is_finished() or self.game.is_archived()):
-            return HttpResponseRedirect(reverse('journals:journal_read', args=(self.character.id, self.game.id)))
+        raise ValueError("Invalid confirmation form")
 
     def __get_context_data(self):
         context = {
