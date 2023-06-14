@@ -348,12 +348,14 @@ def get_default_world_element_choice_form(element_type):
     elem_data_by_name = {}
     if stock_elements.count() > 0:
         current_options = []
-        current_category = stock_elements[0].category
+        current_category_id = stock_elements[0].category_id
+        current_category_name = stock_elements[0].category.name
         for element in stock_elements:
-            if element.category != current_category:
-                options.append((current_category.name, current_options))
+            if element.category_id != current_category_id:
+                options.append((current_category_name, current_options))
                 current_options = []
-                current_category = element.category
+                current_category_name = element.category.name
+                current_category_id = element.category_id
             current_options.append((element.system, element.name))
             elem_data_by_name[element.name] = {
                 "description": element.description,
@@ -362,7 +364,7 @@ def get_default_world_element_choice_form(element_type):
                 "cutoff": element.cutoff,
                 "threat_level": element.threat_level,
             }
-        options.append((current_category.name, current_options))
+        options.append((current_category_name, current_options))
     default_field = forms.ChoiceField(choices=options,
                                       label="Select Premade " + element_type,
                                       required=False,)

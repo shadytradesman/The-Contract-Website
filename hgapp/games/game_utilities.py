@@ -22,7 +22,7 @@ def __inner_get_character_contacts(character):
     game_number = {}
     for i, game_id in enumerate(game_ids):
         game_number[game_id] = i + 1
-    attendances = Game_Attendance.objects.filter(relevant_game__id__in=game_ids, is_confirmed=True).order_by("relevant_game__end_time")
+    attendances = Game_Attendance.objects.select_related("relevant_game").select_related("attending_character").filter(relevant_game__id__in=game_ids, is_confirmed=True, attending_character__isnull=False).order_by("relevant_game__end_time")
     games_by_character = defaultdict(list)
     for attendance in attendances:
         if hasattr(attendance, "attending_character") and attendance.attending_character:

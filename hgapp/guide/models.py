@@ -73,8 +73,7 @@ class GuideSection(models.Model):
         super(GuideSection, self).save(*args, **kwargs)
 
     def to_url(self):
-        guidebook_url = self.book.get_url()
-        return "{}#{}".format(guidebook_url, self.slug)
+        return "{}#{}".format(reverse('guide:read_guidebook', args=(self.book_id,)), self.slug)
 
 
 class GuidePic(models.Model):

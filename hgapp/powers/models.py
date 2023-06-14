@@ -985,13 +985,10 @@ class Power_Full(models.Model):
         return self.latest_rev.archive_txt()
 
     def reward_count(self, include_improvements=True):
-        count = 0
-        for power in self.power_set.all():
-            if include_improvements:
-                count += power.relevant_power.filter(is_void=False).count()
-            else:
-                count += power.relevant_power.filter(is_void=False, is_improvement=False).count()
-        return count
+        if include_improvements:
+            return self.power_set.select_related("relevant_power").filter(relevant_power__is_void=False).count()
+        else:
+            return self.power_set.select_related("relevant_power").filter(relevant_power__is_void=False, relevant_power__is_improvement=False).count()
 
     def reward_list(self):
         rewards = []

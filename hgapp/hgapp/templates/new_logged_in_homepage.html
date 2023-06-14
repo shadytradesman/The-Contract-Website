@@ -55,6 +55,11 @@
 <div class="container">
     <div id="" class="row">
         <div class="col-xs-12 col-md-4" style="margin-top: 0px;">
+            <div class="visible-xs-block text-center" style="margin-top: 10px;" >
+                <a href="#news-feed" >
+                    Jump to news feed
+                </a>
+            </div>
             <div class="panel-group" id="accordion1">
 
 
@@ -385,7 +390,10 @@
 
             </div>
         </div>
-        <div class="col-xs-12 col-md-8" style="margin-top: 15px;">
+        <div  class="col-xs-12 col-md-8" style="margin-top: 15px;">
+            <div id="news-feed" style="position:relative;bottom:50px;">
+
+            </div>
             {% for notif in timeline_notifications %}
                 <div>
                     {% render_timeline_notif notif %}

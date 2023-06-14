@@ -529,14 +529,8 @@ class Character(models.Model):
     def world_element_cell_choices(self):
         if not hasattr(self, "player") or not self.player:
             return Cell.objects.none()
-        queryset = self.player.cell_set.filter(cellmembership__is_banned=False).all()
-        games_attended = self.game_set.all()
-        cell_ids = set()
-        for cell in queryset:
-            cell_ids.add(cell.pk)
-        for game in games_attended:
-            if hasattr(game, "cell") and game.cell:
-                cell_ids.add(game.cell.pk)
+        cell_ids = set(self.player.cell_set.filter(cellmembership__is_banned=False).values_list('id', flat=True))
+        cell_ids.update(self.game_set.filter(cell__isnull=False).values_list('cell__id', flat=True))
         return Cell.objects.filter(pk__in=cell_ids).all()
 
     def world_element_initial_cell(self):
@@ -737,10 +731,7 @@ class Character(models.Model):
         return self.character_death_set.filter(is_void=True).all()
 
     def active_game_attendances(self):
-        return [game for game in self.game_attendance_set.all() if game.relevant_game.is_active()]
-
-    def scheduled_game_attendances(self):
-        return [game for game in self.game_attendance_set.all() if game.relevant_game.is_scheduled()]
+        return self.game_attendance_set.filter(relevant_game__status='ACTIVE').all()
 
     def change_ported_status(self, new_ported_status):
         old_status = self.ported
