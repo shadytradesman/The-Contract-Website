@@ -324,19 +324,14 @@ def invite_players(request, cell_id):
         if form.is_valid():
             player = get_object_or_404(User, username__iexact=form.cleaned_data['username'])
             with transaction.atomic():
-                cell.invitePlayer(player, form.cleaned_data['invite_text'])
-            message_body = SafeText('###{0} has invited you to join [{1}]({2}).\n [Click Here]({3}) to respond.'
-                                    .format(request.user.get_username(),
-                                            cell.name,
-                                            request.build_absolute_uri(reverse("cells:cells_view_cell", args=[cell.id])),
-                                            request.build_absolute_uri(reverse("cells:cells_rsvp_invite", args=[cell.id])),
-                                            ))
-            with transaction.atomic():
+                invitation = cell.invitePlayer(player, form.cleaned_data['invite_text'])
                 Notification.objects.create(user=player,
                                             headline="You've been invited to a Playgroup",
                                             content="{} awaits".format(cell.name),
                                             url=request.build_absolute_uri(reverse("cells:cells_view_cell", args=[cell.id])),
-                                            notif_type=PLAYGROUP_NOTIF)
+                                            notif_type=PLAYGROUP_NOTIF,
+                                            is_timeline=True,
+                                            article=invitation)
             return HttpResponseRedirect(reverse('cells:cells_invite_players', args=(cell.id,)))
         else:
             print(form.errors)

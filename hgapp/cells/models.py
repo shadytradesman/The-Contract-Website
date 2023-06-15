@@ -547,3 +547,15 @@ class CellInvite(models.Model):
         else:
             super(CellInvite, self).save(*args, **kwargs)
 
+    def render_timeline_display(self, user, var):
+        membership = get_object_or_none(CellMembership.objects.filter(member_player=user, is_banned=False, relevant_cell=self.relevant_cell))
+        if membership is not None:
+            return None
+        return render_to_string("cells/timeline_invite.html", {"cell": self.relevant_cell})
+
+
+    def render_timeline_header(self, user, var):
+        membership = get_object_or_none(CellMembership.objects.filter(member_player=user, is_banned=False, relevant_cell=self.relevant_cell))
+        if membership is not None:
+            return None
+        return "Will you join {}?".format(self.relevant_cell.name)
