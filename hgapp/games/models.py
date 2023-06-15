@@ -772,6 +772,26 @@ class Game_Attendance(models.Model):
     class Meta:
         unique_together = (("attending_character", "relevant_game"))
 
+    def render_timeline_display(self, user, var):
+        reward = self.get_reward()
+        spent_reward = reward is None or (hasattr(reward, "relevant_power") and reward.relevant_power is not None)
+        spent_exp = not hasattr(self, "experience_reward") or (self.experience_reward and self.experience_reward.rewarded_character.unspent_experience() < 3)
+        if spent_exp and spent_reward:
+            return None
+        if self.attending_character:
+            reward_url = reverse("characters:characters_spend_reward", args=[self.attending_character.id])
+        else:
+            reward_url = reverse("characters:characters_allocate_gm_exp")
+        context = {
+            "url": reward_url,
+            "reward": reward,
+            "attendance": self
+        }
+        return render_to_string("games/timeline/timeline_attendance_reward.html", context)
+
+    def render_timeline_header(self, user, var):
+        return None
+
 
 class Game_Invite(models.Model):
     invited_player = models.ForeignKey(settings.AUTH_USER_MODEL,
@@ -1035,7 +1055,9 @@ class Scenario(models.Model):
                 headline="You've unlocked a Scenario",
                 content="{}".format(self.title),
                 url=reverse("games:games_view_scenario", args=(self.pk,)),
-                notif_type=SCENARIO_NOTIF)
+                notif_type=SCENARIO_NOTIF,
+                is_timeline=True,
+                article=discovery)
             return discovery
         return None
 
@@ -1267,6 +1289,16 @@ class Scenario_Discovery(models.Model):
                 assign_perm('edit_scenario', self.discovering_player, self.relevant_scenario)
         else:
             super(Scenario_Discovery, self).save(*args, **kwargs)
+
+    def render_timeline_display(self, user, var):
+        context = {
+            "url": reverse("games:games_view_scenario", args=(self.relevant_scenario_id,)),
+            "discovery": self
+        }
+        return render_to_string("games/timeline/timeline_scenario_discovery.html", context)
+
+    def render_timeline_header(self, user, var):
+        return None
 
 
 class Cycle(models.Model):

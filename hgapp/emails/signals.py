@@ -56,12 +56,14 @@ def notify_game_ended(**kwargs):
             else:
                 scenario_url = None
             attendance = invite.attendance
-            character_name = attendance.attending_character.name if attendance.attending_character else "ringer"
+            character_name = attendance.attending_character.name if attendance.attending_character else "Your ringer"
             Notification.objects.create(user=invite.invited_player,
                                         headline="You've done well.",
                                         content="{} earned Rewards".format(character_name),
                                         url=reward_url,
-                                        notif_type=REWARD_NOTIF)
+                                        notif_type=REWARD_NOTIF,
+                                        is_timeline=True,
+                                        article=attendance)
             email = invite.invited_player.profile.get_confirmed_email()
             if email:
                 send_email_for_game_ended(email, invite, game_url, reward_url, scenario_url)
