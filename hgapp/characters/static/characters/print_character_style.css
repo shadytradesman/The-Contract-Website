@@ -855,3 +855,7 @@ TIME LINE
 .css-timeline-item {
     page-break-inside: avoid;
 }
+
+.ccs-print-page-hidden {
+display:none;
+}

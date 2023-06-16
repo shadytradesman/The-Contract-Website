@@ -398,7 +398,7 @@
                 <div>
                     {% render_timeline_notif notif %}
                 </div>
-                {% if forloop.counter|divisibleby:6 %}
+                {% if forloop.counter|divisibleby:5 %}
                     {% render_fake_ad request.user %}
                 {% endif %}
             {% endfor %}
