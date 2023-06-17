@@ -99,9 +99,9 @@
                                 {% if active_games or attendance_invites_to_confirm or upcoming_games_running or upcoming_games_invited %}
                                 <br>
                                 {% endif %}
-                                <div class="col-md-10 col-md-offset-1">
+                                <div class="">
                                     {% if active_games %}
-                                    <div class="alert alert-warning text-center css-home-alert">
+                                    <div class="alert alert-warning text-center css-contractor-alert" style="margin-top:10px;">
                                         <h4>Ongoing Contract!</h4>
                                         <ul class="nav nav-pills nav-stacked">
                                             {% for game in active_games %}
@@ -198,9 +198,9 @@
                             <div  class="css-nav-section-content" >
 
                                 <div class="row css-home-row">
-                                    <div class="col-md-10 col-md-offset-1">
+                                    <div class="">
                                         {% if not cell_invites and not cells %}
-                                        <div class="alert alert-warning text-center">
+                                        <div class="alert alert-warning text-center css-contractor-alert" style="margin-top:10px;">
                                             <h3>You aren't a member of any Playgroups</h3>
                                             <p>
                                                 <a href="{% url 'cells:cells_find_world' %}" >
@@ -336,6 +336,7 @@
                                     <div class="alert alert-warning text-center css-contractor-alert" style="margin-top:10px;">
                                         <h3>Who are you?</h3>
                                         <p>You haven't made any Contractors yet.</p>
+                                        <br>
                                         <div>
                                             <a href="{% url 'characters:characters_create' %}" class="btn btn-primary btn-lg">Time to change that</a>
                                         </div>

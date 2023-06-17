@@ -25,7 +25,7 @@ from characters.models import Character, CharacterTutorial
 from powers.models import Power_Full, Enhancement, Drawback, Parameter, Base_Power, SYS_LEGACY_POWERS, SYS_PS2
 
 from games.models import GAME_STATUS, Scenario, Game, Game_Attendance, WIN, LOSS, DEATH
-from hgapp.forms import SignupForm, ResendEmailConfirmation
+from hgapp.forms import SignupForm, ResendEmailConfirmation, LoginUsernameOrEmailForm
 from blog.models import Post
 from info.models import FrontPageInfo
 from cells.models import WorldEvent
@@ -43,6 +43,7 @@ class SignupView(account.views.SignupView):
 
 
 class LoginView(account.views.LoginView):
+    form_class = LoginUsernameOrEmailForm
     def get_initial(self):
         return {
             "remember": True
