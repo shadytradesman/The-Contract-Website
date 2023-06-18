@@ -33,26 +33,26 @@ def fiction(request):
 
 
 def leaderboard(request):
-    num_to_fetch = 10
+    num_to_fetch = 15
     top_gms = Profile.objects.order_by('-num_games_gmed').filter(is_private=False)[:num_to_fetch]
     deadliest_gms = Profile.objects.order_by('-num_gm_kills').filter(is_private=False)[:num_to_fetch]
     most_social_gms = Profile.objects.order_by('-num_gmed_players').filter(is_private=False)[:num_to_fetch]
 
     top_players = Profile.objects.order_by('-num_player_games').filter(is_private=False)[:num_to_fetch]
-    top_ringer_players = Profile.objects.order_by('-num_played_ringers').filter(is_private=False)[:num_to_fetch]
+    top_contractors_players = Profile.objects.order_by('-num_contractors_played').filter(is_private=False)[:num_to_fetch]
     top_survivors = Profile.objects.order_by('-num_player_survivals').filter(is_private=False)[:num_to_fetch]
 
     top_contractor_wins = Character.objects.order_by('-num_victories').filter(player__profile__is_private=False)[:num_to_fetch]
-    top_contractor_losses = Character.objects.order_by('-num_losses').filter(player__profile__is_private=False)[:num_to_fetch]
+    senior_contractor_deaths = Character.objects.order_by('-num_games').filter(is_dead=True, player__profile__is_private=False)[:num_to_fetch]
     top_contractor_journals = Character.objects.order_by('-num_journals').filter(player__profile__is_private=False)[:num_to_fetch]
 
-    top_scenario_runs = Scenario.objects.order_by('-times_run', '-num_gms_run')[:num_to_fetch]
-    top_scenario_gms = Scenario.objects.order_by('-num_gms_run', '-times_run')[:num_to_fetch]
-    top_scenario_deadliness = Scenario.objects.filter(num_gms_run__gt=2).order_by('-deadliness_ratio')[:num_to_fetch]
+    top_scenario_runs = Scenario.objects.order_by('-times_run', '-num_gms_run').filter(creator__profile__is_private=False)[:num_to_fetch]
+    top_scenario_gms = Scenario.objects.order_by('-num_words', '-times_run').filter(creator__profile__is_private=False)[:num_to_fetch]
+    top_scenario_deadliness = Scenario.objects.filter(num_gms_run__gt=1, times_run__gt=2).filter(creator__profile__is_private=False).order_by('-deadliness_ratio')[:num_to_fetch]
 
     context = {
         "top_players": top_players,
-        "top_ringer_players": top_ringer_players,
+        "top_ringer_players": top_contractors_players,
         "top_survivors": top_survivors,
 
         "top_gms": top_gms,
@@ -60,7 +60,7 @@ def leaderboard(request):
         "most_social_gms": most_social_gms,
 
         "top_contractor_wins": top_contractor_wins,
-        "top_contractor_losses": top_contractor_losses,
+        "top_contractor_losses": senior_contractor_deaths,
         "top_contractor_journals": top_contractor_journals,
 
         "top_scenario_runs": top_scenario_runs,
