@@ -1,7 +1,7 @@
 {% if not empty %}
 <div class="css-ad-container css-no-print">
     <a type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#fakeAdModal{{counter}}" style="padding:0px;">
-        <img src="{{ad.banner.url }}" class="css-fake-ad-banner">
+        <img src="{{ ad.get_random_banner_url }}" class="css-fake-ad-banner">
     </a>
     <figcaption>
         <small>
