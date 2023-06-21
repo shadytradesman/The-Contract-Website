@@ -400,7 +400,7 @@
                     {% render_timeline_notif notif %}
                 </div>
                 {% if forloop.counter|divisibleby:5 %}
-                    {% render_fake_ad request.user %}
+                    {% render_fake_ad request.user forloop.counter %}
                 {% endif %}
             {% endfor %}
             {% if timeline_notifications|length < 15 %}
@@ -453,7 +453,7 @@
                 </div>
             {% endif %}
             {% if timeline_notifications|length < 5 %}
-                {% render_fake_ad request.user %}
+                {% render_fake_ad request.user 'short' %}
             {% endif %}
         </div>
     </div>

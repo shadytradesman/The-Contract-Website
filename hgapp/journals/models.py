@@ -17,9 +17,10 @@ from notifications.models import Notification, REWARD_NOTIF
 
 NUM_JOURNALS_PER_IMPROVEMENT = 4
 
+
 class Journal(models.Model):
     title = models.CharField(max_length=400)
-    content = models.TextField(max_length=74000, null=True, blank=True)
+    content = models.TextField(max_length=100000, null=True, blank=True)
     writer = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT)
@@ -63,7 +64,6 @@ class Journal(models.Model):
                                   relevant_game=self.game_attendance.relevant_game,
                                   is_void=False,
                                   is_journal=True)
-
 
     def get_exp_reward(self):
         if hasattr(self, "experience_reward") and self.experience_reward:

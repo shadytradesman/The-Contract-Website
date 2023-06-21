@@ -163,11 +163,9 @@ def home(request):
         if hasattr(request.user, 'profile'):
             if not request.user.profile.confirmed_agreements:
                 return HttpResponseRedirect(reverse('profiles:profiles_terms'))
-        my_characters = request.user.character_set.filter(is_deleted=False).order_by('name').all()
-        living_characters = [x for x in my_characters if x.is_dead == False]
-        dead_characters = [x for x in my_characters if x.is_dead == True]
-        my_powers = request.user.power_full_set.filter(is_deleted=False).order_by('name').all()
-        my_scenarios = request.user.scenario_creator.order_by("title").all()
+        living_characters = request.user.character_set.filter(is_deleted=False, is_dead=False).order_by('name').all()
+        dead_characters = request.user.character_set.filter(is_deleted=False, is_dead=True).order_by('name').all()
+        my_powers = request.user.power_full_set.filter(is_deleted=False, character__isnull=True).order_by('name').all()
         new_players = User.objects.order_by('-date_joined').filter(profile__is_private=False)[:6]
         new_powers = Power_Full.objects.filter(private=False, is_deleted=False).filter(owner__profile__is_private=False).order_by('-id')[:6]
         new_characters = Character.objects.filter(private=False, is_deleted=False).filter(player__profile__is_private=False).order_by('-id')[:6]
@@ -181,9 +179,13 @@ def home(request):
         avail_charon_coins = request.user.profile.get_avail_charon_coins()
         avail_exp_rewards = request.user.profile.get_avail_exp_rewards()
         cells = request.user.cell_set.filter(cellmembership__is_banned=False).all()
-        cell_ids = set(request.user.cell_set.values_list('id', flat=True).all())
-        world_events = WorldEvent.objects.filter(parent_cell__id__in=cell_ids).order_by('-created_date').all()
-        cell_invites = request.user.cellinvite_set.filter(membership=None).filter(is_declined=False).all()
+        world_events = None
+        cell_invites = None
+        if hasattr(request.user, 'profile'):
+            if not request.user.profile.early_access_user:
+                cell_ids = set(request.user.cell_set.values_list('id', flat=True).all())
+                world_events = WorldEvent.objects.filter(parent_cell__id__in=cell_ids).order_by('-created_date').all()[:3]
+                cell_invites = request.user.cellinvite_set.filter(membership=None).filter(is_declined=False).all()
         attendance_invites_to_confirm = request.user.game_invite_set.filter(attendance__is_confirmed=False).exclude(is_declined=True).all()
         email = EmailAddress.objects.get_primary(request.user)
         email_verified = email and email.verified
@@ -193,7 +195,6 @@ def home(request):
             'living_characters': living_characters,
             'dead_characters': dead_characters,
             'powers': my_powers,
-            'my_scenarios': my_scenarios,
             'new_players': new_players,
             'new_powers': new_powers,
             'new_characters': new_characters,
@@ -204,7 +205,7 @@ def home(request):
             'avail_charon_coins': avail_charon_coins,
             'cells': cells,
             'cell_invites': cell_invites,
-            'world_events': world_events[:3],
+            'world_events': world_events,
             'attendance_invites_to_confirm': attendance_invites_to_confirm,
             'avail_exp_rewards': avail_exp_rewards,
             'latest_blog_post': latest_blog_post,
