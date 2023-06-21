@@ -8,37 +8,43 @@
         <span style="font-size: 18px; height: 25px; display: inline-block;  padding: 5px;"><b style="position:relative; bottom: 5px;">{{power.get_gift_cost}}</b>
         </span>
     </span>
-    <span
-            data-title="Gift Type: {{power.modality.name}}"
-            data-original-title="Gift Type: {{power.modality.name}}"
-            data-toggle="tooltip"
-            class="has-popover"
-            style=" height: 25px; display: inline-block;">
-        {% if power.modality.icon %}
-            <img src="{{power.modality.icon.url}}" width="25" height="25" style="vertical-align: text-bottom;">
-        {% endif %}
-    </span>
-    <span
-        data-title="Effect: {{power.base.name}}"
-        data-original-title="Effect: {{power.base.name}}"
-        data-toggle="tooltip"
-        class="has-popover"
-        style=" height: 25px; display: inline-block;">
-        {% if power.base.icon %}
-            <img src="{{power.base.icon.url}}" width="25" height="25" style="vertical-align: text-bottom;" >
-        {% endif %}
-    </span>
-    {% if power.shouldDisplayVector %}
+    {% with power.get_modality_display as modality %}
         <span
-            data-title="Style: {{power.vector.name}}"
-            data-original-title="Style: {{power.vector.name}}"
-            data-toggle="tooltip"
-            class="has-popover"
-            style=" height: 25px; display: inline-block;">
-            {% if power.vector.icon %}
-                <img src="{{power.vector.icon.url}}" width="25" height="25" style="vertical-align: text-bottom;">
+                data-title="Gift Type: {{modality.name}}"
+                data-original-title="Gift Type: {{modality.name}}"
+                data-toggle="tooltip"
+                class="has-popover"
+                style=" height: 25px; display: inline-block;">
+            {% if modality.icon_url %}
+                <img src="{{modality.icon_url}}" width="25" height="25" style="vertical-align: text-bottom;">
             {% endif %}
         </span>
+    {% endwith %}
+    {% with power.get_effect_display as base %}
+        <span
+            data-title="Effect: {{base.name}}"
+            data-original-title="Effect: {{base.name}}"
+            data-toggle="tooltip"
+            class="has-popover"
+            style=" height: 25px; display: inline-block;">
+            {% if base.icon_url %}
+                <img src="{{base.icon_url}}" width="25" height="25" style="vertical-align: text-bottom;" >
+            {% endif %}
+        </span>
+    {% endwith %}
+    {% if power.shouldDisplayVector %}
+        {% with power.get_vector_display as vector %}
+            <span
+                data-title="Style: {{vector.name}}"
+                data-original-title="Style: {{vector.name}}"
+                data-toggle="tooltip"
+                class="has-popover"
+                style=" height: 25px; display: inline-block;">
+                {% if vector.icon_url %}
+                    <img src="{{vector.icon_url}}" width="25" height="25" style="vertical-align: text-bottom;">
+                {% endif %}
+            </span>
+        {% endwith %}
     {% endif %}
     {% if power.get_num_enhancements %}
         <span

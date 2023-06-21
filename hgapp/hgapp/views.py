@@ -165,7 +165,7 @@ def home(request):
                 return HttpResponseRedirect(reverse('profiles:profiles_terms'))
         living_characters = request.user.character_set.filter(is_deleted=False, is_dead=False).order_by('name').all()
         dead_characters = request.user.character_set.filter(is_deleted=False, is_dead=True).order_by('name').all()
-        my_powers = request.user.power_full_set.filter(is_deleted=False, character__isnull=True).order_by('name').all()
+        my_powers = request.user.power_full_set.filter(is_deleted=False, character__isnull=True).select_related('latest_rev').order_by('name').all()
         new_players = User.objects.order_by('-date_joined').filter(profile__is_private=False)[:6]
         new_powers = Power_Full.objects.filter(private=False, is_deleted=False).filter(owner__profile__is_private=False).order_by('-id')[:6]
         new_characters = Character.objects.filter(private=False, is_deleted=False).filter(player__profile__is_private=False).order_by('-id')[:6]

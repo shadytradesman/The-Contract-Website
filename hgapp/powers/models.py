@@ -608,6 +608,21 @@ class Base_Power(models.Model):
             return Power_Full.objects.filter(latest_rev__vector=self, tags__isnull=False, is_deleted=False).distinct()
         raise ValueError("invalid base type")
 
+    @staticmethod
+    def get_cached_for_display(base_power_id):
+        sentinel = object()
+        cache_key = "componentDisplay-{}".format(base_power_id)
+        cache_contents = cache.get(cache_key, sentinel)
+        if cache_contents is sentinel:
+            base = get_object_or_none(Base_Power.objects.filter(pk=base_power_id))
+            cache_contents = {
+                "icon_url": base.icon.url if base and base.icon else None,
+                "name": base.name if base else None
+            }
+            cache.set(cache_key, cache_contents, timeout=1000)
+        return cache_contents
+
+
     def used_power_fulls(self):
         return Power_Full.objects.filter(base=self, character__isnull=False, is_deleted=False)
 
@@ -855,7 +870,7 @@ class Power_Full(models.Model):
     example_description = models.CharField(max_length=9000,
                                            blank=True,
                                            null=True)
-    stock_order = models.IntegerField(default=0) # denormalized, access with get_gift_cost()
+    stock_order = models.IntegerField(default=0)
 
     class Meta:
         permissions = (
@@ -1091,6 +1106,15 @@ class Power(models.Model):
     def __str__(self):
         return self.name + " (" + self.description + ")"
 
+    def get_modality_display(self):
+        return Base_Power.get_cached_for_display(self.modality_id)
+
+    def get_effect_display(self):
+        return Base_Power.get_cached_for_display(self.base_id)
+
+    def get_vector_display(self):
+        return Base_Power.get_cached_for_display(self.vector_id)
+
     def passes_status_check(self, status):
         if self.required_status == STATUS_SEASONED:
             return status in [STATUS_SEASONED, STATUS_PROFESSIONAL, STATUS_VETERAN]
@@ -1192,7 +1216,7 @@ class Power(models.Model):
         }
 
     def get_gift_cost(self):
-        if hasattr(self, "gift_cost") and self.gift_cost:
+        if hasattr(self, "gift_cost") and self.gift_cost is not None:
             return self.gift_cost
         else:
             self.gift_cost = self._get_point_value()
