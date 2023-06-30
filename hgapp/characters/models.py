@@ -1657,16 +1657,17 @@ class Artifact(WorldElement):
             transfer_type=transfer_type,
             quantity=quantity)
         if self.is_consumable:
-            self.__transfer_consumables_to_character(transfer_type, to_character, notes, quantity)
+            linked_artifact = self.__transfer_consumables_to_character(transfer_type, to_character, notes, quantity)
         else:
             self.character = to_character
+            linked_artifact = self
         self.save()
         quantity_phrase = "the" if self.is_signature else "one" if quantity == 1 else quantity
         Notification.objects.create(
             user=to_character.player,
-            headline="Received Artifact".format(self.name),
+            headline="Received {}".format(self.name, "Artifact" if self.is_crafted_artifact else "Consumables"),
             content="{} acquired {} {}".format(to_character.name, quantity_phrase, self.name),
-            url=reverse('characters:characters_artifact_view', args=(self.id,)),
+            url=reverse('characters:characters_artifact_view', args=(linked_artifact.id,)),
             notif_type=ARTIFACT_NOTIF)
 
     def __transfer_consumables_to_character(self, transfer_type, to_character, notes, quantity):
@@ -1705,6 +1706,7 @@ class Artifact(WorldElement):
                                          new_artifact=new_stack,
                                          quantity=quantity,
                                          power=power)
+        return new_stack
 
 
 class ArtifactStatusChange(models.Model):

@@ -157,7 +157,7 @@ def _create_new_power_and_save(power_form, request, SigArtifactForm):
         sig_artifact_form = SigArtifactForm(request.POST)
         # do nothing with the form yet, just check its validity so we know whether we should save the power or not.
         if not sig_artifact_form.is_valid():
-            raise ValueError("Invalid signature artifact form")
+            raise ValueError("Invalid signature artifact form: " + sig_artifact_form.errors)
 
     # These instances are unsaved and do not yet reference the power.
     modifier_instances = _get_modifier_instances_and_validate(

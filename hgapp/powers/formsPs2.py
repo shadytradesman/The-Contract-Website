@@ -76,26 +76,29 @@ def make_select_signature_artifact_form(existing_character=None, existing_power=
     initial_artifact_queryset = Artifact.objects.none()
     initial_artifact = None
     if existing_power and existing_power.crafting_type == CRAFTING_SIGNATURE:
-        initial_artifact = get_object_or_none(existing_power.artifactpowerfull_set.filter(relevant_artifact__is_signature=True))
+        initial_artifact = get_object_or_none(existing_power.artifactpowerfull_set.filter(relevant_artifact__is_signature=True, relevant_artifact__is_deleted=False))
         if initial_artifact is not None:
             initial_artifact_queryset = Artifact.objects.filter(pk=initial_artifact.relevant_artifact.pk)
     if existing_character:
         queryset = existing_character.artifact_set.filter(
             cell__isnull=True,
             crafting_character=existing_character,
-            is_signature=True)
+            is_signature=True,
+            is_deleted=False)
     elif existing_power and existing_power.owner == user:
         queryset = Artifact.objects.filter(
             creating_player=existing_power.owner,
             cell__isnull=True,
             crafting_character__isnull=True,
-            is_signature=True)
+            is_signature=True,
+            is_deleted=False)
     elif user and user.is_authenticated:
         queryset = Artifact.objects.filter(
             creating_player=user,
             cell__isnull=True,
             crafting_character__isnull=True,
-            is_signature=True)
+            is_signature=True,
+            is_deleted=False)
     else:
         queryset = Artifact.objects.none()
     final_queryset = initial_artifact_queryset | queryset
