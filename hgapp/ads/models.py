@@ -11,8 +11,8 @@ class FakeAd(models.Model):
     subject = models.CharField(max_length=3000)
     content = models.TextField(max_length=20000)
 
-    def get_random_banner_url(self):
+    def get_random_banner(self):
         banners = [self.banner, self.banner_2, self.banner_3]
         banners = [x for x in banners if x.name]
         random.shuffle(banners)
-        return banners[0].url
+        return banners[0]

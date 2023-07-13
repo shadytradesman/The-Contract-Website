@@ -1,7 +1,11 @@
 {% if not empty %}
 <div class="css-ad-container css-no-print">
     <a type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#fakeAdModal{{counter}}" style="padding:0px;">
-        <img src="{{ ad.get_random_banner_url }}" class="css-fake-ad-banner">
+        {% with ad.get_random_banner as banner %}
+            <div>
+                <img src="{{ banner.url}}" class="css-fake-ad-banner" height="{{banner.height}}" width="{{banner.width}}">
+            </div>
+        {% endwith %}
     </a>
     <figcaption>
         <small>
@@ -26,7 +30,7 @@
     <div class="modal-dialog modal-lg {% if is_vertical %}css-tut-modal-vert{%endif%}" role="document">
         <div class="modal-content">
             {% if ad.picture and is_vertical %}
-                <img src="{{ ad.picture.url }}" class="css-fake-ad-image hidden-xs hidden-sm">
+                <img src="{{ ad.picture.url }}" class="css-fake-ad-image hidden-xs hidden-sm" height="ad.picture.height" width="ad.picture.width">
             {% endif %}
             <div class="modal-header text-center ">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true" class="text-primary" style="position: absolute; right: 20px; ">&times;</span></button>
@@ -34,7 +38,7 @@
             </div>
             {% if ad.picture and not is_vertical %}
             <div style="text-align: center;">
-                <img src="{{ ad.picture.url }}" class="css-fake-ad-horizontal css-fake-ad-image hidden-xs hidden-sm">
+                <img src="{{ ad.picture.url }}" class="css-fake-ad-horizontal css-fake-ad-image hidden-xs hidden-sm" height="ad.picture.height" width="ad.picture.width">
             </div>
             {% endif %}
             <div class="modal-body" >
@@ -46,7 +50,7 @@
                 </div>
                 {% if ad.picture %}
                     <div style="text-align: center;">
-                        <img class="css-fake-ad-image hidden-md hidden-lg" src="{{ ad.picture.url }}" style="max-width:100%;">
+                        <img class="css-fake-ad-image hidden-md hidden-lg" src="{{ ad.picture.url }}" style="max-width:100%;" height="ad.picture.height" width="ad.picture.width">
                     </div>
                 {% endif %}
                 <div>
