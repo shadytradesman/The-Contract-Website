@@ -1,9 +1,12 @@
 {% if not empty %}
 <div class="css-ad-container css-no-print">
-    <a type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#fakeAdModal{{counter}}" style="padding:0px;">
+    <a type="button" data-toggle="modal" data-target="#fakeAdModal{{counter}}" style="padding:0px;">
         {% with ad.get_random_banner as banner %}
-            <div>
-                <img src="{{ banner.url}}" class="css-fake-ad-banner" height="{{banner.height}}" width="{{banner.width}}">
+            <div style="
+                position: relative;
+                height: 0;
+                padding-top: calc({{banner.height}} / {{banner.width}} * 100%);">
+                <img src="{{ banner.url}}" class="css-fake-ad-banner">
             </div>
         {% endwith %}
     </a>

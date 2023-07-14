@@ -26,11 +26,11 @@
 }
 
 .css-guide-image {
-    max-height: 100%;
-    max-width: 100%;
-    min-height: 250px;
-    position: relative;
-    height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-width: 100%;
+  height: auto;
 }
 
 .css-guide-image img {
@@ -46,13 +46,15 @@
     float: right;
     margin-bottom: 10px;
     margin-top: 10px;
-    position: relative;
-    left: 10px;
+    max-width: 175px !important;
+    padding: 0px !important;
+    height: 175px !important;
 }
 
 .css-guide-image-md img {
    object-fit: contain;
    max-width: 175px;
+   height: 175px !important;
 }
 
 @media (min-width: 991px) {
@@ -86,6 +88,9 @@
     margin-right: 10px;
     margin-bottom: 10px;
     margin-top: 10px;
+    width: 50px !important;
+    height: 50px !important;
+    padding: 0px !important;
 }
 
 .css-guide-image-sm img {

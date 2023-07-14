@@ -21,11 +21,12 @@ def render_content(unrendered_content, pics_by_slug):
 
 def __render_images(content, pics_by_slug):
     return re.sub(r"(<p>[\s]*)?\{![\s]*image(-sm|-md)? ([\w./-]+)[\s]+([\w\./\s\'\,\"\(\)\?\-\!]*)!\}([\s]*</p>)?",
-                  lambda x: '<div class="css-guide-image{}"><img src=\'{}\' height="{}" width="{}"></div>{}'.format(
+                  lambda x: '<div class="css-guide-image{}" style="{}"><img src=\'{}\'></div>{}'.format(
                       x.group(2) if x.group(2) else "",
+                      "position: relative; height: 0; padding-top: calc({} / {} * 100%);".format(
+                          pics_by_slug[x.group(3)].picture.height,
+                          pics_by_slug[x.group(3)].picture.width),
                       pics_by_slug[x.group(3)].picture.url,
-                      pics_by_slug[x.group(3)].picture.height,
-                      pics_by_slug[x.group(3)].picture.width,
                       '<span class="css-guide-image-caption">{}</span>'.format(x.group(4)) if not x.group(2) else "",
                   ),
                   content)
