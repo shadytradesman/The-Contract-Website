@@ -23,7 +23,7 @@ def __render_images(content, pics_by_slug):
     return re.sub(r"(<p>[\s]*)?\{![\s]*image(-sm|-md)? ([\w./-]+)[\s]+([\w\./\s\'\,\"\(\)\?\-\!]*)!\}([\s]*</p>)?",
                   lambda x: '<div class="css-guide-image{}" style="{}"><img src=\'{}\'></div>{}'.format(
                       x.group(2) if x.group(2) else "",
-                      "position: relative; height: 0; padding-top: calc({} / {} * 100%);".format(
+                      "position: relative; height: 0; padding-top: min(calc({} / {} * 100%), 80vh);".format(
                           pics_by_slug[x.group(3)].picture.height,
                           pics_by_slug[x.group(3)].picture.width),
                       pics_by_slug[x.group(3)].picture.url,

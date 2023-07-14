@@ -34,6 +34,10 @@
   left: 0;
   max-width: 100%;
   height: auto;
+  max-height: 80vh;
+  top: 50%;
+    left: 50%;
+transform: translateY(-50%) translateX(-50%);
 }
 
 .css-guide-image-md {
@@ -106,16 +110,8 @@
     background-position: top, center;
 }
 
-@media (max-width: 991px) {
-    .css-guide-image {
-        min-height: 300px;
-    }
-}
 
 @media (min-width: 991px) {
-    .css-section-body>.css-guide-image {
-        min-height: 450px;
-    }
 
     .css-section-body p {
         padding-left: 25px;
