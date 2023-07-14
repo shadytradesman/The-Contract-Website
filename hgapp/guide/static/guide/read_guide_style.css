@@ -26,19 +26,14 @@
 }
 
 .css-guide-image {
+}
+
+.css-guide-image img {
   position: absolute;
   top: 0;
   left: 0;
   max-width: 100%;
   height: auto;
-}
-
-.css-guide-image img {
-   object-fit: contain;
-   max-width: 100%;
-   max-height: 500px;
-   display: block;
-   margin: auto;
 }
 
 .css-guide-image-md {
