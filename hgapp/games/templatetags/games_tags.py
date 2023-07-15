@@ -2,6 +2,18 @@ from django import template
 
 register = template.Library()
 
+@register.inclusion_tag('games/view_game_pages/post_game_invite_tag.html')
+def render_post_game_invite(game, invitation, player):
+    attending_contractor = invitation.attendance.attending_character
+    return {
+        'game': game,
+        'invitation': invitation,
+        'contractor': attending_contractor,
+        'player_can_view_contractor': attending_contractor.player_can_view(player) if attending_contractor else False,
+        'player_can_edit_contractor': attending_contractor.player_can_edit(player) if attending_contractor else False,
+        'reward': invitation.attendance.get_reward(),
+    }
+
 @register.inclusion_tag('reward_thumb.html')
 def render_reward(reward):
     return {

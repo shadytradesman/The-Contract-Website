@@ -1,0 +1,110 @@
+{% load games_tags %}
+{% load account_tags %}
+
+<div class="row">
+    <div class="col-xs-12">
+        <span class = "lead">
+            <strong>
+                {% if contractor %}
+                    {% if player_can_view_contractor %}
+                        <a href="{% url 'characters:characters_view' invitation.attendance.attending_character.id %}">
+                            {{invitation.attendance.attending_character.name}}
+                        </a>
+                    {% else %}
+                            {{invitation.attendance.attending_character.name}}
+                    {% endif %}
+                {% else %}
+                    An NPC ringer
+                {% endif %}
+            </strong>
+            -
+            {{ invitation.attendance.get_outcome_display }}
+            {% if invitation.attendance.is_mvp %}
+                <span class="glyphicon glyphicon-star css-scenario-rewarded-star" aria-hidden="true"
+                      data-toggle="tooltip"
+                      title='This Contractor earned bonus Commission. +2 Exp.'>
+                </span>
+            {% endif %}
+        </span>
+        <div  style="text-indent: 20px;">
+            Played by
+            <a href="{% url 'profiles:profiles_view_profile' invitation.invited_player.id %}">
+                <b>{{ invitation.invited_player.username }}</b>
+            </a>
+            <br>
+            {% if reward %}
+                <p>
+                {% if reward.relevant_power and player_can_view_contractor %}
+                    <div class="row">
+                        <div class="col-xs-10 col-xs-offset-1">
+                            <div class="thumbnail" style="margin-bottom: 10px;">
+                                {% render_reward reward %}
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    {% if reward.is_improvement %}
+                        {% user_display invitation.invited_player %} has not yet used their Improvement from this Contract.
+                    {% elif reward.is_charon_coin %}
+                        {% user_display invitation.invited_player %} has not yet used their Charon Coin from this Contract.
+                    {% else %}
+                        {{invitation.attendance.attending_character.name}} has not yet spent their Gift for this Contract.
+                        {% if player_can_edit_contractor %}
+                             <a href="{% url 'characters:characters_spend_reward' invitation.attendance.attending_character.id %}"
+                                class="btn btn-success btn-xs"
+                                style="text-indent: 0px;">
+                                 Accept Gift!
+                             </a>
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+                </p>
+            {% endif %}
+
+            {% if invitation.attendance.character_death.cause_of_death %}
+                Cause of death: {{ invitation.attendance.character_death.cause_of_death }}
+            {% endif %}
+
+            {% if invitation.attendance.notes %}
+            <p>
+                <i>{{invitation.attendance.notes}}</i>
+            </p>
+            {% endif %}
+
+            {% if invitation.attendance.journal_set.first and player_can_view_contractor %}
+            <p>
+                <a href="{% url 'journals:journal_read_game' invitation.attendance.attending_character.id game.id %}"
+                   class="btn btn-default btn-xs"
+                   style="text-indent: 0px;">
+                    Read {{invitation.attendance.attending_character.name}}'s Journal entry for this Contract
+                </a>
+            </p>
+            {% endif %}
+            {% if not invitation.attendance.is_confirmed %}
+                {% if invitation.is_declined %}
+                    <div class="alert alert-danger" role="alert">
+                        <p>
+                            This Player denied their attendance in this Contract.
+                        </p>
+                    </div>
+                {% else %}
+                    <br>
+                    <div class="alert row alert-warning col-xs-10 col-xs-offset-1" role="alert">
+                        {% if invitation.invited_player.id is request.user.id  %}
+                            <p>
+                                <a href="{% url 'games:games_confirm_attendance' invitation.attendance.id %}">
+                                    Click Here
+                                </a>
+                                to confirm or deny your attendance in this Contract.
+                            </p>
+                        {% else %}
+                            <p>
+                                This Player has not yet confirmed their attendance.
+                            </p>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</div>

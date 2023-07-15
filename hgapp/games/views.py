@@ -295,9 +295,8 @@ def view_scenario(request, scenario_id, game_id=None):
     scenario = get_object_or_404(Scenario, id=scenario_id)
     if not scenario.is_public() and not request.user.is_authenticated:
         raise PermissionDenied("You don't have permission to view this scenario")
-    if not scenario.is_public() and not scenario.player_discovered(request.user):
+    if not scenario.is_public() and not (scenario.player_discovered(request.user) or request.user.is_superuser):
         raise PermissionDenied("You don't have permission to view this scenario")
-
     if request.user.is_authenticated and scenario.is_spoilable_for_player(request.user):
         return HttpResponseRedirect(reverse('games:games_spoil_scenario', args=(scenario.id,)))
 
