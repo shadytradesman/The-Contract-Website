@@ -49,6 +49,7 @@ def power_rev_badge(power, force_show_warnings=False, crafter_blurb=None, artifa
         'art_id': art_id,
         'reward_count': reward_count,
         'at_least_one_gift': at_least_one_gift,
+        'can_edit': can_edit
     }
 
 @register.inclusion_tag('powers/power_badge_snippet.html')
@@ -86,6 +87,7 @@ def power_badge(power_full, force_show_warnings=False, artifact=None, can_edit=F
         'reward_count': reward_count,
         'at_least_one_gift': at_least_one_gift,
         'gift_cost': gift_cost,
+        'can_edit': can_edit
     }
 
 @register.inclusion_tag('powers/ps2_view_pages/heading_snip.html')

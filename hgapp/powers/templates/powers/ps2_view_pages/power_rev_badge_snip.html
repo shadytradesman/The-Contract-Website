@@ -22,8 +22,19 @@
                 {% endif %}
             </div>
         {% endif %}
+        {% if can_edit %}
+            <div class="pull-right" style="margin-left: 5px;">
+                <a href="{% url 'powers:powers_edit_power' power_full.id %}">
+                    <div class="btn btn-default btn-xs">
+                        <i class="fa fa-edit"></i>
+                    </div>
+                </a>
+            </div>
+        {% endif %}
         {% if show_active_toggle %}
-        <div class="pull-right form-inline" style="margin-left: 5px;">
+        <div class="pull-right form-inline" style="margin-left: 5px;"
+             data-title="Toggle this Gift's stat bonuses on or off"
+             data-toggle="tooltip" >
             <form
                     method="post"
                     {% if art_id %}
@@ -43,7 +54,7 @@
                 </div>
             </form>
             <div style="font-size: 10px; " class="{% if is_active %} text-success {% else %} text-muted {% endif %} text-center">
-                {% if is_active %}Stat Bonus+{% else %}Stat Bonus{% endif %}
+                {% if is_active %}Stat+ On{% else %}Stat Bonus{% endif %}
             </div>
         </div>
         {% endif %}
