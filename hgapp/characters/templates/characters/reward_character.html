@@ -17,24 +17,16 @@
     <div class="backdropped">
     {% if character.num_unspent_rewards > 0 or unspent_exp > 2 %}
         <div class="text-center">
-            {% if character.num_unspent_gifts > 0 %}
+            {% if character.num_unspent_rewards > 0 or unspent_exp > 2 %}
                 <h1>
                     You've done well, <a href="{% url 'characters:characters_view' character.id %}">{{ character.name }}</a>
                 </h1>
                 <h3>
-                    {% if character.num_unspent_rewards > 0 and unspent_exp > 2 %}
-                        Spend these rewards wisely
-                    {% elif character.num_unspent_gifts == 1 and character.num_unspent_improvements == 0 %}
-                        Spend this Gift wisely
-                    {% elif character.num_unspent_gifts > 1 %}
-                        Spend these Gifts wisely
-                    {% else %}
-                        Spend these rewards wisely
-                    {% endif %}
+                    {{ character.get_reward_phrase}}
                 </h3>
             {% else %}
                 <h1>
-                    Imbue <a href="{% url 'characters:characters_view' character.id %}">{{ character.name }}</a> with an Improvement
+                    <a href="{% url 'characters:characters_view' character.id %}">{{ character.name }}</a> has no Gifts, Improvements or Experience available
                 </h1>
             {% endif %}
         </div>
@@ -69,7 +61,7 @@
                             </a>
                         </div>
                     {% endif %}
-                    {% if unassigned_powers %}
+                    {% if unassigned_powers and character.num_unspent_rewards %}
                         <div style="margin: auto;  margin-bottom: 5px;">
                             <a class="btn btn-default btn-lg" href="{% url 'characters:characters_power_picker' character.id %}">
                                 Grant Unassigned Gifts
@@ -84,7 +76,7 @@
                         </div>
                     {% endif %}
                 </div>
-                {% if character.power_full_set.all|length > 0 %}
+                {% if character.power_full_set.all|length > 0  and character.num_unspent_rewards > 0 %}
                     <hr>
                     <h2 class="text-center">Improve Existing Gifts</h2>
                     {% for power_full in character.power_full_set.all %}
@@ -97,7 +89,7 @@
                                 {% endif %}
                             </div>
                             <div class= "col-xs-9 col-md-11">
-                                {% power_heading power_full.latest_revision %}
+                                {% power_badge power_full%}
                             </div>
                         </div>
                     {% endfor %}

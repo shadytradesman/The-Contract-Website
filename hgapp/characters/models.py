@@ -785,6 +785,31 @@ class Character(models.Model):
     def num_improvements(self):
         return self.reward_set.filter(is_void=False, is_improvement=True).count()
 
+    def get_reward_phrase(self):
+        num_gifts = self.num_unspent_gifts()
+        num_exp = self.unspent_experience()
+        num_improvements = self.num_unspent_improvements()
+        if num_gifts > 0:
+            if num_exp > 2 or num_improvements > 0:
+                return "Spend these Rewards wisely"
+            if num_gifts == 1:
+                return "Spend this Gift wisely"
+            else:
+                return "Spend these Gifts wisely"
+        elif num_improvements > 0:
+            if num_exp > 2:
+                return "Spend these Rewards wisely"
+            if num_improvements == 1:
+                return "Spend this Improvement wisely"
+            else:
+                return "Spend these Improvements wisely"
+        elif num_exp > 2:
+            return "Spend this Experience wisely"
+        else:
+            return "No Rewards available"
+
+
+
     def reward_cost_for_item(self, sig_item):
         unspent_gifts = self.unspent_gifts()
         num_unspent_gifts = self.num_unspent_gifts()
