@@ -787,7 +787,7 @@ def accept_invite(request, game_id):
                     invite.save()
                     if invite.as_ringer and not form.cleaned_data['attending_character']:
                         #Reveal scenario to ringer
-                        game.scenario.played_discovery(request.user)
+                        game.scenario.unlocked_discovery(request.user)
                     Notification.objects.create(
                         user=game.gm,
                         headline="Player RSVPed to your Contract",
