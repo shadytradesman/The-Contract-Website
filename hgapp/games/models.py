@@ -775,7 +775,7 @@ class Game_Attendance(models.Model):
     def render_timeline_display(self, user, var):
         reward = self.get_reward()
         spent_reward = reward is None or (hasattr(reward, "relevant_power") and reward.relevant_power is not None)
-        spent_exp = not hasattr(self, "experience_reward") or (self.experience_reward and self.experience_reward.rewarded_character.unspent_experience() < 3)
+        spent_exp = not hasattr(self, "experience_reward") or (self.experience_reward and self.experience_reward.rewarded_character and self.experience_reward.rewarded_character.unspent_experience() < 3)
         if spent_exp and spent_reward:
             return None
         if self.attending_character:

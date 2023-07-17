@@ -1378,7 +1378,7 @@ class Power(models.Model):
 
 
 class ArtifactPower(models.Model):
-    relevant_artifact = models.ForeignKey(Artifact, on_delete=models.PROTECT)
+    relevant_artifact = models.ForeignKey(Artifact, on_delete=models.CASCADE)
     relevant_power = models.ForeignKey(Power, on_delete=models.CASCADE)
 
     class Meta:

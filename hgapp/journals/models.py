@@ -159,6 +159,8 @@ class Journal(models.Model):
         return len(soup.text.split())
 
     def player_can_view(self, player):
+        if not hasattr(self.game_attendance, "attending_character") or self.game_attendance.attending_character is None:
+            return False
         return self.player_satisfies_nsfw_requirements(player) and self.player_satisfies_spoiler_requirements(player)
 
     def player_satisfies_nsfw_requirements(self, player):

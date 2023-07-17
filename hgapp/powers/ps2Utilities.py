@@ -38,7 +38,7 @@ def get_edit_context(existing_power_full=None, is_edit=False, existing_char=None
                 'stock_order': existing_power_full.stock_order,
             })
     else:
-        power_form = PowerForm ()
+        power_form = PowerForm()
     sig_item_artifact_form = make_select_signature_artifact_form(
         existing_character=existing_char,
         existing_power=existing_power_full,
