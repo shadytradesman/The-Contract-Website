@@ -24,7 +24,7 @@ from django.urls import reverse
 from characters.models import Character, CharacterTutorial
 from powers.models import Power_Full, Enhancement, Drawback, Parameter, Base_Power, SYS_LEGACY_POWERS, SYS_PS2
 
-from games.models import GAME_STATUS, Scenario, Game, Game_Attendance, WIN, LOSS, DEATH
+from games.models import GAME_STATUS, Scenario, Game, Game_Attendance, WIN, LOSS, DEATH, Scenario_Discovery
 from hgapp.forms import SignupForm, ResendEmailConfirmation, LoginUsernameOrEmailForm
 from blog.models import Post
 from info.models import FrontPageInfo
@@ -135,6 +135,8 @@ def home(request):
         num_deaths = Game_Attendance.objects.filter(outcome=DEATH, is_confirmed=True).count()
         now = datetime.datetime.now()
         two_hours_ago = now - datetime.timedelta(hours=2)
+
+
         games = Game.objects.filter(
             list_in_lfg=True,
             status=GAME_STATUS[0][0],
@@ -191,6 +193,10 @@ def home(request):
         email_verified = email and email.verified
 
         timeline_notifications = Notification.get_timeline_notifications_for_player_queryset(request.user)
+
+        guest_scenarios = set([x.relevant_scenario for x in Scenario_Discovery.objects.filter(discovering_player=196)])
+        shady_scenarios = set([x.relevant_scenario for x in Scenario_Discovery.objects.filter(discovering_player=23)])
+        guest_hasnt_played = shady_scenarios.difference(guest_scenarios)
         context = {
             'living_characters': living_characters,
             'dead_characters': dead_characters,
@@ -215,6 +221,7 @@ def home(request):
             'expand_playgroups': cells.count() < 5,
             'expand_gifts': my_powers.count() < 3,
             'expand_contracts': True,
+            'guest_hasnt_played':guest_hasnt_played,
         }
         if hasattr(request.user, 'profile'):
             if request.user.profile.early_access_user:

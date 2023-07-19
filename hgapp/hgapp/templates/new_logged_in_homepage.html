@@ -24,6 +24,11 @@
     <br>
      <div class="upper-section css-backgrounded" style="background-image: url({% static 'overrides/art/doors_bg.jpg' %});">
          <br>
+         {% for scenario in guest_hasnt_played %}
+         <div>
+             {{scenario.title}}
+         </div>
+         {% endfor %}
     <div class="text-center">
         <h1>Welcome, {% user_display request.user %} </h1>
         <br>
