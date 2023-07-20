@@ -31,8 +31,6 @@ if DEBUG:
 else:
     ALLOWED_HOSTS = [
         'hgapp-dev.us-west-2.elasticbeanstalk.com',
-        'thecontractgame.com',
-        'www.thecontractgame.com',
         'thecontractrpg.com',
         'www.thecontractrpg.com',
         'contract-al2-hgapp.wrumqdjmpw.us-west-2.elasticbeanstalk.com',
@@ -430,7 +428,7 @@ PAGEDOWN_WIDGET_CSS = ("overrides/pagedown_widget.css",)
 
 
 # Theme settings
-THEME_CONTACT_EMAIL = "TheContractGame@gmail.com"
+THEME_CONTACT_EMAIL = "admin@thecontractrpg.com"
 
 # TinyMCE settings
 TINYMCE_JS_URL = "https://cdn.tiny.cloud/1/12xkz9g5ryiyz78mjzhthvq62r42rsi6tzik4yulk1tol6rn/tinymce/5/tinymce.min.js"
