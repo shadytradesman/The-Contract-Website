@@ -1,0 +1,147 @@
+{% load static %}
+{% if request.user.profile.num_games_gmed == 0 %}
+<div>
+  <div class="panel panel-default">
+    <div class="panel-heading" style="display: flex;">
+      <div style="margin-right: 10px; width: 25px; height: 100%; padding-top: 5px; ">
+        <img src="{% static 'overrides/notif_icons/sprout.svg' %}" width=25 height="25">
+      </div>
+      <h3 style="margin-top: 5px; margin-bottom: 0px;">Let's Get Started</h3>
+    </div>
+    <div class="panel-body">
+      <h4>This checklist will update automatically as you complete its steps.</h4>
+      <ol style="" class="css-homepage-checklist">
+        <li>
+          ✅
+          <span style="text-decoration: line-through;">
+            Create an account
+          </span>
+        </li>
+        <li>
+          {% if visited_tutorial %}
+            ✅
+          {% endif %}
+            <span {% if visited_tutorial %} style="text-decoration: line-through;" {% endif %}>
+              <a href="{% url 'info:how-to-play' %}" target="_blank" rel="noopener noreferrer">
+                Learn to Play
+              </a>
+            </span>
+          {% if not visited_tutorial %}
+            <div>
+              <small>
+                Visit the <a href="{% url 'info:how-to-play' %}" target="_blank" rel="noopener noreferrer">How to Play</a> page for a variety of ways to learn The
+                Contract. Continue with the checklist as soon as you feel ready.
+              </small>
+            </div>
+          {% endif %}
+        </li>
+        <li>
+          {% if living_characters|length != 0 %}
+            ✅
+          {% endif %}
+          <span {% if living_characters|length != 0  %} style="text-decoration: line-through;" {% endif %}>
+            Create a Contractor
+          </span>
+          {% if living_characters|length == 0 %}
+            <div>
+              <small>
+                Whether you're going to play or GM, you should
+                <a href="{% url 'characters:characters_create' %}" target="_blank" rel="noopener noreferrer">
+                  Create a Contractor
+                </a>
+              </small>
+            </div>
+          {% endif %}
+        </li>
+        <li>
+          {% if cells|length != 0 %}
+            ✅
+          {% endif %}
+          <span {% if cells|length != 0  %} style="text-decoration: line-through;" {% endif %}>
+            Get a Playgroup
+          </span>
+          {% if cells|length == 0 %}
+            <div>
+              <small>
+                <a href="{% url 'cells:cells_create' %}" class="" target="_blank" rel="noopener noreferrer">
+                  Create
+                </a>
+                your own Playgroup or
+                <a href="{% url 'cells:cells_find_world' %}" class="" target="_blank" rel="noopener noreferrer">
+                  find a Playgroup
+                </a>
+                to join.
+              </small>
+            </div>
+          {% endif %}
+        </li>
+        <li>
+          {% if completed_a_contract %}
+            ✅
+          {% endif %}
+          <span {% if completed_a_contract %} style="text-decoration: line-through;" {% endif %}>
+            Play in a Contract
+          </span>
+          {% if not completed_a_contract %}
+            <div>
+              <small>
+                Attend one of your Playgroup's scheduled Contracts or visit the
+                <a href="{% url 'games:games_looking_for_game' %}" target="_blank" rel="noopener noreferrer">
+                  Looking for Game
+                </a>
+                page for a list of upcoming Contracts open to visitors.
+              </small>
+            </div>
+          {% endif %}
+        </li>
+        <li>
+          {% if rewarded_a_contractor %}
+            ✅
+          {% endif %}
+          <span {% if rewarded_a_contractor %} style="text-decoration: line-through;" {% endif %}>
+            Create a Gift for your Contractor
+          </span>
+          {% if not rewarded_a_contractor %}
+            <div>
+              <small>
+                {% if gift_earned is None %}
+                  You earn Gifts by claiming victory on Contracts. Once you do, you can
+                  <a href="{% url 'powers:powers_create_ps2' %}" >
+                    create a Gift
+                  </a>
+                  using the Gift Builder.
+                {% else %}
+                  You risked your life for greatness. Now
+                  <a href="{% url 'characters:characters_spend_reward' gift_earned.rewarded_character.id %}">spend {{gift_earned.rewarded_character.name}}'s Gift</a>.
+                {% endif %}
+              </small>
+            </div>
+          {% endif %}
+        </li>
+        <li>
+          GM a Contract
+          <div>
+            <small>
+              Since anyone can GM each time you play The Contract, you aren't a fully-fledged Player until you take your
+              turn and GM a Contract. Read the
+              <a href="https://thecontractrpg.com/guide/gm-manual/#how-to-start-gming">
+                How to Start GMing guide
+              </a>
+              for a crash course, and then dive right in!
+              {% if request.user.profile.num_player_games > 4 %}
+                <h4 class="text-danger">
+                  You have Played in {{request.user.profile.num_player_games}} contracts without GMing.
+                  <b>
+                    You are ready to GM.
+                  </b>
+                  The only way to get better is by doing it! Don't be afraid!
+                </h4>
+              {% endif %}
+            </small>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </div>
+</div>
+{% endif %}

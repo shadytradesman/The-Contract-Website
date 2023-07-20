@@ -115,3 +115,11 @@
     padding-left: 10px;
     padding-right: 10px;
 }
+
+.css-homepage-checklist {
+    font-size: 16px;
+}
+
+.css-homepage-checklist>li {
+    margin-top: 10px;
+}

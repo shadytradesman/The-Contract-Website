@@ -24,7 +24,7 @@ from django.urls import reverse
 from characters.models import Character, CharacterTutorial
 from powers.models import Power_Full, Enhancement, Drawback, Parameter, Base_Power, SYS_LEGACY_POWERS, SYS_PS2
 
-from games.models import GAME_STATUS, Scenario, Game, Game_Attendance, WIN, LOSS, DEATH, Scenario_Discovery
+from games.models import GAME_STATUS, Scenario, Game, Game_Attendance, WIN, LOSS, DEATH, Reward
 from hgapp.forms import SignupForm, ResendEmailConfirmation, LoginUsernameOrEmailForm
 from blog.models import Post
 from info.models import FrontPageInfo
@@ -135,8 +135,6 @@ def home(request):
         num_deaths = Game_Attendance.objects.filter(outcome=DEATH, is_confirmed=True).count()
         now = datetime.datetime.now()
         two_hours_ago = now - datetime.timedelta(hours=2)
-
-
         games = Game.objects.filter(
             list_in_lfg=True,
             status=GAME_STATUS[0][0],
@@ -194,9 +192,17 @@ def home(request):
 
         timeline_notifications = Notification.get_timeline_notifications_for_player_queryset(request.user)
 
-        guest_scenarios = set([x.relevant_scenario for x in Scenario_Discovery.objects.filter(discovering_player=196)])
-        shady_scenarios = set([x.relevant_scenario for x in Scenario_Discovery.objects.filter(discovering_player=23)])
-        guest_hasnt_played = shady_scenarios.difference(guest_scenarios)
+        completed_a_contract = True
+        rewarded_a_contractor = True
+        gift_earned = None
+        visited_tutorial = True
+        if request.user.profile.num_games_gmed == 0:
+            completed_a_contract = request.user.profile.num_player_games > 0
+            visited_tutorial = request.session.get("tutorial_visited", False) or completed_a_contract
+            rewarded_a_contractor = Reward.objects.filter(relevant_game__isnull=False, is_void=False, relevant_power__isnull=False, rewarded_player=request.user, is_improvement=False).count() > 0
+            gift_earned = Reward.objects.filter(relevant_game__isnull=False, is_void=False,
+                                                      relevant_power__isnull=True,
+                                                      rewarded_player=request.user, is_improvement=False).first()
         context = {
             'living_characters': living_characters,
             'dead_characters': dead_characters,
@@ -221,12 +227,12 @@ def home(request):
             'expand_playgroups': cells.count() < 5,
             'expand_gifts': my_powers.count() < 3,
             'expand_contracts': True,
-            'guest_hasnt_played':guest_hasnt_played,
+            'visited_tutorial': visited_tutorial,
+            'completed_a_contract': completed_a_contract,
+            'rewarded_a_contractor': rewarded_a_contractor,
+            'gift_earned': gift_earned,
         }
-        if hasattr(request.user, 'profile'):
-            if request.user.profile.early_access_user:
-                return render(request, 'new_logged_in_homepage.html', context)
-        return render(request, 'logged_in_homepage.html', context)
+        return render(request, 'new_logged_in_homepage.html', context)
 
 def csrf_failure(request, reason=""):
     raise PermissionDenied("CSRF token failure. Refresh form and try again.")

@@ -24,11 +24,6 @@
     <br>
      <div class="upper-section css-backgrounded" style="background-image: url({% static 'overrides/art/doors_bg.jpg' %});">
          <br>
-         {% for scenario in guest_hasnt_played %}
-         <div>
-             {{scenario.title}}
-         </div>
-         {% endfor %}
     <div class="text-center">
         <h1>Welcome, {% user_display request.user %} </h1>
         <br>
@@ -404,6 +399,9 @@
                 <div>
                     {% render_timeline_notif notif %}
                 </div>
+                {% if forloop.counter == 3 %}
+                    {% include "new_homepage_checklist.html" %}
+                {% endif %}
                 {% if forloop.counter|divisibleby:5 %}
                     {% render_fake_ad request.user forloop.counter %}
                 {% endif %}
@@ -457,6 +455,7 @@
                     </div>
                 </div>
             {% endif %}
+            {% include "new_homepage_checklist.html" %}
             {% if timeline_notifications|length < 5 %}
                 {% render_fake_ad request.user 'short' %}
             {% endif %}
