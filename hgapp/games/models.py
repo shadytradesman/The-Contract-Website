@@ -264,7 +264,7 @@ class Game(models.Model):
         if player.is_superuser:
             return None
         if hasattr(self, "max_rsvp") and self.max_rsvp and self.get_attended_players().count() >= self.max_rsvp:
-            if player not in self.get_attended_players():
+            if player not in [x.invited_player for x in self.get_attended_players()]:
                 return "This Contract is full."
         if self.invitation_mode == CLOSED or not self.is_scheduled():
             return "This Contract is closed for RSVPs."
@@ -1043,7 +1043,7 @@ class Scenario(models.Model):
             )
             discovery.save()
 
-    def unlocked_discovery(self, player):
+    def unlocked_discovery(self, player, notify=True):
         if not player.scenario_set.filter(id=self.id).exists():
             discovery = Scenario_Discovery(
                 discovering_player=player,
@@ -1052,14 +1052,15 @@ class Scenario(models.Model):
                 is_spoiled=False,
             )
             discovery.save()
-            Notification.objects.create(
-                user=player,
-                headline="You've unlocked a Scenario",
-                content="{}".format(self.title),
-                url=reverse("games:games_view_scenario", args=(self.pk,)),
-                notif_type=SCENARIO_NOTIF,
-                is_timeline=True,
-                article=discovery)
+            if notify:
+                Notification.objects.create(
+                    user=player,
+                    headline="You've unlocked a Scenario",
+                    content="{}".format(self.title),
+                    url=reverse("games:games_view_scenario", args=(self.pk,)),
+                    notif_type=SCENARIO_NOTIF,
+                    is_timeline=True,
+                    article=discovery)
             return discovery
         return None
 

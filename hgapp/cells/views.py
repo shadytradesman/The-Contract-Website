@@ -264,7 +264,7 @@ def view_cell(request, cell_id):
 
     memberships_and_characters = ()
     for role in ROLE:
-        for membership in cell.cellmembership_set.filter(role=role[0], is_banned=False).prefetch_related("member_player"):
+        for membership in cell.cellmembership_set.filter(role=role[0], is_banned=False).prefetch_related("member_player").order_by("member_player__username"):
             characters = membership.member_player.character_set.filter(cell=cell, is_deleted=False, is_dead=False).all()
             memberships_and_characters = memberships_and_characters + ((membership, characters,),)
     upcoming_games = cell.game_set.filter(status=GAME_STATUS[0][0])

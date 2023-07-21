@@ -10,7 +10,7 @@ from account.signals import user_signed_up
 def unlock_scenarios_for_new_users(sender, user, **kwargs):
     for tag in ScenarioTag.objects.filter(tag="public"):
         for scenario in tag.scenario_set.all():
-            scenario.unlocked_discovery(user)
+            scenario.unlocked_discovery(user, notify=False)
 
 
 # This is done as a signal instead of model override due to django doc recommendation
