@@ -1618,7 +1618,7 @@ const ComponentRendering = {
         }
       },
       mergeStatuses(currentStatus, requiredStatus, reason) {
-            if (null == requiredStatus || requiredStatus[0] === "ANY") {
+            if (null == requiredStatus || ["ANY", "NOVICE", "NEWBIE"].includes(requiredStatus[0])) {
                 return currentStatus;
             }
             if (requiredStatus[0] === "VETERAN") {
@@ -1806,7 +1806,11 @@ const ComponentRendering = {
           return this.drawbacks.filter(drawb => this.selectedDrawbacks.map(mod => mod.id).includes(drawb["id"]));
       },
       getRequiredStatusEnhancements(status) {
-        return this.enhancements.filter(enh => enh.requiredStatus[0] == status);
+        if (status === 'ANY') {
+            return this.enhancements.filter(enh => ['ANY', 'NEWBIE', 'NOVICE'].includes(enh.requiredStatus[0]))
+        } else {
+            return this.enhancements.filter(enh => enh.requiredStatus[0] == status);
+        }
       },
       getRequiredStatusDrawbacks(status) {
         return this.drawbacks.filter(drb => drb.requiredStatus[0] == status);
