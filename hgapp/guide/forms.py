@@ -54,6 +54,9 @@ def make_guide_section_form(previous_section=None, next_section=None):
         is_hidden = forms.BooleanField(label='Hide from non-admins?',
                                        help_text="If checked, non-admins will not be able to view this article. Great for WIPs!",
                                        required=False)
+        is_spoilers = forms.BooleanField(label='Contains spoilers??',
+                                       help_text="If checked, users must opt-in to view this content.",
+                                       required=False)
         content = forms.CharField(label='Content',
                                   widget=TinyMCE(attrs={'cols': 80, 'rows': 30}, mce_attrs=GUIDE_SECTION_TINYMCE_SETTINGS),
                                   max_length=73000,

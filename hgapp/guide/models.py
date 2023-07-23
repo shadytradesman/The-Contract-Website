@@ -36,7 +36,6 @@ class GuideBook(models.Model):
         return reverse('guide:read_guidebook', args=(self.slug,))
 
 
-
 class GuideSection(models.Model):
     # Sections and subsections of a book.
     book = models.ForeignKey(GuideBook, on_delete=models.CASCADE)
@@ -46,6 +45,7 @@ class GuideSection(models.Model):
     position = models.PositiveIntegerField(default=1) # Guide sections are ordered by their position.
     is_deleted = models.BooleanField(default=False)
     is_hidden = models.BooleanField(default=False)
+    is_spoilers = models.BooleanField(default=False)
     content = models.TextField(max_length=74000) # tinymce html content for editing
     rendered_content = models.TextField(max_length=78000) # content that is rendered for display
     last_editor = models.ForeignKey(

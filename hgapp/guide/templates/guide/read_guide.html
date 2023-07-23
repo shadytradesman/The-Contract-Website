@@ -116,9 +116,63 @@
                                 {% endif %}
                             </div>
                             {% if section.rendered_content %}
-                            <div class="css-section-body">
-                                {{section.rendered_content|safe}}
-                            </div>
+                                {% if section.is_spoilers %}
+                                        <div
+                                            id="collapse-section-{{section.id}}-heading"
+                                            {% if request.user.is_authenticated %}
+                                                role="button" data-toggle="collapse"
+                                                data-target=".collapse-section-{{section.id}}"
+                                                aria-expanded="false"
+                                                aria-controls="collapse-section-{{section.id}}"
+                                            {% endif %}
+                                        >
+                                            <div class="collapse collapse-section-{{section.id}} in"
+                                                 role="tabpanel"
+                                                 aria-labelledby="collapse-section-{{section.id}}-heading" >
+                                                <div class="css-section-body">
+                                                    <h4 class="text-center">
+                                                        This section is hidden because it contains spoilers
+                                                        <div>
+                                                            <small>
+                                                                Only read this section if you're looking for content to GM.
+                                                                Otherwise, you risk learning too much about content that may be run for you.
+                                                            </small>
+                                                        </div>
+                                                        {% if request.user.is_authenticated %}
+                                                            <div style="margin-top:5px;">
+                                                                <small >
+                                                                    (<span class="visible-xs-inline visible-sm-inline">tap</span><span class="hidden-xs hidden-sm">click</span>
+                                                                    to expand)
+                                                                </small>
+                                                            </div>
+                                                        {% else %}
+                                                            <div style="margin-top:15px;">
+                                                                You must
+                                                                <a href="{% url 'account_login' %}">
+                                                                    log in
+                                                                </a>
+                                                                to view spoilers.
+                                                            </div>
+                                                        {% endif %}
+                                                    </h4>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div
+                                            class="panel-collapse collapse collapse-section-{{section.id}}"
+                                            role="tabpanel"
+                                            aria-labelledby="collapse-section-{{section.id}}-heading">
+                                            <div class="css-section-body">
+                                                {% if request.user.is_authenticated %}
+                                                    {{section.rendered_content|safe}}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                {% else %}
+                                    <div class="css-section-body">
+                                        {{section.rendered_content|safe}}
+                                    </div>
+                                {% endif %}
                             {% endif %}
                             {% if section.header_level > 1 %}
                                 </div>
