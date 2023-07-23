@@ -28,104 +28,106 @@
     {% include "games/view_game_pages/navbar_snippet.html" %}
     <div class="panel-group">
         <div class="panel panel-default">
-            <h3 class="text-center">
-                <a href="{% url 'profiles:profiles_view_profile' game.creator.id %}">
-                    {% if request.user == game.gm %}
-                        You
-                    {% else %}
-                        {% user_display game.gm %}
-                    {% endif %}
-                </a>
-                {% if game.is_scheduled %}
-                    will run
-                {% elif game.is_active%}
-                    {% if request.user == game.gm %}
-                        are
-                    {% else %}
-                        is
-                    {% endif %}
-                    currently running
-                {% elif game.is_canceled %}
-                    {% if request.user == game.gm %}
-                        were
-                    {% else %}
-                        was
-                    {% endif %}
-                    going to run
-                {% else %}
-                    ran
-                {% endif %}
-                {% render_scenario_title_check_for_link game.scenario %}
-                {% if scenario_spoiled %}
-                    {% if game.scenario.objective%}
-                        <div style="padding-left: 10px; padding-right: 10px;">
-                            <small>
-                                {{game.scenario.objective}}
-                            </small>
-                        </div>
-                    {% endif %}
-                {% endif %}
-            </h3>
-                <h4 class="text-center">
-                    This Contract
-                    {% if game.is_scheduled %}
-                        will take place
-                    {% elif game.is_active%}
-                        is taking place
-                    {% elif game.is_canceled%}
-                        would have taken place
-                    {% else %}
-                        took place
-                    {% endif %}
-                    {% if game.cell %}
-                        in <a href="{% url 'cells:cells_view_cell' game.cell.id %}">{{ game.cell.name }}</a>
-                    {% endif %}
-                    {% if game.is_scheduled %}
-                        in {{ game.scheduled_start_time|timeuntil }}:
-                        on {{ game.scheduled_start_time|date:'M d, Y' }} at {{ game.scheduled_start_time|date:'g:iA' }}
-                        {% if request.user.account %}
-                            {{request.user.account.timezone}}
+            <div class="panel-body" style="padding-top: 0px; padding-bottom: 0px;">
+                <h3 class="text-center">
+                    <a href="{% url 'profiles:profiles_view_profile' game.creator.id %}">
+                        {% if request.user == game.gm %}
+                            You
+                        {% else %}
+                            {% user_display game.gm %}
                         {% endif %}
+                    </a>
+                    {% if game.is_scheduled %}
+                        will run
                     {% elif game.is_active%}
-                    {% elif game.is_canceled%}
-                        but was canceled and never occurred
+                        {% if request.user == game.gm %}
+                            are
+                        {% else %}
+                            is
+                        {% endif %}
+                        currently running
+                    {% elif game.is_canceled %}
+                        {% if request.user == game.gm %}
+                            were
+                        {% else %}
+                            was
+                        {% endif %}
+                        going to run
                     {% else %}
-                        on {{ game.end_time|date:'M d, Y' }} at {{ game.end_time|date:'g:iA' }}
-                        {% if request.user.account %}
-                            {{request.user.account.timezone}}
+                        ran
+                    {% endif %}
+                    {% render_scenario_title_check_for_link game.scenario %}
+                    {% if scenario_spoiled %}
+                        {% if game.scenario.objective%}
+                            <div style="padding-left: 10px; padding-right: 10px;">
+                                <small>
+                                    {{game.scenario.objective}}
+                                </small>
+                            </div>
                         {% endif %}
                     {% endif %}
-                </h4>
-            {% if game.is_scheduled or game.is_active %}
-                {% if gametime_url or community_link %}
-                <div class="row">
-                    <div class="col-md-10 col-md-offset-1 text-center">
-                        <div role="alert" class="alert alert-info" style="padding: 5px;">
-                            <b>
-                            {% if gametime_url %}
-                                Gametime link:
-                                <a href="{{gametime_url}}">
-                                    {{gametime_url}}
-                                </a>
-                            {% elif community_link %}
-                                {% if is_discord_link %}
-                                    <a class="btn btn-default btn" href="{{community_link}}" target="_blank" rel="noopener noreferrer">
-                                        <img class="float-left" src="{% static 'overrides/other_graphics/Discord-Logo-Color.svg' %}" style="width: 25px; height: 25px; position: absolute;">
-                                        <span style="padding-left: 25px;">Visit {{game.cell.name}}'s Discord Server</span>
-                                    </a>
-                                {% else %}
-                                    {{game.cell.name}}'s off-site community:
-                                    <a href="{{community_link}}">
-                                        {{community_link}}
-                                    </a>
-                                {% endif %}
+                </h3>
+                    <h4 class="text-center">
+                        This Contract
+                        {% if game.is_scheduled %}
+                            will take place
+                        {% elif game.is_active%}
+                            is taking place
+                        {% elif game.is_canceled%}
+                            would have taken place
+                        {% else %}
+                            took place
+                        {% endif %}
+                        {% if game.cell %}
+                            in <a href="{% url 'cells:cells_view_cell' game.cell.id %}">{{ game.cell.name }}</a>
+                        {% endif %}
+                        {% if game.is_scheduled %}
+                            in {{ game.scheduled_start_time|timeuntil }}:
+                            on {{ game.scheduled_start_time|date:'M d, Y' }} at {{ game.scheduled_start_time|date:'g:iA' }}
+                            {% if request.user.account %}
+                                {{request.user.account.timezone}}
                             {% endif %}
-                            </b>
+                        {% elif game.is_active%}
+                        {% elif game.is_canceled%}
+                            but was canceled and never occurred
+                        {% else %}
+                            on {{ game.end_time|date:'M d, Y' }} at {{ game.end_time|date:'g:iA' }}
+                            {% if request.user.account %}
+                                {{request.user.account.timezone}}
+                            {% endif %}
+                        {% endif %}
+                    </h4>
+                {% if game.is_scheduled or game.is_active %}
+                    {% if gametime_url or community_link %}
+                    <div class="row">
+                        <div class="col-md-10 col-md-offset-1 text-center">
+                            <div role="alert" class="alert alert-info" style="padding: 5px;">
+                                <b>
+                                {% if gametime_url %}
+                                    Gametime link:
+                                    <a href="{{gametime_url}}">
+                                        {{gametime_url}}
+                                    </a>
+                                {% elif community_link %}
+                                    {% if is_discord_link %}
+                                        <a class="btn btn-default btn" href="{{community_link}}" target="_blank" rel="noopener noreferrer">
+                                            <img class="float-left" src="{% static 'overrides/other_graphics/Discord-Logo-Color.svg' %}" style="width: 25px; height: 25px; position: absolute;">
+                                            <span style="padding-left: 25px;">Visit {{game.cell.name}}'s Discord Server</span>
+                                        </a>
+                                    {% else %}
+                                        {{game.cell.name}}'s off-site community:
+                                        <a href="{{community_link}}">
+                                            {{community_link}}
+                                        </a>
+                                    {% endif %}
+                                {% endif %}
+                                </b>
+                            </div>
                         </div>
                     </div>
-                </div>
+                    {% endif %}
                 {% endif %}
-            {% endif %}
+            </div>
             {% if game.is_scheduled and game.hook %}
                 <div class="panel-heading">
                     <p>
@@ -153,24 +155,25 @@
                             {% else %}
                                 Contractor, regardless of Status.
                             {% endif %}
-                            <br>
-                            <b>{{game.gm.username}}'s GM title: </b> {% render_gm_title game.gm %}
-                            {% if game.mediums.all|length %}
-                                <br>
-                                <b>Medium:</b>
-                                {% render_game_mediums game %}
-                            {% endif %}
-                            {% if not game.gm == request.user and request.user.is_authenticated %}
-                                <br>
-                                <a href="{% url 'postman:write' game.gm.username %}">
-                                    <i class="fa fa-envelope-o fa-1x"></i> Send {{game.gm.username}} a message.
-                                </a>
-                            {% endif %}
-                            {% if request.user.is_anonymous %}
-                                <br>
-                                <a href="{% url 'account_login' %}">Log in</a>
-                                and RSVP to view this Contract's game-time communication link.
-                            {% endif %}
+                            <div style="margin-top: 10px;">
+                                <b>{{game.gm.username}}'s GM title: </b> {% render_gm_title game.gm %}
+                                {% if game.mediums.all|length %}
+                                    <br>
+                                    <b>Medium:</b>
+                                    {% render_game_mediums game %}
+                                {% endif %}
+                                {% if not game.gm == request.user and request.user.is_authenticated %}
+                                    <br>
+                                    <a href="{% url 'postman:write' game.gm.username %}">
+                                        <i class="fa fa-envelope-o fa-1x"></i> Send {{game.gm.username}} a message.
+                                    </a>
+                                {% endif %}
+                                {% if request.user.is_anonymous %}
+                                    <br>
+                                    <a href="{% url 'account_login' %}">Log in</a>
+                                    and RSVP to view this Contract's game-time communication link.
+                                {% endif %}
+                            </div>
                         </small>
                     </h4>
                 </div>

@@ -1,0 +1,13 @@
+{% load games_tags %}
+
+{% for status, scenarios in runnable_scenarios_by_status.items %}
+  <h3>{{status}}</h3>
+  <ul>
+    {% for scenario in scenarios %}
+    <li>
+      {% render_scenario_title_with_link scenario %}
+    </li>
+    {% endfor %}
+  </ul>
+{% endfor %}
+

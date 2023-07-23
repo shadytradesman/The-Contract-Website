@@ -1,6 +1,8 @@
 {% load account_tags %}
 {% load bootstrap %}
 
+{% include "games/view_game_pages/other_scenarios_modal.html" %}
+
 <div class="panel-body">
     {% if user.is_authenticated and user == game.gm %}
         <h3 class="text-center" style="margin-top: 5px;">
@@ -19,6 +21,19 @@
 
         {% if game.get_accepted_invites %}
             <h4>Accepted Invites</h4>
+                {% if request.user == game.gm %}
+                    <div style="margin:5px;">
+                        <button type="button"
+                                class="btn btn-default btn-xs" data-toggle="modal" data-target="#otherScenariosModal"
+                                hx-get="{% url 'games:other_scenarios' game.id %}"
+                                hx-trigger="click"
+                                hx-target="#other-scenarios-content"
+                                hx-swap="outerHTML"
+                        >
+                            What else could I run for these Players?
+                        </button>
+                    </div>
+                {% endif %}
             <ul>
                 {% for invitation in game.get_accepted_invites %}
                 <li>

@@ -37,7 +37,7 @@ from cells.models import WorldEvent
 
 from games.models import Scenario, Game, DISCOVERY_REASON, Game_Invite, Game_Attendance, Reward, REQUIRED_HIGH_ROLLER_STATUS, \
     Move, GameChangeStartTime, GameEnded, ScenarioWriteup, MISSION, OVERVIEW, BACKSTORY, INTRODUCTION, AFTERMATH, \
-    ScenarioElement
+    ScenarioElement, Scenario_Discovery
 
 from profiles.models import Profile
 
@@ -64,6 +64,29 @@ def enter_game(request):
         'cells' : cells,
     }
     return render(request, 'games/enter_game.html', context)
+
+
+def view_other_scenarios(request, game_id):
+    game = get_object_or_404(Game, id=game_id)
+    if request.user != game.gm:
+        raise PermissionDenied("Cannot view other Scenarios for a Contract you aren't the GM for")
+    my_scenario_discoveries = Scenario_Discovery.objects\
+        .filter(discovering_player=request.user)\
+        .select_related("relevant_scenario")\
+        .order_by("relevant_scenario__title")
+    their_scenario_ids = set()
+    for invite in game.get_accepted_invites():
+        their_scenario_ids.update(Scenario_Discovery.objects
+                                  .filter(discovering_player=invite.invited_player, is_spoiled=True)
+                                  .values_list("relevant_scenario__pk", flat=True))
+    runnable_scenarios = [x.relevant_scenario for x in my_scenario_discoveries if x.relevant_scenario.pk not in their_scenario_ids]
+    runnable_scenarios_by_status = defaultdict(list)
+    for scenario in runnable_scenarios:
+        runnable_scenarios_by_status[scenario.get_suggested_status_display()].append(scenario)
+    context = {
+        "runnable_scenarios_by_status": dict(runnable_scenarios_by_status),
+    }
+    return render(request, 'games/view_game_pages/runnable_scenarios_content.html', context)
 
 
 def activity(request):

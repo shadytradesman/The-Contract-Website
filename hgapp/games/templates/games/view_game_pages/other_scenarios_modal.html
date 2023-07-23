@@ -1,0 +1,26 @@
+{% extends "powers/ps2_create_pages/tutorial/modal_template_longwise.html" %}
+
+{% block modal_id %}otherScenariosModal{% endblock %}
+
+{% block modal_title %}
+Other Scenarios for this group
+{% endblock %}
+
+{% block modal_header %}
+{% endblock %}
+
+{% block modal_body %}
+<p>
+  Given the Players who have RSVPed, which of your available Scenarios are unspoiled for all of them?
+</p>
+<div id="other-scenarios-content">
+  <div id="loading-spinner" style="position:relative; margin:auto;">
+    <h1 class="text-center">
+      <span class="glyphicon glyphicon-refresh spin"></span>
+      <div>
+        <small style="margin-top: 15px;">Loading...</small>
+      </div>
+    </h1>
+  </div>
+</div>
+{% endblock %}
