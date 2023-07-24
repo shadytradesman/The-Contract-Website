@@ -43,7 +43,7 @@
           </ul>
     </li>
     {% else %}
-        <li><a class="btn-primary" href="{% url 'account_login' %}">{% trans "Log in" %}</a></li>
+        <li><a class="btn-primary css-nav-butt" href="{% url 'account_login' %}">{% trans "Log in" %}</a></li>
         {% if ACCOUNT_OPEN_SIGNUP %}
             <li><a class="hidden-xs" href="{% url 'account_signup' %}" class="btn-primary">{% trans "Sign up" %}</a></li>
         {% endif %}
