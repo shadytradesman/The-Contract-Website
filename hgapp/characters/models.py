@@ -332,8 +332,8 @@ PORTED_IMPROVEMENT_ADJUSTMENT = {
 }
 PORTED_EXP_ADJUSTMENT = {
     NOT_PORTED: 0,
-    SEASONED_PORTED: 90,
-    VETERAN_PORTED: 180,
+    SEASONED_PORTED: 100,
+    VETERAN_PORTED: 200,
 }
 
 
@@ -581,7 +581,13 @@ class Character(models.Model):
         return self.num_victories if self.num_victories else 0
 
     def get_contractor_status_display(self):
-        return self.get_status_display() if self.ported == NOT_PORTED else self.get_ported_display()
+        if self.ported == NOT_PORTED:
+            return self.get_status_display()
+        else:
+            effective_victories = self.number_of_victories() + PORTED_GIFT_ADJUSTMENT[self.ported]
+            effective_status = self.calculate_status(num_victories=effective_victories)
+            return "Ported {}".format(effective_status.lower().capitalize())
+
 
     def get_calculated_contractor_status_display(self):
         self.status = self.calculate_status()
@@ -606,8 +612,9 @@ class Character(models.Model):
             return self.number_completed_games()
         return self.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).exclude(relevant_game__cell=self.cell).count()
 
-    def calculate_status(self):
-        num_victories = self.number_of_victories()
+    def calculate_status(self, num_victories=None):
+        if num_victories is None:
+            num_victories = self.number_of_victories()
         if num_victories < 4:
             return STATUS_NEWBIE
         elif num_victories < 10:
