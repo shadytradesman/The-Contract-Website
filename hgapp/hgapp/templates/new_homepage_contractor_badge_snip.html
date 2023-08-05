@@ -15,6 +15,18 @@
             </a>
         {% endif %}
     {% endif %}
+    {% if  character.is_dead %}
+    {% if character.needs_obit %}
+    <a class="btn btn-primary btn-xs text-center" href="{%url 'characters:characters_obituary' character.id %}" style="height: 40px; margin-top: 2px;">
+        <i class="fa fa-hand-spock-o fa-2x"></i>
+        <small style="position:relative; bottom: 3px;">
+            <div>
+                RIP
+            </div>
+        </small>
+    </a>
+    {% endif %}
+    {% endif %}
     <a href="{% url 'characters:characters_view' character.id %}" style="flex:1;">
         <div >
             <div>
@@ -25,13 +37,6 @@
                     </div>
                 </h4>
                 <div style="padding-top: 5px;">
-                    {% if character.is_dead %}
-                        {% if character.needs_obit %}
-                        <a href="{%url 'characters:characters_obituary' character.id %}" class="btn btn-info btn-xs">
-                            Write Epitaph
-                        </a>
-                        {% endif %}
-                    {% endif %}
                 </div>
             </div>
         </div>

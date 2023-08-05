@@ -548,7 +548,8 @@ class Character(models.Model):
         self._update_loss_count()
         self._update_victory_count()
         self._update_game_count()
-        self.status = self.calculate_status()
+        effective_victories = self.number_of_victories() + PORTED_GIFT_ADJUSTMENT[self.ported]
+        self.status = self.calculate_status(num_victories=effective_victories)
         self.save()
 
     def get_source_refill_cooldown(self):
@@ -589,7 +590,8 @@ class Character(models.Model):
             return "Ported {}".format(effective_status.lower().capitalize())
 
     def get_calculated_contractor_status_display(self):
-        self.status = self.calculate_status()
+        effective_victories = self.number_of_victories() + PORTED_GIFT_ADJUSTMENT[self.ported]
+        self.status = self.calculate_status(num_victories=effective_victories)
         return self.get_contractor_status_display()
 
     def _update_victory_count(self):
