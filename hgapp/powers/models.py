@@ -443,7 +443,7 @@ class Parameter(models.Model):
             levels.append(self.level_six)
         return levels
 
-    def get_value_for_level(self, level):
+    def get_value_for_level(self, level: int) -> models.CharField:
         if level == 0:
             return self.level_zero
         if level == 1:
