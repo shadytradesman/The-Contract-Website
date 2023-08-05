@@ -588,7 +588,6 @@ class Character(models.Model):
             effective_status = self.calculate_status(num_victories=effective_victories)
             return "Ported {}".format(effective_status.lower().capitalize())
 
-
     def get_calculated_contractor_status_display(self):
         self.status = self.calculate_status()
         return self.get_contractor_status_display()
