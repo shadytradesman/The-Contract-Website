@@ -284,13 +284,11 @@
                                     </div>
                                     <div class="row css-home-row">
                                         {% for power_full in powers %}
-                                        {% if not power_full.character %}
                                         <a href="{% url 'powers:powers_view_power_full' power_full.id %}">
                                             <div >
                                                 {% power_heading power_full.latest_rev %}
                                             </div>
                                         </a>
-                                        {% endif %}
                                         {% endfor %}
                                     </div>
                                 {% else %}
