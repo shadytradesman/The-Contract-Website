@@ -110,7 +110,7 @@
                     create a Gift
                   </a>
                   using the Gift Builder.
-                {% else %}
+                {% elif gift_earned.rewarded_character %}
                   You risked your life for greatness. Now
                   <a href="{% url 'characters:characters_spend_reward' gift_earned.rewarded_character.id %}">spend {{gift_earned.rewarded_character.name}}'s Gift</a>.
                 {% endif %}
