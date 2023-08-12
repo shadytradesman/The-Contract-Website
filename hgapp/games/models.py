@@ -767,7 +767,7 @@ class Game_Attendance(models.Model):
             self.attending_character.reveal_char_and_powers_to_player(self.relevant_game.gm)
         elif self.attending_character:
             self.attending_character.default_perms_char_and_powers_to_player(self.relevant_game.gm)
-        if (not hasattr(self, "attending_character") or self.attending_character is None) and self.is_confirmed:
+        if (not hasattr(self, "attending_character") or self.attending_character is None) and self.is_confirmed and hasattr(self, "game_invite") and self.game_invite is not None:
             self.relevant_game.scenario.unlocked_discovery(self.game_invite.invited_player)
 
     # prevent double attendance
