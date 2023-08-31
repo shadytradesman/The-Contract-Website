@@ -1,21 +1,36 @@
 {% if not empty %}
 <div class="css-ad-container css-no-print">
-    <a type="button" data-toggle="modal" data-target="#fakeAdModal{{counter}}" style="padding:0px;">
-        {% with ad.get_random_banner as banner %}
+    {% if ad.url %}
+        <a href="{{ad.url}}" style="padding:0px;" target="_blank" rel="noopener noreferrer">
+            {% with ad.get_random_banner as banner %}
             <div style="
-                position: relative;
-                height: 0;
-                padding-top: min(calc({{banner.height}} / {{banner.width}} * 100%), 15vh);">
+                    position: relative;
+                    height: 0;
+                    padding-top: min(calc({{banner.height}} / {{banner.width}} * 100%), 15vh);">
                 <img src="{{ banner.url}}" class="css-fake-ad-banner">
             </div>
-        {% endwith %}
-    </a>
+            {% endwith %}
+        </a>
+    {% else %}
+        <a type="button" data-toggle="modal" data-target="#fakeAdModal{{counter}}" style="padding:0px;">
+            {% with ad.get_random_banner as banner %}
+                <div style="
+                    position: relative;
+                    height: 0;
+                    padding-top: min(calc({{banner.height}} / {{banner.width}} * 100%), 15vh);">
+                    <img src="{{ banner.url}}" class="css-fake-ad-banner">
+                </div>
+            {% endwith %}
+        </a>
+    {% endif %}
     <figcaption>
         <small>
+            {% if not ad.url %}
             <a type="button" data-toggle="modal" data-target="#fakeAdModal{{counter}}" href="">
                 Learn about {{ad.subject}}
             </a>
             -
+            {% endif %}
             <a href="{% url 'profiles:profiles_edit' %}">
                 Hide fake ads
             </a>

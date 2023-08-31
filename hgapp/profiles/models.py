@@ -1,7 +1,5 @@
 from django.db import models
 from django.conf import settings
-from django.contrib.auth.models import Permission
-from .apps import ProfilesConfig
 
 from django.utils import timezone
 from games.models import Game, Move, REQUIRED_HIGH_ROLLER_STATUS, REQ_STATUS_ANY, REQ_STATUS_NEWBIE_OR_NOVICE, \
@@ -44,6 +42,7 @@ PROFESSIONAL = 'PROFESSIONAL'
 VETERAN = 'VETERAN'
 MASTER = 'MASTER'
 GRANDMASTER = 'GRANDMASTER'
+LEGEND = 'LEGEND'
 PLAYER_SUFFIX = (
     (NEWBIE, 'Newbie'),
     (NOVICE, 'Novice'),
@@ -53,6 +52,7 @@ PLAYER_SUFFIX = (
     (SEASONED, 'Operative'),
     (MASTER, 'Master'),
     (GRANDMASTER, 'Grandmaster'),
+    (LEGEND, 'Legend'),
 )
 
 GM_PREFIX = (
@@ -70,6 +70,7 @@ RULER = 'RULER'
 GOD = 'GOD'
 HARBINGER = 'HARBINGER'
 MIDDLE_MANAGEMENT = 'MIDDLE_MANAGEMENT'
+PSYCHO = 'PSYCHO'
 GM_SUFFIX = (
     (SPECTATOR, 'Spectator'),
     (REFEREE, 'Referee'),
@@ -77,7 +78,8 @@ GM_SUFFIX = (
     (RULER, 'Ruler'),
     (GOD, 'God'),
     (HARBINGER, 'Harbinger'),
-    (MIDDLE_MANAGEMENT, 'Manager')
+    (MIDDLE_MANAGEMENT, 'Manager'),
+    (PSYCHO, 'Psycho')
 )
 
 
@@ -374,8 +376,10 @@ class Profile(models.Model):
             return VETERAN
         elif num_completed < 350:
             return MASTER
-        else:
+        elif num_completed < 500:
             return GRANDMASTER
+        else:
+            return LEGEND
 
 
     def _gm_suffix_from_num_gm_games(self, num_games_gmed, num_moves_gmed):
@@ -392,8 +396,10 @@ class Profile(models.Model):
             return RULER
         elif num_gm_games < 100:
             return HARBINGER
-        else:
+        elif num_gm_games < 200:
             return GOD
+        else:
+            return PSYCHO
 
 
     def _gm_prefix_from_stats(self, num_gm_games, num_killed_contractors):

@@ -10,6 +10,7 @@ class FakeAd(models.Model):
     headline = models.CharField(max_length=3000)
     subject = models.CharField(max_length=3000)
     content = models.TextField(max_length=20000)
+    url = models.TextField(max_length=20000, blank=True)
 
     def get_random_banner(self):
         banners = [self.banner, self.banner_2, self.banner_3]
