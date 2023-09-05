@@ -181,11 +181,6 @@ def home(request):
         cells = request.user.cell_set.filter(cellmembership__is_banned=False).all()
         world_events = None
         cell_invites = None
-        if hasattr(request.user, 'profile'):
-            if not request.user.profile.early_access_user:
-                cell_ids = set(request.user.cell_set.values_list('id', flat=True).all())
-                world_events = WorldEvent.objects.filter(parent_cell__id__in=cell_ids).order_by('-created_date').all()[:3]
-                cell_invites = request.user.cellinvite_set.filter(membership=None).filter(is_declined=False).all()
         attendance_invites_to_confirm = request.user.game_invite_set.filter(attendance__is_confirmed=False).exclude(is_declined=True).all()
         email = EmailAddress.objects.get_primary(request.user)
         email_verified = email and email.verified
