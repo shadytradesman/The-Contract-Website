@@ -26,6 +26,18 @@ urlpatterns = [
     url(r'^edit/s/(?P<scenario_id>[\d]+)/$',
         RedirectView.as_view(pattern_name='games:games_scenario_edit', query_string=True, permanent=True)),
 
+    # ex: .com/contract/scenario/submit/112
+    url(r'^scenario/submit/(?P<scenario_id>[\d]+)/$', views.submit_scenario, name='games_scenario_submit'),
+
+    # ex: .com/contract/scenario/retract/112
+    url(r'^scenario/retract/(?P<scenario_id>[\d]+)/$', views.retract_scenario, name='games_scenario_retract'),
+
+    # ex: .com/contract/scenario/approvals/
+    url(r'^scenario/approvals/$', views.approve_scenarios, name='games_scenario_approve'),
+
+    # ex: .com/contract/scenario/approve/112
+    url(r'^scenario/approve/(?P<scenario_id>[\d]+)/$', views.approve_scenario, name='games_scenario_approve_specific'),
+
     # ex: .com/contract/scenario/110
     url(r'^scenario/(?P<scenario_id>[\d]+)/$', views.view_scenario, name='games_view_scenario'),
     url(r'^view/s/(?P<scenario_id>[\d]+)/$',

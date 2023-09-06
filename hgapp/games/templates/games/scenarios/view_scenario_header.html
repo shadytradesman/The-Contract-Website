@@ -6,15 +6,17 @@
                     Edit Scenario
                 </a>
             </li>
-        <li>
-            <a class="btn-default" href="{% url 'games:scenario_history' scenario.id %}">
-                View Edit History
-            </a>
-        </li>
+            <li>
+                <a class="btn-default" href="{% url 'games:scenario_history' scenario.id %}">
+                    View Edit History
+                </a>
+            </li>
+            {% if not scenario.is_on_exchange %}
+                <li>
+                    <a class="btn-default" href="{% url 'games:games_scenario_submit' scenario.pk %}">Submit to Exchange</a>
+                </li>
+            {% endif %}
         {% endif %}
-        <li>
-            <a class="btn-default" href="{% url 'games:games_view_scenario_gallery' %}">My Scenario Gallery</a>
-        </li>
         <li>
             <a class="btn-default" href="{% url 'games:games_create_game' %}">Schedule Contract</a>
         </li>

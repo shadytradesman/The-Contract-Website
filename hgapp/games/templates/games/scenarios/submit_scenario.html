@@ -1,0 +1,143 @@
+{% extends "site_base.html" %}
+
+
+{% load account_tags %}
+{% load static %}
+
+{% block extra_scripts %}
+{% endblock %}
+
+{% block head_title %}
+Submit Scenario
+{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+
+{% block body_base %}
+<div class="container">
+    <div class="panel panel-default" style="margin-top: 15px;">
+        <div class="panel-body">
+            {% if scenario.is_on_exchange %}
+                <h3>This Scenario is already on the Community Scenario Exchange.</h3>
+            {% else %}
+                {% if not latest_approval or not latest_approval.is_waiting %}
+                    <div class="text-center">
+                        <h3>Submit {{scenario.title}} to the Community Scenario Exchange?</h3>
+                    </div>
+
+                    <div style="max-width: 800px; margin: auto;">
+                        <small>
+                            <i>
+                                <p>
+                                    Once you submit your Scenario to the Community Scenario Exchange, it must be approved by
+                                    a site administrator to ensure quality.
+                                </p>
+                                <p>
+                                    Once your Scenario is approved, it will appear on the Community Scenario Exchange and you
+                                    will earn {{submission_value}} Exchange Credits to unlock other Scenarios.
+                                </p>
+                                <p>
+                                    Scenarios submitted to the exchange must satisfy the following requirements:
+                                    <ul>
+                                        <li>The Scenario's writeup must be at least 1000 words.</li>
+                                        <li>The Scenario must have been run as a Contract for real Players and Contractors
+                                            and entered into the site.</li>
+                                        <li>The Scenario must be specific to The Contract and use its stats and mechanics.</li>
+                                        <li>The Scenario must conform with all the standard
+                                            <a href="https://www.thecontractrpg.com/guide/gm-manual/#structure-and-rules" target="_blank" rel="noopener noreferrer">
+                                                Scenario Creation rules
+                                            </a> and achieve a minimum standard of quality.
+                                        </li>
+                                    </ul>
+                                </p>
+                                <p>
+                                    Contributing a Scenario to the Community Exchange is subject to The Contract's
+                                    <a href="{% url 'info:terms' %}">EULA and Terms and Conditions</a>. You testify that you
+                                    own the copyright to the Scenario, including but not limited to all text, images, and
+                                    characters within. You grant Sapient Snake LLC the associated rights to publish this
+                                    Scenario as they see fit.
+                                </p>
+                                <p>
+                                    In the future, users may be able to purchase Exchange Credits or obtain them via a
+                                    premium membership. Submitting a Scenario to the Community Exchange supports The Contract
+                                    and allows us to continue offering this game and service as freely as we do.
+                                </p>
+                                <p>
+                                    You may retract an approved Scenario from the Exchange at any time. If your Scenario has not been
+                                    purchased at least 4 times, {{submission_value}} Exchange credits will be deducted from your account balance.
+                                </p>
+                            </i>
+                        </small>
+                    </div>
+                    {% if scenario.get_steps_to_receive_improvement|length > 0 %}
+                        <h4 class="text-danger">This Scenario does not satisfy the requirements to be submitted.</h4>
+                        <h5>Requirements:</h5>
+                        <ul>
+                            {% for reason in scenario.get_steps_to_receive_improvement %}
+                            <li>{{reason}}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <div class="" style="display:flex; justify-content: center;">
+                            <div class="" style="margin-right: 10px;">
+                                <form action="{% url 'games:games_scenario_submit' scenario.pk %}" method="post">
+                                    {{ form.non_field_errors }}
+                                    {% csrf_token %}
+                                    {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+                                    <input class="btn btn-primary" type="submit" value="Submit to Exchange" />
+                                </form>
+                            </div>
+                            <div class="">
+                                <a href="{% url 'games:games_view_scenario' scenario.pk %}" class="btn btn-default" >
+                                    No thanks
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center">
+                        <h3>You submitted {{scenario.title}} for approval {{latest_approval.created_date|timesince}} ago</h3>
+                        <h5>Approval is currently pending.</h5>
+                    </div>
+                    <div style="display: flex; justify-content: center;">
+                        <form action="{% url 'games:games_scenario_retract' scenario.pk %}" method="post">
+                            {{ form.non_field_errors }}
+                            {% csrf_token %}
+                            {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+                            <input class="btn btn-default" type="submit" value="Cancel Submission" />
+                        </form>
+                        <a href="{% url 'games:games_view_scenario' scenario.pk %}" class="btn btn-primary" style="margin-left: 20px;">
+                            Return to Scenario
+                        </a>
+                    </div>
+                {% endif %}
+                {% if approvals %}
+                <div style="margin-top: 20px;"></div>
+                <h4>Previous Submissions for this Scenario</h4>
+                {% for approval in approvals %}
+                <div class="thumbnail">
+                    <b>Submitted {{approval.created_date|timesince}} ago.</b>
+                    {% if approval.closed_date %}
+                        <div>
+                            Closed {{approval.closed_date|timesince}} ago.
+                        </div>
+                    {% endif %}
+                    <div>
+                        <b>
+                            Outcome: {{approval.get_status_display}}
+                        </b>
+                    </div>
+                    {% if approval.feedback %}
+                    <div>
+                        <b>Feedback:</b> {{approval.feedback}}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

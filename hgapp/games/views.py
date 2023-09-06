@@ -25,7 +25,7 @@ from games.forms import CreateScenarioForm, CellMemberAttendedForm, make_game_fo
     CustomInviteForm, make_accept_invite_form, ValidateAttendanceForm, DeclareOutcomeForm, GameFeedbackForm, \
     OutsiderAttendedForm, make_who_was_gm_form,make_archive_game_general_info_form, get_archival_outcome_form, \
     RsvpAttendanceForm, make_edit_move_form, ScenarioWriteupForm, RevertToEditForm, make_grant_stock_element_form, \
-    make_grant_element_form, SpoilScenarioForm
+    make_grant_element_form, SpoilScenarioForm, ScenarioApprovalForm
 from .game_form_utilities import get_context_for_create_finished_game, change_time_to_current_timezone, convert_to_localtime, \
     create_archival_game, get_context_for_completed_edit, handle_edit_completed_game, get_context_for_choose_attending, \
     get_gm_form, get_outsider_formset, get_member_formset, get_players_for_new_attendances, get_element_formset, \
@@ -37,7 +37,7 @@ from cells.models import WorldEvent
 
 from games.models import Scenario, Game, DISCOVERY_REASON, Game_Invite, Game_Attendance, Reward, REQUIRED_HIGH_ROLLER_STATUS, \
     Move, GameChangeStartTime, GameEnded, ScenarioWriteup, MISSION, OVERVIEW, BACKSTORY, INTRODUCTION, AFTERMATH, \
-    ScenarioElement, Scenario_Discovery
+    ScenarioElement, Scenario_Discovery, ScenarioApproval, WAITING, WITHDRAWN, REJECTED, EXCHANGE_SUBMISSION_VALUE
 
 from profiles.models import Profile
 
@@ -277,6 +277,111 @@ def edit_scenario(request, scenario_id):
             'loose_end_formset': loose_end_formset,
         }
         return render(request, 'games/scenarios/edit_scenario.html', context)
+
+
+@login_required
+def submit_scenario(request, scenario_id):
+    scenario = get_object_or_404(Scenario, id=scenario_id)
+    if not request.user.profile.confirmed_agreements:
+        return HttpResponseRedirect(reverse('profiles:profiles_terms'))
+    if request.user.profile.get_confirmed_email() is None:
+        messages.add_message(request, messages.WARNING,
+                             mark_safe("<h4 class=\"text-center\" style=\"margin-bottom:5px;\">You must validate your email address to submit Scenarios</h4>"))
+        return HttpResponseRedirect(reverse('account_resend_confirmation'))
+    if scenario.creator != request.user:
+        raise PermissionDenied("Only a Scenario's creator can submit it to the exchange.")
+    if request.method == 'POST':
+        if len(scenario.get_steps_to_receive_improvement) > 0:
+            raise ValueError("Scenario does not meet requirements for exchange")
+        form = RsvpAttendanceForm(request.POST)
+        if form.is_valid():
+            with transaction.atomic():
+                open_approval = ScenarioApproval.objects.filter(relevant_scenario=scenario, status=WAITING).first()
+                if open_approval:
+                    return HttpResponseRedirect(reverse('games:games_scenario_submit', args=(scenario.id,)))
+                else:
+                    ScenarioApproval.objects.create(relevant_scenario=scenario)
+        else:
+            raise ValueError("Invalid Scenario Exchange submission form")
+        return HttpResponseRedirect(reverse('games:games_scenario_submit', args=(scenario.id,)))
+    form = RsvpAttendanceForm()
+    latest_approval = ScenarioApproval.objects.filter(relevant_scenario=scenario).order_by("-created_date").first()
+    approvals = ScenarioApproval.objects.filter(relevant_scenario=scenario).order_by("-created_date")
+    context = {
+        "scenario": scenario,
+        "latest_approval": latest_approval,
+        "approvals": approvals,
+        "form": form,
+        "submission_value": EXCHANGE_SUBMISSION_VALUE,
+    }
+    return render(request, 'games/scenarios/submit_scenario.html', context)
+
+@login_required
+def retract_scenario(request, scenario_id):
+    scenario = get_object_or_404(Scenario, id=scenario_id)
+    if not request.user.profile.confirmed_agreements:
+        return HttpResponseRedirect(reverse('profiles:profiles_terms'))
+    if scenario.creator != request.user:
+        raise PermissionDenied("Only a Scenario's creator can submit it to the exchange.")
+    if request.method == 'POST':
+        form = RsvpAttendanceForm(request.POST)
+        if form.is_valid():
+            with transaction.atomic():
+                open_approval = ScenarioApproval.objects.filter(relevant_scenario=scenario, status=WAITING).first()
+                if open_approval:
+                    open_approval.status = WITHDRAWN
+                    open_approval.closed_date = timezone.now()
+                    open_approval.approver = request.user
+                    open_approval.save()
+                    return HttpResponseRedirect(reverse('games:games_view_scenario', args=(scenario.id,)))
+        else:
+            raise ValueError("Invalid Scenario Exchange submission form")
+        return HttpResponseRedirect(reverse('games:games_scenario_submit', args=(scenario.id,)))
+    HttpResponseRedirect(reverse('games:games_scenario_submit', args=(scenario.id,)))
+
+
+@login_required
+def approve_scenarios(request):
+    if not (request.user.profile.exchange_approver or request.user.is_superuser):
+        raise PermissionDenied("You must be an exchange approver to approve Scenarios")
+    context = {
+        "outstanding_approvals": ScenarioApproval.objects.filter(status=WAITING).order_by("created_date"),
+        "closed_approvals": ScenarioApproval.objects.filter(closed_date__isnull=False).order_by("-closed_date")[:20],
+        "form": ScenarioApprovalForm(),
+    }
+    return render(request, 'games/scenarios/approve_scenarios.html', context)
+
+
+@login_required
+def approve_scenario(request, scenario_id):
+    scenario = get_object_or_404(Scenario, id=scenario_id)
+    if not (request.user.profile.exchange_approver or request.user.is_superuser):
+        raise PermissionDenied("You must be an exchange approver to approve Scenarios")
+    if request.method == 'POST':
+        form = ScenarioApprovalForm(request.POST)
+        if form.is_valid():
+            with transaction.atomic():
+                open_approval = ScenarioApproval.objects.filter(relevant_scenario=scenario, status=WAITING).first()
+                if open_approval:
+                    if "is_approved" in form.cleaned_data and form.cleaned_data["is_approved"]:
+                        open_approval.approve(request.user)
+                    else:
+                        open_approval.status = REJECTED
+                        open_approval.closed_date = timezone.now()
+                        open_approval.feedback = form.cleaned_data["feedback"]
+                        open_approval.approver = request.user
+                        open_approval.save()
+                        Notification.objects.create(
+                            user=open_approval.relevant_scenario.creator,
+                            headline="Your Scenario has been rejected",
+                            content="{} left feedback on {}.".format(request.user.username,
+                                                                     open_approval.relevant_scenario.title),
+                            url=reverse('games:games_scenario_submit', args=(open_approval.relevant_scenario_id,)),
+                            notif_type=SCENARIO_NOTIF)
+                    return HttpResponseRedirect(reverse('games:games_scenario_approve'))
+        else:
+            raise ValueError("Invalid Scenario Exchange submission form")
+    return HttpResponseRedirect(reverse('games:games_scenario_approve'))
 
 
 def get_writeups_from_form(request, scenario, writeup_form):

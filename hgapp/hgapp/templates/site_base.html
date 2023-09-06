@@ -106,6 +106,13 @@
                             Scenario Gallery
                         </a>
                     </li>
+                    {% if request.user.profile.exchange_approver or request.user.is_superuser %}
+                        <li>
+                            <a href="{% url 'games:games_scenario_approve' %}">
+                                Approve Scenarios
+                            </a>
+                        </li>
+                    {% endif %}
                     <li class="dropdown-header">
                         Contractors
                     </li>

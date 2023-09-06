@@ -34,6 +34,8 @@ NotifyGameInvitee = django.dispatch.Signal(providing_args=['game_invite', 'reque
 GameChangeStartTime = django.dispatch.Signal(providing_args=['game', 'request'])
 GameEnded = django.dispatch.Signal(providing_args=['game', 'request'])
 
+EXCHANGE_SUBMISSION_VALUE = 240
+
 
 logger = logging.getLogger("app." + __name__)
 
@@ -104,14 +106,29 @@ WRITEUP_SECTION = (
 
 NOTIF_VAR_UPCOMING = "upcoming"
 NOTIF_VAR_FINISHED = "finished"
+
+
+APPROVED = 'APPROVED'
+REJECTED = 'REJECTED'
+WAITING = 'WAITING'
+WITHDRAWN = 'WITHDRAWN'
+APPROVAL_STATUS = (
+    (APPROVED, 'Approved'),
+    (REJECTED, 'Rejected'),
+    (WAITING, 'Awaiting Approval'),
+    (WITHDRAWN, 'Withdrawn'),
+)
+
 def migrate_add_gms(apps, schema_editor):
     Game = apps.get_model('games', 'Game')
     for game in Game.objects.all().iterator():
         game.gm = game.creator
         game.save()
 
+
 def reverse_add_gms_migration(apps, schema_editor):
     pass
+
 
 class Game(models.Model):
     creator = models.ForeignKey(
@@ -169,9 +186,7 @@ class Game(models.Model):
     list_in_lfg = models.BooleanField(default=False)
     invite_all_members = models.BooleanField(default=False)
     allow_ringers = models.BooleanField(default=False)
-    invitation_mode = models.CharField(choices=INVITE_MODE,
-                              max_length=55,
-                              default=INVITE_MODE[0][0])
+    invitation_mode = models.CharField(choices=INVITE_MODE, max_length=55, default=INVITE_MODE[0][0])
     gametime_url = models.CharField(max_length=2500, blank=True, null=True)
     max_rsvp = models.IntegerField(blank=True, null=True)
     mediums = models.ManyToManyField("GameMedium",
@@ -878,6 +893,8 @@ class Scenario(models.Model):
     num_deaths = models.IntegerField("Number of deaths caused by this Scenario", default=0)
     deadliness_ratio = models.FloatField("A denormalization of deaths over victories", default=0)
 
+    is_on_exchange = models.BooleanField(default=False)
+
     class Meta:
         permissions = (
             ('edit_scenario', 'Edit scenario'),
@@ -1572,3 +1589,39 @@ class Move(models.Model):
 
     def __get_summary_wordcount(self):
         return len(self.summary.split())
+
+
+class ScenarioApproval(models.Model):
+    relevant_scenario = models.ForeignKey(Scenario, on_delete=models.CASCADE)
+    status = models.CharField(choices=APPROVAL_STATUS, max_length=1000, default=WAITING)
+    feedback = models.CharField(max_length=8000, blank=True)
+    created_date = models.DateTimeField('date created', auto_now_add=True)
+    closed_date = models.DateTimeField(blank=True, null=True)
+    approver = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
+
+    def is_waiting(self):
+        return self.status == WAITING
+
+    def approve(self, approver):
+        self.status = APPROVED
+        self.closed_date = timezone.now()
+        self.approver = approver
+        self.save()
+        self.relevant_scenario.is_on_exchange = True
+        self.relevant_scenario.save()
+        # reward scenario writer
+        profile = self.relevant_scenario.creator.profile
+        profile.exchange_credits = profile.exchange_credits + EXCHANGE_SUBMISSION_VALUE
+
+        # Notify
+        Notification.objects.create(
+            user=self.relevant_scenario.creator,
+            headline="Your Scenario has been approved!",
+            content="{} is on the Community Scenario Exchange.".format(self.relevant_scenario.title),
+            #TODO: change this to the scenario exchange.
+            url=reverse('games:games_view_scenario', args=(self.relevant_scenario_id,)),
+            notif_type=SCENARIO_NOTIF)
+
+        # Set profile flag for scenario writer
+        profile.exchange_contributor = True
+        profile.save()

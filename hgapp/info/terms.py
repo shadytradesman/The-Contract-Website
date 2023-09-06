@@ -1,7 +1,7 @@
 TERMS= """
 
 The Contract Terms and Conditions
-Last updated April 4, 2021
+Last updated September 6, 2023
 
 
 AGREEMENT TO TERMS
@@ -308,8 +308,8 @@ Please note that if you materially misrepresent that the disabled or removed con
 Designated Copyright Agent
 Spencer Stecko
 Attn: Copyright Agent
-Santa Rosa, California
-thecontractrpg@gmail.com
+Denver, Colorado
+spencerstecko@thecontractrpg.com
 
 COPYRIGHT INFRINGEMENTS
 

@@ -145,6 +145,11 @@ class Profile(models.Model):
     # Other Preferences
     hide_fake_ads = models.BooleanField(default=False)
 
+    # Scenario Exchange
+    exchange_contributor = models.BooleanField(default=False)
+    exchange_approver = models.BooleanField(default=False)
+    exchange_credits = models.IntegerField(default=0)
+
     def __str__(self):
         return self.user.username
 

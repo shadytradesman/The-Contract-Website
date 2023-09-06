@@ -630,3 +630,14 @@ def make_edit_move_form(gm, cell=None):
                                   max_length=70000,
                                   help_text='Describe the events and outcome of the Move. This will appear on the Contractor\'s sheet and Journal')
     return EditMoveForm
+
+
+class ScenarioApprovalForm(forms.Form):
+    is_approved = forms.BooleanField(label="Approve",
+                                    required=False,
+                                    help_text='If checked, Scenario is added to the exchange. If not, Scenario is rejected.')
+    feedback = forms.CharField(label='Feedback',
+                                 max_length=8000,
+                                 widget=forms.Textarea,
+                                 required=False,
+                                 help_text='Will be shown to the person who submitted the Scenario if rejected.')

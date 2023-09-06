@@ -1,0 +1,72 @@
+{% extends "site_base.html" %}
+
+
+{% load account_tags %}
+{% load static %}
+{% load bootstrap%}
+
+{% block extra_scripts %}
+{% endblock %}
+
+{% block head_title %}
+Submit Scenario
+{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+
+{% block body_base %}
+<div class="container">
+    <div class="panel panel-default" style="margin-top: 15px;">
+        <div class="panel-body">
+            <h2>Open Scenarios Submissions</h2>
+            {% for approval in outstanding_approvals %}
+                <div class="thumbnail">
+                    <b>
+                        <a href="{% url 'games:games_view_scenario' approval.relevant_scenario.pk %}" target="_blank" rel="noopener noreferrer">
+                            {{approval.relevant_scenario.title}}
+                        </a>
+                    </b>
+                    <div>
+                        Submitted {{approval.created_date|timesince}} ago.
+                    </div>
+                    <div>
+                        <form action="{% url 'games:games_scenario_approve_specific' approval.relevant_scenario.pk %}" method="post">
+                            {{ form.non_field_errors }}
+                            {{form|bootstrap}}
+                            {% csrf_token %}
+                            <input class="btn btn-primary" type="submit" value="Submit" />
+                        </form>
+                    </div>
+                </div>
+            {% empty %}
+                <h5>No Scenarios awaiting approval!</h5>
+            {% endfor %}
+            <h2>Closed Approvals</h2>
+            {% for approval in closed_approvals %}
+                <div class="thumbnail">
+                    <div>
+                        <b>
+                            <a href="{% url 'games:games_view_scenario' approval.relevant_scenario.pk %}" target="_blank" rel="noopener noreferrer">
+                                {{approval.relevant_scenario.title}}
+                            </a> by {{approval.relevant_scenario.creator.username}}
+                        </b>
+                    </div>
+                    Submitted {{approval.created_date|timesince}} ago.
+                    <div>
+                        Closed {{approval.closed_date|timesince}} ago {% if approval.approver %} by {{approval.approver.username}} {% endif %}
+                    </div>
+                    <b>
+                        Outcome: {{approval.get_status_display}}
+                    </b>
+                    {% if approval.feedback %}
+                    <div>
+                        <b>Feedback:</b> {{approval.feedback}}
+                    </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
