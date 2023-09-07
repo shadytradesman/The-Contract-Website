@@ -25,7 +25,7 @@ from games.forms import CreateScenarioForm, CellMemberAttendedForm, make_game_fo
     CustomInviteForm, make_accept_invite_form, ValidateAttendanceForm, DeclareOutcomeForm, GameFeedbackForm, \
     OutsiderAttendedForm, make_who_was_gm_form,make_archive_game_general_info_form, get_archival_outcome_form, \
     RsvpAttendanceForm, make_edit_move_form, ScenarioWriteupForm, RevertToEditForm, make_grant_stock_element_form, \
-    make_grant_element_form, SpoilScenarioForm, ScenarioApprovalForm
+    make_grant_element_form, SpoilScenarioForm, ScenarioApprovalForm, SubmitScenarioForm
 from .game_form_utilities import get_context_for_create_finished_game, change_time_to_current_timezone, convert_to_localtime, \
     create_archival_game, get_context_for_completed_edit, handle_edit_completed_game, get_context_for_choose_attending, \
     get_gm_form, get_outsider_formset, get_member_formset, get_players_for_new_attendances, get_element_formset, \
@@ -229,6 +229,8 @@ def edit_scenario(request, scenario_id):
                 scenario.is_rivalry = scenario_form.cleaned_data['is_rivalry']
                 scenario.is_wiki_editable = scenario_form.cleaned_data['is_wiki_editable']
                 scenario.requires_ringer = scenario_form.cleaned_data['requires_ringer']
+                if scenario.exchange_information or scenario.is_on_exchange:
+                    scenario.exchange_information = scenario_form.cleaned_data['exchange_information']
                 if request.user.is_superuser:
                     scenario.tags.set(scenario_form.cleaned_data["tags"])
             new_writeups = get_writeups_from_form(request, scenario, writeup_form)
@@ -259,6 +261,7 @@ def edit_scenario(request, scenario_id):
                 'objective': scenario.objective,
                 'max_players': scenario.max_players,
                 'min_players': scenario.min_players,
+                'exchange_information': scenario.exchange_information,
                 'suggested_character_status': scenario.suggested_status,
                 'is_highlander': scenario.is_highlander,
                 'is_rivalry': scenario.is_rivalry,
@@ -279,6 +282,39 @@ def edit_scenario(request, scenario_id):
         return render(request, 'games/scenarios/edit_scenario.html', context)
 
 
+def scenario_exchange(request):
+    form = RsvpAttendanceForm()
+    if request.user.is_authenticated:
+        scenarios = Scenario.objects.filter(is_on_exchange=True).exclude(available_to__id=request.user.pk).order_by("title")
+        discovered_scenarios = Scenario.objects.filter(is_on_exchange=True).filter(available_to__id=request.user.pk).order_by("title")
+    else:
+        scenarios = Scenario.objects.filter(is_on_exchange=True).order_by("title")
+        discovered_scenarios = []
+    context = {
+        "scenarios": scenarios,
+        "discovered_scenarios": discovered_scenarios,
+        "form": form,
+        "exchange_credits": request.user.profile.exchange_credits if request.user.profile else 0,
+    }
+    return render(request, 'games/scenarios/exchange.html', context)
+
+
+@login_required
+def purchase_scenario(request, scenario_id):
+    scenario = get_object_or_404(Scenario, id=scenario_id)
+    if not scenario.is_on_exchange:
+        raise ValueError("You cannot unlock a scenario that isn't on the exchange!")
+    if request.method == 'POST':
+        form = RsvpAttendanceForm(request.POST)
+        if form.is_valid():
+            with transaction.atomic():
+                scenario = Scenario.objects.select_for_update().get(pk=scenario_id)
+                scenario.purchase(request.user)
+        else:
+            raise ValueError("Invalid scenario unlock form")
+    return HttpResponseRedirect(reverse('games:games_view_scenario', args=(scenario.id,)))
+
+
 @login_required
 def submit_scenario(request, scenario_id):
     scenario = get_object_or_404(Scenario, id=scenario_id)
@@ -291,11 +327,13 @@ def submit_scenario(request, scenario_id):
     if scenario.creator != request.user:
         raise PermissionDenied("Only a Scenario's creator can submit it to the exchange.")
     if request.method == 'POST':
-        if len(scenario.get_steps_to_receive_improvement) > 0:
+        if len(scenario.get_steps_to_receive_improvement()) > 0:
             raise ValueError("Scenario does not meet requirements for exchange")
-        form = RsvpAttendanceForm(request.POST)
+        form = SubmitScenarioForm(request.POST)
         if form.is_valid():
             with transaction.atomic():
+                scenario = Scenario.objects.select_for_update().get(pk=scenario_id)
+                scenario.exchange_information = form.cleaned_data['exchange_information']
                 open_approval = ScenarioApproval.objects.filter(relevant_scenario=scenario, status=WAITING).first()
                 if open_approval:
                     return HttpResponseRedirect(reverse('games:games_scenario_submit', args=(scenario.id,)))
@@ -304,7 +342,7 @@ def submit_scenario(request, scenario_id):
         else:
             raise ValueError("Invalid Scenario Exchange submission form")
         return HttpResponseRedirect(reverse('games:games_scenario_submit', args=(scenario.id,)))
-    form = RsvpAttendanceForm()
+    form = SubmitScenarioForm()
     latest_approval = ScenarioApproval.objects.filter(relevant_scenario=scenario).order_by("-created_date").first()
     approvals = ScenarioApproval.objects.filter(relevant_scenario=scenario).order_by("-created_date")
     context = {
@@ -324,9 +362,10 @@ def retract_scenario(request, scenario_id):
     if scenario.creator != request.user:
         raise PermissionDenied("Only a Scenario's creator can submit it to the exchange.")
     if request.method == 'POST':
-        form = RsvpAttendanceForm(request.POST)
+        form = SubmitScenarioForm(request.POST)
         if form.is_valid():
             with transaction.atomic():
+                scenario = Scenario.objects.select_for_update().get(pk=scenario_id)
                 open_approval = ScenarioApproval.objects.filter(relevant_scenario=scenario, status=WAITING).first()
                 if open_approval:
                     open_approval.status = WITHDRAWN

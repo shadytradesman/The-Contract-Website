@@ -1,0 +1,108 @@
+{% extends "site_base.html" %}
+
+
+{% load account_tags %}
+{% load static %}
+{% load bootstrap%}
+{% load games_tags %}
+
+{% block extra_scripts %}
+{% endblock %}
+
+{% block head_title %}
+Community Scenario Exchange
+{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+
+{% block body_base %}
+<div class="container">
+  <div class="panel panel-default" style="margin-top: 15px;">
+    <div class="panel-body">
+      <div class="text-center">
+        <h2 style="margin-top: 10px;">Community Scenario Exchange</h2>
+      </div>
+      <div class="text-center">
+        {% if request.user.is_authenticated %}
+        <h4>
+          You have
+          <b>{{ exchange_credits }}</b> Exchange Credits available.
+        </h4>
+        <p>
+          Tip: <i>earn more Exchange Credits by submitting Scenarios to the exchange.</i>
+        </p>
+        {% else %}
+          <h4 class="text-danger">
+            You must log in to unlock these Scenarios!
+          </h4>
+        {% endif %}
+      </div>
+      <div>
+        {% for scenario in scenarios %}
+          <div class="thumbnail">
+            <h4><b>{{scenario.title}}</b> - {{scenario.get_suggested_status_display}}</h4>
+            <div>
+              Written by
+              <a href="{% url 'profiles:profiles_view_profile' scenario.creator.id %}">
+                <b>{% user_display scenario.creator %}</b></a>, the {{scenario.creator.profile.get_gm_title}}.
+            </div>
+            {% if scenario.exchange_information %}
+              <div style="margin-left: 20px;">
+                <i>{{scenario.exchange_information}}</i>
+              </div>
+            {% endif %}
+            <p>
+            <div>
+              <b>{{scenario.num_words}} </b> words in writeup.
+              <b>{{scenario.get_latest_of_all_writeup_sections|length}}</b> writeup sections used.
+              <b>{{scenario.get_latest_of_all_elements|length}}</b> handouts.
+            </div>
+              <div>
+                This Scenario has been run <b>{{scenario.num_finished_games}}</b> time{{scenario.num_finished_games|pluralize}}
+                by <b>{{scenario.num_gms_run}}</b> GM{{scenario.num_gms_run|pluralize}}.
+              </div>
+              <div style="margin-left: 20px;">
+                Victories: <b>{{scenario.num_victories}}</b>
+                Deaths: <b>{{scenario.num_deaths}}</b>
+              </div>
+            </p>
+            {% if request.user.is_authenticated %}
+              {% if exchange_credits >= 100 %}
+                <form action="{% url 'games:games_scenario_purchase' scenario.pk %}" method="post">
+                  {{ form.non_field_errors }}
+                  {% csrf_token %}
+                  {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+                  <input class="btn btn-primary" type="submit" value="Unlock for 100 Exchange Credits" />
+                </form>
+              {% else %}
+                <input disabled class="btn btn-default" type="submit" value="Unlock" />
+                <i>
+                  (You need at least 100 Exchange Credits to unlock this Scenario.)
+                </i>
+              {% endif %}
+            {% else %}
+              You must log in to unlock Scenarios in the Community Scenario Exchange.
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+      {% if discovered_scenarios %}
+        <div>
+          <h3>
+            Unlocked Scenarios
+          </h3>
+          <p>
+            You cannot purchase these Scenarios because you already have access to them.
+          </p>
+          {% for scenario in discovered_scenarios %}
+          <div class="thumbnail">
+            {% render_scenario_title_with_link scenario %}
+          </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

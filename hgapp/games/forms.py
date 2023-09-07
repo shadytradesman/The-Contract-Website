@@ -135,6 +135,14 @@ class CreateScenarioForm(forms.Form):
                               max_length=400,
                               required=False,
                               help_text="Summarize the Scenario so that people who have already played it can recognize it.")
+    exchange_information = forms.CharField(label='Exchange blurb',
+                              max_length=1000,
+                              required=False,
+                              help_text="SPOILER-FREE information to display to prospective GMs in the Scenario Exchange. "
+                                        "E.g. \"A great Scenario for new GMs.\" "
+                                        "NOTE: all Players and "
+                                        "anonymous users will be able to read this on the exchange, so assume you are telling this to all "
+                                        "would-be Players.")
     description = forms.CharField(label='Write-up',
                                   required=False,
                             widget=TinyMCE(attrs={'cols': 80, 'rows': 30}),
@@ -605,6 +613,17 @@ def get_archival_outcome_form(game_id):
 
 class RsvpAttendanceForm(forms.Form):
     pass
+
+
+class SubmitScenarioForm(forms.Form):
+    exchange_information = forms.CharField(label='Exchange blurb',
+                                       max_length=1000,
+                                       required=False,
+                                       help_text="SPOILER-FREE information to display to prospective GMs in the Scenario Exchange. "
+                                                 "E.g. \"A great Scenario for new GMs.\" "
+                                                 "All Players and "
+                                                 "anonymous users will be able to read this on the exchange, so assume you are telling this to all "
+                                                 "would-be Players. Can be edited in the Scenario writeup once set here.")
 
 
 def make_edit_move_form(gm, cell=None):

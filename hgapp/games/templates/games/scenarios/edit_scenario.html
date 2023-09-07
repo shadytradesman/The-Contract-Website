@@ -111,6 +111,11 @@
                     <div class="col-md-10 col-md-offset-1">
                         {{scenario_form.is_wiki_editable |bootstrap}}
                     </div>
+                {% if scenario %}
+                {% if scenario.exchange_information or scenario.is_on_exchange %}
+                {{ scenario_form.exchange_information | bootstrap }}
+                {% endif %}
+                {% endif %}
                     <div style="margin-top: 15px;"></div>
                 {% endif %}
                 {% if scenario_form %}

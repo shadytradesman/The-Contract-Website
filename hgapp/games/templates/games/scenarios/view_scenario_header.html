@@ -11,7 +11,7 @@
                     View Edit History
                 </a>
             </li>
-            {% if not scenario.is_on_exchange %}
+            {% if not scenario.is_on_exchange and scenario.creator == request.user %}
                 <li>
                     <a class="btn-default" href="{% url 'games:games_scenario_submit' scenario.pk %}">Submit to Exchange</a>
                 </li>

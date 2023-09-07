@@ -103,7 +103,7 @@
                     </li>
                     <li>
                         <a href="{% url 'games:games_view_scenario_gallery' %}">
-                            Scenario Gallery
+                            Scenario Collection
                         </a>
                     </li>
                     {% if request.user.profile.exchange_approver or request.user.is_superuser %}
@@ -113,6 +113,11 @@
                             </a>
                         </li>
                     {% endif %}
+                    <li>
+                        <a href="{% url 'games:games_scenario_exchange' %}">
+                            Community Scenario Exchange
+                        </a>
+                    </li>
                     <li class="dropdown-header">
                         Contractors
                     </li>

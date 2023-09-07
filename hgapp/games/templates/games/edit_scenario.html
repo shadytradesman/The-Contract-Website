@@ -49,6 +49,11 @@
                 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
                 {{ form.title | bootstrap}}
                 {{ form.summary | bootstrap}}
+                {% if scenario %}
+                    {% if scenario.exchange_information or scenario.is_on_exchange %}
+                        {{ form.exchange_information | bootstrap }}
+                    {% endif %}
+                {% endif %}
                 {{ form.objective | bootstrap}}
                 {{ form.description | bootstrap}}
                 <div class="row">

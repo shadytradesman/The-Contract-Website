@@ -3,6 +3,7 @@
 
 {% load account_tags %}
 {% load static %}
+{% load bootstrap %}
 
 {% block extra_scripts %}
 {% endblock %}
@@ -79,21 +80,24 @@ Submit Scenario
                             {% endfor %}
                         </ul>
                     {% else %}
-                        <div class="" style="display:flex; justify-content: center;">
-                            <div class="" style="margin-right: 10px;">
-                                <form action="{% url 'games:games_scenario_submit' scenario.pk %}" method="post">
-                                    {{ form.non_field_errors }}
-                                    {% csrf_token %}
-                                    {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-                                    <input class="btn btn-primary" type="submit" value="Submit to Exchange" />
-                                </form>
+                        <form action="{% url 'games:games_scenario_submit' scenario.pk %}" method="post">
+                            <div>
+                                {{form|bootstrap}}
                             </div>
-                            <div class="">
-                                <a href="{% url 'games:games_view_scenario' scenario.pk %}" class="btn btn-default" >
-                                    No thanks
-                                </a>
+                            <div class="" style="display:flex; justify-content: center;">
+                                <div class="" style="margin-right: 10px;">
+                                        {{ form.non_field_errors }}
+                                        {% csrf_token %}
+                                        {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+                                        <input class="btn btn-primary" type="submit" value="Submit to Exchange" />
+                                </div>
+                                <div class="">
+                                    <a href="{% url 'games:games_view_scenario' scenario.pk %}" class="btn btn-default" >
+                                        No thanks
+                                    </a>
+                                </div>
                             </div>
-                        </div>
+                        </form>
                     {% endif %}
                 {% else %}
                     <div class="text-center">
@@ -130,7 +134,7 @@ Submit Scenario
                     </div>
                     {% if approval.feedback %}
                     <div>
-                        <b>Feedback:</b> {{approval.feedback}}
+                        <b>Feedback:</b> {{approval.feedback|linebreaks}}
                     </div>
                     {% endif %}
                 </div>

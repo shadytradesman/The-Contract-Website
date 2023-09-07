@@ -35,6 +35,7 @@ GameChangeStartTime = django.dispatch.Signal(providing_args=['game', 'request'])
 GameEnded = django.dispatch.Signal(providing_args=['game', 'request'])
 
 EXCHANGE_SUBMISSION_VALUE = 240
+EXCHANGE_SCENARIO_COST = 100
 
 
 logger = logging.getLogger("app." + __name__)
@@ -72,11 +73,13 @@ OUTCOME = (
     (RINGER_FAILURE, 'Ringer Failure'),
 )
 
+DISCOVERY_PURCHASED = "PURCHASED"
 DISCOVERY_REASON = (
     ('PLAYED', 'Played'),
     ('CREATED', 'Created'),
     ('SHARED', 'Shared'),
     ('UNLOCKED', 'Unlocked'),
+    (DISCOVERY_PURCHASED, 'Purchased'),
 )
 
 INVITE_ONLY = 'INVITE_ONLY'
@@ -864,6 +867,8 @@ class Scenario(models.Model):
     suggested_status = models.CharField(choices=HIGH_ROLLER_STATUS,
                                        max_length=25,
                                        default=STATUS_ANY)
+    exchange_information = models.CharField(max_length=1000, blank=True)
+
     max_players = models.IntegerField("Suggested Maximum number of players")
     min_players = models.IntegerField("Suggested Minimum number of players")
     cycle = models.ForeignKey("Cycle",
@@ -1081,6 +1086,30 @@ class Scenario(models.Model):
             return discovery
         return None
 
+    def purchase(self, player):
+        if not player.scenario_set.filter(id=self.id).exists():
+            if player.profile.exchange_credits < EXCHANGE_SCENARIO_COST:
+                return ValueError("Insufficient funds")
+            discovery = Scenario_Discovery(
+                discovering_player=player,
+                relevant_scenario=self,
+                reason=DISCOVERY_PURCHASED,
+                is_spoiled=False,
+            )
+            discovery.save()
+            player.profile.exchange_credits = player.profile.exchange_credits - EXCHANGE_SCENARIO_COST
+            player.profile.save()
+            Notification.objects.create(
+                user=player,
+                headline="You've purchased a Scenario",
+                content="{}".format(self.title),
+                url=reverse("games:games_view_scenario", args=(self.pk,)),
+                notif_type=SCENARIO_NOTIF,
+                is_timeline=True,
+                article=discovery)
+            return discovery
+        return None
+
     def is_stock(self):
         return self.tags.count() > 0
 
@@ -1104,12 +1133,6 @@ class Scenario(models.Model):
             if section and section.content:
                 sections.append(section)
         return sections
-
-    def get_latest_of_all_elements(self):
-        return self.scenarioelement_set\
-            .order_by().order_by("designation", "-created_date")\
-            .distinct("designation")\
-            .select_related("relevant_element")
 
     def get_latest_of_all_elements(self):
         return self.scenarioelement_set \

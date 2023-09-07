@@ -38,6 +38,12 @@ urlpatterns = [
     # ex: .com/contract/scenario/approve/112
     url(r'^scenario/approve/(?P<scenario_id>[\d]+)/$', views.approve_scenario, name='games_scenario_approve_specific'),
 
+    # ex: .com/contract/scenario/exchange/
+    url(r'^scenario/exchange/$', views.scenario_exchange, name='games_scenario_exchange'),
+
+    # ex: .com/contract/scenario/exchange/unlock/122
+    url(r'^scenario/exchange/unlock/(?P<scenario_id>[\d]+)/$', views.purchase_scenario, name='games_scenario_purchase'),
+
     # ex: .com/contract/scenario/110
     url(r'^scenario/(?P<scenario_id>[\d]+)/$', views.view_scenario, name='games_view_scenario'),
     url(r'^view/s/(?P<scenario_id>[\d]+)/$',
