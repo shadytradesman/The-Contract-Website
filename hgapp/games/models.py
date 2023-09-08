@@ -1671,14 +1671,17 @@ class ScenarioApproval(models.Model):
         self.relevant_scenario.save()
 
         # reward scenario writer
-        profile = self.relevant_scenario.creator.profile
-        profile.exchange_credits = profile.exchange_credits + EXCHANGE_SUBMISSION_VALUE
-        reward = ExperienceReward.objects.create(
-            rewarded_player=self.relevant_scenario.creator,
-            type=EXP_EXCHANGE,
-        )
-        self.experience_reward = reward
-        self.save()
+        rewarded_approval_count = ScenarioApproval.objects\
+            .filter(relevant_scenario=self.relevant_scenario, status=APPROVED, experience_reward__isnull=False,  experience_reward__is_void=False).count()
+        if rewarded_approval_count == 0:
+            profile = self.relevant_scenario.creator.profile
+            profile.exchange_credits = profile.exchange_credits + EXCHANGE_SUBMISSION_VALUE
+            reward = ExperienceReward.objects.create(
+                rewarded_player=self.relevant_scenario.creator,
+                type=EXP_EXCHANGE,
+            )
+            self.experience_reward = reward
+            self.save()
 
         # Notify
         Notification.objects.create(

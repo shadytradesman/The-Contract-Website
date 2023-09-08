@@ -6,20 +6,35 @@
 {% load bootstrap%}
 {% load games_tags %}
 
-{% block extra_scripts %}
-{% endblock %}
-
 {% block head_title %}
 Scenario Exchange
+{% endblock %}
+
+{% block extra_styles %}
+<link rel="stylesheet" type="text/css" href="{% static 'games/exchange_style.css' %}" />
+{% endblock %}
+
+{% block extra_scripts %}
+  <script type="text/javascript">
+          {% if show_tutorial %}
+              showTutorial=true;
+          {% else %}
+              showTutorial=false;
+          {% endif %}
+  	</script>
+  <script src="{% static 'powers/stock_powers_script.js' %}"></script>
 {% endblock %}
 
 {% block body_class %}home{% endblock %}
 
 
 {% block body_base %}
+{% with main_modal_art_url as modal_art_url %}
+  {% include "games/scenarios/exchange_modal.html" %}
+{% endwith %}
 <div class="container">
   <div class="text-center">
-    <h1 >Scenario Exchange</h1>
+    <h1 >Community Scenario Exchange</h1>
   </div>
   <div class="panel panel-default" style="margin-top: 15px;">
     <div class="panel-body">
@@ -28,35 +43,37 @@ Scenario Exchange
         <h4>
           You have
           <i class="fa fa-handshake-o fa-1x css-text-exchange"></i>
-          <b class="css-text-exchange">{{ exchange_credits }}</b> Exchange Credits available.
+          <b class="css-text-exchange">{{ exchange_credits }}</b> Exchange Credits available
         </h4>
-        <p>
-          Tip: <i>earn more Exchange Credits by submitting Scenarios to the exchange.</i>
-        </p>
         {% else %}
-          <h4 class="text-danger">
+          <h4 class="text-warning">
             You must <a href="{% url 'account_login' %}">log in</a> to unlock these Scenarios
           </h4>
         {% endif %}
+        <div class="text-center">
+          <button type="button" class="btn btn-default btn-xs " data-toggle="modal" data-target="#mainTutorialModal">
+            Help
+          </button>
+        </div>
       </div>
       <div>
         {% if scenarios %}
-        <h3>Available Scenarios</h3>
+        <h2>Available Scenarios</h2>
         {% endif %}
         {% for scenario in scenarios %}
           <div class="thumbnail">
             <h4><b>{{scenario.title}}</b> - {{scenario.get_suggested_status_display}}</h4>
-            <div>
-              Written by
-              <a href="{% url 'profiles:profiles_view_profile' scenario.creator.id %}">
-                <b>{% user_display scenario.creator %}</b></a>, the {{scenario.creator.profile.get_gm_title}}.
-            </div>
             {% if scenario.exchange_information %}
               <div style="margin-left: 20px;">
                 <i>{{scenario.exchange_information}}</i>
               </div>
             {% endif %}
             <p>
+            <div>
+              Written by
+              <a href="{% url 'profiles:profiles_view_profile' scenario.creator.id %}">
+                <b>{% user_display scenario.creator %}</b></a>, the {{scenario.creator.profile.get_gm_title}}.
+            </div>
             <div>
               <b>{{scenario.num_words}} </b> words in writeup.
               <b>{{scenario.get_latest_of_all_writeup_sections|length}}</b> writeup sections used.
@@ -72,7 +89,7 @@ Scenario Exchange
                 Deaths: <b>{{scenario.num_deaths}}</b>
               </div>
             <div>
-              Unlocked <b class="css-text-exchange">{{scenario.num_times_purchased}}</b> times.
+              Unlocked <b class="css-text-exchange">{{scenario.num_times_purchased}}</b> time{{scenario.num_times_purchased|pluralize}}.
             </div>
             </p>
             {% if request.user.is_authenticated %}
@@ -90,22 +107,35 @@ Scenario Exchange
                 </i>
               {% endif %}
             {% else %}
-              You must <a href="{% url 'account_login' %}">log in</a> to unlock Scenarios in the Scenario Exchange.
+              <input disabled class="btn btn-default" type="submit" value="Unlock" />
+              <i>
+                You must <a href="{% url 'account_login' %}">log in</a> to unlock Scenarios on the exchange.
+              </i>
             {% endif %}
           </div>
         {% endfor %}
       </div>
       {% if discovered_scenarios %}
         <div>
-          <h3>
+          <h2>
             Unlocked Scenarios
-          </h3>
+          </h2>
           <p>
             You cannot purchase these Scenarios because you already have access to them.
           </p>
           {% for scenario in discovered_scenarios %}
           <div class="thumbnail">
-            {% render_scenario_title_with_link scenario %}
+            <h4 style="margin-bottom: 2px; margin-top: 5px;">
+              {% render_scenario_title_with_link scenario %}
+            </h4>
+            <div>
+              Written by
+              <a href="{% url 'profiles:profiles_view_profile' scenario.creator.id %}">
+                <b>{% user_display scenario.creator %}</b></a>, the {{scenario.creator.profile.get_gm_title}}.
+            </div>
+            <div>
+              Run <b>{{scenario.num_finished_games}}</b> time{{scenario.num_finished_games|pluralize}}. Unlocked <b class="css-text-exchange">{{scenario.num_times_purchased}}</b> time{{scenario.num_times_purchased|pluralize}}.
+            </div>
           </div>
           {% endfor %}
         </div>

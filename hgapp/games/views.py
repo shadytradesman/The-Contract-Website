@@ -7,6 +7,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.db import transaction
+from django.templatetags.static import static
 from django.contrib import messages
 from django.urls import reverse
 from django.utils import timezone
@@ -296,6 +297,8 @@ def scenario_exchange(request):
         "discovered_scenarios": discovered_scenarios,
         "form": form,
         "exchange_credits": request.user.profile.exchange_credits if request.user.is_authenticated else 0,
+        "show_tutorial": not request.user.is_authenticated or request.user.scenario_set.count() < 4,
+        "main_modal_art_url": static('overrides/art/horns.jpg'),
     }
     return render(request, 'games/scenarios/exchange.html', context)
 
