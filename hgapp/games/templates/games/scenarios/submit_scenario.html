@@ -19,24 +19,82 @@ Submit Scenario
 <div class="container">
     <div class="panel panel-default" style="margin-top: 15px;">
         <div class="panel-body">
+            {% include "_messages.html" %}
             {% if scenario.is_on_exchange %}
-                <h3>This Scenario is already on the Community Scenario Exchange.</h3>
+                <h2 class="text-center">
+                    <a href="{% url 'games:games_view_scenario' scenario.pk %}" >
+                        {{scenario.title}}
+                    </a>
+                     is active on the
+                    <a href="{% url 'games:games_scenario_exchange' %}">
+                        Scenario Exchange
+                    </a>
+                </h2>
+                <div class="text-center" style="margin-bottom: 25px;">
+                    {% if latest_approval.closed_date %}
+                            {{scenario.title}} has been on the exchange for {{latest_approval.closed_date|timesince}}.
+                    {% endif %}
+                    It has been purchased <b class="css-text-exchange">{{scenario.num_times_purchased}}</b> times.
+                </div>
+                <div  style="max-width: 800px; margin: auto;">
+                    <h4 class="text-center">
+                        Remove {{scenario.title}} from the exchange?
+                        <div>
+                            <small>
+                                {% if scenario.num_times_purchased_since_last_submission < 4 %}
+                                    Because this Scenario has been purchased at fewer than 4 times since its last
+                                    submission, your Exchange Credits and Exp will be refunded when you remove it from
+                                    the exchange.
+                                {% else %}
+                                    This Scenario has been purchased by enough people that your Exchange Credits will
+                                    not be refunded.
+                                {% endif %}
+                            </small>
+                        </div>
+                    </h4>
+                    <div style="display: flex; justify-content: center;">
+
+                        <form action="{% url 'games:games_scenario_retract' scenario.pk %}" method="post">
+                            {{ form.non_field_errors }}
+                            {% csrf_token %}
+                            {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+                            <input class="btn btn-default" type="submit" value="Remove from Exchange" />
+                        </form>
+                        <a href="{% url 'games:games_view_scenario' scenario.pk %}" class="btn btn-primary" style="margin-left: 20px;">
+                            Return to Scenario
+                        </a>
+                    </div>
+                </div>
             {% else %}
                 {% if not latest_approval or not latest_approval.is_waiting %}
                     <div class="text-center">
-                        <h3>Submit {{scenario.title}} to the Community Scenario Exchange?</h3>
+                        <h2>
+                            Submit
+                            <a href="{% url 'games:games_view_scenario' scenario.pk %}" >
+                                {{scenario.title}}
+                            </a>
+                            to the
+                            <a href="{% url 'games:games_scenario_exchange' %}">
+                                Scenario Exchange?
+                            </a>
+                        </h2>
                     </div>
 
                     <div style="max-width: 800px; margin: auto;">
                         <small>
                             <i>
                                 <p>
-                                    Once you submit your Scenario to the Community Scenario Exchange, it must be approved by
+                                    Once you submit your Scenario to the
+                                    <a href="{% url 'games:games_scenario_exchange' %}">
+                                        Scenario Exchange,
+                                    </a>
+                                    it must be approved by
                                     a site administrator to ensure quality.
                                 </p>
                                 <p>
-                                    Once your Scenario is approved, it will appear on the Community Scenario Exchange and you
-                                    will earn {{submission_value}} Exchange Credits to unlock other Scenarios.
+                                    Once your Scenario is approved, it will appear on the Scenario Exchange and you
+                                    will earn {{submission_value}} Exchange Credits to unlock other Scenarios as well as
+                                    5 Exp to grant to a Contractor.
                                 </p>
                                 <p>
                                     Scenarios submitted to the exchange must satisfy the following requirements:
@@ -116,30 +174,39 @@ Submit Scenario
                         </a>
                     </div>
                 {% endif %}
-                {% if approvals %}
-                <div style="margin-top: 20px;"></div>
-                <h4>Previous Submissions for this Scenario</h4>
-                {% for approval in approvals %}
-                <div class="thumbnail">
-                    <b>Submitted {{approval.created_date|timesince}} ago.</b>
-                    {% if approval.closed_date %}
-                        <div>
-                            Closed {{approval.closed_date|timesince}} ago.
-                        </div>
+            {% endif %}
+            {% if approvals %}
+            <div style="margin-top: 20px;"></div>
+            <h4>Submission history</h4>
+            {% for approval in approvals %}
+            <div class="thumbnail">
+                <b>
+                    {% if approval.is_removed %}
+                        Removed from the exchange
+                    {% else %}
+                        Submitted
                     {% endif %}
+                    {{approval.created_date|timesince}} ago.
+                </b>
+                {% if approval.closed_date %}
+                <div>
+                    Closed {{approval.closed_date|timesince}} ago.
+                </div>
+                {% endif %}
+                {% if not approval.is_removed %}
                     <div>
                         <b>
                             Outcome: {{approval.get_status_display}}
                         </b>
                     </div>
-                    {% if approval.feedback %}
-                    <div>
-                        <b>Feedback:</b> {{approval.feedback|linebreaks}}
-                    </div>
-                    {% endif %}
-                </div>
-                {% endfor %}
                 {% endif %}
+                {% if approval.feedback %}
+                <div>
+                    <b>Feedback:</b> {{approval.feedback|linebreaks}}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
             {% endif %}
         </div>
     </div>

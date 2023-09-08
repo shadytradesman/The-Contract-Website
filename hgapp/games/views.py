@@ -37,7 +37,8 @@ from cells.models import WorldEvent
 
 from games.models import Scenario, Game, DISCOVERY_REASON, Game_Invite, Game_Attendance, Reward, REQUIRED_HIGH_ROLLER_STATUS, \
     Move, GameChangeStartTime, GameEnded, ScenarioWriteup, MISSION, OVERVIEW, BACKSTORY, INTRODUCTION, AFTERMATH, \
-    ScenarioElement, Scenario_Discovery, ScenarioApproval, WAITING, WITHDRAWN, REJECTED, EXCHANGE_SUBMISSION_VALUE
+    ScenarioElement, Scenario_Discovery, ScenarioApproval, WAITING, WITHDRAWN, REJECTED, EXCHANGE_SUBMISSION_VALUE,\
+    EXCHANGE_SCENARIO_COST
 
 from profiles.models import Profile
 
@@ -294,7 +295,7 @@ def scenario_exchange(request):
         "scenarios": scenarios,
         "discovered_scenarios": discovered_scenarios,
         "form": form,
-        "exchange_credits": request.user.profile.exchange_credits if request.user.profile else 0,
+        "exchange_credits": request.user.profile.exchange_credits if request.user.is_authenticated else 0,
     }
     return render(request, 'games/scenarios/exchange.html', context)
 
@@ -310,9 +311,13 @@ def purchase_scenario(request, scenario_id):
             with transaction.atomic():
                 scenario = Scenario.objects.select_for_update().get(pk=scenario_id)
                 scenario.purchase(request.user)
+                messages.add_message(request, messages.SUCCESS,
+                                     mark_safe(
+                                         "<h4 class=\"text-center\" style=\"margin-bottom:5px;\">{} unlocked for {} Exchange Credits</h4>"
+                                         .format(scenario.title, EXCHANGE_SCENARIO_COST)))
         else:
             raise ValueError("Invalid scenario unlock form")
-    return HttpResponseRedirect(reverse('games:games_view_scenario', args=(scenario.id,)))
+    return HttpResponseRedirect(reverse('games:games_view_scenario_gallery'))
 
 
 @login_required
@@ -366,13 +371,22 @@ def retract_scenario(request, scenario_id):
         if form.is_valid():
             with transaction.atomic():
                 scenario = Scenario.objects.select_for_update().get(pk=scenario_id)
-                open_approval = ScenarioApproval.objects.filter(relevant_scenario=scenario, status=WAITING).first()
-                if open_approval:
-                    open_approval.status = WITHDRAWN
-                    open_approval.closed_date = timezone.now()
-                    open_approval.approver = request.user
-                    open_approval.save()
-                    return HttpResponseRedirect(reverse('games:games_view_scenario', args=(scenario.id,)))
+                if scenario.is_on_exchange:
+                    scenario.remove_from_exchange()
+                    messages.add_message(request, messages.SUCCESS,
+                                         mark_safe(
+                                             "<h4 class=\"text-center\" style=\"margin-bottom:5px;\">{} has been removed from the Exchange</h4>".format(
+                                                 scenario.title)))
+                else:
+                    open_approval = ScenarioApproval.objects.filter(relevant_scenario=scenario, status=WAITING).first()
+                    if open_approval:
+                        open_approval.status = WITHDRAWN
+                        open_approval.closed_date = timezone.now()
+                        open_approval.approver = request.user
+                        open_approval.save()
+                        return HttpResponseRedirect(reverse('games:games_view_scenario', args=(scenario.id,)))
+                    else:
+                        raise ValueError("Scenario {} not on exchange and has no open approval".format(scenario.pk))
         else:
             raise ValueError("Invalid Scenario Exchange submission form")
         return HttpResponseRedirect(reverse('games:games_scenario_submit', args=(scenario.id,)))

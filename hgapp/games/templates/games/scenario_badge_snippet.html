@@ -1,6 +1,7 @@
 {% load account_tags games_tags %}
 <div class="thumbnail">
     <h4>
+        {% render_scenario_title_with_link scenario %}
         {% if scenario.get_active_improvement %}
         <span class="glyphicon glyphicon-star css-scenario-rewarded-star" aria-hidden="true"
               data-toggle="tooltip"
@@ -18,7 +19,12 @@
         >
             </span>
         {% endif %}
-        {% render_scenario_title_with_link scenario %}
+        {% if scenario.is_on_exchange %}
+        <span data-toggle="tooltip"
+              title='This Scenario is on the Scenario Exchange.'>
+            <i class="fa fa-handshake-o fa-1x css-text-exchange"></i>
+        </span>
+        {% endif %}
         <div style="margin-top: 10px;">
             <small>
                 A

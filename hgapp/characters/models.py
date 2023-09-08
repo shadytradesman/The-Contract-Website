@@ -269,6 +269,7 @@ EXP_GM_NEW_PLAYER = "GM_NEW_PLAYER"
 EXP_GM_MOVE = "GM_MOVE"
 EXP_JOURNAL = "JOURNAL"
 EXP_CUSTOM = "CUSTOM"
+EXP_EXCHANGE = "Exchange"
 EXP_REWARD_TYPE = (
     (EXP_MVP, "earning Commission"),
     (EXP_LOSS_V1, "losing"),
@@ -287,6 +288,7 @@ EXP_REWARD_TYPE = (
     (EXP_GM_MOVE, "GMing a Move"),
     (EXP_JOURNAL, "writing a journal"),
     (EXP_CUSTOM, "custom reason"),
+    (EXP_EXCHANGE, "submitting a Scenario to the exchange"),
 )
 
 EXP_REWARD_VALUES = {
@@ -306,6 +308,7 @@ EXP_REWARD_VALUES = {
     EXP_GM_NEW_PLAYER: 6,
     EXP_GM_MOVE: 2,
     EXP_JOURNAL: 1,
+    EXP_EXCHANGE: 5,
 }
 
 EXP_NEW_CHAR = 150
@@ -1848,6 +1851,11 @@ class ExperienceReward(models.Model):
             return "{} in {}".format(reason, self.game.scenario.title)
         if self.type == EXP_GM_MOVE:
             return "{} in {}: {}".format(reason, self.move.cell, self.move.title)
+        if self.type == EXP_EXCHANGE:
+            if hasattr(self, "scenarioapproval"):
+                return "from submitting '{}' to the Scenario Exchange".format(self.scenarioapproval.relevant_scenario.title)
+            else:
+                return "from submitting to the Scenario Exchange"
         if self.type == EXP_JOURNAL:
             return mark_safe("<a href={}>{}: {}</a>".format(
                 reverse("journals:journal_read_id", args=(self.journal.pk,)),

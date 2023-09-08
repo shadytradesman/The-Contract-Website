@@ -97,13 +97,13 @@
                         Contracts
                     </li>
                     <li>
-                        <a href="{% url 'games:games_create_game' %}">
-                            Schedule Contract
+                        <a href="{% url 'games:games_enter_game' %}" >
+                            Enter Contract
                         </a>
                     </li>
                     <li>
                         <a href="{% url 'games:games_view_scenario_gallery' %}">
-                            Scenario Collection
+                            My Scenario Collection
                         </a>
                     </li>
                     {% if request.user.profile.exchange_approver or request.user.is_superuser %}
@@ -115,7 +115,8 @@
                     {% endif %}
                     <li>
                         <a href="{% url 'games:games_scenario_exchange' %}">
-                            Community Scenario Exchange
+                             <i class="fa fa-handshake-o fa-1x css-text-exchange"></i>
+                            Scenario Exchange
                         </a>
                     </li>
                     <li class="dropdown-header">
@@ -209,6 +210,12 @@
         <li>
             <a href="{% url 'info:leaderboard' %}">
                 Hall of Fame
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'games:games_scenario_exchange' %}">
+                <i class="fa fa-handshake-o fa-1x css-text-exchange"></i>
+                Scenario Exchange
             </a>
         </li>
         <li class="dropdown-header">

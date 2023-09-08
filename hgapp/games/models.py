@@ -9,7 +9,7 @@ from django.contrib.auth import get_user_model
 from characters.models import Character, HIGH_ROLLER_STATUS, Character_Death, ExperienceReward, AssetDetails, EXP_GM, \
     EXP_LOSS_V2, EXP_WIN_V2, EXP_LOSS_RINGER_V2, EXP_WIN_RINGER_V2, EXP_LOSS_IN_WORLD_V2, EXP_WIN_IN_WORLD_V2, EXP_MVP,\
     EXP_WIN_V1, EXP_LOSS_V1, Artifact, EXP_GM_MOVE, EXP_GM_RATIO, EXP_GM_NEW_PLAYER, StockWorldElement, ELEMENT_TYPE, \
-    CONDITION, CIRCUMSTANCE, TROPHY, LOOSE_END, STATUS_ANY
+    CONDITION, CIRCUMSTANCE, TROPHY, LOOSE_END, STATUS_ANY, EXP_EXCHANGE
 from django.template.loader import render_to_string
 from powers.models import Power, Power_Full
 from cells.models import Cell, WorldEvent
@@ -114,12 +114,14 @@ NOTIF_VAR_FINISHED = "finished"
 APPROVED = 'APPROVED'
 REJECTED = 'REJECTED'
 WAITING = 'WAITING'
-WITHDRAWN = 'WITHDRAWN'
+WITHDRAWN = 'WITHDRAWN' # withdrawn before approval
+REMOVED = 'REMOVED' # removed from exchange
 APPROVAL_STATUS = (
     (APPROVED, 'Approved'),
     (REJECTED, 'Rejected'),
     (WAITING, 'Awaiting Approval'),
     (WITHDRAWN, 'Withdrawn'),
+    (REMOVED, 'Removed'),
 )
 
 def migrate_add_gms(apps, schema_editor):
@@ -897,6 +899,7 @@ class Scenario(models.Model):
     num_victories = models.IntegerField("Number of victories awarded in this Scenario", default=0)
     num_deaths = models.IntegerField("Number of deaths caused by this Scenario", default=0)
     deadliness_ratio = models.FloatField("A denormalization of deaths over victories", default=0)
+    num_times_purchased = models.IntegerField("Number of times this Scenario was purchased on the exchange", default=0)
 
     is_on_exchange = models.BooleanField(default=False)
 
@@ -928,6 +931,31 @@ class Scenario(models.Model):
             return characters
         else:
             return Character.objects.none()
+
+    def num_times_purchased_since_last_submission(self):
+        latest_approval = ScenarioApproval.objects\
+            .filter(relevant_scenario=self, status=APPROVED).order_by("-created_date").first()
+        if latest_approval:
+            return Scenario_Discovery.objects\
+                .filter(relevant_scenario=self, created_date__gt=latest_approval.created_date, reason=DISCOVERY_PURCHASED)\
+                .count()
+        else:
+            return 0
+
+    def remove_from_exchange(self):
+        if not self.is_on_exchange:
+            return
+        if self.num_times_purchased_since_last_submission() < 4:
+            latest_approval = ScenarioApproval.objects \
+                .filter(relevant_scenario=self, status=APPROVED).order_by("-created_date").first()
+            if latest_approval and hasattr(latest_approval, "experience_reward") and latest_approval.experience_reward:
+                latest_approval.experience_reward.mark_void()
+            profile = self.creator.profile
+            profile.exchange_credits = profile.exchange_credits - EXCHANGE_SUBMISSION_VALUE
+            profile.save()
+        ScenarioApproval.objects.create(relevant_scenario=self, status=REMOVED)
+        self.is_on_exchange = False
+        self.save()
 
     def player_has_gmed(self, gm):
         return Game.objects.filter(scenario=self, gm=gm).exists()
@@ -1107,6 +1135,8 @@ class Scenario(models.Model):
                 notif_type=SCENARIO_NOTIF,
                 is_timeline=True,
                 article=discovery)
+            self.num_times_purchased = self.num_times_purchased + 1
+            self.save()
             return discovery
         return None
 
@@ -1293,6 +1323,7 @@ class ScenarioElement(models.Model):
         blob["is_element"] = True
         return blob
 
+
 class Scenario_Discovery(models.Model):
     discovering_player = models.ForeignKey(settings.AUTH_USER_MODEL,
                                            on_delete=models.CASCADE)
@@ -1302,6 +1333,7 @@ class Scenario_Discovery(models.Model):
                               max_length=25)
     is_spoiled = models.BooleanField(default=True)
     is_aftermath_spoiled = models.BooleanField(default=True)
+    created_date = models.DateTimeField('date created', auto_now_add=True, null=True, blank=True)
 
     # prevent double discoveries.
     class Meta:
@@ -1621,20 +1653,32 @@ class ScenarioApproval(models.Model):
     created_date = models.DateTimeField('date created', auto_now_add=True)
     closed_date = models.DateTimeField(blank=True, null=True)
     approver = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
+    experience_reward = models.OneToOneField(ExperienceReward, null=True, blank=True, on_delete=models.CASCADE)
 
     def is_waiting(self):
         return self.status == WAITING
+
+    def is_removed(self):
+        return self.status == REMOVED
 
     def approve(self, approver):
         self.status = APPROVED
         self.closed_date = timezone.now()
         self.approver = approver
         self.save()
+
         self.relevant_scenario.is_on_exchange = True
         self.relevant_scenario.save()
+
         # reward scenario writer
         profile = self.relevant_scenario.creator.profile
         profile.exchange_credits = profile.exchange_credits + EXCHANGE_SUBMISSION_VALUE
+        reward = ExperienceReward.objects.create(
+            rewarded_player=self.relevant_scenario.creator,
+            type=EXP_EXCHANGE,
+        )
+        self.experience_reward = reward
+        self.save()
 
         # Notify
         Notification.objects.create(

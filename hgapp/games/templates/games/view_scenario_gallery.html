@@ -15,6 +15,7 @@
     <h1 class="text-center">Scenario Collection</h1>
     <div class="panel panel-default">
         <div class="panel-body">
+            {% include "_messages.html" %}
             <div class="text-center">
                 <h4>
                     This collection contains all the
@@ -24,6 +25,14 @@
                 <p>
                     You may view the full write-up of any Scenarios that appear below including spoilers,
                     Journals, and feedback from the GMs who have run them.
+                </p>
+                <p>
+                    Visit the
+                    <a href="{% url 'games:games_scenario_exchange' %}">
+                        <i class="fa fa-handshake-o fa-1x css-text-exchange"></i>
+                        Scenario Exchange
+                    </a>
+                    to unlock more Scenarios!
                 </p>
             </div>
         </div>

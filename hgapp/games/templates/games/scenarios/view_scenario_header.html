@@ -11,14 +11,22 @@
                     View Edit History
                 </a>
             </li>
-            {% if not scenario.is_on_exchange and scenario.creator == request.user %}
+            {% if  scenario.creator == request.user %}
                 <li>
-                    <a class="btn-default" href="{% url 'games:games_scenario_submit' scenario.pk %}">Submit to Exchange</a>
+                    <a class="btn-default css-text-exchange" href="{% url 'games:games_scenario_submit' scenario.pk %}">
+                        {% if not scenario.is_on_exchange %}
+                            Submit to Exchange
+                        {% else %}
+                            Exchange Status
+                        {% endif %}
+                    </a>
                 </li>
             {% endif %}
         {% endif %}
         <li>
-            <a class="btn-default" href="{% url 'games:games_create_game' %}">Schedule Contract</a>
+            <a class="btn-default" href="{% url 'games:games_enter_game' %}" >
+                Enter Contract
+            </a>
         </li>
     </ul>
 

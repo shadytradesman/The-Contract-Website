@@ -1,9 +1,14 @@
 
 {% load static %}
 
-<div style="margin-top: 5px;"
+<div style="margin-top: 5px;">
+    {% if scenario.is_on_exchange %}
+        <span data-toggle="tooltip"
+          title='This Scenario is on the Scenario Exchange.'>
+            <i class="fa fa-handshake-o fa-1x css-text-exchange"></i>
+        </span>
+    {% endif %}
 
->
 
 {% if scenario.get_active_improvement %}
 
