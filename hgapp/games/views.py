@@ -152,6 +152,11 @@ def create_scenario(request):
             )
             if request.user.is_superuser:
                 scenario.tags.set(scenario_form.cleaned_data["tags"])
+            if 'community_edit_mode' in scenario_form.cleaned_data:
+                scenario.is_wiki_editable = True
+                scenario.wiki_edit_mode = scenario_form.cleaned_data['community_edit_mode']
+            else:
+                scenario.is_wiki_editable = False
             new_writeups = get_writeups_from_form(request, scenario,writeup_form)
             with transaction.atomic():
                 scenario.save()
@@ -229,7 +234,11 @@ def edit_scenario(request, scenario_id):
                 scenario.suggested_status = scenario_form.cleaned_data['suggested_character_status']
                 scenario.is_highlander = scenario_form.cleaned_data['is_highlander']
                 scenario.is_rivalry = scenario_form.cleaned_data['is_rivalry']
-                scenario.is_wiki_editable = scenario_form.cleaned_data['is_wiki_editable']
+                if 'community_edit_mode' in scenario_form.cleaned_data:
+                    scenario.is_wiki_editable = True
+                    scenario.wiki_edit_mode = scenario_form.cleaned_data['community_edit_mode']
+                else:
+                    scenario.is_wiki_editable = False
                 scenario.requires_ringer = scenario_form.cleaned_data['requires_ringer']
                 if scenario.exchange_information or scenario.is_on_exchange:
                     scenario.exchange_information = scenario_form.cleaned_data['exchange_information']
@@ -267,7 +276,7 @@ def edit_scenario(request, scenario_id):
                 'suggested_character_status': scenario.suggested_status,
                 'is_highlander': scenario.is_highlander,
                 'is_rivalry': scenario.is_rivalry,
-                'is_wiki_editable': scenario.is_wiki_editable,
+                'community_edit_mode': None if not scenario.is_wiki_editable else scenario.wiki_edit_mode,
                 'requires_ringer': scenario.requires_ringer,
                 'tags': scenario.tags.all(),
             })

@@ -73,6 +73,13 @@ OUTCOME = (
     (RINGER_FAILURE, 'Ringer Failure'),
 )
 
+WIKI_EDIT_ALL = 'ALL'
+WIKI_EDIT_EXCHANGE = 'EXCHANGE'
+WIKI_EDIT_MODE = (
+    (WIKI_EDIT_ALL, 'Anyone spoiled'),
+    (WIKI_EDIT_EXCHANGE, 'Scenario Exchange contributors')
+)
+
 DISCOVERY_PURCHASED = "PURCHASED"
 DISCOVERY_REASON = (
     ('PLAYED', 'Played'),
@@ -863,6 +870,9 @@ class Scenario(models.Model):
     summary = models.TextField(max_length=5000, blank=True, null=True)
     description = models.TextField(max_length=74000, blank=True)
     is_wiki_editable = models.BooleanField(default=True)
+    wiki_edit_mode = models.CharField(choices=WIKI_EDIT_MODE,
+                                        max_length=50,
+                                        default=WIKI_EDIT_ALL)
     objective = models.TextField(max_length=5000, blank=True)
     created_date = models.DateTimeField('date created', auto_now_add=True)
 
@@ -985,7 +995,10 @@ class Scenario(models.Model):
         if user == self.creator or user.is_superuser:
             return True
         if self.is_wiki_editable and self.player_is_spoiled(user):
-            return True
+            if self.wiki_edit_mode == WIKI_EDIT_ALL:
+                return True
+            if self.wiki_edit_mode == WIKI_EDIT_EXCHANGE and user.profile.exchange_contributor:
+                return True
         return False
 
     def is_valid(self):

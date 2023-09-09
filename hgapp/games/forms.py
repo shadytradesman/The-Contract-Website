@@ -13,7 +13,7 @@ from django.db.models import Q
 
 from games.models import OUTCOME, ScenarioTag, REQUIRED_HIGH_ROLLER_STATUS, INVITE_MODE, GameMedium, REQ_STATUS_ANY, \
     REQ_STATUS_NEWBIE, REQ_STATUS_NOVICE, REQ_STATUS_SEASONED, REQ_STATUS_PROFESSIONAL, REQ_STATUS_VETERAN, \
-    REQ_STATUS_NEWBIE_OR_NOVICE
+    REQ_STATUS_NEWBIE_OR_NOVICE, WIKI_EDIT_MODE
 from .games_constants import EXP_V1_V2_GAME_ID
 from characters.models import Character, ELEMENT_TYPE
 from characters.forms import LooseEndForm
@@ -160,15 +160,16 @@ class CreateScenarioForm(forms.Form):
     is_highlander = forms.BooleanField(label = "Highlander",
                                        required=False,
                                        help_text = "Only one Contractor can achieve victory")
-    is_wiki_editable = forms.BooleanField(label = "Allow Community Edits",
-                                          required=False,
-                                          initial=True,
-                                          help_text = "If selected, anyone who has spoiled this Scenario can edit its "
-                                                      "writeup ala a wiki page. Only you, the Scenario's original "
-                                                      "creator, can edit the primary details of the Scenario such as "
-                                                      "its summary, objective, required status, and title. A full "
+    edit_mode_choices = list(WIKI_EDIT_MODE)
+    edit_mode_choices.insert(0, ('', 'No community editing'))
+    community_edit_mode = forms.ChoiceField(label="Allow Community Edits",
+                                            choices=edit_mode_choices,
+                                            required=False,
+                                            help_text="Determines who else can edit this Scenario's writeup for formatting, typos, rules updates, etc. "
+                                                      "You can always edit your own Scenario, and only you "
+                                                      "can edit the primary details of the Scenario such as "
+                                                      "its summary, objective, and title. A full "
                                                       "revision history is kept, and you may revert any edits at will.")
-
     is_rivalry = forms.BooleanField(label = "Rivalry",
                                     required=False,
                                     help_text="The Contractors may have different or opposing goals")

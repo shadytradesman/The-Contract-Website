@@ -109,7 +109,21 @@
                         </div>
                     {% endif %}
                     <div class="col-md-10 col-md-offset-1">
-                        {{scenario_form.is_wiki_editable |bootstrap}}
+                        {{scenario_form.community_edit_mode |bootstrap}}
+                        <div class="text-muted">
+                            <ul>
+                                <li>
+                                    <b>No community editing:</b> only you can edit the Scenario's writeup.
+                                </li>
+                                <li>
+                                    <b>Anyone spoiled:</b> Anyone spoiled on this Scenario can edit the writeup.
+                                </li>
+                                <li>
+                                    <b>Scenario Exchange Contributors:</b> Anyone spoiled on this Scenario who has also
+                                    successfully submitted a Scenario to the Scenario Exchange can edit the writeup.
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 {% if scenario %}
                 {% if scenario.exchange_information or scenario.is_on_exchange %}
