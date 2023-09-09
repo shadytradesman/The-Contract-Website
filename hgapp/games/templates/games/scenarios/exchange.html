@@ -85,9 +85,15 @@ Scenario Exchange
                 by <b>{{scenario.num_gms_run}}</b> GM{{scenario.num_gms_run|pluralize}}.
               </div>
               <div style="margin-left: 20px;">
-                Victories: <b>{{scenario.num_victories}}</b>
-                Deaths: <b>{{scenario.num_deaths}}</b>
+                <div>
+                  Victories: <b>{{scenario.num_victories}}</b>
+                  Deaths: <b>{{scenario.num_deaths}}</b>
+                </div>
+                <div>
+                  Last run {{scenario.last_run_time|timesince}} ago
+                </div>
               </div>
+
             <div>
               Unlocked <b class="css-text-exchange">{{scenario.num_times_purchased}}</b> time{{scenario.num_times_purchased|pluralize}}.
             </div>

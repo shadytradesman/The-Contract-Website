@@ -1029,6 +1029,14 @@ class Scenario(models.Model):
             if active_improvement and not self.is_wiki_editable:
                 active_improvement.mark_void()
 
+    def last_run_time(self):
+        last_run = self.game_set.exclude(get_completed_game_excludes_query()).order_by("-end_time").first()
+        if last_run is not None:
+            return last_run.end_time
+        else:
+            return None
+
+
     def update_stats(self):
         self.times_run = self.game_set.exclude(get_completed_game_excludes_query()).count()
         self.num_gms_run = Game.objects \
