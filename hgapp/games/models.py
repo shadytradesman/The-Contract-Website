@@ -1689,6 +1689,8 @@ class ScenarioApproval(models.Model):
         self.save()
 
         self.relevant_scenario.is_on_exchange = True
+        if self.relevant_scenario.wiki_edit_mode == WIKI_EDIT_ALL:
+            self.relevant_scenario.wiki_edit_mode = WIKI_EDIT_EXCHANGE
         self.relevant_scenario.save()
 
         # reward scenario writer

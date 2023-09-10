@@ -95,6 +95,7 @@ new_scenario_widget = TinyMCE(
     },
     mce_attrs=SCENARIO_TINYMCE_SETTINGS,
 )
+
 class ScenarioWriteupForm(forms.Form):
     overview = forms.CharField(label='Overview',
                                required=False,
@@ -127,59 +128,63 @@ class ScenarioWriteupForm(forms.Form):
                                 help_text='What happens after the Contract is over? What if Contractors return to the scene of the crime? '
                                           'Provide guidance for Loose Ends or Moves.')
 
-class CreateScenarioForm(forms.Form):
-    title = forms.CharField(label='Title',
-                           max_length=130,
-                           help_text='This Scenario\'s title. This may be seen by people who have not played the Scenario.')
-    summary = forms.CharField(label='Summary',
-                              max_length=400,
-                              required=False,
-                              help_text="Summarize the Scenario so that people who have already played it can recognize it.")
-    exchange_information = forms.CharField(label='Exchange blurb',
-                              max_length=1000,
-                              required=False,
-                              help_text="SPOILER-FREE information to display to prospective GMs in the Scenario Exchange. "
-                                        "E.g. \"A great Scenario for new GMs.\" "
-                                        "NOTE: all Players and "
-                                        "anonymous users will be able to read this on the exchange, so assume you are telling this to all "
-                                        "would-be Players.")
-    description = forms.CharField(label='Write-up',
-                                  required=False,
-                            widget=TinyMCE(attrs={'cols': 80, 'rows': 30}),
-                            max_length=70000,
-                            help_text='Describe the Scenario in detail. Win conditions, enemies, background, etc.')
-    objective = forms.CharField(label='Objective',
-                              max_length=400,
-                              required=True,
-                              help_text="What is the Contractors' goal in this Scenario? Be very careful with your wording.")
-    max_players = forms.IntegerField(label = "Max Players", initial=4)
-    min_players = forms.IntegerField(label = "Minimum Players", initial=2)
-    suggested_character_status = forms.ChoiceField(label = "Required Status",
-                                                   choices=HIGH_ROLLER_STATUS,
-                                                   help_text='Must be this tall to ride')
-    is_highlander = forms.BooleanField(label = "Highlander",
-                                       required=False,
-                                       help_text = "Only one Contractor can achieve victory")
-    edit_mode_choices = list(WIKI_EDIT_MODE)
-    edit_mode_choices.insert(0, ('', 'No community editing'))
-    community_edit_mode = forms.ChoiceField(label="Allow Community Edits",
-                                            choices=edit_mode_choices,
-                                            required=False,
-                                            help_text="Determines who else can edit this Scenario's writeup for formatting, typos, rules updates, etc. "
-                                                      "You can always edit your own Scenario, and only you "
-                                                      "can edit the primary details of the Scenario such as "
-                                                      "its summary, objective, and title. A full "
-                                                      "revision history is kept, and you may revert any edits at will.")
-    is_rivalry = forms.BooleanField(label = "Rivalry",
-                                    required=False,
-                                    help_text="The Contractors may have different or opposing goals")
-    requires_ringer = forms.BooleanField(label = "Requires Ringer",
-                                         required=False,
-                                         help_text="One Player must play an NPC instead of their Contractor")
-    tags = forms.ModelMultipleChoiceField(queryset=ScenarioTag.objects.order_by("tag").all(),
-                                          required=False,
-                                          widget=forms.CheckboxSelectMultiple)
 
+def make_create_scenario_form(existing_scenario=None):
+    class CreateScenarioForm(forms.Form):
+        title = forms.CharField(label='Title',
+                               max_length=130,
+                               help_text='This Scenario\'s title. This may be seen by people who have not played the Scenario.')
+        summary = forms.CharField(label='Summary',
+                                  max_length=400,
+                                  required=False,
+                                  help_text="Summarize the Scenario so that people who have already played it can recognize it.")
+        exchange_information = forms.CharField(label='Exchange blurb',
+                                  max_length=1000,
+                                  required=False,
+                                  help_text="SPOILER-FREE information to display to prospective GMs in the Scenario Exchange. "
+                                            "E.g. \"A great Scenario for new GMs.\" "
+                                            "NOTE: all Players and "
+                                            "anonymous users will be able to read this on the exchange, so assume you are telling this to all "
+                                            "would-be Players.")
+        description = forms.CharField(label='Write-up',
+                                      required=False,
+                                widget=TinyMCE(attrs={'cols': 80, 'rows': 30}),
+                                max_length=70000,
+                                help_text='Describe the Scenario in detail. Win conditions, enemies, background, etc.')
+        objective = forms.CharField(label='Objective',
+                                  max_length=400,
+                                  required=True,
+                                  help_text="What is the Contractors' goal in this Scenario? Be very careful with your wording.")
+        max_players = forms.IntegerField(label = "Max Players", initial=4)
+        min_players = forms.IntegerField(label = "Minimum Players", initial=2)
+        suggested_character_status = forms.ChoiceField(label = "Required Status",
+                                                       choices=HIGH_ROLLER_STATUS,
+                                                       help_text='Must be this tall to ride')
+        is_highlander = forms.BooleanField(label = "Highlander",
+                                           required=False,
+                                           help_text = "Only one Contractor can achieve victory")
+        edit_mode_choices = list(WIKI_EDIT_MODE)
+        if existing_scenario is not None and existing_scenario.is_on_exchange:
+            edit_mode_choices = edit_mode_choices[1:]
+        edit_mode_choices.insert(0, ('', 'No community editing'))
+        community_edit_mode = forms.ChoiceField(label="Allow Community Edits",
+                                                choices=edit_mode_choices,
+                                                required=False,
+                                                help_text="Determines who else can edit this Scenario's writeup for formatting, typos, rules updates, etc. "
+                                                          "You can always edit your own Scenario, and only you "
+                                                          "can edit the primary details of the Scenario such as "
+                                                          "its summary, objective, and title. A full "
+                                                          "revision history is kept, and you may revert any edits at will.")
+        is_rivalry = forms.BooleanField(label = "Rivalry",
+                                        required=False,
+                                        help_text="The Contractors may have different or opposing goals")
+        requires_ringer = forms.BooleanField(label = "Requires Ringer",
+                                             required=False,
+                                             help_text="One Player must play an NPC instead of their Contractor")
+        tags = forms.ModelMultipleChoiceField(queryset=ScenarioTag.objects.order_by("tag").all(),
+                                              required=False,
+                                              widget=forms.CheckboxSelectMultiple)
+    return CreateScenarioForm
 
 class ScenarioElementForm(forms.Form):
     designation = forms.CharField(max_length=120,

@@ -22,7 +22,7 @@ from collections import defaultdict
 
 logger = logging.getLogger("app." + __name__)
 
-from games.forms import CreateScenarioForm, CellMemberAttendedForm, make_game_form, make_allocate_improvement_form, \
+from games.forms import make_create_scenario_form, CellMemberAttendedForm, make_game_form, make_allocate_improvement_form, \
     CustomInviteForm, make_accept_invite_form, ValidateAttendanceForm, DeclareOutcomeForm, GameFeedbackForm, \
     OutsiderAttendedForm, make_who_was_gm_form,make_archive_game_general_info_form, get_archival_outcome_form, \
     RsvpAttendanceForm, make_edit_move_form, ScenarioWriteupForm, RevertToEditForm, make_grant_stock_element_form, \
@@ -130,7 +130,7 @@ def create_scenario(request):
     loose_end_formset = get_element_formset_empty(POST, LOOSE_END)
     trophy_formset = get_element_formset_empty(POST, TROPHY)
     if request.method == 'POST':
-        scenario_form = CreateScenarioForm(request.POST)
+        scenario_form = make_create_scenario_form()(request.POST)
         writeup_form = ScenarioWriteupForm(request.POST)
         if scenario_form.is_valid() and writeup_form.is_valid() \
                 and condition_formset.is_valid() \
@@ -173,7 +173,7 @@ def create_scenario(request):
             print(scenario_form.errors)
             return None
     else:
-        scenario_form = CreateScenarioForm()
+        scenario_form = make_create_scenario_form()()
         writeup_form = ScenarioWriteupForm()
         context = {
             'scenario_form': scenario_form,
@@ -217,7 +217,7 @@ def edit_scenario(request, scenario_id):
     if request.method == 'POST':
         scenario_form = None
         if can_edit_scenario:
-            scenario_form = CreateScenarioForm(request.POST)
+            scenario_form = make_create_scenario_form(existing_scenario=scenario)(request.POST)
         writeup_form = ScenarioWriteupForm(request.POST, initial=writeup_form_initial)
         if (not scenario_form or (scenario_form and scenario_form.is_valid())) \
                 and writeup_form.is_valid() \
@@ -266,7 +266,7 @@ def edit_scenario(request, scenario_id):
     else:
         scenario_form = None
         if can_edit_scenario:
-            scenario_form = CreateScenarioForm(initial={
+            scenario_form = make_create_scenario_form(existing_scenario=scenario)(initial={
                 'title': scenario.title,
                 'summary': scenario.summary,
                 'objective': scenario.objective,
