@@ -1104,7 +1104,8 @@ class Scenario(models.Model):
         return self.finished_games().count()
 
     def played_discovery(self, player):
-        if not player.scenario_set.filter(id=self.id).exists():
+        discovery = player.scenario_set.filter(id=self.id).first()
+        if discovery is None:
             discovery = Scenario_Discovery (
                 discovering_player=player,
                 relevant_scenario=self,
@@ -1112,6 +1113,9 @@ class Scenario(models.Model):
                 is_spoiled=True,
                 is_aftermath_spoiled=False,
             )
+            discovery.save()
+        else:
+            discovery.is_spoiled = True
             discovery.save()
 
     def unlocked_discovery(self, player, notify=True):
