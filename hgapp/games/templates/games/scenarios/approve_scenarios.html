@@ -28,8 +28,13 @@
                     </b>
                     {% render_scenario_unlock approval.relevant_scenario %}
                     <div>
-                        Submitted {{approval.created_date|timesince}} ago.
+                        Submitted {{approval.created_date|timesince}} ago by {{approval.relevant_scenario.creator.username}}.
                     </div>
+                    {% if approval.relevant_scenario.exchange_information %}
+                    <i>
+                        {{approval.relevant_scenario.exchange_information }}
+                    </i>
+                    {% endif %}
                     {% if approval.relevant_scenario.creator != request.user %}
                     <div>
                         <form action="{% url 'games:games_scenario_approve_specific' approval.relevant_scenario.pk %}" method="post">
