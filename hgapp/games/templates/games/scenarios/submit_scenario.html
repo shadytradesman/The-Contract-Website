@@ -141,13 +141,18 @@ Submit Scenario
                             </i>
                         </small>
                     </div>
-                    {% if scenario.get_steps_to_receive_improvement|length > 0 %}
+                    {% if scenario.get_steps_to_receive_improvement|length > 0 or not scenario.objective %}
                         <h4 class="text-danger">This Scenario does not satisfy the requirements to be submitted.</h4>
                         <h5>Requirements:</h5>
                         <ul>
                             {% for reason in scenario.get_steps_to_receive_improvement %}
                             <li>{{reason}}</li>
                             {% endfor %}
+                            {% if not scenario.objective %}
+                                <li>
+                                    Edit your Scenario and fill out the newly required fields, such as the Objective.
+                                </li>
+                            {% endif %}
                         </ul>
                     {% else %}
                         <form action="{% url 'games:games_scenario_submit' scenario.pk %}" method="post">
