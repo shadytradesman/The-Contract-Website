@@ -4,6 +4,7 @@
 {% load account_tags %}
 {% load static %}
 {% load bootstrap%}
+{% load games_tags %}
 
 {% block extra_scripts %}
 {% endblock %}
@@ -23,13 +24,13 @@
             {% for approval in outstanding_approvals %}
                 <div class="thumbnail">
                     <b>
-                        <a href="{% url 'games:games_view_scenario' approval.relevant_scenario.pk %}" target="_blank" rel="noopener noreferrer">
-                            {{approval.relevant_scenario.title}}
-                        </a>
+                        {% render_scenario_title_check_for_link approval.relevant_scenario %}
                     </b>
+                    {% render_scenario_unlock approval.relevant_scenario %}
                     <div>
                         Submitted {{approval.created_date|timesince}} ago.
                     </div>
+                    {% if approval.relevant_scenario.creator != request.user %}
                     <div>
                         <form action="{% url 'games:games_scenario_approve_specific' approval.relevant_scenario.pk %}" method="post">
                             {{ form.non_field_errors }}
@@ -38,6 +39,13 @@
                             <input class="btn btn-primary" type="submit" value="Submit" />
                         </form>
                     </div>
+                    {% else %}
+                        <div>
+                            <i>
+                                You cannot approve your own Scenarios.
+                            </i>
+                        </div>
+                    {% endif %}
                 </div>
             {% empty %}
                 <h5>No Scenarios awaiting approval!</h5>
@@ -61,7 +69,7 @@
                     </b>
                     {% if approval.feedback %}
                     <div>
-                        <b>Feedback:</b> {{approval.feedback}}
+                        <b>Feedback:</b> {{approval.feedback|linebreaks}}
                     </div>
                     {% endif %}
                 </div>

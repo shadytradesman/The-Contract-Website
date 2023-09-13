@@ -1,0 +1,8 @@
+{% if unlockable %}
+<form action="{% url 'games:games_scenario_unlock' scenario.pk %}" method="post" style="display: inline;">
+    {{ form.non_field_errors }}
+    {{form}}
+    {% csrf_token %}
+    <input class="btn btn-default" type="submit" value="Unlock Scenario" />
+</form>
+{% endif %}

@@ -44,6 +44,9 @@ urlpatterns = [
     # ex: .com/contract/scenario/exchange/unlock/122
     url(r'^scenario/exchange/unlock/(?P<scenario_id>[\d]+)/$', views.purchase_scenario, name='games_scenario_purchase'),
 
+    # ex: .com/contract/scenario/unlock/122
+    url(r'^scenario/unlock/(?P<scenario_id>[\d]+)/$', views.unlock_scenario, name='games_scenario_unlock'),
+
     # ex: .com/contract/scenario/110
     url(r'^scenario/(?P<scenario_id>[\d]+)/$', views.view_scenario, name='games_view_scenario'),
     url(r'^view/s/(?P<scenario_id>[\d]+)/$',

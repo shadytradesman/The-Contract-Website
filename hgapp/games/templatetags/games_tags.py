@@ -40,6 +40,7 @@ def render_scenario_title_without_link(scenario, custom_link=None):
         "custom_link": custom_link,
     }
 
+
 @register.inclusion_tag('scenario_title.html', takes_context=True)
 def render_scenario_title_check_for_link(context, scenario):
     request = context["request"] if "request" in context else None
@@ -48,6 +49,17 @@ def render_scenario_title_check_for_link(context, scenario):
     return {
         "scenario": scenario,
         "render_link": scenario.player_discovered(request.user),
+    }
+
+
+@register.inclusion_tag('scenario_unlock_button.html', takes_context=True)
+def render_scenario_unlock(context, scenario):
+    request = context["request"] if "request" in context else None
+    if not request:
+        raise ValueError("Scenario tag had no context")
+    return {
+        "scenario": scenario,
+        "unlockable": not scenario.player_discovered(request.user),
     }
 
 

@@ -331,6 +331,23 @@ def purchase_scenario(request, scenario_id):
             raise ValueError("Invalid scenario unlock form")
     return HttpResponseRedirect(reverse('games:games_view_scenario_gallery'))
 
+@login_required
+def unlock_scenario(request, scenario_id):
+    scenario = get_object_or_404(Scenario, id=scenario_id)
+    latest_approval = ScenarioApproval.objects.filter(relevant_scenario=scenario).order_by("-created_date").first()
+    if not request.user.profile.exchange_approver:
+        raise PermissionDenied("You must be an exchange approver to unlock the scenario")
+    if latest_approval is None or latest_approval.status != WAITING:
+        raise PermissionDenied("You cannot unlock a scenario that isn't awaiting approval")
+    if request.method == 'POST':
+        form = RsvpAttendanceForm(request.POST)
+        if form.is_valid():
+            with transaction.atomic():
+                scenario = Scenario.objects.select_for_update().get(pk=scenario_id)
+                scenario.unlocked_discovery(request.user, True)
+        else:
+            raise ValueError("Invalid scenario unlock form")
+    return HttpResponseRedirect(reverse('games:games_scenario_approve'))
 
 @login_required
 def submit_scenario(request, scenario_id):
@@ -357,6 +374,13 @@ def submit_scenario(request, scenario_id):
                     return HttpResponseRedirect(reverse('games:games_scenario_submit', args=(scenario.id,)))
                 else:
                     ScenarioApproval.objects.create(relevant_scenario=scenario)
+                    for player in Profile.objects.filter(exchange_approver=True):
+                        Notification.objects.create(
+                            user=player.user,
+                            headline="A new Scenario is awaiting approval",
+                            content="{}".format(scenario.title),
+                            url=reverse('games:games_scenario_approve'),
+                            notif_type=SCENARIO_NOTIF)
         else:
             raise ValueError("Invalid Scenario Exchange submission form")
         return HttpResponseRedirect(reverse('games:games_scenario_submit', args=(scenario.id,)))
@@ -411,8 +435,8 @@ def approve_scenarios(request):
     if not (request.user.profile.exchange_approver or request.user.is_superuser):
         raise PermissionDenied("You must be an exchange approver to approve Scenarios")
     context = {
-        "outstanding_approvals": ScenarioApproval.objects.filter(status=WAITING).order_by("created_date"),
-        "closed_approvals": ScenarioApproval.objects.filter(closed_date__isnull=False).order_by("-closed_date")[:20],
+        "outstanding_approvals": ScenarioApproval.objects.filter(status=WAITING).order_by("-created_date"),
+        "closed_approvals": ScenarioApproval.objects.filter(closed_date__isnull=False).order_by("-closed_date")[:80],
         "form": ScenarioApprovalForm(),
     }
     return render(request, 'games/scenarios/approve_scenarios.html', context)
@@ -423,6 +447,8 @@ def approve_scenario(request, scenario_id):
     scenario = get_object_or_404(Scenario, id=scenario_id)
     if not (request.user.profile.exchange_approver or request.user.is_superuser):
         raise PermissionDenied("You must be an exchange approver to approve Scenarios")
+    if request.user == scenario.creator and not request.user.is_superuser:
+        raise PermissionDenied("You cannot approve your own Scenarios.")
     if request.method == 'POST':
         form = ScenarioApprovalForm(request.POST)
         if form.is_valid():
