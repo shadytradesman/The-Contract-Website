@@ -296,8 +296,8 @@ def edit_scenario(request, scenario_id):
 def scenario_exchange(request):
     form = RsvpAttendanceForm()
     if request.user.is_authenticated:
-        scenarios = Scenario.objects.filter(is_on_exchange=True).exclude(available_to__id=request.user.pk).order_by("title")
-        discovered_scenarios = Scenario.objects.filter(is_on_exchange=True).filter(available_to__id=request.user.pk).order_by("title")
+        scenarios = Scenario.objects.filter(is_on_exchange=True).exclude(available_to__id=request.user.pk).order_by("-date_added_to_exchange", "title")
+        discovered_scenarios = Scenario.objects.filter(is_on_exchange=True).filter(available_to__id=request.user.pk).order_by("-date_added_to_exchange", "title")
     else:
         scenarios = Scenario.objects.filter(is_on_exchange=True).order_by("title")
         discovered_scenarios = []

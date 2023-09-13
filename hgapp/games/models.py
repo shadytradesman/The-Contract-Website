@@ -912,6 +912,8 @@ class Scenario(models.Model):
     num_times_purchased = models.IntegerField("Number of times this Scenario was purchased on the exchange", default=0)
 
     is_on_exchange = models.BooleanField(default=False)
+    date_added_to_exchange = models.DateTimeField(blank=True, null=True)
+
 
     class Meta:
         permissions = (
@@ -1693,6 +1695,7 @@ class ScenarioApproval(models.Model):
         self.save()
 
         self.relevant_scenario.is_on_exchange = True
+        self.relevant_scenario.date_added_to_exchange = timezone.now()
         if self.relevant_scenario.wiki_edit_mode == WIKI_EDIT_ALL:
             self.relevant_scenario.wiki_edit_mode = WIKI_EDIT_EXCHANGE
         self.relevant_scenario.save()
