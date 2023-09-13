@@ -351,6 +351,7 @@ def submit_scenario(request, scenario_id):
             with transaction.atomic():
                 scenario = Scenario.objects.select_for_update().get(pk=scenario_id)
                 scenario.exchange_information = form.cleaned_data['exchange_information']
+                scenario.save()
                 open_approval = ScenarioApproval.objects.filter(relevant_scenario=scenario, status=WAITING).first()
                 if open_approval:
                     return HttpResponseRedirect(reverse('games:games_scenario_submit', args=(scenario.id,)))
