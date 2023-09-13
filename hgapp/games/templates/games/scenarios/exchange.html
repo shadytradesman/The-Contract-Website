@@ -100,11 +100,29 @@ Scenario Exchange
             </p>
             {% if request.user.is_authenticated %}
               {% if exchange_credits >= 100 %}
-                <form action="{% url 'games:games_scenario_purchase' scenario.pk %}" method="post">
-                  {{ form.non_field_errors }}
-                  {% csrf_token %}
-                  {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-                  <input class="btn btn-primary" type="submit" value="Unlock for 100 Exchange Credits" />
+
+            <form action="{% url 'games:games_scenario_purchase' scenario.pk %}" method="post">
+              {{ form.non_field_errors }}
+              {% csrf_token %}
+              {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#unlock-{{scenario.pk}}">Unlock for 100 Exchange Credits</button>
+            <div id="unlock-{{scenario.pk}}" class="collapse">
+              <div style="margin-bottom: 5px; margin-top: 10px;">
+                Are you sure?
+              </div>
+              <div>
+                <input
+                        type="submit"
+                        class="btn btn-primary"
+                        value="Unlock"
+                        style="margin-left: 10px;"
+                />
+                <button type="button" style="margin-left: 10px;"
+                        class="btn btn-default" data-toggle="collapse" data-target="#unlock-{{scenario.pk}}">
+                  Never mind
+                </button>
+              </div>
+            </div>
                 </form>
               {% else %}
                 <input disabled class="btn btn-default" type="submit" value="Unlock" />
