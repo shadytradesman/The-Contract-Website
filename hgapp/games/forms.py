@@ -30,6 +30,8 @@ SCENARIO_TINYMCE_SETTINGS = {
     "theme": "silver",
     "height": 500,
     "menubar": False,
+    "browser_spellcheck": True,
+    "contextmenu": "useBrowserSpellcheck",
     "images_upload_handler": """
     function (blobInfo, success, failure) {
     var xhr, formData;
