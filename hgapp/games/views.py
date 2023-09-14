@@ -465,7 +465,7 @@ def approve_scenario(request, scenario_id):
                         open_approval.save()
                         Notification.objects.create(
                             user=open_approval.relevant_scenario.creator,
-                            headline="Your Scenario has been rejected",
+                            headline="Your Scenario isn't ready for the Exchange",
                             content="{} left feedback on {}.".format(request.user.username,
                                                                      open_approval.relevant_scenario.title),
                             url=reverse('games:games_scenario_submit', args=(open_approval.relevant_scenario_id,)),
