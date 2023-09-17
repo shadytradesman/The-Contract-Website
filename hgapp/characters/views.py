@@ -358,7 +358,13 @@ def view_character(request, character_id, secret_key=None):
     journal_cover = get_object_or_none(JournalCover, character=character.id)
     next_entry = get_characters_next_journal_credit(character) if user_can_edit else None
 
-    available_gift = character.num_unspent_rewards() > 0
+    num_spent_rewards = character.num_active_spent_rewards()
+    num_total_rewards = character.num_active_rewards()
+    character_at_reward_limit = character.num_victories > 1 and (2 * character.num_victories) == num_spent_rewards
+    character_over_reward_limit = character.num_victories > 1 and (2 * character.num_victories) < num_spent_rewards
+    num_unspent_rewards = character.num_unspent_rewards()
+    available_gift = num_unspent_rewards > 0
+
     circumstance_form = None
     condition_form = None
     artifact_form = None
@@ -471,6 +477,12 @@ def view_character(request, character_id, secret_key=None):
         'unavail_crafted_artifacts': char_artifacts.unavail_crafted_artifacts,
         'lost_signature_items': char_artifacts.lost_signature_items,
         'num_improvements': character.num_improvements() if character.player == request.user else None,
+        'num_gifts': character.num_gifts() if character.player == request.user else None,
+        'num_spent_rewards': num_spent_rewards,
+        'num_unspent_rewards': num_unspent_rewards,
+        'num_total_rewards': num_total_rewards,
+        'character_at_reward_limit': character_at_reward_limit,
+        'character_over_reward_limit': character_over_reward_limit,
         'moves': moves,
         'num_moves':  moves.count(),
         'loose_ends': loose_ends,
@@ -658,10 +670,19 @@ def spend_reward(request, character_id):
         raise PermissionDenied("You do not have permission to edit this Character")
     unassigned_powers = request.user.power_full_set.filter(is_deleted=False, character__isnull=True).all()
     unspent_exp = character.unspent_experience()
+    num_spent_rewards = character.num_active_spent_rewards()
+    num_total_rewards = character.num_active_rewards()
+    character_at_reward_limit = character.num_victories > 1 and (2 * character.num_victories) == num_spent_rewards
+    character_over_reward_limit = character.num_victories > 1 and (2 * character.num_victories) < num_spent_rewards
     context = {
         'character': character,
         'unassigned_powers': unassigned_powers,
         'unspent_exp': unspent_exp,
+        'num_spent_rewards': num_spent_rewards,
+        'num_total_rewards': num_total_rewards,
+        'character_at_reward_limit': character_at_reward_limit,
+        'character_over_reward_limit': character_over_reward_limit,
+        'num_unspent_rewards': character.num_unspent_rewards(),
     }
     return render(request, 'characters/reward_character.html', context)
 

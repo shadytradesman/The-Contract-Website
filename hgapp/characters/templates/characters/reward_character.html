@@ -48,6 +48,7 @@
         </ul>
         <div class="panel panel-default">
             <div class="panel-body">
+
                 <div class="row text-center" style="display: flex; flex-wrap: wrap; justify-content: space-between;">
                     {% if character.num_unspent_gifts > 0 %}
                         <div style="margin: auto;  margin-bottom: 5px;">
@@ -79,6 +80,39 @@
                 {% if character.power_full_set.all|length > 0  and character.num_unspent_rewards > 0 %}
                     <hr>
                     <h2 class="text-center">Improve Existing Gifts</h2>
+
+                {% if character_over_reward_limit %}
+                <div class="alert alert-danger text-center css-char-alert" role="alert">
+                    <p>
+                        {{character.name}} has spent over their Reward limit.
+                        You cannot spend more than 2 Gifts / Improvements per Contract victory.
+                    </p>
+                    <p>
+                        <b>{{num_total_rewards}}</b> Reward{{num_total_rewards|pluralize}} earned,
+                        <b>{{num_spent_rewards}}</b> spent.
+                        <b>{{ character.number_of_victories }}</b> Victories.
+                    </p>
+                    <p>
+                        To remove this message, edit your Gifts to refund an appropriate number of Rewards. You can spend them when you earn additional Contract victories.
+                    </p>
+                </div>
+                {% endif %}
+
+
+                {% if character_at_reward_limit and num_unspent_rewards > 0 %}
+                <div class="alert alert-info text-center css-char-alert" role="alert">
+                    <p>
+                        {{character.name}} has unspent Rewards but is at their Reward limit.
+                        You cannot spend more than 2 Gifts / Improvements
+                        per Contract victory. Achieve another victory to spend your unspent Rewards.
+                    </p>
+                    <p>
+                        <b>{{num_total_rewards}}</b> Reward{{num_total_rewards|pluralize}} earned,
+                        <b>{{num_spent_rewards}}</b> spent.
+                        <b>{{ character.number_of_victories }}</b> Victories.
+                    </p>
+                </div>
+                {% endif %}
                     {% for power_full in character.power_full_set.all %}
                         <div class="row">
                             <div class= "col-xs-3 col-md-1">

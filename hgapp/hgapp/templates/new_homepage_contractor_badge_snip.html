@@ -1,11 +1,11 @@
 <div class="" style="display:flex; margin-top: 5px;">
     {% if not character.is_dead %}
-        {% if character.num_unspent_rewards > 0 or character.unspent_experience > 2 %}
+        {% if character.is_rewardable or character.unspent_experience > 2 %}
             <a class="btn btn-success btn-xs text-center" href="{% url 'characters:characters_spend_reward' character.id %}" style="height: 40px; margin-top: 2px;">
                 <i class="fa fa-plus-square fa-2x"></i>
                 <small style="position:relative; bottom: 3px;">
                     <div>
-                        {% if character.num_unspent_rewards > 0 %}
+                        {% if character.is_rewardable %}
                             Gift
                         {% elif character.unspent_experience > 2 %}
                             Exp

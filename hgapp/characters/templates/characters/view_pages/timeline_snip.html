@@ -8,7 +8,15 @@
     <b>{{ character.number_of_victories }}</b> Victories -
     <b>{{ character.number_of_losses }}</b> Failure{{character.number_of_losses|pluralize}}
     {% if request.user == character.player %}
-    - <b>{{ num_improvements }} </b> Improvement{{num_improvements|pluralize}}
+      <div>
+        <b>{{num_total_rewards}}</b> Reward{{num_total_rewards|pluralize}}
+        <span {% if character_over_reward_limit %} class="text-danger" {% endif %}>
+          ({{num_spent_rewards}} spent)
+        </span>
+
+        - <b>{{num_gifts}}</b> Gift{{num_gifts|pluralize}}
+      - <b>{{ num_improvements }} </b> Improvement{{num_improvements|pluralize}}
+      </div>
     {% endif %}
   </div>
   <div {% if unspent_experience < 0 %}class="text-danger"{% endif %}>

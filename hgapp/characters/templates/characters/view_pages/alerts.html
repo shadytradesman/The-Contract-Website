@@ -1,3 +1,4 @@
+{% load games_tags %}
 
 {% if secret_key and secret_key_valid and not request.user.is_authenticated %}
 <div class="row">
@@ -79,6 +80,55 @@
         </p>
     </div>
 {% endif %}
+
+
+{% if character_over_reward_limit %}
+<div class="alert alert-danger text-center css-char-alert" role="alert">
+    <p>
+        {{character.name}} has spent over their Reward limit.
+        You cannot spend more than 2 Gifts / Improvements per Contract victory.
+    </p>
+    <p>
+        <b>{{num_total_rewards}}</b> Reward{{num_total_rewards|pluralize}} earned,
+        <b>{{num_spent_rewards}}</b> spent.
+        <b>{{ character.number_of_victories }}</b> Victories.
+    </p>
+    <p>
+        To remove this message, edit your Gifts to refund an appropriate number of Rewards. You can spend them when you earn additional Contract victories.
+    </p>
+</div>
+{% endif %}
+
+
+
+{% if request.user == character.player and character_at_reward_limit and num_unspent_rewards > 0 %}
+    <div class="alert alert-info text-center css-char-alert" role="alert">
+        <p>
+            <b>Only you can see this.</b>
+        </p>
+        <p>
+            {{character.name}} has unspent Rewards but is at their Reward limit.
+            You cannot spend more than 2 Gifts / Improvements
+            per Contract victory. Achieve another victory to spend your unspent Rewards.
+        </p>
+        <p>
+            <b>{{num_total_rewards}}</b> Reward{{num_total_rewards|pluralize}} earned,
+            <b>{{num_spent_rewards}}</b> spent.
+            <b>{{ character.number_of_victories }}</b> Victories.
+        </p>
+        <p>
+            <b>Unspent Rewards:</b>
+            <ul>
+                {% for reward in character.unspent_rewards %}
+                    {% render_reward reward %}
+                {% endfor %}
+
+            </ul>
+        </p>
+    </div>
+{% endif %}
+
+
 {% if not character.cell  %}
     {% if character.number_of_victories > 3 %}
         <div class="alert alert-danger text-center css-char-alert" role="alert">
@@ -156,10 +206,10 @@
             </p>
         </div>
 {% endif %}
-{% if user_can_edit and available_gift %}
+{% if user_can_edit and available_gift and not character_at_reward_limit and not character_over_reward_limit %}
         <a href="{% url 'characters:characters_spend_reward' character.id %}">
             <div class="alert alert-success btn btn-success css-char-alert" role="alert">
-                Spend Available Gifts
+                Spend Available Rewards
             </div>
         </a>
 {% endif %}

@@ -555,6 +555,11 @@ class Character(models.Model):
         self.status = self.calculate_status(num_victories=effective_victories)
         self.save()
 
+    def is_rewardable(self):
+        num_spent_rewards = self.num_active_spent_rewards()
+        character_at_reward_limit = self.num_victories > 1 and (2 * self.num_victories) <= num_spent_rewards
+        return self.num_unspent_rewards() > 0 and not character_at_reward_limit
+
     def get_source_refill_cooldown(self):
         if not self.status:
             return None
@@ -795,6 +800,9 @@ class Character(models.Model):
 
     def num_improvements(self):
         return self.reward_set.filter(is_void=False, is_improvement=True).count()
+
+    def num_gifts(self):
+        return self.reward_set.filter(is_void=False, is_improvement=False).count()
 
     def get_reward_phrase(self):
         num_gifts = self.num_unspent_gifts()
