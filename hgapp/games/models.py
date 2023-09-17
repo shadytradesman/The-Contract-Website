@@ -1041,7 +1041,7 @@ class Scenario(models.Model):
                 self._grant_reward()
         else:
             # shouldn't have improvement
-            if active_improvement and not self.is_wiki_editable:
+            if active_improvement:
                 active_improvement.mark_void()
 
     def last_run_time(self):
