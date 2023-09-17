@@ -360,8 +360,8 @@ def view_character(request, character_id, secret_key=None):
 
     num_spent_rewards = character.num_active_spent_rewards()
     num_total_rewards = character.num_active_rewards()
-    character_at_reward_limit = character.num_victories > 1 and (2 * character.num_victories) == num_spent_rewards
-    character_over_reward_limit = character.num_victories > 1 and (2 * character.num_victories) < num_spent_rewards
+    character_at_reward_limit = character.effective_victories() > 1 and (2 * character.effective_victories()) == num_spent_rewards
+    character_over_reward_limit = character.effective_victories() > 1 and (2 * character.effective_victories()) < num_spent_rewards
     num_unspent_rewards = character.num_unspent_rewards()
     available_gift = num_unspent_rewards > 0
 
@@ -672,8 +672,8 @@ def spend_reward(request, character_id):
     unspent_exp = character.unspent_experience()
     num_spent_rewards = character.num_active_spent_rewards()
     num_total_rewards = character.num_active_rewards()
-    character_at_reward_limit = character.num_victories > 1 and (2 * character.num_victories) == num_spent_rewards
-    character_over_reward_limit = character.num_victories > 1 and (2 * character.num_victories) < num_spent_rewards
+    character_at_reward_limit = character.effective_victories() > 1 and (2 * character.effective_victories()) == num_spent_rewards
+    character_over_reward_limit = character.effective_victories() > 1 and (2 * character.effective_victories()) < num_spent_rewards
     context = {
         'character': character,
         'unassigned_powers': unassigned_powers,

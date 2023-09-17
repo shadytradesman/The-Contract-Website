@@ -551,13 +551,16 @@ class Character(models.Model):
         self._update_loss_count()
         self._update_victory_count()
         self._update_game_count()
-        effective_victories = self.number_of_victories() + PORTED_GIFT_ADJUSTMENT[self.ported]
+        effective_victories = self.effective_victories()
         self.status = self.calculate_status(num_victories=effective_victories)
         self.save()
 
+    def effective_victories(self):
+        return self.number_of_victories() + PORTED_GIFT_ADJUSTMENT[self.ported]
+
     def is_rewardable(self):
         num_spent_rewards = self.num_active_spent_rewards()
-        character_at_reward_limit = self.num_victories > 1 and (2 * self.num_victories) <= num_spent_rewards
+        character_at_reward_limit = self.effective_victories() > 1 and (2 * self.effective_victories()) <= num_spent_rewards
         return self.num_unspent_rewards() > 0 and not character_at_reward_limit
 
     def get_source_refill_cooldown(self):
