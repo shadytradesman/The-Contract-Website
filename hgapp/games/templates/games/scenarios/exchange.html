@@ -40,17 +40,18 @@ Scenario Exchange
     <div class="panel-body">
       <div class="text-center">
         {% if request.user.is_authenticated %}
-        <h4>
-          You have
-          <i class="fa fa-handshake-o fa-1x css-text-exchange"></i>
-          <b class="css-text-exchange">{{ exchange_credits }}</b> Exchange Credits available
-        </h4>
+          <h4>
+            You have
+            <i class="fa fa-handshake-o fa-1x css-text-exchange"></i>
+            <b class="css-text-exchange">{{ exchange_credits }}</b> Exchange Credits available
+          </h4>
         {% else %}
           <h4 class="text-warning">
             You must <a href="{% url 'account_login' %}">log in</a> to unlock these Scenarios
           </h4>
         {% endif %}
         <div class="text-center">
+          There are a total of <b>{{num_scenarios_on_exchange}}</b> Scenarios on the Exchange.
           <button type="button" class="btn btn-default btn-xs " data-toggle="modal" data-target="#mainTutorialModal">
             Help
           </button>

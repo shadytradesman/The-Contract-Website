@@ -295,6 +295,7 @@ def edit_scenario(request, scenario_id):
 
 def scenario_exchange(request):
     form = RsvpAttendanceForm()
+    num_scenarios_on_exchange = Scenario.objects.filter(is_on_exchange=True).count()
     if request.user.is_authenticated:
         scenarios = Scenario.objects.filter(is_on_exchange=True).exclude(available_to__id=request.user.pk).order_by("-date_added_to_exchange", "title")
         discovered_scenarios = Scenario.objects.filter(is_on_exchange=True).filter(available_to__id=request.user.pk).order_by("-date_added_to_exchange", "title")
@@ -308,6 +309,7 @@ def scenario_exchange(request):
         "exchange_credits": request.user.profile.exchange_credits if request.user.is_authenticated else 0,
         "show_tutorial": not request.user.is_authenticated or request.user.scenario_set.count() < 4,
         "main_modal_art_url": static('overrides/art/horns.jpg'),
+        "num_scenarios_on_exchange": num_scenarios_on_exchange,
     }
     return render(request, 'games/scenarios/exchange.html', context)
 
