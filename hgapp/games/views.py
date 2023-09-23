@@ -437,7 +437,7 @@ def approve_scenarios(request):
     if not (request.user.profile.exchange_approver or request.user.is_superuser):
         raise PermissionDenied("You must be an exchange approver to approve Scenarios")
     context = {
-        "outstanding_approvals": ScenarioApproval.objects.filter(status=WAITING).order_by("-created_date"),
+        "outstanding_approvals": ScenarioApproval.objects.filter(status=WAITING).order_by("created_date"),
         "closed_approvals": ScenarioApproval.objects.filter(closed_date__isnull=False).order_by("-closed_date")[:80],
         "form": ScenarioApprovalForm(),
     }

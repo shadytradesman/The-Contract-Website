@@ -126,7 +126,7 @@ Submit Scenario
                                                 <li>
                                                     <b>You use the proper heading styles</b> in the writeup so that the table of contents populates properly.
                                                     <div>
-                                                        <img src="{% static 'games/images/headermenu.jpg' %}" width="300">
+                                                        <img src="{% static 'games/images/headermenu.jpg' %}" width="300" style="max-width:100%;">
                                                     </div>
                                                 </li>
                                                 <li>
@@ -226,9 +226,12 @@ Submit Scenario
                     {{approval.created_date|timesince}} ago.
                 </b>
                 {% if approval.closed_date %}
-                <div>
-                    Closed {{approval.closed_date|timesince}} ago.
-                </div>
+                    <div>
+                        Closed {{approval.closed_date|timesince}} ago
+                        {% if approval.approver %}
+                        by <b>{{approval.approver.username}}</b>
+                        {% endif %}
+                    </div>
                 {% endif %}
                 {% if not approval.is_removed %}
                     <div>
