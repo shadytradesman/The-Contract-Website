@@ -13,10 +13,11 @@ from .models import Question, Answer
 
 from .forms import AnswerForm
 
+
 @login_required
 def edit_answer(request, answer_id):
-    if not request.user.is_superuser:
-        raise PermissionDenied("Admins only for now.")
+    if not (request.user.is_authenticated and request.user.profile.early_access_user):
+        raise PermissionDenied("Early access only for now.")
     answer = get_object_or_404(Answer, id=answer_id)
     character = answer.relevant_character
     if character.player != request.user:
@@ -48,8 +49,8 @@ def edit_answer(request, answer_id):
 
 @login_required
 def answer_next(request, character_id, question_id=None):
-    if not request.user.is_superuser:
-        raise PermissionDenied("Admins only for now.")
+    if not (request.user.is_authenticated and request.user.profile.early_access_user):
+        raise PermissionDenied("Early access only for now.")
     character = get_object_or_404(Character, id=character_id)
     if character.player != request.user:
         raise PermissionDenied("Only a Contractor's creator can answer their questionnaire")
@@ -123,8 +124,8 @@ def answer_next(request, character_id, question_id=None):
 
 
 def view_questionnaire(request, character_id):
-    if not request.user.is_superuser:
-        raise PermissionDenied("Admins only for now.")
+    if not (request.user.is_authenticated and request.user.profile.early_access_user):
+        raise PermissionDenied("Early access only for now.")
     character = get_object_or_404(Character, id=character_id)
     if not character.player_can_view(request.user):
         raise PermissionDenied("You cannot view the questionnaire of a contractor you can't view")

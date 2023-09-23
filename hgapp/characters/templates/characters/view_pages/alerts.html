@@ -235,7 +235,7 @@
     </a>
 {% endif %}
 
-{% if request.user and request.user.is_superuser and has_available_questions %}
+{% if early_access and has_available_questions %}
     <a href="{% url 'questionnaire:questionnaire_answer' character.id %}">
         <div class="alert alert-info btn btn-primary css-char-alert" style="white-space: normal;">
             Earn {{next_question_reward}}
