@@ -1450,6 +1450,7 @@ class Reward(models.Model):
     is_void = models.BooleanField(default=False)
     is_journal = models.BooleanField(default=False)
     is_new_player_gm_reward = models.BooleanField(default=False)
+    is_questionnaire = models.BooleanField(default=False)
 
     awarded_on = models.DateTimeField('awarded on')
     assigned_on = models.DateTimeField('assigned on',

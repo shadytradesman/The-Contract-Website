@@ -124,6 +124,7 @@ INSTALLED_APPS = [
     'emails.apps.EmailsConfig',
     'images.apps.ImagesConfig',
     'notifications.apps.NotificationsConfig',
+    'questionnaire.apps.QuestionnaireConfig',
     'ads.apps.AdsConfig',
     'django.contrib.admin',
     'django.contrib.auth',

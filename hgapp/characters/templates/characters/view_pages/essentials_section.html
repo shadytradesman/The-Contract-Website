@@ -46,6 +46,13 @@
             </a>
             has {{num_journal_entries}} {% if num_journal_entries > 1 %} entries{% else %} entry{%endif%}.
     {% endif %}
+    {% if num_questions_answered and early_access %}
+        {{character.pronoun_possessive_capitalized}}
+        <a href="{% url 'questionnaire:questionnaire_view' character.id %}">
+            Questionnaire
+        </a>
+        has {{num_questions_answered}} answer{{num_questions_answered|pluralize}}.
+    {% endif %}
     </p>
     {% endif %}
 </div>

@@ -1,6 +1,7 @@
 from journals.models import Journal
+from questionnaire.models import Question, Answer
 from hgapp.utilities import get_object_or_none
-from .models import Weapon
+from .models import Weapon, EXP_REWARD_VALUES, EXP_QUESTIONNAIRE_INITIAL
 from collections import defaultdict
 
 # If applicable, returns an object containing info about what journal a character can write for a reward.
@@ -26,6 +27,44 @@ def get_characters_next_journal_credit(character):
         return {"attendance": chosen_attendance, "is_downtime": is_downtime, "reward_is_improvement": reward_is_improvement}
     else:
         return None
+
+
+def does_character_have_outstanding_questions(character):
+    game_number = character.number_completed_games()
+    num_answered_questions = Answer.objects.filter(relevant_character=character, is_valid=True).count()
+    num_questions_available = Question.objects.exclude(contract_number__gt=game_number).count()
+    if num_answered_questions < num_questions_available:
+        return True
+    num_unique_questions = Question.objects.count()
+    if num_answered_questions >= num_unique_questions:
+        # They've gone through all questions at least once. Got to check repeats.
+        num_repeatable_questions = Question.objects.filter(is_repeatable=True).count()
+        if num_answered_questions >= num_unique_questions + num_repeatable_questions:
+            # Character has completely finished questionnaire including all repeats
+            return False
+        num_repeatable_answers = Answer.objects\
+            .filter(relevant_character=character,
+                    is_valid=True,
+                    question__is_repeatable=True,
+                    written_contract_number__lt=game_number-9)\
+            .count()
+        if num_answered_questions < num_repeatable_answers + num_unique_questions:
+            # There are outstanding repeatable questions
+            return True
+    return False
+
+
+def next_question_reward(character):
+    next_reward_type = "Exp"
+    next_reward_quantity = 1
+    num_answered_questions = Answer.objects.filter(is_valid=True, relevant_character=character).count()
+    if num_answered_questions < 5:
+        next_reward_quantity = EXP_REWARD_VALUES[EXP_QUESTIONNAIRE_INITIAL]
+    elif num_answered_questions >= 5:
+        if (num_answered_questions - 5) % 10 < 2:
+            next_reward_type = "Improvement"
+    return "{} {}".format(next_reward_quantity, next_reward_type)
+
 
 def get_world_element_default_dict(world_element_cell_choices):
     # It is important that cells that may not /yet/ have elements in them be included.

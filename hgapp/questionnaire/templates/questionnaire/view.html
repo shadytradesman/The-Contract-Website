@@ -1,0 +1,79 @@
+{% extends "site_base.html" %}
+
+{% load static %}
+{% load account_tags %}
+{% load bootstrap %}
+
+{% block head_title %}
+View Questionnaire
+{% endblock %}
+
+{% block extra_head %}
+{{ form.media }}
+{% endblock %}
+
+{% block extra_styles %}
+{% endblock %}
+
+{% block extra_scripts %}
+{% endblock %}
+
+{% block body_base %}
+<div class="container">
+    <h1 class="text-center">
+        <a  href="{% url 'characters:characters_view' character.id %}">
+            {{character.name}}'s
+        </a>
+        Questionnaire
+    </h1>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            {% if can_edit %}
+            <div class="text-center">
+                {% if next_question %}
+                    <a href="{% url 'questionnaire:questionnaire_answer' character.id %}">
+                        <div class="btn btn-primary" role="alert">
+                            Answer {% if answers %} more {% endif %} questions for Exp and Improvements!
+                        </div>
+                    </a>
+                {% else %}
+                    <i>
+                        Participate in more Contracts to unlock new questions
+                    </i>
+                {% endif %}
+            </div>
+            {% endif %}
+            {% for answer in answers %}
+            <div style="margin-top: 25px;">
+                <h4>
+                    {{answer.question.prompt}}
+                </h4>
+                    <div style="margin-bottom: 10px;">
+                        {% if can_edit and answer.written_contract_number == character.number_completed_games %}
+                        <a class="btn btn-default btn-xs" href="{% url 'questionnaire:questionnaire_edit' answer.id %}">
+                            Edit Answer
+                        </a>
+                        {% endif %}
+                        <span class="text-muted">
+                            {% if answer.written_contract_number != 0 %}
+                                Answered after Contract <b>{{answer.written_contract_number}}</b>,
+                                <a href="{% url 'games:games_view_game' answer.game_attendance.relevant_game.id %}">
+                                    {{answer.game_attendance.relevant_game.scenario.title}}
+                                </a>
+                            {% else %}
+                                Answered before {{character.name}}'s first Contract.
+                            {% endif %}
+                        </span>
+                    </div>
+                <div class="thumbnail">
+                    {{answer.content|safe}}
+                </div>
+            </div>
+            {% empty %}
+                {{character.name}} has not answered any questions yet.
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

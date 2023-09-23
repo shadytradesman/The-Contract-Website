@@ -36,7 +36,8 @@ from characters.forms import make_character_form, CharacterDeathForm, ConfirmAss
     LooseEndForm, LooseEndDeleteForm
 from characters.form_utilities import get_edit_context, character_from_post, update_character_from_post, \
     grant_trauma_to_character, delete_trauma_rev, get_world_element_class_from_url_string, get_blank_sheet_context
-from characters.view_utilities import get_characters_next_journal_credit, get_world_element_default_dict, get_weapons_by_type
+from characters.view_utilities import get_characters_next_journal_credit, get_world_element_default_dict, get_weapons_by_type, \
+    does_character_have_outstanding_questions, next_question_reward
 
 
 from journals.models import Journal, JournalCover
@@ -357,6 +358,7 @@ def view_character(request, character_id, secret_key=None):
 
     journal_cover = get_object_or_none(JournalCover, character=character.id)
     next_entry = get_characters_next_journal_credit(character) if user_can_edit else None
+    has_outstanding_question = does_character_have_outstanding_questions(character)
 
     num_spent_rewards = character.num_active_spent_rewards()
     num_total_rewards = character.num_active_rewards()
@@ -453,6 +455,9 @@ def view_character(request, character_id, secret_key=None):
         'num_journal_entries': num_journal_entries,
         'journal_cover': journal_cover,
         'next_entry': next_entry,
+        'has_available_questions': has_outstanding_question,
+        'next_question_reward': next_question_reward(character) if has_outstanding_question else None,
+        'num_questions_answered': character.answer_set.filter(is_valid=True).count(),
         'latest_journals': latest_journals,
         'available_gift': available_gift,
         'circumstance_form': circumstance_form,
@@ -487,6 +492,7 @@ def view_character(request, character_id, secret_key=None):
         'num_moves':  moves.count(),
         'loose_ends': loose_ends,
         'expired_loose_ends': expired_loose_ends,
+        'early_access':request.user.is_authenticated and request.user.profile.early_access_user,
     }
     return render(request, 'characters/view_pages/view_character.html', context)
 

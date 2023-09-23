@@ -1,7 +1,7 @@
 {% load markdown_deux_tags %}
 
 {% if user_can_gm %}
-<h3 style="margin-bottom: 10px;">GM Notes</h3>
+<h3 style="margin-bottom: 10px;  margin-top: 15px;">GM Notes</h3>
 <div style="margin-left: 5px;">
   <small>These notes are <b>hidden</b> from the Player who owns this Contractor.
     Only other Players who can edit this Contractor can view these notes.</small>
@@ -37,7 +37,7 @@
 
 
 {% if character.background or user_can_edit %}
-<h3>Biography</h3>
+<h3 style=" margin-top: 15px;">Biography</h3>
 <div class="thumbnail">
   {% if character.background or user_can_edit %}
   <div class="css-bio-text">

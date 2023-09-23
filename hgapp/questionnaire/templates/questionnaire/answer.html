@@ -1,0 +1,66 @@
+{% extends "site_base.html" %}
+
+{% load static %}
+{% load account_tags %}
+{% load bootstrap %}
+
+{% block head_title %}
+Answer Questionnaire
+{% endblock %}
+
+{% block extra_head %}
+{{ form.media }}
+{% endblock %}
+
+{% block extra_styles %}
+{% endblock %}
+
+{% block extra_scripts %}
+{% endblock %}
+
+{% block body_base %}
+<div class="container">
+    <h1 class="text-center">
+        Answering
+        <a href="{% url 'questionnaire:questionnaire_view' character.id %}">
+            {{character.name}}'s Questionnaire
+        </a>
+    </h1>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <h3 id="answer-{{answer.id}}">
+                {{question.prompt}}
+            </h3>
+            <div class="text-muted">
+                <small>
+                    <i>Your answer must be at least {{question.min_word_count}} words to earn credit and unlock the next question.</i>
+                </small>
+            </div>
+            <form
+                    {% if existing_answer %}
+                        action="{% url 'questionnaire:questionnaire_edit' existing_answer.id %}"
+                    {% else %}
+                        action="{% url 'questionnaire:questionnaire_answer_question' character.id question.id %}"
+                    {% endif %}
+                  method="post" onsubmit="setFormSubmitting()">
+                {% csrf_token %}
+                {{form.content|bootstrap}}
+                <input class="btn btn-primary" type="submit" value="Submit" />
+            </form>
+            {% if not existing_answer or not existing_answer.is_valid %}
+                <div style="margin-top: 10px;">
+                    {% if questions_until_reward == 0 %}
+                        Answer this question with at least {{question.min_word_count}} words to earn {{next_reward_string}}!
+                    {% else %}
+                        Answer this question and {{questions_until_reward}} more to earn {{next_reward_string}}.
+                        <p>
+                            Your answer must be at least <b>{{question.min_word_count}} words</b> to unlock the next question.
+                        </p>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -213,6 +213,7 @@
             </div>
         </a>
 {% endif %}
+
 {% if next_entry %}
     <a href="{% url 'journals:journal_write_next' character.id %}">
         <div class="alert alert-info btn btn-primary css-char-alert" role="alert">
@@ -222,7 +223,6 @@
             {% else %}
             1 Exp
             {% endif %}
-            for {{character.name}}
             <div class="visible-xs-block"></div>
             by writing a
             {% if next_entry.is_downtime %}
@@ -231,6 +231,19 @@
             Contract
             {% endif %}
             journal
+        </div>
+    </a>
+{% endif %}
+
+{% if request.user and request.user.is_superuser and has_available_questions %}
+    <a href="{% url 'questionnaire:questionnaire_answer' character.id %}">
+        <div class="alert alert-info btn btn-primary css-char-alert" style="white-space: normal;">
+            Earn {{next_question_reward}}
+            {% if num_questions_answered %}
+                continuing your questionnaire
+            {% else %}
+                answering a few questions about {{character.name}}
+            {% endif %}
         </div>
     </a>
 {% endif %}

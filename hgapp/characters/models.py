@@ -270,6 +270,8 @@ EXP_GM_MOVE = "GM_MOVE"
 EXP_JOURNAL = "JOURNAL"
 EXP_CUSTOM = "CUSTOM"
 EXP_EXCHANGE = "Exchange"
+EXP_QUESTIONNAIRE_CONTRACT = "Questionnaire_contract"
+EXP_QUESTIONNAIRE_INITIAL = "Questionnaire_initial"
 EXP_REWARD_TYPE = (
     (EXP_MVP, "earning Commission"),
     (EXP_LOSS_V1, "losing"),
@@ -289,6 +291,8 @@ EXP_REWARD_TYPE = (
     (EXP_JOURNAL, "writing a journal"),
     (EXP_CUSTOM, "custom reason"),
     (EXP_EXCHANGE, "submitting a Scenario to the exchange"),
+    (EXP_QUESTIONNAIRE_CONTRACT, "answering two questionnaire questions"),
+    (EXP_QUESTIONNAIRE_INITIAL, "answering the first five questionnaire questions")
 )
 
 EXP_REWARD_VALUES = {
@@ -309,6 +313,8 @@ EXP_REWARD_VALUES = {
     EXP_GM_MOVE: 2,
     EXP_JOURNAL: 1,
     EXP_EXCHANGE: 5,
+    EXP_QUESTIONNAIRE_CONTRACT: 1,
+    EXP_QUESTIONNAIRE_INITIAL: 5,
 }
 
 EXP_NEW_CHAR = 150
@@ -699,6 +705,9 @@ class Character(models.Model):
     # Latest game last
     def completed_games(self):
         return self.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).order_by("relevant_game__end_time").all()
+
+    def get_latest_attendance(self):
+        return self.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).order_by("-relevant_game__end_time").first()
 
     # Latest game first
     def completed_games_rev_sort(self):
@@ -1878,6 +1887,8 @@ class ExperienceReward(models.Model):
         if hasattr(self, 'mvp_exp_attendance'):
             attendance = self.mvp_exp_attendance
             return "{} in {}".format(reason, attendance.relevant_game.scenario.title)
+        if hasattr(self, 'answer'):
+            return "from answering the questionnaire"
         else:
             self.log_bad_source()
             raise ValueError("Experience reward has bad source: " + str(self.pk))
