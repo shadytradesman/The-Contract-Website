@@ -7,14 +7,14 @@
     </div>
 </div>
 {% if early_access %}
-<div>
-    <h3 style="margin-bottom: 5px;" data-toggle="tooltip" title='{{tutorial.moves|safe}}'>Questionnaire</h3>
-    {% if num_questions_answered %}
-        <a href="{% url 'questionnaire:questionnaire_view' character.id %}">
-            View {{character.name}}'s {{num_questions_answered}} answer{{num_questions_answered|pluralize}}.
-        </a>
-    {% endif %}
-</div>
+    <div>
+        <h3 style="margin-bottom: 5px;" data-toggle="tooltip" title='{{tutorial.moves|safe}}'>Questionnaire</h3>
+        {% if num_questions_answered %}
+            <a href="{% url 'questionnaire:questionnaire_view' character.id %}">
+                View {{character.name}}'s {{num_questions_answered}} answer{{num_questions_answered|pluralize}}.
+            </a>
+        {% endif %}
+    </div>
 {% endif %}
 
 {% include "characters/view_pages/moves_snip.html" %}

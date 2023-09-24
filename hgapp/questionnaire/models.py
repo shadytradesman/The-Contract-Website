@@ -90,6 +90,8 @@ class Answer(models.Model):
             models.UniqueConstraint(fields=['relevant_character', 'written_contract_number', 'question'], name='unique_answer_2'),
         ]
 
+    def __str__(self):
+        return "{} answered {}".format(self.relevant_character.name, self.question.prompt)
     def set_content(self, content):
         original_valid = self.is_valid
         is_valid = self.__get_is_valid(content)
