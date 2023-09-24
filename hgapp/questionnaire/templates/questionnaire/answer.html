@@ -33,7 +33,7 @@ Answer Questionnaire
             </h3>
             <div class="text-muted">
                 <small>
-                    <i>Your answer must be at least {{question.min_word_count}} words to earn credit and unlock the next question.</i>
+                    <i>Your answer must be at least <b style="font-size:1.3em;">{{question.min_word_count}} words</b> to earn credit and unlock the next question.</i>
                 </small>
             </div>
             <form
@@ -50,11 +50,11 @@ Answer Questionnaire
             {% if not existing_answer or not existing_answer.is_valid %}
                 <div style="margin-top: 10px;">
                     {% if questions_until_reward == 0 %}
-                        Answer this question with at least {{question.min_word_count}} words to earn {{next_reward_string}}!
+                        Answer this question with at least <b style="font-size:1.3em;">{{question.min_word_count}} words</b> to earn {{next_reward_string}}!
                     {% else %}
                         Answer this question and {{questions_until_reward}} more to earn {{next_reward_string}}.
                         <p>
-                            Your answer must be at least <b>{{question.min_word_count}} words</b> to unlock the next question.
+                            Your answer must be at least <b style="font-size:1.3em;">{{question.min_word_count}} words</b> to unlock the next question.
                         </p>
                     {% endif %}
                 </div>
