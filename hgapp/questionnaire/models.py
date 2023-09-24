@@ -9,7 +9,7 @@ from games.models import Game_Attendance, Reward
 
 from characters.models import Character, ExperienceReward, EXP_QUESTIONNAIRE_CONTRACT, EXP_QUESTIONNAIRE_INITIAL
 
-from notifications.models import Notification, REWARD_NOTIF
+from notifications.models import Notification, REWARD_NOTIF, JOURNAL_NOTIF
 
 
 class Question(models.Model):
@@ -103,6 +103,26 @@ class Answer(models.Model):
         self.save()
         if self.is_valid and not original_valid:
             self.grant_reward()
+            self.send_notifications()
+
+    def send_notifications(self):
+        if not self.relevant_character.private:
+            num_answered_questions = Answer.objects.filter(is_valid=True,
+                                                           relevant_character=self.relevant_character).count()
+            if num_answered_questions != 5 and (num_answered_questions - 5) % 6 != 0:
+                return
+            cell = self.relevant_character.cell if hasattr(self.relevant_character, "cell") else None
+            if cell is not None:
+                members = cell.get_unbanned_members()
+                for player_membership in members:
+                    player = player_membership.member_player
+                    if player is not None and player.profile.early_access_user:
+                        Notification.objects.create(
+                            user=player,
+                            headline="{} is answering their Questionnaire".format(self.relevant_character.name),
+                            content="{} has answered {} questions".format(self.relevant_character.name, num_answered_questions),
+                            url=reverse('questionnaire:questionnaire_view', args=(self.relevant_character_id,)),
+                            notif_type=JOURNAL_NOTIF)
 
     def __get_is_valid(self, content):
         word_count = self.__get_wordcount(content)

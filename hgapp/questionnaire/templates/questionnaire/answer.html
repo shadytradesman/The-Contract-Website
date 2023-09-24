@@ -16,6 +16,7 @@ Answer Questionnaire
 {% endblock %}
 
 {% block extra_scripts %}
+<script src="{% static 'questionnaire/write_scripts.js' %}"></script>
 {% endblock %}
 
 {% block body_base %}
@@ -45,7 +46,7 @@ Answer Questionnaire
                   method="post" onsubmit="setFormSubmitting()">
                 {% csrf_token %}
                 {{form.content|bootstrap}}
-                <input class="btn btn-primary" type="submit" value="Submit" />
+                <input id="question-submit" class="btn btn-primary" type="submit" value="Submit" />
             </form>
             {% if not existing_answer or not existing_answer.is_valid %}
                 <div style="margin-top: 10px;">
