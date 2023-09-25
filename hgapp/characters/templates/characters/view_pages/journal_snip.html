@@ -32,19 +32,19 @@
     </div>
     {% if latest_journals %}
         <i>Latest {{ latest_journals|length }} of {{num_journal_entries}} entries</i>
-        {% for journal in latest_journals %}
-            <ul>
-                <li>
-                    <a href="{% url 'journals:journal_read_id' journal.id %}">
-                        {% if journal.title %}
-                            <h4>{{journal.title}}</h4>
-                        {% else %}
-                            <h4>An untitled Journal</h4>
-                        {% endif %}
-                    </a>
-                </li>
-            </ul>
-        {% endfor %}
+            {% for journal in latest_journals %}
+                <ul>
+                    <li>
+                        <a href="{% url 'journals:journal_read_id' journal.id %}">
+                            {% if journal.title %}
+                                <h4>{{journal.title}}</h4>
+                            {% else %}
+                                <h4>An untitled Journal</h4>
+                            {% endif %}
+                        </a>
+                    </li>
+                </ul>
+            {% endfor %}
     {% endif %}
 {% else %}
 <div class="text-center">

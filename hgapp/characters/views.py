@@ -423,6 +423,7 @@ def view_character(request, character_id, secret_key=None):
     loose_ends = character.looseend_set.filter(is_deleted=False).order_by("cutoff").all()
     expired_loose_ends = character.looseend_set.filter(is_deleted=False, cutoff=0).exists()
     unspent_exp = character.unspent_experience()
+    num_questions_answered = character.answer_set.filter(is_valid=True).count()
     context = {
         'character': character,
         'unspent_exp': unspent_exp,
@@ -457,7 +458,8 @@ def view_character(request, character_id, secret_key=None):
         'next_entry': next_entry,
         'has_available_questions': has_outstanding_question,
         'next_question_reward': next_question_reward(character) if has_outstanding_question else None,
-        'num_questions_answered': character.answer_set.filter(is_valid=True).count(),
+        'num_questions_answered': num_questions_answered,
+        'last_few_answers': character.answer_set.filter(is_valid=True).order_by("-created_date")[:3] if num_questions_answered else [],
         'latest_journals': latest_journals,
         'available_gift': available_gift,
         'circumstance_form': circumstance_form,

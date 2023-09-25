@@ -46,6 +46,9 @@ Answer Questionnaire
                   method="post" onsubmit="setFormSubmitting()">
                 {% csrf_token %}
                 {{form.content|bootstrap}}
+                {% if request.user.profile.view_adult_content %}
+                    {{form.is_nsfw|bootstrap}}
+                {% endif %}
                 <input id="question-submit" class="btn btn-primary" type="submit" value="Submit" />
             </form>
             {% if not existing_answer or not existing_answer.is_valid %}

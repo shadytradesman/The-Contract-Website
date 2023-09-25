@@ -13,6 +13,7 @@ View Questionnaire
 {% endblock %}
 
 {% block extra_styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'questionnaire/view_style.css' %}" />
 {% endblock %}
 
 {% block extra_scripts %}
@@ -32,7 +33,7 @@ View Questionnaire
             <div class="text-center">
                 {% if next_question %}
                     <a href="{% url 'questionnaire:questionnaire_answer' character.id %}">
-                        <div class="btn btn-primary" role="alert">
+                        <div class="btn btn-primary" role="alert" style="white-space: normal;">
                             Answer {% if answers %} more {% endif %} questions for Exp and Improvements!
                         </div>
                     </a>
@@ -44,15 +45,27 @@ View Questionnaire
             </div>
             {% endif %}
             {% for answer in answers %}
-            <div style="margin-top: 25px;">
+            <div id="answer-{{answer.id}}" style="margin-top: 30px;">
                 <h4>
-                    {{answer.question.prompt}}
+                    {{forloop.counter}}. {{answer.question.prompt}}
                 </h4>
                     <div style="margin-bottom: 10px;">
                         {% if can_edit and answer.written_contract_number == character.number_completed_games %}
-                        <a class="btn btn-default btn-xs" href="{% url 'questionnaire:questionnaire_edit' answer.id %}">
-                            Edit Answer
-                        </a>
+                            <a class="btn btn-default btn-xs" href="{% url 'questionnaire:questionnaire_edit' answer.id %}">
+                                Edit Answer
+                            </a>
+                        {% endif %}
+                        <span>
+                            <a class="btn-xs" href="#answer-{{answer.id}}">
+                                <i class="fa fa-link"></i> Link
+                            </a>
+                        </span>
+                        {% if answer.is_nsfw %}
+                            <span
+                                    data-toggle="tooltip"
+                                    title="This Answer contains 18+ content">
+                            🔞
+                            </span>
                         {% endif %}
                         <span class="text-muted">
                             {% if answer.written_contract_number != 0 %}
@@ -65,8 +78,19 @@ View Questionnaire
                             {% endif %}
                         </span>
                     </div>
-                <div class="thumbnail">
-                    {{answer.content|safe}}
+                <div class="thumbnail css-answer-content">
+                    {% if answer.is_nsfw and not request.user.profile.view_adult_content %}
+                        <div class="text-center">
+                            <b>You cannot view this answer because it contains 18+ content.</b>
+                            <br>
+                            You can adjust your content settings by
+                            <a href="{% url 'profiles:profiles_edit' %}">
+                                editing your Profile.
+                            </a>
+                        </div>
+                    {% else %}
+                        {{answer.content|safe}}
+                    {% endif %}
                 </div>
             </div>
             {% empty %}

@@ -29,6 +29,8 @@ def edit_answer(request, answer_id):
             answer = Answer.objects.select_for_update().filter(id=answer_id).first()
             form = AnswerForm(request.POST)
             if form.is_valid():
+                if request.user.profile.view_adult_content:
+                    answer.is_nsfw = form.cleaned_data['is_nsfw']
                 answer.set_content(form.cleaned_data['content'])
             else:
                 raise ValueError("Invalid edit answer form")
@@ -36,6 +38,7 @@ def edit_answer(request, answer_id):
     else:
         initial = {
             'content': answer.content,
+            'is_nsfw': answer.is_nsfw,
         }
         form = AnswerForm(initial)
         context = {
@@ -72,6 +75,7 @@ def answer_next(request, character_id, question_id=None):
                         writer=request.user,
                         game_attendance=character.get_latest_attendance(),
                         written_contract_number=character.number_completed_games(),
+                        is_nsfw=form.cleaned_data['is_nsfw'],
                     )
                     answer.save()
                     answer.set_content(form.cleaned_data['content'])
@@ -97,6 +101,7 @@ def answer_next(request, character_id, question_id=None):
         else:
             initial = {
                 'content': existing_answer.content,
+                'is_nsfw': existing_answer.is_nsfw,
             }
             form = AnswerForm(initial)
 

@@ -76,6 +76,7 @@ class Answer(models.Model):
     content = models.TextField(max_length=100000, null=True, blank=True)
     created_date = models.DateTimeField('date created', auto_now_add=True)
     is_valid = models.BooleanField(default=False)
+    is_nsfw = models.BooleanField(default=False)
     experience_reward = models.OneToOneField(ExperienceReward,
                                              null=True,
                                              blank=True,
@@ -92,6 +93,9 @@ class Answer(models.Model):
 
     def __str__(self):
         return "{} answered {}".format(self.relevant_character.name, self.question.prompt)
+
+    def get_url(self):
+        return "{}#answer-{}".format(reverse('questionnaire:questionnaire_view', args=(self.relevant_character_id,)), self.pk)
 
     def set_content(self, content):
         original_valid = self.is_valid

@@ -25,13 +25,14 @@
         {% endif %}
         and often appears as <b>{{character.appearance}}</b>.
     </p>
-    {% if character.cell or num_journal_entries %}
+    {% if character.cell or num_journal_entries or num_questions_answered %}
     <p style="margin-bottom: 5px;">
     {% if character.cell %}
         {{character.name}} lives in
         <a href="{% url 'cells:cells_view_cell' character.cell.id %}">{{ character.cell.name }}</a>,
         a setting {{ character.cell.setting_sheet_blurb}}.
     {% endif %}
+
     {% if num_journal_entries %}
             {{character.pronoun_possessive_capitalized}}
             {% if journal_cover %}
@@ -46,7 +47,7 @@
             </a>
             has {{num_journal_entries}} {% if num_journal_entries > 1 %} entries{% else %} entry{%endif%}.
     {% endif %}
-    {% if num_questions_answered and early_access %}
+    {% if num_questions_answered %}
         {{character.pronoun_possessive_capitalized}}
         <a href="{% url 'questionnaire:questionnaire_view' character.id %}">
             Questionnaire

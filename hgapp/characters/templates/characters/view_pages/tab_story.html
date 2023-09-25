@@ -8,11 +8,40 @@
 </div>
 {% if early_access %}
     <div>
-        <h3 style="margin-bottom: 5px;" data-toggle="tooltip" title='{{tutorial.moves|safe}}'>Questionnaire</h3>
-        {% if num_questions_answered %}
+        <h3 style="margin-bottom: 5px;" data-toggle="tooltip" title='The Questionnaire rewards Contractors who answer character-building questions'>
+            {% if num_questions_answered %}
             <a href="{% url 'questionnaire:questionnaire_view' character.id %}">
-                View {{character.name}}'s {{num_questions_answered}} answer{{num_questions_answered|pluralize}}.
+                Questionnaire
             </a>
+            {% else %}
+                Questionnaire
+            {% endif %}
+        </h3>
+        {% if early_access and has_available_questions and character.player == request.user %}
+            <a href="{% url 'questionnaire:questionnaire_answer' character.id %}">
+                <div class="alert-info btn btn-primary css-char-alert" style="white-space: normal; margin-bottom: 10px;">
+                    Earn {{next_question_reward}}
+                    {% if num_questions_answered %}
+                    continuing your questionnaire
+                    {% else %}
+                    answering a few questions about {{character.name}}
+                    {% endif %}
+                </div>
+            </a>
+        {% endif %}
+        <p>
+            <i>Latest {{last_few_answers|length}} of {{num_questions_answered}} answers</i>
+        </p>
+        {% if last_few_answers %}
+        <ul>
+            {% for answer in last_few_answers %}
+                <li>
+                    <a href="{{answer.get_url}}">
+                        {{answer.question.prompt}}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
         {% endif %}
     </div>
 {% endif %}
