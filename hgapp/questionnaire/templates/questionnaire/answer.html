@@ -17,6 +17,7 @@ Answer Questionnaire
 
 {% block extra_scripts %}
 <script src="{% static 'questionnaire/write_scripts.js' %}"></script>
+<script src="{% static 'overrides/wiki-macro-scripts.js' %}"></script>
 {% endblock %}
 
 {% block body_base %}
@@ -29,6 +30,45 @@ Answer Questionnaire
     </h1>
     <div class="panel panel-default">
         <div class="panel-body">
+            <div class="row text-center">
+                <a class="btn btn-default btn-sm wiki-entry-collapsible" style="margin-bottom: 0px">Help!</a>
+                <div class="collapse-content clearfix"  style="display:none;">
+                    <br>
+                    <div class="col-md-8 col-md-offset-2 thumbnail text-left">
+                        <p>
+                            The Questionnaire is a series of character-building questions you can
+                            answer for Experience and Improvements.
+                        </p>
+                        <p>
+                            If you opt to answer in-character, don't be secretive. Pretend {{character.name}} was dosed with
+                            truth serum or is answering the questions in their head.
+                        </p>
+                        <p>
+                            <b>The first five questions</b> are available right from character creation. Answering all
+                            five awards <b>5 Exp</b>.
+                        </p>
+                        <p>
+                            <b>After that,</b> each time {{character.name}} attends a Contract (win or lose), they unlock
+                            two more questions. Each pair of questions awards 1 Exp, except the first pair and every 5
+                            pairs afterwards, which award an Improvement instead.
+                            That means answering questions 7, 17, and 27 award an Improvement, and questions 9, 11, 13, etc award 1 Exp.
+                        </p>
+                        <p>
+                            Because your answers to some questions are bound to change over time, <b>each question
+                            records when you answer it.</b> Some questions can be re-answered for credit after <b>10</b>
+                            Contracts have passed since your original answer. However, you must still unlock them two at
+                            a time by participating in Contracts.
+                        </p>
+                        <p>
+                            <b>You cannot edit your answers from previous Contracts.</b> Any unanswered questions
+                            remain available to answer until you're ready.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+
+
             <h3 id="answer-{{answer.id}}">
                 {{question.prompt}}
             </h3>
