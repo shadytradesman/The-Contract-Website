@@ -59,14 +59,14 @@ Scenario Exchange
       </div>
       <div>
         {% if scenarios %}
-        <h2>Available Scenarios</h2>
+          <h2>Available Scenarios</h2>
         {% endif %}
         {% for scenario in scenarios %}
-        {% if scenario.date_added_to_exchange %}
-          <small class="text-muted">
-            Added to the exchange {{scenario.date_added_to_exchange|timesince}} ago
-          </small>
-        {% endif %}
+          {% if scenario.date_added_to_exchange %}
+            <small class="text-muted">
+              Added to the exchange {{scenario.date_added_to_exchange|timesince}} ago
+            </small>
+          {% endif %}
           <div class="thumbnail">
             <h4><b>{{scenario.title}}</b> - {{scenario.get_suggested_status_display}}</h4>
             {% if scenario.exchange_information %}

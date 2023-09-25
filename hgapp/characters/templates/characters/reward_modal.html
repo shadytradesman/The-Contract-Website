@@ -1,0 +1,70 @@
+{% extends "powers/ps2_create_pages/tutorial/modal_template.html" %}
+
+{% block modal_id %}mainTutorialModal{% endblock %}
+
+{% block modal_title %}
+What Gifts should I get?
+{% endblock %}
+
+{% block modal_header %}
+{% endblock %}
+
+{% block modal_body %}
+<h3>
+    First Four Gifts
+</h3>
+<p>
+    This guidance helps your Contractor feel useful in a wide range of situations while remaining flavorful and true to their concept.
+<ul>
+    <li>
+        <b>The "Puzzle Piece" Gift</b>
+        <ul>
+            <li>
+                If there is a situation where it would be bizarre if your Contractor failed, this Gift ensures that victory.
+                <ul>
+                    <li>A chef's Power to make food everyone loves</li>
+                    <li>A beastmaster’s ability to control animals</li>
+                    <li>A driver’s ability to claim victory in a high-speed chase</li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+    <li>
+        <b>A Combat Gift</b>
+        <ul>
+            <li>
+                This is something your Contractor can use in combat AFTER the fighting has started.
+            </li>
+            <li>
+                Contractors don't have to deal with violence by killing things, but if they don't have
+                <i>some</i> way to deal with someone running at them with a knife, they will end up in
+                <a href="{% url 'characters:characters_graveyard' %}">the Graveyard</a>.
+            </li>
+        </ul>
+    </li>
+    <li>
+        <b>An Info-gathering Gift</b>
+        <ul>
+            <li>
+                Something that provides unique and useful information.
+            </li>
+            <li>
+                Awareness Effects such as Heightened Senses and Investigative Effects are good choices.
+            </li>
+        </ul>
+    </li>
+    <li>
+        <b>A Gift that Breaks Rules</b>
+        <ul>
+            <li>
+                These Gifts help you create opportunities by breaking the "rules" standard humans abide by.
+            </li>
+            <li>
+                Examples include mobility Gifts that allow reaching new area or influence Powers to
+                control an interaction such as Disguise or Emotion Control.
+            </li>
+        </ul>
+    </li>
+</ul>
+</p>
+{% endblock %}

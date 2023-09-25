@@ -12,7 +12,21 @@
 {% load games_tags %}
 {% load power_tags %}
 
+{% block extra_scripts %}
+<script type="text/javascript">
+          {% if show_tutorial %}
+              showTutorial=true;
+          {% else %}
+              showTutorial=false;
+          {% endif %}
+  	</script>
+<script src="{% static 'powers/stock_powers_script.js' %}"></script>
+{% endblock %}
+
 {% block body_base %}
+{% with main_modal_art_url as modal_art_url %}
+    {% include "characters/reward_modal.html" %}
+{% endwith %}
 <div class="container">
     <div class="backdropped">
     {% if character.num_unspent_rewards > 0 or unspent_exp > 2 %}
@@ -76,6 +90,11 @@
                             </a>
                         </div>
                     {% endif %}
+                </div>
+                <div class="text-center">
+                    <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#mainTutorialModal">
+                        What Gifts should I get?
+                    </button>
                 </div>
                 {% if character.power_full_set.all|length > 0  and character.num_unspent_rewards > 0 %}
                     <hr>
