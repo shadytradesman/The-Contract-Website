@@ -106,7 +106,7 @@ def answer_next(request, character_id, question_id=None):
             form = AnswerForm(initial)
 
         next_reward_type = "Exp"
-        next_reward_quantity = 1
+        next_reward_quantity = 2
         questions_until_reward = 0
         num_answered_questions = Answer.objects.filter(is_valid=True, relevant_character=character).count()
         if num_answered_questions < 5:
@@ -117,6 +117,7 @@ def answer_next(request, character_id, question_id=None):
                 questions_until_reward = 1
             if (num_answered_questions - 5) % 10 < 2:
                 next_reward_type = "Improvement"
+                next_reward_quantity = 1
         next_reward_string = "{} {}".format(next_reward_quantity, next_reward_type)
         context = {
             "question": next_question,

@@ -205,7 +205,7 @@ class Answer(models.Model):
                 Notification.objects.create(
                     user=self.writer,
                     headline="Exp earned from Questionnaire",
-                    content="{} earned 1 Exp".format(self.relevant_character.name),
+                    content="{} earned 2 Exp".format(self.relevant_character.name),
                     url=reverse("characters:characters_spend_reward", args=[self.relevant_character.id]),
                     notif_type=REWARD_NOTIF)
                 return
