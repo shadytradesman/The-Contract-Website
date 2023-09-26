@@ -56,13 +56,14 @@ def does_character_have_outstanding_questions(character):
 
 def next_question_reward(character):
     next_reward_type = "Exp"
-    next_reward_quantity = 1
+    next_reward_quantity = 2
     num_answered_questions = Answer.objects.filter(is_valid=True, relevant_character=character).count()
     if num_answered_questions < 5:
         next_reward_quantity = EXP_REWARD_VALUES[EXP_QUESTIONNAIRE_INITIAL]
     elif num_answered_questions >= 5:
         if (num_answered_questions - 5) % 10 < 2:
             next_reward_type = "Improvement"
+            next_reward_quantity = 1
     return "{} {}".format(next_reward_quantity, next_reward_type)
 
 
