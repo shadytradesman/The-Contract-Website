@@ -631,14 +631,14 @@ class Game_Attendance(models.Model):
         self.give_reward()
 
     def get_reward(self):
-        objects = Reward.objects.filter(rewarded_player=self.get_player(), relevant_game=self.relevant_game, is_void=False, is_journal=False)
+        objects = Reward.objects.filter(rewarded_player=self.get_player(), relevant_game=self.relevant_game, is_void=False, is_journal=False, is_questionnaire=False)
         # this is because of an error where Edgar somehow got both an Improvement and Gift on killer chicken island (game 125)
         if objects.count() > 1:
             objects[0].mark_void()
             logger.error('Error: too many gifts for game: %s \n gifts: %s',
                          str(self.pk),
                          str(objects))
-        return get_object_or_none(Reward, rewarded_player=self.get_player(), relevant_game=self.relevant_game, is_void=False, is_journal=False)
+        return get_object_or_none(Reward, rewarded_player=self.get_player(), relevant_game=self.relevant_game, is_void=False, is_journal=False, is_questionnaire=False)
 
     def get_player(self):
         if self.attending_character:
@@ -1546,6 +1546,8 @@ class Reward(models.Model):
                 reason = "dying in "
             elif self.is_journal:
                 reason = "writing a Journal for "
+            elif self.is_questionnaire:
+                return "answering questions for their questionnaire"
             else:
                 reason = "playing in "
             reason = reason + self.relevant_game.scenario.title
