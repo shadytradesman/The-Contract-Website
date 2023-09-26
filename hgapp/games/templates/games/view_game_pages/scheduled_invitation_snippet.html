@@ -1,5 +1,6 @@
 {% load account_tags %}
 {% load bootstrap %}
+{% load games_tags %}
 
 {% include "games/view_game_pages/other_scenarios_modal.html" %}
 
@@ -40,7 +41,13 @@
                     <a href="{% url 'profiles:profiles_view_profile' invitation.invited_player.id %}">
                         <b>{% user_display invitation.invited_player %}</b> the {{invitation.invited_player.profile.get_player_prefix_display}} {{invitation.invited_player.profile.get_player_suffix_display}}
                     </a>
-                    <br>
+                    <div>
+                        <small>
+                            <i>
+                                Citizenship: {% user_display invitation.invited_player %} has played in {% render_citizenship invitation.invited_player game.cell %} Contracts in {{game.cell.name}} since GMing.
+                            </i>
+                        </small>
+                    </div>
                     {% if invitation.attendance %}
                             {% if invitation.attendance.attending_character %}
                                 <b>Playing</b>

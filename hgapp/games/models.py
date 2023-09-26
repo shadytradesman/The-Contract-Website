@@ -241,7 +241,7 @@ class Game(models.Model):
         if player.is_superuser:
             return True
         return player.is_authenticated and (player.has_perm('edit_game', self) \
-                                            or self.cell.player_can_manage_games(player))
+                                            or (self.cell is not None and self.cell.player_can_manage_games(player)))
 
     def render_timeline_display(self, user, variety):
         if variety == NOTIF_VAR_UPCOMING:

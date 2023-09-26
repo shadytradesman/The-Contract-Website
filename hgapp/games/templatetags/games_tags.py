@@ -1,6 +1,16 @@
 from django import template
+from games.models import Game, GAME_STATUS, Game_Attendance
+from games.games_constants import get_completed_game_excludes_query
+import datetime
 
 register = template.Library()
+
+@register.simple_tag
+def render_citizenship(player, cell):
+    last_gm_game = Game.objects.filter(gm=player, cell=cell).exclude(get_completed_game_excludes_query()).order_by("-end_time").first()
+    last_gm_game_time = datetime.datetime(1970, 1, 1, 0, 0) if last_gm_game is None else last_gm_game.end_time
+    return player.profile.completed_game_invites().filter(relevant_game__cell=cell, relevant_game__end_time__gt=last_gm_game_time).count()
+
 
 @register.inclusion_tag('games/view_game_pages/post_game_invite_tag.html')
 def render_post_game_invite(game, invitation, player):
