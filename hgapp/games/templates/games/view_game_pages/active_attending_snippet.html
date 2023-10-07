@@ -29,11 +29,11 @@
                                         {% endfor %}
                                     </ul>
                                 </li>
-                                {% if invitation.attendance.attending_character.condition_set.count != 0 %}
+                                {% if invitation.attendance.attending_character.get_conditions.count != 0 %}
                                     <li>
                                         <b>Conditions</b>
                                         <ul>
-                                            {% for condition in invitation.attendance.attending_character.condition_set.all %}
+                                            {% for condition in invitation.attendance.attending_character.get_conditions %}
                                             <li data-title="{{condition.system}}" data-toggle="tooltip" >
                                                 {{condition.name}}
                                             </li>
@@ -41,11 +41,11 @@
                                         </ul>
                                     </li>
                                 {% endif %}
-                                {% if invitation.attendance.attending_character.circumstance_set.count != 0 %}
+                                {% if invitation.attendance.attending_character.get_circumstances.count != 0 %}
                                     <li>
                                         <b>Circumstances</b>
                                         <ul>
-                                            {% for circumstance in invitation.attendance.attending_character.circumstance_set.all %}
+                                            {% for circumstance in invitation.attendance.attending_character.get_circumstances.all%}
                                             <li data-title="{{circumstance.system}}" data-toggle="tooltip" >
                                             {{circumstance.name}}</li>
                                             {% endfor %}

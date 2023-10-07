@@ -1342,6 +1342,12 @@ Archived on: {}
             .order_by('relevant_ability__name')\
             .all()
 
+    def get_conditions(self):
+        return self.condition_set.filter(is_deleted=False)
+
+    def get_circumstances(self):
+        return self.circumstance_set.filter(is_deleted=False)
+
     def get_health_display(self):
         # Example output for bottom 3 rows.
         # format is: (injury flavor, body box id or 'none', penalty, mind box id or 'none', mental health flavor)
