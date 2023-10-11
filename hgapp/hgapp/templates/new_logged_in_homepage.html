@@ -106,7 +106,7 @@
                                         <ul class="nav nav-pills nav-stacked">
                                             {% for game in active_games %}
                                             <li>
-                                                <a href="{% url 'games:games_view_game' game.id %}"><b>{{game.title}}</b> at {{game.scheduled_start_time}}</a>
+                                                <a href="{% url 'games:games_view_game' game.id %}"><b>{{game.scenario.title}}</b> at {{game.scheduled_start_time}}</a>
                                             </li>
                                             {% endfor %}
                                         </ul>
@@ -122,7 +122,7 @@
                                             {% for invite in attendance_invites_to_confirm %}
                                             <li>
                                                 <a href="{% url 'games:games_confirm_attendance' invite.attendance.id %}">
-                                                    <b>{{invite.attendance.relevant_game.title}}</b> at {{invite.attendance.relevant_game.scheduled_start_time}}
+                                                    <b>{{invite.attendance.relevant_game.scenario.title}}</b> at {{invite.attendance.relevant_game.scheduled_start_time}}
                                                 </a>
                                             </li>
                                             {% endfor %}
@@ -135,7 +135,7 @@
                                         <ul class="nav nav-pills nav-stacked">
                                             {% for game in upcoming_games_running %}
                                             <li>
-                                                <a href="{% url 'games:games_view_game' game.id %}"><b>{{game.title}}</b> at {{game.scheduled_start_time}}</a>
+                                                <a href="{% url 'games:games_view_game' game.id %}"><b>{{game.scenario.title}}</b> at {{game.scheduled_start_time}}</a>
                                             </li>
                                             {% endfor %}
                                         </ul>
@@ -154,7 +154,7 @@
                                                     <b>Awaiting RSVP - </b>
                                                     {% endif %}
                                                     <b>
-                                                        {{game_invite.relevant_game.title}}
+                                                        {{game_invite.relevant_game.scenario.title}}
                                                     </b> at {{game_invite.relevant_game.scheduled_start_time}}
                                                 </a>
                                             </li>

@@ -1,14 +1,16 @@
 <div style="text-decoration: none; font-style: normal;">
     {% for cat in elements %}
-    <h5 style="font-size: 15px; margin-bottom: 5px; margin-top: 5px;" >
-        {{cat.0}}
-    </h5>
-    <ul>
-        {% for elem in cat.1 %}
-        <li>
-            <strong>{{elem.0}}</strong>: {{elem.1}} {% if elem.2 %}<i>({{elem.2}})</i> {% endif %}
-        </li>
-        {% endfor %}
-    </ul>
+        {% if elements|length > 1 %}
+            <h5 style="font-size: 15px; margin-bottom: 5px; margin-top: 5px;" >
+                {{cat.0}}
+            </h5>
+        {% endif %}
+        <ul>
+            {% for elem in cat.1 %}
+            <li>
+                <strong>{{elem.0}}</strong>: {{elem.1}} {% if elem.2 %}<i>({{elem.2}})</i> {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
     {% endfor %}
 </div>
