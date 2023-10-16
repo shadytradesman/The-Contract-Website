@@ -208,8 +208,8 @@ def graveyard(request):
         'Seasoned': [],
         'Professional': [],
         'Veteran': [],
-        'Ported as Seasoned': [],
-        'Ported as Veteran': []
+        'Ported Seasoned': [],
+        'Ported Veteran': []
     }
     num_deaths = 0
     for death in dead_characters:
