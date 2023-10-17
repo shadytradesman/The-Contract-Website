@@ -27,7 +27,7 @@ class EditWorldForm(forms.Form):
                                           help_text='')
     house_rules = forms.CharField(label='House Rules',
                                   widget=TinyMCE(attrs={'cols': 70, 'rows': 10}),
-                                  max_length=48000,
+                                  max_length=80000,
                                   required=False,
                                   help_text='Rules that exist only in this Playgroup.')
     use_golden_ratio = forms.BooleanField(label='Enable Golden Ratio',
@@ -44,7 +44,7 @@ class EditWorldForm(forms.Form):
                                                             'If your House Rules affect Gifts, Experience, or Gifts, uncheck this box.')
     setting_create_char_info = forms.CharField(label='',
                                                widget=TinyMCE(attrs={'cols': 80, 'rows': 30}),
-                                               max_length=9800,
+                                               max_length=80000,
                                                required=False,
                                                help_text='')
     setting_summary = forms.CharField(label='Setting Summary',

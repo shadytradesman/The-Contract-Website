@@ -72,11 +72,11 @@ class Cell(models.Model):
     setting_description = models.TextField(max_length=70000,
                                            null=True,
                                            blank=True)
-    setting_create_char_info = models.CharField(max_length=10000, null=True, blank=True)
+    setting_create_char_info = models.CharField(max_length=90000, null=True, blank=True)
 
     # Cell Info
     cell_sell = models.CharField(max_length=10000, null=True, blank=True)
-    house_rules = models.CharField(max_length=50000, null=True, blank=True)
+    house_rules = models.CharField(max_length=80000, null=True, blank=True)
     community_link = models.CharField(max_length=1000, null=True, blank=True)
     is_community_link_public = models.BooleanField(default=False)
     is_listed_publicly = models.BooleanField(default=False)
