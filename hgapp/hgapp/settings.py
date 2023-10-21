@@ -383,14 +383,14 @@ FIXTURE_DIRS = [
 ]
 
 if DEBUG:
-    if 'AWS_ACCESS_KEY_ID' in os.environ:
-        DEFAULT_FROM_EMAIL = 'The Contract RPG <admin@thecontractrpg.com>'
-        EMAIL_USE_TLS = True
-        EMAIL_BACKEND = 'django_ses.SESBackend'
-        AWS_SES_REGION_NAME = 'us-west-2'
-        AWS_SES_REGION_ENDPOINT = 'email.us-west-2.amazonaws.com'
-    else:
-        EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+    # if 'AWS_ACCESS_KEY_ID' in os.environ:
+    #     DEFAULT_FROM_EMAIL = 'The Contract RPG <admin@thecontractrpg.com>'
+    #     EMAIL_USE_TLS = True
+    #     EMAIL_BACKEND = 'django_ses.SESBackend'
+    #     AWS_SES_REGION_NAME = 'us-west-2'
+    #     AWS_SES_REGION_ENDPOINT = 'email.us-west-2.amazonaws.com'
+    # else:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 else:
     DEFAULT_FROM_EMAIL = 'The Contract RPG <admin@thecontractrpg.com>'
     EMAIL_USE_TLS = True
@@ -403,6 +403,7 @@ else:
 
 def do_nothing(deletion):
     pass
+
 
 ACCOUNT_OPEN_SIGNUP = True
 ACCOUNT_EMAIL_UNIQUE = True
