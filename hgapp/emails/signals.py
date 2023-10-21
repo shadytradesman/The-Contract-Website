@@ -136,7 +136,7 @@ def send_email_for_game_ended(email, game_invite, game_url, reward_url, scenario
     html_message = render_to_string("emails/game_end_email.html", context)
     message = render_to_string('emails/game_end_email.txt', context)
 
-    send_email(subject, message, from_email, [email.email], fail_silently=False, html_message=html_message)
+    send_email.delay(subject, message, from_email, [email.email], fail_silently=False, html_message=html_message)
 
 
 def send_email_for_game_time_update(email, game_invite, game_url):
@@ -156,7 +156,7 @@ def send_email_for_game_time_update(email, game_invite, game_url):
     html_message = render_to_string("emails/game_start_update_email.html", context)
     message = render_to_string('emails/game_start_update_email.txt', context)
 
-    send_email(subject, message, from_email, [email.email], fail_silently=False, html_message=html_message)
+    send_email.delay(subject, message, from_email, [email.email], fail_silently=False, html_message=html_message)
 
 
 def send_email_for_game_invite(email, game_invite, game_url):
@@ -177,4 +177,4 @@ def send_email_for_game_invite(email, game_invite, game_url):
     html_message = render_to_string("emails/game_email.html", context)
     message = render_to_string('emails/game_email.txt', context)
 
-    send_email(subject, message, from_email, [email.email], fail_silently=False, html_message=html_message)
+    send_email.delay(subject, message, from_email, [email.email], fail_silently=False, html_message=html_message)
