@@ -32,7 +32,7 @@ class EmailSettingsForm(forms.Form):
                                                     "time or is canceled or when one I am attending ends and rewards are granted.")
     direct_messages = forms.BooleanField(required=False)
     intro_contracts = forms.BooleanField(required=False, widget=forms.HiddenInput)
-    site_announcements = forms.BooleanField(required=False, widget=forms.HiddenInput)
+    site_announcements = forms.BooleanField(required=False)
 
 
 class AcceptTermsForm(forms.Form):
