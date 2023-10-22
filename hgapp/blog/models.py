@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import strip_tags
 from django.utils.translation import ugettext_lazy as _
+from django.utils.html import mark_safe
 
 import pytz
 from pinax.images.models import ImageSet
@@ -130,6 +131,12 @@ class Post(models.Model):
     def meta_image(self):
         if self.image_set.primary_image:
             return self.image_set.primary_image.image.url
+
+    def render_timeline_display(self, user, variety):
+        return mark_safe('{}<h4><a href="{}">Learn More</a></h4>'.format(self.teaser_html, self.sharable_url))
+
+    def render_timeline_header(self, user, variety):
+        return self.title
 
     def rev(self, rev_id):
         return self.revisions.get(pk=rev_id)

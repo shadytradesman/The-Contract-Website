@@ -229,6 +229,7 @@ def home(request):
         }
         return render(request, 'new_logged_in_homepage.html', context)
 
+
 def csrf_failure(request, reason=""):
     raise PermissionDenied("CSRF token failure. Refresh form and try again.")
 

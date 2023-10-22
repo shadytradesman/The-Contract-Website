@@ -176,3 +176,20 @@ def send_email_for_game_invite(email, game_invite, game_url):
     message = render_to_string('emails/game_email.txt', context)
 
     send_email(subject, message, from_email, [email.email], fail_silently=False, html_message=html_message)
+
+
+def send_email_for_published_article(email, article, article_url):
+    logger.info("sending email for published article to {}".format(email.email))
+    context = {
+        'article': article,
+        'url': article_url,
+    }
+    subject = "Announcing {}".format(article.title)
+
+    # Email subject *must not* contain newlines
+    subject = ''.join(subject.splitlines())
+
+    html_message = render_to_string("emails/article_email.html", context)
+    message = render_to_string('emails/article_email.txt', context)
+
+    send_email(subject, message, from_email, [email.email], fail_silently=False, html_message=html_message)

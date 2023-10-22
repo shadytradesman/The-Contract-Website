@@ -1,0 +1,9 @@
+{% extends "emails/base_email.html" %}
+
+{% block email_body %}
+<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;background:#ffffff;">
+    <h3>{{article.title}}</h3>
+    <p style="color:grey;">{{article.teaser_html|safe}}</p>
+    <h4><a href="{{url}}">Click here to learn more.</a></h4>
+</table>
+{% endblock %}

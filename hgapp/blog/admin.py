@@ -10,6 +10,7 @@ from pinax.images.models import ImageSet
 from .conf import settings
 from .forms import AdminPostForm
 from .models import Blog, Post, ReviewComment, Section
+from .tasks import publish_article
 
 
 class PostImageSet(ImageSet):
@@ -30,11 +31,20 @@ def make_published(modeladmin, request, queryset):
 make_published.short_description = _("Publish selected posts")
 
 
+@admin.action(description="Publish notifications")
+def publish(modeladmin, request, queryset):
+    if queryset.count() > 1:
+        raise ValueError("Cannot publish more than one article at once.")
+    for article in queryset:
+        url = request.build_absolute_uri(article.sharable_url)
+        publish_article.delay(article.pk, url)
+
+
 class PostAdmin(admin.ModelAdmin):
     list_display = ["title", "state", "section", "published", "show_secret_share_url"]
     list_filter = ["section", "state"]
     form = AdminPostForm
-    actions = [make_published]
+    actions = [make_published, publish]
     fields = [
         "section",
         "title",
@@ -98,3 +108,9 @@ admin.site.register(
     raw_id_fields=["created_by"],
     inlines=[ImageInline],
 )
+
+
+class ArticleAdmin(admin.ModelAdmin):
+    list_display = ["title", "status"]
+    ordering = ["title"]
+    actions = [make_published]

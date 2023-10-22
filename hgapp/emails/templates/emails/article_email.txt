@@ -1,0 +1,8 @@
+{% extends "emails/base_email.txt" %}
+{% block email_body %}
+{{article.title}}
+
+{{article.description}}
+
+Click here to learn more: {{url}}
+{% endblock %}
