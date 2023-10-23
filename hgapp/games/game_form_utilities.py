@@ -243,7 +243,7 @@ def create_archival_game(request, general_form, cell, outcome_formset):
         game.give_rewards()
         game.update_profile_stats()
         game.unlock_stock_scenarios()
-        GameEnded.send_robust(sender=None, game=game, request=request)
+    GameEnded.send_robust(sender=None, game=game, request=request)
 
 
 def get_context_for_choose_attending(cell, game=None):

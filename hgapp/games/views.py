@@ -736,6 +736,7 @@ def create_game(request, cell_id=None):
             if form.cleaned_data['scenario']:
                 game.scenario = form.cleaned_data['scenario']
                 game.title = game.scenario.title
+            invites = []
             with transaction.atomic():
                 game.save()
                 game.mediums.set(form.cleaned_data['mediums'])
@@ -748,7 +749,9 @@ def create_game(request, cell_id=None):
                         if member.member_player.has_perm("view_scenario", game.scenario):
                             game_invite.as_ringer = True
                         game_invite.save()
-                        game_invite.notify_invitee(request, game)
+                        invites.append(game_invite)
+            for game_invite in invites:
+                game_invite.notify_invitee(request, game)
             messages.add_message(request, messages.SUCCESS, mark_safe("Your Contract has been successfully scheduled."))
             post_game_webhook(game, request)
             return HttpResponseRedirect(reverse('games:games_invite_players', args=(game.id,)))
@@ -843,6 +846,7 @@ def edit_game(request, game_id):
             if form.cleaned_data['scenario']:
                 game.scenario = form.cleaned_data['scenario']
                 game.title = game.scenario.title
+            invites = []
             with transaction.atomic():
                 game.save()
                 game.mediums.set(form.cleaned_data['mediums'])
@@ -853,10 +857,12 @@ def edit_game(request, game_id):
                                                   invite_text=game.hook,
                                                   as_ringer=False)
                         game_invite.save()
-                        game_invite.notify_invitee(request, game)
-                if changed_start:
-                    GameChangeStartTime.send_robust(sender=None, game=game, request=request)
-                    post_game_webhook(game, request, is_changed_start=True)
+                        invites.append(game_invite)
+            if changed_start:
+                GameChangeStartTime.send_robust(sender=None, game=game, request=request)
+                post_game_webhook(game, request, is_changed_start=True)
+            for game_invite in invites:
+                game_invite.notify_invitee(request, game)
             return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
         else:
             logger.error('Error: invalid GameForm. Errors: %s', str(form.errors))
@@ -959,7 +965,7 @@ def invite_players(request, game_id):
                                       as_ringer=form.cleaned_data['invite_as_ringer'])
             with transaction.atomic():
                 game_invite.save()
-                game_invite.notify_invitee(request, game)
+            game_invite.notify_invitee(request, game)
             return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
         else:
             logger.error('Error: invalid CustomInviteForm. Errors: %s', str(form.errors))
@@ -1221,7 +1227,6 @@ def end_game(request, game_id):
                             element.relevant_element.grant_to_character_no_trauma(character, request.user, game.cell)
                 game.save()
                 game.transition_to_finished()
-                GameEnded.send_robust(sender=None, game=game, request=request)
                 if game.gm != game.scenario.creator:
                     Notification.objects.create(
                         user=game.scenario.creator,
@@ -1229,6 +1234,7 @@ def end_game(request, game_id):
                         content=game.scenario.title,
                         url=reverse('games:games_view_scenario', args=(game.scenario.id,)),
                         notif_type=SCENARIO_NOTIF)
+            GameEnded.send_robust(sender=None, game=game, request=request)
             return HttpResponseRedirect(reverse('games:games_view_game', args=(game.id,)))
         else:
             logger.error('Error: invalid declare_outcome_formset or game_feedback_form. declare_outcome_formset errors: %s\n\n game_feedback_form errors: %s',
