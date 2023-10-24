@@ -12,7 +12,7 @@ from django.core.files.base import ContentFile
 
 from characters.models import Character, HIGH_ROLLER_STATUS, Attribute, Roll, NO_PARRY_INFO, NO_SPEED_INFO, DODGE_ONLY, \
     ATTACK_PARRY_TYPE, ROLL_SPEED, THROWN, Attribute, Ability, Weapon, WEAPON_MELEE, WEAPON_TYPE, Artifact, STATUS_SEASONED, \
-    STATUS_VETERAN, STATUS_NEWBIE, STATUS_PROFESSIONAL
+    STATUS_VETERAN, STATUS_NEWBIE, STATUS_PROFESSIONAL, STATUS_NOVICE
 from guardian.shortcuts import assign_perm, remove_perm
 from django.utils.html import mark_safe, escape, linebreaks
 from django.db.utils import IntegrityError
@@ -1116,6 +1116,8 @@ class Power(models.Model):
         return Base_Power.get_cached_for_display(self.vector_id)
 
     def passes_status_check(self, status):
+        if self.required_status == STATUS_NOVICE:
+            return status in [STATUS_NOVICE, STATUS_SEASONED, STATUS_PROFESSIONAL, STATUS_VETERAN]
         if self.required_status == STATUS_SEASONED:
             return status in [STATUS_SEASONED, STATUS_PROFESSIONAL, STATUS_VETERAN]
         if self.required_status == STATUS_VETERAN:

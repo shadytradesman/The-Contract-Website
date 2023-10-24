@@ -8,7 +8,7 @@ from django.db.models import Prefetch
 from .models import PowerSystem, EPHEMERAL, UNIQUE, ADDITIVE, SUB_JOINING_AND, SUB_JOINING_OR, SUB_ALL, \
     ADDITIVE
 
-from characters.models import STATUS_SEASONED, STATUS_VETERAN, STATUS_ANY
+from characters.models import STATUS_SEASONED, STATUS_VETERAN, STATUS_ANY, STATUS_NOVICE
 
 
 def merge_status(current_status, incoming_status):
@@ -16,6 +16,8 @@ def merge_status(current_status, incoming_status):
         return incoming_status
     if incoming_status == STATUS_ANY:
         return current_status
+    if incoming_status == STATUS_NOVICE and current_status != STATUS_VETERAN and current_status != STATUS_SEASONED:
+        return STATUS_NOVICE
     if incoming_status == STATUS_SEASONED and current_status != STATUS_VETERAN:
         return STATUS_SEASONED
     if incoming_status == STATUS_VETERAN or current_status == STATUS_VETERAN:

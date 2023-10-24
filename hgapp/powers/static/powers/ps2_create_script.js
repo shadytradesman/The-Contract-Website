@@ -1618,14 +1618,18 @@ const ComponentRendering = {
         }
       },
       mergeStatuses(currentStatus, requiredStatus, reason) {
-            if (null == requiredStatus || ["ANY", "NOVICE", "NEWBIE"].includes(requiredStatus[0])) {
+            if (null == requiredStatus || ["ANY", "NEWBIE"].includes(requiredStatus[0])) {
                 return currentStatus;
             }
             if (requiredStatus[0] === "VETERAN") {
                 this.requiredStatusReason = reason;
                 return requiredStatus;
             }
-            if (requiredStatus[0] === "SEASONED" && (null === currentStatus || currentStatus[0] === "ANY")) {
+            if (requiredStatus[0] === "SEASONED" && (null === currentStatus || currentStatus[0] === "ANY" || currentStatus[0] === "NOVICE")) {
+                this.requiredStatusReason = reason;
+                return requiredStatus;
+            }
+            if (requiredStatus[0] === "NOVICE" && (null === currentStatus || currentStatus[0] === "ANY")) {
                 this.requiredStatusReason = reason;
                 return requiredStatus;
             }
@@ -1660,7 +1664,10 @@ const ComponentRendering = {
         });
         if (null != characterBlob && null != requiredStatus) {
             let char_status = characterBlob["status"];
-            if (requiredStatus[0] == "SEASONED" && char_status != "SEASONED" && char_status != "VETERAN") {
+            if (requiredStatus[0] == "SEASONED" && !['SEASONED', 'PROFESSIONAL', 'VETERAN'].includes(char_status)) {
+                this.requiredStatusSatisfied = false;
+            }
+            if (requiredStatus[0] == "NOVICE" && !['NOVICE', 'SEASONED', 'PROFESSIONAL', 'VETERAN'].includes(char_status)) {
                 this.requiredStatusSatisfied = false;
             }
             if (requiredStatus[0] == "VETERAN" && char_status != "VETERAN") {
@@ -1807,7 +1814,7 @@ const ComponentRendering = {
       },
       getRequiredStatusEnhancements(status) {
         if (status === 'ANY') {
-            return this.enhancements.filter(enh => ['ANY', 'NEWBIE', 'NOVICE'].includes(enh.requiredStatus[0]))
+            return this.enhancements.filter(enh => ['ANY', 'NEWBIE'].includes(enh.requiredStatus[0]))
         } else {
             return this.enhancements.filter(enh => enh.requiredStatus[0] == status);
         }

@@ -80,10 +80,10 @@
                 </span>
             </span>
     {% endif %}
-    {% if power.required_status == "SEASONED" or power.required_status == "VETERAN" %}
+    {% if power.required_status == "NOVICE" or power.required_status == "SEASONED" or power.required_status == "VETERAN" %}
     <div class="{% if show_status_warning %} text-danger {% else %} text-muted {% endif %}"
          data-toggle="tooltip"
-         title="Your Contractor must be {{power.get_required_status_display}} to use this Gift. Seasoned = 10+ Victories. Veteran = 25+ Victories."
+         title="Your Contractor must be {{power.get_required_status_display}} to use this Gift. Novice = 4+ victories. Seasoned = 10+ victories. Veteran = 25+ victories."
          style="display: inline-block; margin-left: 3px; position: relative; bottom: 3px;">
         {% if force_show_warnings %}
             Creator

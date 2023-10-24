@@ -202,6 +202,17 @@
                 {% endwith %}
             </div>
         </div>
+        <div v-if="getRequiredStatusEnhancements('NOVICE').length > 0">
+            <h5 class="text-muted">Novice Enhancements</h5>
+            <div v-for="(modifier, modIndex) in getRequiredStatusEnhancements('NOVICE')"
+                 :key="modifier.id" >
+                {% with 'Enhancements' as vue_model_name %}
+                {% with 'clickEnhancement' as vue_on_click %}
+                {% include "powers/ps2_create_pages/snip_modifier_template.html" %}
+                {% endwith %}
+                {% endwith %}
+            </div>
+        </div>
         <div v-if="getRequiredStatusEnhancements('SEASONED').length > 0">
             <h5 class="text-muted">Seasoned Enhancements</h5>
             <div v-for="(modifier, modIndex) in getRequiredStatusEnhancements('SEASONED')"
