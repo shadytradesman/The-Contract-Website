@@ -40,6 +40,7 @@ def notify_game_invitee(sender, **kwargs):
     uri_prefix = request.build_absolute_uri('/')
     game_invite_notification.delay(invite.pk, uri_prefix)
 
+
 @receiver(bounce_received)
 def bounce_handler(sender, mail_obj, bounce_obj, raw_message, *args, **kwargs):
     recipient_list = mail_obj['destination']

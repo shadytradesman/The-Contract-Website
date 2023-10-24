@@ -5,6 +5,9 @@ from django.urls import reverse
 from notifications.models import Notification, CONTRACT_NOTIF, REWARD_NOTIF
 from django.conf import settings
 from games.models import Game, Game_Invite
+
+from .models import BouncedEmail
+
 import logging
 
 logger = logging.getLogger("app." + __name__)
@@ -17,7 +20,15 @@ NOTIF_VAR_FINISHED = "finished"
 
 @shared_task(name="send_email")
 def send_email(subject, message, from_email, recipient_list, fail_silently, html_message):
-    return send_mail(subject, message, from_email, recipient_list, fail_silently=fail_silently, html_message=html_message)
+    valid_recipients = []
+    for recipient in recipient_list:
+        if BouncedEmail.objects.filter(email=recipient).first() is not None:
+            logger.info("Not sending email to address because address has bounced: {}".format(str(recipient)))
+            return
+        else:
+            valid_recipients.append(recipient)
+    if valid_recipients:
+        return send_mail(subject, message, from_email, valid_recipients, fail_silently=fail_silently, html_message=html_message)
 
 
 @shared_task(name="game_invite_notification")

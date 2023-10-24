@@ -183,6 +183,9 @@ class Profile(models.Model):
         else:
             return None
 
+    def get_primary_email(self):
+        return EmailAddress.objects.get_primary(self.user)
+
     # This should be the only way you set the user's adult content prefs
     def update_view_adult_content(self, view_adult_content):
         if view_adult_content != self.view_adult_content:

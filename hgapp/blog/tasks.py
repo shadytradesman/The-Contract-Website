@@ -14,7 +14,7 @@ def publish_article(article_pk, url):
     notif_headline = "Website Update"
     notif_content = article.title
     for profile in profiles:
-        email = profile.get_confirmed_email()
+        email = profile.get_primary_email()
         if profile.site_announcements==True and email is not None:
             send_email_for_published_article(email, article, url)
         Notification.objects.create(user=profile.user,
