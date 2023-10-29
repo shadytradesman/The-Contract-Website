@@ -67,10 +67,9 @@ def email_verified(user):
 
 @register.inclusion_tag('tags/character_nav_list.html')
 def characters_nav_list(user):
-    characters = user.character_set.filter(is_deleted=False).order_by("-edit_date")[:5]
-    characters_sorted = sorted(characters, key=lambda x: x.name)
+    characters = user.character_set.filter(is_deleted=False, is_dead=False).order_by("-edit_date")[:6]
     return {
-        "characters": characters_sorted
+        "characters": characters
     }
 
 @register.inclusion_tag('tags/guidebook_toc.html', takes_context=True)

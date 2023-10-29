@@ -11,13 +11,16 @@ def upload_image(request):
         return JsonResponse({"error": "Must be logged in"}, status=403)
     if request.POST:
         scenario_id = request.POST["scenario"]
-        scenario = get_object_or_404(Scenario, pk=scenario_id)
-        if not scenario.player_can_edit_writeup(request.user):
-            return JsonResponse({"error": "Cannot edit Scenario"}, status=403)
+        if scenario_id:
+            scenario = get_object_or_404(Scenario, pk=scenario_id)
+            if not scenario.player_can_edit_writeup(request.user):
+                return JsonResponse({"error": "Cannot edit Scenario"}, status=403)
+        else:
+            scenario = None
         new_image = UserImage(
             uploader=request.user,
             image=request.FILES["file"],
-            scenario=scenario )
+            scenario=scenario)
         with transaction.atomic():
             new_image.save()
         return JsonResponse({"location": new_image.image.url}, status=200)
