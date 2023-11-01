@@ -95,6 +95,7 @@ function setFormInputPrefixValues() {
 
             $(this).attr("name", renderedName);
             $(this).attr("id", renderedId);
+            $(this).attr("required", true);
         })
         $(this).find("label").each(function() {
             let currFor = $(this).attr("for");
