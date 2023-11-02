@@ -203,7 +203,7 @@
             </div>
         </div>
         <div v-if="getRequiredStatusEnhancements('NOVICE').length > 0">
-            <h5 class="text-muted">Novice Enhancements</h5>
+            <h5 class="text-muted" v-if="selectedEffect.requiredStatusLabel != 'Novice'">Novice Enhancements</h5>
             <div v-for="(modifier, modIndex) in getRequiredStatusEnhancements('NOVICE')"
                  :key="modifier.id" >
                 {% with 'Enhancements' as vue_model_name %}
@@ -214,7 +214,7 @@
             </div>
         </div>
         <div v-if="getRequiredStatusEnhancements('SEASONED').length > 0">
-            <h5 class="text-muted">Seasoned Enhancements</h5>
+            <h5 class="text-muted" v-if="selectedEffect.requiredStatusLabel != 'Seasoned'">Seasoned Enhancements</h5>
             <div v-for="(modifier, modIndex) in getRequiredStatusEnhancements('SEASONED')"
                  :key="modifier.id" >
                 {% with 'Enhancements' as vue_model_name %}

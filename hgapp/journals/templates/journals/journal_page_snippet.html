@@ -165,7 +165,7 @@
             {% elif not forloop.counter0 %}
             <i class="fa fa-exclamation-circle fa-1x"
                data-toggle="tooltip"
-               title='This Journal is not 250 words and did not grant any Exp.'
+               title='This Journal is not 150 words and did not grant any Exp.'
             ></i>
             {% endif %}
             {% if journal.contains_spoilers %}
@@ -223,7 +223,7 @@
                 You have not written a Downtime Journal for this Contract yet.
                 You will earn 1 Exp
                 for {{character.name}} if you write an in-character Journal at least
-                250 words in length explaining what occurred between this Contract and the next.
+                150 words in length explaining what occurred between this Contract and the next.
             {% endif %}
             <br>
             <a class="btn btn-primary"

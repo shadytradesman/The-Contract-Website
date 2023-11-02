@@ -150,9 +150,10 @@ class Journal(models.Model):
         return needed - num_valid
 
     def __get_is_valid(self, content):
+        threshold = 148 if self.is_downtime else 246
         word_count = self.__get_wordcount(content)
         # use slightly fewer words than what we tell people in case our counting sucks
-        return word_count >= 246
+        return word_count >= threshold
 
     def __get_wordcount(self, content):
         soup = BeautifulSoup(content, features="html5lib")
