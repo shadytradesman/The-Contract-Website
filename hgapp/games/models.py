@@ -34,7 +34,7 @@ NotifyGameInvitee = django.dispatch.Signal(providing_args=['game_invite', 'reque
 GameChangeStartTime = django.dispatch.Signal(providing_args=['game', 'request'])
 GameEnded = django.dispatch.Signal(providing_args=['game', 'request'])
 
-EXCHANGE_SUBMISSION_VALUE = 240
+EXCHANGE_SUBMISSION_VALUE = 340
 EXCHANGE_SCENARIO_COST = 100
 
 

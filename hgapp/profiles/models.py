@@ -311,7 +311,7 @@ class Profile(models.Model):
         # gm_prefix can be None, so we return the db value here
         # GM prefix is calculated based on any/newbie/novice contracts because they expect higher death counts.
         self.gm_prefix = self._gm_prefix_from_stats(num_gm_games=self.num_games_gmed_novice,
-                                                    num_killed_contractors=self.num_gm_kills_novice)
+                                                    num_killed_contractors=self.num_gm_kills)
         self.save()
 
     def get_gm_title(self):
