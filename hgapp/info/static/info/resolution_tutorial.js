@@ -78,7 +78,7 @@ function rollDice(roller, action) {
     var outcomeText;
     if (action.isContested) {
         const combinedOutcome = 3 - outcome;
-        roller.find(".js-qs-contested-outcome").html("3 (Bradley's Outcome) - " + outcome + " = " + combinedOutcome);
+        roller.find(".js-qs-contested-outcome").html("3 (Bradley's Outcome) - " + outcome + " (Lucy's Outcome) = " + combinedOutcome);
         if (combinedOutcome > 0) {
             outcomeText = "A positive contested Outcome means that Bradley's attempted Action is successful.";
             roller.find(".js-qs-action-outcome").html(action.outcomeCompleteSuccess);

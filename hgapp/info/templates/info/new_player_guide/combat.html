@@ -5,19 +5,21 @@
             Combat in The Contract is quick, unpredictable, and deadly.
         </li>
         <li>
-            A successful combat relies more on setting up the right fight than being the best fighter.
-        </li>
-        <li>
-            The best way to win a fight is with an ambush or a numbers advantage.
+            Successful combat relies more on setting up the right fight than being the best fighter.
+            <ul>
+                <li>
+                    The best way to win a fight is with an ambush or a numbers advantage.
+                </li>
+            </ul>
         </li>
     </ul>
-    <b>Going turn-based</b>
+    <b>Going Turn-based</b>
     <ul>
         <li>
             When the action comes to a head and many characters want to do something at once, the game enters a turn-based mode called Combat. 
         </li>
         <li>
-            At the start of Combat each character rolls Initiative (Dexterity + Perception) to determine their place in the turn order.
+            At the start of Combat, each character rolls Initiative (Dexterity + Perception) to determine their place in the turn order.
         </li>
         <li>
             Each Round of turns represents three seconds of in-game action.
@@ -36,6 +38,7 @@
         <div role="tabpanel" class="tab-pane active " id="myturn">
             <div class="css-combat-tab-content">
                 <div class="text-center">You get one <b>Movement</b> and one <b>Action</b> on your turn each Round.</div>
+                <br>
                 <b>Movement</b>
                 <ul>
                     <li>You may move up to 5 + (5 x Dexterity) feet immediately before OR After your Action.</li>
@@ -46,8 +49,8 @@
                         <b>Attack</b> with your weapon or hands.
                         <ul>
                             <li>
-                                If an attack's Outcome is positive after defense, it inflicts a new Injury with Severity =
-                                <b>Outcome + Weapon damage - Armor</b>
+                                If an attack's Contested Outcome is positive, it inflicts a new Injury with Severity =
+                                <b>Outcome + Weapon damage - Armor</b>.
                             </li>
                         </ul>
                     </li>
@@ -62,6 +65,7 @@
                 <div class="text-center">
                     If you have not yet spent your Action this Round, you may use it as a Reaction.
                 </div>
+                <br>
                 <b>Reactions</b>
                 <ul>
                     <li>
@@ -74,10 +78,10 @@
                     </li>
                     <li>
                             <span data-toggle="tooltip" title="
-                                Unarmed people can Defend against other unarmed attacks.
-                                Melee weapons can Defend against unarmed, melee, or thrown attacks.
-                                Firearms cannot Defend but may be Defended only against if the attacker is within reach.
-                                ">
+                            Unarmed characters may Defend against unarmed attacks.
+                            Characters armed with a melee weapon may Defend against unarmed, melee, or thrown projectile
+                            attacks. Firearms can be used as melee weapons to Defend and can only be Defended against by
+                            those in melee range. ">
                                 <b>Defend</b> with your weapon by rolling its attack roll.
                                 Your Outcome is subtracted from the attacker's. Availability depends on weapon match-up
                                 (<span class="visible-xs-inline">tap</span><span class="hidden-xs">hover</span>).
