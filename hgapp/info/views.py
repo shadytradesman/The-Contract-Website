@@ -2,16 +2,14 @@ from django.shortcuts import render
 from .terms import EULA, TERMS, PRIVACY
 from django.shortcuts import get_object_or_404
 from heapq import merge
-from django.templatetags.static import static
 from info.models import FrontPageInfo, QuickStartInfo, ExampleAction
-from profiles.models import Profile
-from characters.models import CharacterTutorial, Ability, Character
 from characters.forms import InjuryForm
 from powers.models import Base_Power, Power_Full
 from info.models import FrontPageInfo
 from profiles.models import Profile
 from characters.models import CharacterTutorial, Ability, Character
 from games.models import Scenario
+
 
 def terms(request):
     context= {
@@ -21,15 +19,17 @@ def terms(request):
     }
     return render(request, 'info/terms.html', context)
 
+
 def probability(request):
     return render(request, 'info/probability.html')
 
-def fiction(request):
+
+def vibes(request):
     info = FrontPageInfo.objects.first()
     context= {
         "info": info,
     }
-    return render(request, 'info/fiction.html', context)
+    return render(request, 'info/vibes.html', context)
 
 
 def leaderboard(request):

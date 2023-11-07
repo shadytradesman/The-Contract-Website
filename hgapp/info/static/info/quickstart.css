@@ -1,3 +1,13 @@
+html {
+    scroll-padding-top: 55px;
+}
+
+@media (min-width: 768px) {
+    .css-learning-style-link {
+        text-align: center;
+    }
+}
+
 .css-quickstart-container {
     background-color: #262d37;
     padding: 10px;

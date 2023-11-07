@@ -1,0 +1,149 @@
+{% extends "site_base.html" %}
+
+{% block head_title %}Just Vibes{% endblock %}
+
+{% load static %}
+
+{% block extra_styles %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'info/fiction.css' %}" />
+
+{% endblock %}
+
+{% block body_base %}
+<div class="container">
+    <div class="row">
+        <div class="col-sm-6 col-md-4">
+            <div class="text-center">
+                <h1>
+                    The Mixtape
+                </h1>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <p>
+                        <b>
+                            This Mixtape evokes The Contract.
+                        </b>
+                    </p>
+
+                    <p>
+                        If you asked any of The Contract's fans to make their own mixtape, they'd probably come up with
+                        something completely different. For me, this collection of songs embodies the diversity of
+                        Contractors as well as the tone and contemporary nature of the setting.
+                    </p>
+                    <p>
+                        I'm pretty into lyrics. If you're not really about that, your milage may vary.
+                    </p>
+
+                    <h4>
+                        <a href="https://youtube.com/playlist?list=PLPlNUy_pJ0wg1SreIbDbfMsy-7e8yonyk&feature=shared">
+                            Listen on Youtube
+                        </a>
+                    </h4>
+
+                    <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/7kyGdlpsrzNuDBr2kza5le?utm_source=generator&theme=0" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+
+                    <div style="margin-top: 30px;">
+                        <h4>
+                            Why These Songs?
+                        </h4>
+                        <p style="margin-top:25px;">
+                            <h5>
+                                Wolf Piss by Aesop Rock
+                            </h5>
+                            So many of Aesop’s songs capture the outsider urban fantasy vibe The Contract evokes. “Wolf Piss” has so many golden nuggets of character, setting, and the supernatural. Sit back and let the barrage of motifs and images wash over you.
+                        </p>
+
+                        <p style="margin-top:25px;">
+                        <h5>
+                            Drain the Blood by The Distillers
+
+                        </h5>
+                        Like many punk songs, this anthem acknowledges the slimy, shittiness of being on the losing side of society while simultaneously building the outsiders up. “All my friends are murderers” is certainly a sentiment a lot of Contractors share.
+                        </p>
+
+                        <p style="margin-top:25px;">
+                        <h5>
+                            The Man by The Killers
+                        </h5>
+                        Not all Contractors are poor, outsider punks. Some start their careers as successful business people, jaded manipulators, or hungry bullies. Some of them know what they want and are already trying to make it happen. Maybe you can help each other, if you’ve got something to offer.
+                        </p>
+
+                        <p style="margin-top:25px;">
+                        <h5>
+                            The Cult of Dionysus by The Orion Experience
+                        </h5>
+                        Contractors come in many shapes from many backgrounds. Their methods are various and personal, their ambitions global in scale. The joy of The Contract is the ability to play any sort of character, even a would-be hedonistic cult leader. A group of Contractors is a grab-bag of big personalities and conflicting ambitions. They are as unique as snowflakes and thus sometimes referred to as “Snowflakes of carnage.”
+                        </p>
+
+
+                        <p style="margin-top:25px;">
+                        <h5>
+                            Kill V Maim by Grimes
+                        </h5>
+                        Half of getting power is having the foolishness to use it. Contractors fuck up. Some face consequences, and some get out for free. Love the overconfidence in this one. A lot of Contractors with this attitude end up in the graveyard, but few without it make it far to begin with.
+                        </p>
+
+                        <p style="margin-top:25px;">
+                        <h5>
+                            Comfort Eagle by CAKE
+                        </h5>
+                            This one’s similar to “The Cult of Dionysus” but a bit more cynical. Hey, not all upstart religions are created equal. This one smacks of commerce and media and false prophets, all of which are commonplace in The Illumination.
+                        </p>
+
+
+                        <p style="margin-top:25px;">
+                        <h5>
+                            That Funny Feeling by Bo Burnam (performed by Phoebe Bridgers)
+                        </h5>
+                        <p>
+                            This iteration of The Contract started as my COVID project in 2020. I wanted its setting, The Illumination, not to be an escapist fantasy world but a reflection of our world, where Players could engage with real problems that are relevant today. So it became a world where the powers that be divide the losers and pit them against each other, where we are told every day that the world is about to end, where we feel isolated and hopeless despite being simultaneously closer to everyone else.
+                        </p>
+                        <p>
+                            The fantasy is the opportunity to fix it. But what does that look like? And what do we have to give up to make the world a better place?
+                        </p>
+                        <p>
+                            This closeness to real life isn’t always comfortable, but it connects people with their characters and the world in a way that more outlandish settings simply can’t.
+                        </p>
+
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-sm-6 col-md-8">
+
+            <div class="text-center">
+                <h1>
+                    Fiction
+                </h1>
+            </div>
+            <div class="css-contractor-fiction panel panel-default">
+                <div class="panel-body">
+                    <h2 class="text-center" style="margin-top: 10px;">
+                        Introductions
+                        <div class="">
+                            <small>
+                                By <a href="https://www.davidemeryauthor.com/">David Emery</a>
+                            </small>
+                        </div>
+                    </h2>
+                    <br>
+                    {{info.shown_fiction|safe}}
+                    <span id="continue-from-home"></span>
+                    {{info.hidden_fiction|safe}}
+                    <div class="text-center lead">
+                        Written by <a href="https://www.davidemeryauthor.com/">David Emery</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+    </div>
+</div>
+{% endblock %}

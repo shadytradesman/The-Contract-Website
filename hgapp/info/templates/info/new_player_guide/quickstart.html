@@ -53,40 +53,87 @@
 
 <div class="container">
     <h1 class="text-center">
-        Introduction to The Contract
+        How do you want to learn more?
+    </h1>
+
+    <div class="css-rules css-rules-centered" style="margin-bottom: 10px;">
+        <div class="row" >
+            <div class="col-md-6" style="margin-bottom: 25px;">
+                <a href="#guide-start" class="css-learning-style-link">
+                    <h3 style="margin-top: 10px;">
+                        The How to Play Manual
+                    </h3>
+                </a>
+                <ul>
+                    <li>
+                        Learn the game's core mechanics alongside a short
+                        narrative that covers the events of a typical play session.
+                    </li>
+                    <li>You should probably choose this one (or scroll down).</li>
+                </ul>
+            </div>
+
+            <div class="col-md-6" style="margin-bottom: 25px;">
+                <a href="/guide/rules/" class="css-learning-style-link">
+                    <h3 style="margin-top: 10px;">
+                        The Rules Guidebook
+                    </h3>
+                </a>
+                <ul>
+                    <li>
+                        All the rules, unabridged.
+                    </li>
+                    <li>
+                        A classic guidebook. Drink from the firehose.
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6" style="margin-bottom: 25px;">
+                <a href="{% url 'info:vibes'%}" class="css-learning-style-link">
+                    <h3 style="margin-top: 10px;">
+                        Just Vibes
+                    </h3>
+                </a>
+                <ul>
+                    <li>
+                        A mixtape, some fiction.
+                    </li>
+                    <li>
+                        All style, no substance.
+                    </li>
+                </ul>
+            </div>
+
+
+            <div class="col-md-6" style="margin-bottom: 25px;">
+                <a href="https://discord.gg/xUZZegYNNy" class="css-learning-style-link">
+                    <h3 style="margin-top: 10px;">
+                        Join our Discord Server
+                    </h3>
+                </a>
+                <ul>
+                    <li>
+                        Meet the fans. Talk to a human!
+                    </li>
+                    <li>
+                        Let's call it "traditional learning."
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+
+    </div>
+    <div id="guide-start"></div>
+    <h1 class="text-center" style="margin-top: 45px;">
+        How to Play The Contract
     </h1>
     <div class="panel panel-default">
         <div class="panel-body">
             {% cache 5000 quickstart4 %}
-                <div class="css-rules css-rules-centered">
-                    <div>
-                        <b>This guide is the quickest way to learn to The Contract.</b>
-                        <ul>
-                            <li>
-                                It explains the game's core mechanics alongside a short
-                                narrative that covers the events of a typical play session.
-                            </li>
-                            <li>
-                                Read <a href="/guide/rules/">the Player's Guide</a> instead
-                                if you would like a more in-depth explanation without an accompanying narrative.
-                            </li>
-
-                        </ul>
-                    </div>
-                    <b>When you finish this Guide:</b>
-                    <ul>
-                        <li>
-                            You will know what The Contract is and how to play it.
-                        </li>
-                        <li>
-                            You will have made your own Contractor.
-                        </li>
-                        <li>
-                            You will either be scheduled to participate in an upcoming online Contract
-                            OR you will be prepared to start running The Contract for your own group.
-                        </li>
-                    </ul>
-                </div>
                 {% include "info/new_player_guide/1-intro-and-format.html" %}
                 {% include "info/new_player_guide/2-contractors-and-dice.html" %}
                 {% include "info/new_player_guide/3-downtimes-setting-worlds.html" %}
