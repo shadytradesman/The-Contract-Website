@@ -120,7 +120,7 @@ class Answer(models.Model):
                 members = cell.get_unbanned_members()
                 for player_membership in members:
                     player = player_membership.member_player
-                    if player is not None and player.profile.early_access_user:
+                    if player is not None:
                         Notification.objects.create(
                             user=player,
                             headline="{} is answering their Questionnaire".format(self.relevant_character.name),

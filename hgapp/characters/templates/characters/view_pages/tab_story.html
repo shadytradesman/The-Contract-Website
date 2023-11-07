@@ -6,7 +6,6 @@
         {% include "characters/view_pages/journal_snip.html" %}
     </div>
 </div>
-{% if early_access %}
     <div>
         <h3 style="margin-bottom: 5px;" data-toggle="tooltip" title='The Questionnaire rewards Contractors who answer character-building questions'>
             {% if num_questions_answered %}
@@ -17,7 +16,7 @@
                 Questionnaire
             {% endif %}
         </h3>
-        {% if early_access and has_available_questions and character.player == request.user %}
+        {% if has_available_questions and character.player == request.user %}
             <a href="{% url 'questionnaire:questionnaire_answer' character.id %}">
                 <div class="btn btn-primary css-char-alert" style="white-space: normal; margin-bottom: 10px;">
                     Earn {{next_question_reward}}
@@ -44,7 +43,6 @@
         </ul>
         {% endif %}
     </div>
-{% endif %}
 
 {% include "characters/view_pages/moves_snip.html" %}
 
