@@ -72,20 +72,18 @@
     width: 50%;
     min-width: 370px;
     margin: auto;
-    top: 50%;
 }
 
 @media (max-width: 768px) {
     .css-main-logo {
         padding: 10px;
-        padding-top: 150px;
     }
 }
 
 .css-logo-cont {
     width: 100%;
     position: relative;
-    top: 150px;
+    top: 50px;
     text-align: center;
 }
 
@@ -105,13 +103,10 @@
     width: 50%;
     max-width: 900px;
     min-width: 375px;
-    margin: 0;
-    position: relative;
-    margin-top: 15vh;
-    left: 50%;
-    -ms-transform: translate(-50%, -50%);
-    transform: translate(-50%, -50%);
+    margin: auto;
+    margin-top: 40px;
     font-size: 20px;
+    text-align: center;
     text-shadow:
    -1px -1px 0 #000,
     1px -1px 0 #000,
@@ -121,7 +116,6 @@
 
 @media (max-width: 768px) {
     .css-main-text {
-        margin-top: 35vh;
         padding: 15px;
         padding: 15px;
     }
