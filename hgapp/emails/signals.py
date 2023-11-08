@@ -46,4 +46,4 @@ def bounce_handler(sender, mail_obj, bounce_obj, raw_message, *args, **kwargs):
     recipient_list = mail_obj['destination']
     for recipient in recipient_list:
         logger.info("Email bounced: {}".format(recipient))
-        BouncedEmail.create(email=recipient)
+        BouncedEmail.objects.create(email=recipient)
