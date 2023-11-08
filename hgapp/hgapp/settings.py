@@ -150,6 +150,7 @@ INSTALLED_APPS = [
     "pinax.images",
     'django_celery_beat',
     'django_celery_results',
+    'captcha',
 ]
 
 MIDDLEWARE = [

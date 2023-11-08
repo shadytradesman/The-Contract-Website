@@ -7,6 +7,8 @@ from django.utils.translation import gettext_lazy as _
 from hgapp.utilities import get_object_or_none
 
 from info.terms import TERMS, EULA, PRIVACY
+from captcha.fields import CaptchaField
+
 
 class SignupForm(account.forms.SignupForm):
     agree_to_tos = forms.BooleanField(required=True)
@@ -19,6 +21,8 @@ class SignupForm(account.forms.SignupForm):
         required=False,
         initial="US/Pacific"
     )
+    captcha = CaptchaField()
+
 
 class ResendEmailConfirmation(forms.Form):
     pass

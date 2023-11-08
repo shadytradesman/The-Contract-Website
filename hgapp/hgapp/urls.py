@@ -43,6 +43,7 @@ urlpatterns = [
     url(r"^tinymce/", include("tinymce.urls")),
     url(r"^news/", include("blog.urls", namespace="pinax_blog")),
     url(r"^ajax/images/", include("pinax.images.urls", namespace="pinax_images")),
+    path('captcha/', include('captcha.urls')),
 ]
 
 import os
