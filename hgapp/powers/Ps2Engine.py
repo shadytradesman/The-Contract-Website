@@ -53,6 +53,8 @@ class PowerEngine:
                 current_status = merge_status(current_status, STATUS_SEASONED)
         for group in active_groups:
             count = active_groups[group] if group in active_groups else 0
+            if count >= self.blob[PowerSystem.ENHANCEMENT_GROUP_BY_PK][group]["novice_threshold"]:
+                current_status = merge_status(current_status, STATUS_NOVICE)
             if count >= self.blob[PowerSystem.ENHANCEMENT_GROUP_BY_PK][group]["seasoned_threshold"]:
                 current_status = merge_status(current_status, STATUS_SEASONED)
             if count >= self.blob[PowerSystem.ENHANCEMENT_GROUP_BY_PK][group]["veteran_threshold"]:
