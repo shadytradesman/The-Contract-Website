@@ -24,6 +24,9 @@ urlpatterns = [
     # ex: .com/info/vibes/
     url(r"^vibes/$", views.vibes, name="vibes"),
 
-    # ex: .com/info/quickstart/
+    # ex: .com/info/how-to-play/
     url(r"^how-to-play/$", views.how_to_play, name="how-to-play"),
+
+    # ex: .com/info/learn-to-play/
+    url(r"^learn-to-play/$", views.learn_to_play, name="learn-to-play"),
 ]

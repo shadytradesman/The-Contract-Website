@@ -32,15 +32,18 @@
             <div class="css-main-text header-font">
                 <div class="css-backdropped-text">
                     <div>
-                        The Contract is a gritty tabletop roleplaying game about ambitious people who go on deadly missions to earn fantastic powers.
+                        The Contract is a tabletop roleplaying game about ambitious people who go on deadly missions to earn fantastic powers.
                     </div>
                     <div style="margin-top: 2vh;">
                         Those clever enough to survive are forged into the most formidable beings on earth.
                     </div>
-                    <div class="text-center" style="margin-top: 5vh;">
-                        <a href="{% url 'info:how-to-play' %}" class="btn btn-lg btn-warning">Play for Free</a>
-                    </div>
                 </div>
+            </div>
+        </div>
+        <div class="css-scroll-down-text" style=" ">
+            Scroll Down
+            <div>
+                <span class="glyphicon glyphicon-arrow-down"></span>
             </div>
         </div>
         <div class="css-main-slideshow">
@@ -83,36 +86,15 @@
 
     <div class="css-talent-section js-affix-container" >
         <div class="js-affix-image">
-            <a href="{% url 'info:how-to-play' %}">
+            <a href="{% url 'info:learn-to-play' %}">
                 <div style="position:absolute;">
-                    <div class="css-art-front-talent" style='background-image:url({% static "overrides/art/talent-front.webp" %})'></div>
+                    <div class="css-art-front-talent" style='background-image:url({% static "overrides/art/otaku-web.webp" %})'></div>
                 </div>
             </a>
         </div>
         <div class="css-talent-section-text">
             <div class="css-front-text-bullets css-backdropped-text">
-                <div class="">
-                    <h3 style="margin-bottom: 30px;">
-                        {{num_players}} Players
-                        <span class="css-weak-head">
-                                have created
-                        </span>
-                        {{num_contractors}} Contractors
-                        <span class="css-weak-head">
-                                and earned
-                        </span>
-                            <span>
-                                {{num_victories}} Victories,
-                            </span>
-                            <span>
-                                {{num_losses }} Failures,
-                            </span>
-                            <span>
-                                and {{num_deaths}} Deaths
-                            </span>
-                    </h3>
-                </div>
-                <h4 class="css-padded-header">
+                <h4 class="css-bullet-header">
                     Be anything, even a<span class="visible-xs-inline">:</span>
                     <span id="js-concept" class="css-concept-text visible-xs-block visible-sm-inline visible-md-inline visible-lg-inline">
                         stoner magical girl
@@ -120,127 +102,87 @@
                 </h4>
                 <ul>
                     <li>
-                        Create custom powers and equipment for any concept with The Contract’s revolutionary
-                        <a href="{% url 'powers:powers_create_ps2' %}">
+                        Start human, become whatever you want.
+                        <i>
+                            This is your origin story.
+                        </i>
+                    </li>
+                    <li>
+                        Create balanced powers with rich advancement using The Contract’s custom
+                        <a href="{% url 'powers:powers_create_ps2' %}" target="_blank" rel="noopener noreferrer">
                             Gift Builder.
                         </a>
                     </li>
-                    <li>
-                        Explore exciting social dynamics driven by strong individual ambitions and a unique in-game economy.
-                    </li>
-                    <li>
-                        Face challenges that demand outside-the-box problem-solving, not min-maxed stats.
-                    </li>
                 </ul>
 
-                <h4>Say goodbye to scheduling woes</h4>
+                <h4 class="css-bullet-header">Wade into the illicit and inexplicable</h4>
+                <ul>
+                    <li>Smuggle supernatural creatures, steal corporate secrets, and do whatever it takes to get the job done.</li>
+                    <li>Your Gifts, skills, and equipment are your tools. To succeed, you’ll have to get creative.</li>
+                </ul>
+
+                <h4 class="css-bullet-header">Play with anyone, any time</h4>
                 <ul>
                     <li>Each session is a self-contained mission with great risks and rewards.</li>
-                    <li>Play your favorite Contractor no matter who shows up to game night.</li>
+                    <li>Play your Contractor no matter who shows up to game night.</li>
                     <li>No more "forever GM." A different person may act as GameMaster (GM) each session.</li>
                 </ul>
 
-                <h4>
-                    Much more than a PDF
-                </h4>
+
+                <h4 class="css-bullet-header">Join a community of communities</h4>
                 <ul>
+                    <li>Play privately with your friends or join online worlds with hundreds of Players.</li>
                     <li>
-                        The Contract is available 100% free online via this website.
+                        Across all Playgroups,
+                        <b>{{num_players}}</b> Players have
+                        achieved <b>{{num_victories}}</b> victories, suffered
+                        <b>{{num_losses }}</b> failures, and lost <b>{{num_deaths}}</b> Contractors.
                     </li>
-                    <li>
-                        Extensive integrated tools make learning, playing, and running The Contract a breeze.
-                    </li>
-                    <li>
-                        Lead Playgroups of any size. Play with a few friends in person or join a massive online world with
-                        hundreds of Players.
-                    </li>
-                    <li>
-                        Play <b>5</b> free Stock Scenarios and <b>{{num_scenarios_with_valid_writeups}}</b> community-written Scenarios.
-                    </li>
-                    <li>
-                        Frequent patches fix balance issues and add content based on community feedback.
-                    </li>
+                    {% if games %}
+                        <li>
+                            {{num_games}} GM{{num_games|pluralize}} currently looking for Players.
+                            <ul>
+                                {% for game in games %}
+                                <li>
+                                    <a href="{% url 'games:games_view_game' game.id %}" target="_blank" rel="noopener noreferrer">
+                                        {{game.gm.username}} will run {{game.scenario.title}} in
+                                        {{game.scheduled_start_time|timeuntil}}
+                                    </a>
+                                </li>
+                                {% endfor %}
+                                {% if num_games > 3 %}
+                                    <li>
+                                        Find the rest on the
+                                        <a href="{% url 'games:games_looking_for_game' %}">
+                                            Looking for Game
+                                        </a>
+                                        page.
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </li>
+                    {% endif %}
                 </ul>
 
-                {% if games %}
-
-                    <h3 style="margin-top: 40px;">
-                        {{num_games}} GM{{num_games|pluralize}} currently looking for Players
-                        <div >
-                            <small>
-                                Upcoming online Contract{{num_games|pluralize}}
-                            </small>
-                        </div>
-                    </h3>
-                    <ul>
-                        {% for game in games %}
-                            <li>
-                                <a href="{% url 'games:games_view_game' game.id %}" target="_blank" rel="noopener noreferrer">
-                                    {{game.gm.username}} will run {{game.scenario.title}} in
-                                    {{game.scheduled_start_time|timeuntil}}
-                                </a>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                    {% if num_games > 3 %}
-                        <div>
-                            Find the rest on the
-                            <a href="{% url 'games:games_looking_for_game' %}">
-                                Looking for Game
-                            </a>
-                            page.
-                        </div>
-                    {% endif %}
-
-                {% endif %}
+                <h3>So where's the game?</h3>
+                <p style="font-size: 15px;">
+                    <b>
+                        The Contract is complete, polished, and 100% free-to-play.
+                    </b>
+                    This website's online guidebook and extensive integrated tools make learning, playing, and running The Contract a breeze.
+                </p>
+                <p style="font-size: 15px;">
+                    We are currently in our <b>Open Prerelease</b> phase and will soon launch a Kickstarter campaign to
+                    produce a PDF and physical book, but this website will always be the best way to play.
+                </p>
 
 
-
-                <div id="get-started-wrapper" class="text-center">
-                    <div id="get-started" class="text-center">
-                        <a class="btn btn-lg btn-default css-discord-button" href="https://discord.gg/xUZZegYNNy">
-                            <img class="float-left" src="{% static 'overrides/other_graphics/Discord-Logo-Color.svg' %}" style="width: 25px; height: 25px; position: absolute;">
-                            <span style="margin-left: 30px;">
-                                Our Discord
-                            </span>
-                        </a>
-                        <a class="btn btn-lg btn-warning" href="{% url 'info:how-to-play' %}">Play</a>
-                    </div>
+                <h2 class="text-center" style="color:#e1b276;margin-top: 25px;">How do you want to learn?</h2>
+                <div class="thumbnail" style="margin-top: 35px; padding-left: 15px; padding-right: 15px; margin-top: 10px;">
+                    {% include "info/how_to_learn_snip.html" %}
                 </div>
-            </div>
 
-            <hr>
-            <div class="css-talent-narrative css-backdropped-text">
-                <p>
-                    Yesterday I went online and watched this bartender, Alex, light a cigarette with a snap of his fingers, no lighter. Did it under the observation of a bunch of scientists too, so that’s that. He’s officially Illuminated.
-                </p>
-                <p>
-                    Of course “magic” has always been around. It wasn’t a secret. All those myths, legends, religions, and folktales; they’re all true. Well, sorta. Some of them are make-believe. The rest have been told and retold, twisted each time to suit the monarchy or Disney or what have you.
-                </p>
-                <p>
-                    Nowadays it’s different. Now you’ve got a cell phone with a 4K camera in your pocket. All you’ve gotta do is snap the video, post it to CryptoLeak, and you’ve got millions of views. And while the ambitious and greedy scramble to capitalize, you can sit back and watch all the debunkers and conspiracy theorists debate whether or not the whole thing is a hoax.
-                </p>
-                <p>
-                    Never ceases to amaze me. All this technology and people still can’t tell what’s real and what’s a scam.
-                </p>
-                <p>
-                    I hear fire-finger Alex’s bar is doing good business now, but it won’t last. What can he do that anyone with a lighter can’t? No, it won’t be long before the novelty wears off and no one cares about his little party trick. If he’s lucky, some aristocrat or senator will hire him as a Jafar, pay him to stand nearby at parties and press conferences.
-                </p>
-                <p>
-                    The truth is, even if people like Alex are one in fifty thousand, they’re still a dime a dozen.
-                </p>
-                <p>
-                    But you—people like you are different. You’re hungry, curious, and a little vicious. Your untapped potential is off the charts if you play your cards right.
-                </p>
-                <p>
-                    What I'm saying, friend, is you’ve got talent. Real talent. Trust me, I’ve got a knack for spotting that kind of thing.
-                </p>
-                <p>
-                    So, what do you say?
-                </p>
-                <div class="text-center" style="margin-top: 25px; margin-bottom: 30px;">
-                    <a class="btn btn-lg btn-warning text-center" href="{% url 'info:how-to-play' %}">Let's shake on it.</a>
-                </div>
+
             </div>
         </div>
     </div>

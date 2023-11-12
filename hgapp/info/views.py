@@ -117,3 +117,8 @@ def how_to_play(request):
         "five_power": Power_Full.objects.filter(tags__in=["splash1"]).first(),
     }
     return render(request, 'info/new_player_guide/quickstart.html', context)
+
+
+def learn_to_play(request):
+    return render(request, 'info/learn_to_play.html', {})
+

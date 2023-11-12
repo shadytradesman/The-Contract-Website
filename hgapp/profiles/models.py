@@ -348,7 +348,7 @@ class Profile(models.Model):
         return Move.objects.filter(gm=self.user).exclude(deleted_on__isnull=False).order_by("-created_date").all()
 
     def get_gm_title_tooltip(self):
-        return "Games GMed: {}<br>Contractors killed: {}<br>Victories awarded: {} <br>Losses awarded: {}"\
+        return "Contracts GMed: {}<br>Contractors killed: {}<br>Victories awarded: {} <br>Losses awarded: {}"\
             .format(self.num_games_gmed, self.num_gm_kills, self.num_gm_victories, self.num_gm_losses)
 
     def _player_prefix_from_counts(self, num_completed, num_deadly_games, num_deaths_on_games):

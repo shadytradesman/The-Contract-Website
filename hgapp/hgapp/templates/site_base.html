@@ -57,7 +57,7 @@
     </li>
     {% if not request.user.is_authenticated %}
         <li>
-            <a class="css-nav-butt btn-warning" href="{% url 'info:how-to-play' %}">Play</a>
+            <a class="css-nav-butt btn-warning" href="{% url 'info:learn-to-play' %}">Play<span class="hidden-xs"> for free</span></a>
         </li>
     {% endif%}
     {% cache 500 nav-rules-toc1 guidebook.slug request.user.is_authenticated  %}
@@ -186,6 +186,27 @@
     </a>
     <ul class="dropdown-menu" style="position: absolute; background-color: #20252d; left: -20px;">
         <div class="visible-xs-block clearfix"></div>
+        <li >
+            <a href="{% url 'info:learn-to-play' %}" class="btn-primary">Learn to Play</a>
+        </li>
+        <li class="dropdown-header">
+            Contractors
+        </li>
+        <li>
+            <a href="{% url 'characters:characters_create'%}">Create Contractor</a>
+        </li>
+        <li>
+            <a href="{% url 'characters:characters_graveyard' %}">Graveyard</a>
+        </li>
+        <li class="dropdown-header">
+            Gifts
+        </li>
+        <li>
+            <a href="{% url 'powers:powers_create_ps2'%}">Create Gift</a>
+        </li>
+        <li>
+            <a href="{% url 'powers:powers_stock'%}">Stock Gifts</a>
+        </li>
         <li class="dropdown-header">
             Community
         </li>
@@ -211,30 +232,6 @@
             <a href="{% url 'info:leaderboard' %}">
                 Hall of Fame
             </a>
-        </li>
-        <li>
-            <a href="{% url 'games:games_scenario_exchange' %}">
-                <i class="fa fa-handshake-o fa-1x css-text-exchange"></i>
-                Scenario Exchange
-            </a>
-        </li>
-        <li class="dropdown-header">
-            Contractors
-        </li>
-        <li>
-            <a href="{% url 'characters:characters_create'%}">Create Contractor</a>
-        </li>
-        <li>
-            <a href="{% url 'characters:characters_graveyard' %}">Graveyard</a>
-        </li>
-        <li class="dropdown-header">
-            Gifts
-        </li>
-        <li>
-            <a href="{% url 'powers:powers_create_ps2'%}">Create Gift</a>
-        </li>
-        <li>
-            <a href="{% url 'powers:powers_stock'%}">Stock Gifts</a>
         </li>
         <li class="dropdown-header">
             Website

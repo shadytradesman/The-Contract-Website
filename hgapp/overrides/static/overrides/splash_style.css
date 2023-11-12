@@ -43,6 +43,16 @@
     }
 }
 
+.css-scroll-down-text {
+position:absolute; top: 80vh; width: 100%; text-align: center;
+}
+
+@media (max-width: 768px) {
+    .css-scroll-down-text {
+        top: 92vh;
+    }
+}
+
 .css-main-images {
   position: absolute;
   left: 0;
@@ -185,6 +195,7 @@
 
 .css-talent-section {
     background-color: #20252d;
+    min-height: 100vh;
 }
 
 .css-art-front-talent {
@@ -201,7 +212,7 @@
 @media(max-width: 768px) {
     .css-art-front-talent {
         background-position: top center;
-        background-size: cover, 100%;
+        background-size: 120%, cover;
         width: 100vw;
         left: 0px;
     }
@@ -225,6 +236,12 @@
     padding-top: 10px;
 }
 
+.css-main-text .css-backdropped-text {
+    border-radius: 5px;
+    background-color: rgba(17, 20, 24, 0.5);
+    padding: 15px;
+}
+
 .css-talent-section-text .css-backdropped-text {
     background-color: rgba(32, 37, 45, 0.7);
     padding: 15px;
@@ -235,12 +252,14 @@
     padding: 15px;
 }
 
+
+
 @media(max-width: 768px) {
 .css-talent-section-text {
     left: 0px;
     width: 100%;
     padding: 15px;
-    padding-top: 70vh;
+    padding-top: 50vh;
     }
 }
 
@@ -315,4 +334,9 @@
 
 .css-discord-button {
     margin-right: 20px;
+}
+
+.css-bullet-header {
+    margin-top: 15px;
+    margin-bottom: 5px;
 }

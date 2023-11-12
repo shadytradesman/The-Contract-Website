@@ -293,6 +293,7 @@ def edit_scenario(request, scenario_id):
         return render(request, 'games/scenarios/edit_scenario.html', context)
 
 
+@login_required
 def scenario_exchange(request):
     form = RsvpAttendanceForm()
     num_scenarios_on_exchange = Scenario.objects.filter(is_on_exchange=True).count()

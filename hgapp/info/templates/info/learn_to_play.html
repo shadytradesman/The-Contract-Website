@@ -1,0 +1,23 @@
+{% extends "site_base.html" %}
+
+{% block head_title %}Learn to Play{% endblock %}
+
+{% block extra_styles %}
+{% endblock %}
+
+{% block extra_scripts %}
+{% endblock %}
+
+{% block body_base %}
+
+<div class="container">
+    <h1 class="text-center" >
+        How would you like to learn?
+    </h1>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            {% include "info/how_to_learn_snip.html" %}
+        </div>
+    </div>
+</div>
+{% endblock %}
