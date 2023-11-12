@@ -49,7 +49,7 @@ position:absolute; top: 80vh; width: 100%; text-align: center;
 
 @media (max-width: 768px) {
     .css-scroll-down-text {
-        top: 92vh;
+        top: 87vh;
     }
 }
 
