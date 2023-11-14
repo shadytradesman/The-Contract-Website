@@ -372,6 +372,7 @@ class Character(models.Model):
     private = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
     is_dead = models.BooleanField(default=False)
+    is_stock = models.BooleanField(default=False)
     pub_date = models.DateTimeField('date published')
     edit_date = models.DateTimeField('date last edited')
 
@@ -1164,6 +1165,7 @@ Archived on: {}
 
             "crafting_gifts": None,
             "artifacts": None,
+            "is_stock": self.is_stock,
         }
 
     # WARNING: this is an expensive call

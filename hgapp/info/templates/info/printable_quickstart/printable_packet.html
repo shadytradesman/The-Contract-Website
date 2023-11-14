@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Printable Quickstart</title>
+  {{data|json_script:"rulesData"}}
+  <link rel="stylesheet" type="text/css" href="{% static 'info/print_quickstart_styles.css' %}" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+<div id="js-sheet-component" >
+  <div v-if="ready">
+    <div class="css-no-print">
+        {% include "info/printable_quickstart/no_print_section.html" %}
+    </div>
+    <div class="css-page">
+      <div class="css-content">
+        {% include "info/printable_quickstart/page_resolution.html" %}
+      </div>
+      <div class="css-logo-url">
+        TheContractRPG.com
+      </div>
+    </div>
+
+    <div class="css-page-spacer"></div>
+    <div class="css-page">
+      <div class="css-content">
+        {% include "info/printable_quickstart/page_mind_and_body.html" %}
+      </div>
+      <div class="css-logo-url">
+        TheContractRPG.com
+      </div>
+    </div>
+
+    <div class="css-page-spacer"></div>
+    <div class="css-page">
+      <div class="css-content">
+        {% include "info/printable_quickstart/page_combat.html" %}
+      </div>
+      <div class="css-logo-url">
+        TheContractRPG.com
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/vue@3.2.26/dist/vue.global.prod.js"></script>
+<script src="{% static 'info/print_quickstart.js' %}"></script>
+
+</body>
+</html>

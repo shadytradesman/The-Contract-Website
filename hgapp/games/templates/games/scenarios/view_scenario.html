@@ -89,7 +89,7 @@
                 </div>
             </div>
 
-            {% if not aftermath_spoiled %}
+            {% if not aftermath_spoiled and not request.user.is_anonymous %}
             <div style="margin-bottom: 15px;">
                 <div class="alert alert-info" style="margin: auto; width: 90%;">
                     <h3 class="text-center" style="margin-top: 0px;">

@@ -29,4 +29,7 @@ urlpatterns = [
 
     # ex: .com/info/learn-to-play/
     url(r"^learn-to-play/$", views.learn_to_play, name="learn-to-play"),
+
+    # ex: .com/info/printable-quickstart
+    url(r"^printable-quickstart/$", views.printable_quickstart, name="printable_quickstart"),
 ]

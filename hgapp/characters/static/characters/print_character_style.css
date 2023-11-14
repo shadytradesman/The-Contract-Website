@@ -63,6 +63,42 @@ body {
 }
 
 
+.css-content {
+    padding-bottom: .03in;
+}
+
+@page {
+    margin: 0.25in;
+}
+
+@media print {
+    .css-no-print {
+        display: none;
+    }
+
+    .css-only-print-block {
+        display: block!important;
+    }
+
+    .css-only-print-inline {
+        display: inline-block!important;
+    }
+
+    h1 {
+        break-before: always;
+    }
+
+    .css-page-spacer {
+        break-inside: auto;
+        height: .05in;
+    }
+}
+
+.text-muted, .text-muted p {
+    color: grey !important;
+}
+
+
 /* MAIN CONTENT INTRO */
 .css-main-logo {
     height: .8in;
@@ -222,41 +258,6 @@ body {
   border-radius: 50%;
   display: inline-block;
   margin-right: 1px;
-}
-
-.css-content {
-    padding-bottom: .03in;
-}
-
-@page {
-    margin: 0.25in;
-}
-
-@media print {
-    .css-no-print {
-        display: none;
-    }
-
-    .css-only-print-block {
-        display: block!important;
-    }
-
-    .css-only-print-inline {
-        display: inline-block!important;
-    }
-
-    h1 {
-        break-before: always;
-    }
-
-    .css-page-spacer {
-        break-inside: auto;
-        height: .05in;
-    }
-}
-
-.text-muted, .text-muted p {
-    color: grey !important;
 }
 
 .css-system-text-drawback {

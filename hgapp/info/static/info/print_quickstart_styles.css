@@ -1,0 +1,210 @@
+.css-how-to-character h3 {
+    margin-top: 15px;
+    margin-bottom: 12px;
+}
+
+.css-page-spacer {
+    height: .05in;
+    border: none;
+}
+
+.css-how-to-character h5 {
+    margin-top: 10px;
+    margin-bottom: 7px;
+}
+
+.css-tutorial-text {
+    font-size: .75em;
+}
+
+.css-tutorial-text ul{
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+.css-limit {
+    font-size: .85em;
+    margin-bottom: .05in;
+}
+
+.css-limit span {
+    font-size: .85em;
+    margin-left: 5px;
+}
+
+.css-no-break {
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+
+.css-quirk-cont {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: space-around;
+    justify-content: space-between;
+}
+
+.css-quirk {
+    width: 48%;
+    font-size: .85em;
+    margin-bottom: .03in;
+    padding: 5px;
+    align-content: space-around;
+    justify-content: space-between;
+    border: 1px solid black;
+    border-radius: 4px;
+}
+
+.css-quirk-desc {
+    font-size: .9em;
+}
+
+.css-quirk-system {
+    font-size: .9em;
+    font-style: italic;
+    padding-left: .01in;
+}
+
+.css-quirk-value {
+    font-size: 1.2em;
+}
+
+
+body {
+    box-sizing: border-box;
+    font-family:  Helvetica Neue,Helvetica,Arial,sans-serif;
+    -webkit-print-color-adjust: exact !important;
+    font-size: 1em;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.css-page {
+    width: 8in;
+    border: 2px solid grey;
+    border-style: ridge;
+    padding: .2in;
+    margin: auto;
+    page-break-inside: avoid;
+    break-inside: avoid;
+    max-height: 10.3in;
+    overflow: hidden;
+    -webkit-box-decoration-break: clone;
+    page-break-after: always;
+    position:relative;
+}
+
+.css-page-long {
+    width: 8in;
+    border: 2px solid grey;
+    border-style: ridge;
+    padding: .2in;
+    margin: auto;
+    page-break-after: always;
+    position:relative;
+}
+
+.css-page-long:last-child {
+    page-break-after: avoid;
+}
+
+.css-page-long-section {
+    -webkit-box-decoration-break: clone;
+}
+
+.css-condition-field {
+    padding-left: .05in;
+    padding-right: .05in;
+}
+
+.css-no-print {
+    width: 8in;
+    border: 1px solid grey;
+    padding: .2in;
+    padding-bottom: .05in;
+    margin: auto;
+    margin-top: 5px;
+    margin-bottom: 15px;
+}
+
+
+.css-option {
+    margin-left: .1in;
+}
+
+.css-main-logo {
+    height: .8in;
+    float: right;
+}
+
+.css-logo-url {
+    text-align: right;
+    font-size: .7em;
+    position: absolute;
+    bottom: 0.02in;
+    right: 0.15in;
+    width: 4in;
+    z-index: 9999;
+    background-color: white;
+    padding: .03in;
+}
+
+.css-content {
+    padding-bottom: .03in;
+}
+
+@page {
+    margin: 0.25in;
+}
+
+@media print {
+    .css-no-print {
+        display: none;
+    }
+
+    .css-only-print-block {
+        display: block!important;
+    }
+
+    .css-only-print-inline {
+        display: inline-block!important;
+    }
+
+    h1 {
+        break-before: always;
+    }
+
+    .css-page-spacer {
+        break-inside: auto;
+        height: .05in;
+    }
+}
+
+.text-muted, .text-muted p {
+    color: grey !important;
+}
+
+.css-double-col {
+    width: 50%;
+    float: left;
+}
+
+.css-col-cont {
+    display: table;
+    content: " ";
+    clear: both;
+    width: 100%;
+}
+
+.padded-col {
+    padding-left: .05in;
+    padding-right: .05in;
+}
+
+ul ul {
+ margin-top: 3px !important;
+}
+

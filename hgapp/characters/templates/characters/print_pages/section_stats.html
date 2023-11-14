@@ -5,7 +5,10 @@
         <div class="css-char-name-subtitle">
             <div>
                 <span>A {character.num_victories}-Victory <b>{character.status}</b> Contractor </span>
-                <span>played by {character.player}</span>
+                <span>played by
+                    <span v-if="!character.is_stock">{character.player}</span>
+                    <span v-if="character.is_stock">___________</span>
+                </span>
             </div>
         </div>
     </div>

@@ -7,8 +7,10 @@ from characters.forms import InjuryForm
 from powers.models import Base_Power, Power_Full
 from info.models import FrontPageInfo
 from profiles.models import Profile
-from characters.models import CharacterTutorial, Ability, Character
+from characters.models import CharacterTutorial, Ability, Character, Attribute
 from games.models import Scenario
+from django.forms.models import model_to_dict
+from django.templatetags.static import static
 
 
 def terms(request):
@@ -122,3 +124,18 @@ def how_to_play(request):
 def learn_to_play(request):
     return render(request, 'info/learn_to_play.html', {})
 
+
+def printable_quickstart(request):
+    tutorial = get_object_or_404(CharacterTutorial)
+    attributes = Attribute.objects.filter(is_deprecated=False).order_by('name').all()
+    abilities = Ability.objects.filter(is_primary=True).order_by('name').all()
+    context = {
+        "data": {
+            "tutorial": model_to_dict(tutorial),
+            "attributes": [model_to_dict(x) for x in attributes],
+            "abilities": [model_to_dict(x) for x in abilities],
+            "d10_outline_url": static("overrides/branding/d10-outline2.svg"),
+            "d10_filled_url": static("overrides/branding/d10-filled.svg"),
+        }
+    }
+    return render(request, 'info/printable_quickstart/printable_packet.html', context)

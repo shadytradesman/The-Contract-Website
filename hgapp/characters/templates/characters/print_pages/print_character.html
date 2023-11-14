@@ -104,6 +104,15 @@
                 TheContractRPG.com
             </div>
         </div>
+        <div v-if="character.is_stock" class="css-page-spacer"></div>
+        <div v-if="character.is_stock" class="css-page">
+            <div class="css-content">
+                {% include "characters/print_pages/stock_rundown.html" %}
+            </div>
+            <div class="css-logo-url">
+                TheContractRPG.com
+            </div>
+        </div>
     </div>
 </div>
     <script src="https://unpkg.com/vue@3.2.26/dist/vue.global.prod.js"></script>

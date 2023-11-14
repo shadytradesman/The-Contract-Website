@@ -59,7 +59,10 @@ def power_badge(power_full, force_show_warnings=False, artifact=None, can_edit=F
     force_show_warnings = force_show_warnings and not is_stock
     show_status_warning = force_show_warnings
     if character and (not is_stock or rewarding_character):
-        show_status_warning = not latest_revision.passes_status_check(character.status)
+        if character.is_stock:
+            show_status_warning = False
+        else:
+            show_status_warning = not latest_revision.passes_status_check(character.status)
     show_active_toggle = can_edit and latest_revision.show_status_toggle(artifact)
     is_active = show_active_toggle
     if show_active_toggle:
@@ -67,8 +70,12 @@ def power_badge(power_full, force_show_warnings=False, artifact=None, can_edit=F
     art_id = artifact.id if artifact else None
     gift_cost = power_full.get_gift_cost()
     if not is_stock and (character or force_show_warnings):
-        reward_count = power_full.reward_count()
-        at_least_one_gift = power_full.reward_count(include_improvements=False)
+        if character and character.is_stock:
+            reward_count = power_full.get_gift_cost()
+            at_least_one_gift = True
+        else:
+            reward_count = power_full.reward_count()
+            at_least_one_gift = power_full.reward_count(include_improvements=False)
     else:
         reward_count = 0
         at_least_one_gift = True
