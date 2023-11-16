@@ -1,6 +1,4 @@
-from collections import defaultdict
 import random
-import pickle
 from django.http import HttpResponseRedirect, HttpResponse,JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
@@ -10,19 +8,12 @@ from django.templatetags.static import static
 from django.template.loader import render_to_string
 from django.views import View
 from django.views import generic
-from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
-from django.forms import formset_factory
 from django.db import transaction
 from django.db.models import Prefetch
 from .signals import gift_major_revision
 
 from characters.models import Character, Artifact
-from .createPowerFormUtilities import get_create_power_context_from_base, \
-    get_create_power_context_from_power, get_edit_power_context_from_power, create_new_power_and_parent, \
-    create_power_for_new_edit, refund_or_assign_rewards
-from .models import Power, Base_Power_Category, Base_Power, Base_Power_System, DICE_SYSTEM, Power_Full, PowerTag, \
-    PremadeCategory, PowerTutorial, SYS_PS2, EFFECT, VECTOR, MODALITY
+from .models import Power,  Base_Power, Base_Power_System, DICE_SYSTEM, Power_Full,  PremadeCategory,  SYS_PS2
 from .forms import DeletePowerForm
 from .ps2Utilities import get_edit_context, save_gift
 from .templatetags.power_tags import power_badge
@@ -93,29 +84,6 @@ class EditExistingPower(EditPower):
         if self.character and not self.character.player_can_edit(self.request.user):
             raise PermissionDenied("You can't give Gifts to a Character you can't edit.")
 
-
-def create(request, character_id=None):
-    if character_id:
-        return HttpResponseRedirect(reverse('powers:powers_create_ps2_for_char', args=(character_id,)))
-    else:
-        return HttpResponseRedirect(reverse('powers:powers_create_ps2', ))
-    category_list = Base_Power_Category.objects\
-        .prefetch_related(Prefetch('base_power_set',queryset=Base_Power.objects.order_by('name')))\
-        .order_by('name')
-    category_list = [x for x in category_list if x.base_power_set.filter(is_public=True).count() > 0]
-    character=None
-    show_tutorial = (not request.user.is_authenticated) or (not request.user.power_full_set.exists())
-    tutorial = get_object_or_404(PowerTutorial)
-    context = {
-        'category_list': category_list,
-        'character': character,
-        'show_tutorial': show_tutorial,
-        'modal_header': tutorial.modal_base_header,
-        'modal_text': tutorial.modal_base,
-        'modal_art': 'overrides/art/lady_lake_sm.jpg',
-    }
-    return render(request, 'powers/choosecat.html', context)
-
 def powers_and_examples(request):
     base_powers_list = Base_Power.objects.order_by('name').all()
     only_examples = Power_Full.objects.filter(tags__in=["example"])
@@ -132,106 +100,6 @@ def powers_and_effects(request):
         'base_powers_list': base_powers_list,
     }
     return render(request, 'powers/powers_and_effects.html', context)
-
-def create_category(request, category_slug, character_id=None):
-    return HttpResponseRedirect(reverse('powers:powers_create_ps2', ))
-    powers_list = Base_Power.objects.filter(category=category_slug, is_public=True)
-    category = get_object_or_404(Base_Power_Category, pk=category_slug)
-    character = None
-    if character_id:
-        character = get_object_or_404(Character, pk=character_id)
-    tutorial = get_object_or_404(PowerTutorial)
-    context = {
-        'powers_list': powers_list,
-        'category': category,
-        'character': character,
-        'modal_header': tutorial.modal_base_header,
-        'modal_text': tutorial.modal_base,
-        'modal_art': 'overrides/art/lady_lake_sm.jpg',
-    }
-    return render(request, 'powers/choosebasecat.html', context)
-
-def create_all(request, character_id=None):
-    return HttpResponseRedirect(reverse('powers:powers_create_ps2', ))
-    powers_list = Base_Power.objects.filter(is_public=True).order_by('name')
-    character = None
-    if character_id:
-        character = get_object_or_404(Character, pk=character_id)
-    tutorial = get_object_or_404(PowerTutorial)
-    context = {
-        'powers_list': powers_list,
-        'character': character,
-        'modal_header': tutorial.modal_base_header,
-        'modal_text': tutorial.modal_base,
-        'modal_art': 'overrides/art/lady_lake_sm.jpg',
-    }
-    return render(request, 'powers/choosebaseall.html', context)
-
-def create_power(request, base_power_slug, character_id=None):
-    if character_id:
-        return HttpResponseRedirect(reverse('powers:powers_create_ps2_for_char', args=(character_id,)))
-    else:
-        return HttpResponseRedirect(reverse('powers:powers_create_ps2', ))
-    base_power = get_object_or_404(Base_Power, pk=base_power_slug)
-    if base_power.base_type in [VECTOR, MODALITY] or base_power.base_power_system_set.exclude(dice_system=SYS_PS2).count() == 0:
-        raise PermissionDenied("SHH! Pay no attention to the man behind the curtain")
-    character = None
-    if character_id:
-        character = get_object_or_404(Character, pk=character_id)
-        if not character.player_can_edit(request.user):
-            raise PermissionDenied("You can't give Gifts to a Character you can't edit.")
-    if request.method == 'POST':
-        with transaction.atomic():
-            power = create_new_power_and_parent(base_power, request, character)
-            if (power):
-                if character:
-                    refund_or_assign_rewards(power)
-                return HttpResponseRedirect(reverse('powers:powers_view_power', args=(power.id,)))
-            else:
-                print("ERROR CREATING POWER")
-    else:
-        # Build a power form.
-        context = get_create_power_context_from_base(base_power, character)
-        return render(request, 'powers/create_power_pages/createpower.html', context)
-
-
-def create_power_from_existing(request, power_id):
-    extant_power = get_object_or_404(Power, pk=power_id)
-    return HttpResponseRedirect(reverse('powers:powers_create_from_existing_ps2', args=(extant_power.parent_power_id,)))
-    base_power = get_object_or_404(Base_Power, pk=extant_power.base.slug)
-    if request.method == 'POST':
-        with transaction.atomic():
-            new_power = create_new_power_and_parent(base_power, request)
-        if (new_power):
-            return HttpResponseRedirect(reverse('powers:powers_view_power', args=(new_power.id,)))
-        else:
-            print("ERROR CREATING POWER")
-    else:
-        # Build a power form.
-        if not extant_power.player_can_view(request.user):
-            raise PermissionDenied("This Power has been deleted, or you're not allowed to view it")
-        context = get_create_power_context_from_power(extant_power, False)
-        return render(request, 'powers/create_power_pages/createpower.html', context)
-
-def edit_power(request, power_id):
-    return HttpResponseRedirect(reverse('powers:powers_edit_ps2', args=(power_id,)))
-    power_full = get_object_or_404(Power_Full, pk=power_id)
-    if not power_full.player_can_edit(request.user):
-        raise PermissionDenied("This Power has been deleted, or you're not allowed to view it")
-    extant_power = power_full.power_set.order_by('-pub_date').all()[0]
-    base_power = get_object_or_404(Base_Power, pk=extant_power.base.slug)
-    if request.method == 'POST':
-        with transaction.atomic():
-            new_power = create_power_for_new_edit(base_power, request, power_full)
-            if new_power:
-                refund_or_assign_rewards(new_power, extant_power)
-                return HttpResponseRedirect(reverse('powers:powers_view_power', args=(new_power.id,)))
-            else:
-                print("ERROR CREATING POWER")
-    else:
-        # Build a power form.
-        context = get_edit_power_context_from_power(extant_power)
-        return render(request, 'powers/create_power_pages/edit_power.html', context)
 
 
 def delete_power(request, power_id):

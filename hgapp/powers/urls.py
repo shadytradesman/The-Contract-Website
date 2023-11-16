@@ -65,36 +65,6 @@ urlpatterns = [
     path('ajax/example/effect/<slug:effect_id>/', views.ajax_example_view, name='powers_view_power_full_ajax'),
 
     ### LEGACY POWER SYSTEM
-    # ex: .com/powers/create/
-    url(r'^create-legacy/$', views.create, name='powers_create'),
-
-    # ex: .com/powers/create/c/32
-    url(r'^create-legacy/c/(?P<character_id>[\d]+)$', views.create, name='powers_create_for_char'),
-
-    # ex: .com/powers/create/offensive
-    url(r'^create-legacy/cat/(?P<category_slug>[\w-]+)/$', views.create_category, name='powers_create_category'),
-
-    # ex: .com/powers/create/offensive/c/12
-    url(r'^create-legacy/cat/(?P<category_slug>[\w-]+)/c/(?P<character_id>[\d]+)$', views.create_category, name='powers_create_category_for_char'),
-
-    # ex: .com/powers/create/all
-    url(r'^create-legacy/all/$', views.create_all, name='powers_create_all'),
-
-    # ex: .com/powers/create/all/c/21
-    url(r'^create-legacy/all/c/(?P<character_id>[\d]+)$', views.create_all, name='powers_create_all_for_char'),
-
-    # ex: .com/powers/create/b/blast
-    url(r'^create-legacy/b/(?P<base_power_slug>[\w-]+)/$', views.create_power, name = 'powers_create_power'),
-
-    # ex: .com/powers/create/b/blast/c/21
-    url(r'^create-legacy/b/(?P<base_power_slug>[\w-]+)/c/(?P<character_id>[\d]+)$', views.create_power, name='powers_create_power_for_char'),
-
-    # ex: .com/powers/create/p/110
-    url(r'^create-legacy/p/(?P<power_id>[\d]+)/$', views.create_power_from_existing, name='powers_create_power_from_existing'),
-
-    # ex: .com/powers/edit/p/110
-    url(r'^edit-legacy/p/(?P<power_id>[\d]+)/$', views.edit_power, name='powers_edit_power'),
-
     # ex: .com/powers/view/b/blast
     url(r'^view-legacy/b/(?P<pk>[\w-]+)/$', BasePowerDetailView.as_view(), name='powers_view_base'),
 

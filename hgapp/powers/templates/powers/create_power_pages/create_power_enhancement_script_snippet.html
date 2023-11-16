@@ -1,9 +1,0 @@
-{% for modifier_form in enhancements %}
-    <script type="text/html" id="{{modifier_form.empty_form.enhancement_slug}}-template">
-        <div id="enhancement-__prefix__">
-            {% with modifier_form.empty_form as mod %}
-                {% include "powers/create_power_pages/create_power_modifier_snippet.html" %}
-            {% endwith %}
-        </div>
-    </script>
-{% endfor %}
