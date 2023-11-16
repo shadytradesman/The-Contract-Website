@@ -31,6 +31,16 @@
         {% else %}
         	userAdmin = false;
         {% endif %}
+        {% if existing_artifact_pk %}
+        	existingArtifactPk = {{existing_artifact_pk}};
+        {% else %}
+        	existingArtifactPk = null;
+        {% endif %}
+        {% if existing_artifact_name %}
+        	existingArtifactName = "{{existing_artifact_name}}";
+		{% else %}
+			existingArtifactName = null;
+        {% endif %}
 	</script>
 	{{power_edit_blob|json_script:"powerEditBlob"}}
 	{{character_blob|json_script:"characterBlob"}}

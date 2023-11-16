@@ -5,6 +5,8 @@
                 Customizing Gift <small><small><div style="padding-top: 5px;">{% if character %}For {{character.name}}: {% endif %} {{ current_power.name }}</div></small></small>
             {% elif current_power %}
                 Editing Gift {% if current_power %}<small><small><div style="padding-top: 5px;">{{ current_power.name }}</div></small></small>{% endif %}
+            {% elif existing_artifact_name %}
+                Adding Effect <small><small><div style="padding-top: 5px;">to {{existing_artifact_name}}</div></small></small>
             {% else %}
                 Creating a Gift {% if character %}<small><small><div style="padding-top: 5px;">For {{character.name}}</div></small></small>{% endif %}
             {% endif %}
@@ -17,6 +19,8 @@
                     Customizing Gift <small><small><div style="padding-top: 5px;">{% if character %}For {{character.name}}: {% endif %}{{ current_power.name }}</div></small></small>
                 {% elif current_power %}
                     Editing Gift {% if current_power %}<small><small><div style="padding-top: 5px;">{{ current_power.name }}</div></small></small>{% endif %}
+                {% elif existing_artifact_name %}
+                Adding Effect <small><small><div style="padding-top: 5px;">to {{existing_artifact_name}}</div></small></small>
                 {% else %}
                     Creating a Gift {% if character %}<small><small><div style="padding-top: 5px;">For {{character.name}}</div></small></small>{% endif %}
                 {% endif %}
@@ -27,7 +31,7 @@
                      :class="{
                              'css-step-active': expandedTab === 'modalities',
                              'css-step-unfinished': !selectedModality,
-                             'css-step-finished': selectedModality
+                             'css-step-finished': selectedModality && existingArtifactPk === null
                              }"
                      @click="clickModalityTab">
                     <div class=" css-step-after">

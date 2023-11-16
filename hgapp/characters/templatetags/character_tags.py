@@ -60,6 +60,7 @@ def render_sig_item(artifact, user, viewing_character=None, rewarding_character=
         reason_unavail = 'Currently {}.'.format(artifact.get_most_recent_status_change_display())
     render_link = viewing_character is not None
     powers = artifact.power_full_set.order_by("name")
+    is_early_access = user.profile.early_access_user if user.is_authenticated else False,
     return {
         "item": artifact,
         "is_crafted": artifact.is_crafted_artifact,
@@ -76,5 +77,6 @@ def render_sig_item(artifact, user, viewing_character=None, rewarding_character=
         "is_preview": is_preview,
         "powers": powers,
         "can_edit_gifts": can_edit_gifts,
+        "is_early_access": is_early_access,
     }
 

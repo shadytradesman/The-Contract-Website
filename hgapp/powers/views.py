@@ -23,6 +23,7 @@ class EditPower(View):
     existing_power = None
     power_to_edit = None
     character = None
+    artifact = None
 
     def dispatch(self, *args, **kwargs):
         redirect = self.__check_permissions()
@@ -39,7 +40,7 @@ class EditPower(View):
                 self.character = Character.objects.select_for_update().get(pk=self.character.id)
             if self.power_to_edit:
                 self.power_to_edit = Power_Full.objects.select_for_update().get(pk=self.power_to_edit.id)
-            new_power_full = save_gift(request, power_full=self.power_to_edit, character=self.character)
+            new_power_full = save_gift(request, power_full=self.power_to_edit, character=self.character, existing_artifact=self.artifact)
         return HttpResponseRedirect(reverse('powers:powers_view_power', args=(new_power_full.id,)))
 
     def __check_permissions(self):
@@ -49,13 +50,17 @@ class EditPower(View):
         return get_edit_context(existing_power_full=self.existing_power,
                                 is_edit=self.power_to_edit,
                                 existing_char=self.character,
-                                user=self.request.user)
+                                user=self.request.user,
+                                existing_artifact=self.artifact)
 
 
 class CreatePower(EditPower):
     def dispatch(self, *args, **kwargs):
         if 'character_id' in self.kwargs:
             self.character = get_object_or_404(Character, id=self.kwargs['character_id'])
+        if 'artifact_id' in self.kwargs:
+            self.artifact = get_object_or_404(Artifact, id=self.kwargs['artifact_id'])
+            self.character = self.artifact.crafting_character
         if 'power_full_id' in self.kwargs:
             self.existing_power = get_object_or_404(Power_Full, id=self.kwargs['power_full_id'])
             if not self.existing_power.player_can_view(self.request.user):

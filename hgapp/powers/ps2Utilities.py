@@ -24,7 +24,7 @@ from .Ps2Engine import PowerEngine, SystemTextRenderer
 logger = logging.getLogger("app." + __name__)
 
 
-def get_edit_context(existing_power_full=None, is_edit=False, existing_char=None, user=None):
+def get_edit_context(existing_power_full=None, is_edit=False, existing_char=None, user=None, existing_artifact=None):
     modifiers_formset = get_modifiers_formset()
     params_formset = get_params_formset()
     sys_field_text_formset = get_sys_field_text_formset()
@@ -42,7 +42,8 @@ def get_edit_context(existing_power_full=None, is_edit=False, existing_char=None
     sig_item_artifact_form = make_select_signature_artifact_form(
         existing_character=existing_char,
         existing_power=existing_power_full,
-        user=user,)()
+        user=user,
+        existing_artifact=existing_artifact)()
     categories = Base_Power_Category.objects.all()
     show_tutorial = (not user) or (not user.is_authenticated) or (not user.power_full_set.exists())
     is_stock = False
@@ -61,7 +62,9 @@ def get_edit_context(existing_power_full=None, is_edit=False, existing_char=None
         'sys_field_roll_formset': sys_field_roll_formset,
         'cat_colors': [(cat.container_class(), cat.color) for cat in categories],
         'current_power': existing_power_full.latest_revision() if existing_power_full else None,
-        'power_full': existing_power_full if existing_power_full else None,
+        'power_full': existing_power_full,
+        'existing_artifact_pk': existing_artifact.pk if existing_artifact is not None else None,
+        'existing_artifact_name': existing_artifact.name if existing_artifact is not None else None,
         'is_stock': is_stock,
         'is_upgrade': existing_power_full.latest_revision().dice_system == SYS_LEGACY_POWERS if existing_power_full else False,
         'character': existing_char if existing_char else None,
@@ -73,18 +76,22 @@ def get_edit_context(existing_power_full=None, is_edit=False, existing_char=None
         'consumable_craft_modal_art_url': static('overrides/art/sushi.jpg'),
     }
     form_url = reverse("powers:powers_create_ps2")
-    if existing_power_full:
+    if existing_power_full is not None:
         context['power_edit_blob'] = json.dumps(existing_power_full.latest_revision().to_edit_blob())
     if is_edit:
         form_url = reverse("powers:powers_edit_ps2", kwargs={"power_full_id": existing_power_full.pk})
     elif existing_char:
         form_url = reverse("powers:powers_create_ps2_for_char", kwargs={"character_id": existing_char.pk})
+    if existing_artifact is not None:
+        if not existing_artifact.is_signature:
+            raise ValueError("Cannot add an effect to a non-legendary artifact")
+        form_url = reverse("powers:powers_create_ps2_for_artifact", kwargs={"artifact_id": existing_artifact.pk})
     context["form_url"] = form_url
     return context
 
 
 # TODO: permissions are checked before this method is called.
-def save_gift(request, power_full=None, character=None):
+def save_gift(request, power_full=None, character=None, existing_artifact=None):
     if not request.POST:
         raise ValueError("Can only create new gift from post request")
     power_form = PowerForm(request.POST)
@@ -92,7 +99,8 @@ def save_gift(request, power_full=None, character=None):
         SignatureArtifactForm = make_select_signature_artifact_form(
             existing_character=character,
             existing_power=power_full,
-            user=request.user,)
+            user=request.user,
+            existing_artifact=existing_artifact)
         new_power = _create_new_power_and_save(power_form=power_form, request=request, SigArtifactForm=SignatureArtifactForm)
         _populate_power_change_log(new_power, power_full)
 
@@ -157,7 +165,7 @@ def _create_new_power_and_save(power_form, request, SigArtifactForm):
         sig_artifact_form = SigArtifactForm(request.POST)
         # do nothing with the form yet, just check its validity so we know whether we should save the power or not.
         if not sig_artifact_form.is_valid():
-            raise ValueError("Invalid signature artifact form: " + sig_artifact_form.errors)
+            raise ValueError("Invalid signature artifact form: " + str(sig_artifact_form.errors))
 
     # These instances are unsaved and do not yet reference the power.
     modifier_instances = _get_modifier_instances_and_validate(

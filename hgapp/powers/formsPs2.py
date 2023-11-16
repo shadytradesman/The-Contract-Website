@@ -72,7 +72,7 @@ class PowerForm(forms.Form):
                                     }))
 
 
-def make_select_signature_artifact_form(existing_character=None, existing_power=None, user=None):
+def make_select_signature_artifact_form(existing_character=None, existing_power=None, user=None, existing_artifact=None):
     initial_artifact_queryset = Artifact.objects.none()
     initial_artifact = None
     if existing_power and existing_power.crafting_type == CRAFTING_SIGNATURE:
@@ -81,6 +81,9 @@ def make_select_signature_artifact_form(existing_character=None, existing_power=
             initial_artifact = get_object_or_none(existing_power.artifactpowerfull_set.filter(relevant_artifact__is_signature=True, relevant_artifact__is_deleted=False))
         if initial_artifact is not None:
             initial_artifact_queryset = Artifact.objects.filter(pk=initial_artifact.relevant_artifact.pk)
+    if existing_artifact:
+        initial_artifact = existing_artifact
+        initial_artifact_queryset = Artifact.objects.filter(pk=existing_artifact.pk)
     if existing_character:
         queryset = existing_character.artifact_set.filter(
             cell__isnull=True,

@@ -268,7 +268,9 @@
             {{power_form.tagline|bootstrap}}
         </div>
     </div>
-    <div v-if="selectedModality.slug === 'signature-item-mod'" class="row">
+    <div v-if="selectedModality.slug === 'signature-item-mod'" class="row" :class="{
+                             'css-form-hidden': existingArtifactPk != null
+                             }">
         <div class="col-md-6">
             {{sig_item_artifact_form.selected_artifact|bootstrap}}
         </div>

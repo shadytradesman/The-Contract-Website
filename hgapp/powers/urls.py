@@ -17,6 +17,9 @@ urlpatterns = [
     path('create/for-contractor/<int:character_id>/', views.CreatePower.as_view(), name='powers_create_ps2_for_char'),
     path('create-ps2/c/<int:character_id>/', RedirectView.as_view(pattern_name='powers:powers_create_ps2_for_char', query_string=True, permanent=True)),
 
+    # ex: .com/gift/create/for-artifact/32
+    path('create/for-artifact/<int:artifact_id>/', views.CreatePower.as_view(), name='powers_create_ps2_for_artifact'),
+
     # ex: .com/gift/edit/21
     path('edit/<int:power_full_id>/', views.EditExistingPower.as_view(), name='powers_edit_ps2'),
     path('edit-ps2/p/<int:power_full_id>/', RedirectView.as_view(pattern_name='powers:powers_edit_ps2', query_string=True, permanent=True)),

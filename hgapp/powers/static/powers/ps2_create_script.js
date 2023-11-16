@@ -969,6 +969,8 @@ const ComponentRendering = {
       currentExampleBlob: null,
       exampleEffectDisplay: "",
       lastUsedMarkers: [],
+      existingArtifactPk: null,
+      existingArtifactName: null,
     }
   },
   methods: {
@@ -1064,6 +1066,15 @@ const ComponentRendering = {
         this.populateWarnings();
         this.openCustomizationTab();
         $("#giftPreviewModal").modal({});
+      },
+      setStateForAddEffect(existingArtifactPk, existingArtifactName) {
+        this.existingArtifactPk = existingArtifactPk;
+        this.existingArtifactName = existingArtifactName;
+        this.selectedModality = this.modalities.find(comp => comp.slug === "signature-item-mod");
+        this.selectedItem = this.existingArtifactPk;
+        this.giftPreviewModalFirstShow = false;
+        this.changeModality();
+        console.log("modality selected");
       },
       setStateForEdit(powerEditBlob) {
         this.giftName = powerEditBlob["name"].decodeHTML();
@@ -1257,6 +1268,9 @@ const ComponentRendering = {
           });
       },
       clickModalityTab() {
+          if (this.existingArtifactPk) {
+            return
+          }
           if (this.expandedTab === "modalities" && this.selectedModality) {
               if (this.selectedEffect === null) {
                   this.openEffectsTab(true);
@@ -1969,12 +1983,15 @@ $(function() {
             mountedApp.$nextTick(function () {
               activateTooltips();
             });
+            if (existingArtifactPk != null) {
+                mountedApp.setStateForAddEffect(existingArtifactPk, existingArtifactName);
+            }
             $('#giftPreviewModal').on('hidden.bs.modal', function (e) {
               mountedApp.giftPreviewModalFirstShow = false;
             });
             $('#vue-app').show();
             $('#loading-spinner').hide();
-            if (!(document.getElementById('powerEditBlob').textContent.length > 2)) {
+            if (!(document.getElementById('powerEditBlob').textContent.length > 2) && (existingArtifactPk === null)) {
                 window.location.hash = '#modalities';
             }
         });

@@ -197,6 +197,10 @@
     background-color: #555e7b;
 }
 
+.css-form-hidden {
+    display: none;
+}
+
 .css-step-contents {
     left: 50%;
     height: 100%;

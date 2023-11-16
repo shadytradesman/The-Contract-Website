@@ -111,15 +111,24 @@
         {% endif %}
     </div>
     {% if not is_stock %}
-        <div id="hx-timeline-item{{item.id}}" class="css-no-print ccs-print-page-hidden">
-            <button
-                    class="btn btn-default btn-xs"
-                    hx-get="{% url 'characters:item_timeline' item.id %}"
-                    hx-trigger="click"
-                    hx-target="#hx-timeline-item{{item.id}}"
-                    hx-swap="outerHTML">
-                History
-            </button>
+        <div  class="css-no-print ccs-print-page-hidden">
+            <span id="hx-timeline-item{{item.id}}">
+                <button
+                        class="btn btn-default btn-xs"
+                        hx-get="{% url 'characters:item_timeline' item.id %}"
+                        hx-trigger="click"
+                        hx-target="#hx-timeline-item{{item.id}}"
+                        hx-swap="outerHTML">
+                    History
+                </button>
+            </span>
+            {% if can_edit_gifts and is_early_access %}
+            <span >
+                <a href="{% url 'powers:powers_create_ps2_for_artifact' item.pk %}" class="btn btn-default btn-xs ">
+                    Add Effect to this Artifact
+                </a>
+            </span>
+            {% endif %}
         </div>
     {% endif %}
 </div>
