@@ -36,7 +36,7 @@ def render_consumable(artifact, user):
 def render_sig_item(artifact, user, viewing_character=None, rewarding_character=None, is_stock=False, is_preview=False):
     if not (artifact.is_signature or artifact.is_crafted_artifact):
         raise ValueError("attempting to display non-signature artifact as signature")
-    can_edit = artifact.character.player_can_edit(user) if artifact.character else artifact.creating_player == user
+    can_edit = artifact.player_can_edit_or_transfer(user)
     edit_form = None
     status_form = None
     transfer_form = None
@@ -58,6 +58,7 @@ def render_sig_item(artifact, user, viewing_character=None, rewarding_character=
     if artifact.most_recent_status_change and artifact.most_recent_status_change not in [RECOVERED, REPAIRED]:
         reason_unavail = 'Currently {}.'.format(artifact.get_most_recent_status_change_display())
     render_link = viewing_character is not None
+    powers = artifact.power_full_set.order_by("name")
     return {
         "item": artifact,
         "is_crafted": artifact.is_crafted_artifact,
@@ -72,5 +73,6 @@ def render_sig_item(artifact, user, viewing_character=None, rewarding_character=
         "rewarding_character": rewarding_character,
         "is_stock": is_stock,
         "is_preview": is_preview,
+        "powers": powers,
     }
 

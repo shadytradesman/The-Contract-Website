@@ -910,7 +910,15 @@ class Power_Full(models.Model):
         self.character = None
         for reward in self.reward_list():
             reward.refund_keeping_character_assignment()
+        artifacts_to_delete = []
+        if self.is_signature():
+            old_artifacts = self.artifacts.all()
+            for artifact in old_artifacts:
+                if artifact.power_full_set.filter(crafting_type=CRAFTING_SIGNATURE).count() == 1:
+                    artifacts_to_delete.append(artifact)
         self.artifacts.clear()
+        for artifact in artifacts_to_delete:
+            artifact.delete()
         self.is_deleted = True
         self.save()
 
