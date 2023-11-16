@@ -18,7 +18,7 @@
     </a>
     <small>
       - {{power_full.get_gift_cost}} Gift
-      <a href="{% url 'powers:powers_view_base' power_full.base.slug %}">{{power_full.base.name}}</a>
+      {{power_full.base.name}}
       Power
 
       {% if power_full.character and not power_full.at_least_one_gift_assigned %}

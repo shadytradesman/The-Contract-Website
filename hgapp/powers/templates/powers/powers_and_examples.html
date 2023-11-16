@@ -26,14 +26,11 @@
         <div class="col-lg-4 col-sm-6">
             <div class="thumbnail">
                 <div class="label">
-                         <a class="btn btn-default"  style="width: 100%; margin-bottom: 10px;" href="{% url 'powers:powers_view_base' base_power.slug %}" role="button">
                              {% if not base_power.is_public %}
                              <h5>{{base_power.name}}</h5>
                              {% else %}
                              <h3>{{base_power.name}}</h3>
                              {% endif %}
-
-                         </a>
                         {% if not base_power.is_public %}
                             <div style="margin-bottom: 10px;">
                                 <b class="text-warn">Not public</b>

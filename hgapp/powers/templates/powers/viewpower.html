@@ -31,7 +31,7 @@
             </h2>
             <p>
                 A {{power_full.get_gift_cost}} Gift
-                <a href="{% url 'powers:powers_view_base' power_full.base.slug %}">{{power_full.base.name}}</a>
+                {{power_full.base.name}}
                 Power
             {% if power.parent_power.character %}
                 used by <a href="{% url 'characters:characters_view' power.parent_power.character.id %}">{{ power.parent_power.character.name }}</a>,

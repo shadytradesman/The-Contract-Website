@@ -302,21 +302,6 @@ def get_stock_gift_display(request, rewarding_character, power, use_cache=True):
 
 
 
-class BasePowerDetailView(generic.DetailView):
-    model = Base_Power
-    template_name = 'powers/view_base_power.html'
-
-    def get_queryset(self):
-        self.base_power = get_object_or_404(Base_Power, slug=self.kwargs['pk'])
-        return Base_Power.objects
-
-    def get_context_data(self, **kwargs):
-        context = super(BasePowerDetailView, self).get_context_data(**kwargs)
-        context['system_text'] = Base_Power_System.objects.filter(dice_system=DICE_SYSTEM[1][0]).get(base_power=self.base_power)
-        context['base_power'] = self.base_power
-        return context
-
-
 def toggle_active(request, power_id, is_currently_active, art_id=None):
     power = get_object_or_404(Power, id=power_id)
     if not power.player_can_edit(request.user):

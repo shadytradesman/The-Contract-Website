@@ -596,9 +596,6 @@ class Base_Power(models.Model):
             PowerSystem.mark_all_dirty()
         super(Base_Power, self).save(*args, **kwargs)
 
-    def get_absolute_url(self):
-        return reverse('powers:powers_create_power', kwargs={'base_power_slug': self.slug})
-
     def example_powers(self):
         if self.base_type == EFFECT:
             return Power_Full.objects.filter(latest_rev__base=self, tags__isnull=False, is_deleted=False).distinct()

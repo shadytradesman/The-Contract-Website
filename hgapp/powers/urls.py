@@ -1,7 +1,6 @@
 from django.conf.urls import url
 from django.urls import path
 
-from .views import BasePowerDetailView
 from django.views.generic.base import RedirectView
 
 from . import views
@@ -66,9 +65,5 @@ urlpatterns = [
 
     ### AJAX ENDPOINTS
     path('ajax/example/effect/<slug:effect_id>/', views.ajax_example_view, name='powers_view_power_full_ajax'),
-
-    ### LEGACY POWER SYSTEM
-    # ex: .com/powers/view/b/blast
-    url(r'^view-legacy/b/(?P<pk>[\w-]+)/$', BasePowerDetailView.as_view(), name='powers_view_base'),
 
 ]
