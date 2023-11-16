@@ -1639,7 +1639,6 @@ class Artifact(WorldElement):
             models.Index(fields=['character']),
         ]
 
-
     def player_can_edit_or_transfer(self, player):
         return self.character.player_can_edit(player) if self.character else self.creating_player == player
 
