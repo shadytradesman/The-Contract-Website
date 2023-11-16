@@ -37,6 +37,7 @@ def render_sig_item(artifact, user, viewing_character=None, rewarding_character=
     if not (artifact.is_signature or artifact.is_crafted_artifact):
         raise ValueError("attempting to display non-signature artifact as signature")
     can_edit = artifact.player_can_edit_or_transfer(user)
+    can_edit_gifts = artifact.player_can_edit_gifts(user)
     edit_form = None
     status_form = None
     transfer_form = None
@@ -74,5 +75,6 @@ def render_sig_item(artifact, user, viewing_character=None, rewarding_character=
         "is_stock": is_stock,
         "is_preview": is_preview,
         "powers": powers,
+        "can_edit_gifts": can_edit_gifts,
     }
 

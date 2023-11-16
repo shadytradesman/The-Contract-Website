@@ -1642,6 +1642,11 @@ class Artifact(WorldElement):
     def player_can_edit_or_transfer(self, player):
         return self.character.player_can_edit(player) if self.character else self.creating_player == player
 
+    def player_can_edit_gifts(self, player):
+        if self.creating_player and self.creating_player == player:
+            return True
+        if self.crafting_character and self.crafting_character.player_can_edit(player):
+            return True
 
     def after_use_quantity(self):
         return self.quantity - 1

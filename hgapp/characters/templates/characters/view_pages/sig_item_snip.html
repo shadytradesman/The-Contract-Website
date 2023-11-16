@@ -105,7 +105,7 @@
         {% else %}
             {% for power in powers %}
                 <span class="css-world-element-name">
-                    {% power_badge power True item user_can_edit rewarding_character is_stock %}
+                    {% power_badge power True item can_edit_gifts rewarding_character is_stock %}
                 </span>
             {% endfor %}
         {% endif %}
