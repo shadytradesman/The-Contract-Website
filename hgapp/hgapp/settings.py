@@ -150,7 +150,7 @@ INSTALLED_APPS = [
     "pinax.images",
     'django_celery_beat',
     'django_celery_results',
-    'captcha',
+    'django_recaptcha',
 ]
 
 MIDDLEWARE = [
@@ -474,3 +474,9 @@ CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_REDIS_URL', 'redis://localhost
 # this allows you to schedule items in the Django admin.
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
 CELERY_RESULT_EXTENDED = True
+
+if DEBUG:
+    SILENCED_SYSTEM_CHECKS = ['django_recaptcha.recaptcha_test_key_error']
+else:
+    RECAPTCHA_PUBLIC_KEY = os.environ['RECAPTCHA_PUBLIC_KEY']
+    RECAPTCHA_PRIVATE_KEY = os.environ['RECAPTCHA_PRIVATE_KEY']

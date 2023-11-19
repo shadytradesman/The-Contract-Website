@@ -124,7 +124,8 @@
             </span>
             {% if can_edit_gifts and is_early_access and not is_crafted %}
             <span >
-                <a href="{% url 'powers:powers_create_ps2_for_artifact' item.pk %}" class="btn btn-default btn-xs ">
+                <a href="{% url 'powers:powers_create_ps2_for_artifact' item.pk %}"
+                   class="btn btn-default btn-xs ">
                     Add Effect to this Artifact
                 </a>
             </span>
