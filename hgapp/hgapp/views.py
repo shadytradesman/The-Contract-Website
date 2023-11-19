@@ -227,7 +227,10 @@ def home(request):
             'rewarded_a_contractor': rewarded_a_contractor,
             'gift_earned': gift_earned,
         }
-        return render(request, 'new_logged_in_homepage.html', context)
+        if request.user.profile.early_access_user:
+            return render(request, 'new_logged_in_homepage.html', context)
+        else:
+            return render(request, 'logged_in_homepage.html', context)
 
 
 def csrf_failure(request, reason=""):

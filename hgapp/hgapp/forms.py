@@ -15,6 +15,11 @@ class SignupForm(account.forms.SignupForm):
     terms=TERMS
     eula=EULA
     privacy=PRIVACY
+    email = forms.EmailField(
+        label=_("Email"),
+        widget=forms.TextInput(), required=True,
+        help_text="Email verification is required."
+    )
     timezone = forms.ChoiceField(
         label=("My Timezone"),
         choices=settings.ACCOUNT_TIMEZONES,

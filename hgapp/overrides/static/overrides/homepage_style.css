@@ -123,3 +123,9 @@
 .css-homepage-checklist>li {
     margin-top: 10px;
 }
+
+@media (max-width: 767px) {
+    .css-accordion-header h2 {
+        font-size: 18px;
+    }
+}

@@ -17,7 +17,6 @@
 
 {% block extra_scripts %}
     <script src="{% static 'overrides/wiki-macro-scripts.js' %}"></script>
-    <script src="{% static 'overrides/homepage-scripts.js' %}"></script>
 {% endblock %}
 
 {% block body_base %}
@@ -56,7 +55,14 @@
 <div class="container">
     <div id="" class="row">
         <div class="col-xs-12 col-md-4" style="margin-top: 0px;">
+            <div class="visible-xs-block text-center" style="margin-top: 10px;" >
+                <a href="#news-feed" >
+                    Jump to news feed
+                </a>
+            </div>
             <div class="panel-group" id="accordion1">
+
+
                 <div class="panel panel-default css-start-play-section" style="margin-top: 10px;">
                     <a data-toggle="collapse" data-parent="#accordion" href="#collapse-play-3" class="css-accordion-header-button {% if not expand_contracts %}collapsed{%endif%}">
                         <div class="">
@@ -68,7 +74,8 @@
                         </div>
                     </a>
                     <div id="collapse-play-3" class="panel-collapse  collapse
-                                {% if expand_contracts %} js-auto-in {% endif %} ">
+                                {% if expand_contracts %} in {% endif %}
+">
                         <div class="css-accordion-body">
                             <ul class="nav nav-pills nav-justified">
                                 <li>
@@ -162,6 +169,7 @@
                 </div>
 
 
+
                 <div class="panel panel-default css-start-play-section" style="margin-top: 10px;">
                     <a data-toggle="collapse" data-parent="#accordion" href="#collapse-play-2" class="css-accordion-header-button {% if not expand_playgroups %} collapsed {% endif %}">
                         <div class="">
@@ -172,7 +180,7 @@
                             </div>
                         </div>
                     </a>
-                    <div id="collapse-play-2" class="panel-collapse collapse {% if expand_playgroups %} js-auto-in {% endif %}">
+                    <div id="collapse-play-2" class="panel-collapse collapse {% if expand_playgroups %} in {% endif %}">
                         <div class="css-accordion-body">
 
                             <ul class="nav nav-pills nav-justified">
@@ -245,7 +253,6 @@
                     </div>
                 </div>
 
-
                 <div class="panel panel-default css-start-play-section" style="margin-top: 10px;">
                     <a data-toggle="collapse" data-parent="#accordion" href="#collapse-play-4" class="css-accordion-header-button {% if not expand_gifts %}collapsed{%endif%}">
                         <div class="">
@@ -256,7 +263,7 @@
                             </div>
                         </div>
                     </a>
-                    <div id="collapse-play-4" class="panel-collapse  collapse {% if expand_gifts %}js-auto-in{%endif%}">
+                    <div id="collapse-play-4" class="panel-collapse  collapse {% if expand_gifts %}in{%endif%}">
                         <div class="css-accordion-body">
                             <ul class="nav nav-pills nav-justified">
                                 <li>
@@ -292,7 +299,7 @@
                     </div>
                 </div>
 
-                <div class="panel panel-default css-start-play-section" style="margin-top: 10px; margin-bottom: 5px;">
+                <div class="panel panel-default css-start-play-section" style="margin-top: 20px; margin-bottom: 5px;">
                     <a data-toggle="collapse" data-parent="#accordion" href="#collapse-play-1" class="css-accordion-header-button {% if not expand_contractors %}collapsed{%endif%}">
                         <div class="">
                             <div class="panel-heading css-accordion-header" >
@@ -302,8 +309,9 @@
                             </div>
                         </div>
                     </a>
-                    <div id="collapse-play-1" class="panel-collapse collapse {% if expand_contractors%}js-auto-in{%endif%}">
+                    <div id="collapse-play-1" class="panel-collapse collapse {% if expand_contractors%}in{%endif%}">
                         <div class="css-accordion-body ">
+
                             <ul class="nav nav-pills nav-justified">
                                 <li>
                                     <a href="{% url 'characters:characters_create' %}" class="btn btn-primary">
