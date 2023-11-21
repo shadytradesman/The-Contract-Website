@@ -108,12 +108,10 @@
                 {% endfor %}
             {% endfor %}
         {% else %}
-            {% for crafter_powers in powers_by_crafter.items %}
-                {% for power in crafter_powers.1 %}
-                    <span class="css-world-element-name">
-                        {% power_badge power True item can_edit_gifts rewarding_character is_stock %}
-                    </span>
-                {% endfor %}
+            {% for power in item.power_full_set.all %}
+                <span class="css-world-element-name">
+                    {% power_badge power True item can_edit_gifts rewarding_character is_stock %}
+                </span>
             {% endfor %}
         {% endif %}
     </div>
