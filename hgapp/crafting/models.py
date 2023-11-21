@@ -147,8 +147,6 @@ class CraftingEvent(models.Model):
                 artifact.delete()
         num_avail_free = allowed_number_free - current_num_free + num_free_refunded
         for artifact in artifacts:
-            if artifact.crafting_character != self.relevant_character:
-                raise ValueError("cannot craft artifact crafted by someone else.")
             if artifact.pk not in craftings_by_art_id:
                 if artifact.character != self.relevant_character:
                     raise ValueError("cannot craft artifact held by someone else.")
