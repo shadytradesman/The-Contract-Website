@@ -1,6 +1,6 @@
 from celery import shared_task
 
-from.models import Post
+from .models import Post
 
 from profiles.models import Profile
 from notifications.models import Notification, PROMOTIONAL_NOTIF

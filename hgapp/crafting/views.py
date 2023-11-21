@@ -257,6 +257,7 @@ class Craft(View):
 
         existing_artifacts = []
         existing_artifact_ids = set()
+        #TODO: work here for crafting effects onto other peoples artifacts.
         crafted_artifacts = self.character.artifact_set.filter(is_crafted_artifact=True, crafting_character=self.character, is_deleted=False).all()
         for artifact in crafted_artifacts:
             current_fulls = set(artifact.power_full_set.values_list('id', flat=True))
