@@ -93,17 +93,22 @@
     {% endif %}
     <div class="css-item-gift-list">
         {% if is_crafted %}
-            {% for power in item.power_set.all %}
-                <span class="css-world-element-name">
-                    {% if is_greyed_out %}
-                        {% power_heading power %}
-                    {% else %}
-                        {% power_rev_badge power True item %}
-                    {% endif %}
-                </span>
+            {% for crafter_powers in powers_by_crafter.items %}
+                {% if powers_by_crafter|length > 1 %}
+                <b>Crafted by {{crafter_powers.0.name}}</b>
+                {% endif %}
+                {% for power in crafter_powers.1 %}
+                    <span class="css-world-element-name">
+                        {% if is_greyed_out %}
+                            {% power_heading power %}
+                        {% else %}
+                            {% power_rev_badge power True item %}
+                        {% endif %}
+                    </span>
+                {% endfor %}
             {% endfor %}
         {% else %}
-            {% for power in powers %}
+            {% for power in item.power_full_set.all %}
                 <span class="css-world-element-name">
                     {% power_badge power True item can_edit_gifts rewarding_character is_stock %}
                 </span>

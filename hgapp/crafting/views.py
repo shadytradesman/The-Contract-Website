@@ -55,7 +55,7 @@ class Craft(View):
         with transaction.atomic():
             self.character = Character.objects.select_for_update().get(id=self.character.pk)
             page_data, consumable_forms, new_artifact_formset, artifact_gift_selector_formset = \
-                self.__get_page_data_and_forms(request.POST)
+                self.__get_page_data_and_forms(request.POST, request.user.profile.early_access_user)
             consumable_forms = [x[0] for x in consumable_forms] # strip the powers out
             for form in consumable_forms:
                 if not form.is_valid():
@@ -81,7 +81,7 @@ class Craft(View):
         return HttpResponseRedirect(reverse('characters:characters_view', args=(self.character.pk,)))
 
     def __get_context_data(self):
-        page_data, consumable_forms, new_artifact_formset, artifact_gift_selector_formset = self.__get_page_data_and_forms()
+        page_data, consumable_forms, new_artifact_formset, artifact_gift_selector_formset = self.__get_page_data_and_forms(None, self.request.user.profile.early_access_user)
         return {
             "consumable_forms": consumable_forms,
             "new_artifact_formset": new_artifact_formset,
@@ -184,7 +184,7 @@ class Craft(View):
                         new_number_free=number_free,
                         power_full=power)
 
-    def __get_page_data_and_forms(self, POST=None):
+    def __get_page_data_and_forms(self, POST=None, early_access=False):
         self.prev_crafted_consumables = Counter()
         self.prev_crafted_free_consumables = Counter()
         self.event_by_power_full = {ev.relevant_power_full_id: ev for ev in self.crafting_events}
@@ -257,10 +257,19 @@ class Craft(View):
 
         existing_artifacts = []
         existing_artifact_ids = set()
-        #TODO: work here for crafting effects onto other peoples artifacts.
-        crafted_artifacts = self.character.artifact_set.filter(is_crafted_artifact=True, crafting_character=self.character, is_deleted=False).all()
+        if early_access:
+            crafted_artifacts = self.character.artifact_set.filter(is_crafted_artifact=True,
+                                                                   crafting_character__isnull=False,
+                                                                   is_deleted=False).all()
+        else:
+            crafted_artifacts = self.character.artifact_set.filter(is_crafted_artifact=True,
+                                                                   crafting_character=self.character,
+                                                                   is_deleted=False).all()
+        all_contractor_power_full_ids = set(power_fulls.values_list('id', flat=True))
+        additional_artifact_power_full_ids = set()
         for artifact in crafted_artifacts:
             current_fulls = set(artifact.power_full_set.values_list('id', flat=True))
+            additional_artifact_power_full_ids.update(current_fulls.difference(all_contractor_power_full_ids))
             refundable_fulls = refundable_power_fulls_by_artifact_id[artifact.pk]
             current_fulls.difference_update(refundable_fulls)
             existing_artifact_ids.add(artifact.pk)
@@ -289,12 +298,14 @@ class Craft(View):
                 "holder": art.character.name,
                 "holder_url": reverse("characters:characters_view", args=(art.character.pk,)),
             })
+        additional_power_fulls = Power_Full.objects.filter(pk__in=additional_artifact_power_full_ids)
+        all_needed_power_fulls = additional_power_fulls | power_fulls
         page_data = {
             "prev_crafted_consumables": self.prev_crafted_consumables,
             "initial_consumable_counts": initial_consumable_counts,
             "free_crafts_by_power_full": self.free_crafts_by_power_full,
             "consumable_details_by_power": dict(consumable_details_by_power),
-            "power_by_pk": {p.pk: p.to_crafting_blob() for p in power_fulls},
+            "power_by_pk": {p.pk: p.to_crafting_blob() for p in all_needed_power_fulls},
             "artifact_power_choices": self.artifact_power_full_choices,
             "existing_artifacts": existing_artifacts,
             "artifacts_out_of_pos": artifacts_out_of_pos,

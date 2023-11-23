@@ -6,6 +6,7 @@ from characters.models import LOST, DESTROYED, RECOVERED, REPAIRED, AT_HOME, LOO
 from django.urls import reverse
 from django.template.loader import render_to_string
 
+from collections import defaultdict
 register = template.Library()
 
 @register.inclusion_tag('characters/view_pages/consumable_item_snip.html')
@@ -59,7 +60,10 @@ def render_sig_item(artifact, user, viewing_character=None, rewarding_character=
     if artifact.most_recent_status_change and artifact.most_recent_status_change not in [RECOVERED, REPAIRED]:
         reason_unavail = 'Currently {}.'.format(artifact.get_most_recent_status_change_display())
     render_link = viewing_character is not None
-    powers = artifact.power_full_set.order_by("name")
+    events = artifact.craftingevent_set.all()
+    powers_by_crafter = defaultdict(list)
+    for event in events:
+        powers_by_crafter[event.relevant_character].append(event.relevant_power)
     is_early_access = user.profile.early_access_user if user.is_authenticated else False,
     return {
         "item": artifact,
@@ -75,7 +79,7 @@ def render_sig_item(artifact, user, viewing_character=None, rewarding_character=
         "rewarding_character": rewarding_character,
         "is_stock": is_stock,
         "is_preview": is_preview,
-        "powers": powers,
+        "powers_by_crafter": dict(powers_by_crafter),
         "can_edit_gifts": can_edit_gifts,
         "is_early_access": is_early_access,
     }
