@@ -33,15 +33,6 @@
                 </a>
             </div>
         {% endif %}
-        {% if is_superuser %}
-            <div class="pull-right" style="margin-left: 5px;">
-                <a href="{% url 'powers:powers_upload_image' latest_revision.id %}">
-                    <div class="btn btn-default btn-xs">
-                        Manage Images
-                    </div>
-                </a>
-            </div>
-        {% endif %}
         {% if show_active_toggle %}
         <div class="pull-right form-inline" style="margin-left: 5px;"
              data-title="Toggle this Gift's stat bonuses on or off"
@@ -141,6 +132,15 @@
                         {% image_thumb image %}
                     {% endfor %}
                 </div>
+                {% if is_superuser %}
+                <div style="margin: 5px;">
+                    <a href="{% url 'powers:powers_upload_image' latest_revision.id %}">
+                        <div class="btn btn-default btn-xs">
+                            Add/Remove Images
+                        </div>
+                    </a>
+                </div>
+                {% endif %}
             </div>
         {% endif %}
         <div class="collapse collapse-power-{{latest_revision.id}} in"
@@ -189,6 +189,15 @@
                             {% image_thumb image %}
                         {% endfor %}
                     </div>
+                    {% if is_superuser %}
+                        <div style="margin: 5px;">
+                            <a href="{% url 'powers:powers_upload_image' latest_revision.id %}">
+                                <div class="btn btn-default btn-xs">
+                                    Add/Remove Images
+                                </div>
+                            </a>
+                        </div>
+                    {% endif %}
                 {% endif %}
                 {% if latest_revision.extended_description %}
                     <div style="position: relative; bottom: 8px;">
