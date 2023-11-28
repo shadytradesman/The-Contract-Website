@@ -17,6 +17,7 @@ from guardian.shortcuts import assign_perm, remove_perm
 from django.utils.html import mark_safe, escape, linebreaks
 from django.db.utils import IntegrityError
 from hgapp.utilities import get_object_or_none
+from images.models import PrivateUserImage
 
 html_replace_map = {
     '(': '&#40;',
@@ -1052,10 +1053,16 @@ class Power(models.Model):
                                                      blank=True,
                                                      null=True)
 
+    images = models.ManyToManyField(PrivateUserImage,
+                                       through="PowerImage",
+                                       through_fields=('relevant_power', 'relevant_image'))
+
     # Crafting
     artifacts = models.ManyToManyField(Artifact,
                                        through="ArtifactPower",
                                        through_fields=('relevant_power', 'relevant_artifact'))
+
+
     # Structure and system
     system = models.TextField(max_length=54000,
                               blank=True,
@@ -1933,3 +1940,17 @@ class PowerSystem(models.Model):
     def _generate_enhancement_groups_blob():
         groups = EnhancementGroup.objects.all()
         return {x.pk: x.to_blob() for x in groups}
+
+
+class PowerImage(models.Model):
+    relevant_power = models.ForeignKey(Power, on_delete=models.CASCADE)
+    relevant_image = models.ForeignKey(PrivateUserImage, on_delete=models.CASCADE)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['relevant_power']),
+            models.Index(fields=['relevant_image']),
+        ]
+        unique_together = (
+            ("relevant_image", "relevant_power"),
+        )

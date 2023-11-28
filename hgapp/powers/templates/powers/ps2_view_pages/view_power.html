@@ -12,6 +12,7 @@
 {% load power_tags %}
 {% load ad_tags %}
 {% load static %}
+{% load image_tags %}
 
 {% block extra_scripts %}
     {% if power.parent_power.character %}
@@ -127,6 +128,20 @@
                         <br class="css-only-print-block">
                     {% endif %}
                         <i class="text-muted">{{ power.description|linebreaks}}</i>
+                    <div>
+                        {% for image in power.images.all %}
+                            {% image_thumb image %}
+                        {% endfor %}
+                    </div>
+                    {% if request.user.is_superuser %}
+                    <div style="margin: 5px;">
+                        <a href="{% url 'powers:powers_upload_image' power.id %}">
+                            <div class="btn btn-default btn-xs">
+                                Add/Remove Images
+                            </div>
+                        </a>
+                    </div>
+                    {% endif %}
                     {% if power.extended_description %}
                         <div>
                             <a id="collapse-ext-desc-{{power.id}}-heading"

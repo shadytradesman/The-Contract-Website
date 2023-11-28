@@ -117,6 +117,7 @@ def save_gift(request, power_full=None, character=None, existing_artifact=None):
             previous_rev = power_full.latest_rev
             power_full.dice_system = SYS_PS2
             power_full.crafting_type = new_power.modality.crafting_type
+            new_power.images.add(*previous_rev.images.values_list("pk", flat=True))
         _handle_sig_artifact(request, SignatureArtifactForm, power_full, new_power, previous_rev)
         if request.user.is_superuser:
             power_full.tags.set(power_form.cleaned_data["tags"])

@@ -1,3 +1,5 @@
+{% load image_tags %}
+
 <div
         class="panel-heading power-badge"
         style="background-color: #353e4b; padding: 10px;"
@@ -125,6 +127,20 @@
                     </span>
                 {% endif %}
                 {{ latest_revision.description|linebreaks }}
+                <div>
+                    {% for image in latest_revision.images.all %}
+                        {% image_thumb image %}
+                    {% endfor %}
+                </div>
+                {% if is_superuser %}
+                <div style="margin: 5px;">
+                    <a href="{% url 'powers:powers_upload_image' latest_revision.id %}">
+                        <div class="btn btn-default btn-xs">
+                            Add/Remove Images
+                        </div>
+                    </a>
+                </div>
+                {% endif %}
             </div>
         {% endif %}
         <div class="collapse collapse-power-{{latest_revision.id}} in"
@@ -168,6 +184,20 @@
                         </span>
                     {% endif %}
                     <i>{{latest_revision.description|linebreaks}}</i>
+                    <div>
+                        {% for image in latest_revision.images.all %}
+                            {% image_thumb image %}
+                        {% endfor %}
+                    </div>
+                    {% if is_superuser %}
+                        <div style="margin: 5px;">
+                            <a href="{% url 'powers:powers_upload_image' latest_revision.id %}">
+                                <div class="btn btn-default btn-xs">
+                                    Add/Remove Images
+                                </div>
+                            </a>
+                        </div>
+                    {% endif %}
                 {% endif %}
                 {% if latest_revision.extended_description %}
                     <div style="position: relative; bottom: 8px;">

@@ -90,6 +90,7 @@ else:
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
     AWS_QUERYSTRING_AUTH = False
     AWS_STORAGE_BUCKET_NAME = os.environ['AWS_STORAGE_BUCKET_NAME']
+    AWS_STORAGE_PRIVATE_BUCKET_NAME = os.environ['AWS_STORAGE_PRIVATE_BUCKET_NAME']
     AWS_S3_REGION_NAME = os.environ['AWS_S3_REGION_NAME']
 
 
@@ -350,11 +351,11 @@ else:
 if DEBUG:
     pass
     # #Comment this CACHES block out to test caching during development.
-    # CACHES = {
-    #     'default': {
-    #         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
-    #     }
-    # }
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        }
+    }
 else:
     CACHES = {
         'default': {
@@ -480,3 +481,7 @@ if DEBUG:
 else:
     RECAPTCHA_PUBLIC_KEY = os.environ['RECAPTCHA_PUBLIC_KEY']
     RECAPTCHA_PRIVATE_KEY = os.environ['RECAPTCHA_PRIVATE_KEY']
+
+
+# IMAGES
+THUMB_SIZE = (200,200)
