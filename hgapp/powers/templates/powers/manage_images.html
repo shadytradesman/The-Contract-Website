@@ -1,0 +1,56 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+
+
+{% block head_title %}Power Images{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+
+{% load bootstrap %}
+{% load ad_tags %}
+{% load static %}
+
+{% block extra_scripts %}
+{% endblock %}
+
+{% block extra_styles %}
+<link rel="stylesheet" type="text/css" media="print" href="{% static 'characters/print_character_style.css' %}" />
+{% endblock %}
+
+{% block body_base %}
+<div class="container">
+    <h1 class="text-center">
+        Managing Images for
+        <a href="{% url 'powers:powers_view_power' power.id %}">
+            {{power.name}}
+        </a>
+    </h1>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div>
+                {% for image in images %}
+                    {% if image.thumbnail %}
+                        <img src="{{image.thumbnail.url}}" class="css-inline-image">
+                    {% endif %}
+                    <img src="{{image.image.url}}" class="css-inline-image">
+                {% endfor %}
+
+
+            </div>
+
+
+            <div>
+                <form action="{% url 'powers:powers_upload_image' power.id %}" method="post" enctype="multipart/form-data" onsubmit="setFormSubmitting()">
+                    {% csrf_token %}
+                    {{form}}
+                    <input class="btn btn-primary" type="submit" value="Upload" />
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+

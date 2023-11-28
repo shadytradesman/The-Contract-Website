@@ -24,3 +24,7 @@ h2 {
 .css-game-badge {
     border-color: lightskyblue;
 }
+
+.css-profile-user-text img {
+    max-width: 100%;
+}

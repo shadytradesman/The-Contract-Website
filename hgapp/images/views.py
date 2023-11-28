@@ -28,8 +28,6 @@ def upload_image_tiny(request):
 
 
 def upload_image(request):
-    if request.user.is_anonymous or not request.user.is_authenticated:
-        return JsonResponse({"error": "Must be logged in"}, status=403)
     if not request.user.is_superuser:
         raise PermissionError("Only superusers for now.")
 

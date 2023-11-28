@@ -31,6 +31,15 @@
                 </a>
             </div>
         {% endif %}
+        {% if is_superuser %}
+            <div class="pull-right" style="margin-left: 5px;">
+                <a href="{% url 'powers:powers_upload_image' latest_revision.id %}">
+                    <div class="btn btn-default btn-xs">
+                        Manage Images
+                    </div>
+                </a>
+            </div>
+        {% endif %}
         {% if show_active_toggle %}
         <div class="pull-right form-inline" style="margin-left: 5px;"
              data-title="Toggle this Gift's stat bonuses on or off"

@@ -33,8 +33,9 @@ def render_consumable(artifact, user):
     }
 
 
-@register.inclusion_tag('characters/view_pages/sig_item_snip.html')
-def render_sig_item(artifact, user, viewing_character=None, rewarding_character=None, is_stock=False, is_preview=False):
+@register.inclusion_tag('characters/view_pages/sig_item_snip.html', takes_context=True)
+def render_sig_item(context, artifact, user, viewing_character=None, rewarding_character=None, is_stock=False, is_preview=False):
+    request = context["request"] if "request" in context else None
     if not (artifact.is_signature or artifact.is_crafted_artifact):
         raise ValueError("attempting to display non-signature artifact as signature")
     can_edit = artifact.player_can_edit_or_transfer(user)
@@ -82,5 +83,6 @@ def render_sig_item(artifact, user, viewing_character=None, rewarding_character=
         "powers_by_crafter": dict(powers_by_crafter),
         "can_edit_gifts": can_edit_gifts,
         "is_early_access": is_early_access,
+        "request": request
     }
 

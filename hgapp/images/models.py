@@ -4,10 +4,6 @@ import uuid
 import os
 from django.core.files.storage import default_storage
 from overrides.storage import PrivateS3Storage
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
-
-from games.models import Scenario
 
 
 def image_upload_name(instance, filename):
@@ -26,7 +22,7 @@ class UserImage(models.Model):
     file_size = models.IntegerField()
     uploader = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
     created_date = models.DateTimeField('date created', auto_now_add=True)
-    scenario = models.ForeignKey(Scenario, on_delete=models.CASCADE, null=True)
+    scenario = models.CharField(null=True, max_length=2000)
 
     class Meta:
         indexes = [
@@ -36,10 +32,9 @@ class UserImage(models.Model):
         ]
 
     def __str__(self):
-        return "Uploaded by {} for {}".format(self.uploader.username, self.scenario.title if self.scenario else "an unknown Scenario")
+        return "Uploaded by {} for scenario {}".format(self.uploader.username, self.scenario if self.scenario else "an unknown Scenario")
 
     def save(self, *args, **kwargs):
-        existing_pk = self.pk
         self.file_size = self.image.size
         if self.file_size > 5_000_000:
             raise ValueError("Image too large. Size: " + self.file_size)
@@ -54,20 +49,15 @@ class PrivateUserImage(models.Model):
     file_size = models.IntegerField()
     uploader = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
     created_date = models.DateTimeField('date created', auto_now_add=True)
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
-    object_id = models.CharField(max_length=2000, blank=True)
-    article = GenericForeignKey() # the world event, journal, etc. Must implement render_timeline_display()
 
     class Meta:
         indexes = [
             models.Index(fields=['uploader']),
             models.Index(fields=['uploader', 'file_size']),
-            models.Index(fields=['content_type']),
-            models.Index(fields=['content_type', 'object_id']),
         ]
 
     def __str__(self):
-        return "Uploaded by {} for {}".format(self.uploader.username, self.scenario.title if self.scenario else "an unknown Scenario")
+        return "Uploaded by {}".format(self.uploader.username)
 
     def save(self, *args, **kwargs):
         self.file_size = self.image.size

@@ -18,8 +18,9 @@ def discovery_power_badge(power_full):
         'show_status_warning': False,
     }
 
-@register.inclusion_tag('powers/power_badge_snippet.html')
-def power_rev_badge(power, force_show_warnings=False, crafter_blurb=None, artifact=None, can_edit=False):
+@register.inclusion_tag('powers/power_badge_snippet.html', takes_context=True)
+def power_rev_badge(context, power, force_show_warnings=False, crafter_blurb=None, artifact=None, can_edit=False):
+    request = context["request"] if "request" in context else None
     power_full = power.parent_power
     character = power_full.character if power_full.character else None
     show_status_warning = force_show_warnings
@@ -49,11 +50,13 @@ def power_rev_badge(power, force_show_warnings=False, crafter_blurb=None, artifa
         'art_id': art_id,
         'reward_count': reward_count,
         'at_least_one_gift': at_least_one_gift,
-        'can_edit': can_edit
+        'can_edit': can_edit,
+        'is_superuser': request.user.is_superuser,
     }
 
-@register.inclusion_tag('powers/power_badge_snippet.html')
-def power_badge(power_full, force_show_warnings=False, artifact=None, can_edit=False, rewarding_character=None, is_stock=False):
+@register.inclusion_tag('powers/power_badge_snippet.html',  takes_context=True)
+def power_badge(context, power_full, force_show_warnings=False, artifact=None, can_edit=False, rewarding_character=None, is_stock=False):
+    request = context["request"] if "request" in context else None
     latest_revision = power_full.latest_revision()
     character = rewarding_character if rewarding_character else power_full.character if power_full.character else None
     force_show_warnings = force_show_warnings and not is_stock
@@ -94,7 +97,8 @@ def power_badge(power_full, force_show_warnings=False, artifact=None, can_edit=F
         'reward_count': reward_count,
         'at_least_one_gift': at_least_one_gift,
         'gift_cost': gift_cost,
-        'can_edit': can_edit
+        'can_edit': can_edit,
+        'is_superuser': request.user.is_superuser,
     }
 
 @register.inclusion_tag('powers/ps2_view_pages/heading_snip.html')

@@ -17,6 +17,8 @@ from .models import Power,  Base_Power, Base_Power_System, DICE_SYSTEM, Power_Fu
 from .forms import DeletePowerForm
 from .ps2Utilities import get_edit_context, save_gift
 from .templatetags.power_tags import power_badge
+from images.forms import ImageUploadForm
+from images.models import PrivateUserImage
 
 class EditPower(View):
     template_name = 'powers/ps2_create_pages/create_ps2.html'
@@ -305,7 +307,7 @@ def get_stock_gift_display(request, rewarding_character, power, use_cache=True):
 def toggle_active(request, power_id, is_currently_active, art_id=None):
     power = get_object_or_404(Power, id=power_id)
     if not power.player_can_edit(request.user):
-        raise PermissionDenied("This Power has been deleted, or you're not allowed to view it")
+        raise PermissionDenied("This Power has been deleted, or you're not allowed to edit it")
     character = power.parent_power.character if power.parent_power.character else None
     if art_id:
         artifact = get_object_or_404(Artifact, id=art_id)
@@ -324,3 +326,31 @@ def toggle_active(request, power_id, is_currently_active, art_id=None):
         raise ValueError("must be POST")
     char = artifact.character if artifact else power.parent_power.character
     return HttpResponseRedirect(reverse('characters:characters_view', args=(char.id,)))
+
+
+def upload_image(request, power_id):
+    power = get_object_or_404(Power, id=power_id)
+    if not request.user.is_superuser:
+        raise PermissionDenied("Superusers only for now")
+    if not power.player_can_edit(request.user):
+        raise PermissionDenied("This Power has been deleted, or you're not allowed to edit it")
+    if request.method == 'POST':
+        form = ImageUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            with transaction.atomic():
+                new_image = PrivateUserImage.objects.create(
+                    image=request.FILES['file'],
+                    uploader=request.user,
+                )
+                power.images.add(new_image)
+        else:
+            raise ValueError("Invalid image upload form")
+    form = ImageUploadForm()
+    images = power.images.all()
+    context = {
+        "power": power,
+        "form": form,
+        "images": images,
+    }
+    return render(request, 'powers/manage_images.html', context)
+

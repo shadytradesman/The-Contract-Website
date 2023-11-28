@@ -7,6 +7,8 @@ from . import views
 
 app_name = 'powers'
 urlpatterns = [
+    path('upload-image/<int:power_id>/', views.upload_image, name='powers_upload_image'),
+
     ### NEW POWER SYSTEM
     # ex: .com/gift/create/
     path('create/', views.CreatePower.as_view(), name='powers_create_ps2'),
