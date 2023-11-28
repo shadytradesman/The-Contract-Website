@@ -1,11 +1,13 @@
 from django.http import HttpResponseRedirect, HttpResponse,JsonResponse
 from django.db import transaction
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 
 from .models import UserImage
 from games.models import Scenario
 
 
+@login_required
 def upload_image_tiny(request):
     if request.user.is_anonymous or not request.user.is_authenticated:
         return JsonResponse({"error": "Must be logged in"}, status=403)
@@ -27,9 +29,10 @@ def upload_image_tiny(request):
     return JsonResponse({"error": "invalid request type"}, status=500)
 
 
+@login_required
 def upload_image(request):
-    if not request.user.is_superuser:
-        raise PermissionError("Only superusers for now.")
+    if not request.user.is_authenticated and request.user.profile.early_access_user:
+        raise PermissionError("Early Access only")
 
     if request.POST:
         scenario_id = request.POST["scenario"]

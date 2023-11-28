@@ -30,6 +30,18 @@
     </h1>
     <div class="panel panel-default">
         <div class="panel-body">
+            {% if not power.is_latest_revision %}
+                <div class="text-center" style="margin: auto; max-width:800px;">
+                    <div class="thumbnail">
+                        <h4>You are managing images for an old version of this Gift.</h4>
+                        To manage images for the most recent revision
+                        <a href="{% url 'powers:powers_upload_image' power.parent_power.latest_rev_id %}">
+                            click here.
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+
             <div>
                 <form action="{% url 'powers:powers_upload_image' power.id %}" method="post" enctype="multipart/form-data" onsubmit="setFormSubmitting()">
                     {% csrf_token %}

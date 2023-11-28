@@ -1121,6 +1121,9 @@ class Power(models.Model):
     def get_modality_display(self):
         return Base_Power.get_cached_for_display(self.modality_id)
 
+    def is_latest_revision(self):
+        return self == self.parent_power.latest_rev
+
     def get_effect_display(self):
         return Base_Power.get_cached_for_display(self.base_id)
 

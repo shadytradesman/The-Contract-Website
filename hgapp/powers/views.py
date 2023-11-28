@@ -14,6 +14,7 @@ from .signals import gift_major_revision
 
 from characters.models import Character, Artifact
 from .models import Power,  Base_Power, Power_Full,  PremadeCategory,  SYS_PS2, PowerImage
+from django.contrib.auth.decorators import login_required
 from .forms import DeletePowerForm, DeleteImageForm
 from .ps2Utilities import get_edit_context, save_gift
 from .templatetags.power_tags import power_badge
@@ -329,10 +330,11 @@ def toggle_active(request, power_id, is_currently_active, art_id=None):
     return HttpResponseRedirect(reverse('characters:characters_view', args=(char.id,)))
 
 
+@login_required
 def upload_image(request, power_id):
     power = get_object_or_404(Power, id=power_id)
-    if not request.user.is_superuser:
-        raise PermissionDenied("Superusers only for now")
+    if not request.user.is_authenticated and request.user.profile.early_access_user:
+        raise PermissionDenied("Early Access only")
     if not power.player_can_edit(request.user):
         raise PermissionDenied("This Power has been deleted, or you're not allowed to edit it")
     if request.method == 'POST':
@@ -357,10 +359,11 @@ def upload_image(request, power_id):
     return render(request, 'powers/manage_images.html', context)
 
 
+@login_required
 def delete_image(request, power_id, image_id):
     power = get_object_or_404(Power, id=power_id)
-    if not request.user.is_superuser:
-        raise PermissionDenied("Superusers only for now")
+    if not request.user.is_authenticated and request.user.profile.early_access_user:
+        raise PermissionDenied("Early Access only")
     if not power.player_can_edit(request.user):
         raise PermissionDenied("This Power has been deleted, or you're not allowed to edit it")
     power_image = get_object_or_404(PowerImage, relevant_power=power_id, relevant_image=image_id)

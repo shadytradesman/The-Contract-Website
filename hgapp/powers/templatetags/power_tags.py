@@ -51,7 +51,7 @@ def power_rev_badge(context, power, force_show_warnings=False, crafter_blurb=Non
         'reward_count': reward_count,
         'at_least_one_gift': at_least_one_gift,
         'can_edit': can_edit,
-        'is_superuser': request.user.is_superuser if request else False,
+        'is_early_access': request.user.is_authenticated and request.user.profile.early_access_user
     }
 
 @register.inclusion_tag('powers/power_badge_snippet.html',  takes_context=True)
@@ -98,7 +98,7 @@ def power_badge(context, power_full, force_show_warnings=False, artifact=None, c
         'at_least_one_gift': at_least_one_gift,
         'gift_cost': gift_cost,
         'can_edit': can_edit,
-        'is_superuser': request.user.is_superuser  if request else False,
+        'is_early_access': request.user.is_authenticated and request.user.profile.early_access_user
     }
 
 @register.inclusion_tag('powers/ps2_view_pages/heading_snip.html')

@@ -9,8 +9,9 @@ from django.template.loader import render_to_string
 from collections import defaultdict
 register = template.Library()
 
-@register.inclusion_tag('characters/view_pages/consumable_item_snip.html')
-def render_consumable(artifact, user):
+@register.inclusion_tag('characters/view_pages/consumable_item_snip.html',takes_context=True)
+def render_consumable(context, artifact, user):
+    request = context["request"] if "request" in context else None
     if not artifact.is_consumable:
         raise ValueError("attempting to display non-consumable artifact as consumable")
     can_use = artifact.character.player_can_edit(user)
@@ -30,6 +31,7 @@ def render_consumable(artifact, user):
         "transfer_form": transfer_form,
         "power": power,
         "crafter_blurb": status_blurb,
+        "request": request,
     }
 
 
@@ -83,6 +85,6 @@ def render_sig_item(context, artifact, user, viewing_character=None, rewarding_c
         "powers_by_crafter": dict(powers_by_crafter),
         "can_edit_gifts": can_edit_gifts,
         "is_early_access": is_early_access,
-        "request": request
+        "request": request,
     }
 
