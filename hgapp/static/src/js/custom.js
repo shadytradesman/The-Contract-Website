@@ -528,3 +528,20 @@ $(document).ready(function()
 {
     $("tr:odd").addClass("css-even-row");
 });
+
+$(".js-image-expand-link").click(function () {
+    let element = $(this);
+    if (element.attr("data-expanded") === "true") {
+        let url = element.attr("data-thumb-url");
+        let parent = element.parent();
+        element.children().remove();
+        element.append('<img class="css-thumbnail-image" src="' + url + '" />');
+        element.attr("data-expanded", "false");
+    } else {
+        let url = element.attr("data-image-url");
+        let parent = element.parent();
+        element.children().remove();
+        element.append('<img class="css-expanded-image" src="' + url + '" />');
+        element.attr("data-expanded", "true");
+    }
+})

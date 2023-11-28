@@ -13,8 +13,8 @@ from django.db.models import Prefetch
 from .signals import gift_major_revision
 
 from characters.models import Character, Artifact
-from .models import Power,  Base_Power, Base_Power_System, DICE_SYSTEM, Power_Full,  PremadeCategory,  SYS_PS2
-from .forms import DeletePowerForm
+from .models import Power,  Base_Power, Power_Full,  PremadeCategory,  SYS_PS2, PowerImage
+from .forms import DeletePowerForm, DeleteImageForm
 from .ps2Utilities import get_edit_context, save_gift
 from .templatetags.power_tags import power_badge
 from images.forms import ImageUploadForm
@@ -345,12 +345,36 @@ def upload_image(request, power_id):
                 power.images.add(new_image)
         else:
             raise ValueError("Invalid image upload form")
-    form = ImageUploadForm()
+    upload_form = ImageUploadForm()
     images = power.images.all()
     context = {
         "power": power,
-        "form": form,
+        "upload_form": upload_form,
+        "delete_form": DeleteImageForm(),
         "images": images,
     }
     return render(request, 'powers/manage_images.html', context)
 
+
+def delete_image(request, power_id, image_id):
+    power = get_object_or_404(Power, id=power_id)
+    if not request.user.is_superuser:
+        raise PermissionDenied("Superusers only for now")
+    if not power.player_can_edit(request.user):
+        raise PermissionDenied("This Power has been deleted, or you're not allowed to edit it")
+    power_image = get_object_or_404(PowerImage, relevant_power=power_id, relevant_image=image_id)
+    image = power_image.relevant_image
+    if request.method == 'POST':
+        form = DeleteImageForm(request.POST)
+        if form.is_valid():
+            with transaction.atomic():
+                if form.cleaned_data["from_all_revisions"]:
+                    if hasattr(power, "parent_power") and power.parent_power is not None:
+                        power_revisions = Power.objects.filter(parent_power=power.parent_power_id).all()
+                        for power_rev in power_revisions:
+                            power_rev.images.remove(image)
+                    else:
+                        power.images.remove(image)
+                else:
+                    power.images.remove(image)
+    return HttpResponseRedirect(reverse('powers:powers_upload_image', args=(power_id,)))

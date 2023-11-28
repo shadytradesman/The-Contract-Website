@@ -1,0 +1,9 @@
+<span>
+    <a data-image-url="{{image.image.url}}" data-thumb-url="{% if image.thumbnail %}{{image.thumbnail.url}}{%else%}{{image.image.url}}{%endif%}" class="js-image-expand-link">
+        {% if image.thumbnail %}
+            <img src="{{image.thumbnail.url}}">
+        {% else %}
+            <img src="{{image.image.url}}" style="max-width:200px; max-height:200px;">
+        {% endif %}
+    </a>
+</span>

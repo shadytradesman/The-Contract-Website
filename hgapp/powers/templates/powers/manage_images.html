@@ -1,6 +1,7 @@
 {% extends "site_base.html" %}
 
 {% load i18n %}
+{% load image_tags %}
 
 
 {% block head_title %}Power Images{% endblock %}
@@ -30,24 +31,38 @@
     <div class="panel panel-default">
         <div class="panel-body">
             <div>
-                {% for image in images %}
-                    {% if image.thumbnail %}
-                        <img src="{{image.thumbnail.url}}" class="css-inline-image">
-                    {% endif %}
-                    <img src="{{image.image.url}}" class="css-inline-image">
-                {% endfor %}
-
-
-            </div>
-
-
-            <div>
                 <form action="{% url 'powers:powers_upload_image' power.id %}" method="post" enctype="multipart/form-data" onsubmit="setFormSubmitting()">
                     {% csrf_token %}
-                    {{form}}
-                    <input class="btn btn-primary" type="submit" value="Upload" />
+                    <h4>Upload a new image</h4>
+                    {{upload_form.file}}
+                    <div style="margin-top: 10px;">
+                        <input class="btn btn-primary" type="submit" value="Upload" />
+                    </div>
                 </form>
             </div>
+
+
+            <div style="margin-top: 30px;">
+                <h4>Existing Images</h4>
+                <div style="display:flex; flex-wrap: wrap;">
+                    {% for image in images %}
+                        <div style="margin-top: 25px; margin-left: 10px;">
+                            {% if image.thumbnail %}
+                            <img src="{{image.thumbnail.url}}" class="css-inline-image">
+                            {% else %}
+                            <img src="{{image.image.url}}" class="css-inline-image" style="max-width:200px; max-height:200px;">
+                            {% endif %}
+                            <form action="{% url 'powers:powers_delete_image' power.id image.id %}" method="post">
+                                {% csrf_token %}
+                                {{delete_form|bootstrap}}
+                                <input class="btn btn-default btn-xs" type="submit" value="Delete" />
+                            </form>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+
         </div>
     </div>
 </div>

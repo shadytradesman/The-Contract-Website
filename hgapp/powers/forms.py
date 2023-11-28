@@ -165,8 +165,13 @@ class SystemFieldTextForm(forms.Form):
     system_field_id = forms.IntegerField(label=None, widget=forms.HiddenInput(),) # hidden field to track which system field we are editing.
     field_text = forms.CharField(required=False,
                                  widget=forms.TextInput(attrs={'class': 'form-control'}))
+
     def __init__(self, *args, **kwargs):
         super(SystemFieldTextForm, self).__init__(*args, **kwargs)
         if "system_field" in self.initial:
             sys_field = self.initial["system_field"]
             self.fields["field_text"].label = sys_field.name
+
+
+class DeleteImageForm(forms.Form):
+    from_all_revisions = forms.BooleanField(required=False, label="Delete from all revisions?")

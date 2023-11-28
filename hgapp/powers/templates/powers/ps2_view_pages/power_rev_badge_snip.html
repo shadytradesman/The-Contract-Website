@@ -1,3 +1,5 @@
+{% load image_tags %}
+
 <div
         class="panel-heading power-badge"
         style="background-color: #353e4b; padding: 10px;"
@@ -134,6 +136,11 @@
                     </span>
                 {% endif %}
                 {{ latest_revision.description|linebreaks }}
+                <div>
+                    {% for image in latest_revision.images.all %}
+                        {% image_thumb image %}
+                    {% endfor %}
+                </div>
             </div>
         {% endif %}
         <div class="collapse collapse-power-{{latest_revision.id}} in"
@@ -177,6 +184,11 @@
                         </span>
                     {% endif %}
                     <i>{{latest_revision.description|linebreaks}}</i>
+                    <div>
+                        {% for image in latest_revision.images.all %}
+                            {% image_thumb image %}
+                        {% endfor %}
+                    </div>
                 {% endif %}
                 {% if latest_revision.extended_description %}
                     <div style="position: relative; bottom: 8px;">
