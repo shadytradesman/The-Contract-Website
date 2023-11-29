@@ -132,7 +132,7 @@
                         {% image_thumb image %}
                     {% endfor %}
                 </div>
-                {% if is_early_access %}
+                {% if can_edit and is_early_access %}
                 <div style="margin: 5px;">
                     <a href="{% url 'powers:powers_upload_image' latest_revision.id %}">
                         <div class="btn btn-default btn-xs">
@@ -189,7 +189,7 @@
                             {% image_thumb image %}
                         {% endfor %}
                     </div>
-                    {% if is_early_access %}
+                    {% if can_edit and is_early_access %}
                         <div style="margin: 5px;">
                             <a href="{% url 'powers:powers_upload_image' latest_revision.id %}">
                                 <div class="btn btn-default btn-xs">

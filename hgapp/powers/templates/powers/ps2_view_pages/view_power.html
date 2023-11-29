@@ -133,7 +133,7 @@
                             {% image_thumb image %}
                         {% endfor %}
                     </div>
-                    {% if request.user.is_superuser %}
+                    {% if can_edit and request.user.is_authenticated and request.user.profile.early_access_user %}
                     <div style="margin: 5px;">
                         <a href="{% url 'powers:powers_upload_image' power.id %}">
                             <div class="btn btn-default btn-xs">
