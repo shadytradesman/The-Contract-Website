@@ -11,8 +11,11 @@ from .models import PrivateUserImage
 @shared_task(name="generate_thumbnail")
 def generate_thumbnail(private_image_pk):
     private_image = PrivateUserImage.objects.get(pk=private_image_pk)
+    if private_image.is_too_small_for_thumb():
+        return "Image dimensions do not demand thumbnail"
+    private_image = PrivateUserImage.objects.get(pk=private_image_pk)
     image = Image.open(private_image.image)
-    image.thumbnail((200,200), Image.ANTIALIAS)
+    image.thumbnail(settings.THUMB_SIZE, Image.ANTIALIAS)
 
     thumb_name, thumb_extension = os.path.splitext(private_image.image.name)
     thumb_extension = thumb_extension.lower()

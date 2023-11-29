@@ -64,3 +64,6 @@ class PrivateUserImage(models.Model):
         if self.file_size > 5_000_000:
             raise ValueError("Image too large. Size: " + self.file_size)
         super(PrivateUserImage, self).save(*args, **kwargs)
+
+    def is_too_small_for_thumb(self):
+        return self.image.width <= settings.THUMB_SIZE[0] and self.image.height <= settings.THUMB_SIZE[1]
