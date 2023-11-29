@@ -295,7 +295,7 @@ def get_stock_gift_display(request, rewarding_character, power, use_cache=True):
         if cache_contents is sentinel:
             cache_contents = render_to_string(
                 'powers/power_badge_snippet.html',
-                power_badge(power, False, None, False, rewarding_character, True),
+                power_badge({"request": request}, power, False, None, False, rewarding_character, True),
                 request)
             cache.set(cache_key, cache_contents, 8000)
         return cache_contents

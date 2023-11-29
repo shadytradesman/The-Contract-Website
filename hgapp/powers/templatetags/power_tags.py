@@ -54,7 +54,7 @@ def power_rev_badge(context, power, force_show_warnings=False, crafter_blurb=Non
         'is_early_access': request.user.is_authenticated and request.user.profile.early_access_user
     }
 
-@register.inclusion_tag('powers/power_badge_snippet.html',  takes_context=True)
+@register.inclusion_tag('powers/power_badge_snippet.html', takes_context=True)
 def power_badge(context, power_full, force_show_warnings=False, artifact=None, can_edit=False, rewarding_character=None, is_stock=False):
     request = context["request"] if "request" in context else None
     latest_revision = power_full.latest_revision()
