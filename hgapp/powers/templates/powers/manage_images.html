@@ -27,6 +27,16 @@
         <a href="{% url 'powers:powers_view_power' power.id %}">
             {{power.name}}
         </a>
+        {% if power.parent_power.character %}
+        <div>
+            <small>
+                On
+                <a href="{% url 'characters:characters_view' power.parent_power.character.id %}">
+                    {{power.parent_power.character.name}}
+                </a>
+            </small>
+        </div>
+        {% endif %}
     </h1>
     <div class="panel panel-default">
         <div class="panel-body">
