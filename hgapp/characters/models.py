@@ -272,6 +272,7 @@ EXP_CUSTOM = "CUSTOM"
 EXP_EXCHANGE = "Exchange"
 EXP_QUESTIONNAIRE_CONTRACT = "Questionnaire_contract"
 EXP_QUESTIONNAIRE_INITIAL = "Questionnaire_initial"
+EXP_QUESTIONNAIRE_PRE_CONTRACT = "Questionnaire_pre_contract"
 EXP_REWARD_TYPE = (
     (EXP_MVP, "earning Commission"),
     (EXP_LOSS_V1, "losing"),
@@ -291,8 +292,9 @@ EXP_REWARD_TYPE = (
     (EXP_JOURNAL, "writing a journal"),
     (EXP_CUSTOM, "custom reason"),
     (EXP_EXCHANGE, "submitting a Scenario to the exchange"),
-    (EXP_QUESTIONNAIRE_CONTRACT, "answering two questionnaire questions"),
-    (EXP_QUESTIONNAIRE_INITIAL, "answering the first five questionnaire questions")
+    (EXP_QUESTIONNAIRE_CONTRACT, "answering questionnaire questions"),
+    (EXP_QUESTIONNAIRE_INITIAL, "answering the first five questionnaire questions"),
+    (EXP_QUESTIONNAIRE_PRE_CONTRACT, "answering a questionnaire question"),
 )
 
 EXP_REWARD_VALUES = {
@@ -315,6 +317,7 @@ EXP_REWARD_VALUES = {
     EXP_EXCHANGE: 6,
     EXP_QUESTIONNAIRE_CONTRACT: 2,
     EXP_QUESTIONNAIRE_INITIAL: 6,
+    EXP_QUESTIONNAIRE_PRE_CONTRACT: 1,
 }
 
 EXP_NEW_CHAR = 150

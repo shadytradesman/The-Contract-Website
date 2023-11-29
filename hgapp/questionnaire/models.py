@@ -7,7 +7,7 @@ from django.urls import reverse
 
 from games.models import Game_Attendance, Reward
 
-from characters.models import Character, ExperienceReward, EXP_QUESTIONNAIRE_CONTRACT, EXP_QUESTIONNAIRE_INITIAL
+from characters.models import Character, ExperienceReward, EXP_QUESTIONNAIRE_CONTRACT, EXP_QUESTIONNAIRE_PRE_CONTRACT
 
 from notifications.models import Notification, REWARD_NOTIF, JOURNAL_NOTIF
 
@@ -162,11 +162,11 @@ class Answer(models.Model):
         num_answered_questions = Answer.objects.filter(is_valid=True, relevant_character=self.relevant_character).count()
         if self.experience_reward and not self.experience_reward.is_void:
             raise ValueError("questionnaire is granting exp reward when it already has one.", str(self.id))
-        if num_answered_questions == 5:
+        if num_answered_questions < 5:
             exp_reward = ExperienceReward(
                 rewarded_character=self.relevant_character,
                 rewarded_player=self.writer,
-                type=EXP_QUESTIONNAIRE_INITIAL,
+                type=EXP_QUESTIONNAIRE_PRE_CONTRACT,
             )
             exp_reward.save()
             self.experience_reward = exp_reward
@@ -174,7 +174,23 @@ class Answer(models.Model):
             Notification.objects.create(
                 user=self.writer,
                 headline="Exp earned from Questionnaire",
-                content="{} earned 5 Exp".format(self.relevant_character.name),
+                content="{} earned 1 Exp".format(self.relevant_character.name),
+                url=reverse("characters:characters_spend_reward", args=[self.relevant_character.id]),
+                notif_type=REWARD_NOTIF)
+            return
+        elif num_answered_questions == 5:
+            exp_reward = ExperienceReward(
+                rewarded_character=self.relevant_character,
+                rewarded_player=self.writer,
+                type=EXP_QUESTIONNAIRE_CONTRACT,
+            )
+            exp_reward.save()
+            self.experience_reward = exp_reward
+            self.save()
+            Notification.objects.create(
+                user=self.writer,
+                headline="Exp earned from Questionnaire",
+                content="{} earned 2 Exp".format(self.relevant_character.name),
                 url=reverse("characters:characters_spend_reward", args=[self.relevant_character.id]),
                 notif_type=REWARD_NOTIF)
             return

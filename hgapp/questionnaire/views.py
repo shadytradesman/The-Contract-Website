@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.http import HttpResponse, JsonResponse
 from django.http import HttpResponseRedirect
 
-from characters.models import Character, EXP_QUESTIONNAIRE_CONTRACT, EXP_QUESTIONNAIRE_INITIAL, EXP_REWARD_VALUES
+from characters.models import Character, EXP_QUESTIONNAIRE_PRE_CONTRACT, EXP_QUESTIONNAIRE_CONTRACT, EXP_REWARD_VALUES
 
 from .models import Question, Answer
 
@@ -105,9 +105,12 @@ def answer_next(request, character_id, question_id=None):
         next_reward_quantity = 2
         questions_until_reward = 0
         num_answered_questions = Answer.objects.filter(is_valid=True, relevant_character=character).count()
-        if num_answered_questions < 5:
-            next_reward_quantity = EXP_REWARD_VALUES[EXP_QUESTIONNAIRE_INITIAL]
-            questions_until_reward = 4 - num_answered_questions
+        if num_answered_questions < 4:
+            next_reward_quantity = EXP_REWARD_VALUES[EXP_QUESTIONNAIRE_PRE_CONTRACT]
+            questions_until_reward = 0
+        elif num_answered_questions == 4:
+            next_reward_quantity = EXP_REWARD_VALUES[EXP_QUESTIONNAIRE_CONTRACT]
+            questions_until_reward = 0
         elif num_answered_questions >= 5:
             if num_answered_questions % 2 != 0:
                 questions_until_reward = 1
