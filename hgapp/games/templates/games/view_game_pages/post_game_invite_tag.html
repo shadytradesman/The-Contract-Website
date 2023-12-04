@@ -90,13 +90,13 @@
                 {% else %}
                     <br>
                     <div class="alert row alert-warning col-xs-10 col-xs-offset-1" role="alert">
-                        {% if invitation.invited_player.id is request.user.id  %}
-                            <p>
+                        {% if invitation.invited_player_id == request.user.id  %}
+                            <h4 style="margin-bottom: 0px;">
                                 <a href="{% url 'games:games_confirm_attendance' invitation.attendance.id %}">
                                     Click Here
                                 </a>
                                 to confirm or deny your attendance in this Contract.
-                            </p>
+                            </h4>
                         {% else %}
                             <p>
                                 This Player has not yet confirmed their attendance.

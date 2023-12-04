@@ -12,10 +12,12 @@ def render_citizenship(player, cell):
     return player.profile.completed_game_invites().filter(relevant_game__cell=cell, relevant_game__end_time__gt=last_gm_game_time).count()
 
 
-@register.inclusion_tag('games/view_game_pages/post_game_invite_tag.html')
-def render_post_game_invite(game, invitation, player):
+@register.inclusion_tag('games/view_game_pages/post_game_invite_tag.html', takes_context=True)
+def render_post_game_invite(context, game, invitation, player):
+    request = context["request"] if "request" in context else None
     attending_contractor = invitation.attendance.attending_character
     return {
+        'request': request,
         'game': game,
         'invitation': invitation,
         'contractor': attending_contractor,
