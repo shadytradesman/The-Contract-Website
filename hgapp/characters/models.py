@@ -24,6 +24,7 @@ from hgapp.utilities import get_queryset_size, get_object_or_none
 from cells.models import Cell
 from characters.signals import GrantAssetGift, VoidAssetGifts, AlterPortedRewards, transfer_consumables
 from notifications.models import Notification, ARTIFACT_NOTIF, CONTRACTOR_NOTIF
+from images.models import PrivateUserImage
 
 import random
 import hashlib
@@ -463,6 +464,12 @@ class Character(models.Model):
         on_delete=models.CASCADE,
         null=True,
         blank=True)
+
+    images = models.ManyToManyField(PrivateUserImage,
+                                    through="CharacterImage",
+                                    through_fields=('relevant_character', 'relevant_image'))
+
+    primary_image = models.ForeignKey(PrivateUserImage, on_delete=models.CASCADE, null=True, related_name="primary_image")
 
     mental_damage = models.PositiveIntegerField(default=0)
 
@@ -2863,3 +2870,16 @@ class AttributeBonus(models.Model):
             models.Index(fields=['character', 'attribute']),
         ]
 
+
+class CharacterImage(models.Model):
+    relevant_character = models.ForeignKey(Character, on_delete=models.CASCADE)
+    relevant_image = models.ForeignKey(PrivateUserImage, on_delete=models.CASCADE)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['relevant_character']),
+            models.Index(fields=['relevant_image']),
+        ]
+        unique_together = (
+            ("relevant_image", "relevant_character"),
+        )

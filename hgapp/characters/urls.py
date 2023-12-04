@@ -152,4 +152,8 @@ urlpatterns = [
     url(r'^post/ajax/c/(?P<element_id>[\d\w]+)/edit-world-element/(?P<element>[\w]+)/(?P<secret_key>[\da-z]*)$',
         views.edit_world_element,
         name="edit_world_element"),
+
+    path('upload-image/<int:character_id>/', views.upload_image, name='characters_upload_image'),
+    path('delete-image/<int:character_id>/<int:image_id>/', views.delete_image, name='characters_delete_image'),
+    path('make-primary-image/<int:character_id>/<int:image_id>/', views.make_primary_image, name='characters_make_primary_image'),
 ]

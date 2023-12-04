@@ -19,6 +19,23 @@ h1 {
     border-style: solid;
     padding: 10px;
     background-color: #353e4b;
+    display: flex;
+    align-items: center;
+}
+
+.css-character-primary-image {
+    margin-right : 20px;
+}
+
+@media (max-width: 767px) {
+    .char-essentials {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .css-character-primary-image {
+        margin-right : 0px;
+        margin-bottom: 10px;
+    }
 }
 
 .css-health-section {

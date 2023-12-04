@@ -25,7 +25,7 @@ from notifications.models import Notification, CONTRACTOR_NOTIF
 
 from characters.models import Character, BasicStats, Character_Death, Graveyard_Header, Attribute, Ability, \
     CharacterTutorial, Asset, Liability, BattleScar, Trauma, TraumaRevision, Injury, Source, ExperienceReward, Artifact, \
-    LOST, DESTROYED, AT_HOME, CONDITION, CIRCUMSTANCE, TROPHY, TRAUMA,StockWorldElement, LooseEnd, LOOSE_END
+    LOST, DESTROYED, AT_HOME, CONDITION, CIRCUMSTANCE, TROPHY, TRAUMA,StockWorldElement, LooseEnd, LOOSE_END, CharacterImage
 from powers.models import Power_Full, SYS_LEGACY_POWERS, SYS_PS2, CRAFTING_NONE, CRAFTING_SIGNATURE, CRAFTING_ARTIFACT, \
     CRAFTING_CONSUMABLE
 from powers.signals import gift_major_revision
@@ -33,7 +33,7 @@ from characters.forms import make_character_form, CharacterDeathForm, ConfirmAss
     AssetForm, LiabilityForm, BattleScarForm, TraumaForm, InjuryForm, SourceValForm, make_allocate_gm_exp_form, EquipmentForm,\
     DeleteCharacterForm, BioForm, make_world_element_form, get_default_scar_choice_form, make_artifact_status_form, \
     make_transfer_artifact_form, make_consumable_use_form, NotesForm, get_default_world_element_choice_form, \
-    LooseEndForm, LooseEndDeleteForm
+    LooseEndForm, LooseEndDeleteForm, create_image_upload_form, DeleteImageForm
 from characters.form_utilities import get_edit_context, character_from_post, update_character_from_post, \
     grant_trauma_to_character, delete_trauma_rev, get_world_element_class_from_url_string, get_blank_sheet_context
 from characters.view_utilities import get_characters_next_journal_credit, get_world_element_default_dict, get_weapons_by_type, \
@@ -42,6 +42,7 @@ from characters.view_utilities import get_characters_next_journal_credit, get_wo
 
 from journals.models import Journal, JournalCover
 from cells.models import Cell
+from images.models import PrivateUserImage
 
 from hgapp.utilities import get_object_or_none
 
@@ -494,7 +495,7 @@ def view_character(request, character_id, secret_key=None):
         'num_moves':  moves.count(),
         'loose_ends': loose_ends,
         'expired_loose_ends': expired_loose_ends,
-        'early_access':request.user.is_authenticated and request.user.profile.early_access_user,
+        'early_access': request.user.is_authenticated and request.user.profile.early_access_user,
     }
     return render(request, 'characters/view_pages/view_character.html', context)
 
@@ -1351,3 +1352,77 @@ def edit_world_element(request, element_id, element, secret_key=None):
             return JsonResponse(responseMap, status=200)
         return JsonResponse({}, status=200)
     return JsonResponse({"error": ""}, status=400)
+
+
+@login_required
+def upload_image(request, character_id):
+    character = get_object_or_404(Character, id=character_id)
+    if not request.user.is_authenticated and request.user.profile.early_access_user:
+        raise PermissionDenied("Early Access only")
+    if not character.player_can_edit(request.user):
+        raise PermissionDenied("This Contractor has been deleted, or you're not allowed to edit it")
+
+    if request.method == 'POST':
+        form = create_image_upload_form(character)(request.POST, request.FILES)
+        if form.is_valid():
+            with transaction.atomic():
+                if character.images.count() == 0:
+                    is_primary=True
+                else:
+                    is_primary=form.cleaned_data["is_primary"]
+                new_image = PrivateUserImage.objects.create(
+                    image=request.FILES['file'],
+                    uploader=request.user,
+                )
+                character.images.add(new_image)
+                if is_primary:
+                    character.primary_image = new_image
+                    character.save()
+        else:
+            raise ValueError("Invalid image upload form")
+    upload_form = create_image_upload_form(character)
+    images = character.images.all()
+    context = {
+        "character": character,
+        "upload_form": upload_form,
+        "delete_form": DeleteImageForm(),
+        "images": images,
+    }
+    return render(request, 'characters/manage_images.html', context)
+
+
+@login_required
+def delete_image(request, character_id, image_id):
+    character = get_object_or_404(Character, id=character_id)
+    if not request.user.is_authenticated and request.user.profile.early_access_user:
+        raise PermissionDenied("Early Access only")
+    if not character.player_can_edit(request.user):
+        raise PermissionDenied("This Contractor has been deleted, or you're not allowed to edit it")
+    character_image = get_object_or_404(CharacterImage, relevant_character=character_id, relevant_image=image_id)
+    image = character_image.relevant_image
+    if request.method == 'POST':
+        form = DeleteImageForm(request.POST)
+        if form.is_valid():
+            with transaction.atomic():
+                character.images.remove(image)
+                if character.primary_image == image:
+                    character.primary_image = character.images.first()
+                    character.save()
+    return HttpResponseRedirect(reverse('characters:characters_upload_image', args=(character_id,)))
+
+@login_required
+def make_primary_image(request, character_id, image_id):
+    character = get_object_or_404(Character, id=character_id)
+    if not request.user.is_authenticated and request.user.profile.early_access_user:
+        raise PermissionDenied("Early Access only")
+    if not character.player_can_edit(request.user):
+        raise PermissionDenied("This Contractor has been deleted, or you're not allowed to edit it")
+    character_image = get_object_or_404(CharacterImage, relevant_character=character_id, relevant_image=image_id)
+    image = character_image.relevant_image
+    if request.method == 'POST':
+        form = DeleteImageForm(request.POST)
+        if form.is_valid():
+            with transaction.atomic():
+                character.primary_image = image
+                character.save()
+    return HttpResponseRedirect(reverse('characters:characters_upload_image', args=(character_id,)))

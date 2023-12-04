@@ -17,7 +17,6 @@
 {% endblock %}
 
 {% block extra_styles %}
-<link rel="stylesheet" type="text/css" media="print" href="{% static 'characters/print_character_style.css' %}" />
 {% endblock %}
 
 {% block body_base %}
@@ -63,26 +62,27 @@
                 </form>
             </div>
 
-
-            <div style="margin-top: 30px;">
-                <h4>Existing Images</h4>
-                <div style="display:flex; flex-wrap: wrap;">
-                    {% for image in images %}
-                        <div style="margin-top: 25px; margin-left: 10px;">
-                            {% if image.thumbnail %}
-                            <img src="{{image.thumbnail.url}}" class="css-inline-image">
-                            {% else %}
-                            <img src="{{image.image.url}}" class="css-inline-image" style="max-width:200px; max-height:200px;">
-                            {% endif %}
-                            <form action="{% url 'powers:powers_delete_image' power.id image.id %}" method="post">
-                                {% csrf_token %}
-                                {{delete_form|bootstrap}}
-                                <input class="btn btn-default btn-xs" type="submit" value="Delete" />
-                            </form>
-                        </div>
-                    {% endfor %}
+            {% if images %}
+                <div style="margin-top: 30px;">
+                    <h4>Existing Images</h4>
+                    <div style="display:flex; flex-wrap: wrap;">
+                        {% for image in images %}
+                            <div style="margin-top: 25px; margin-left: 10px;">
+                                {% if image.thumbnail %}
+                                <img src="{{image.thumbnail.url}}" class="css-inline-image">
+                                {% else %}
+                                <img src="{{image.image.url}}" class="css-inline-image" style="max-width:200px; max-height:200px;">
+                                {% endif %}
+                                <form action="{% url 'powers:powers_delete_image' power.id image.id %}" method="post">
+                                    {% csrf_token %}
+                                    {{delete_form|bootstrap}}
+                                    <input class="btn btn-default btn-xs" type="submit" value="Delete" />
+                                </form>
+                            </div>
+                        {% endfor %}
+                    </div>
                 </div>
-            </div>
+            {% endif %}
 
 
         </div>

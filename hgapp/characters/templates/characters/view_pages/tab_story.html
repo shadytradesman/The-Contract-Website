@@ -1,3 +1,5 @@
+{% load image_tags %}
+
 <div class="row">
     <div class="col-xs-12 col-md-6">
         {% include "characters/view_pages/timeline_snip.html" %}
@@ -45,6 +47,20 @@
     </div>
 
 {% include "characters/view_pages/moves_snip.html" %}
+
+{% if character.images.count > 1 %}
+    <div>
+        <h3 style="margin-bottom: 5px;" >
+            Images
+        </h3>
+        <div style="display:flex; flex-wrap: wrap;">
+
+        </div>
+        {% for image in character.images.all %}
+            {% image_thumb image %}
+        {% endfor %}
+    </div>
+{% endif %}
 
 {% include "characters/view_pages/bio_and_gm_notes_snip.html" %}
 

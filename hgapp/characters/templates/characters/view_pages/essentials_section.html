@@ -1,59 +1,81 @@
 {% load markdown_deux_tags %}
+{% load image_tags %}
 
-<div class="text-center char-essentials">
-    <h5 style="margin-top: 0px;">
-        <b>{{character.name}}</b> is a <b>{{character.concept_summary}}</b> who will risk {{character.get_pronoun_display}} life to
-        {% if character.paradigm %}
-            become
-            {% if character.number_of_victories < 1 and not character.started_supernatural %}
-                a
-            {% else %}
-                the ultimate
+<div class="{% if not character.primary_image %}text-center {% endif %}char-essentials">
+    {% if character.primary_image %}
+        <div class="css-character-primary-image" style="">
+            {% image_thumb character.primary_image %}
+            {% if early_access and user_can_edit%}
+            <div class="text-center">
+                <a href="{% url 'characters:characters_upload_image' character.id %}" class="btn btn-xs btn-default">
+                    <span class="glyphicon glyphicon-picture" aria-hidden="true"></span>
+                    Manage Images
+                </a>
+            </div>
             {% endif %}
-            <b>
-                {{character.paradigm}}
-            </b>
-            and
-        {% endif %}
-        <b>{{character.ambition}}</b>.
-    </h5>
-    <p>
-        {{character.pres_tense_to_be}} <b>{{character.age}}</b> years old,
-        {% if character.residence %}
-            live{{character.pres_tense_pluralize}}
-            in <b>{{character.residence}}</b>,
-        {% endif %}
-        and often appears as <b>{{character.appearance}}</b>.
-    </p>
-    {% if character.cell or num_journal_entries or num_questions_answered %}
-    <p style="margin-bottom: 5px;">
-    {% if character.cell %}
-        {{character.name}} lives in
-        <a href="{% url 'cells:cells_view_cell' character.cell.id %}">{{ character.cell.name }}</a>,
-        a setting {{ character.cell.setting_sheet_blurb}}.
+        </div>
     {% endif %}
-
-    {% if num_journal_entries %}
-            {{character.pronoun_possessive_capitalized}}
-            {% if journal_cover %}
-                journal,
-            {% endif %}
-            <a class="js-journal-link" href="{% url 'journals:journal_read' character.id %}">
-                {% if journal_cover %}
-                    {{journal_cover.title}},
+    <div>
+        <h5 style="margin-top: 0px;">
+            <b>{{character.name}}</b> is a <b>{{character.concept_summary}}</b> who will risk {{character.get_pronoun_display}} life to
+            {% if character.paradigm %}
+                become
+                {% if character.number_of_victories < 1 and not character.started_supernatural %}
+                    a
                 {% else %}
-                    journal
+                    the ultimate
                 {% endif %}
+                <b>
+                    {{character.paradigm}}
+                </b>
+                and
+            {% endif %}
+            <b>{{character.ambition}}</b>.
+        </h5>
+        <p>
+            {{character.pres_tense_to_be}} <b>{{character.age}}</b> years old,
+            {% if character.residence %}
+                live{{character.pres_tense_pluralize}}
+                in <b>{{character.residence}}</b>,
+            {% endif %}
+            and often appears as <b>{{character.appearance}}</b>.
+            {% if early_access and not character.primary_image and user_can_edit %}
+                <a href="{% url 'characters:characters_upload_image' character.id %}" class="btn btn-xs btn-primary">
+                    <span class="glyphicon glyphicon-picture" aria-hidden="true"></span>
+                    Upload Contractor Image
+                </a>
+            {% endif %}
+        </p>
+        {% if character.cell or num_journal_entries or num_questions_answered %}
+        <p style="margin-bottom: 5px;">
+        {% if character.cell %}
+            {{character.name}} lives in
+            <a href="{% url 'cells:cells_view_cell' character.cell.id %}">{{ character.cell.name }}</a>,
+            a setting {{ character.cell.setting_sheet_blurb}}.
+        {% endif %}
+
+        {% if num_journal_entries %}
+                {{character.pronoun_possessive_capitalized}}
+                {% if journal_cover %}
+                    journal,
+                {% endif %}
+                <a class="js-journal-link" href="{% url 'journals:journal_read' character.id %}">
+                    {% if journal_cover %}
+                        {{journal_cover.title}},
+                    {% else %}
+                        journal
+                    {% endif %}
+                </a>
+                has {{num_journal_entries}} {% if num_journal_entries > 1 %} entries{% else %} entry{%endif%}.
+        {% endif %}
+        {% if num_questions_answered %}
+            {{character.pronoun_possessive_capitalized}}
+            <a href="{% url 'questionnaire:questionnaire_view' character.id %}">
+                Questionnaire
             </a>
-            has {{num_journal_entries}} {% if num_journal_entries > 1 %} entries{% else %} entry{%endif%}.
-    {% endif %}
-    {% if num_questions_answered %}
-        {{character.pronoun_possessive_capitalized}}
-        <a href="{% url 'questionnaire:questionnaire_view' character.id %}">
-            Questionnaire
-        </a>
-        has {{num_questions_answered}} answer{{num_questions_answered|pluralize}}.
-    {% endif %}
-    </p>
-    {% endif %}
+            has {{num_questions_answered}} answer{{num_questions_answered|pluralize}}.
+        {% endif %}
+        </p>
+        {% endif %}
+    </div>
 </div>

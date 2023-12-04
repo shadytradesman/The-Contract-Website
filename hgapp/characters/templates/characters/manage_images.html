@@ -1,0 +1,86 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+{% load image_tags %}
+
+
+{% block head_title %}Character Images{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+
+{% load bootstrap %}
+{% load ad_tags %}
+{% load static %}
+
+{% block extra_scripts %}
+{% endblock %}
+
+{% block extra_styles %}
+{% endblock %}
+
+{% block body_base %}
+<div class="container">
+    <h1 class="text-center">
+        Managing Images for
+        <a href="{% url 'characters:characters_view' character.id %}">
+            {{character.name}}
+        </a>
+    </h1>
+    <div class="panel panel-default">
+        <div class="panel-body">
+
+            <div>
+                <form action="{% url 'characters:characters_upload_image' character.id %}" method="post" enctype="multipart/form-data" onsubmit="setFormSubmitting()">
+                    {% csrf_token %}
+                    {{upload_form|bootstrap}}
+                    <div style="margin-top: 10px;">
+                        <input class="btn btn-primary" type="submit" value="Upload" />
+                    </div>
+                </form>
+            </div>
+
+
+            {% if images %}
+                <div style="margin-top: 30px;">
+                    <h4>Existing Images</h4>
+                    <div style="display:flex; flex-wrap: wrap;">
+                        {% for image in images %}
+                            <div style="margin-top: 25px; margin-left: 10px;">
+                                {% if image.thumbnail %}
+                                    <img src="{{image.thumbnail.url}}" class="css-inline-image">
+                                {% else %}
+                                    <img src="{{image.image.url}}" class="css-inline-image" style="max-width:200px; max-height:200px;">
+                                {% endif %}
+                                {% if character.primary_image == image %}
+                                    <div>
+                                        Current primary image
+                                    </div>
+                                {% endif %}
+                                <div style="display: flex; margin-top: 5px;">
+                                    <form action="{% url 'characters:characters_delete_image' character.id image.id %}" method="post">
+                                        {% csrf_token %}
+                                        {{delete_form|bootstrap}}
+                                        <input class="btn btn-default btn-xs" type="submit" value="Delete" />
+                                    </form>
+                                    {% if character.primary_image != image %}
+                                        <form action="{% url 'characters:characters_make_primary_image' character.id image.id %}" method="post">
+                                            {% csrf_token %}
+                                            {{delete_form|bootstrap}}
+                                            <input class="btn btn-default btn-xs" type="submit" value="Make Primary Image" style="margin-left: 5px;"/>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+

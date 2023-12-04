@@ -628,3 +628,17 @@ def make_consumable_use_form(artifact):
             widget=forms.HiddenInput())
 
     return UseConsumableForm
+
+
+def create_image_upload_form(character):
+    class ImageUploadForm(forms.Form):
+        file = forms.FileField(label="Upload new image")
+        if character.images.count() == 0:
+            is_primary = forms.BooleanField(required=False,  widget=forms.HiddenInput(), label="" )
+        else:
+            is_primary = forms.BooleanField(required=False, label="Make primary image?")
+    return ImageUploadForm
+
+
+class DeleteImageForm(forms.Form):
+    pass
