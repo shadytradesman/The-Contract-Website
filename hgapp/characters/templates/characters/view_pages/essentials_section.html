@@ -4,7 +4,9 @@
 <div class="{% if not character.primary_image %}text-center {% endif %}char-essentials">
     {% if character.primary_image %}
         <div class="css-character-primary-image" style="">
-            {% image_thumb character.primary_image %}
+            <div class="text-center">
+                {% image_thumb character.primary_image %}
+            </div>
             {% if early_access and user_can_edit%}
             <div class="text-center">
                 <a href="{% url 'characters:characters_upload_image' character.id %}" class="btn btn-xs btn-default">

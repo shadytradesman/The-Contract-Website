@@ -53,6 +53,12 @@
         <h3 style="margin-bottom: 5px;" >
             Images
         </h3>
+        {% if early_access and user_can_edit %}
+        <a href="{% url 'characters:characters_upload_image' character.id %}" class="btn btn-xs btn-primary">
+            <span class="glyphicon glyphicon-picture" aria-hidden="true"></span>
+            Manage Images
+        </a>
+        {% endif %}
         <div style="display:flex; flex-wrap: wrap;">
 
         </div>
