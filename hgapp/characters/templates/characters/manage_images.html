@@ -35,6 +35,11 @@
                     {% csrf_token %}
                     {{upload_form|bootstrap}}
                     <div style="margin-top: 10px;">
+                        <div>
+                            <small>
+                                Maximum image size is 5MB. Images smaller than 200x200 will display in their original resolution without a thumbnail.
+                            </small>
+                        </div>
                         <input class="btn btn-primary" type="submit" value="Upload" />
                     </div>
                 </form>
