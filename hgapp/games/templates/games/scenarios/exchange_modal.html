@@ -3,40 +3,47 @@
 {% block modal_id %}mainTutorialModal{% endblock %}
 
 {% block modal_title %}
-Welcome to the Community Scenario Exchange!
+Welcome to the Scenario Exchange!
 {% endblock %}
 
 {% block modal_header %}
 {% endblock %}
 
 {% block modal_body %}
+<h4>Support The Contract and unlock new Scenarios</h4>
 <p>
-    <a href="https://thecontractrpg.com/guide/rules/#scenarios" target="_blank" rel="noopener noreferrer">Scenarios</a>
-    are content modules that GMs run as a single-session Contracts. Several free stock Scenarios come with the game, and
-    GMs can also write their own and unlock the Scenarios others have written by playing in them.
-</p>
-<p>
-    The <b>Community Scenario Exchange</b> is yet another way to get Scenarios. It lets Scenario writers share their
-    content with each other, even if they've never played together.
-</p>
-    The Scenarios listed here were submitted to the exchange by their authors and given a stamp of quality by a site administrator.
-    Each one has at least a 1000 word write-up and has been run as a Contract at least once.
+    The Scenario Exchange is yet another way for GMs to unlock new
+    <a href="https://thecontractrpg.com/guide/rules/#scenarios" target="_blank" rel="noopener noreferrer">Scenarios</a>.
+    These Scenarios cost <span style="color:violet;">Exchange Credits</span>, which can be obtained by backing our
+    <a href="https://www.kickstarter.com/projects/sapientsnake/the-contract-rpg" target="_blank" rel="noopener noreferrer">Kickstarter</a>
+    or donating your own Scenarios to the Exchange. Each Scenario costs <span style="color:violet;">100 Exchange Credits</span>
+    to unlock.
 </p>
 <p>
-    Each Scenario costs 100 Exchange Credits to unlock.
-    The only way to earn Exchange Credits currently is to submit Scenarios you've written to the exchange (for 340 credits each).
-    In the future, users may be able to earn Exchange Credits in other ways, including by purchasing them or receiving them as part of a premium membership.
+    Donating your Scenarios is a great way to support The Contract if you lack the funds to back our
+    <a href="https://www.kickstarter.com/projects/sapientsnake/the-contract-rpg" target="_blank" rel="noopener noreferrer">Kickstarter</a>
+    or subscribe to our
+    <a href="https://www.patreon.com/ContractRpg" target="_blank" rel="noopener noreferrer">Patreon</a>!
+</p>
+
+<h4>How do I donate a Scenario?</h4>
+<p>
+    Scenario writers can donate a Scenario to the Exchange via its page in their
+    <a href="{% url 'games:games_view_scenario_gallery' %}">Scenario Collection</a>.
+    In order to submit, the Scenario must have been run as a Contract, and its writeup must be at least 1000 words long.
+    Next, The Contract's administrators will vet the writeup to ensure it meets our quality standards and may approve it or ask for revisions.
 </p>
 <p>
-    Submitting Scenarios to the exchange supports The Contract and will make it possible to continue providing this game
-    and web service for free to everyone. Thank you!
+    Once your Scenario is approved, it's added to the Scenario Exchange, and you receive <span style="color:violet;">340 Exchange Credits</span>.
 </p>
-<h5>
+
+<h4>
     A note about spoilers
-</h5>
+</h4>
 <p>
   Contractors and their Players go into each Contract completely blind.
-    Even a Player knowing that a Scenario takes place in the jungle or favors investigative Contractors can affect their choice of Contractor or decision to participate.
-    Because of this, this page reveals as little as possible about the nature of each Scenario.
+    Even a Player knowing that a Scenario takes place in the jungle or favors investigation can affect their
+    choice of Contractor or decision to participate. Because of this, this page reveals as little as possible about the
+    nature of each Scenario.
 </p>
 {% endblock %}
