@@ -79,7 +79,7 @@
                                         <a href="{% url 'profiles:profiles_view_profile' loose_end.granting_gm.id %}">
                                             {{loose_end.granting_gm}}
                                         </a>
-                                        {% else %}
+                                        {% elif loose_end.granting_player %}
                                         <a href="{% url 'profiles:profiles_view_profile' loose_end.granting_player.id %}">
                                             {{loose_end.granting_player}}
                                         </a>
@@ -139,7 +139,7 @@
                                     <a href="{% url 'profiles:profiles_view_profile' loose_end.granting_gm.id %}">
                                         {{loose_end.granting_gm}}
                                     </a>
-                                    {% else %}
+                                    {% elif loose_end.granting_player %}
                                     <a href="{% url 'profiles:profiles_view_profile' loose_end.granting_player.id %}">
                                         {{loose_end.granting_player}}
                                     </a>
