@@ -57,7 +57,9 @@ $(document).ready(function(){
 /* html character decoding */
 
 String.prototype.decodeHTML = function() {
-    var map = {"gt":">" /* , … */};
+    var map = {
+        "gt":">",
+         "lt": "<"/* , … */};
     return this.replace(/&(#(?:x[0-9a-f]+|\d+)|[a-z]+);?/gi, function($0, $1) {
         if ($1[0] === "#") {
             return String.fromCharCode($1[1].toLowerCase() === "x" ? parseInt($1.substr(2), 16)  : parseInt($1.substr(1), 10));
@@ -568,7 +570,11 @@ const htmlReplaceMap = {
     '#': '&#35;',
     ';': '&#59;',
     '!': '&#33;',
-    '*': '&#42;'
+    '*': '&#42;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '\'': '&#x27;',
+    '\"': '&quot;'
 }
 
 function cleanUserInputField(userInput){
@@ -587,7 +593,7 @@ function cleanUserInputField(userInput){
 
 
 function subUserInputForDollarSign(replacementText, userInput) {
-    userInput = '<span class="css-system-text-user-input">' + cleanUserInputField(userInput) + "</span>";
+    userInput = '<span class="css-system-text-user-input">' + userInput + "</span>";
     return replacementText.replaceAll("$", userInput);
 }
 
@@ -635,7 +641,7 @@ function addReplacementsForModifiers(replacements, selectedModifiers, detailsByM
                   } else {
                       dollarSub = detailsByModifiers[mod["slug"]][numIncludedForSlug];
                   }
-                  replacement = subUserInputForDollarSign(replacement, dollarSub);
+                  replacement = subUserInputForDollarSign(replacement, cleanUserInputField(dollarSub));
               }
               const newSub = {
                   mode: sub["mode"],
@@ -1938,7 +1944,7 @@ const ComponentRendering = {
                 }
                 let sub = "";
                 if (field.isText) {
-                    sub = this.fieldTextInput[field.id];
+                    sub = cleanUserInputField(this.fieldTextInput[field.id]);
                 }
                 if (field.isRoll) {
                     const choices = this.fieldRollInput[field.id];

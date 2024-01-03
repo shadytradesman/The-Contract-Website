@@ -4,6 +4,7 @@ from django.forms import formset_factory
 from .models import PowerTag, Base_Power, EFFECT, MODALITY, VECTOR, CRAFTING_SIGNATURE
 from characters.models import Weapon, Artifact
 from hgapp.utilities import get_object_or_none
+from django.template.defaultfilters import escape
 
 
 class PowerForm(forms.Form):
@@ -198,8 +199,8 @@ class SystemFieldTextForm(SystemField):
                                       "autocomplete": "off",
                                   }))
 
-    def clean_details_text(self):
-        data = self.cleaned_data['details_text']
+    def clean_detail_text(self):
+        data = self.cleaned_data['detail_text']
         return clean_user_input_field(data)
 
 
@@ -263,6 +264,10 @@ html_replace_map = {
     ';': '&#59;',
     '!': '&#33;',
     '*': '&#42;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '\'': '&#x27;',
+    '\"': '&quot;',
 }
 
 def clean_user_input_field(user_input):
