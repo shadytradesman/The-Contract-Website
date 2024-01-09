@@ -1,7 +1,7 @@
 {% load markdown_deux_tags %}
 {% load image_tags %}
 
-<div class="{% if not character.primary_image %}text-center {% endif %}char-essentials">
+<div class="{% if character.primary_image is None %} text-center {% endif %}char-essentials">
     {% if character.primary_image %}
         <div class="css-character-primary-image" style="">
             <div class="text-center">

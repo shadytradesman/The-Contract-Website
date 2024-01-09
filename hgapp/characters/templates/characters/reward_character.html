@@ -29,93 +29,110 @@
 {% endwith %}
 <div class="container">
     <div class="backdropped">
-    {% if character.num_unspent_rewards > 0 or unspent_exp > 2 %}
-        <div class="text-center">
-            {% if character.num_unspent_rewards > 0 or unspent_exp > 2 %}
+        {% if character.num_unspent_rewards > 0 or unspent_exp > 2 %}
+            <div class="text-center">
                 <h1>
                     You've done well, <a href="{% url 'characters:characters_view' character.id %}">{{ character.name }}</a>
                 </h1>
                 <h3>
                     {{ character.get_reward_phrase}}
                 </h3>
-            {% else %}
-                <h1>
-                    <a href="{% url 'characters:characters_view' character.id %}">{{ character.name }}</a> has no Gifts, Improvements or Experience available
-                </h1>
-            {% endif %}
-        </div>
-        <ul class="list-unstyled text-center">
-            {% for reward in character.unspent_rewards %}
+            </div>
+            <ul class="list-unstyled text-center">
+                {% for reward in character.unspent_rewards %}
+                    <li>
+                        <div class="thumbnail" style="margin-bottom: 10px;">
+                            {% render_reward reward %}
+                        </div>
+                    </li>
+                {% endfor %}
+                {% if unspent_exp > 1 %}
                 <li>
                     <div class="thumbnail" style="margin-bottom: 10px;">
-                        {% render_reward reward %}
+                        {{unspent_exp}} unspent Experience
                     </div>
                 </li>
-            {% endfor %}
-            {% if unspent_exp > 1 %}
-            <li>
-                <div class="thumbnail" style="margin-bottom: 10px;">
-                    {{unspent_exp}} unspent Experience
-                </div>
-            </li>
-            {% endif %}
-        </ul>
+                {% endif %}
+            </ul>
+        {% else %}
+        <h2 class="text-center">
+            <a href="{% url 'characters:characters_view' character.id %}">{{ character.name }}</a> does not have any Gift Credits or Improvements to spend
+            <div>
+                <small>
+                    Advancing them will put them in bad standing
+                </small>
+            </div>
+        </h2>
+        {% endif %}
         <div class="panel panel-default">
             <div class="panel-body">
-
                 <div class="row text-center" style="display: flex; flex-wrap: wrap; justify-content: space-between;">
-                    {% if character.num_unspent_gifts > 0 %}
+
                         <div style="margin: auto;  margin-bottom: 5px;">
-                            <a class="btn btn-success btn-lg" href="{% url 'powers:powers_create_ps2_for_char' character.id %}">
+                            <a class="btn
+                            {% if character.num_unspent_gifts > 0 %}
+                                btn-success
+                            {% else %}
+                                btn-default
+                            {% endif %}
+                            btn-lg" href="{% url 'powers:powers_create_ps2_for_char' character.id %}">
                                 Create a New Gift
                             </a>
                         </div>
                         <div style="margin: auto;  margin-bottom: 5px;">
-                            <a class="btn btn-success btn-lg" href="{% url 'powers:powers_stock' character.id %}">
+                            <a class="btn
+                            {% if character.num_unspent_gifts > 0 %}
+                                btn-success
+                            {% else %}
+                                btn-default
+                            {% endif %}
+                            btn-lg" href="{% url 'powers:powers_stock' character.id %}">
                                 Customize a Stock Gift
                             </a>
                         </div>
-                    {% endif %}
-                    {% if unassigned_powers and character.num_unspent_rewards %}
+                    {% if unassigned_powers %}
                         <div style="margin: auto;  margin-bottom: 5px;">
                             <a class="btn btn-default btn-lg" href="{% url 'characters:characters_power_picker' character.id %}">
                                 Grant Unassigned Gifts
                             </a>
                         </div>
                     {% endif %}
-                    {% if unspent_exp > 2 %}
                         <div style="margin: auto; margin-bottom: 5px;">
-                            <a href="{% url 'characters:characters_edit' character.id secret_key %}" class="btn btn-success btn-lg">
+                            <a href="{% url 'characters:characters_edit' character.id secret_key %}" class="btn
+                            {% if unspent_exp > 2 %}
+                                btn-success
+                            {% else %}
+                                btn-default
+                            {% endif %}
+                            btn-lg">
                                 Spend {{unspent_exp}} Experience
                             </a>
                         </div>
-                    {% endif %}
                 </div>
                 <div class="text-center">
                     <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#mainTutorialModal">
                         What Gifts should I get?
                     </button>
                 </div>
-                {% if character.power_full_set.all|length > 0  and character.num_unspent_rewards > 0 %}
+                {% if character.power_full_set.all|length > 0  %}
                     <hr>
                     <h2 class="text-center">Improve Existing Gifts</h2>
-
-                {% if character_over_reward_limit %}
-                <div class="alert alert-danger text-center css-char-alert" role="alert">
-                    <p>
-                        {{character.name}} has spent over their Reward limit.
-                        You cannot spend more than 2 Gifts / Improvements per Contract victory.
-                    </p>
-                    <p>
-                        <b>{{num_total_rewards}}</b> Reward{{num_total_rewards|pluralize}} earned,
-                        <b>{{num_spent_rewards}}</b> spent.
-                        <b>{{ character.number_of_victories }}</b> Victories.
-                    </p>
-                    <p>
-                        To remove this message, edit your Gifts to refund an appropriate number of Rewards. You can spend them when you earn additional Contract victories.
-                    </p>
-                </div>
-                {% endif %}
+                    {% if character_over_reward_limit %}
+                    <div class="alert alert-danger text-center css-char-alert" role="alert">
+                        <p>
+                            {{character.name}} has spent over their Reward limit.
+                            You cannot spend more than 2 Gifts / Improvements per Contract victory.
+                        </p>
+                        <p>
+                            <b>{{num_total_rewards}}</b> Reward{{num_total_rewards|pluralize}} earned,
+                            <b>{{num_spent_rewards}}</b> spent.
+                            <b>{{ character.number_of_victories }}</b> Victories.
+                        </p>
+                        <p>
+                            To remove this message, edit your Gifts to refund an appropriate number of Rewards. You can spend them when you earn additional Contract victories.
+                        </p>
+                    </div>
+                    {% endif %}
 
 
                 {% if character_at_reward_limit and num_unspent_rewards > 0 %}
@@ -135,11 +152,15 @@
                     {% for power_full in character.power_full_set.all %}
                         <div class="row">
                             <div class= "col-xs-3 col-md-1">
+                                <a href="{% url 'powers:powers_edit_ps2' power_full.id %}" class="btn
                                 {% if character.num_unspent_rewards > 0 %}
-                                    <a href="{% url 'powers:powers_edit_ps2' power_full.id %}" class="btn btn-success">
-                                        <i class="fa fa-plus-square fa-4x"></i>
-                                    </a>
+                                    btn-success
+                                {% else %}
+                                    btn-default
                                 {% endif %}
+                                ">
+                                    <i class="fa fa-plus-square fa-4x"></i>
+                                </a>
                             </div>
                             <div class= "col-xs-9 col-md-11">
                                 {% power_badge power_full%}
@@ -148,12 +169,6 @@
                     {% endfor %}
                 {% endif %}
             </div>
-        </div>
-    {% else %}
-        <h1>
-            <a href="{% url 'characters:characters_view' character.id %}">{{ character.name }}</a> does not have any Gift Credits or Improvements to spend.
-        </h1>
-    {% endif %}
         </div>
     </div>
 </div>

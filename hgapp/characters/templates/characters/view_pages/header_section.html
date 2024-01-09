@@ -43,9 +43,16 @@
                 </ul>
             </li>
             {% if character.player %}
-                <li><a href="{% url 'characters:characters_power_picker' character.id %}" class="btn btn-default">
-                    Assign Gifts
-                </a></li>
+                <li>
+                    <a href="{% url 'characters:characters_spend_reward' character.id %}" class="btn
+                    {% if available_gift and not character_at_reward_limit and not character_over_reward_limit or unspent_exp > 1 %}
+                    btn-success
+                    {% else %}
+                    btn-default
+                    {% endif %}">
+                        Advance Contractor
+                    </a>
+                </li>
                 {% if character.is_dead %}
                     <li><a href="{%url 'characters:characters_obituary' character.id %}" class="btn btn-default">
                         Edit Obituary

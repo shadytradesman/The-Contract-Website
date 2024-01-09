@@ -1577,18 +1577,19 @@ class EnterMove(View):
 
                 if new_event:
                     self.move.gm.profile.update_move_stat()
-                    webhooks = self.cell.webhook_cell.filter(send_for_events=True).all()
-                    for webhook in webhooks:
-                        webhook.post_for_event(self.world_event, request, self.move)
-                    for membership in self.cell.get_unbanned_members():
-                        Notification.objects.create(
-                            user=membership.member_player,
-                            headline="A Contractor made a Move",
-                            content="In {}".format(self.cell.name),
-                            url=reverse('games:view_move', args=(self.move.id,)),
-                            notif_type=WORLD_NOTIF,
-                            is_timeline=True,
-                            article=self.world_event)
+                    if not self.move.is_private:
+                        webhooks = self.cell.webhook_cell.filter(send_for_events=True).all()
+                        for webhook in webhooks:
+                            webhook.post_for_event(self.world_event, request, self.move)
+                        for membership in self.cell.get_unbanned_members():
+                            Notification.objects.create(
+                                user=membership.member_player,
+                                headline="A Contractor made a Move",
+                                content="In {}".format(self.cell.name),
+                                url=reverse('games:view_move', args=(self.move.id,)),
+                                notif_type=WORLD_NOTIF,
+                                is_timeline=True,
+                                article=self.world_event)
             return HttpResponseRedirect(reverse('games:view_move', args=(self.move.id,)))
         raise ValueError("Invalid Move or event form")
 

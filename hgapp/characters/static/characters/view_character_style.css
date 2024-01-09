@@ -21,6 +21,8 @@ h1 {
     background-color: #353e4b;
     display: flex;
     align-items: center;
+    justify-content: center;
+
 }
 
 .css-character-primary-image {
