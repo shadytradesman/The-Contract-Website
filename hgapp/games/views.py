@@ -45,8 +45,6 @@ from profiles.models import Profile
 
 from characters.models import Character, LOOSE_END, CONDITION, TROPHY, CIRCUMSTANCE, StockWorldElement
 
-from characters.forms import get_default_world_element_choice_form
-
 from hgapp.utilities import get_queryset_size, get_object_or_none
 
 from cells.models import Cell

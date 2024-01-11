@@ -32,7 +32,7 @@
                 <b>{{ invitation.invited_player.username }}</b>
             </a>
             <br>
-            {% if reward %}
+            {% for reward in rewards %}
                 <p>
                 {% if reward.relevant_power and player_can_view_contractor %}
                     <div class="row">
@@ -45,6 +45,13 @@
                 {% else %}
                     {% if reward.is_improvement %}
                         {% user_display invitation.invited_player %} has not yet used their Improvement from this Contract.
+                        {% if player_can_edit_contractor and reward.is_MVP %}
+                            <a href="{% url 'characters:characters_spend_reward' invitation.attendance.attending_character.id %}"
+                               class="btn btn-success btn-xs"
+                               style="text-indent: 0px;">
+                                Accept Commission Improvement!
+                            </a>
+                        {% endif %}
                     {% elif reward.is_charon_coin %}
                         {% user_display invitation.invited_player %} has not yet used their Charon Coin from this Contract.
                     {% else %}
@@ -59,7 +66,7 @@
                     {% endif %}
                 {% endif %}
                 </p>
-            {% endif %}
+            {% endfor %}
 
             {% if invitation.attendance.character_death.cause_of_death %}
                 Cause of death: {{ invitation.attendance.character_death.cause_of_death }}

@@ -630,15 +630,8 @@ class Game_Attendance(models.Model):
         self.save()
         self.give_reward()
 
-    def get_reward(self):
-        objects = Reward.objects.filter(rewarded_player=self.get_player(), relevant_game=self.relevant_game, is_void=False, is_journal=False, is_questionnaire=False)
-        # this is because of an error where Edgar somehow got both an Improvement and Gift on killer chicken island (game 125)
-        if objects.count() > 1:
-            objects[0].mark_void()
-            logger.error('Error: too many gifts for game: %s \n gifts: %s',
-                         str(self.pk),
-                         str(objects))
-        return get_object_or_none(Reward, rewarded_player=self.get_player(), relevant_game=self.relevant_game, is_void=False, is_journal=False, is_questionnaire=False)
+    def get_rewards(self):
+        return Reward.objects.filter(rewarded_player=self.get_player(), relevant_game=self.relevant_game, is_void=False, is_journal=False, is_questionnaire=False).all()
 
     def get_player(self):
         if self.attending_character:
@@ -655,9 +648,9 @@ class Game_Attendance(models.Model):
         current_outcome = self.outcome
         if current_outcome == new_outcome and attending_character == self.attending_character and self.is_confirmed == is_confirmed and self.is_mvp == is_mvp:
             return
-        current_reward = self.get_reward()
+        current_rewards = self.get_rewards()
         # Void rewards
-        if current_reward:
+        for current_reward in current_rewards:
             current_reward.mark_void()
         # Void experience rewards
         if hasattr(self, "experience_reward") and self.experience_reward:
@@ -705,8 +698,8 @@ class Game_Attendance(models.Model):
     def give_reward(self):
         if not self.is_confirmed:
             return None
-        if self.get_reward():
-            raise ValueError("attendance is granting reward when it already has one. Attendance: " +
+        if self.get_rewards().count() > 0:
+            raise ValueError("attendance is granting rewards when it already has one. Attendance: " +
                              str(self.id))
         if self.experience_reward:
             raise ValueError("attendance is granting exp reward when it already has one. Attendance: " +
@@ -761,6 +754,20 @@ class Game_Attendance(models.Model):
             exp_reward.save()
             self.mvp_reward = exp_reward
             self.save()
+            if hasattr(self, "attending_character") and self.attending_character is not None:
+                # MVP improvement
+                num_mvp_awards = Reward.objects.filter(is_void=False, is_MVP=True, rewarded_character=self.attending_character).count()
+                num_mvp_games = Game_Attendance.objects.filter(is_confirmed=True, attending_character=self.attending_character, is_mvp=True).count()
+                if num_mvp_games % 3 == 0:
+                    if num_mvp_awards >= num_mvp_games // 3:
+                        raise ValueError("Character has too many MVP awards. Attendance: " + str(self.pk))
+                    mvp_reward = Reward(relevant_game=self.relevant_game,
+                                        rewarded_character=self.attending_character,
+                                        rewarded_player=self.attending_character.player,
+                                        is_improvement=True,
+                                        is_MVP=True)
+                    mvp_reward.save()
+
 
 
     # Save attendance, creating scenario discoveries as needed, killing characters if needed, and setting GM perms on the
@@ -802,8 +809,10 @@ class Game_Attendance(models.Model):
         unique_together = (("attending_character", "relevant_game"))
 
     def render_timeline_display(self, user, var):
-        reward = self.get_reward()
-        spent_reward = reward is None or (hasattr(reward, "relevant_power") and reward.relevant_power is not None)
+        rewards = self.get_rewards()
+        spent_reward = None
+        for reward in rewards:
+            spent_reward = reward is None or (hasattr(reward, "relevant_power") and reward.relevant_power is not None)
         spent_exp = not hasattr(self, "experience_reward") or (self.experience_reward and self.experience_reward.rewarded_character and self.experience_reward.rewarded_character.unspent_experience() < 3)
         if spent_exp and spent_reward:
             return None
@@ -813,7 +822,6 @@ class Game_Attendance(models.Model):
             reward_url = reverse("characters:characters_allocate_gm_exp")
         context = {
             "url": reward_url,
-            "reward": reward,
             "attendance": self
         }
         return render_to_string("games/timeline/timeline_attendance_reward.html", context)
@@ -1451,6 +1459,7 @@ class Reward(models.Model):
     is_journal = models.BooleanField(default=False)
     is_new_player_gm_reward = models.BooleanField(default=False)
     is_questionnaire = models.BooleanField(default=False)
+    is_MVP = models.BooleanField(default=False)
 
     awarded_on = models.DateTimeField('awarded on')
     assigned_on = models.DateTimeField('assigned on',
@@ -1548,6 +1557,8 @@ class Reward(models.Model):
                 reason = "writing a Journal for "
             elif self.is_questionnaire:
                 return "answering questions for their questionnaire"
+            elif self.is_MVP:
+                reason = "Earning commission in "
             else:
                 reason = "playing in "
             reason = reason + self.relevant_game.scenario.title

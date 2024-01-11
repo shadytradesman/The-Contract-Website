@@ -23,7 +23,7 @@ def render_post_game_invite(context, game, invitation, player):
         'contractor': attending_contractor,
         'player_can_view_contractor': attending_contractor.player_can_view(player) if attending_contractor else False,
         'player_can_edit_contractor': attending_contractor.player_can_edit(player) if attending_contractor else False,
-        'reward': invitation.attendance.get_reward(),
+        'rewards': invitation.attendance.get_rewards(),
     }
 
 @register.inclusion_tag('reward_thumb.html')

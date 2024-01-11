@@ -237,9 +237,17 @@ def create_archival_game(request, general_form, cell, outcome_formset):
             if game.creator.id == player.id:
                 attendance.is_confirmed = True
                 attendance.attending_character.progress_loose_ends(occurred_time)
+            attendance.is_mvp = form.cleaned_data["MVP"]
             attendance.save()
             game_invite.attendance = attendance
             game_invite.save()
+            if not attendance.is_confirmed:
+                Notification.objects.create(
+                    user=player,
+                    headline="{} says you attended a Contract".format(game.gm.username),
+                    content="Click here to confirm or deny your attendance",
+                    url=reverse('games:games_view_game', args=(game.id,)),
+                    notif_type=CONTRACT_NOTIF)
         game.give_rewards()
         game.update_profile_stats()
         game.unlock_stock_scenarios()
