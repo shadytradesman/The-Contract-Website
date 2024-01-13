@@ -117,6 +117,7 @@ def how_to_play(request):
         "tutorial": character_tutorial,
         "expand_step": expand_step,
         "five_power": Power_Full.objects.filter(tags__in=["splash1"]).first(),
+        "scenarios_to_unlock": Scenario.objects.filter(tags__isnull=False).all(),
     }
     return render(request, 'info/new_player_guide/quickstart.html', context)
 

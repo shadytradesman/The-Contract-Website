@@ -44,7 +44,7 @@
                     <div>
                         <small>
                             <i>
-                                Citizenship: {% user_display invitation.invited_player %} has played in {% render_citizenship invitation.invited_player game.cell %} Contracts in {{game.cell.name}} since GMing.
+                                {% render_citizenship invitation.invited_player game.cell %}
                             </i>
                         </small>
                     </div>
@@ -137,9 +137,16 @@
         {% endif %}
         <div>
             <ul>
-                {% for invite in game.get_attended_players %}
+                {% for invite in game.get_accepted_invites %}
                     <li>
-                        {{invite}}
+                        {% user_display invite.invited_player %}
+                        <div>
+                            <small>
+                                <i>
+                                    {% render_citizenship invite.invited_player game.cell %}
+                                </i>
+                            </small>
+                        </div>
                     </li>
                 {% endfor %}
             </ul>

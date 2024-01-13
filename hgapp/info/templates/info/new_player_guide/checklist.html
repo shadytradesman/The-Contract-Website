@@ -154,34 +154,20 @@
                         </div>
                         <p>
                         <ul>
-                            <li>
-                                <a href="/games/view/s/41/" class="btn btn-primary btn-sm">
-                                    <b>
-                                        Mushroom Hunt
-                                    </b>
-                                </a>
-                                - is avilable to all Players for free, registered or not. Note: because Players may view Mushroom Hunt when logged-out, GMs can't rely on the website to determine if a Player is spoiled on it.
-                            </li>
-                            <li>
-                                <b>Sanctuary</b> - Create a Playgroup
-                            </li>
-                            <li>
-                                <b>Passing the Hours</b> - Play a Contractor in a Contract
-                            </li>
-                            <li>
-                                <b>Beware the Assassin</b> - GM a Contract
-                            </li>
-                            <li>
-                                <b>Monster Hunter Island</b> - Lose a Contractor on a Contract
-                            </li>
-                            <li>
-                                Finally, the Scenario from this guide's narrative
-                                <a href="games/view/s/39/" class="btn btn-default btn-xs">
-                                    See no Evil, Hear no Evil, Smell no Evil
-                                </a>
-                                is available to all users but should not be run because it is spoiled in the tutorial.
-                            </li>
-
+                        {% for scenario in scenarios_to_unlock %}
+                        <li>
+                            {% if scenario.is_public %}
+                            <a href="{% url 'games:games_view_scenario' scenario.id %}">
+                                {{ scenario.title }}
+                            </a>
+                            {% else %}
+                            <b>{{scenario.title}}: </b>
+                            {% endif %}
+                            {% for scenario_tag in scenario.tags.all %}
+                            {{ scenario_tag.unlock_instructions | safe }}
+                            {% endfor %}
+                        </li>
+                        {% endfor %}
                         </ul>
                         </p>
                         <div class="text-center">

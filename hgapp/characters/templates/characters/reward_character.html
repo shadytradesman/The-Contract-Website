@@ -101,6 +101,8 @@
                             <a href="{% url 'characters:characters_edit' character.id secret_key %}" class="btn
                             {% if unspent_exp > 2 %}
                                 btn-success
+                            {% elif unspent_exp < 0 %}
+                                btn-danger
                             {% else %}
                                 btn-default
                             {% endif %}

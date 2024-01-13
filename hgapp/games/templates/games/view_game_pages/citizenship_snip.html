@@ -1,0 +1,13 @@
+{% load account_tags %}
+
+Citizenship: {% user_display player %} has played in
+<b class="
+    {% if num_games_since > 4 %}
+    text-warning
+    {% elif num_games_since > 6 %}
+    text-danger
+    {% endif %}
+" >
+    {{num_games_since}} Contract{{num_games_since|pluralize}}
+</b>
+in {{cell.name}} since GMing.

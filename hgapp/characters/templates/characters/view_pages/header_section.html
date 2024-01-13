@@ -49,8 +49,21 @@
                     btn-success
                     {% else %}
                     btn-default
-                    {% endif %}">
+                    {% endif %}" style="height: 42px; padding: 10px;">
+                    <span style="position: relative; bottom: 7px;">
                         Advance Contractor
+                        {% if available_gift%}
+                        <small>
+                            <small>
+                                <div>
+                                    {% if available_gift %}
+                                        Spend Gift
+                                    {% endif %}
+                                </div>
+                            </small>
+                        </small>
+                        {% endif %}
+                    </span>
                     </a>
                 </li>
                 {% if character.is_dead %}
