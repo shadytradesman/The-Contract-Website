@@ -50,7 +50,9 @@
                     {% else %}
                     btn-default
                     {% endif %}" style="height: 42px; padding: 10px;">
-                    <span style="position: relative; bottom: 7px;">
+                    <span {% if available_gift%}
+                            style="position: relative; bottom: 7px;"
+                            {% endif %} >
                         Advance Contractor
                         {% if available_gift%}
                         <small>
