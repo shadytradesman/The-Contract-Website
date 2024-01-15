@@ -305,7 +305,7 @@ if 'RDS_HOSTNAME' in os.environ:
             'PORT': os.environ['RDS_PORT'],
         }
     }
-elif 'LOCAL_CONTRACT_POSTGRES' in os.environ:
+elif 'LOCAL_CONTRACT_POSTGRES' in os.environ and os.environ['LOCAL_CONTRACT_POSTGRES'] == 'true':
     print("Using local postgres")
     DATABASES = {
         'default': {

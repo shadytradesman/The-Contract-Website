@@ -286,7 +286,9 @@
                                         {% for power_full in powers %}
                                         <a href="{% url 'powers:powers_view_power_full' power_full.id %}">
                                             <div >
-                                                {% power_heading power_full.latest_rev %}
+                                                {% if power_full.latest_rev %}
+                                                    {% power_heading power_full.latest_rev %}
+                                                {% endif %}
                                             </div>
                                         </a>
                                         {% endfor %}

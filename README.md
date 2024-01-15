@@ -15,6 +15,8 @@ However, most of the static assets don't utilize this build system.
 
 #### Setting up Environment
 
+*Use Python 3.6*
+
 1. First of all, clone the repo. The team suggests either Mac or Linux for development, or Windows Subsystem Linux.
 2. Then you will want to start a virtual environment: ```python3 -m venv my-environment``` You should be sure to start 
 your environment in the root directory of the repository. This should start your environment which should be listed 
