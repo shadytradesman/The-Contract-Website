@@ -155,18 +155,26 @@
                             {% else %}
                                 Contractor, regardless of Status.
                             {% endif %}
-                            <div style="margin-top: 10px;">
-                                <b>{{game.gm.username}}'s GM title: </b> {% render_gm_title game.gm %}
+                            <div style="">
+                                <div>
+                                    <b>{{game.gm.username}}'s GM title: </b> {% render_gm_title game.gm %}
+                                    <small>
+                                        ({{ game.gm.profile.num_games_gmed}} Contract{{game.gm.profile.num_games_gmed|pluralize}} GMed)
+                                    </small>
+                                </div>
+
                                 {% if game.mediums.all|length %}
-                                    <br>
-                                    <b>Medium:</b>
-                                    {% render_game_mediums game %}
+                                    <div>
+                                        <b>Medium:</b>
+                                        {% render_game_mediums game %}
+                                    </div>
                                 {% endif %}
                                 {% if not game.gm == request.user and request.user.is_authenticated %}
-                                    <br>
-                                    <a href="{% url 'postman:write' game.gm.username %}">
-                                        <i class="fa fa-envelope-o fa-1x"></i> Send {{game.gm.username}} a message.
-                                    </a>
+                                    <div>
+                                        <a href="{% url 'postman:write' game.gm.username %}">
+                                            <i class="fa fa-envelope-o fa-1x"></i> Send {{game.gm.username}} a message.
+                                        </a>
+                                    </div>
                                 {% endif %}
                                 {% if request.user.is_anonymous %}
                                     <br>
