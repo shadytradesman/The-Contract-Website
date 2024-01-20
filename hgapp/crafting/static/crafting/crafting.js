@@ -22,10 +22,10 @@ let newArtifactNumber = -1;
 let artNum = 0;
 let giftSelectorNumber = 0;
 
-function createArtifactFromExisting(name, description, id, nonRefundablePowerIds, refundablePowerIds) {
+function createArtifactFromExisting(name, description, id, nonRefundablePowerIds, refundablePowerIds, upgradablePowerIds) {
     let number = artNum;
     artNum++;
-    return createArtifact(true, name, description, number, id, nonRefundablePowerIds, refundablePowerIds);
+    return createArtifact(true, name, description, number, id, nonRefundablePowerIds, refundablePowerIds, upgradablePowerIds);
 }
 
 function createNewArtifact() {
@@ -33,24 +33,51 @@ function createNewArtifact() {
     artNum++;
     newArtifactNumber++;
     let idVal = -(number+1);
-    return createArtifact(false, "New Artifact", "", number, idVal, [], []);
+    return createArtifact(false, "New Artifact", "", number, idVal, [], [], []);
 }
 
-function createArtifact(isPreExisting, name, description, number, id, nonRefundablePowerIds, refundablePowerIds) {
+function createArtifact(isPreExisting, name, description, number, id, nonRefundablePowerIds, refundablePowerIds, upgradablePowerIds) {
     let newArtForm = $("#empty_new_art_form").html();
     let giftSelectForm = $("#empty_gift_selector_id_form").html();
     let selectorNumber = giftSelectorNumber;
     let giftOptionsName = "gift_selector-" + selectorNumber + "-selected_gifts";
     giftSelectorNumber++;
     let optionNumber = 0;
-    nonRefundablePowerFulls = nonRefundablePowerIds.map(id=>pageData["power_by_pk"][id])
-    let giftOptions = pageData["artifact_power_choices"]
-        .filter(choice => !nonRefundablePowerIds.includes(choice["pk"]))
-        .map(choice => {
+
+    // This code is.. not ideal.
+    // But.. convert my map to an array to get a list of artifacts that are on there
+    let upgradablePowerIDsAsInt = Object.keys(upgradablePowerIds).map(parseInt)
+    let existingPowersOnArtifactFulls = [...new Set([...nonRefundablePowerIds, ...upgradablePowerIDsAsInt])];
+    let nonRefundablePowerFulls = existingPowersOnArtifactFulls.map(id=>pageData["power_by_pk"][id])
+
+    let notCraftablePowerIDs = nonRefundablePowerIds
+
+    for (const property in upgradablePowerIds)
+    {
+        const index = notCraftablePowerIDs.indexOf(Number(property));
+        if (index > -1) { // only splice array when item is found
+        notCraftablePowerIDs.splice(index, 1); // 2nd parameter means remove one item only
+        }
+
+    }
+
+
+    let giftOptions = pageData["artifact_power_choices"].filter(choice => !notCraftablePowerIDs.includes(choice["pk"])).map(choice => {
             let powerId = choice["pk"];
             let powerName = choice["name"];
-            let cost = pageData["power_by_pk"][powerId]["gift_cost"] + 1;
-            return createGiftOption(powerName, powerId, cost, giftOptionsName, optionNumber++, refundablePowerIds.includes(choice["pk"]));
+            let cost = 0;
+            let upgradeText = "";
+
+            if(upgradablePowerIds.hasOwnProperty((powerId))) {
+                cost = upgradablePowerIds[powerId];
+                upgradeText = " (Upgrade)"
+            }
+            else
+            {
+                cost = pageData["power_by_pk"][powerId]["gift_cost"] + 1;
+            }
+
+            return createGiftOption(powerName + upgradeText, powerId, cost, giftOptionsName, optionNumber++, refundablePowerIds.includes(choice["pk"]));
         });
     return {
         "isPreExisting": isPreExisting,
@@ -64,7 +91,7 @@ function createArtifact(isPreExisting, name, description, number, id, nonRefunda
         "giftOptions": giftOptions,
         "giftOptionsName": giftOptionsName,
         "id": id, // for linking artifacts with forms.
-        "nonRefundablePowerFulls": nonRefundablePowerFulls,
+        "nonRefundablePowerFulls": nonRefundablePowerFulls
     };
 }
 
@@ -116,7 +143,8 @@ const CraftingRendering = {
                     art["description"],
                     art["id"],
                     art["nonrefundable_power_fulls"],
-                    art["refundable_power_fulls"]));
+                    art["refundable_power_fulls"],
+                    art["upgradable_power_fulls"]));
         this.artifacts.forEach(art => art["giftOptions"].forEach(opt => {
             if (opt["startChecked"]) {
                 this.checkedGiftOptions[opt["name"]] = true;

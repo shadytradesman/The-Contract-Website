@@ -215,7 +215,11 @@ class Craft(View):
                 self.free_crafts_by_power_full[power.parent_power.pk] += NUM_FREE_ARTIFACTS_PER_REWARD
 
         refundable_power_fulls_by_artifact_id = defaultdict(list)
+        upgradable_power_fulls_by_artifact_id = defaultdict(list)
+        all_crafter_powers_full_object_by_artifact_id = defaultdict(list)
+
         for power in power_fulls:
+            all_crafter_powers_full_object_by_artifact_id[power.pk] = power
             if power.crafting_type == CRAFTING_CONSUMABLE:
                 self.free_crafts_by_power_full[power.pk] += NUM_FREE_CONSUMABLES_PER_DOWNTIME
                 if power.pk in self.event_by_power_full:
@@ -247,6 +251,7 @@ class Craft(View):
                     crafted_artifacts = self.event_by_power_full[power.pk].craftedartifact_set.all()
                     for artifact_craft in crafted_artifacts:
                         refundable_power_fulls_by_artifact_id[artifact_craft.relevant_artifact_id].append(power.pk)
+                        upgradable_power_fulls_by_artifact_id[artifact_craft.relevant_artifact_id].append(power.pk)
                         self.prev_crafted_consumables[power.pk] += artifact_craft.quantity
 
         new_artifact_formset = None
@@ -268,9 +273,47 @@ class Craft(View):
         all_contractor_power_full_ids = set(power_fulls.values_list('id', flat=True))
         additional_artifact_power_full_ids = set()
         for artifact in crafted_artifacts:
+
             current_fulls = set(artifact.power_full_set.values_list('id', flat=True))
             additional_artifact_power_full_ids.update(current_fulls.difference(all_contractor_power_full_ids))
             refundable_fulls = refundable_power_fulls_by_artifact_id[artifact.pk]
+
+            # Get upgradable ones... so, all of powers
+            upgradable_pks = all_contractor_power_full_ids
+            # That are on this artifact
+            upgradable_pks = upgradable_pks.intersection(current_fulls)
+            # That aren't refundable... if they're refundable they'll be auto-refunded if they enter a condition where
+            # they could be otherwise upgraded.
+            # Correction, I need to know if it's being updated in higher level logic.
+            # upgradable_pks = upgradable_pks.difference(refundable_fulls)
+
+            power_revisions_on_artifact_by_parent_id = defaultdict(list)
+            for power_revision in artifact.power_set.all():
+                # We only want the latest, but this should be in order...
+                power_revisions_on_artifact_by_parent_id[power_revision.parent_power_id] = power_revision
+
+                # For each power revision on the artifact, if its revision is equal to the latest revision's revision
+                # It's not ugpradable.
+                if power_revision.parent_power_id in all_crafter_powers_full_object_by_artifact_id:
+                    if power_revision.id == all_crafter_powers_full_object_by_artifact_id[power_revision.parent_power.id].latest_rev_id:
+                        if power_revision.parent_power_id in upgradable_pks:
+                            # Need to be able to
+                            if power_revision.parent_power_id not in refundable_fulls:
+                                upgradable_pks.remove(power_revision.parent_power_id)
+
+            # And the cost.
+            # Going to do a map of upgradable power -> cost.  This overrides the values in the crafting blob pk list.
+            upgradable_costs_by_pk = defaultdict()
+            for upgradablePower in upgradable_pks:
+                # This is true when we're refunding
+                if all_crafter_powers_full_object_by_artifact_id[upgradablePower].latest_rev == power_revisions_on_artifact_by_parent_id[upgradablePower]:
+                    previous_revisions = artifact.power_set.filter(parent_power_id=upgradablePower).order_by('-pub_date')
+                    if previous_revisions.count() >= 2:
+                        previous_revision_for_upgradable_power = previous_revisions[1]
+                        upgradable_costs_by_pk[upgradablePower] = all_crafter_powers_full_object_by_artifact_id[upgradablePower].get_gift_cost_delta(previous_revision_for_upgradable_power) + 1
+                else:
+                    upgradable_costs_by_pk[upgradablePower] = all_crafter_powers_full_object_by_artifact_id[upgradablePower].get_gift_cost_delta(power_revisions_on_artifact_by_parent_id[upgradablePower]) +1 # the +1 should be somewhere better, but...
+                                                                                                                                                                                                           # If you change it here it also needs to be changed in models.py
             current_fulls.difference_update(refundable_fulls)
             existing_artifact_ids.add(artifact.pk)
             existing_artifacts.append({
@@ -279,6 +322,7 @@ class Craft(View):
                 "id": artifact.pk,
                 "nonrefundable_power_fulls": list(current_fulls),
                 "refundable_power_fulls": refundable_fulls,
+                "upgradable_power_fulls": upgradable_costs_by_pk,
             })
 
         for event in self.crafting_events:

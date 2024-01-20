@@ -884,6 +884,7 @@ class Power_Full(models.Model):
     def to_crafting_blob(self):
         return {
             "name": self.name,
+            "id": self.id,
             "gift_cost": self.get_gift_cost(),
             "crafting_type": self.crafting_type,
         }
@@ -965,6 +966,10 @@ class Power_Full(models.Model):
 
     def get_gift_cost(self):
         return self.latest_revision().get_gift_cost()
+
+# Takes itself, and a power revision.
+    def get_gift_cost_delta(self, delta_revision):
+        return self.latest_revision().get_gift_cost() - delta_revision.get_gift_cost()
 
     def set_self_and_children_privacy(self, is_private):
         if is_private:
