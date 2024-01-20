@@ -33,7 +33,7 @@ class Craft(View):
     free_crafts_by_power_full = None
 
     def dispatch(self, *args, **kwargs):
-        if self.request.user.profile.get_confirmed_email() is None:
+        if self.request.user.profile.get_confirmed_email() is None and not self.request.user.is_superuser:
             messages.add_message(self.request, messages.WARNING,
                                  mark_safe(
                                      "<h4 class=\"text-center\" style=\"margin-bottom:5px;\">You must validate your email address to craft</h4>"))

@@ -55,7 +55,7 @@ from notifications.models import Notification, SCENARIO_NOTIF, WORLD_NOTIF, CONT
 def enter_game(request):
     if not request.user.is_authenticated:
         raise PermissionDenied("You must be logged in to enter a Game")
-    if request.user.profile.get_confirmed_email() is None:
+    if request.user.profile.get_confirmed_email() is None and not request.user.is_superuser:
         messages.add_message(request, messages.WARNING,
                              mark_safe("<h4 class=\"text-center\" style=\"margin-bottom:5px;\">You must validate your email address to schedule a Contract</h4>"))
         return HttpResponseRedirect(reverse('account_resend_confirmation'))
@@ -690,7 +690,7 @@ def view_scenario_gallery(request):
 def create_game(request, cell_id=None):
     if not request.user.is_authenticated:
         raise PermissionDenied("You must be logged in to schedule a Contract")
-    if request.user.profile.get_confirmed_email() is None:
+    if request.user.profile.get_confirmed_email() is None and not request.user.is_superuser:
         messages.add_message(request, messages.WARNING,
                              mark_safe("<h4 class=\"text-center\" style=\"margin-bottom:5px;\">You must validate your email address to schedule a Contract</h4>"))
         return HttpResponseRedirect(reverse('account_resend_confirmation'))
