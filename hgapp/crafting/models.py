@@ -15,6 +15,8 @@ NUM_FREE_CONSUMABLES_PER_REWARD = 1
 NUM_FREE_ARTIFACTS_PER_DOWNTIME = 0
 NUM_FREE_ARTIFACTS_PER_REWARD = 1
 
+def get_exp_cost_per_upgrade():
+    return 1
 
 def get_exp_cost_per_consumable():
     return 1
@@ -58,6 +60,18 @@ class CraftingEvent(models.Model):
 
     def get_exp_cost_per_artifact(self):
         return self.relevant_power.get_gift_cost() + 1
+    
+    # Calculate cost if this is an upgrade
+    def get_exp_cost_for_crafting_instance(self, artifact):
+        
+        artifact_cost = self.get_exp_cost_per_artifact()
+
+        last_existing_copy = artifact.power_set.filter(parent_power_id=self.relevant_power_full_id).order_by("pub_date").last()
+
+        if last_existing_copy is not None:
+            artifact_cost = self.relevant_power_full.get_gift_cost_delta(last_existing_copy) + get_exp_cost_per_upgrade()
+
+        return artifact_cost
 
     def refund_all(self):
         if self.relevant_power_full.crafting_type == CRAFTING_CONSUMABLE:
@@ -129,10 +143,15 @@ class CraftingEvent(models.Model):
         for art_id in artifacts_to_refund:
             crafting = craftings_by_art_id[art_id]
             artifact = existing_artifacts_by_id[art_id]
+
+            is_upgrade = artifact.power_set.filter(parent_power_id=self.relevant_power_full.pk).count() > 1
+
             self.relevant_power.artifacts.remove(artifact)
-            self.relevant_power_full.artifacts.remove(artifact)
+
+            if not is_upgrade:
+                self.relevant_power_full.artifacts.remove(artifact)
             if crafting.quantity_free == 0:
-                self.total_exp_spent -= self.get_exp_cost_per_artifact()
+                self.total_exp_spent -= self.get_exp_cost_for_crafting_instance(artifact)
             else:
                 num_free_refunded += 1
             self.artifacts.remove(artifact)
@@ -150,8 +169,12 @@ class CraftingEvent(models.Model):
             if artifact.pk not in craftings_by_art_id:
                 if artifact.character != self.relevant_character:
                     raise ValueError("cannot craft artifact held by someone else.")
-                if artifact.power_full_set.filter(id=self.relevant_power_full_id).first() is not None:
-                    raise ValueError("cannot craft the same power_full onto an artifact twice.")
+                # Don't allow to craft the same revision onto it twice
+                if artifact.power_set.filter(id=self.relevant_power_id).first() is not None:
+                    raise ValueError("cannot craft the same power onto an artifact twice.")
+
+                artifact_cost = self.get_exp_cost_for_crafting_instance(artifact)
+
                 quant_free = 0
                 if num_avail_free > 0:
                     quant_free = 1
@@ -167,7 +190,7 @@ class CraftingEvent(models.Model):
                 power_full.latest_rev.save()
                 power_full.save()
                 if quant_free == 0:
-                    self.total_exp_spent += self.get_exp_cost_per_artifact()
+                    self.total_exp_spent += artifact_cost
             else:
                 # adjust free craftings if necessary
                 crafting = craftings_by_art_id[artifact.pk]
