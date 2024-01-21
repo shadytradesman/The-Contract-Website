@@ -63,7 +63,8 @@ def render_sig_item(context, artifact, user, viewing_character=None, rewarding_c
     if artifact.most_recent_status_change and artifact.most_recent_status_change not in [RECOVERED, REPAIRED]:
         reason_unavail = 'Currently {}.'.format(artifact.get_most_recent_status_change_display())
     render_link = viewing_character is not None
-    events = artifact.craftingevent_set.all().order_by("id").reverse() #We can have multiple versions of one gift on an artifact.  We only want to show the newest (highest ID)
+    #We can have multiple versions of one gift on an artifact.  We only want to show the newest (highest ID)
+    events = artifact.craftingevent_set.select_related("relevant_character").select_related("relevant_power").order_by("id").reverse().all()
     powers_by_crafter = defaultdict(list)
     powers_by_parent_id = set()
 

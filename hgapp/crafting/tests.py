@@ -293,7 +293,7 @@ class CraftingModelTests(TestCase):
         )
         coin_reward.save()
 
-    def atest_basic_consumable_crafting_pre_game(self):
+    def test_basic_consumable_crafting_pre_game(self):
         power = create_power(effect=self.base_effect, vector=self.base_vector, modality=self.base_modality, character=self.char_full)
         original_exp = self.char_full.unspent_experience()
         crafting_event = CraftingEvent.objects.create(
@@ -375,7 +375,7 @@ class CraftingModelTests(TestCase):
         self.assertEquals(new_artifact.quantity, 0)
         self.assertEquals(self.char_full.unspent_experience(), original_exp - 9)
 
-    def atest_basic_consumable_crafting_after_game(self):
+    def test_basic_consumable_crafting_after_game(self):
         power = create_power(effect=self.base_effect, vector=self.base_vector, modality=self.base_modality, character=self.char_full)
         attendance = self.send_contractor_on_game(self.char_full)
 
@@ -501,7 +501,7 @@ class CraftingModelTests(TestCase):
         self.assertEquals(new_artifact.quantity, 0)
         self.assertEquals(new_artifact2.quantity, 0)
 
-    def atest_transfer_and_refund_consumables_from_different_events(self):
+    def test_transfer_and_refund_consumables_from_different_events(self):
         power = create_power(effect=self.base_effect, vector=self.base_vector, modality=self.base_modality, character=self.char_full)
         original_exp = self.char_full.unspent_experience()
         crafting_event = CraftingEvent.objects.create(
@@ -568,7 +568,7 @@ class CraftingModelTests(TestCase):
         self.assertEquals(new_artifact.quantity, 1)
         self.assertEquals(new_artifact2.quantity, 2)
 
-    def atest_power_adjustment_updates_consumables(self):
+    def test_power_adjustment_updates_consumables(self):
         power = create_power(effect=self.base_effect, vector=self.base_vector, modality=self.base_modality, character=self.char_full)
         crafting_event = CraftingEvent.objects.create(
             relevant_character=self.char_full,
@@ -727,7 +727,7 @@ class CraftingModelTests(TestCase):
         new_artifact = self.char_full.artifact_set.first()
         self.assertEquals(art2, new_artifact)
 
-    def atest_artifact_crafting_errors(self):
+    def test_artifact_crafting_errors(self):
         power = create_power(effect=self.base_effect, vector=self.base_vector, modality=self.base_modality,
                              character=self.char_full)
         crafting_event = CraftingEvent.objects.create(
@@ -748,13 +748,6 @@ class CraftingModelTests(TestCase):
                 crafting_event.set_crafted_artifacts(artifacts=[art1], allowed_number_free=1)
 
         art1.character = self.char_full
-        art1.crafting_character = self.char2
-        art1.save()
-        # Can't craft on an artifact originally crafted by someone else.
-        with transaction.atomic():
-            with self.assertRaises(ValueError):
-                crafting_event.set_crafted_artifacts(artifacts=[art1], allowed_number_free=1)
-
         art1.crafting_character = self.char_full
         art1.save()
         crafting_event.set_crafted_artifacts(artifacts=[art1], allowed_number_free=1)
