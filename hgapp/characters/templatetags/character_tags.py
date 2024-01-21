@@ -65,12 +65,12 @@ def render_sig_item(context, artifact, user, viewing_character=None, rewarding_c
     render_link = viewing_character is not None
     events = artifact.craftingevent_set.all().order_by("id").reverse() #We can have multiple versions of one gift on an artifact.  We only want to show the newest (highest ID)
     powers_by_crafter = defaultdict(list)
-    powers_by_parent_id = defaultdict(list)
+    powers_by_parent_id = set()
 
     for event in events:
         if event.relevant_power.parent_power_id not in powers_by_parent_id:
             powers_by_crafter[event.relevant_character].append(event.relevant_power)
-            powers_by_parent_id[event.relevant_power.parent_power_id] = event.relevant_power
+            powers_by_parent_id.add(event.relevant_power.parent_power_id)
 
     is_early_access = user.profile.early_access_user if user.is_authenticated else False,
     return {

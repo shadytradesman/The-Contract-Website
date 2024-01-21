@@ -15,6 +15,8 @@ NUM_FREE_CONSUMABLES_PER_REWARD = 1
 NUM_FREE_ARTIFACTS_PER_DOWNTIME = 0
 NUM_FREE_ARTIFACTS_PER_REWARD = 1
 
+def get_exp_cost_per_upgrade():
+    return 1
 
 def get_exp_cost_per_consumable():
     return 1
@@ -64,10 +66,10 @@ class CraftingEvent(models.Model):
         
         artifact_cost = self.get_exp_cost_per_artifact()
 
-        last_existing_copy = artifact.power_set.filter(parent_power_id=self.relevant_power_full_id).last()
+        last_existing_copy = artifact.power_set.filter(parent_power_id=self.relevant_power_full_id).order_by("pub_date").last()
 
         if last_existing_copy is not None:
-            artifact_cost = self.relevant_power_full.get_gift_cost_delta(last_existing_copy) + 1
+            artifact_cost = self.relevant_power_full.get_gift_cost_delta(last_existing_copy) + get_exp_cost_per_upgrade()
 
         return artifact_cost
 
