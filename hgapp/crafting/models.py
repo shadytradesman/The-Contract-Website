@@ -172,8 +172,11 @@ class CraftingEvent(models.Model):
                 # Don't allow to craft the same revision onto it twice
                 if artifact.power_set.filter(id=self.relevant_power_id).first() is not None:
                     raise ValueError("cannot craft the same power onto an artifact twice.")
-
                 artifact_cost = self.get_exp_cost_for_crafting_instance(artifact)
+
+                is_upgrade = artifact.power_set.filter(parent_power_id=self.relevant_power_full.pk).count() > 1
+                if is_upgrade and not self.relevant_character.player.profile.early_access_user:
+                    raise ValueError("Early access only")
 
                 quant_free = 0
                 if num_avail_free > 0:
