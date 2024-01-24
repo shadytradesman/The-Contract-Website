@@ -39,6 +39,11 @@ In production it uses a **Postgres 12 AWS RDS DB**. When run locally, it uses ei
 The Contract has a front end build system that uses node and webpack to render .less files, javascript, and other static assets.
 However, many of the static assets don't utilize this build system.
 
+Media files are served via AWS S3. Memcached is used by the primary webservers as a distributed in-memory cache. 
+Asynchronous processing is available utilizing Celery Beat with Redis acting as a message broker. 
+
+Automated bulk emails are sent via Amazon SES. 
+
 ### Contributing
 If you are an active Player of The Contract and would like to contribute to the website, please reach out to Shady Tradesman 
 on Discord, Github, or https://www.thecontractRPG.com for help and guidance on what needs work.
