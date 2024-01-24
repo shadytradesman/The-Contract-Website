@@ -46,7 +46,7 @@ function createArtifact(isPreExisting, name, description, number, id, nonRefunda
 
     // This code is.. not ideal.
     // But.. convert my map to an array to get a list of artifacts that are on there
-    let upgradablePowerIDsAsInt = Object.keys(upgradablePowerIds).map(parseInt)
+    let upgradablePowerIDsAsInt = Object.keys(upgradablePowerIds).map(function(num) { return parseInt(num, 10); });
     let existingPowersOnArtifactFulls = [...new Set([...nonRefundablePowerIds, ...upgradablePowerIDsAsInt])];
     let nonRefundablePowerFulls = existingPowersOnArtifactFulls.map(id=>pageData["power_by_pk"][id])
 
