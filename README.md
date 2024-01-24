@@ -2,16 +2,48 @@
 
 ## Overview
 
-The Contract Website is a web app that enables users to build and manage powers in conjunction with the game The Contract. 
+The Contract Website is an extensive web application for The Contract RPG. Its primary deployment can be found at https://www.TheContractRPG.com/
 
-The website is built in Django 3.2.9 using Python 3.6 It is deployed via Elastic Beanstalk on AWS and uses a Postgres 12 RDS DB.
-When run locally, it uses either a postgres database hydrated from the main site, or a sqlite database that is check in 
-to the repo (default).
+The goal of the website is to replace the need for a physical print book and elevate the user experience of playing The 
+Contract to one commonly offered by online video games. 
+
+That means the game's rules are not only offered in a guidebook, but also displayed contextually and even obscured entirely (for 
+example, when calculating rewards and advancement costs), allowing Players to play the game without learning all 
+the rules. This offering is common in video games but rare in tabletop games.
+
+Beyond the experiences of learning and playing the game, The Contract Website also eases meta-game organization 
+troubles that emerge when playing with large, loosely-organized groups of Players.
+
+Feature overview:
+
+* Rule management
+  * Interactive character sheets ease / erase the need to know most of the game's rules to create or play a character.
+  * The Custom Gift System allows Players to create and advance equipment and powers for any character concept, automatically generating system text and assigning a power level to anything created.
+  * An online guidebook is easily searchable for every page on the site.
+* Recordkeeping
+  * Registered users can save and share the Contractors, Gifts, and Scenarios they create.
+  * All Contractors, Gifts, and Scenarios maintain full edit histories for auditing.
+  * Sessions are logged into the site along with their participants, allowing the website to provide a full activity history for each Player and Character, GM, and Scenario.
+  * To empower homebrew rules, Players are free to "break the rules" of the game when managing their materials, but the website will flag those differences to other Players and GMs.
+* Community
+  * Groups of Players can organize into Playgroups. 
+  * GMs and Playgroup leaders can advertise their Playgroups and upcoming sessions on "looking-for-game" pages.
+  * Each Playgroup gets its own news feed of in-game events and out-of-game activity to keep all the Players informed.
+  * Playgroup leaders can manage the membership and permissions of their Playgroups with flexible role-based access controls (RBAC)
+
+## Developer's Guide
+The Contract Website is built in **Django 3.2.9** using **Python 3.6**. 
+
+In production it uses a **Postgres 12 AWS RDS DB**. When run locally, it uses either a postgres database hydrated from the main site, or a sqlite database that is checked into the repo (default).
 
 The Contract has a front end build system that uses node and webpack to render .less files, javascript, and other static assets.
-However, most of the static assets don't utilize this build system.
+However, many of the static assets don't utilize this build system.
 
-## Getting Started
+### Contributing
+If you are an active Player of The Contract and would like to contribute to the website, please reach out to Shady Tradesman 
+on Discord, Github, or https://www.thecontractRPG.com for help and guidance on what needs work.
+
+### Getting Started
 
 #### Setting up Environment
 
@@ -48,7 +80,3 @@ would like to overwrite any existing files.
 1. The admin's credentials are `admin:nobnobnob`. There are also a bunch of test users (user1, user2, user3, etc) with 
 the password `nobnobnob` 
 
-## Contributing
-
-Please do! We have open github issues, but we recommend reaching out to Shady Tradesman before contributing so he can help
-you find appropriate bug / feature / cleanup work.
