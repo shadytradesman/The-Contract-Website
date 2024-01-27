@@ -61,7 +61,7 @@ packaging==21.3
 paramiko==2.10.1
 pathspec==0.5.9
 pilkit==2.0
-Pillow==9.3.0
+Pillow==10.2.0
 pinax-eventlog==2.0.3
 pinax-images==5.0.1
 pinax-theme-bootstrap==8.0.1
