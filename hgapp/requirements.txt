@@ -13,7 +13,7 @@ botocore==1.27.51
 cached-property==1.5.1
 celery==5.3.4
 cement==2.8.2
-certifi==2020.4.5.1
+certifi==2022.12.7
 cffi==1.15.0
 chardet==3.0.4
 charset-normalizer==2.1.1
@@ -61,7 +61,7 @@ packaging==21.3
 paramiko==2.10.1
 pathspec==0.5.9
 pilkit==2.0
-Pillow==9.0.1
+Pillow==9.3.0
 pinax-eventlog==2.0.3
 pinax-images==5.0.1
 pinax-theme-bootstrap==8.0.1

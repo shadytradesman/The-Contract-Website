@@ -30,6 +30,8 @@ Feature overview:
   * GMs and Playgroup leaders can advertise their Playgroups and upcoming sessions on "looking-for-game" pages.
   * Each Playgroup gets its own news feed of in-game events and out-of-game activity to keep all the Players informed.
   * Playgroup leaders can manage the membership and permissions of their Playgroups with flexible role-based access controls (RBAC)
+  * Direct-messaging and profile customization
+  * Hall of fame, graveyard, and community content discovery pages
 
 ## Developer's Guide
 The Contract Website is built in **Django 3.2.9** using **Python 3.6**. 
