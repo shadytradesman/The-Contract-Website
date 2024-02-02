@@ -69,7 +69,7 @@ class CraftingEvent(models.Model):
         last_existing_copy = artifact.power_set.filter(parent_power_id=self.relevant_power_full_id).order_by("pub_date").last()
 
         if last_existing_copy is not None:
-            delta = self.exp_earned() < self.max_bonus_exp()
+            delta = self.relevant_power_full.get_gift_cost_delta(last_existing_copy)
             artifact_cost = (delta + get_exp_cost_per_upgrade()) if delta != 0 else 0
 
         return artifact_cost
