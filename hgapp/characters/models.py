@@ -568,6 +568,7 @@ class Character(models.Model):
         self._update_loss_count()
         self._update_victory_count()
         self._update_game_count()
+        self._update_exp_earned()
         effective_victories = self.effective_victories()
         self.status = self.calculate_status(num_victories=effective_victories)
         self.save()
@@ -1070,10 +1071,17 @@ Archived on: {}
         gifts = self._archive_text_gifts()
         return "\n\n".join([header, stats, other_stat_info, gifts])
 
-
     def can_get_bonus_exp(self):
-        return not self.is_dead and self.exp_earned() < (EXP_NEW_CHAR + 10 + (self.num_victories * 12))
+        return not self.is_dead and self.exp_earned() < self.max_bonus_exp()
 
+    def overearned_exp(self):
+        return self.exp_earned() > self.max_bonus_exp()
+
+    def overspent_bonus_exp(self):
+        return self.exp_earned() > self.max_bonus_exp()
+
+    def max_bonus_exp(self):
+        return (EXP_NEW_CHAR + 16 + (self.num_games * 12))
 
     def unspent_experience(self):
         total_exp = self.exp_earned()

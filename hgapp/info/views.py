@@ -7,7 +7,7 @@ from characters.forms import InjuryForm
 from powers.models import Base_Power, Power_Full
 from info.models import FrontPageInfo
 from profiles.models import Profile
-from characters.models import CharacterTutorial, Ability, Character, Attribute
+from characters.models import CharacterTutorial, Ability, Character, Attribute, NOT_PORTED
 from games.models import Scenario
 from django.forms.models import model_to_dict
 from django.templatetags.static import static

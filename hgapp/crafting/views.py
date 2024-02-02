@@ -308,9 +308,13 @@ class Craft(View):
                     previous_revisions = artifact.power_set.filter(parent_power_id=upgradablePower).order_by('-pub_date')
                     if previous_revisions.count() >= 2:
                         previous_revision_for_upgradable_power = previous_revisions[1]
-                        upgradable_costs_by_pk[upgradablePower] = all_crafter_powers_full_object_by_artifact_id[upgradablePower].get_gift_cost_delta(previous_revision_for_upgradable_power) + get_exp_cost_per_upgrade()
+                        delta = all_crafter_powers_full_object_by_artifact_id[upgradablePower]\
+                            .get_gift_cost_delta(previous_revision_for_upgradable_power)
+                        upgradable_costs_by_pk[upgradablePower] = (delta + get_exp_cost_per_upgrade()) if delta > 0 else 0
                 else:
-                    upgradable_costs_by_pk[upgradablePower] = all_crafter_powers_full_object_by_artifact_id[upgradablePower].get_gift_cost_delta(power_revisions_on_artifact_by_parent_id[upgradablePower]) + get_exp_cost_per_upgrade()
+                    delta = all_crafter_powers_full_object_by_artifact_id[upgradablePower]\
+                        .get_gift_cost_delta(power_revisions_on_artifact_by_parent_id[upgradablePower])
+                    upgradable_costs_by_pk[upgradablePower] =  (delta + get_exp_cost_per_upgrade()) if delta > 0 else 0
 
             current_fulls.difference_update(refundable_fulls)
             existing_artifact_ids.add(artifact.pk)
