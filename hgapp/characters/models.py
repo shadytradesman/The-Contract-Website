@@ -1904,6 +1904,14 @@ class ExperienceReward(models.Model):
     def __str__(self):
         return "{} for {} ({})".format(self.get_value(), self.rewarded_player.username, self.type)
 
+    def save(self, *args, **kwargs):
+        existing = get_object_or_none(Attribute, pk=self.pk)
+        super().save(*args, **kwargs)
+        if existing is None and not self.is_void and hasattr(self, "rewarded_character") and self.rewarded_character is not None:
+            self.rewarded_character.earned_exp += self.get_value()
+            self.rewarded_character.save()
+
+
     def mark_void(self):
         self.is_void = True
         self.save()
