@@ -306,6 +306,62 @@ class CharacterArtifacts:
             if artifact.character is not None and artifact.character != character:
                 self.lost_signature_items.append(artifact)
 
+def view_character_stock(request, character_id, secret_key=None):
+    character = get_object_or_404(Character, id=character_id)
+    character = Character.objects.filter(id=character.id).select_related("stats_snapshot").first()
+    if character.player and secret_key:
+        return HttpResponseRedirect(reverse('characters:characters_view', args=(character_id,)))
+    if not character.player_can_view(request.user):
+        raise PermissionDenied("You do not have permission to view this Contractor")
+    secret_key_valid = False
+    if secret_key:
+        secret_key_valid = character.is_editable_with_key(secret_key)
+    else:
+        secret_key = ""
+    user_can_edit = (request.user.is_authenticated and character.player_can_edit(request.user)) or secret_key_valid
+    user_can_gm = character.player_can_gm(request.user)
+
+    legacy_powers = character.power_full_set.filter(dice_system=SYS_LEGACY_POWERS).all()
+    new_powers = character.power_full_set.filter(dice_system=SYS_PS2, crafting_type=CRAFTING_NONE).select_related("latest_rev__modality").select_related("latest_rev__vector").select_related("latest_rev__base").all()
+    crafting_artifact_gifts = character.power_full_set.filter(dice_system=SYS_PS2, crafting_type=CRAFTING_ARTIFACT).select_related("latest_rev__modality").select_related("latest_rev__vector").select_related("latest_rev__base").all()
+    crafting_consumable_gifts = character.power_full_set.filter(dice_system=SYS_PS2, crafting_type=CRAFTING_CONSUMABLE).select_related("latest_rev__modality").select_related("latest_rev__vector").select_related("latest_rev__base").all()
+    equipment_form = EquipmentForm()
+
+    artifact_form = None
+    default_trophy_form = None
+    world_element_cell_choices = None
+    condition_form = None
+
+    world_element_initial_cell = character.world_element_initial_cell()
+    if user_can_edit or user_can_gm:
+        condition_form = make_world_element_form(world_element_cell_choices, world_element_initial_cell)
+        world_element_cell_choices = character.world_element_cell_choices()
+        artifact_form = make_world_element_form(world_element_cell_choices, world_element_initial_cell)
+        default_trophy_form = get_default_world_element_choice_form(TROPHY)
+
+    char_artifacts = CharacterArtifacts(character, world_element_cell_choices)
+    artifacts = dict(char_artifacts.artifacts)
+
+    context = {
+        'user_can_edit': user_can_edit,
+        'user_can_gm': user_can_gm,
+        'character': character,
+        'equipment_form': equipment_form,
+        'artifact_form': artifact_form,
+        'artifacts_by_cell': artifacts,
+        'legacy_powers': legacy_powers,
+        'new_powers': new_powers,
+        'crafting_artifact_gifts': crafting_artifact_gifts,
+        'crafting_consumable_gifts': crafting_consumable_gifts,
+        'signature_items': char_artifacts.signature_items,
+        'consumables': char_artifacts.consumables,
+        'avail_crafted_artifacts': char_artifacts.avail_crafted_artifacts,
+        'unavail_crafted_artifacts': char_artifacts.unavail_crafted_artifacts,
+        'default_trophy_form': default_trophy_form,
+        'lost_signature_items': char_artifacts.lost_signature_items,
+        'condition_form': condition_form,
+    }
+    return render(request, 'characters/view_pages/tab_stock.html', context)
 
 def view_character(request, character_id, secret_key=None):
     character = get_object_or_404(Character, id=character_id)
@@ -331,17 +387,11 @@ def view_character(request, character_id, secret_key=None):
                  "user_can_edit": user_can_edit}
         return render(request, 'characters/legacy_character.html', context)
 
-    legacy_powers = character.power_full_set.filter(dice_system=SYS_LEGACY_POWERS).all()
-    new_powers = character.power_full_set.filter(dice_system=SYS_PS2, crafting_type=CRAFTING_NONE).select_related("latest_rev__modality").select_related("latest_rev__vector").select_related("latest_rev__base").all()
-    crafting_artifact_gifts = character.power_full_set.filter(dice_system=SYS_PS2, crafting_type=CRAFTING_ARTIFACT).select_related("latest_rev__modality").select_related("latest_rev__vector").select_related("latest_rev__base").all()
-    crafting_consumable_gifts = character.power_full_set.filter(dice_system=SYS_PS2, crafting_type=CRAFTING_CONSUMABLE).select_related("latest_rev__modality").select_related("latest_rev__vector").select_related("latest_rev__base").all()
-
     ability_value_by_name, ability_value_by_id = character.get_abilities_by_name_and_id()
     unspent_experience = character.unspent_experience()
     exp_earned = character.exp_earned()
     exp_cost = character.exp_cost()
 
-    equipment_form = EquipmentForm()
     bio_form = BioForm()
 
     num_journal_entries = character.num_journals if character.num_journals else 0
@@ -370,31 +420,24 @@ def view_character(request, character_id, secret_key=None):
 
     circumstance_form = None
     condition_form = None
-    artifact_form = None
     world_element_initial_cell = character.world_element_initial_cell()
     world_element_cell_choices = None
     default_scar_field = None
     default_condition_form = None
     default_circumstance_form = None
     default_trauma_form = None
-    default_trophy_form = None
     element_description_by_name = None
     if user_can_edit or user_can_gm:
         # We only need these choices if the user can edit, both for forms and for char sheet.
         world_element_cell_choices = character.world_element_cell_choices()
         circumstance_form = make_world_element_form(world_element_cell_choices, world_element_initial_cell)
         condition_form = make_world_element_form(world_element_cell_choices, world_element_initial_cell)
-        artifact_form = make_world_element_form(world_element_cell_choices, world_element_initial_cell)
         default_scar_field = get_default_scar_choice_form()
         default_condition_form = get_default_world_element_choice_form(CONDITION)
         default_circumstance_form = get_default_world_element_choice_form(CIRCUMSTANCE)
         default_trauma_form = get_default_world_element_choice_form(TRAUMA)
-        default_trophy_form = get_default_world_element_choice_form(TROPHY)
         element_descriptions = StockWorldElement.objects.filter(is_user_created=False).values_list('name', 'description')
         element_description_by_name = {x[0]: x[1] for x in element_descriptions}
-
-    char_artifacts = CharacterArtifacts(character, world_element_cell_choices)
-    artifacts = dict(char_artifacts.artifacts)
 
     circumstances = get_world_element_default_dict(world_element_cell_choices)
     for circumstance in character.circumstance_set.exclude(is_deleted=True).all():
@@ -442,14 +485,12 @@ def view_character(request, character_id, secret_key=None):
         'element_description_by_name': element_description_by_name,
         'default_condition_form': default_condition_form,
         'default_circumstance_form': default_circumstance_form,
-        'default_trophy_form': default_trophy_form,
         'default_trauma_form': default_trauma_form,
         'trauma_form': TraumaForm(prefix="trauma"),
         'injury_form': InjuryForm(request.POST, prefix="injury"),
         'exp_cost': exp_cost,
         'exp_earned': exp_earned,
         'unspent_experience': unspent_experience,
-        'equipment_form': equipment_form,
         'bio_form': bio_form,
         'notes_form': NotesForm(),
         'secret_key': secret_key,
@@ -465,8 +506,6 @@ def view_character(request, character_id, secret_key=None):
         'available_gift': available_gift,
         'circumstance_form': circumstance_form,
         'condition_form': condition_form,
-        'artifact_form': artifact_form,
-        'artifacts_by_cell': artifacts,
         'conditions_by_cell': conditions,
         'circumstances_by_cell': circumstances,
         'trouble_circumstances': deleted_but_not_bought_off_circumstances,
@@ -475,15 +514,6 @@ def view_character(request, character_id, secret_key=None):
         'assets': assets,
         'liabilities': liabilities,
         'weapons_by_type': get_weapons_by_type(),
-        'legacy_powers': legacy_powers,
-        'new_powers': new_powers,
-        'crafting_artifact_gifts': crafting_artifact_gifts,
-        'crafting_consumable_gifts': crafting_consumable_gifts,
-        'signature_items': char_artifacts.signature_items,
-        'consumables': char_artifacts.consumables,
-        'avail_crafted_artifacts': char_artifacts.avail_crafted_artifacts,
-        'unavail_crafted_artifacts': char_artifacts.unavail_crafted_artifacts,
-        'lost_signature_items': char_artifacts.lost_signature_items,
         'num_improvements': character.num_improvements() if character.player == request.user else None,
         'num_gifts': character.num_gifts() if character.player == request.user else None,
         'num_spent_rewards': num_spent_rewards,

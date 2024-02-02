@@ -8,6 +8,7 @@ app_name = 'characters'
 urlpatterns = [
     # ex: .com/contractor/view/c/110
     url(r'^(?P<character_id>[\d]+)/$', views.view_character, name='characters_view'),
+    url(r'^(?P<character_id>[\d]+)/stock/$', views.view_character_stock, name='characters_view_stock'),
     url(r'^view/c/(?P<character_id>[\d]+)/$',
         RedirectView.as_view(pattern_name='characters:characters_view', query_string=True, permanent=True)),
     # ex: .com/contractor/view/c/110/6db20aef104038d363eca31985142c08daa82be57e29e53ad3c8171b9d46083f

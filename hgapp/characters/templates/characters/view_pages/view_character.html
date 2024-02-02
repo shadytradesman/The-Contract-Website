@@ -115,7 +115,16 @@
                         {% include "characters/view_pages/tab_stats.html" %}
                     </div>
                     <div role="tabpanel" class="tab-pane" id="community">
-                        {% include "characters/view_pages/tab_stock.html" %}
+                        <div hx-get="{% url 'characters:characters_view_stock' character.pk %}" hx-trigger="load">
+                            <div class="css-loading">
+                                <h1 style="margin-bottom: 0px; margin-top: 10px;">
+                                    <span class="glyphicon glyphicon-refresh spin" ></span>
+                                </h1>
+                                <h2 style="margin-top: 0px;">
+                                    <small style="margin-top: 0px;">Loading...</small>
+                                </h2>
+                            </div>
+                        </div>
                     </div>
                     <div role="tabpanel" class="tab-pane " id="setting">
                         {% include "characters/view_pages/tab_story.html" %}
