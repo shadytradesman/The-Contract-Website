@@ -4,11 +4,13 @@ from hgapp.utilities import get_object_or_none
 from .models import Weapon, EXP_REWARD_VALUES, EXP_QUESTIONNAIRE_INITIAL
 from collections import defaultdict
 
+
 # If applicable, returns an object containing info about what journal a character can write for a reward.
 def get_characters_next_journal_credit(character):
     chosen_attendance = None
     is_downtime = False
     attendances_without_game_journals = character.game_attendance_set \
+        .select_related("relevant_game") \
         .filter(relevant_game__end_time__isnull=False, journal__isnull=True) \
         .order_by("relevant_game__end_time") \
         .all()
@@ -22,6 +24,7 @@ def get_characters_next_journal_credit(character):
             if not downtime_journal:
                 chosen_attendance = attendance
                 is_downtime = True
+                break
     if chosen_attendance:
         reward_is_improvement = Journal.get_num_journals_until_improvement(character) <= 1 and not is_downtime
         return {"attendance": chosen_attendance, "is_downtime": is_downtime, "reward_is_improvement": reward_is_improvement}

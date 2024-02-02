@@ -40,15 +40,15 @@ def guidebook_search_blob():
 
 
 def _get_guide_index_blob():
-    sections = GuideSection.objects.filter(is_deleted=False, is_hidden=False).all()
+    sections = GuideSection.objects.filter(is_deleted=False, is_hidden=False).values('slug', 'title', 'tags', 'book_id').all()
     section_by_tag = defaultdict(list)
     for section in sections:
         search_hit = {
-            "url": section.to_url(),
-            "title": section.title,
+            "url": GuideSection.section_to_url(section["book_id"], section["slug"]),
+            "title": section["title"],
         }
-        tags = section.tags if section.tags else []
-        tags.extend(section.title.split())
+        tags = section["tags"] if section["tags"] else []
+        tags.extend(section["title"].split())
         for tag in tags:
             section_by_tag[tag.lower()].append(search_hit)
     return {

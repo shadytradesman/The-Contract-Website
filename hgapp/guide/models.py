@@ -75,6 +75,9 @@ class GuideSection(models.Model):
     def to_url(self):
         return "{}#{}".format(reverse('guide:read_guidebook', args=(self.book_id,)), self.slug)
 
+    @staticmethod
+    def section_to_url(book_id, slug):
+        return "{}#{}".format(reverse('guide:read_guidebook', args=(book_id,)), slug)
 
 class GuidePic(models.Model):
     slug = models.SlugField(primary_key=True)

@@ -397,7 +397,7 @@ def view_character(request, character_id, secret_key=None):
     num_journal_entries = character.num_journals if character.num_journals else 0
     latest_journals = []
     if num_journal_entries > 0:
-        journal_query = Journal.objects.filter(game_attendance__attending_character=character.id).order_by('-created_date')
+        journal_query = Journal.objects.select_related("game_attendance__attending_character").filter(game_attendance__attending_character=character.id).order_by('-created_date')
         if request.user.is_anonymous or not request.user.profile.view_adult_content:
             journal_query = journal_query.exclude(is_nsfw=True)
         journals = journal_query.all()
@@ -440,7 +440,7 @@ def view_character(request, character_id, secret_key=None):
         element_description_by_name = {x[0]: x[1] for x in element_descriptions}
 
     circumstances = get_world_element_default_dict(world_element_cell_choices)
-    for circumstance in character.circumstance_set.exclude(is_deleted=True).all():
+    for circumstance in character.circumstance_set.select_related("cell").exclude(is_deleted=True).all():
         cell = circumstance.cell if circumstance.cell else character.cell
         circumstances[cell].append(circumstance)
     circumstances = dict(circumstances)
@@ -449,15 +449,15 @@ def view_character(request, character_id, secret_key=None):
             if x.record_of_quirk_grant()]
 
     conditions = get_world_element_default_dict(world_element_cell_choices)
-    for condition in character.condition_set.exclude(is_deleted=True).all():
+    for condition in character.condition_set.select_related("cell").exclude(is_deleted=True).all():
         conditions[condition.cell].append(condition)
     conditions = dict(conditions)
     deleted_but_not_bought_off_conditions \
         = [x for x in character.condition_set.filter(cell__isnull=True, is_deleted=True, deleted_by_quirk_removal=False).all() \
            if x.record_of_quirk_grant()]
 
-    assets = character.stats_snapshot.assetdetails_set.all()
-    liabilities = character.stats_snapshot.liabilitydetails_set.all()
+    assets = character.stats_snapshot.assetdetails_set.select_related("relevant_asset").all()
+    liabilities = character.stats_snapshot.liabilitydetails_set.select_related("relevant_liability").all()
     attributes = character.get_attributes()
     attribute_value_by_id = {}
     for attr in attributes:
@@ -470,6 +470,8 @@ def view_character(request, character_id, secret_key=None):
     num_questions_answered = character.answer_set.filter(is_valid=True).count()
     context = {
         'character': character,
+        'num_mind_levels': character.num_mind_levels(),
+        'num_body_levels': character.num_body_levels(),
         'unspent_exp': unspent_exp,
         'user_can_edit': user_can_edit,
         'user_can_gm': user_can_gm,
