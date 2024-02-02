@@ -384,6 +384,7 @@ class Character(models.Model):
     num_victories = models.IntegerField(default=0)
     num_losses = models.IntegerField(default=0)
     num_journals = models.IntegerField(default=0)
+    earned_exp = models.IntegerField(default=0)
 
     ported = models.CharField(choices=PORT_STATUS,
                                max_length=50,
@@ -575,6 +576,9 @@ class Character(models.Model):
 
     def effective_victories(self):
         return self.number_of_victories() + PORTED_GIFT_ADJUSTMENT[self.ported]
+
+    def effective_num_games(self):
+        return self.num_games + PORTED_GIFT_ADJUSTMENT[self.ported]
 
     def is_rewardable(self):
         num_spent_rewards = self.num_active_spent_rewards()
@@ -1078,22 +1082,30 @@ Archived on: {}
         return self.exp_earned() > self.max_bonus_exp()
 
     def overspent_bonus_exp(self):
-        return self.exp_earned() > self.max_bonus_exp()
+        return self.exp_cost() > self.max_bonus_exp()
 
     def max_bonus_exp(self):
-        return (EXP_NEW_CHAR + 16 + (self.num_games * 12))
+        return (EXP_NEW_CHAR + 16 + (self.effective_num_games() * 12))
 
     def unspent_experience(self):
         total_exp = self.exp_earned()
         exp_cost = self.exp_cost()
         return int(total_exp - exp_cost)
 
+    def spendable_experience(self):
+        if self.overearned_exp():
+            return self.max_bonus_exp() - self.exp_cost()
+        return self.unspent_experience()
+
     def exp_earned(self):
+        return self.earned_exp
+
+    def _update_exp_earned(self):
         rewards = self.experiencereward_set.filter(is_void=False).all()
         total_exp = EXP_NEW_CHAR
         for reward in rewards:
             total_exp = total_exp + reward.get_value()
-        return int(total_exp) + PORTED_EXP_ADJUSTMENT[self.ported]
+        self.earned_exp = int(total_exp) + PORTED_EXP_ADJUSTMENT[self.ported]
 
     def exp_cost(self):
         crafting_cost = self.craftingevent_set.aggregate(Sum('total_exp_spent'))['total_exp_spent__sum']
@@ -1895,6 +1907,13 @@ class ExperienceReward(models.Model):
     def mark_void(self):
         self.is_void = True
         self.save()
+
+    def refund_from_character(self):
+        if not hasattr(self, "rewarded_character") or self.rewarded_character is None:
+            raise ValueError("attempted to unassign unassigned exp reward")
+        self.rewarded_character = None
+        self.save()
+
 
     def source_blurb(self):
         if hasattr(self, 'custom_reason') and self.custom_reason:

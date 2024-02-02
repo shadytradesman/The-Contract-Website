@@ -52,6 +52,13 @@ def leaderboard(request):
     top_scenario_words = Scenario.objects.order_by('-num_words', '-times_run').filter(creator__profile__is_private=False, times_run__gt=0)[:num_to_fetch]
     top_scenario_deadliness = Scenario.objects.filter(num_gms_run__gt=1, times_run__gt=2).filter(creator__profile__is_private=False).order_by('-deadliness_ratio')[:num_to_fetch]
 
+    over_characters = []
+    for character in Character.objects.filter(is_dead=False, ported=NOT_PORTED).all():
+        if not character.can_get_bonus_exp():
+            over_characters.append(character)
+
+
+
     context = {
         "top_players": top_players,
         "top_ringer_players": top_contractors_players,

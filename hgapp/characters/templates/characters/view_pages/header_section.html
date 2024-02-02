@@ -3,7 +3,7 @@
 <div class="text-center css-header-buttons">
     {% if user_can_edit %}
         <ul class="nav nav-pills nav-justified">
-            {% if unspent_exp > 1 %}
+            {% if character.spendable_experience > 1 %}
                 <li><a href="{% url 'characters:characters_edit' character.id secret_key %}" class="btn btn-success" style="height: 42px; padding: 10px;">
                     <span style="position: relative; bottom: 7px;">
                         Edit Contractor
@@ -45,7 +45,7 @@
             {% if character.player %}
                 <li>
                     <a href="{% url 'characters:characters_spend_reward' character.id %}" class="btn
-                    {% if available_gift and not character_at_reward_limit and not character_over_reward_limit or unspent_exp > 1 %}
+                    {% if available_gift and not character_at_reward_limit and not character_over_reward_limit %}
                     btn-success
                     {% else %}
                     btn-default
@@ -54,7 +54,7 @@
                             style="position: relative; bottom: 7px;"
                             {% endif %} >
                         Advance Contractor
-                        {% if available_gift%}
+                        {% if available_gift %}
                         <small>
                             <small>
                                 <div>

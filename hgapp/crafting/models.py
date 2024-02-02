@@ -70,7 +70,7 @@ class CraftingEvent(models.Model):
 
         if last_existing_copy is not None:
             delta = self.exp_earned() < self.max_bonus_exp()
-            artifact_cost = (delta + get_exp_cost_per_upgrade()) if delta > 0 else 0
+            artifact_cost = (delta + get_exp_cost_per_upgrade()) if delta != 0 else 0
 
         return artifact_cost
 

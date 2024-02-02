@@ -678,7 +678,7 @@ def spend_reward(request, character_id):
     if not character.player_can_edit(request.user):
         raise PermissionDenied("You do not have permission to edit this Character")
     unassigned_powers = request.user.power_full_set.filter(is_deleted=False, character__isnull=True).all()
-    unspent_exp = character.unspent_experience()
+    unspent_exp = character.spendable_experience()
     num_spent_rewards = character.num_active_spent_rewards()
     num_total_rewards = character.num_active_rewards()
     character_at_reward_limit = character.effective_victories() > 1 and (2 * character.effective_victories()) == num_spent_rewards
@@ -722,6 +722,8 @@ def allocate_gm_exp(request, secret_key = None):
                         reward.rewarded_character = char
                         reward.created_time = timezone.now()
                         reward.save()
+                        char._update_exp_earned()
+                        char.save()
             return HttpResponseRedirect(reverse('home'))
         else:
             raise ValueError("Invalid reward forms")
