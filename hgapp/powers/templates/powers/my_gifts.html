@@ -1,0 +1,51 @@
+{% extends "site_base.html" %}
+
+{% block head_title %}My Gifts{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% load account_tags %}
+{% load power_tags %}
+{% load ad_tags %}
+
+{% block body_base %}
+<div class="container">
+    <h1 class="text-center">My Gifts</h1>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="text-center">
+                <h4>
+                    This collection contains all the
+                    <a href="/guide/rules/#gifts">Gifts</a>
+                    you've created that are not yet assigned to a Contractor.
+                </h4>
+                <a href="{% url 'powers:powers_create_ps2' %}" class="btn btn-primary">
+                    Create Gift
+                </a>
+                <a href="{% url 'powers:powers_stock' %}" class="btn btn-default">
+                    Stock Gifts
+                </a>
+            </div>
+            {% if unassigned_powers %}
+            <div class="row css-home-row" style="margin-top: 5px; margin-bottom: 5px;">
+                <h4 class="text-center">Unassigned Gifts</h4>
+            </div>
+            <div class="" style="display:flex; flex-wrap: wrap; justify-content: center;">
+                {% for power_full in unassigned_powers %}
+                    <a href="{% url 'powers:powers_view_power_full' power_full.id %}">
+                        <div style="max-width: 500px; min-width: 40%; margin: 5px;">
+                            {% if power_full.latest_rev_id %}
+                                {% power_heading power_full.latest_rev power_full %}
+                            {% endif %}
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <h4 class="text-center">You have not yet created any Gifts.</h4>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% render_fake_ad request.user %}
+{% endblock %}

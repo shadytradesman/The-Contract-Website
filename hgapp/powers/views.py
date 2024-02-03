@@ -102,6 +102,16 @@ def powers_and_examples(request):
     }
     return render(request, 'powers/powers_and_examples.html', context)
 
+
+@login_required
+def my_gifts(request):
+    unassigned_powers = request.user.power_full_set.filter(is_deleted=False, character__isnull=True).select_related('latest_rev').order_by('name').all()
+    context = {
+        'unassigned_powers': unassigned_powers,
+    }
+    return render(request, 'powers/my_gifts.html', context)
+
+
 def powers_and_effects(request):
     base_powers_list = Base_Power.objects.filter(is_public=True).order_by('name').all()
     context = {

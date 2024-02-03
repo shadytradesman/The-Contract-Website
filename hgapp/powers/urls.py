@@ -44,6 +44,9 @@ urlpatterns = [
     # ex: .com/gift/and-effects
     url(r'^and-effects/$', views.powers_and_effects, name='powers_and_effects'),
 
+    # ex: .com/gift/my
+    url(r'^my/$', views.my_gifts, name='my_gifts'),
+
     # ex: .com/gift/delete/110
     url(r'^delete/(?P<power_id>[\d]+)/$', views.delete_power, name='powers_delete_power'),
     url(r'^delete/p/(?P<power_id>[\d]+)/$',

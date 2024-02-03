@@ -163,9 +163,6 @@ def home(request):
         if hasattr(request.user, 'profile'):
             if not request.user.profile.confirmed_agreements:
                 return HttpResponseRedirect(reverse('profiles:profiles_terms'))
-        living_characters = request.user.character_set.filter(is_deleted=False, is_dead=False).order_by('name').all()
-        dead_characters = request.user.character_set.filter(is_deleted=False, is_dead=True).order_by('name').all()
-        my_powers = request.user.power_full_set.filter(is_deleted=False, character__isnull=True).select_related('latest_rev').order_by('name').all()
         new_players = User.objects.order_by('-date_joined').filter(profile__is_private=False)[:6]
         new_powers = Power_Full.objects.filter(private=False, is_deleted=False).filter(owner__profile__is_private=False).order_by('-id')[:6]
         new_characters = Character.objects.filter(private=False, is_deleted=False).filter(player__profile__is_private=False).order_by('-id')[:6]
@@ -175,9 +172,6 @@ def home(request):
         active_games_attending = request.user.game_set.filter(status=GAME_STATUS[1][0])
         active_games_creator = request.user.game_creator.filter(status=GAME_STATUS[1][0])
         active_games = list(chain(active_games_attending, active_games_creator))
-        avail_improvements = request.user.profile.get_avail_improvements()
-        avail_charon_coins = request.user.profile.get_avail_charon_coins()
-        avail_exp_rewards = request.user.profile.get_avail_exp_rewards()
         cells = request.user.cell_set.filter(cellmembership__is_banned=False).all()
         world_events = None
         cell_invites = None
@@ -199,38 +193,46 @@ def home(request):
                                                       relevant_power__isnull=True,
                                                       rewarded_player=request.user, is_improvement=False).first()
         context = {
-            'living_characters': living_characters,
-            'dead_characters': dead_characters,
-            'powers': my_powers,
             'new_players': new_players,
             'new_powers': new_powers,
             'new_characters': new_characters,
             'upcoming_games_running': upcoming_games_running,
             'upcoming_games_invited': upcoming_games_invited,
             'active_games': active_games,
-            'avail_improvements': avail_improvements,
-            'avail_charon_coins': avail_charon_coins,
             'cells': cells,
             'cell_invites': cell_invites,
             'world_events': world_events,
             'attendance_invites_to_confirm': attendance_invites_to_confirm,
-            'avail_exp_rewards': avail_exp_rewards,
             'latest_blog_post': latest_blog_post,
             'email_verified': email_verified,
             'timeline_notifications': timeline_notifications,
             'expand_contractors': True,
             'expand_playgroups': cells.count() < 5,
-            'expand_gifts': my_powers.count() < 3,
+            'expand_gifts': True,
             'expand_contracts': True,
             'visited_tutorial': visited_tutorial,
             'completed_a_contract': completed_a_contract,
             'rewarded_a_contractor': rewarded_a_contractor,
             'gift_earned': gift_earned,
         }
-        if request.user.profile.early_access_user:
-            return render(request, 'new_logged_in_homepage.html', context)
-        else:
-            return render(request, 'logged_in_homepage.html', context)
+        return render(request, 'logged_in_homepage.html', context)
+
+
+@login_required
+def logged_in_contractors(request):
+    living_characters = request.user.character_set.filter(is_deleted=False, is_dead=False).order_by('name').all()
+    dead_characters = request.user.character_set.filter(is_deleted=False, is_dead=True).order_by('name').all()
+    avail_improvements = request.user.profile.get_avail_improvements()
+    avail_charon_coins = request.user.profile.get_avail_charon_coins()
+    avail_exp_rewards = request.user.profile.get_avail_exp_rewards()
+    context = {
+        'living_characters': living_characters,
+        'dead_characters': dead_characters,
+        'avail_improvements': avail_improvements,
+        'avail_charon_coins': avail_charon_coins,
+        'avail_exp_rewards': avail_exp_rewards,
+    }
+    return render(request, 'logged_in_contractors.html', context)
 
 
 def csrf_failure(request, reason=""):

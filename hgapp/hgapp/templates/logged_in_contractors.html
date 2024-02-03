@@ -1,0 +1,55 @@
+<div class="css-nav-section-content">
+    {% if not living_characters and not dead_characters %}
+    <div>
+        <div class="alert alert-warning text-center css-contractor-alert" style="margin-top:10px;">
+            <h3>Who are you?</h3>
+            <p>You haven't made any Contractors yet.</p>
+            <br>
+            <div>
+                <a href="{% url 'characters:characters_create' %}" class="btn btn-primary btn-lg">Time to change that</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% if avail_exp_rewards or avail_improvements %}
+    <div class="alert alert-success text-center css-home-alert css-contractor-alert" style="margin-top:10px;">
+        <h4>
+            Allocate Rewards to your Contractors
+        </h4>
+        {% if avail_exp_rewards %}
+        <a href="{% url 'characters:characters_allocate_gm_exp' %}" class="btn btn-primary">
+            Grant {{avail_exp_rewards|length}} Exp Reward{{avail_exp_rewards|pluralize}}
+        </a>
+        {% endif %}
+        {% if avail_improvements %}
+        <a href="{% url 'games:games_allocate_improvement_generic' %}" class="btn btn-primary">
+            Grant {{avail_improvements|length}} Improvement{{avail_improvements|pluralize}}
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+    <div>
+
+        {% if living_characters or dead_characters%}
+        {% if living_characters %}
+        <div class="">
+            {% for character in living_characters %}
+            {% include "homepage_contractor_badge_snip.html" %}
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% if dead_characters %}
+        <a class="wiki-entry-collapsible">
+            <div class=" css-transparent-overlay">
+                <h4 style="padding: 10px;">View Deceased Contractors</h4>
+            </div>
+        </a>
+        <div class="collapse-content clearfix" style="display:none;">
+            {% for character in dead_characters %}
+            {% include "homepage_contractor_badge_snip.html" %}
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endif %}
+    </div>
+</div>

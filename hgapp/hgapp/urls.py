@@ -14,6 +14,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^messages/', include('postman.urls', namespace="postman"), name="postman"),
     url(r"^$", views.home, name="home"),
+    url(r"^home/contractors$", views.logged_in_contractors, name="logged_in_contractors"),
     url(r'^gift/', include('powers.urls'), name="powers"),
     url(r'^powers/', views.RedirectRootUrlView.as_view(new_root="/gift", permanent="true")),
     url(r"^account/signup/$", views.SignupView.as_view(), name="account_signup"),

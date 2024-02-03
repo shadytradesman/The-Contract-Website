@@ -17,6 +17,7 @@
 
 {% block extra_scripts %}
     <script src="{% static 'overrides/wiki-macro-scripts.js' %}"></script>
+    <script src="{% static 'overrides/homepage-scripts.js' %}"></script>
 {% endblock %}
 
 {% block body_base %}
@@ -55,14 +56,7 @@
 <div class="container">
     <div id="" class="row">
         <div class="col-xs-12 col-md-4" style="margin-top: 0px;">
-            <div class="visible-xs-block text-center" style="margin-top: 10px;" >
-                <a href="#news-feed" >
-                    Jump to news feed
-                </a>
-            </div>
             <div class="panel-group" id="accordion1">
-
-
                 <div class="panel panel-default css-start-play-section" style="margin-top: 10px;">
                     <a data-toggle="collapse" data-parent="#accordion" href="#collapse-play-3" class="css-accordion-header-button {% if not expand_contracts %}collapsed{%endif%}">
                         <div class="">
@@ -74,8 +68,7 @@
                         </div>
                     </a>
                     <div id="collapse-play-3" class="panel-collapse  collapse
-                                {% if expand_contracts %} in {% endif %}
-">
+                                {% if expand_contracts %} js-auto-in {% endif %} ">
                         <div class="css-accordion-body">
                             <ul class="nav nav-pills nav-justified">
                                 <li>
@@ -169,7 +162,6 @@
                 </div>
 
 
-
                 <div class="panel panel-default css-start-play-section" style="margin-top: 10px;">
                     <a data-toggle="collapse" data-parent="#accordion" href="#collapse-play-2" class="css-accordion-header-button {% if not expand_playgroups %} collapsed {% endif %}">
                         <div class="">
@@ -180,7 +172,7 @@
                             </div>
                         </div>
                     </a>
-                    <div id="collapse-play-2" class="panel-collapse collapse {% if expand_playgroups %} in {% endif %}">
+                    <div id="collapse-play-2" class="panel-collapse collapse {% if expand_playgroups %} js-auto-in {% endif %}">
                         <div class="css-accordion-body">
 
                             <ul class="nav nav-pills nav-justified">
@@ -253,6 +245,7 @@
                     </div>
                 </div>
 
+
                 <div class="panel panel-default css-start-play-section" style="margin-top: 10px;">
                     <a data-toggle="collapse" data-parent="#accordion" href="#collapse-play-4" class="css-accordion-header-button {% if not expand_gifts %}collapsed{%endif%}">
                         <div class="">
@@ -263,7 +256,7 @@
                             </div>
                         </div>
                     </a>
-                    <div id="collapse-play-4" class="panel-collapse  collapse {% if expand_gifts %}in{%endif%}">
+                    <div id="collapse-play-4" class="panel-collapse  collapse {% if expand_gifts %}js-auto-in{%endif%}">
                         <div class="css-accordion-body">
                             <ul class="nav nav-pills nav-justified">
                                 <li>
@@ -276,32 +269,19 @@
                                         Stock Gifts
                                     </a>
                                 </li>
+                                <li>
+                                    <a href="{% url 'powers:my_gifts' %}" class="btn btn-default">
+                                        My Gifts
+                                    </a>
+                                </li>
                             </ul>
                             <div>
-                                {% if powers %}
-                                    <div class="row css-home-row" style="margin-top: 5px; margin-bottom: 5px;">
-                                            <h4 class="text-center">Unassigned Gifts</h4>
-                                    </div>
-                                    <div class="row css-home-row">
-                                        {% for power_full in powers %}
-                                        <a href="{% url 'powers:powers_view_power_full' power_full.id %}">
-                                            <div >
-                                                {% if power_full.latest_rev %}
-                                                    {% power_heading power_full.latest_rev %}
-                                                {% endif %}
-                                            </div>
-                                        </a>
-                                        {% endfor %}
-                                    </div>
-                                {% else %}
-                                  <h4 class="text-center">You have not yet created any Gifts.</h4>
-                                {% endif %}
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="panel panel-default css-start-play-section" style="margin-top: 20px; margin-bottom: 5px;">
+                <div class="panel panel-default css-start-play-section" style="margin-top: 10px; margin-bottom: 5px;">
                     <a data-toggle="collapse" data-parent="#accordion" href="#collapse-play-1" class="css-accordion-header-button {% if not expand_contractors %}collapsed{%endif%}">
                         <div class="">
                             <div class="panel-heading css-accordion-header" >
@@ -311,9 +291,8 @@
                             </div>
                         </div>
                     </a>
-                    <div id="collapse-play-1" class="panel-collapse collapse {% if expand_contractors%}in{%endif%}">
+                    <div id="collapse-play-1" class="panel-collapse collapse {% if expand_contractors%}js-auto-in{%endif%}">
                         <div class="css-accordion-body ">
-
                             <ul class="nav nav-pills nav-justified">
                                 <li>
                                     <a href="{% url 'characters:characters_create' %}" class="btn btn-primary">
@@ -330,59 +309,15 @@
                                 </li>
                             </ul>
                             <div class="css-nav-section-content">
-
-                                {% if not living_characters and not dead_characters %}
-                                <div>
-                                    <div class="alert alert-warning text-center css-contractor-alert" style="margin-top:10px;">
-                                        <h3>Who are you?</h3>
-                                        <p>You haven't made any Contractors yet.</p>
-                                        <br>
-                                        <div>
-                                            <a href="{% url 'characters:characters_create' %}" class="btn btn-primary btn-lg">Time to change that</a>
-                                        </div>
+                                <div hx-get="{% url 'logged_in_contractors' %}" hx-trigger="load">
+                                    <div class="css-loading" style="text-align: center;">
+                                        <h1 style="margin-bottom: 0px; margin-top: 10px;">
+                                            <span class="glyphicon glyphicon-refresh spin" ></span>
+                                        </h1>
+                                        <h2 style="margin-top: 0px;">
+                                            <small style="margin-top: 0px;">Loading...</small>
+                                        </h2>
                                     </div>
-                                </div>
-                                {% endif %}
-                                {% if avail_exp_rewards or avail_improvements %}
-                                <div class="alert alert-success text-center css-home-alert css-contractor-alert" style="margin-top:10px;">
-                                    <h4>
-                                        Allocate Rewards to your Contractors
-                                    </h4>
-                                    {% if avail_exp_rewards %}
-                                    <a href="{% url 'characters:characters_allocate_gm_exp' %}" class="btn btn-primary">
-                                        Grant {{avail_exp_rewards|length}} Exp Reward{{avail_exp_rewards|pluralize}}
-                                    </a>
-                                    {% endif %}
-                                    {% if avail_improvements %}
-                                    <a href="{% url 'games:games_allocate_improvement_generic' %}" class="btn btn-primary">
-                                        Grant {{avail_improvements|length}} Improvement{{avail_improvements|pluralize}}
-                                    </a>
-                                    {% endif %}
-                                </div>
-                                {% endif %}
-                                <div>
-
-                                    {% if living_characters or dead_characters%}
-                                    {% if living_characters %}
-                                    <div class="">
-                                        {% for character in living_characters %}
-                                            {% include "homepage_contractor_badge_snip.html" %}
-                                        {% endfor %}
-                                    </div>
-                                    {% endif %}
-                                    {% if dead_characters %}
-                                    <a class="wiki-entry-collapsible">
-                                        <div class=" css-transparent-overlay">
-                                            <h4 style="padding: 10px;">View Deceased Contractors</h4>
-                                        </div>
-                                    </a>
-                                    <div class="collapse-content clearfix" style="display:none;">
-                                        {% for character in dead_characters %}
-                                            {% include "homepage_contractor_badge_snip.html" %}
-                                        {% endfor %}
-                                    </div>
-                                    {% endif %}
-                                    {% endif %}
                                 </div>
                             </div>
                         </div>

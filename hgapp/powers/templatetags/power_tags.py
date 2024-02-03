@@ -102,10 +102,10 @@ def power_badge(context, power_full, force_show_warnings=False, artifact=None, c
     }
 
 @register.inclusion_tag('powers/ps2_view_pages/heading_snip.html')
-def power_heading(power):
+def power_heading(power, power_full=None):
     latest_revision = power
-    power_full = power.parent_power
-    character = power_full.character if power_full.character else None
+    power_full = power.parent_power if power_full is None else power_full
+    character = power_full.character if power_full.character_id else None
     show_status_warning = False
     if character:
         show_status_warning = not latest_revision.passes_status_check(character.status)
