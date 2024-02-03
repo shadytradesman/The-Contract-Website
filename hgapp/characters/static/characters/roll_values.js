@@ -1,7 +1,7 @@
-const abilityValueById = JSON.parse(document.getElementById('abilityValueById').textContent);
-const attributeValueById = JSON.parse(document.getElementById('attributeValueById').textContent);
 
 function updateRollValues() {
+    let abilityValueById = JSON.parse(document.getElementById('abilityValueById').textContent);
+    let attributeValueById = JSON.parse(document.getElementById('attributeValueById').textContent);
     $(".js-roll-num-dice").each(function(){
         const attrId = parseInt($(this).attr('data-attr-id'));
         const isMind = $(this).attr('data-is-mind');
@@ -40,3 +40,5 @@ function updateRollValues() {
 window.onload = function () {
     updateRollValues();
 };
+
+$(updateRollValues);

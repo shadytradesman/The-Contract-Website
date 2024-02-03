@@ -98,4 +98,3 @@ $(".css-consumable-item").on("submit",".js-use-consumable-form", function (e) {
         }
     })
 })
-
