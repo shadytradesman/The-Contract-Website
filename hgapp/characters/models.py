@@ -474,8 +474,6 @@ class Character(models.Model):
 
     mental_damage = models.PositiveIntegerField(default=0)
 
-    attribute_bonuses = {}
-
     class Meta:
         permissions = (
             ('view_private_character', 'View private character'),
@@ -1402,10 +1400,8 @@ Archived on: {}
         return health_rows
 
     def get_bonus_for_attribute(self, attribute):
-        if self.attribute_bonuses is None or attribute.pk not in self.attribute_bonuses:
-            existing_bonus = get_object_or_none(AttributeBonus, character=self, attribute=attribute)
-            self.attribute_bonuses[attribute.pk] = existing_bonus.value if existing_bonus else 0
-        return self.attribute_bonuses[attribute.pk]
+        existing_bonus = get_object_or_none(AttributeBonus, character=self, attribute=attribute)
+        return existing_bonus.value if existing_bonus else 0
 
     def set_bonus_for_attribute(self, attribute, value):
         existing_bonus = get_object_or_none(AttributeBonus, character=self, attribute=attribute)
@@ -2719,7 +2715,6 @@ class TraitValue(models.Model):
 
 class AttributeValue(TraitValue):
     relevant_attribute = models.ForeignKey(Attribute, on_delete=models.CASCADE)
-    bonus_val = None
 
 
     class Meta:
@@ -2730,9 +2725,7 @@ class AttributeValue(TraitValue):
         ]
 
     def val_with_bonuses(self):
-        if self.bonus_val is None:
-            self.bonus_val = self.value + self.relevant_stats.assigned_character.get_bonus_for_attribute(attribute=self.relevant_attribute)
-        return self.bonus_val
+        return self.value + self.relevant_stats.assigned_character.get_bonus_for_attribute(attribute=self.relevant_attribute)
 
     def get_class(self):
         return AttributeValue
