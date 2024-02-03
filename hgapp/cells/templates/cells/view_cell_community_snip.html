@@ -66,13 +66,6 @@
                             <small>
                                 A {{character.number_of_victories }}-Victory {{ character.get_contractor_status_display }} Contractor
                             </small>
-                            {% if character.num_unspent_rewards > 0 and can_edit_characters %}
-                            <br>
-                                <a class="btn btn-success btn-xs"
-                                   href="{% url 'characters:characters_spend_reward' character.id %}">
-                                    Spend Rewards
-                                </a>
-                            {% endif %}
                         </div>
                     {% endfor %}
                 </div>

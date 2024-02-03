@@ -269,7 +269,7 @@ def view_cell(request, cell_id):
             memberships_and_characters = memberships_and_characters + ((membership, characters,),)
     upcoming_games = cell.game_set.filter(status=GAME_STATUS[0][0])
     completed_games = cell.completed_games()
-    world_events = WorldEvent.objects.filter(parent_cell=cell).order_by("-created_date").all()
+    world_events = WorldEvent.objects.filter(parent_cell=cell).order_by("-created_date").all()[:10]
 
     can_view_community_link = cell.is_community_link_public or user_membership
     community_link = cell.community_link if can_view_community_link else None
@@ -311,6 +311,17 @@ def view_cell(request, cell_id):
         'show_webhook_tip': show_webhook_tip,
     }
     return render(request, 'cells/view_cell.html', context)
+
+
+def view_cell_events(request, cell_id):
+    cell = get_object_or_404(Cell, id=cell_id)
+    world_events = WorldEvent.objects.filter(parent_cell=cell).order_by("-created_date").all()
+    context = {
+        "cell": cell,
+        "world_events": world_events,
+    }
+    return render(request, 'cells/world_events.html', context)
+
 
 def invite_players(request, cell_id):
     if not request.user.is_authenticated:

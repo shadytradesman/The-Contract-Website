@@ -1,0 +1,35 @@
+{% extends "site_base.html" %}
+
+{% block head_title %}My Gifts{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% load account_tags %}
+{% load power_tags %}
+{% load ad_tags %}
+{% load static %}
+
+{% block extra_styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'cells/view_cell_events.css' %}" />
+{% endblock %}
+
+{% block body_base %}
+<div class="container">
+    <h1 class="text-center">
+        World Events of
+        <a href="{% url 'cells:cells_view_cell' cell.id %}">
+            {{cell.name}}
+        </a>
+    </h1>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            {% for event in world_events %}
+                <div id="event-{{event.id}}">
+                    {% include "cells/world_event_snip.html" %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% render_fake_ad request.user %}
+{% endblock %}

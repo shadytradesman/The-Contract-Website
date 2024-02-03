@@ -53,4 +53,7 @@
             {% include "cells/world_event_snip.html" %}
         </div>
     {% endfor %}
+    <a href="{% url 'cells:cells_world_events' cell.pk %}">
+        View all World Events
+    </a>
 </div>

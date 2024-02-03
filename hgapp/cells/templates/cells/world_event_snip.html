@@ -22,7 +22,7 @@
                 View Move
             </a>
         {% else %}
-            <a href="#event-{{event.id}}">
+            <a href="{% url 'cells:cells_world_events' cell.id %}#event-{{event.id}}">
                 Permalink
             </a>
         {% endif %}
