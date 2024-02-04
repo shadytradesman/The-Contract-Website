@@ -7,6 +7,11 @@
 {% load account_tags %}
 {% load power_tags %}
 {% load ad_tags %}
+{% load static %}
+
+{% block extra_styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'powers/my_gifts_style.css' %}" />
+{% endblock %}
 
 {% block body_base %}
 <div class="container">
@@ -30,10 +35,10 @@
             <div class="row css-home-row" style="margin-top: 5px; margin-bottom: 5px;">
                 <h4 class="text-center">Unassigned Gifts</h4>
             </div>
-            <div class="" style="display:flex; flex-wrap: wrap; justify-content: center;">
+            <div class="gifts-container" style="">
                 {% for power_full in unassigned_powers %}
                     <a href="{% url 'powers:powers_view_power_full' power_full.id %}">
-                        <div style="max-width: 500px; min-width: 40%; margin: 5px;">
+                        <div class="css-gift-banner" style="">
                             {% if power_full.latest_rev_id %}
                                 {% power_heading power_full.latest_rev power_full %}
                             {% endif %}

@@ -1,0 +1,20 @@
+.gifts-container {
+    display:flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.css-gift-banner {
+    max-width: 48%;
+    min-width: 48%;
+    margin: 5px;
+}
+@media (max-width: 767px) {
+    .gifts-container {
+        justify-content: left;
+
+    }
+    .css-gift-banner {
+        width: 100%;
+    }
+
+}
