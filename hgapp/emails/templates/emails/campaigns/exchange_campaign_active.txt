@@ -1,0 +1,21 @@
+{% extends "emails/base_email.html" %}
+
+{% block email_body %}
+Hey {{user.username}},
+
+We’re glad you’ve been enjoying The Contract!
+
+As we approach our Kickstarter, it’s more important than ever that we have a solid selection of content on the Scenario Exchange to offer to backers.
+
+Please consider supporting The Contract by donating your Scenario to the Exchange! Not only will it allow us to continue offering The Contract and its website for free, it also allows new GMs to enjoy your awesome content, even after you quit playing.
+
+If you’re interested, please consider donating these Scenarios of yours:
+
+{% for scenario in scenarios %}
+{{scenario.title}}:  https://www.thecontractrpg.com{% url 'games:games_view_scenario' scenario.pk %}
+{% endfor %}
+
+Donating a Scenario is as easy as clicking the link for each Scenario above and then clicking the “Submit to Exchange" link at the top of the Scenario's writeup.
+
+Thank you for playing The Contract!
+{% endblock %}

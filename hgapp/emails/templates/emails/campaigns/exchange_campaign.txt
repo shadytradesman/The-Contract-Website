@@ -1,0 +1,25 @@
+{% extends "emails/base_email.html" %}
+
+{% block email_body %}
+Hey {{user.username}},
+
+It’s been a while since you’ve played The Contract, and the Scenarios you wrote are in danger of going extinct.
+
+When everyone who’s played a Scenario stops running it, that Scenario goes “extinct,” never to be played again. That's a bummer. What you created was cool and valuable, and it would be a shame to lose it.
+
+Luckily, we’ve made it easy to share your Scenarios with new GMs, even if you never plan on playing The Contract again.
+
+All you have to do is donate them to the Scenario Exchange! Donating your old Scenarios is a great way to keep them in circulation and support The Contract RPG without spending any money. We share these Scenarios with GMs who donate Scenarios or money to the site or who back the game on Kickstarter.
+
+If you’re interested, please consider donating these old Scenarios of yours:
+
+{% for scenario in scenarios %}
+{{scenario.title}}:  https://www.thecontractrpg.com{% url 'games:games_view_scenario' scenario.pk %}
+{% endfor %}
+
+Donating a Scenario is as easy as clicking the link for each Scenario above and then clicking the “Submit to Exchange" link at the top of the Scenario's writeup.
+
+We will spruce up their formatting, correct typos, and potentially commission illustrations and/or maps for them. If you ever change your mind, you can remove them from the Exchange at any time.
+
+Thank you for playing The Contract!
+{% endblock %}

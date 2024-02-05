@@ -939,6 +939,14 @@ class Scenario(models.Model):
     def __str__(self):
         return self.title
 
+    def can_submit_to_exchange(self):
+        if self.is_on_exchange:
+            return False
+        latest_approval = ScenarioApproval.objects.filter(relevant_scenario=self).order_by("-created_date").first()
+        if latest_approval is not None and latest_approval.is_waiting():
+            return False
+        return len(self.get_steps_to_receive_improvement()) == 0
+
     def get_scheduled_or_active_game_for_gm(self, gm):
         return Game.objects.filter(scenario=self, gm=gm)\
             .exclude(get_scheduled_game_excludes_query())\

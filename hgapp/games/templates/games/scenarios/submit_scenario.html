@@ -170,7 +170,10 @@ Submit Scenario
                             {% endfor %}
                             {% if not scenario.objective %}
                                 <li>
-                                    Edit your Scenario and fill out the newly required fields, such as the Objective.
+                                    <a href="{% url 'games:games_scenario_edit' scenario.pk %}">
+                                        Edit your Scenario
+                                    </a>
+                                    and fill out the newly required fields, such as the Objective.
                                 </li>
                             {% endif %}
                         </ul>

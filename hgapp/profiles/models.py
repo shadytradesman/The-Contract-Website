@@ -328,6 +328,12 @@ class Profile(models.Model):
             .order_by("-relevant_game__end_time") \
             .all()
 
+    def most_recent_game_time(self):
+        invites = self.completed_game_invites()
+        if len(invites) > 0:
+            return invites[0].relevant_game.end_time
+        return None
+
     def get_avail_improvements(self):
         return self.user.rewarded_player.filter(rewarded_character=None,
                                             is_charon_coin=False).filter(is_void=False).all()

@@ -1,0 +1,53 @@
+{% extends "emails/base_email.html" %}
+
+{% block email_body %}
+<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;background:#ffffff;">
+    <p>
+        Hey {{user.username}},
+    </p>
+    <p>
+        It’s been a while since you’ve played The Contract, and the Scenarios you wrote are in danger of going extinct.
+    </p>
+    <p>
+        When everyone who’s played a Scenario stops running it, that Scenario goes “extinct,” never to be played again.
+        That's a bummer. What you created was cool and valuable, and it would be a shame to lose it.
+    </p>
+    <p>
+        Luckily, we’ve made it easy to share your Scenarios with new GMs, even if you never plan on playing The Contract again.
+    </p>
+    <p>
+        All you have to do is donate them to the Scenario Exchange! Donating your old Scenarios is a great way to keep
+        them in circulation and support The Contract RPG without spending any money. We share these Scenarios with GMs
+        who donate Scenarios or money to the site or who back the game on Kickstarter.
+    </p>
+    <p>
+        If you’re interested, please consider donating these old Scenarios of yours:
+    </p>
+    <ul>
+        {% for scenario in scenarios %}
+        <li>
+            <a href="https://www.thecontractrpg.com{% url 'games:games_view_scenario' scenario.pk %}">
+                {{scenario.title}}
+            </a>
+            –
+            <a href="https://www.thecontractrpg.com{% url 'games:games_scenario_submit' scenario.pk%}">
+                <i>
+                    Donate
+                </i>
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+    <p>
+        Donating a Scenario is as easy as clicking the “Donate” link for each Scenario above, scrolling down, and
+        confirming by clicking “Submit to Exchange.”
+    </p>
+    <p>
+        We will spruce up their formatting, correct typos, and potentially commission illustrations and/or maps for them.
+        If you ever change your mind, you can remove them from the Exchange at any time.
+    </p>
+    <p>
+        Thank you for playing The Contract!
+    </p>
+</table>
+{% endblock %}

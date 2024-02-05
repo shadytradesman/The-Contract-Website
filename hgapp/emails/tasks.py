@@ -1,10 +1,13 @@
 from celery import shared_task
+import datetime
 from django.core.mail import send_mail
+from collections import defaultdict
 from django.template.loader import render_to_string
 from django.urls import reverse
 from notifications.models import Notification, CONTRACT_NOTIF, REWARD_NOTIF
 from django.conf import settings
-from games.models import Game, Game_Invite
+from games.models import Game, Game_Invite, Scenario
+from django.utils import timezone
 
 from .models import BouncedEmail
 
@@ -16,6 +19,42 @@ from_email = settings.DEFAULT_FROM_EMAIL
 
 NOTIF_VAR_UPCOMING = "upcoming"
 NOTIF_VAR_FINISHED = "finished"
+
+@shared_task(name="campaign_exchange")
+def campaign_exchange():
+    scenarios = Scenario.objects.filter(num_words__gt=1000, is_on_exchange=False, times_run__gt=0).order_by("creator").all()
+    scenarios_by_creator = defaultdict(list)
+    for scenario in scenarios:
+        if scenario.can_submit_to_exchange():
+            scenarios_by_creator[scenario.creator].append(scenario)
+    for creator, scenarios in scenarios_by_creator.items():
+        recent_time = creator.profile.most_recent_game_time()
+        is_active = True
+        if recent_time is None or recent_time + datetime.timedelta(days=35) > timezone.now():
+            is_active = False
+        if not creator.profile.site_announcements:
+            print("Not sending email to {} because their site announcements are disabled".format(creator.username))
+            continue
+        if len(scenarios) == 0:
+            continue
+        email = creator.profile.get_confirmed_email()
+        if email is None:
+            continue
+        print("sending email to {}".format(creator.username))
+        context = {
+            'user': creator,
+            'scenarios': scenarios,
+        }
+        if is_active:
+            subject = "Support the Contract, donate a Scenario!"
+            html_message = render_to_string("emails/campaigns/exchange_campaign_active.html", context)
+            message = render_to_string('emails/campaigns/exchange_campaign_active.txt', context)
+        else:
+            subject = "Don’t let your Scenarios go extinct!"
+            html_message = render_to_string("emails/campaigns/exchange_campaign.html", context)
+            message = render_to_string('emails/campaigns/exchange_campaign.txt', context)
+
+        send_email(subject, message, from_email, [email.email], fail_silently=False, html_message=html_message)
 
 
 @shared_task(name="send_email")
