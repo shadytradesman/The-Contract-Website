@@ -1,5 +1,5 @@
 // add world element
-$(document).submit(function (e) {
+$(document).on("submit", ".js-world-element-form", function (e) {
     e.preventDefault();
     let form = $(e.target);
     var serializedData = form.serialize();
