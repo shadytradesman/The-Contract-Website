@@ -334,8 +334,8 @@ def view_character_stock(request, character_id, secret_key=None):
 
     world_element_initial_cell = character.world_element_initial_cell()
     if user_can_edit or user_can_gm:
-        condition_form = make_world_element_form(world_element_cell_choices, world_element_initial_cell)
         world_element_cell_choices = character.world_element_cell_choices()
+        condition_form = make_world_element_form(world_element_cell_choices, world_element_initial_cell)
         artifact_form = make_world_element_form(world_element_cell_choices, world_element_initial_cell)
         default_trophy_form = get_default_world_element_choice_form(TROPHY)
 
@@ -358,6 +358,7 @@ def view_character_stock(request, character_id, secret_key=None):
         'avail_crafted_artifacts': char_artifacts.avail_crafted_artifacts,
         'unavail_crafted_artifacts': char_artifacts.unavail_crafted_artifacts,
         'default_trophy_form': default_trophy_form,
+        'weapons_by_type': get_weapons_by_type(),
         'lost_signature_items': char_artifacts.lost_signature_items,
         'condition_form': condition_form,
     }
@@ -515,7 +516,6 @@ def view_character(request, character_id, secret_key=None):
         'initial_cell': world_element_initial_cell,
         'assets': assets,
         'liabilities': liabilities,
-        'weapons_by_type': get_weapons_by_type(),
         'num_improvements': character.num_improvements() if character.player == request.user else None,
         'num_gifts': character.num_gifts() if character.player == request.user else None,
         'num_spent_rewards': num_spent_rewards,

@@ -87,7 +87,7 @@ if (document.getElementById('descByName')) {
     descByName = JSON.parse(document.getElementById('descByName').textContent);
 }
 
-$(".js-premade-element-form select").change(function (e) {
+$(document).on("change", ".js-premade-element-form select", function (e) {
     let selectedOption = e.target.options[e.target.selectedIndex];
     let nameField = $(e.target).closest(".js-world-element-form").find("#id_name");
     let descField = $(e.target).closest(".js-world-element-form").find("#id_description");

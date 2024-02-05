@@ -1,15 +1,15 @@
 // add world element
-$(".js-world-element-form").submit(function (e) {
+$(document).submit(function (e) {
     e.preventDefault();
-    var serializedData = $(this).serialize();
-    var delUrl = $(this).attr("data-delete-world-element-url");
-    var editUrl = $(this).attr("data-edit-world-element-url");
-    var elementContainer = $(this).closest(".js-world-element-container");
-    var form = $(this);
+    let form = $(e.target);
+    var serializedData = form.serialize();
+    var delUrl = form.attr("data-delete-world-element-url");
+    var editUrl = form.attr("data-edit-world-element-url");
+    var elementContainer = form.closest(".js-world-element-container");
 
     $.ajax({
         type: 'POST',
-        url: $(this).attr("data-new-world-element-url"),
+        url: form.attr("data-new-world-element-url"),
         data: serializedData,
         success: function (response) {
             form.trigger('reset');
@@ -36,7 +36,7 @@ $(".js-world-element-form").submit(function (e) {
 })
 
 // delete world-element
-$(".js-world-element-container").on("submit",".js-delete-world-element-form", function (e) {
+$(document).on("submit",".js-delete-world-element-form", function (e) {
     e.preventDefault();
     var serializedData = $(this).serialize();
     var worldElement = $(this);
