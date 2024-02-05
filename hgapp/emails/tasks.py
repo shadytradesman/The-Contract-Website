@@ -29,9 +29,9 @@ def campaign_exchange():
             scenarios_by_creator[scenario.creator].append(scenario)
     for creator, scenarios in scenarios_by_creator.items():
         recent_time = creator.profile.most_recent_game_time()
-        is_active = True
+        is_active = False
         if recent_time is None or recent_time + datetime.timedelta(days=35) > timezone.now():
-            is_active = False
+            is_active = True
         if not creator.profile.site_announcements:
             print("Not sending email to {} because their site announcements are disabled".format(creator.username))
             continue
