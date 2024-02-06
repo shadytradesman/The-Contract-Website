@@ -35,6 +35,7 @@ urlpatterns = [
     url(r"^info/", include("info.urls"), name="info"),
     url(r"^guide/", include("guide.urls"), name="guide"),
     url(r"^image/", include("images.urls"), name="image"),
+    url(r"^report/", include("reporting.urls"), name="reporting"),
     url(r"^journal/", include("journals.urls"), name="journals"),
     url(r"^journals/*", views.RedirectRootUrlView.as_view(new_root="/journal", permanent="true")),
     url(r"^crafting/", include("crafting.urls"), name="crafting"),

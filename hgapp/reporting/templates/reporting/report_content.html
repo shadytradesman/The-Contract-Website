@@ -1,0 +1,35 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+{% load bootstrap %}
+
+{% block extra_head %}
+{{ form.media }}
+{% endblock %}
+
+{% block head_title %}Report Inappropriate Content{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% block body_base %}
+<div class="container">
+    <h1 class="text-center">Report Inappropriate Content</h1>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            {{ form.about.errors }}
+            <form action="{{request.get_full_path}}" method="post">
+                {{ form.non_field_errors }}
+                {% csrf_token %}
+                {{form | bootstrap }}
+                <input class="btn btn-primary" type="submit" value="Submit Report" />
+            </form>
+            <div>
+                <h3>
+                    Reporting:
+                </h3>
+                {{content_object.render_for_report}}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

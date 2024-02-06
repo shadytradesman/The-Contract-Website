@@ -1,0 +1,11 @@
+{% if not empty %}
+  {% if existing_report is not None %}
+    <small class="text-muted">
+      <i>
+        Reported
+      </i>
+    </small>
+  {% else %}
+    <a href="{{url}}" class="btn-xs btn btn-default">Report</a>
+  {% endif %}
+{% endif %}

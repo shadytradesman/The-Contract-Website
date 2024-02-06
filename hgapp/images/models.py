@@ -4,6 +4,10 @@ import uuid
 import os
 from django.core.files.storage import default_storage
 from overrides.storage import PrivateS3Storage
+from .templatetags.image_tags import image_thumb
+from django.utils.safestring import mark_safe
+from django.template import loader
+
 
 
 def image_upload_name(instance, filename):
@@ -67,3 +71,14 @@ class PrivateUserImage(models.Model):
 
     def is_too_small_for_thumb(self):
         return self.image.width <= settings.THUMB_SIZE[0] and self.image.height <= settings.THUMB_SIZE[1]
+
+    def get_responsible_user(self):
+        return self.uploader
+
+    def report_remove(self):
+        pass
+        #TODO: implement
+
+    def render_for_report(self):
+        context = image_thumb({}, self, reportable=False)
+        return mark_safe(loader.get_template("images/image_thumb.html").render(context))

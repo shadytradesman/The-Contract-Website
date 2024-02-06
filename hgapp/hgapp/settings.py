@@ -124,6 +124,7 @@ INSTALLED_APPS = [
     'crafting.apps.CraftingConfig',
     'emails.apps.EmailsConfig',
     'images.apps.ImagesConfig',
+    'reporting.apps.ReportingConfig',
     'notifications.apps.NotificationsConfig',
     'questionnaire.apps.QuestionnaireConfig',
     'ads.apps.AdsConfig',
