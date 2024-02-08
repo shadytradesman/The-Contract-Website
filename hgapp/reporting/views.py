@@ -10,11 +10,12 @@ from django.contrib.contenttypes.models import ContentType
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.db import transaction
 from collections import defaultdict
+from notifications.models import Notification, MESSAGE_NOTIF
 
 from .utilities import ensure_content_type_is_reportable, ensure_content_object_is_reportable, get_url_for_content
 from .forms import ReportForm, ModerationActionForm
 from .models import Report, ACTION_DISMISSED, ACTION_BAN, ACTION_WARN
-
+from profiles.models import Profile
 
 @method_decorator(login_required(login_url='account_login'), name='dispatch')
 class ReportContent(View):
@@ -59,6 +60,13 @@ class ReportContent(View):
                 new_report.url = get_url_for_content(self.content_object, content_type=self.content_type)
                 new_report.content = self.content_object
                 new_report.save()
+                moderators = Profile.objects.filter(is_site_moderator=True).all()
+                for mod in moderators:
+                    Notification.objects.create(user=mod.user,
+                                                headline="New report",
+                                                content="{} has been reported".format(new_report.reported_user.username),
+                                                url=reverse("reporting:moderation_queue"),
+                                                notif_type=MESSAGE_NOTIF)
         else:
             raise ValueError("Invalid form")
 
@@ -119,19 +127,24 @@ class ModerationQueue(View):
 
                     if mod_action != ACTION_DISMISSED:
                         content_object.report_remove()
-                    if mod_action == ACTION_BAN and self.report.reported_user.is_superuser == False and self.report.reported_user.profile.is_site_moderator == False:
-                        self.report.reported_user.is_active = False
-                        self.report.reported_user.save()
-                    # ban user if required
-        return redirect(reverse('reporting:moderation_queue'))
 
+                    # ban user if required
+                    if self.report.reported_user.is_superuser == False and self.report.reported_user.profile.is_site_moderator == False:
+                        num_warnings = Report.objects.filter(reported_user=self.report.reported_user,
+                                                             moderation_action=ACTION_WARN)\
+                            .distinct("moderation_date")\
+                            .count()
+                        if mod_action == ACTION_BAN or num_warnings > 2:
+                            self.report.reported_user.is_active = False
+                            self.report.reported_user.save()
+        return redirect(reverse('reporting:moderation_queue'))
 
     def __get_context_data(self):
         all_reports = Report.objects.filter(moderation_date__isnull=True).order_by("url").all()
         reports_by_subject = defaultdict(list)
         for report in all_reports:
             reports_by_subject[report.url].append(report)
-        closed_reports = Report.objects.filter(moderation_date__isnull=False).order_by("-moderation_date").all()
+        closed_reports = Report.objects.filter(moderation_date__isnull=False).distinct("moderation_date").order_by("-moderation_date").all()
         return {
             "reports_by_subject": dict(reports_by_subject),
             "form": ModerationActionForm(),

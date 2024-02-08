@@ -106,6 +106,13 @@
                             My Scenario Collection
                         </a>
                     </li>
+                    {% if request.user.profile.is_site_moderator or request.user.is_superuser %}
+                        <li>
+                            <a href="{% url 'reporting:moderation_queue' %}">
+                                Moderation Queue
+                            </a>
+                        </li>
+                    {% endif %}
                     {% if request.user.profile.exchange_approver or request.user.is_superuser %}
                         <li>
                             <a href="{% url 'games:games_scenario_approve' %}">
