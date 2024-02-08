@@ -1415,7 +1415,7 @@ def upload_image(request, character_id):
         else:
             raise ValueError("Invalid image upload form")
     upload_form = create_image_upload_form(character)
-    images = character.images.all()
+    images = character.images.exclude(is_deleted=True).all()
     context = {
         "character": character,
         "upload_form": upload_form,

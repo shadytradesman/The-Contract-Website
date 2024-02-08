@@ -63,7 +63,9 @@
 
         </div>
         {% for image in character.images.all %}
-            {% image_thumb image %}
+            {% if not image.is_deleted %}
+                {% image_thumb image %}
+            {% endif %}
         {% endfor %}
     </div>
 {% endif %}

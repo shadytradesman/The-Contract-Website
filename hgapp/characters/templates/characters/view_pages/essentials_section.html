@@ -5,7 +5,9 @@
     {% if character.primary_image %}
         <div class="css-character-primary-image" style="">
             <div class="text-center">
-                {% image_thumb character.primary_image %}
+                {% if not character.primary_image.is_deleted %}
+                    {% image_thumb character.primary_image %}
+                {% endif %}
             </div>
             {% if early_access and user_can_edit%}
             <div class="text-center">

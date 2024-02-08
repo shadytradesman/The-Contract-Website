@@ -130,7 +130,9 @@
                         <i class="text-muted">{{ power.description|linebreaks}}</i>
                     <div>
                         {% for image in power.images.all %}
-                            {% image_thumb image %}
+                            {% if not image.is_deleted %}
+                                {% image_thumb image %}
+                            {% endif %}
                         {% endfor %}
                     </div>
                     {% if can_edit and request.user.is_authenticated and request.user.profile.early_access_user %}

@@ -359,7 +359,7 @@ def upload_image(request, power_id):
         else:
             raise ValueError("Invalid image upload form")
     upload_form = ImageUploadForm()
-    images = power.images.all()
+    images = power.images.exclude(is_deleted=True).all()
     context = {
         "power": power,
         "upload_form": upload_form,

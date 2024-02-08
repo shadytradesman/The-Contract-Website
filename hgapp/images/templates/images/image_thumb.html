@@ -13,7 +13,7 @@
         </a>
     {% endif %}
 </span>
-{% if reportable %}
+{% if reportable and image.uploader != request.user %}
     <div>
         {% report_content_button image %}
     </div>

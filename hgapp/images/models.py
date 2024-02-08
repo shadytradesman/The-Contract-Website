@@ -53,6 +53,7 @@ class PrivateUserImage(models.Model):
     file_size = models.IntegerField()
     uploader = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
     created_date = models.DateTimeField('date created', auto_now_add=True)
+    is_deleted = models.BooleanField(default=False)
 
     class Meta:
         indexes = [
@@ -76,9 +77,11 @@ class PrivateUserImage(models.Model):
         return self.uploader
 
     def report_remove(self):
-        pass
-        #TODO: implement
+        self.is_deleted = True
+        self.save()
 
     def render_for_report(self):
-        context = image_thumb({}, self, reportable=False)
-        return mark_safe(loader.get_template("images/image_thumb.html").render(context))
+        context = {
+            "image": self
+        }
+        return mark_safe(loader.get_template("images/image_report_display.html").render(context))

@@ -2,6 +2,7 @@ from django import template
 
 register = template.Library()
 
+
 @register.inclusion_tag('images/image_thumb.html', takes_context=True)
 def image_thumb(context, image, reportable=True):
     new_context = context

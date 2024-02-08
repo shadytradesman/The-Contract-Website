@@ -1,0 +1,92 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+{% load bootstrap %}
+
+{% block extra_head %}
+{% endblock %}
+
+{% block head_title %}
+  Moderation Queue
+{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% block body_base %}
+<div class="container">
+  <h1 class="text-center">Moderate Reports</h1>
+  <div class="panel panel-default">
+    <div class="panel-body">
+      {% for url, reports in reports_by_subject.items %}
+        <div>
+          {% if reports.0.content %}
+            <h3>
+              Reported content
+            </h3>
+            {{reports.0.content.render_for_report}}
+          {% else %}
+            <h3>Reported url </h3>
+            <a href="{{reports.0.url}}">{{reports.0.url}}</a>
+          {% endif %}
+          <div style="margin-top: 10px; margin-bottom: 10px;">
+            <b>Posted by:</b>
+            <a href="{% url 'profiles:profiles_view_profile' reports.0.reported_user_id %}">{{reports.0.reported_user.username}}</a>
+          </div>
+          <div>
+            <h4>Reports</h4>
+          </div>
+          <ul>
+            {% for report in reports %}
+              <li>
+                <a href="{% url 'profiles:profiles_view_profile' report.reporting_user_id %}">{{report.reporting_user.username}}</a>
+                –
+                {{report.get_reason_display}}
+                {% if report.extended_reason %}
+                <div style="margin-left:20px;">
+                  <i>
+                    {{report.extended_reason|linebreaks}}
+                  </i>
+                </div>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div>
+          <h4>Take action</h4>
+          <form action="{% url 'reporting:moderation_queue' reports.0.pk %}" method="post">
+            {% csrf_token %}
+            {{form.moderation_action|bootstrap}}
+            {{form.moderation_reason|bootstrap}}
+            {{form.moderator_feedback|bootstrap}}
+            <input class="btn btn-primary" type="submit" value="Swing the Hammer" />
+          </form>
+        </div>
+
+        <hr>
+      {% empty %}
+        No content with open reports!
+      {% endfor %}
+    </div>
+    {% if closed_reports %}
+    <h2>Closed Reports</h2>
+      <ul>
+        {% for report in closed_reports %}
+          <li>
+            {{report.moderation_date|timesince}} ago –
+            <a href="{% url 'profiles:profiles_view_profile' report.moderating_user_id %}">
+              {{report.moderating_user.username}}
+            </a>
+            {{report.get_moderation_action_display}}
+            <a href="{% url 'profiles:profiles_view_profile' report.reported_user_id %}">
+              {{report.reported_user.username}}
+            </a>
+
+
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

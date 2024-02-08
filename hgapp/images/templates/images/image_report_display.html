@@ -1,0 +1,39 @@
+{% load image_tags %}
+
+{% image_thumb image False %}
+
+<div style="margin-top:5px;">
+
+{% if image.character_set.count > 0 %}
+    {% for character in image.character_set.all %}
+        <div>
+            <b>
+                On Contractor
+            </b>
+            <ul>
+                <li>
+                    <a href="{% url 'characters:characters_view' character.pk %}">
+                        {{character.name}}
+                    </a>
+                </li>
+            </ul>
+        </div>
+    {% endfor %}
+{% endif %}
+
+{% if image.power_set.count > 0 %}
+    <div>
+        <b>On Gift revisions:</b>
+    </div>
+    <ul>
+    {% for power in image.power_set.all %}
+        <li>
+            <a href="{% url 'powers:powers_view_power' power.pk %}">
+                {{power.name}}
+            </a>
+        </li>
+    {% endfor %}
+    </ul>
+{% endif %}
+
+</div>
