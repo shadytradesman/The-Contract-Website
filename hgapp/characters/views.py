@@ -16,6 +16,8 @@ from django.views import View
 from django.core import serializers
 from collections import defaultdict
 from django.forms import formset_factory
+from django.contrib.auth import REDIRECT_FIELD_NAME
+from account.utils import handle_redirect_to_login
 from django.http import HttpResponseRedirect
 from django.middleware.csrf import rotate_token
 from django.templatetags.static import static
@@ -370,6 +372,8 @@ def view_character(request, character_id, secret_key=None):
     if character.player and secret_key:
         return HttpResponseRedirect(reverse('characters:characters_view', args=(character_id,)))
     if not character.player_can_view(request.user):
+        if request.user.is_anonymous:
+            return handle_redirect_to_login(request, redirect_field_name=REDIRECT_FIELD_NAME)
         raise PermissionDenied("You do not have permission to view this Contractor")
     secret_key_valid = False
     if secret_key:

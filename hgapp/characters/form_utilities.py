@@ -153,6 +153,7 @@ def character_from_post(user, POST, cell):
 
 def update_character_from_post(user, POST, existing_character):
     char_form = make_character_form(user, existing_character)(POST, instance=existing_character)
+    original_private = existing_character.private
     if char_form.is_valid():
         char_form.save(commit=False)
         existing_character.edit_date = timezone.now()
@@ -162,7 +163,7 @@ def update_character_from_post(user, POST, existing_character):
         if ported_character_form and ported_character_form.is_valid():
             existing_character.change_ported_status(ported_character_form.cleaned_data["port_status"])
         existing_character.save()
-        if existing_character.private != char_form.cleaned_data['private']:
+        if original_private != char_form.cleaned_data['private']:
             for power_full in existing_character.power_full_set.all():
                 power_full.set_self_and_children_privacy(is_private=char_form.cleaned_data['private'])
         if existing_character.stats_snapshot:

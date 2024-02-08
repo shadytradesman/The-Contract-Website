@@ -4,6 +4,8 @@ from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
+from django.contrib.auth import REDIRECT_FIELD_NAME
+from account.utils import handle_redirect_to_login
 from django.templatetags.static import static
 from django.template.loader import render_to_string
 from django.views import View
@@ -67,12 +69,16 @@ class CreatePower(EditPower):
         if 'power_full_id' in self.kwargs:
             self.existing_power = get_object_or_404(Power_Full, id=self.kwargs['power_full_id'])
             if not self.existing_power.player_can_view(self.request.user):
+                if self.request.user.is_anonymous:
+                    return handle_redirect_to_login(self.request, redirect_field_name=REDIRECT_FIELD_NAME)
                 raise PermissionDenied("This Power has been deleted, or you're not allowed to view it")
         self.__check_permissions()
         return super().dispatch(*args, **kwargs)
 
     def __check_permissions(self):
         if self.character and not self.character.player_can_edit(self.request.user):
+            if self.request.user.is_anonymous:
+                return handle_redirect_to_login(self.request, redirect_field_name=REDIRECT_FIELD_NAME)
             raise PermissionDenied("You can't give Gifts to a Character you can't edit.")
 
 
@@ -168,6 +174,8 @@ class ViewPower(View):
 
     def __check_permissions(self):
         if not self.power.player_can_view(self.request.user):
+            if self.request.user.is_anonymous:
+                return handle_redirect_to_login(self.request, redirect_field_name=REDIRECT_FIELD_NAME)
             raise PermissionDenied("This Power has been deleted or you're not allowed to view it")
 
     def __get_context_data(self):
@@ -230,6 +238,8 @@ class ViewPower(View):
 def power_full_view(request, power_full_id):
     power_full = get_object_or_404(Power_Full, id=power_full_id)
     if not power_full.player_can_view(request.user):
+        if request.user.is_anonymous:
+            return handle_redirect_to_login(request, redirect_field_name=REDIRECT_FIELD_NAME)
         raise PermissionDenied("This Power has been deleted or you're not allowed to view it")
     most_recent_power = power_full.latest_revision()
     return ViewPower.as_view()(request, power_id=most_recent_power.id)
