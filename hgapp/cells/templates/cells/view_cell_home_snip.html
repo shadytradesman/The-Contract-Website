@@ -1,10 +1,10 @@
 {% load account_tags %}
 
 {% if upcoming_games %}
+    <h4 class="text-center">Upcoming Contracts</h4>
     {% for game in upcoming_games %}
         <div class="alert alert-info text-center css-upcoming-game" role="alert">
             <h4 class="text-center" style="display: inline-block; margin-bottom: 0px;">
-                Upcoming Contract-
                 <a href="{% url 'profiles:profiles_view_profile' game.gm.id %}">
                     {{game.gm.username}}
                 </a>
