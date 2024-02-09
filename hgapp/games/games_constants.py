@@ -52,6 +52,11 @@ def get_completed_game_excludes_query():
             | Q(status=GAME_STATUS[4][0])
 
 
+def get_completed_relevant_game_excludes_query():
+    return Q(relevant_game__status=GAME_STATUS[0][0]) \
+           | Q(relevant_game__status=GAME_STATUS[1][0]) \
+           | Q(relevant_game__status=GAME_STATUS[4][0])
+
 def get_scheduled_game_excludes_query():
     return Q(status=GAME_FINISHED) \
            | Q(status=GAME_ARCHIVED) \

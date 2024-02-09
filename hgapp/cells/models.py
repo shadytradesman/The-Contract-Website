@@ -13,7 +13,7 @@ import hashlib
 
 from hgapp.utilities import get_queryset_size, get_object_or_none
 
-from games.games_constants import get_completed_game_excludes_query
+from games.games_constants import get_completed_game_excludes_query, get_completed_relevant_game_excludes_query
 
 from .permissionUtilities import default_manage_memberships, default_manage_roles, default_post_events, \
     default_manage_characters, default_manage_games, default_edit_world
@@ -276,8 +276,12 @@ class Cell(models.Model):
             .order_by("-end_time")
 
     def num_games_player_participated(self, player):
-        completed_games = self.completed_games()
-        return len([game for game in completed_games if game.player_participated(player)])
+        as_player = player.game_invite_set.filter(is_declined=False, relevant_game__cell=self).exclude(get_completed_relevant_game_excludes_query()).count()
+        as_gm = self.game_set \
+            .filter(gm=player)\
+            .exclude(get_completed_game_excludes_query()).count()
+        return as_player + as_gm
+
 
     def save(self, *args, **kwargs):
         if self.setting_sheet_blurb and self.setting_sheet_blurb[-1] == '.':
