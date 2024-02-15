@@ -69,7 +69,7 @@ class CellModelTests(TestCase):
 
     def test_banned_user_has_proper_perms(self):
         self.cell.addPlayer(self.user2, role=ROLE[0])
-        self.cell.removePlayer(self.user2)
+        self.cell.remove_player(self.user2)
         self.assertFalse(self.user2.has_perm(CELL_PERMISSIONS[1][0], self.cell))
         self.assertFalse(self.user2.has_perm(CELL_PERMISSIONS[2][0], self.cell))
         self.assertFalse(self.user2.has_perm(CELL_PERMISSIONS[3][0], self.cell))
@@ -91,18 +91,18 @@ class CellModelTests(TestCase):
 
     def test_cant_remove_only_leader(self):
         with self.assertRaises(ValueError):
-            self.cell.removePlayer(self.user1)
+            self.cell.remove_player(self.user1)
         self.cell.addPlayer(self.user2, role=ROLE[0])
-        self.cell.removePlayer(self.user1)
+        self.cell.remove_player(self.user1)
         self.assertEqual(self.cell.cellmembership_set.get(role = ROLE[0][0]).member_player, self.user2, "User 2 should be only leader")
         with self.assertRaises(ValueError):
-            self.cell.removePlayer(self.user2)
+            self.cell.remove_player(self.user2)
 
     def test_cant_remove_non_member(self):
         with self.assertRaises(ValueError):
-            self.cell.removePlayer(self.user2)
+            self.cell.remove_player(self.user2)
         self.cell.addPlayer(self.user2, role=ROLE[0])
-        self.cell.removePlayer(self.user1)
+        self.cell.remove_player(self.user1)
         self.assertFalse(self.cell.cellmembership_set.filter(member_player = self.user1))
         self.assertTrue(self.cell.cellmembership_set.filter(member_player = self.user2))
  
@@ -149,7 +149,7 @@ class CellModelTests(TestCase):
         invite = self.cell.invitePlayer(self.user2, text="invite text")
         invite.accept()
         self.assertEqual(len(self.cell.open_invitations()), 0)
-        self.cell.removePlayer(player=self.user2)
+        self.cell.remove_player(player=self.user2)
         reinvite = self.cell.invitePlayer(self.user2, text="invite text")
         self.assertEqual(len(self.cell.open_invitations()), 1)
         reinvite.accept()
@@ -159,7 +159,7 @@ class CellModelTests(TestCase):
         self.cell.invitePlayer(self.user3, text="invite text")
         self.cell.addPlayer(self.user3, role=ROLE[1])
         self.assertEqual(len(self.cell.open_invitations()), 0)
-        self.cell.removePlayer(player=self.user3)
+        self.cell.remove_player(player=self.user3)
         reinvite = self.cell.invitePlayer(self.user3, text="invite text")
         self.assertEqual(len(self.cell.open_invitations()), 1)
         reinvite.accept()

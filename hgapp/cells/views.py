@@ -487,7 +487,7 @@ def leave_cell(request, cell_id):
         form = RsvpForm(request.POST)
         if form.is_valid():
             with transaction.atomic():
-                cell.removePlayer(request.user)
+                cell.remove_player(request.user)
             return HttpResponseRedirect("/")
         else:
             print(form.errors)
@@ -619,7 +619,7 @@ def kick_player(request, cell_id, user_id):
         form = KickForm(request.POST)
         if form.is_valid():
             with transaction.atomic():
-                cell.removePlayer(player)
+                cell.remove_player(player)
         else:
             print(form.errors)
         return HttpResponseRedirect(reverse('cells:cells_manage_members', args=(cell.id,)))

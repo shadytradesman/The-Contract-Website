@@ -195,7 +195,7 @@ class Cell(models.Model):
             invite.save()
         return membership
 
-    def removePlayer(self, player):
+    def remove_player(self, player):
         membership = get_object_or_none(self.cellmembership_set.filter(member_player=player))
         if not membership:
             raise ValueError("player not in cell")

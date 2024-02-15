@@ -125,19 +125,19 @@
                                     {% if upcoming_games_running %}
                                     <div class="alert alert-info text-center css-home-alert">
                                         <b>Upcoming Contracts you're running</b>
-                                        <ul class="nav nav-pills nav-stacked">
+                                        <ul class="nav nav-pills nav-stacked text-left">
                                             {% for game in upcoming_games_running %}
-                                            <li>
-                                                <a href="{% url 'games:games_view_game' game.id %}"><b>{{game.scenario.title}}</b> at {{game.scheduled_start_time}}</a>
-                                            </li>
+                                                <li>
+                                                    <a href="{% url 'games:games_view_game' game.id %}"><b>{{game.scenario.title}}</b> at {{game.scheduled_start_time}}</a>
+                                                </li>
                                             {% endfor %}
                                         </ul>
                                     </div>
                                     {% endif %}
                                     {% if upcoming_games_invited %}
                                     <div class="alert alert-success text-center css-home-alert">
-                                        <b>Upcoming Contracts you can attend</b>
-                                        <ul class="nav nav-pills nav-stacked">
+                                        <b>You're Invited to Attend</b>
+                                        <ul class="nav nav-pills nav-stacked text-left">
                                             {% for game_invite in upcoming_games_invited %}
                                             <li>
                                                 <a href="{% url 'games:games_view_game' game_invite.relevant_game.id %}">
@@ -146,9 +146,10 @@
                                                     {% else %}
                                                     <b>Awaiting RSVP - </b>
                                                     {% endif %}
-                                                    <b>
                                                         {{game_invite.relevant_game.scenario.title}}
-                                                    </b> at {{game_invite.relevant_game.scheduled_start_time}}
+                                                    <div>
+                                                        Starts {{game_invite.relevant_game.scheduled_start_time}}
+                                                    </div>
                                                 </a>
                                             </li>
                                             {% endfor %}
