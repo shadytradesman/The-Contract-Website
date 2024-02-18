@@ -170,7 +170,7 @@ def home(request):
         upcoming_games_running = request.user.game_creator.filter(status=GAME_STATUS[0][0]).all()
         upcoming_games_invited = request.user.game_invite_set.select_related("relevant_game")\
             .filter(relevant_game__status=GAME_STATUS[0][0], is_declined=False)\
-            .order_by("-relevant_game__scheduled_start_time").all()
+            .order_by("relevant_game__scheduled_start_time").all()
         active_games_attending = request.user.game_set.filter(status=GAME_STATUS[1][0])
         active_games_creator = request.user.game_creator.filter(status=GAME_STATUS[1][0])
         active_games = list(chain(active_games_attending, active_games_creator))

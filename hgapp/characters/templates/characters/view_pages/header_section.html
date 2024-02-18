@@ -3,7 +3,8 @@
 <div class="text-center css-header-buttons">
     {% if user_can_edit %}
         <ul class="nav nav-pills nav-justified">
-            {% if character.spendable_experience > 1 %}
+            {% if secret_key and secret_key_valid and request.user.is_authenticated %}
+            {% elif character.spendable_experience > 1 %}
                 <li><a href="{% url 'characters:characters_edit' character.id secret_key %}" class="btn btn-success" style="height: 42px; padding: 10px;">
                     <span style="position: relative; bottom: 7px;">
                         Edit Contractor

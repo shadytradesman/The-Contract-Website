@@ -1073,8 +1073,8 @@ def use_consumable(request, artifact_id):
 
 def transfer_artifact(request, artifact_id):
     artifact = get_object_or_404(Artifact, id=artifact_id)
+    start_char = artifact.character
     if request.method == "POST":
-        start_char = artifact.character
         __check_world_element_perms(request, character=artifact.character, ext_element=Artifact)
         max_quantity = 0
         if artifact.is_consumable:
@@ -1124,6 +1124,7 @@ def delete_scar(request, scar_id, secret_key = None):
             scar.delete()
         return JsonResponse({}, status=200)
     return JsonResponse({"error": ""}, status=400)
+
 
 def post_trauma(request, character_id, secret_key = None):
     if request.is_ajax and request.method == "POST":
