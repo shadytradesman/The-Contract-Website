@@ -315,13 +315,13 @@ class Game(models.Model):
 
     def get_webhook_post(self, request, is_changed_start):
         if is_changed_start:
-            format_string = "{} has updated the start time of their Contract - {} for {} Contractors in {}. The Contract *now* starts at <t:{}:f> (<t:{}:R>). RSVP: {}"
+            format_string = "{} has updated the start time of their Contract - **{}** for **{}** Contractors in {}. The Contract *now* starts at <t:{}:f> (<t:{}:R>). RSVP: {}"
         else:
-            format_string = "{} will run {} for {} Contractors in {}. The Contract starts at <t:{}:f> (<t:{}:R>). RSVP: {}"
+            format_string = "{} will run **{}** for **{}** Contractors in {}. The Contract starts at <t:{}:f> (<t:{}:R>). RSVP: {}"
         return format_string.format(
             self.gm.username,
             self.scenario.title,
-            self.suggested_status,
+            self.get_required_character_status_display(),
             self.cell.name,
             int(self.scheduled_start_time.timestamp()),
             int(self.scheduled_start_time.timestamp()),
