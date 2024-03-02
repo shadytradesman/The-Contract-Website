@@ -41,7 +41,7 @@ class EditWorldForm(forms.Form):
     are_contractors_portable = forms.BooleanField(label='Contractors are Portable',
                                                   required=False,
                                                   help_text='Check this box to allow Contractors to participate in Contracts in other Playgroups. '
-                                                            'If your House Rules affect Gifts, Experience, or Gifts, uncheck this box.')
+                                                            'If your House Rules affect Gifts, Experience, or Improvements, uncheck this box.')
     setting_create_char_info = forms.CharField(label='',
                                                widget=TinyMCE(attrs={'cols': 80, 'rows': 30}),
                                                max_length=80000,
