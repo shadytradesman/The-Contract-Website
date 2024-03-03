@@ -85,6 +85,7 @@
                     {% else %}
                         action="{% url 'journals:journal_write_game' game.id character.id %}"
                     {% endif %}
+                    class="js-disable-on-submit"
                     method="post" onsubmit="setFormSubmitting()">
                 {% csrf_token %}
                 {{form.title|bootstrap}}

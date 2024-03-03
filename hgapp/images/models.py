@@ -41,7 +41,7 @@ class UserImage(models.Model):
     def save(self, *args, **kwargs):
         self.file_size = self.image.size
         if self.file_size > 5_000_000:
-            raise ValueError("Image too large. Size: " + self.file_size)
+            raise ValueError("Image too large. Size: " + str(self.file_size))
         super(UserImage, self).save(*args, **kwargs)
 
 
@@ -67,7 +67,7 @@ class PrivateUserImage(models.Model):
     def save(self, *args, **kwargs):
         self.file_size = self.image.size
         if self.file_size > 5_000_000:
-            raise ValueError("Image too large. Size: " + self.file_size)
+            raise ValueError("Image too large. Size: " + str(self.file_size))
         super(PrivateUserImage, self).save(*args, **kwargs)
 
     def is_too_small_for_thumb(self):

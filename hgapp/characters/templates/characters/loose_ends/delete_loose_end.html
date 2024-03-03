@@ -23,7 +23,8 @@
     </h1>
     <div class="panel panel-default">
         <div class="panel-body js-world-element-form">
-            <form action="{% url 'characters:delete_loose_end' loose_end.id %}"
+            <form  class="js-disable-on-submit"
+                    action="{% url 'characters:delete_loose_end' loose_end.id %}"
                     method="post" onsubmit="setFormSubmitting()">
                 {% csrf_token %}
                 <div style="max-width: 800px; margin: auto;">
@@ -39,7 +40,7 @@
                 </div>
                 {{form|bootstrap}}
                 <div class="text-center">
-                    <input class="btn btn-primary" type="submit" value="Submit" />
+                    <input class="btn btn-primary " type="submit" value="Submit" />
                 </div>
             </form>
         </div>

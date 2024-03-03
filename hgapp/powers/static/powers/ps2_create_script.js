@@ -1098,7 +1098,7 @@ const ComponentRendering = {
         this.changeModality();
         console.log("modality selected");
         console.log("effect: " + powerEditBlob["effect_pk"]);
-        if (this.selectedModality.slug === "signature-item-mod") {
+        if (this.selectedModality.slug === "signature-item-mod" && powerEditBlob["current_artifact"] != null) {
             this.selectedItem = powerEditBlob["current_artifact"];
         }
         let selectedEffect = this.effects.find(comp => comp.slug === powerEditBlob["effect_pk"]);

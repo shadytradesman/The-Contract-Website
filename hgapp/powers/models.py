@@ -1190,7 +1190,7 @@ class Power(models.Model):
             parent.latest_rev = self
             parent.save()
 
-    def to_edit_blob(self):
+    def to_edit_blob(self, for_edit=True):
         if self.dice_system == SYS_LEGACY_POWERS:
             if self.drawback_instance_set.filter(
                     relevant_drawback__slug__in=("unique-focus", "unique-focus-no-prereq")).count():
@@ -1211,7 +1211,7 @@ class Power(models.Model):
         for reward in rewards:
             spent_rewards.append("{} from {}".format(reward.type_text(), reward.reason_text()))
         initial_artifact = None
-        if self.parent_power.crafting_type == CRAFTING_SIGNATURE:
+        if for_edit and self.parent_power.crafting_type == CRAFTING_SIGNATURE:
              initial_artifact = get_object_or_none(self.parent_power.artifactpowerfull_set.filter(relevant_artifact__is_signature=True))
              initial_artifact = initial_artifact.relevant_artifact.pk if initial_artifact else None
         return {

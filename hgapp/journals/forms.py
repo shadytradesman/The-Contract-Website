@@ -8,7 +8,7 @@ class JournalForm(forms.Form):
                             max_length=380)
     content = forms.CharField(label='Journal Body',
                                   widget=TinyMCE(attrs={'cols': 80, 'rows': 30}),
-                                  max_length=73000,
+                                  max_length=93000,
                                   required=False,
                                   help_text='Write in-character. You must write at least 250 words for a Contract journal and 150 words for a Downtime journal to receive rewards.')
     contains_spoilers = forms.BooleanField(label="Contains Spoilers",

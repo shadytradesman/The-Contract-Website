@@ -77,13 +77,13 @@ def make_select_signature_artifact_form(existing_character=None, existing_power=
     initial_artifact_queryset = Artifact.objects.none()
     initial_artifact = None
     if existing_power and existing_power.crafting_type == CRAFTING_SIGNATURE:
-        player_can_edit = existing_character is not None and user is not None and existing_character.player_can_edit(user)
-        if player_can_edit or existing_power.owner == user:
+        player_can_edit_character = existing_character is not None and user is not None and existing_character.player_can_edit(user)
+        player_can_edit_existing_power = existing_power is not None and user is not None and existing_power.player_can_edit(user)
+        if (player_can_edit_character and player_can_edit_existing_power) or existing_power.owner == user:
             initial_artifact = get_object_or_none(existing_power.artifactpowerfull_set.filter(relevant_artifact__is_signature=True, relevant_artifact__is_deleted=False))
         if initial_artifact is not None:
             initial_artifact_queryset = Artifact.objects.filter(pk=initial_artifact.relevant_artifact.pk)
-    if existing_artifact:
-        initial_artifact = existing_artifact
+    if existing_artifact is not None:
         initial_artifact_queryset = Artifact.objects.filter(pk=existing_artifact.pk)
     if existing_character:
         queryset = existing_character.artifact_set.filter(

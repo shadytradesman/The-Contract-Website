@@ -1306,6 +1306,8 @@ def create_ex_game_for_cell(request, cell_id):
         if gm_form.is_valid() and member_formset.is_valid() and outsider_formset.is_valid():
             gm = get_object_or_404(User, username=gm_form.cleaned_data['gm'])
             players = get_players_for_new_attendances(member_formset, outsider_formset)
+            if str(gm.id) in players:
+                raise ValueError("GM cannot attend their own Contract")
             return HttpResponseRedirect(
                 reverse('games:games_edit_ex_game_add_players', args=(cell.id, gm.id, '+'.join(players),)))
         else:

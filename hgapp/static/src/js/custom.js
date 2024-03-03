@@ -5,6 +5,11 @@ $(document).ready(function(){
     });
 });
 
+/* Disable on submit */
+$(document).on("submit", ".js-disable-on-submit", function(e) {
+    $(e.target).find(":submit").prop('disabled', true);
+});
+
 /* notification collapse */
 let navCollapsed = true;
 $(document).on("click", "#js-notif-nav-button", function(e) {

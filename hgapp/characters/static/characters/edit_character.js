@@ -171,6 +171,7 @@ const expToSpend = JSON.parse(document.getElementById('expToSpend').textContent)
 const costs = JSON.parse(document.getElementById('expCosts').textContent)
 var expPrice = 0;
 
+
 function updateExpTotals() {
     updateExpPrice();
     $(".js-remaining-exp").text(expToSpend + expPrice);
@@ -399,4 +400,8 @@ $(document).on("click", "#js-supernatural-no", function() {
     } else {
         $("#js-supernatural-no").button('toggle');
     }
+});
+
+$(function() {
+    $(".source-name").prop('required',true);
 });

@@ -77,7 +77,7 @@ def get_edit_context(existing_power_full=None, is_edit=False, existing_char=None
     }
     form_url = reverse("powers:powers_create_ps2")
     if existing_power_full is not None:
-        context['power_edit_blob'] = json.dumps(existing_power_full.latest_revision().to_edit_blob())
+        context['power_edit_blob'] = json.dumps(existing_power_full.latest_revision().to_edit_blob(for_edit=is_edit))
     if is_edit:
         form_url = reverse("powers:powers_edit_ps2", kwargs={"power_full_id": existing_power_full.pk})
     elif existing_char:

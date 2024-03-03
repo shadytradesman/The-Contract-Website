@@ -19,6 +19,10 @@
     <h2 class="text-center">Assigning Improvement from {{improvement.reason_text}} {{improvement.relevant_game.scenario.name}}</h2>
      <div class="panel panel-default">
         <div class="panel-body">
+            {% if form.queryset.count == 0 %}
+            You do not have any eligible Contractors. Only living Contractors with total Gifts and Improvements totaling
+            fewer than 2 for every Contract victory are eligible.
+            {% else %}
             <form action="{% url 'games:games_allocate_improvement' improvement.id %}" method="post" class="form-inline">
                 {{ form.non_field_errors }}
                 {{ form.management_form }}
@@ -31,6 +35,7 @@
                     <input class="btn btn-primary" type="submit" value="Confirm" />
                 </div>
             </form>
+            {% endif %}
         </div>
      </div>
 </div>

@@ -44,6 +44,7 @@ class WriteJournal(View):
         form = self.form_class(request.POST)
         if form.is_valid():
             with transaction.atomic():
+                self.character = Character.objects.select_for_update().get(pk=self.character.id)
                 journal = Journal(title=form.cleaned_data['title'],
                                   writer=request.user,
                                   game_attendance=self.game_attendance,
