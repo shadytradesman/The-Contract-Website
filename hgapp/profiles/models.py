@@ -93,6 +93,7 @@ class Profile(models.Model):
     ps2_user = models.BooleanField(default=False)
     early_access_user = models.BooleanField(default=False)
     is_site_moderator = models.BooleanField(default=False)
+    can_edit_guidebook = models.BooleanField(default=False)
     date_confirmed_agreements = models.DateTimeField(blank=True, null=True)
     player_prefix = models.CharField(choices=PLAYER_PREFIX,
                                      max_length=25,
