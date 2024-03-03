@@ -24,7 +24,7 @@ class ReadGuideBook(View):
 
     def __get_context_data(self):
         guidebook = get_object_or_404(GuideBook, pk=self.kwargs['guidebook_slug'])
-        can_edit = self.request.user.is_superuser or self.request.user.profile.can_edit_guidebook if self.request.user else False
+        can_edit = (self.request.user.is_superuser or self.request.user.profile.can_edit_guidebook) if self.request.user.is_authenticated else False
         sections = guidebook.get_sections_in_order(is_admin=can_edit)
         tutorial = CharacterTutorial.objects.first()
         context = {
@@ -43,7 +43,7 @@ class DeleteGuideSection(View):
     current_section = None # currently editing section
 
     def dispatch(self, *args, **kwargs):
-        if not (self.request.user.is_superuser or self.request.user.profile.can_edit_guidebook):
+        if not (self.request.user.is_superuser or self.request.user.profile and self.request.user.profile.can_edit_guidebook):
             raise PermissionDenied("Only admins can edit the players guide")
         self.guidebook = get_object_or_404(GuideBook, pk=self.kwargs['guidebook_slug'])
         self.current_section = get_object_or_404(GuideSection,
@@ -83,7 +83,7 @@ class WriteGuideSection(View):
     next_section = None  # Section after this one
 
     def dispatch(self, *args, **kwargs):
-        if not (self.request.user.is_superuser or self.request.user.profile.can_edit_guidebook):
+        if not (self.request.user.is_superuser or self.request.user.profile and self.request.user.profile.can_edit_guidebook):
             raise PermissionDenied("Only admins can edit the players guide")
         self.guidebook = get_object_or_404(GuideBook, pk=self.kwargs['guidebook_slug'])
         return super().dispatch(*args, **kwargs)
@@ -221,7 +221,7 @@ class EditGuidebook(View):
     initial = None
 
     def dispatch(self, *args, **kwargs):
-        if not (self.request.user.is_superuser or self.request.user.profile.can_edit_guidebook):
+        if not (self.request.user.is_superuser or self.request.user.profile and self.request.user.profile.can_edit_guidebook):
             raise PermissionDenied("Only admins can edit the players guide")
         self.guidebook = get_object_or_404(GuideBook, pk=self.kwargs['guidebook_slug'])
         self.initial = {
