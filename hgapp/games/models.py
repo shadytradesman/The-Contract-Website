@@ -1705,6 +1705,9 @@ class ScenarioApproval(models.Model):
     approver = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
     experience_reward = models.OneToOneField(ExperienceReward, null=True, blank=True, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return "{} - {}".format(self.relevant_scenario.title, self.get_status_display())
+
     def is_waiting(self):
         return self.status == WAITING
 
