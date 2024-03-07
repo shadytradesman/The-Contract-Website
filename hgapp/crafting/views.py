@@ -263,17 +263,11 @@ class Craft(View):
 
         existing_artifacts = []
         existing_artifact_ids = set()
-        if early_access:
-            crafted_artifacts = self.character.artifact_set.filter(is_crafted_artifact=True,
-                                                                   crafting_character__isnull=False,
-                                                                   is_deleted=False).all()
-        else:
-            crafted_artifacts = self.character.artifact_set.filter(is_crafted_artifact=True,
-                                                                   crafting_character=self.character,
-                                                                   is_deleted=False).all()
+        crafted_artifacts = self.character.artifact_set.filter(is_crafted_artifact=True,
+                                                               crafting_character__isnull=False,
+                                                               is_deleted=False).all()
         all_contractor_power_full_ids = set(power_fulls.values_list('id', flat=True))
         additional_artifact_power_full_ids = set()
-        early_access = self.request.user.profile.early_access_user if self.request.user else False
         for artifact in crafted_artifacts:
 
             current_fulls = set(artifact.power_full_set.values_list('id', flat=True))
@@ -324,7 +318,7 @@ class Craft(View):
                 "id": artifact.pk,
                 "nonrefundable_power_fulls": list(current_fulls),
                 "refundable_power_fulls": refundable_fulls,
-                "upgradable_power_fulls": upgradable_costs_by_pk if early_access else {},
+                "upgradable_power_fulls": upgradable_costs_by_pk,
             })
 
         for event in self.crafting_events:

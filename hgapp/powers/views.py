@@ -353,8 +353,6 @@ def toggle_active(request, power_id, is_currently_active, art_id=None):
 @login_required
 def upload_image(request, power_id):
     power = get_object_or_404(Power, id=power_id)
-    if not request.user.is_authenticated and request.user.profile.early_access_user:
-        raise PermissionDenied("Early Access only")
     if not power.player_can_edit(request.user):
         raise PermissionDenied("This Power has been deleted, or you're not allowed to edit it")
     if request.method == 'POST':
@@ -382,8 +380,6 @@ def upload_image(request, power_id):
 @login_required
 def delete_image(request, power_id, image_id):
     power = get_object_or_404(Power, id=power_id)
-    if not request.user.is_authenticated and request.user.profile.early_access_user:
-        raise PermissionDenied("Early Access only")
     if not power.player_can_edit(request.user):
         raise PermissionDenied("This Power has been deleted, or you're not allowed to edit it")
     power_image = get_object_or_404(PowerImage, relevant_power=power_id, relevant_image=image_id)

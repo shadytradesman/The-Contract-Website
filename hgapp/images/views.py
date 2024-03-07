@@ -31,8 +31,8 @@ def upload_image_tiny(request):
 
 @login_required
 def upload_image(request):
-    if not request.user.is_authenticated and request.user.profile.early_access_user:
-        raise PermissionError("Early Access only")
+    if not request.user.is_authenticated:
+        raise PermissionError("Must be logged in")
 
     if request.POST:
         scenario_id = request.POST["scenario"]

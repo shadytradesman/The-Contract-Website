@@ -134,7 +134,7 @@
                         {% endif %}
                     {% endfor %}
                 </div>
-                {% if can_edit and is_early_access %}
+                {% if can_edit %}
                 <div style="margin: 5px;">
                     <a href="{% url 'powers:powers_upload_image' latest_revision.id %}">
                         <div class="btn btn-default btn-xs">
@@ -193,7 +193,7 @@
                             {% endif %}
                         {% endfor %}
                     </div>
-                    {% if can_edit and is_early_access %}
+                    {% if can_edit %}
                         <div style="margin: 5px;">
                             <a href="{% url 'powers:powers_upload_image' latest_revision.id %}">
                                 <div class="btn btn-default btn-xs">

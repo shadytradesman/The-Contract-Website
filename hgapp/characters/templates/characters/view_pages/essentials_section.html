@@ -9,7 +9,7 @@
                     {% image_thumb character.primary_image %}
                 {% endif %}
             </div>
-            {% if early_access and user_can_edit%}
+            {% if user_can_edit%}
             <div class="text-center">
                 <a href="{% url 'characters:characters_upload_image' character.id %}" class="btn btn-xs btn-default">
                     <span class="glyphicon glyphicon-picture" aria-hidden="true"></span>
@@ -43,7 +43,7 @@
                 in <b>{{character.residence}}</b>,
             {% endif %}
             and often appears as <b>{{character.appearance}}</b>.
-            {% if early_access and not character.primary_image and user_can_edit %}
+            {% if not character.primary_image and user_can_edit %}
                 <a href="{% url 'characters:characters_upload_image' character.id %}" class="btn btn-xs btn-primary">
                     <span class="glyphicon glyphicon-picture" aria-hidden="true"></span>
                     Upload Contractor Image

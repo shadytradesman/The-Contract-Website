@@ -1396,8 +1396,8 @@ def edit_world_element(request, element_id, element, secret_key=None):
 @login_required
 def upload_image(request, character_id):
     character = get_object_or_404(Character, id=character_id)
-    if not request.user.is_authenticated and request.user.profile.early_access_user:
-        raise PermissionDenied("Early Access only")
+    if not request.user.is_authenticated:
+        raise PermissionDenied("Logged in only")
     if not character.player_can_edit(request.user):
         raise PermissionDenied("This Contractor has been deleted, or you're not allowed to edit it")
 
@@ -1433,8 +1433,8 @@ def upload_image(request, character_id):
 @login_required
 def delete_image(request, character_id, image_id):
     character = get_object_or_404(Character, id=character_id)
-    if not request.user.is_authenticated and request.user.profile.early_access_user:
-        raise PermissionDenied("Early Access only")
+    if not request.user.is_authenticated:
+        raise PermissionDenied("Logged in only")
     if not character.player_can_edit(request.user):
         raise PermissionDenied("This Contractor has been deleted, or you're not allowed to edit it")
     character_image = get_object_or_404(CharacterImage, relevant_character=character_id, relevant_image=image_id)
@@ -1452,8 +1452,6 @@ def delete_image(request, character_id, image_id):
 @login_required
 def make_primary_image(request, character_id, image_id):
     character = get_object_or_404(Character, id=character_id)
-    if not request.user.is_authenticated and request.user.profile.early_access_user:
-        raise PermissionDenied("Early Access only")
     if not character.player_can_edit(request.user):
         raise PermissionDenied("This Contractor has been deleted, or you're not allowed to edit it")
     character_image = get_object_or_404(CharacterImage, relevant_character=character_id, relevant_image=image_id)

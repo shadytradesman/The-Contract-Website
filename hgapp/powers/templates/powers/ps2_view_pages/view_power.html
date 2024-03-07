@@ -135,7 +135,7 @@
                             {% endif %}
                         {% endfor %}
                     </div>
-                    {% if can_edit and request.user.is_authenticated and request.user.profile.early_access_user %}
+                    {% if can_edit and request.user.is_authenticated %}
                     <div style="margin: 5px;">
                         <a href="{% url 'powers:powers_upload_image' power.id %}">
                             <div class="btn btn-default btn-xs">
