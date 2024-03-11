@@ -58,8 +58,27 @@ Scenario Exchange
         </div>
       </div>
       <div>
+        <b>Legend:</b>
+        <div style="margin-left: 15px;">
+          <div>
+            <span class="glyphicon glyphicon-star css-scenario-rewarded-star" aria-hidden="true"
+                data-toggle="tooltip"
+                title='This Scenario was written by an administrator'
+                style="position:relative; top: 2px;">
+                  </span> This Scenario was written by one of The Contract's administrators.
+          </div>
+          <div>
+            <span class="glyphicon glyphicon-fire " aria-hidden="true"
+                  data-toggle="tooltip"
+                  title='This Scenario is popular with GMs.'
+                  style="position:relative; top: 2px; color: red;">
+              </span> This Scenario is popular with GMs.
+          </div>
+        </div>
+
+      </div>
+      <div>
         {% if scenarios %}
-          <h2>Available Scenarios</h2>
         {% endif %}
         {% for scenario in scenarios %}
           {% if scenario.date_added_to_exchange %}
@@ -68,80 +87,103 @@ Scenario Exchange
             </small>
           {% endif %}
           <div class="thumbnail">
-            <h4><b>{{scenario.title}}</b> - {{scenario.get_suggested_status_display}}</h4>
-            {% if scenario.exchange_information %}
-              <div style="margin-left: 20px;">
-                <i>{{scenario.exchange_information}}</i>
-              </div>
-            {% endif %}
-            <p>
-            <div>
-              Written by
-              <a href="{% url 'profiles:profiles_view_profile' scenario.creator.id %}">
-                <b>{% user_display scenario.creator %}</b></a>, the {{scenario.creator.profile.get_gm_title}}.
-            </div>
-            <div>
-              <b>{{scenario.num_words}} </b> words in writeup.
-              <b>{{scenario.get_latest_of_all_writeup_sections|length}}</b> writeup sections used.
-              <b>{{scenario.get_latest_of_all_elements|length}}</b> handouts.
-            </div>
-              <div>
-                This Scenario has been
-                run <b>{{scenario.num_finished_games}}</b> time{{scenario.num_finished_games|pluralize}}
-                by <b>{{scenario.num_gms_run}}</b> GM{{scenario.num_gms_run|pluralize}}.
-              </div>
-              <div style="margin-left: 20px;">
-                <div>
-                  Victories: <b>{{scenario.num_victories}}</b>
-                  Deaths: <b>{{scenario.num_deaths}}</b>
-                </div>
-                <div>
-                  Last run {{scenario.last_run_time|timesince}} ago
-                </div>
-              </div>
-
-            <div>
-              Unlocked <b class="css-text-exchange">{{scenario.num_times_purchased}}</b> time{{scenario.num_times_purchased|pluralize}}.
-            </div>
-            </p>
-            {% if request.user.is_authenticated %}
-              {% if exchange_credits >= 100 %}
-
-            <form action="{% url 'games:games_scenario_purchase' scenario.pk %}" method="post">
-              {{ form.non_field_errors }}
-              {% csrf_token %}
-              {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#unlock-{{scenario.pk}}">Unlock for 100 Exchange Credits</button>
-            <div id="unlock-{{scenario.pk}}" class="collapse">
-              <div style="margin-bottom: 5px; margin-top: 10px;">
-                Are you sure?
-              </div>
-              <div>
-                <input
-                        type="submit"
-                        class="btn btn-primary"
-                        value="Unlock"
-                        style="margin-left: 10px;"
-                />
-                <button type="button" style="margin-left: 10px;"
-                        class="btn btn-default" data-toggle="collapse" data-target="#unlock-{{scenario.pk}}">
-                  Never mind
-                </button>
-              </div>
-            </div>
-                </form>
-              {% else %}
-                <input disabled class="btn btn-default" type="submit" value="Unlock" />
-                <i>
-                  (You need at least 100 Exchange Credits to unlock this Scenario.)
-                </i>
+            <h4 style="margin-bottom: 5px;">
+              {% if scenario.is_developer_written %}
+                <span class="glyphicon glyphicon-star css-scenario-rewarded-star" aria-hidden="true"
+                      data-toggle="tooltip"
+                      title='This Scenario was written by an administrator'
+                      style="position:relative; top: 2px;">
+                </span>
               {% endif %}
-            {% else %}
-              <input disabled class="btn btn-default" type="submit" value="Unlock" />
-              <i>
-                You must <a href="{% url 'account_login' %}">log in</a> to unlock Scenarios on the exchange.
-              </i>
-            {% endif %}
+              {% if scenario.num_gms_run > 2 %}
+              <span class="glyphicon glyphicon-fire " aria-hidden="true"
+                    data-toggle="tooltip"
+                    title='This Scenario is popular with GMs.'
+                    style="position:relative; top: 2px; color: red;
+                    {% if scenario.is_developer_written %}
+                      width: 13px; right: 5px;
+                    {% endif %}">
+              </span>
+              {% endif %}
+
+              <b>{{scenario.title}}</b> <span class="hidden-xs">- For {{scenario.get_suggested_status_display}} Contractors</span>
+              <div class="visible-xs-block">
+                <small>
+                  For {{scenario.get_suggested_status_display}} Contractors
+                </small>
+              </div>
+            </h4>
+              <div>
+                <b>{{scenario.num_words}} Words.</b>
+                <div class="visible-xs">
+                </div>
+                By
+                <a href="{% url 'profiles:profiles_view_profile' scenario.creator.id %}">
+                  <b>{% user_display scenario.creator %}</b></a>, the {% render_gm_title scenario.creator %}
+              </div>
+              <div style="margin-top:0px;">
+                Run <b>{{scenario.num_finished_games}}</b> time{{scenario.num_finished_games|pluralize}}
+                by <b>{{scenario.num_gms_run}}</b> GM{{scenario.num_gms_run|pluralize}}
+              </div>
+              <div style="margin-left: 00px;">
+                <ul>
+                  <li>
+                    <b>{{scenario.num_victories}}</b> Victories
+                  </li>
+                  <li>
+                    <b>{{scenario.num_deaths}}</b> Deaths
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                Unlocked <b class="css-text-exchange">{{scenario.num_times_purchased}}</b> time{{scenario.num_times_purchased|pluralize}}.
+              </div>
+
+              {% if scenario.exchange_information %}
+                <div style="margin-left: 20px; margin-top: 15px; max-width: 800px;">
+                  <i>{{scenario.exchange_information}}</i>
+                </div>
+              {% endif %}
+            <div style="margin-top:15px;">
+              {% if request.user.is_authenticated %}
+                {% if exchange_credits >= 100 %}
+                  <form action="{% url 'games:games_scenario_purchase' scenario.pk %}" method="post">
+                    {{ form.non_field_errors }}
+                    {% csrf_token %}
+                    {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+                  <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#unlock-{{scenario.pk}}">Unlock for 100 Exchange Credits</button>
+                  <div id="unlock-{{scenario.pk}}" class="collapse">
+                    <div style="margin-bottom: 5px; margin-top: 10px;">
+                      Are you sure?
+                    </div>
+                    <div>
+                      <input
+                              type="submit"
+                              class="btn btn-primary"
+                              value="Unlock"
+                              style="margin-left: 10px;"
+                      />
+                      <button type="button" style="margin-left: 10px;"
+                              class="btn btn-default" data-toggle="collapse" data-target="#unlock-{{scenario.pk}}">
+                        Never mind
+                      </button>
+                    </div>
+                  </div>
+                  </form>
+                {% else %}
+                  <input disabled class="btn btn-default" type="submit" value="Unlock" />
+                  <i>
+                    (You need at least 100 Exchange Credits to unlock this Scenario.)
+                  </i>
+                {% endif %}
+              {% else %}
+                  <input disabled class="btn btn-default" type="submit" value="Unlock" />
+                  <i>
+                    You must <a href="{% url 'account_login' %}">log in</a> to unlock Scenarios on the exchange.
+                  </i>
+              {% endif %}
+            </div>
           </div>
         {% endfor %}
       </div>

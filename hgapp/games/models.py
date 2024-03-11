@@ -940,6 +940,10 @@ class Scenario(models.Model):
     def __str__(self):
         return self.title
 
+    def is_developer_written(self):
+        return self.creator_id in [169, 23, 272, 1]
+
+
     def can_submit_to_exchange(self):
         if self.is_on_exchange:
             return False

@@ -295,10 +295,10 @@ def scenario_exchange(request):
     form = RsvpAttendanceForm()
     num_scenarios_on_exchange = Scenario.objects.filter(is_on_exchange=True).count()
     if request.user.is_authenticated:
-        scenarios = Scenario.objects.filter(is_on_exchange=True).exclude(available_to__id=request.user.pk).order_by("-date_added_to_exchange", "title")
+        scenarios = Scenario.objects.filter(is_on_exchange=True).exclude(available_to__id=request.user.pk).order_by("-times_run", "title")
         discovered_scenarios = Scenario.objects.filter(is_on_exchange=True).filter(available_to__id=request.user.pk).order_by("-date_added_to_exchange", "title")
     else:
-        scenarios = Scenario.objects.filter(is_on_exchange=True).order_by("title")
+        scenarios = Scenario.objects.filter(is_on_exchange=True).order_by("-times_run", "title")
         discovered_scenarios = []
     context = {
         "scenarios": scenarios,
