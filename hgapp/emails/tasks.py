@@ -7,7 +7,10 @@ from django.urls import reverse
 from notifications.models import Notification, CONTRACT_NOTIF, REWARD_NOTIF
 from django.conf import settings
 from games.models import Game, Game_Invite, Scenario
+from profiles.models import Profile
 from django.utils import timezone
+
+from notifications.models import Notification, PROMOTIONAL_NOTIF
 
 from .models import BouncedEmail
 
@@ -19,6 +22,31 @@ from_email = settings.DEFAULT_FROM_EMAIL
 
 NOTIF_VAR_UPCOMING = "upcoming"
 NOTIF_VAR_FINISHED = "finished"
+
+
+@shared_task(name="campaign_kickstarter")
+def campaign_exchange():
+    profiles = Profile.objects.all()
+    for profile in profiles:
+        Notification.objects.create(user=profile.user,
+                                    headline="Kickstarter is LIVE!",
+                                    content="Pledge today!",
+                                    url="https://www.kickstarter.com/projects/sapientsnake/the-contract-rpg?ref=t8jjes",
+                                    notif_type=PROMOTIONAL_NOTIF,)
+        if not profile.site_announcements:
+            print("Not sending email to {} because their site announcements are disabled".format(profile.user.username))
+            continue
+        email = profile.get_confirmed_email()
+        if email is None:
+            continue
+        print("sending email to {}".format(profile.user.username))
+        context = {
+            'user': profile.user,
+        }
+        subject = "The Contract's Kickstarter is LIVE!"
+        html_message = render_to_string("emails/campaigns/kickstarter_campaign.html", context)
+        message = render_to_string('emails/campaigns/kickstarter_campaign.txt', context)
+        send_email(subject, message, from_email, [email.email], fail_silently=False, html_message=html_message)
 
 @shared_task(name="campaign_exchange")
 def campaign_exchange():

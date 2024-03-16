@@ -1,0 +1,18 @@
+{% extends "emails/base_email.html" %}
+
+{% block email_body %}
+Big news {{user.username}},
+
+Our Kickstarter is LIVE!
+
+You can find it here: https://www.kickstarter.com/projects/sapientsnake/the-contract-rpg?ref=t8jjes
+
+Whether you're an active player or someone who enjoyed The Contract before moving on to other things, we need your support. This campaign is your chance to back indie creators and help us produce an awesome print edition of The Contract.
+
+We're hoping to get funded in the first 24 hours. So please, don't hesitate! Oh, and check out our Kickstarter page for our awesome new trailer. Seriously, it's worth it. https://www.kickstarter.com/projects/sapientsnake/the-contract-rpg?ref=t8jjes
+
+Thank you for your support!
+
+Sincerely,
+Shady Tradesman
+{% endblock %}

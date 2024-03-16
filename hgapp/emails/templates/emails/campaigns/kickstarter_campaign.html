@@ -1,0 +1,35 @@
+{% extends "emails/base_email.html" %}
+
+{% block email_body %}
+<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;background:#ffffff;">
+    <p>
+        Big news {{user.username}},
+    </p>
+    <p>
+        Our
+        <a href="https://www.kickstarter.com/projects/sapientsnake/the-contract-rpg?ref=t8jjes" target="_blank" rel="noopener noreferrer">
+                                Kickstarter
+        </a>
+        is <b>LIVE</b>!
+    </p>
+    <p>
+        Whether you're an active player or someone who enjoyed The Contract before moving on to other things, we need your support.
+        This campaign is your chance to back indie creators and help us produce an awesome print edition of The Contract.
+    </p>
+    <p>
+        We're hoping to get funded in the first 24 hours. So please, don't hesitate! Oh, and check out our
+        <a href="https://www.kickstarter.com/projects/sapientsnake/the-contract-rpg?ref=t8jjes" target="_blank" rel="noopener noreferrer">
+            Kickstarter
+        </a> page for our awesome new trailer. Seriously, it's worth it.
+    </p>
+    <p>
+        **Thank you for your support!**
+    </p>
+    <p>
+        Sincerely,
+    </p>
+    <p>
+        Shady Tradesman
+    </p>
+</table>
+{% endblock %}
