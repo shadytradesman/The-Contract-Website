@@ -11,6 +11,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib import admin
 
 urlpatterns = [
+    url(r'^kickstart/', RedirectView.as_view(url='https://www.kickstarter.com/projects/sapientsnake/the-contract-rpg?ref=3tpmim'), name="kickstart"),
+    url(r'^kickstarter/', RedirectView.as_view(url='https://www.kickstarter.com/projects/sapientsnake/the-contract-rpg?ref=3tpmim'), name="kickstarter"),
     url(r'^admin/', admin.site.urls),
     url(r'^messages/', include('postman.urls', namespace="postman"), name="postman"),
     url(r"^$", views.home, name="home"),
