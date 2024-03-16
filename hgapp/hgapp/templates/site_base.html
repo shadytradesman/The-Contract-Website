@@ -80,6 +80,14 @@
                     Quick Nav<span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu" style="position: absolute; background-color: #20252d; left: -20px; max-height: 80vh; overflow: auto;">
+                    <li>
+                        <a class="btn-success" href="https://www.kickstarter.com/projects/sapientsnake/the-contract-rpg?ref=c5nh4t" target="_blank" rel="noopener noreferrer">
+                            <span>
+                                <img class="float-left" src="{% static 'overrides/other_graphics/kickstarter-logo.png' %}" style="width: 20px; height: 20px; position: absolute;">
+                                <span style="padding-left: 25px;"> Back our Kickstarter!</span>
+                            </span>
+                        </a>
+                    </li>
                     <div class="visible-xs-block clearfix"></div>
                     {% cache 500 nav-contractors request.user.id %}
                         {% characters_nav_list request.user %}
@@ -165,14 +173,6 @@
                         Website
                     </li>
                     <li>
-                        <a class="" href="https://www.kickstarter.com/projects/sapientsnake/the-contract-rpg" target="_blank" rel="noopener noreferrer">
-                            <span>
-                                <img class="float-left" src="{% static 'overrides/other_graphics/kickstarter-logo.png' %}" style="width: 20px; height: 20px; position: absolute;">
-                                <span style="padding-left: 25px;"> Follow our Kickstarter!</span>
-                            </span>
-                        </a>
-                    </li>
-                    <li>
                         <a href="https://thecontractrpg.square.site/" target="_blank" rel="noopener noreferrer">
                             <span class="css-gold-font" style="color: #e1b276; ">
                                 Buy Merchandise
@@ -203,6 +203,14 @@
         <div class="visible-xs-block clearfix"></div>
         <li >
             <a href="{% url 'info:learn-to-play' %}" class="btn-primary">Learn to Play</a>
+        </li>
+        <li>
+            <a class="" href="https://www.kickstarter.com/projects/sapientsnake/the-contract-rpg?ref=c5nh4t" target="_blank" rel="noopener noreferrer">
+                            <span>
+                                <img class="float-left" src="{% static 'overrides/other_graphics/kickstarter-logo.png' %}" style="width: 20px; height: 20px; position: absolute;">
+                                <span style="padding-left: 25px;"> Back our Kickstarter!</span>
+                            </span>
+            </a>
         </li>
         <li class="dropdown-header">
             Contractors
@@ -250,14 +258,6 @@
         </li>
         <li class="dropdown-header">
             Website
-        </li>
-        <li>
-            <a class="" href="https://www.kickstarter.com/projects/sapientsnake/the-contract-rpg" target="_blank" rel="noopener noreferrer">
-                            <span>
-                                <img class="float-left" src="{% static 'overrides/other_graphics/kickstarter-logo.png' %}" style="width: 20px; height: 20px; position: absolute;">
-                                <span style="padding-left: 25px;"> Follow our Kickstarter!</span>
-                            </span>
-            </a>
         </li>
         <li>
             <a class="" href="https://www.patreon.com/ContractRpg">
