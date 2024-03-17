@@ -602,6 +602,11 @@ class Game_Attendance(models.Model):
                                       blank=True,
                                       on_delete=models.SET_NULL)
 
+    def __str__(self):
+        return "{} attending {} [{}]".format(self.attending_character.name if self.attending_character else "__",
+                                             self.relevant_game.scenario.title,
+                                             self.get_outcome_display())
+
     def is_victory(self):
         return self.outcome == WIN
 
