@@ -7,7 +7,7 @@
     </div>
 </div>
 
-<div class="row" style="margin-top: 15px; margin-bottom: 30px;">
+<div class="row" style="margin-top: 15px; margin-bottom: 10px;">
     <div v-for="component in modalities"
          :key="component.id"
          class="col-xs-12 col-sm-6 col-md-3" style="padding-right:15px; padding-left: 15px;">
@@ -27,14 +27,14 @@
                        @click="clickModality"
                        style="display:none;"
                 >
-                <h3 class="css-component-header"  style="margin-top: 5px; margin-bottom: 5px;">
+                <h3 class="css-component-header"  style="margin-top: 5px; margin-bottom: 5px; height:53px;">
                     { component.displayName }
                 </h3>
                 <img v-bind:src="component.icon_url" width="100" height="100"/>
-                <h5 style="margin-top: 0px; margin-bottom: 5px;">
+                <h5 style="margin-top: 0px; margin-bottom: 5px; min-height: 31px">
                     { component.summary }
                 </h5>
-                <div class="text-muted">
+                <div class="text-muted" style="min-height:32px;">
                     <small>
                         { component.description }
                     </small>
@@ -51,8 +51,17 @@
                 </div>
             </label>
         </div>
-        <button type="button"  class="btn btn-sm btn-default" style="width:100%" data-toggle="modal" v-bind:data-target="'#tutorialModal' + component.slug">
+        <button type="button" class="btn btn-sm btn-default visible-xs-block visible-sm-block" style="width:100%" data-toggle="modal" v-bind:data-target="'#tutorialModal' + component.slug">
           Learn about { component.displayName } Gifts
+        </button>
+    </div>
+</div>
+<div class="row" style="margin-bottom: 30px;">
+    <div v-for="component in modalities"
+         :key="component.id"
+         class="col-xs-12 col-sm-6 col-md-3" style="padding-right:15px; padding-left: 15px;">
+        <button type="button" class="btn btn-sm btn-default hidden-xs hidden-sm" style="width:100%" data-toggle="modal" v-bind:data-target="'#tutorialModal' + component.slug">
+            Learn about { component.displayName } Gifts
         </button>
     </div>
 </div>
