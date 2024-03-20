@@ -349,6 +349,15 @@
 .css-effect-radio {
     padding: 5px;
     padding-left: 10px;
+    margin: 5px;
+    width: 100%;
+}
+
+@media (min-width: 1200px) {
+.css-effect-radio {
+    min-height: 80px;
+}
+
 }
 
 .css-effect-filter-radio {
@@ -513,4 +522,14 @@
 
 .css-stock-gift-customize-btn {
     display: none;
+}
+
+.css-effect-container {
+    padding-left:15px;
+}
+
+@media (min-width: 1200px) {
+    .css-effect-container {
+        min-height: 90px;
+    }
 }
