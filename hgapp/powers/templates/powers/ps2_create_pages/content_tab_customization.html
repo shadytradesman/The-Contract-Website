@@ -53,9 +53,9 @@
             Style
         </h5>
         <div v-for="component in vectors"
-             class="css-customization-field"
+             class="css-customization-field-vec"
              :key="component.id"
-             style="display: inline-block;">
+             style="">
             <label v-bind:for="component.id"
                    class="css-component-radio css-vector-radio"
                    :class="{'css-selected-component': component.slug === selectedVector.slug}"

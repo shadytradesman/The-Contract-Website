@@ -413,6 +413,13 @@
     padding-left: 5px;
 }
 
+.css-customization-field-vec {
+    width: 100%;
+    padding-right: 5px;
+    padding-left: 5px;
+    display: block;
+}
+
 @media (min-width: 992px) {
     .css-customization-field {
         width: 50%;
