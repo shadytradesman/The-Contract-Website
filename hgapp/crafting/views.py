@@ -328,10 +328,9 @@ class Craft(View):
                     if artifact.pk not in existing_artifact_ids:
                         self.artifacts_out_of_possession_by_power[event.relevant_power_full_id].append(artifact)
                         self.artifacts_out_of_possession.append(artifact)
-                        existing_artifact_ids.add(artifact.pk)
 
-        artifacts_out_of_pos =[]
-        for art in self.artifacts_out_of_possession:
+        artifacts_out_of_pos = []
+        for art in set(self.artifacts_out_of_possession):
             artifacts_out_of_pos.append({
                 "name": art.name,
                 "art_url": reverse("characters:characters_artifact_view", args=(art.pk,)),
