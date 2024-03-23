@@ -7,7 +7,7 @@ from characters.models import Character, ContractStats, Asset, Liability, AssetD
     PORTED_EXP_ADJUSTMENT, EXP_NEW_CHAR, Artifact, GIVEN
 from powers.models import Base_Power, Base_Power_Category, PowerTutorial, Power, EFFECT, VECTOR, MODALITY, SYS_PS2, \
     SYS_ALL, SYS_LEGACY_POWERS, CREATION_NEW, CRAFTING_CONSUMABLE, CRAFTING_NONE, Power_Full, PowerSystem, \
-    CREATION_ADJUSTMENT
+    CREATION_ADJUSTMENT, CREATION_IMPROVEMENT, CREATION_MAJOR_REVISION, CRAFTING_ARTIFACT
 from django.db import transaction
 from games.models import Reward, Scenario, Game, Game_Attendance, GAME_STATUS, WIN, Game_Invite
 from cells.models import Cell
@@ -35,7 +35,7 @@ def create_base_power(power_slug, category=None, public=True, type=EFFECT, craft
         crafting_type=crafting_type,
     )
 
-def edit_power(existing_power, revision_type=CREATION_ADJUSTMENT):
+def edit_power(existing_power, revision_type=CREATION_ADJUSTMENT, cost_change=0):
     power = Power.objects.create(
         name="name",
         flavor_text="flavor",
@@ -44,7 +44,8 @@ def edit_power(existing_power, revision_type=CREATION_ADJUSTMENT):
         base=existing_power.base,
         vector=existing_power.vector,
         modality=existing_power.modality,
-        creation_reason=revision_type,)
+        creation_reason=revision_type,
+        gift_cost=existing_power.gift_cost + cost_change)
     power.character=existing_power.character
     power.created_by=existing_power.character.player
     power.save()
@@ -194,6 +195,11 @@ class CraftingModelTests(TestCase):
                 public=True,
                 type=MODALITY,
                 crafting_type=CRAFTING_CONSUMABLE)
+            self.base_modality_artifact_crafting = create_base_power(
+                power_slug="artifact-crafting",
+                public=True,
+                type=MODALITY,
+                crafting_type=CRAFTING_ARTIFACT)
             self.scenario = Scenario.objects.create(
                 title="test scenario",
                 summary="summary",
@@ -230,6 +236,7 @@ class CraftingModelTests(TestCase):
         game_invite.attendance = attendance
         game_invite.save()
         game.give_rewards()
+        character.refresh_from_db()
         return attendance
 
     def grant_basic_stats_to_char(self, char_full):
@@ -529,6 +536,7 @@ class CraftingModelTests(TestCase):
 
         attendance = self.send_contractor_on_game(self.char_full)
         after_game_exp = original_exp + 5 #victory
+        self.assertEquals(self.char_full.unspent_experience(), after_game_exp - 2)
 
         crafting_event2 = CraftingEvent.objects.create(
             relevant_attendance=attendance,
@@ -680,7 +688,7 @@ class CraftingModelTests(TestCase):
         self.assertEquals(new_artifact_power, power3)
 
     def test_artifact_crafting(self):
-        power = create_power(effect=self.base_effect, vector=self.base_vector, modality=self.base_modality,
+        power = create_power(effect=self.base_effect, vector=self.base_vector, modality=self.base_modality_artifact_crafting,
                          character=self.char_full)
         art_craft_cost = 3 + 1 # gift cost + 1
         crafting_event = CraftingEvent.objects.create(
@@ -728,7 +736,7 @@ class CraftingModelTests(TestCase):
         self.assertEquals(art2, new_artifact)
 
     def test_artifact_crafting_errors(self):
-        power = create_power(effect=self.base_effect, vector=self.base_vector, modality=self.base_modality,
+        power = create_power(effect=self.base_effect, vector=self.base_vector, modality=self.base_modality_artifact_crafting,
                              character=self.char_full)
         crafting_event = CraftingEvent.objects.create(
             relevant_character=self.char_full,
@@ -771,3 +779,82 @@ class CraftingModelTests(TestCase):
         with transaction.atomic():
             with self.assertRaises(ValueError):
                 crafting_event2.set_crafted_artifacts(artifacts=[art1], allowed_number_free=1)
+
+    def test_artifact_crafting_upgrade_refund(self):
+        original_exp = self.char_full.unspent_experience()
+        with transaction.atomic():
+            power1 = create_power(effect=self.base_effect, vector=self.base_vector, modality=self.base_modality_artifact_crafting,
+                                  character=self.char_full)
+            art_craft_cost = 3 + 1 # gift cost + 1
+            crafting_event1 = CraftingEvent.objects.create(
+                relevant_character=self.char_full,
+                relevant_power=power1,
+                relevant_power_full=power1.parent_power)
+            art1 = Artifact.objects.create(
+                character=self.char_full,
+                crafting_character=self.char_full,
+                name="name",
+                description="descr",
+                is_crafted_artifact=True,
+                creating_player=self.char_full.player)
+            art2 = Artifact.objects.create(
+                character=self.char_full,
+                crafting_character=self.char_full,
+                name="name",
+                description="descr",
+                is_crafted_artifact=True,
+                creating_player=self.char_full.player)
+            crafting_event1.set_crafted_artifacts(
+                artifacts=[art1, art2],
+                allowed_number_free=1)
+
+        self.assertEquals(crafting_event1.total_exp_spent, 1 * art_craft_cost) # one is free
+        self.assertEquals(self.char_full.artifact_set.count(), 2)
+        self.assertEquals(self.char_full.unspent_experience(), original_exp - (1 * art_craft_cost))
+
+        #Send them on a game and improve the gift
+        with transaction.atomic():
+            attendance = self.send_contractor_on_game(self.char_full)
+            after_game_exp = original_exp + 5  # victory
+            self.assertEquals(self.char_full.unspent_experience(), after_game_exp - (1 * art_craft_cost))
+            power1_2 = edit_power(power1, revision_type=CREATION_IMPROVEMENT, cost_change=1)
+            handle_gift_revision(sender=None, power_full=power1_2.parent_power, old_power=power1, new_power=power1_2)
+
+        #Nothing should have changed with crafting because gift improvement was on new downtim
+        self.assertEquals(crafting_event1.total_exp_spent, 1 * art_craft_cost) # one is free
+        self.assertEquals(self.char_full.artifact_set.count(), 2)
+        self.assertEquals(self.char_full.unspent_experience(), after_game_exp - (1 * art_craft_cost))
+        self.assertEquals(art1.power_set.filter(pk=power1_2.pk).count(), 0)
+        self.assertEquals(art1.power_set.filter(pk=power1.pk).count(), 1)
+
+        # Upgrade crafted artifacts with 1_2
+        expected_power1_upgrade_cost = 2 # one gift point difference
+        with transaction.atomic():
+            crafting_event1_2 = CraftingEvent.objects.create(
+                relevant_character=self.char_full,
+                relevant_power=power1_2,
+                relevant_power_full=power1_2.parent_power,
+                relevant_attendance=attendance)
+            crafting_event1_2.set_crafted_artifacts(
+                artifacts=[art1, art2],
+                allowed_number_free=1)
+        self.assertEquals(crafting_event1_2.total_exp_spent, expected_power1_upgrade_cost) # one is free
+        self.assertEquals(self.char_full.unspent_experience(), after_game_exp - (1 * art_craft_cost) - expected_power1_upgrade_cost)
+        self.assertEquals(self.char_full.artifact_set.count(), 2)
+        art1.refresh_from_db()
+        self.assertEquals(art1.power_set.filter(pk=power1_2.pk).count(), 1)
+        self.assertEquals(art1.power_set.filter(pk=power1.pk).count(), 1)
+
+        with transaction.atomic():
+            power1_3 = edit_power(power1_2, revision_type=CREATION_MAJOR_REVISION, cost_change=-1)
+            handle_gift_major_revision(sender=None, power_full=power1_3.parent_power, old_power=power1_2, new_power=power1_3)
+        power1_3.parent_power.refresh_from_db()
+        art1 = Artifact.objects.get(pk=art1.pk)
+        self.assertEquals(art1.power_set.filter(pk=power1.pk).count(), 1)
+        self.assertEquals(art1.power_set.filter(pk=power1_3.pk).count(), 0)
+        self.assertEquals(art1.power_set.filter(pk=power1_2.pk).count(), 0)
+        crafting_event1_2.refresh_from_db()
+        self.assertEquals(crafting_event1_2.total_exp_spent, 0)
+        self.assertEquals(self.char_full.unspent_experience(), after_game_exp - (1 * art_craft_cost))
+        self.assertEquals(self.char_full.artifact_set.count(), 2)
+

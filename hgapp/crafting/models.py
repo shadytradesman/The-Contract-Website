@@ -69,14 +69,14 @@ class CraftingEvent(models.Model):
         last_existing_copy = artifact.power_set.filter(parent_power_id=self.relevant_power_full_id).order_by("pub_date").last()
 
         if last_existing_copy is not None:
-            delta = self.relevant_power_full.get_gift_cost_delta(last_existing_copy)
+            delta = abs(self.relevant_power.get_gift_cost() - last_existing_copy.get_gift_cost())# returns zero on refund due to removing enhancement because new cost is equal to old cost, however upgrade cost 2
             artifact_cost = (delta + get_exp_cost_per_upgrade()) if delta != 0 else 0
 
         return artifact_cost
 
     def refund_all(self):
         if self.relevant_power_full.crafting_type == CRAFTING_CONSUMABLE:
-            num_to_refund = self.craftedartifact_set.aggregate(Sum('quantity'))['quantity__sum']
+            num_to_refund = self.craftedartifact_set.filter(relevant_artifact__is_consumable=True).aggregate(Sum('quantity'))['quantity__sum']
             num_to_refund = num_to_refund if num_to_refund is not None else 0
             self.refund_crafted_consumables(number_to_refund=num_to_refund)
         self.set_crafted_artifacts(Artifact.objects.none(), 0)
@@ -84,11 +84,13 @@ class CraftingEvent(models.Model):
         for art in arts:
             if art.power_full_set.count() == 0:
                 art.delete()
+            else:
+                art.power_set.remove(self.relevant_power)
         self.artifacts.clear()
 
     def refund_crafted_consumables(self, number_to_refund):
         remaining_to_refund = number_to_refund
-        crafted_artifacts = self.craftedartifact_set.prefetch_related("relevant_artifact").all()
+        crafted_artifacts = self.craftedartifact_set.prefetch_related("relevant_artifact").filter(relevant_artifact__is_consumable=True).all()
         num_refunded_by_crafted_artifact_id = Counter()
         # First refund the non-free ones.
         for crafted_artifact in crafted_artifacts:
