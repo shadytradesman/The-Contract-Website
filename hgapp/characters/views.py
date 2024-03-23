@@ -997,10 +997,12 @@ def timeline_context(character_id, request):
     if craftings:
         current_crafting_list = []
         last_attendance_examined = craftings[0].relevant_attendance
+        first_craft_before_contract = False
         if last_attendance_examined is not None:
             craft_time = last_attendance_examined.relevant_game.end_time + timedelta(seconds=9)
         else:
             craft_time = character.pub_date + timedelta(seconds=9)
+            first_craft_before_contract = True
         for crafting in craftings:
             if last_attendance_examined != crafting.relevant_attendance:
                 crafting_tuples.append(
@@ -1018,7 +1020,10 @@ def timeline_context(character_id, request):
                 "crafting",
                 CraftingTimelineBlock(current_crafting_list))
         )
-    character_edit_history = [(x.created_time, "edit", x) for x in
+        if len(crafting_tuples) > 0 and first_craft_before_contract:
+            last = crafting_tuples.pop(0)
+            crafting_tuples.append(last)
+        character_edit_history = [(x.created_time, "edit", x) for x in
                               character.contractstats_set.filter(is_snapshot=False).order_by("-created_time").all()]
     character_edit_history = character_edit_history[:-1]
     exp_rewards = [(x.created_time + timedelta(seconds=2), "exp_reward", x) for x in
