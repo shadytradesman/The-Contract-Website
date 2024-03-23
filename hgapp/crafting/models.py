@@ -58,6 +58,11 @@ class CraftingEvent(models.Model):
             self.relevant_power_full.name,
             self.relevant_attendance.relevant_game.scenario.title if self.relevant_attendance else "character creation")
 
+    def get_timeline_string(self):
+        time = self.created_time.strftime("%d %b %Y")
+        line = "{} - <b>{} Crafted {}</b> ".format(time, self.relevant_character.name, self.relevant_power.name)
+        return line
+
     def get_exp_cost_per_artifact(self):
         return self.relevant_power.get_gift_cost() + 1
     
