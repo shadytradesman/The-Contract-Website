@@ -10,6 +10,11 @@ $(document).on("submit", ".js-disable-on-submit", function(e) {
     $(e.target).find(":submit").prop('disabled', true);
 });
 
+$(document).on("click", ".js-disable-on-click", function (e) {
+    $(e.target).prop('disabled', true);
+    $(e.target).text("Loading. . .")
+});
+
 /* notification collapse */
 let navCollapsed = true;
 $(document).on("click", "#js-notif-nav-button", function(e) {
