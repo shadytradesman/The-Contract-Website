@@ -1831,6 +1831,21 @@ class ArtifactStatusChange(models.Model):
         return line
 
 
+class ArtifactTimelineEvent(models.Model):
+    relevant_artifact = models.ForeignKey(Artifact, on_delete=models.CASCADE)
+    created_time = models.DateTimeField(auto_now_add=True)
+    notes = models.CharField(max_length=5000, blank=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['relevant_artifact', 'created_time']),
+        ]
+
+    def get_timeline_string(self):
+        time = self.created_time.strftime("%d %b %Y")
+        line = "{} - {}".format(time, self.notes)
+        return line
+
 
 class ArtifactTransferEvent(models.Model):
     from_character = models.ForeignKey(Character, related_name="from_artifact_status", on_delete=models.CASCADE, null=True)

@@ -3,7 +3,7 @@ from collections import Counter
 from django.db import models
 from django.db.models import Q, Sum
 
-from characters.models import Artifact, Character
+from characters.models import Artifact, Character, ArtifactTimelineEvent
 from games.models import Game_Attendance
 from powers.models import Power, Power_Full, CRAFTING_CONSUMABLE
 from django.urls import reverse
@@ -163,6 +163,11 @@ class CraftingEvent(models.Model):
             else:
                 num_free_refunded += 1
             self.artifacts.remove(artifact)
+            ArtifactTimelineEvent.objects.create(
+                relevant_artifact=artifact,
+                notes="Effect {} {}".format(self.relevant_power.name,
+                                            "downgraded" if is_upgrade else "removed")
+            )
             Notification.objects.create(
                 user=artifact.character.player,
                 headline="Artifact Effect refunded",
@@ -181,7 +186,7 @@ class CraftingEvent(models.Model):
                 if artifact.power_set.filter(id=self.relevant_power_id).first() is not None:
                     raise ValueError("cannot craft the same power onto an artifact twice.")
                 artifact_cost = self.get_exp_cost_for_crafting_instance(artifact)
-
+                is_upgrade = artifact.power_set.filter(parent_power_id=self.relevant_power_full.pk).count() > 1
 
                 quant_free = 0
                 if num_avail_free > 0:
@@ -197,6 +202,12 @@ class CraftingEvent(models.Model):
                 power_full.latest_rev.artifacts.add(artifact)
                 power_full.latest_rev.save()
                 power_full.save()
+                ArtifactTimelineEvent.objects.create(
+                    relevant_artifact=artifact,
+                    notes="Effect {} {} for {}".format(self.relevant_power.name,
+                                                       "upgraded" if is_upgrade else "crafted",
+                                                       "{} Exp".format(artifact_cost) if quant_free == 0 else "free")
+                )
                 if quant_free == 0:
                     self.total_exp_spent += artifact_cost
             else:

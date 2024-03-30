@@ -911,27 +911,18 @@ def delete_loose_end(request, loose_end_id):
 # View Character AJAX
 ####
 
+
 def item_timeline(request, artifact_id):
     artifact = get_object_or_404(Artifact, id=artifact_id)
     if artifact.character and not artifact.character.player_can_view(request.user):
         raise PermissionDenied("You do not have permission to view this artifact")
     status_changes = list(artifact.artifactstatuschange_set.order_by("-created_time").all())
     transfers = list(artifact.artifacttransferevent_set.order_by("-created_time").all())
-    crafts = artifact.craftingevent_set.order_by("-relevant_attendance__relevant_game__end_time").all()
-    craftings_with_dates = []
-    first_craft = None
-    for craft in crafts:
-        if craft.relevant_attendance is not None:
-            craft.created_time = craft.relevant_attendance.relevant_game.end_time
-            craftings_with_dates.append(craft)
-        else:
-            craft.created_time = craft.character.pub_date + timedelta(seconds=9)
-            first_craft = craft
-    if first_craft is not None:
-        craftings_with_dates.append(first_craft)
-    events = list(merge(status_changes, transfers, craftings_with_dates, key=lambda x: x.created_time, reverse=True))
+    timeline_events = artifact.artifacttimelineevent_set.order_by("-created_time").all()
+    events = list(merge(status_changes, transfers, timeline_events, key=lambda x: x.created_time, reverse=True))
     context = {
         "events": events,
+        "artifact": artifact,
     }
     return render(request, 'characters/item_timeline.html', context)
 
