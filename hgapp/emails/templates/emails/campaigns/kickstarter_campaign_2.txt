@@ -1,0 +1,22 @@
+{% extends "emails/base_email.html" %}
+
+{% block email_body %}
+We're almost there, {{user.username}}!
+
+Our Kickstarter is in its last 24 hours!
+
+You can find it here: https://www.kickstarter.com/projects/sapientsnake/the-contract-rpg?ref=3lxlic
+
+If you haven't pledged yet, it's your last chance to support us as we gather funds for our upcoming physical book!
+
+If you have pledged, now's your last chance to share the kickstarter with your friends and family!
+
+I'm asking everyone who ever enjoyed this game to please consider pledging just a few dollars to help us fill the book with incredible art. It's not too late to snag some rewards as well!
+
+Again, you can find it here: https://www.kickstarter.com/projects/sapientsnake/the-contract-rpg?ref=3lxlic
+
+Thank you for your support!
+
+Sincerely,
+Shady Tradesman
+{% endblock %}

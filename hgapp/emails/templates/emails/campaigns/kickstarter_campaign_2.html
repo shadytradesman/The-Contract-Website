@@ -1,0 +1,36 @@
+{% extends "emails/base_email.html" %}
+
+{% block email_body %}
+<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;background:#ffffff;">
+    <p>
+        We're almost there, {{user.username}}!
+    </p>
+    <p>
+        Our
+        <a href="https://www.kickstarter.com/projects/sapientsnake/the-contract-rpg?ref=3lxlic" target="_blank" rel="noopener noreferrer">
+                                Kickstarter
+        </a>
+        <b>has less than 24 hours left</b>!
+    </p>
+    <p>
+        If you haven't pledged yet, it's your last chance to support us as we gather funds for our upcoming physical book!
+        If you have pledged, now's your last chance to share the kickstarter with your friends and family!
+    </p>
+    <p>
+        I'm asking everyone who ever enjoyed this game to please consider pledging just a few dollars to help us fill the book with
+        incredible art. It's not too late to snag some rewards as well! Just visit the
+        <a href="https://www.kickstarter.com/projects/sapientsnake/the-contract-rpg?ref=3lxlic" target="_blank" rel="noopener noreferrer">
+            Kickstarter page
+        </a> and hit Pledge.
+    </p>
+    <p>
+        **Thank you for your support!**
+    </p>
+    <p>
+        Sincerely,
+    </p>
+    <p>
+        Shady Tradesman
+    </p>
+</table>
+{% endblock %}

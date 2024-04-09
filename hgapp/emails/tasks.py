@@ -23,6 +23,29 @@ from_email = settings.DEFAULT_FROM_EMAIL
 NOTIF_VAR_UPCOMING = "upcoming"
 NOTIF_VAR_FINISHED = "finished"
 
+@shared_task(name="campaign_kickstarter_final_24")
+def campaign_exchange():
+    profiles = Profile.objects.all()
+    for profile in profiles:
+        Notification.objects.create(user=profile.user,
+                                    headline="Less than 24 left!",
+                                    content="Pledge today!",
+                                    url="https://www.kickstarter.com/projects/sapientsnake/the-contract-rpg?ref=3lxlic",
+                                    notif_type=PROMOTIONAL_NOTIF,)
+        if not profile.site_announcements:
+            print("Not sending email to {} because their site announcements are disabled".format(profile.user.username))
+            continue
+        email = profile.get_confirmed_email()
+        if email is None:
+            continue
+        print("sending email to {}".format(profile.user.username))
+        context = {
+            'user': profile.user,
+        }
+        subject = "Less than 24 hours left for The Contract's Kickstarter!"
+        html_message = render_to_string("emails/campaigns/kickstarter_campaign_2.html", context)
+        message = render_to_string('emails/campaigns/kickstarter_campaign_2.txt', context)
+        send_email(subject, message, from_email, [email.email], fail_silently=False, html_message=html_message)
 
 @shared_task(name="campaign_kickstarter")
 def campaign_exchange():
