@@ -333,35 +333,6 @@
             <div id="news-feed" style="position:relative;bottom:50px;">
 
             </div>
-            <div class="panel panel-default">
-                <div class="panel-heading" style="display: flex;">
-                    <div style="margin-right: 10px; width: 25px; height: 100%; padding-top: 5px; ">
-                        <img src="{% static 'overrides/other_graphics/kickstarter-logo.png' %}" width=25 height="25">
-                    </div>
-                    <a href="https://www.kickstarter.com/projects/sapientsnake/the-contract-rpg?ref=yo1zfp" target="_blank" rel="noopener noreferrer" class="">
-                        <strong>Our Kickstarter is Live!</strong>
-                        <div class="text-muted">
-                            This is not a drill!
-                        </div>
-                    </a>
-                </div>
-                <div class="panel-body">
-                    <h3 class="text-center" style="margin-top: 5px;">
-                        This is it, folks. Help us bring The Contract to print and PDF!
-                    </h3>
-                    <div class="text-center">
-                        <a class="btn btn-success btn-md" href="https://www.kickstarter.com/projects/sapientsnake/the-contract-rpg?ref=c5nh4t" target="_blank" rel="noopener noreferrer">
-                            <span>
-                                <img class="float-left" src="{% static 'overrides/other_graphics/kickstarter-logo.png' %}" style="width: 40px; height: 40px; position: relative;">
-                                <span style="padding-left: 0px; font-size: 18pt!important;"> Back our Kickstarter!</span>
-                            </span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div>
-
-            </div>
             {% for notif in timeline_notifications %}
                 <div>
                     {% render_timeline_notif notif %}
