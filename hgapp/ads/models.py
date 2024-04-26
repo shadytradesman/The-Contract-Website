@@ -22,6 +22,6 @@ class FakeAd(models.Model):
 
     def get_random_banner(self):
         banners = [self.banner, self.banner_2, self.banner_3]
-        banners = [x for x in banners if x is not None]
+        banners = [x for x in banners if x.name]
         random.shuffle(banners)
         return banners[0]
