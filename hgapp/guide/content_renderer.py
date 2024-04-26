@@ -24,8 +24,8 @@ def __render_images(content, pics_by_slug):
                   lambda x: '<div class="css-guide-image{}" style="{}"><img src=\'{}\'></div>{}'.format(
                       x.group(2) if x.group(2) else "",
                       "position: relative; height: 0; padding-top: min(calc({} / {} * 100%), 80vh);".format(
-                          pics_by_slug[x.group(3)].picture.height,
-                          pics_by_slug[x.group(3)].picture.width),
+                          pics_by_slug[x.group(3)].picture_height,
+                          pics_by_slug[x.group(3)].picture_width),
                       pics_by_slug[x.group(3)].picture.url,
                       '<span class="css-guide-image-caption">{}</span>'.format(x.group(4)) if not x.group(2) else "",
                   ),

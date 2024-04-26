@@ -17,7 +17,7 @@ def render_fake_ad(user, counter=1):
             "empty": True
         }
     if hasattr(ad, "picture") and ad.picture is not None:
-        is_vertical = ad.picture.height > ad.picture.width
+        is_vertical = ad.picture_height > ad.picture_width
     else:
         is_vertical = False
     return {
