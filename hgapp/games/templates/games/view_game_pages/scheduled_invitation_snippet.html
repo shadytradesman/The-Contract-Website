@@ -105,11 +105,6 @@
             {% else %}
             Awaiting response.
             {% endif %}
-            {% if invitation.invitee_is_spoiled_on_scenario %}
-            <div class="text-danger">
-                This Player is already spoiled for this Scenario and should only play an NPC Ringer.
-            </div>
-            {% endif %}
         </li>
         {% endfor %}
     </ul>

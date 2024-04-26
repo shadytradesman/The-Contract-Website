@@ -281,7 +281,7 @@ class Game(models.Model):
         return self.game_invite_set.filter(is_declined=False, attendance__isnull=False).all()
 
     def get_open_invites(self):
-        return self.game_invite_set.filter(attendance__isnull=True).all()
+        return self.game_invite_set.select_related("attendance").filter(attendance__isnull=True).select_related("invited_player__profile").all()
 
     def reason_player_cannot_rsvp(self, player):
         if not player.is_authenticated or player.is_anonymous:
