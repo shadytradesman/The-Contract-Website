@@ -438,7 +438,6 @@ PAGEDOWN_WIDGET_CSS = ("overrides/pagedown_widget.css",)
 THEME_CONTACT_EMAIL = "admin@thecontractrpg.com"
 
 # TinyMCE settings
-TINYMCE_JS_URL = "https://cdn.tiny.cloud/1/12xkz9g5ryiyz78mjzhthvq62r42rsi6tzik4yulk1tol6rn/tinymce/5/tinymce.min.js"
 TINYMCE_DEFAULT_CONFIG = {
     "theme": "silver",
     "height": 500,
