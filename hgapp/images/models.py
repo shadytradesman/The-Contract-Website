@@ -47,9 +47,13 @@ class UserImage(models.Model):
 
 class PrivateUserImage(models.Model):
     image = models.ImageField(upload_to=image_upload_name, storage=select_private_storage)
+    image_height = models.IntegerField(null=True)
+    image_width = models.IntegerField(null=True)
     thumbnail = models.ImageField(upload_to=image_upload_name,
                                   storage=select_private_storage,
                                   null=True) # nullable for async thumbnail generation
+    thumbnail_height = models.IntegerField(null=True)
+    thumbnail_width = models.IntegerField(null=True)
     file_size = models.IntegerField()
     uploader = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
     created_date = models.DateTimeField('date created', auto_now_add=True)
@@ -66,6 +70,8 @@ class PrivateUserImage(models.Model):
 
     def save(self, *args, **kwargs):
         self.file_size = self.image.size
+        self.image_height = self.image.height
+        self.image_width = self.image.width
         if self.file_size > 5_000_000:
             raise ValueError("Image too large. Size: " + str(self.file_size))
         super(PrivateUserImage, self).save(*args, **kwargs)
