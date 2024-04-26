@@ -47,13 +47,13 @@ class UserImage(models.Model):
 
 class PrivateUserImage(models.Model):
     image = models.ImageField(upload_to=image_upload_name, storage=select_private_storage)
-    image_height = models.IntegerField(null=True)
-    image_width = models.IntegerField(null=True)
+    image_height = models.IntegerField()
+    image_width = models.IntegerField()
     thumbnail = models.ImageField(upload_to=image_upload_name,
                                   storage=select_private_storage,
                                   null=True) # nullable for async thumbnail generation
-    thumbnail_height = models.IntegerField(null=True)
-    thumbnail_width = models.IntegerField(null=True)
+    thumbnail_height = models.IntegerField()
+    thumbnail_width = models.IntegerField()
     file_size = models.IntegerField()
     uploader = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
     created_date = models.DateTimeField('date created', auto_now_add=True)

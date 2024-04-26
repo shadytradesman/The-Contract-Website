@@ -4,8 +4,8 @@ import random
 
 class FakeAd(models.Model):
     picture = models.ImageField(null=True, blank=True)
-    picture_height = models.IntegerField(null=True)
-    picture_width = models.IntegerField(null=True)
+    picture_height = models.IntegerField()
+    picture_width = models.IntegerField()
     banner = models.ImageField()
     banner_2 = models.ImageField(blank=True)
     banner_3 = models.ImageField(blank=True)
