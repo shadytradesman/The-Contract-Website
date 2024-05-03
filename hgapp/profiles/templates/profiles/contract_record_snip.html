@@ -16,6 +16,15 @@
             {% with event.1 as move %}
                 {% render_move move %}
             {% endwith %}
+        {% elif event.0 == "credits" %}
+            {% with event.1 as credits %}
+                <div class="css-timeline-item">
+                    <h4>
+                        {{credits.get_display_sentence}}
+                    </h4>
+                </div>
+
+            {% endwith %}
         {% else %}
             Unexpected element. Please file a bug.
         {% endif %}

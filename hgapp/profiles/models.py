@@ -83,6 +83,26 @@ GM_SUFFIX = (
 )
 
 
+KICKSTARTER_NONE = 'KS_NONE'
+KICKSTARTER_NEWBIE = 'KS_NEWBIE'
+KICKSTARTER_NOVICE = 'KS_NOVICE'
+KICKSTARTER_SEASONED = 'KS_SEASONED'
+KICKSTARTER_PROFESSIONAL = 'KS_PROFESSIONAL'
+KICKSTARTER_VETERAN = 'KS_VETERAN'
+KICKSTARTER_HARBINGER = 'KS_HARBINGER'
+KICKSTARTER_POWERS = 'KS_POWERS'
+KS_REWARD_LEVEL = (
+    (KICKSTARTER_NONE, 'None'),
+    (KICKSTARTER_NEWBIE, 'Newbie'),
+    (KICKSTARTER_NOVICE, 'Novice'),
+    (KICKSTARTER_SEASONED, 'Seasoned'),
+    (KICKSTARTER_PROFESSIONAL, 'Professional'),
+    (KICKSTARTER_VETERAN, 'Veteran'),
+    (KICKSTARTER_HARBINGER, 'Harbinger'),
+    (KICKSTARTER_POWERS, 'Powers That Be'),
+)
+
+
 class Profile(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
@@ -108,6 +128,7 @@ class Profile(models.Model):
     gm_suffix = models.CharField(choices=GM_SUFFIX,
                                  max_length=25,
                                  default=GM_SUFFIX[0][0])
+    ks_reward_level = models.CharField(choices=KS_REWARD_LEVEL, max_length=50, default=KICKSTARTER_NONE)
 
     num_games_gmed = models.IntegerField(default=0)
     num_games_gmed_novice = models.IntegerField(default=0)

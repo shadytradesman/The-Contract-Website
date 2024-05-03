@@ -989,6 +989,9 @@ class Scenario(models.Model):
             if latest_approval and hasattr(latest_approval, "experience_reward") and latest_approval.experience_reward:
                 latest_approval.experience_reward.mark_void()
             profile = self.creator.profile
+            ExchangeCreditChange.objects.create(rewarded_player=profile.user,
+                                                reason="Removed {} from the Exchange".format(self.title),
+                                                value=-EXCHANGE_SUBMISSION_VALUE)
             profile.exchange_credits = profile.exchange_credits - EXCHANGE_SUBMISSION_VALUE
             profile.save()
         ScenarioApproval.objects.create(relevant_scenario=self, status=REMOVED)
@@ -1178,6 +1181,9 @@ class Scenario(models.Model):
                 is_spoiled=False,
             )
             discovery.save()
+            ExchangeCreditChange.objects.create(rewarded_player=player,
+                                                reason="Purchased {} on the Exchange".format(self.title),
+                                                value=-EXCHANGE_SCENARIO_COST)
             player.profile.exchange_credits = player.profile.exchange_credits - EXCHANGE_SCENARIO_COST
             player.profile.save()
             Notification.objects.create(
@@ -1740,6 +1746,9 @@ class ScenarioApproval(models.Model):
             .filter(relevant_scenario=self.relevant_scenario, status=APPROVED, experience_reward__isnull=False,  experience_reward__is_void=False).count()
         if rewarded_approval_count == 0:
             profile = self.relevant_scenario.creator.profile
+            ExchangeCreditChange.objects.create(rewarded_player=profile.user,
+                                                reason="Donated {} to the Exchange".format(self.title),
+                                                value=EXCHANGE_SUBMISSION_VALUE)
             profile.exchange_credits = profile.exchange_credits + EXCHANGE_SUBMISSION_VALUE
             reward = ExperienceReward.objects.create(
                 rewarded_player=self.relevant_scenario.creator,
@@ -1760,3 +1769,20 @@ class ScenarioApproval(models.Model):
         # Set profile flag for scenario writer
         profile.exchange_contributor = True
         profile.save()
+
+class ExchangeCreditChange(models.Model):
+    created_time = models.DateTimeField(auto_now_add=True)
+    rewarded_player = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                        on_delete=models.CASCADE)
+    reason = models.CharField(max_length=1000)
+    value = models.IntegerField()
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['rewarded_player', 'created_time']),  # display on timeline
+        ]
+
+    def get_display_sentence(self):
+        verb = "Earned" if self.value > 0 else "Spent"
+        amount = abs(self.value)
+        return "{} {} Exchange Credits: {}".format(verb, amount, self.reason)

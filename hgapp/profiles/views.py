@@ -13,6 +13,7 @@ from profiles.forms import EditProfileForm, AcceptTermsForm
 from profiles.models import Profile
 from info.terms import EULA, TERMS, PRIVACY
 from games.games_constants import get_completed_game_invite_excludes_query, get_completed_game_excludes_query, GAME_STATUS
+from games.models import ExchangeCreditChange
 
 def key_funct(x):
     return x[0]
@@ -86,12 +87,15 @@ class ProfileTimelineView(generic.DetailView):
         self.completed_game_invites = self.profile.completed_game_invites()
         self.gmed_games = self.profile.get_games_where_player_gmed()
         self.gmed_moves = self.profile.get_moves_where_player_gmed()
+        self.credit_changes = ExchangeCreditChange.objects.filter(rewarded_player=self.profile.user)\
+                                                            .order_by("-created_time")
 
         played_games_by_date = [(x.relevant_game.end_time, "play", x) for x in self.completed_game_invites]
         gmed_games_by_date = [(x.end_time, "gm", x) for x in self.gmed_games]
         gmed_moves_by_date = [(x.created_date, "move", x) for x in self.gmed_moves]
+        credit_changes = [(x.created_time, "credits", x) for x in self.credit_changes]
 
-        events_by_date = list(merge(played_games_by_date, gmed_games_by_date, gmed_moves_by_date, reverse=True))
+        events_by_date = list(merge(played_games_by_date, gmed_games_by_date, gmed_moves_by_date, credit_changes, reverse=True))
         timeline = defaultdict(list)
         for event in events_by_date:
             timeline[event[0].strftime("%d %b %Y")].append((event[1], event[2]))
