@@ -5,9 +5,10 @@ def migrate_credits_record(apps, schema_editor):
     Profile = apps.get_model('profiles', 'Profile')
     ExchangeCreditChange = apps.get_model('games', 'ExchangeCreditChange')
     for profile in Profile.objects.all():
-        ExchangeCreditChange.objects.create(rewarded_player=profile.user,
-                                            reason="Pre-existing Exchange Credits",
-                                            value=profile.exchange_credits)
+        if profile.exchange_credits > 0:
+            ExchangeCreditChange.objects.create(rewarded_player=profile.user,
+                                                reason="Pre-existing Exchange Credits",
+                                                value=profile.exchange_credits)
 
 
 def reverse_migrate_primary_writeup():
