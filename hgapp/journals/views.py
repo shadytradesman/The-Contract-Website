@@ -234,17 +234,22 @@ class ReadJournal(View):
     def get(self, request, *args, **kwargs):
         return render(request, self.template_name, self.__get_context_data())
 
-    def __get_context_data(self):
+    def dispatch(self, *args, **kwargs):
         if 'journal_id' in self.kwargs:
-            journal = get_object_or_404(Journal, id=self.kwargs['journal_id'])
-            character = journal.game_attendance.attending_character
-            game_id = journal.game_attendance.relevant_game.id
+            self.journal = get_object_or_404(Journal, id=self.kwargs['journal_id'])
+            self.character = self.journal.game_attendance.attending_character
+            self.game_id = self.journal.game_attendance.relevant_game.id
         else:
-            character = get_object_or_404(Character, id=self.kwargs['character_id'])
-            game_id = self.kwargs['game_id'] if 'game_id' in self.kwargs else None
-        viewer_can_write = character.player_can_edit(self.request.user) if self.request.user else False
-        completed_attendances = character.completed_games()
-        cover = get_object_or_none(JournalCover, character=character)
+            self.character = get_object_or_404(Character, id=self.kwargs['character_id'])
+            self.game_id = self.kwargs['game_id'] if 'game_id' in self.kwargs else None
+        if self.character is None:
+            return HttpResponseRedirect(reverse('home'))
+        return super().dispatch(*args, **kwargs)
+
+    def __get_context_data(self):
+        viewer_can_write = self.character.player_can_edit(self.request.user) if self.request.user else False
+        completed_attendances = self.character.completed_games()
+        cover = get_object_or_none(JournalCover, character=self.character)
         journal_pages = []
         cover_id = "journal_page_cover"
         journal_page = {
@@ -282,7 +287,7 @@ class ReadJournal(View):
                 for journal in journal_page["downtime_journals"]:
                     journal.inject_viewable(self.request.user)
                 journal_pages.append(journal_page)
-        death = character.real_death()
+        death = self.character.real_death()
         if death:
             journal_page = {
                 "header": "death",
@@ -301,11 +306,11 @@ class ReadJournal(View):
                 prev_page['next_id'] = journal_page['id']
                 journal_page['prev_id'] = prev_page['id']
             prev_page = journal_page
-        num_journals_until_improvement = Journal.get_num_journals_until_improvement(character)  if viewer_can_write else 0
+        num_journals_until_improvement = Journal.get_num_journals_until_improvement(self.character)  if viewer_can_write else 0
         next_reward_is_improvement = num_journals_until_improvement <= 1
         context = {
-            'view_game_id': "journal_page_{}".format(game_id) if game_id else cover_id,
-            'character': character,
+            'view_game_id': "journal_page_{}".format(self.game_id) if self.game_id else cover_id,
+            'character': self.character,
             'viewer_can_write': viewer_can_write,
             'journal_pages': journal_pages,
             'next_reward_is_improvement': next_reward_is_improvement,
