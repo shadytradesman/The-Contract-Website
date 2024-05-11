@@ -114,7 +114,6 @@ def send_email(subject, message, from_email, recipient_list, fail_silently, html
     for recipient in recipient_list:
         if BouncedEmail.objects.filter(email=recipient).first() is not None:
             logger.info("Not sending email to address because address has bounced: {}".format(str(recipient)))
-            return
         else:
             valid_recipients.append(recipient)
     if valid_recipients:

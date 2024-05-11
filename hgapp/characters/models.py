@@ -2661,9 +2661,11 @@ class AssetDetails(QuirkDetails):
 
         if not self.previous_revision and not self.is_deleted:
             if self.relevant_asset.grants_gift:
-                GrantAssetGift.send_robust(sender=self.__class__,
-                                      assetDetail=self,
-                                      character=self.relevant_stats.assigned_character)
+                character = self.relevant_stats.assigned_character
+                if hasattr(character, 'player') and character.player:
+                    GrantAssetGift.send_robust(sender=self.__class__,
+                                               assetDetail=self,
+                                               character=character)
             self.grant_quirk_element()
 
     class Meta:
