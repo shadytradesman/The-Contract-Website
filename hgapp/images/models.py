@@ -70,8 +70,8 @@ class PrivateUserImage(models.Model):
 
     def save(self, *args, **kwargs):
         self.file_size = self.image.size
-        self.image_height = self.image.height
-        self.image_width = self.image.width
+        self.image_height = self.image.height if self.image.height else 0
+        self.image_width = self.image.width if self.image.width else 0
         if self.file_size > 5_000_000:
             raise ValueError("Image too large. Size: " + str(self.file_size))
         super(PrivateUserImage, self).save(*args, **kwargs)
