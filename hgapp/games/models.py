@@ -1747,7 +1747,7 @@ class ScenarioApproval(models.Model):
         if rewarded_approval_count == 0:
             profile = self.relevant_scenario.creator.profile
             ExchangeCreditChange.objects.create(rewarded_player=profile.user,
-                                                reason="Donated {} to the Exchange".format(self.title),
+                                                reason="Donated {} to the Exchange".format(self.relevant_scenario.title),
                                                 value=EXCHANGE_SUBMISSION_VALUE)
             profile.exchange_credits = profile.exchange_credits + EXCHANGE_SUBMISSION_VALUE
             reward = ExperienceReward.objects.create(
