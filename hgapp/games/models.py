@@ -1782,6 +1782,9 @@ class ExchangeCreditChange(models.Model):
             models.Index(fields=['rewarded_player', 'created_time']),  # display on timeline
         ]
 
+    def __str__(self):
+        return "{} ::: {}".format(self.rewarded_player.username, self.get_display_sentence())
+
     def get_display_sentence(self):
         verb = "Earned" if self.value > 0 else "Spent"
         amount = abs(self.value)
