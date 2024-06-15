@@ -77,6 +77,9 @@ class PrivateUserImage(models.Model):
         super(PrivateUserImage, self).save(*args, **kwargs)
 
     def is_too_small_for_thumb(self):
+        # if image_width failed to populate, just assume it is big
+        if self.image_width == 0:
+            return False
         return self.image_width <= settings.THUMB_SIZE[0] and self.image_height <= settings.THUMB_SIZE[1]
 
     def get_responsible_user(self):
