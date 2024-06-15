@@ -35,6 +35,9 @@ def generate_thumbnail(private_image_pk):
         image.save(temp_thumb, file_extension)
         temp_thumb.seek(0)
         private_image.thumbnail.save(thumb_filename, ContentFile(temp_thumb.read()))
+        private_image.thumbnail_height = private_image.thumbnail.height
+        private_image.thumbnail_width = private_image.thumbnail.width
+        private_image.save()
 
     return "Completed successfully"
 
