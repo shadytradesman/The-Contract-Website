@@ -23,6 +23,7 @@ from django.urls import reverse
 from django.utils.safestring import SafeText
 from games.games_constants import GAME_STATUS, get_completed_game_excludes_query, get_scheduled_game_excludes_query
 from characters.templatetags.character_game_tags import render_scenario_element
+from characters.signals import recalculate_stats
 from functools import reduce
 
 from hgapp.utilities import get_object_or_none
@@ -531,18 +532,7 @@ class Game(models.Model):
         for invite in self.invitations.all():
             invite.profile.recompute_titles()
         for character in self.attended_by.all():
-            character.refresh_from_db()
-            curr_status = character.status
-            character.update_contractor_game_stats()
-            character.refresh_from_db()
-            if character.status != curr_status and character.cell:
-                for membership in character.cell.get_unbanned_members():
-                    Notification.objects.create(
-                        user=membership.member_player,
-                        headline="Contractor earned new Status",
-                        content="{} is now {}".format(character.name, character.get_contractor_status_display()),
-                        url=reverse('characters:characters_view', args=(character.id,)),
-                        notif_type=CONTRACTOR_NOTIF)
+            recalculate_stats.send(sender=character.__class__, character_pk=character.pk, is_game=True)
 
     def update_profile_stats(self):
         self.update_participant_titles()

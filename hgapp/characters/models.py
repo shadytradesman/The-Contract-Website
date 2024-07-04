@@ -564,12 +564,12 @@ class Character(models.Model):
             .count()
         self.save()
 
-    def update_contractor_game_stats(self):
+    def initial_update_contractor_game_stats(self):
         self.update_contractor_journal_stats()
-        self._update_loss_count()
-        self._update_victory_count()
-        self._update_game_count()
-        self._update_exp_earned()
+        self.update_loss_count()
+        self.update_victory_count()
+        self.update_game_count()
+        self.update_exp_earned()
         effective_victories = self.effective_victories()
         self.status = self.calculate_status(num_victories=effective_victories)
         self.save()
@@ -608,7 +608,7 @@ class Character(models.Model):
     def number_completed_games(self):
         return self.num_games if self.num_games else 0
 
-    def _update_game_count(self):
+    def update_game_count(self):
         self.num_games = self.game_attendance_set.exclude(outcome=None, is_confirmed=False).count()
 
     def number_of_victories(self):
@@ -627,13 +627,13 @@ class Character(models.Model):
         self.status = self.calculate_status(num_victories=effective_victories)
         return self.get_contractor_status_display()
 
-    def _update_victory_count(self):
+    def update_victory_count(self):
         self.num_victories = get_queryset_size(self.game_attendance_set.filter(is_confirmed=True, outcome="WIN"))
 
     def number_of_losses(self):
         return self.num_losses if self.num_losses else 0
 
-    def _update_loss_count(self):
+    def update_loss_count(self):
         self.num_losses = get_queryset_size(self.game_attendance_set.filter(is_confirmed=True, outcome="LOSS"))
 
     def number_completed_games_in_home_cell(self):
@@ -668,7 +668,7 @@ class Character(models.Model):
         if self.pk is None:
             super(Character, self).save(*args, **kwargs)
             self.set_default_permissions()
-            self.update_contractor_game_stats()
+            self.initial_update_contractor_game_stats()
         else:
             self.set_default_permissions()
             super(Character, self).save(*args, **kwargs)
@@ -1100,7 +1100,7 @@ Archived on: {}
     def exp_earned(self):
         return self.earned_exp
 
-    def _update_exp_earned(self):
+    def update_exp_earned(self):
         rewards = self.experiencereward_set.filter(is_void=False).all()
         total_exp = EXP_NEW_CHAR
         for reward in rewards:
@@ -1920,12 +1920,7 @@ class ExperienceReward(models.Model):
         return "{} for {} ({})".format(self.get_value(), self.rewarded_player.username, self.type)
 
     def save(self, *args, **kwargs):
-        existing = get_object_or_none(Attribute, pk=self.pk)
         super().save(*args, **kwargs)
-        if existing is None and not self.is_void and hasattr(self, "rewarded_character") and self.rewarded_character is not None:
-            self.rewarded_character.earned_exp += self.get_value()
-            self.rewarded_character.save()
-
 
     def mark_void(self):
         self.is_void = True

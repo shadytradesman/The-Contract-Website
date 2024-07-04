@@ -758,8 +758,6 @@ def allocate_gm_exp(request, secret_key = None):
                         reward.rewarded_character = char
                         reward.created_time = timezone.now()
                         reward.save()
-                        char._update_exp_earned()
-                        char.save()
             return HttpResponseRedirect(reverse('home'))
         else:
             raise ValueError("Invalid reward forms")

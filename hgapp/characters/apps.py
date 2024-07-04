@@ -6,3 +6,6 @@ class CharactersConfig(AppConfig):
 
     def ready(self):
         import characters.signals
+        import characters.signal_receivers
+
+

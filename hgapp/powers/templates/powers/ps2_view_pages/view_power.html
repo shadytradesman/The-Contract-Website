@@ -104,7 +104,7 @@
                         {% endif %}
                         {% if sig_artifacts %}
                         <div>
-                            On Signature Item {% for artifact in sig_artifacts %}<a href="{% url 'characters:characters_artifact_view' artifact.id %}">{{artifact.name}}</a>{% endfor %}.
+                            On Legendary Artifact {% for artifact in sig_artifacts %}<a href="{% url 'characters:characters_artifact_view' artifact.id %}">{{artifact.name}}</a>{% endfor %}.
                         </div>
                         {% endif %}
                     </div>

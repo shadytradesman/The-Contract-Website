@@ -70,9 +70,11 @@ View Questionnaire
                         <span class="text-muted">
                             {% if answer.written_contract_number != 0 %}
                                 Answered after Contract <b>{{answer.written_contract_number}}</b>,
-                                <a href="{% url 'games:games_view_game' answer.game_attendance.relevant_game.id %}">
-                                    {{answer.game_attendance.relevant_game.scenario.title}}
-                                </a>
+                                {% if answer.game_attendance %}
+                                    <a href="{% url 'games:games_view_game' answer.game_attendance.relevant_game.id %}">
+                                        {{answer.game_attendance.relevant_game.scenario.title}}
+                                    </a>
+                                {% endif %}
                             {% else %}
                                 Answered before {{character.name}}'s first Contract.
                             {% endif %}

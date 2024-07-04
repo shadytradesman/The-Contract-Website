@@ -128,11 +128,11 @@ class GameModelTests(TestCase):
 
     def update_char_stats(self):
         self.char_user1_cell.refresh_from_db()
-        self.char_user1_cell.update_contractor_game_stats()
-        self.char_user1_cell2.update_contractor_game_stats()
-        self.char_user2_cell.update_contractor_game_stats()
-        self.char_user2_nocell.update_contractor_game_stats()
-        self.char_cellowner_cell.update_contractor_game_stats()
+        self.char_user1_cell.initial_update_contractor_game_stats()
+        self.char_user1_cell2.initial_update_contractor_game_stats()
+        self.char_user2_cell.initial_update_contractor_game_stats()
+        self.char_user2_nocell.initial_update_contractor_game_stats()
+        self.char_cellowner_cell.initial_update_contractor_game_stats()
 
     def test_archive_game_victory(self):
         self.assertEquals(self.char_user1_cell.num_unspent_rewards(), 0)
