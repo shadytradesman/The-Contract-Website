@@ -101,7 +101,7 @@ def make_character_form(user, existing_character=None, supplied_cell=None):
                               'change the world?'),
                 'age': _("Age"),
                 'paradigm': _('Supernatural paradigm.'),
-                'residence': _('Where do you live? In what kind of dwelling?'),
+                'residence': _('What kind of dwelling do you live in? Where is it specifically?'),
                 'languages': _('List of languages the character speaks'),
                 'insanities': _('List of instabilities and insanities the character possesses'),
                 'disabilities': _('List of disabilities and battle scars the character possesses'),

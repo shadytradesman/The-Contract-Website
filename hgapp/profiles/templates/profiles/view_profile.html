@@ -156,7 +156,7 @@
                     </div>
                 </div>
             </div>
-            {% cache 9000 view_profile_main profile.user.id request.user %}
+            {% cache 9000 view_profile_main profile.user.id profile.user.character_set.count %}
             <div id="contractors-sec"></div>
             <hr>
             <div class="row" >
