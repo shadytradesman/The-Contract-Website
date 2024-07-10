@@ -12,7 +12,7 @@ from games.models import OUTCOME, ScenarioTag, REQUIRED_HIGH_ROLLER_STATUS, INVI
     REQ_STATUS_NEWBIE, REQ_STATUS_NOVICE, REQ_STATUS_SEASONED, REQ_STATUS_PROFESSIONAL, REQ_STATUS_VETERAN, \
     REQ_STATUS_NEWBIE_OR_NOVICE, WIKI_EDIT_MODE
 from .games_constants import EXP_V1_V2_GAME_ID
-from characters.models import Character, ELEMENT_TYPE
+from characters.models import Character, ELEMENT_TYPE, HIGH_ROLLER_STATUS
 from characters.forms import LooseEndForm
 
 from bootstrap3_datetime.widgets import DateTimePicker
