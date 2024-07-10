@@ -4,12 +4,14 @@ from django.db import models
 from django.db.models import Count
 from django.conf import settings
 from django.forms.models import model_to_dict
+from django.db.models import Q
 from django.contrib.auth import get_user_model
 
 from characters.models import Character, HIGH_ROLLER_STATUS, Character_Death, ExperienceReward, AssetDetails, EXP_GM, \
     EXP_LOSS_V2, EXP_WIN_V2, EXP_LOSS_RINGER_V2, EXP_WIN_RINGER_V2, EXP_LOSS_IN_WORLD_V2, EXP_WIN_IN_WORLD_V2, EXP_MVP,\
     EXP_WIN_V1, EXP_LOSS_V1, Artifact, EXP_GM_MOVE, EXP_GM_RATIO, EXP_GM_NEW_PLAYER, StockWorldElement, ELEMENT_TYPE, \
-    CONDITION, CIRCUMSTANCE, TROPHY, LOOSE_END, STATUS_ANY, EXP_EXCHANGE
+    CONDITION, CIRCUMSTANCE, TROPHY, LOOSE_END, STATUS_ANY, EXP_EXCHANGE, HIGH_ROLLER_STATUS, SEASONED_PORTED, \
+    VETERAN_PORTED, STATUS_NEWBIE, STATUS_NOVICE, STATUS_SEASONED, STATUS_PROFESSIONAL, STATUS_VETERAN
 from django.template.loader import render_to_string
 from powers.models import Power, Power_Full
 from cells.models import Cell, WorldEvent
@@ -189,6 +191,7 @@ class Game(models.Model):
                                           null=True,
                                           blank=True,
                                           on_delete=models.CASCADE)
+    last_email_date = models.DateTimeField('last_email_date', null=True, auto_now_add=True)
 
     # Invitation stuff
     hook = models.TextField(max_length=7000,
@@ -849,6 +852,33 @@ class Game_Invite(models.Model):
         status = "DECLINED" if self.is_declined else "ACCEPTED" if hasattr(self, "attendance") and self.attendance \
             else "OPEN" if self.relevant_game.is_scheduled() else "EXPIRED"
         return "[{}] {} invitation to {}".format(status, self.invited_player.username, self.relevant_game.scenario.title)
+
+    def get_available_characters(self):
+        users_living_character_ids = [char.id for char in
+                                      self.invited_player.character_set.filter(is_deleted=False, is_dead=False).all()]
+        required_status = self.relevant_game.required_character_status
+        if required_status == REQ_STATUS_ANY:
+            queryset = Character.objects.filter(id__in=users_living_character_ids)
+        elif required_status == REQ_STATUS_NEWBIE_OR_NOVICE:
+            queryset = Character.objects.filter(id__in=users_living_character_ids)\
+                .filter(status__in=[STATUS_NEWBIE, STATUS_NOVICE])
+        elif required_status == REQ_STATUS_NEWBIE:
+            queryset = Character.objects.filter(id__in=users_living_character_ids).filter(status=STATUS_NEWBIE)
+        elif required_status == REQ_STATUS_NOVICE:
+            queryset = Character.objects.filter(id__in=users_living_character_ids).filter(status=STATUS_NOVICE)
+        elif required_status == REQ_STATUS_SEASONED:
+            queryset = Character.objects.filter(id__in=users_living_character_ids).filter(
+                Q(status=STATUS_SEASONED) | Q(ported=SEASONED_PORTED))
+        elif required_status == REQ_STATUS_PROFESSIONAL:
+            queryset = Character.objects.filter(id__in=users_living_character_ids).filter(
+                Q(status=STATUS_PROFESSIONAL) | Q(ported=SEASONED_PORTED))
+        elif required_status == REQ_STATUS_VETERAN:
+            queryset = Character.objects.filter(id__in=users_living_character_ids).filter(
+                Q(status=STATUS_VETERAN) | Q(ported=VETERAN_PORTED))
+        else:
+            raise ValueError("unanticipated required roller status")
+        return queryset
+
 
     def notify_invitee(self, request, game):
         NotifyGameInvitee.send_robust(sender=self.__class__,

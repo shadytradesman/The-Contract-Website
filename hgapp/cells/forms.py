@@ -133,6 +133,15 @@ class PlayerRoleForm(forms.Form):
                              widget=forms.Select(attrs={'form': 'manage_form', 'class': 'form-control form-inline'}))
 
 
+class MembershipEmailPrefsForm(forms.Form):
+    membership_id = forms.CharField(label=None, max_length=200, widget=forms.HiddenInput())
+    contract_invitations = forms.BooleanField(required=False, help_text="Email me when I'm invited to a Contract in "
+                                                                        "this Playgroup.")
+    contract_updates = forms.BooleanField(required=False, help_text="Email me when a Contract I'm invited to in this Playgroup "
+                                                    "changes its scheduled start time or when one I am attending ends "
+                                                    "and rewards are granted.")
+
+
 class RolePermissionForm(forms.Form):
     # attrs must be set to allow forms with other submit target urls to exist within other forms in template.
     role = forms.CharField(label=None,

@@ -4,12 +4,9 @@ from itertools import groupby
 from django.forms.models import ModelChoiceIterator
 from itertools import chain
 
-from characters.models import HIGH_ROLLER_STATUS, SEASONED_PORTED, VETERAN_PORTED, STATUS_NEWBIE, STATUS_NOVICE, \
-    STATUS_SEASONED, STATUS_PROFESSIONAL, STATUS_VETERAN
 from django.forms import ModelChoiceField
 from account.conf import settings
 from django.utils import timezone
-from django.db.models import Q
 
 from games.models import OUTCOME, ScenarioTag, REQUIRED_HIGH_ROLLER_STATUS, INVITE_MODE, GameMedium, REQ_STATUS_ANY, \
     REQ_STATUS_NEWBIE, REQ_STATUS_NOVICE, REQ_STATUS_SEASONED, REQ_STATUS_PROFESSIONAL, REQ_STATUS_VETERAN, \
@@ -387,24 +384,7 @@ class CharDisplayByActiveModelChoiceField(ModelChoiceField):
 
 def make_accept_invite_form(invitation):
     class AcceptInviteForm(forms.Form):
-        users_living_character_ids = [char.id for char in invitation.invited_player.character_set.filter(is_deleted=False, is_dead=False).all()]
-        required_status = invitation.relevant_game.required_character_status
-        if required_status == REQ_STATUS_ANY:
-            queryset = Character.objects.filter(id__in=users_living_character_ids)
-        elif required_status == REQ_STATUS_NEWBIE_OR_NOVICE:
-            queryset = Character.objects.filter(id__in=users_living_character_ids).filter(status__in=[STATUS_NEWBIE, STATUS_NOVICE])
-        elif required_status == REQ_STATUS_NEWBIE:
-            queryset = Character.objects.filter(id__in=users_living_character_ids).filter(status=STATUS_NEWBIE)
-        elif required_status == REQ_STATUS_NOVICE:
-            queryset = Character.objects.filter(id__in=users_living_character_ids).filter(status=STATUS_NOVICE)
-        elif required_status == REQ_STATUS_SEASONED:
-            queryset = Character.objects.filter(id__in=users_living_character_ids).filter(Q(status=STATUS_SEASONED) | Q(ported=SEASONED_PORTED))
-        elif required_status == REQ_STATUS_PROFESSIONAL:
-            queryset = Character.objects.filter(id__in=users_living_character_ids).filter(Q(status=STATUS_PROFESSIONAL) | Q(ported=SEASONED_PORTED))
-        elif required_status == REQ_STATUS_VETERAN:
-            queryset = Character.objects.filter(id__in=users_living_character_ids).filter(Q(status=STATUS_VETERAN) | Q(ported=VETERAN_PORTED))
-        else:
-            raise ValueError("unanticipated required roller status")
+        queryset = invitation.get_available_characters()
         if invitation.as_ringer or invitation.relevant_game.allow_ringers:
             attending_character = CharDisplayByCellModelChoiceField(
                 world=invitation.relevant_game.cell,

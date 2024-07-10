@@ -3,6 +3,8 @@ from games.models import Game_Invite, NotifyGameInvitee, GameChangeStartTime, Ga
 from django.conf import settings
 from django_ses.signals import bounce_received
 from emails.tasks import start_time_change_notifications, game_ended_notifications, game_invite_notification
+from datetime import datetime, timedelta
+
 
 from .models import BouncedEmail
 
@@ -20,9 +22,14 @@ NOTIF_VAR_FINISHED = "finished"
 @receiver(GameChangeStartTime)
 def notify_changed_start(**kwargs):
     game = kwargs["game"]
+    an_hour_ago = datetime.now() - timedelta(hours=1)
+    if hasattr(game, "last_email_date") and game.last_email_date > an_hour_ago:
+        return
     request = kwargs["request"]
     uri_prefix = request.build_absolute_uri('/')
     start_time_change_notifications.delay(game.pk, uri_prefix)
+    game.last_email_date = datetime.now()
+    game.save()
 
 
 @receiver(GameEnded)

@@ -12,16 +12,29 @@
     <div class="row">
         <div class="col-md-8">
             <form method="POST" action="{% url "account_settings" %}">
+                {{cell_prefs_formset.management_form}}
+                {{ cell_prefs_formset.about.errors }}
                 <legend>{% trans "Account" %}</legend>
                 {% csrf_token %}
                 <span class="css-email-field">
                     {{ form.email|bootstrap }}
                 </span>
                 {% email_verified request.user %}
+                <h4>Email Settings</h4>
                 <div style="margin-top: 15px;">
-                    <b>Receive Emails for</b>
-                    {{ email_settings_form|bootstrap }}
+                    <b>Global Email Settings</b>
+                    <div style="margin-left: 10px;">
+                        {{ email_settings_form|bootstrap }}
+                    </div>
                 </div>
+                {% for email_form in cell_prefs_formset %}
+                    <div style="margin-top: 15px;">
+                        Email Preferences for <b>{{email_form.initial.cell_name}} </b>
+                        <div style="margin-left: 10px;">
+                            {{ email_form|bootstrap }}
+                        </div>
+                    </div>
+                {% endfor %}
                 <hr>
                 {{form.timezone|bootstrap}}
                 {{form.language|bootstrap}}

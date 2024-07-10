@@ -3,9 +3,11 @@ import datetime
 
 from account.models import Account
 from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponseForbidden
 from django.views import View
 from django.contrib import messages
+from django.forms import formset_factory
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.shortcuts import render
@@ -28,7 +30,8 @@ from games.models import GAME_STATUS, Scenario, Game, Game_Attendance, WIN, LOSS
 from hgapp.forms import SignupForm, ResendEmailConfirmation, LoginUsernameOrEmailForm
 from blog.models import Post
 from info.models import FrontPageInfo
-from cells.models import WorldEvent
+from cells.models import WorldEvent, CellMembership
+from cells.forms import MembershipEmailPrefsForm
 from profiles.forms import EmailSettingsForm
 from profiles.models import Profile
 from notifications.models import Notification
@@ -63,11 +66,27 @@ class SettingsView(account.views.SettingsView):
                 "site_announcements": profile.site_announcements,
             }
             ctx["email_settings_form"] = EmailSettingsForm(initial=email_prefs_initial)
+            CellEmailPrefsFormset = formset_factory(MembershipEmailPrefsForm, extra=0)
+            cell_prefs_formset = CellEmailPrefsFormset(initial=[{'membership_id': x.pk,
+                                                     'contract_invitations': x.email_contract_invites,
+                                                     'contract_updates': x.email_contract_updates,
+                                                     'cell_name': x.relevant_cell.name} for x in self.request.user.cellmembership_set.all()])
+            ctx["cell_prefs_formset"] = cell_prefs_formset
         return ctx
 
     def update_settings(self, form, **kwargs):
         super(SettingsView, self).update_settings(form, **kwargs)
         email_form = EmailSettingsForm(self.request.POST)
+        CellEmailPrefsFormset = formset_factory(MembershipEmailPrefsForm, extra=0)
+        cell_prefs_formset = CellEmailPrefsFormset(self.request.POST)
+        if cell_prefs_formset.is_valid():
+            for form in cell_prefs_formset:
+                membership = get_object_or_404(CellMembership, id=int(form.cleaned_data['membership_id']))
+                if membership.member_player != self.request.user:
+                    raise ValueError("Invalid Membership")
+                membership.email_contract_updates = form.cleaned_data['contract_updates']
+                membership.email_contract_invites = form.cleaned_data['contract_invitations']
+                membership.save()
         if email_form.is_valid() and self.request.user.profile:
             profile = self.request.user.profile
             profile.contract_invitations = email_form.cleaned_data["contract_invitations"]

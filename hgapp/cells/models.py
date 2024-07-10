@@ -406,6 +406,9 @@ class CellMembership(models.Model):
     reason_banned = models.CharField(max_length=2000, blank=True)
     date_banned = models.DateTimeField('date banned', blank=True, null=True)
 
+    email_contract_updates = models.BooleanField(default=True)
+    email_contract_invites = models.BooleanField(default=True)
+
     def add_user_to_current_group(self):
         groupName = self.relevant_cell.getGroupName(self.role)
         group = Group.objects.get(name=groupName)

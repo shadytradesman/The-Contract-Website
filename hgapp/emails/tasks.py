@@ -11,6 +11,7 @@ from profiles.models import Profile
 from django.utils import timezone
 
 from notifications.models import Notification, PROMOTIONAL_NOTIF
+from cells.models import CellMembership
 
 from .models import BouncedEmail
 
@@ -133,10 +134,16 @@ def game_invite_notification(invite_id, uri_prefix):
                                 is_timeline=True,
                                 article=invite.relevant_game,
                                 variety=NOTIF_VAR_UPCOMING)
-    if invite.invited_player.profile.contract_invitations:
-        email = invite.invited_player.profile.get_confirmed_email()
-        if email:
-            send_email_for_game_invite(email, invite, game_url)
+    membership = CellMembership.objects.filter(relevant_cell=invite.relevant_game.cell,
+                                               member_player=invite.invited_player).first()
+    should_send_email = membership is not None and membership.email_contract_invites
+    if membership is None:
+        should_send_email = invite.invited_player.profile.contract_invitations
+    if should_send_email:
+        if invite.get_available_characters().count() != 0:
+            email = invite.invited_player.profile.get_confirmed_email()
+            if email:
+                send_email_for_game_invite(email, invite, game_url)
 
 
 @shared_task(name="start_time_change_notifications")
@@ -144,16 +151,21 @@ def start_time_change_notifications(game_id, uri_prefix):
     game = Game.objects.get(pk=game_id)
     game_url = "{}{}".format(uri_prefix, reverse("games:games_view_game", args=[game.id])[1:])
     for invite in game.game_invite_set.all():
-        profile = invite.invited_player.profile
         Notification.objects.create(user=invite.invited_player,
                                     headline="Start time changed",
                                     content="New start time for " + invite.relevant_game.title,
                                     url=game_url,
                                     notif_type=CONTRACT_NOTIF)
-        if profile.contract_updates:
-            email = invite.invited_player.profile.get_confirmed_email()
-            if email:
-                send_email_for_game_time_update(email, invite, game_url)
+        membership = CellMembership.objects.filter(relevant_cell=invite.relevant_game.cell,
+                                                   member_player=invite.invited_player).first()
+        should_send_email = membership is not None and membership.email_contract_updates
+        if membership is None:
+            should_send_email = invite.invited_player.profile.contract_updates
+        if should_send_email:
+            if invite.get_available_characters().count() != 0:
+                email = invite.invited_player.profile.get_confirmed_email()
+                if email:
+                    send_email_for_game_time_update(email, invite, game_url)
 
 
 @shared_task(name="game_ended_notifications")
@@ -163,8 +175,12 @@ def game_ended_notifications(game_id, uri_prefix):
     players = []
     for invite in game.game_invite_set.all():
         players.append(invite.invited_player)
-        profile = invite.invited_player.profile
-        if profile.contract_updates and hasattr(invite, "attendance") and invite.attendance:
+        membership = CellMembership.objects.filter(relevant_cell=invite.relevant_game.cell,
+                                                   member_player=invite.invited_player).first()
+        should_send_email = membership is not None and membership.email_contract_updates
+        if membership is None:
+            should_send_email = invite.invited_player.profile.contract_updates
+        if should_send_email and hasattr(invite, "attendance") and invite.attendance:
             if invite.attendance.attending_character:
                 reward_url = "{}{}".format(uri_prefix, 
                     reverse("characters:characters_spend_reward", args=[invite.attendance.attending_character.id])[1:])
