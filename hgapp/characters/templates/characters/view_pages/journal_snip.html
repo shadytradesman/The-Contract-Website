@@ -9,6 +9,15 @@
                 {% endif %}
             </h3>
         </a>
+        {% if character.number_of_victories %}
+        <div class="text-center">
+            <h5 style="margin-top: 5px; margin-bottom: 5px;">
+                <a href="{% url 'characters:characters_view_contacts' character.id %}">
+                    View {{character.name}}'s Encountered Contractors
+                </a>
+            </h5>
+        </div>
+        {% endif %}
         {% if user_can_edit and next_entry %}
             <a class="btn btn-sm btn-primary js-journal-link"
                href="{% url 'journals:journal_write_next' character.id %}">

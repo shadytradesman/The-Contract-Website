@@ -10,6 +10,7 @@ from django.db import models
 from django.db.models import Q, Sum
 from django.utils.datetime_safe import datetime
 from django.utils import timezone
+from django.templatetags.static import static
 from guardian.shortcuts import assign_perm, remove_perm
 from django.utils.safestring import mark_safe
 from django.urls import reverse
@@ -855,7 +856,8 @@ class Character(models.Model):
         else:
             return "No Rewards available"
 
-
+    def get_tier_icon(self):
+        return static("overrides/tiericons/{}.svg".format(self.calculate_status().lower()))
 
     def reward_cost_for_item(self, sig_item):
         unspent_gifts = self.unspent_gifts()

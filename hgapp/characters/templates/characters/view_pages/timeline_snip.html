@@ -1,54 +1,60 @@
 {% load games_tags %}
 
-<div class="text-center">
-  <h3  data-toggle="tooltip" title='{{tutorial.character_timeline}}' style="margin-bottom: 5px;">
-    Contractor Timeline
+<div >
+  <h3  class="text-center" data-toggle="tooltip" title='{{tutorial.character_timeline}}' style="margin-bottom: 5px;">
+    Advancement
   </h3>
-  <div>
-    <b>{{ character.number_of_victories }}</b> Victories -
-    <b>{{ character.number_of_losses }}</b> Failure{{character.number_of_losses|pluralize}}
-    {% if request.user == character.player %}
-      <div>
-        <b>{{num_total_rewards}}</b> Reward{{num_total_rewards|pluralize}}
-        <span {% if character_over_reward_limit %} class="text-danger" {% endif %}>
-          ({{num_spent_rewards}} spent)
-        </span>
-
-        - <b>{{num_gifts}}</b> Gift{{num_gifts|pluralize}}
-      - <b>{{ num_improvements }} </b> Improvement{{num_improvements|pluralize}}
+  <div style="display: flex; align-items: center; justify-content: center;">
+    {% if early_access %}
+      <div class="text-center" style="padding: 10px; margin-right: 10px;" >
+        <img src="{{character.get_tier_icon}}" style="width: 55px; height: 55px;">
+        <div class="text-muted">
+          <i>
+            {{character.get_status_display}}
+          </i>
+        </div>
       </div>
     {% endif %}
-  </div>
-  <div {% if unspent_experience < 0 %}class="text-danger"{% endif %}>
-    <b>Remaining Exp: </b>{{unspent_experience}}
-    <small>
-      (<b>Earned: </b> {{exp_earned}} - <b>Spent: </b> {{exp_cost}})
-    </small>
-  </div>
-{% if character.number_of_victories %}
-<div class="text-center">
-  <h5 style="margin-top: 5px; margin-bottom: 5px;">
-    <a href="{% url 'characters:characters_view_contacts' character.id %}">
-      View {{character.name}}'s Encountered Contractors
-    </a>
-  </h5>
-</div>
-{% endif %}
+    <div {% if not early_access %} class="text-center" {% endif %}>
+      <div>
+        <b>{{ character.number_of_victories }}</b> Victories -
+        <b>{{ character.number_of_losses }}</b> Failure{{character.number_of_losses|pluralize}}
+        {% if request.user == character.player %}
+          <div>
+            <b>{{num_total_rewards}}</b> Reward{{num_total_rewards|pluralize}}
+            <span {% if character_over_reward_limit %} class="text-danger" {% endif %}>
+              ({{num_spent_rewards}} spent)
+            </span>
 
+            <br class="visible-xs-block"/>
+            <b>{{num_gifts}}</b> Gift{{num_gifts|pluralize}}
+          - <b>{{ num_improvements }} </b> Improvement{{num_improvements|pluralize}}
+          </div>
+        {% endif %}
+        <div {% if unspent_experience < 0 %}class="text-danger"{% endif %}>
+          <b>Remaining Exp: </b>{{unspent_experience}}
+          <br class="visible-xs-block"/>
+          <small>
+            (<b>Earned: </b> {{exp_earned}} - <b>Spent: </b> {{exp_cost}})
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div id="hx-timeline-char">
-  <div class="text-center" style="margin-top: 10px;">
+  <div class="text-center" style="margin-top: 5px;">
     <button
             class="btn btn-primary js-disable-on-click"
             hx-get="{% url 'characters:character_timeline' character.id %}"
             hx-trigger="click"
             hx-target="#hx-timeline-char"
             hx-swap="outerHTML">
-      Load Full Timeline
+      Load Contractor Timeline
     </button>
     <div>
-      <small>An itemized record of every Contract, Reward, Experience change, Condition, Circumstance, and Move</small>
+      <small>An itemized record of every Contract, advancement, and more</small>
     </div>
   </div>
 </div>

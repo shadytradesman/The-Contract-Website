@@ -241,7 +241,7 @@ def home(request):
 
 @login_required
 def logged_in_contractors(request):
-    living_characters = request.user.character_set.filter(is_deleted=False, is_dead=False).order_by('name').all()
+    living_characters = request.user.character_set.filter(is_deleted=False, is_dead=False).order_by('-num_victories').all()
     dead_characters = request.user.character_set.filter(is_deleted=False, is_dead=True).order_by('name').all()
     avail_improvements = request.user.profile.get_avail_improvements()
     avail_charon_coins = request.user.profile.get_avail_charon_coins()
@@ -252,6 +252,7 @@ def logged_in_contractors(request):
         'avail_improvements': avail_improvements,
         'avail_charon_coins': avail_charon_coins,
         'avail_exp_rewards': avail_exp_rewards,
+        'early_access': request.user.is_authenticated and request.user.profile.early_access_user,
     }
     return render(request, 'logged_in_contractors.html', context)
 

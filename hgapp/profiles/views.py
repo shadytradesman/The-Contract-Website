@@ -54,6 +54,7 @@ class ProfileView(generic.DetailView):
         context['attended_games'] = self.attended_games
         context['profile_view'] = True
         context['profile_viewable'] = self.profile.player_can_view(self.request.user)
+        context['early_access'] = self.request.user.is_authenticated and self.request.user.profile.early_access_user,
         return context
 
     def populate_contractor_stats_context(self, context):

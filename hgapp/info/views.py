@@ -75,6 +75,8 @@ def leaderboard(request):
         "top_scenario_runs": top_scenario_runs,
         "top_scenario_gms": top_scenario_words,
         "top_scenario_deadliness": top_scenario_deadliness,
+
+        'early_access': request.user.is_authenticated and request.user.profile.early_access_user,
     }
     return render(request, 'info/leaderboard/leaderboard.html', context)
 

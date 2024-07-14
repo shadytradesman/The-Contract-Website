@@ -2,20 +2,29 @@
 {% load static %}
 
 {% block entry_content %}
-<a href="{% url 'characters:characters_view' character.id %}" class="css-contractor-sub">
-    {% if character.is_dead %}
-    <img data-title="This Contractor is dead."
-         data-toggle="tooltip"
-         class="css-dead-img"
-         src="{% static 'characters/skull.svg' %}" width="25" height="25"/>
+<div style="display:flex;">
+    {% if early_access %}
+        <div class="text-center" style="padding: 2px; margin-right: 5px;" data-toggle="tooltip" title='{{character.get_status_display}}'>
+            <img src="{{character.get_tier_icon}}" style="width: 40px; height: 40px;" width="40" height="40"/>
+        </div>
     {% endif %}
-    <b>{{character.name}}</b>
-    <p class="main-subtitle">
-        the {{character.concept_summary}} {% if character.paradigm %} {{ character.paradigm}} {% endif %}
-        <br>
-        <span class="subtitle">
+    <div>
+        <a href="{% url 'characters:characters_view' character.id %}" class="css-contractor-sub">
+            {% if character.is_dead %}
+            <img data-title="This Contractor is dead."
+                 data-toggle="tooltip"
+                 class="css-dead-img"
+                 src="{% static 'characters/skull.svg' %}" width="30" height="30"/>
+            {% endif %}
+            <b>{{character.name}}</b>
+            <p class="main-subtitle">
+                the {{character.concept_summary}} {% if character.paradigm %} {{ character.paradigm}} {% endif %}
+                <br>
+                <span class="subtitle">
             <b>{{character.num_victories}}</b> Victories
         </span>
-    </p>
-</a>
+            </p>
+        </a>
+    </div>
+</div>
 {% endblock %}

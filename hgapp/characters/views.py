@@ -233,6 +233,7 @@ def graveyard(request):
         'character_deaths': dead_characters,
         'header': header,
         'num_deaths': num_deaths,
+        'early_access': request.user.is_authenticated and request.user.profile.early_access_user,
     }
     return render(request, 'characters/graveyard.html', context)
 

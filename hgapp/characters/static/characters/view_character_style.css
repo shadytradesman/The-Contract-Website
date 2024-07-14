@@ -25,6 +25,10 @@ h1 {
 
 }
 
+.css-char-essentials-text {
+    max-width: 850px;
+}
+
 .css-character-primary-image {
     margin-right : 20px;
 }

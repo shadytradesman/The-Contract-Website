@@ -36,28 +36,45 @@
         </div>
         <div class="panel-group" id="accordion">
             {% if tombstones.Veteran %}
-                <h2>Veterans</h2>
+                <h2>
+                    Veterans
+                </h2>
             {% endif %}
             {% for tombstone in tombstones.Veteran %}
                 {% include 'characters/tombstone_snippet.html' %}
             {% endfor %}
 
             {% if tombstones.Professional %}
-            <h2>Professional</h2>
+            <h2>
+                {% if early_access %}
+                    <img src="{% static 'overrides/tiericons/professional.svg' %}" style="width: 36px; height: 36px;" width="36" height="36"/>
+                {% endif %}
+                Professional
+            </h2>
             {% endif %}
             {% for tombstone in tombstones.Professional %}
             {% include 'characters/tombstone_snippet.html' %}
             {% endfor %}
 
             {% if tombstones.Seasoned %}
-                <h2>Seasoned</h2>
+                <h2>
+                    {% if early_access %}
+                        <img src="{% static 'overrides/tiericons/seasoned.svg' %}" style="width: 36px; height: 36px;" width="36" height="36"/>
+                    {% endif %}
+                    Seasoned
+                </h2>
             {% endif %}
             {% for tombstone in tombstones.Seasoned %}
                 {% include 'characters/tombstone_snippet.html' %}
             {% endfor %}
 
             {% if tombstones.Novice %}
-                <h2>Novice</h2>
+                <h2>
+                    {% if early_access %}
+                        <img src="{% static 'overrides/tiericons/novice.svg' %}" style="width: 36px; height: 36px;" width="36" height="36"/>
+                    {% endif %}
+                    Novice
+                </h2>
             {% endif %}
             {% for tombstone in tombstones.Novice %}
                 {% include 'characters/tombstone_snippet.html' %}
@@ -65,7 +82,12 @@
 
 
             {% if tombstones.Newbie %}
-                <h2>Newbie</h2>
+                <h2>
+                    {% if early_access %}
+                        <img src="{% static 'overrides/tiericons/newbie.svg' %}" style="width: 36px; height: 36px;" width="36" height="36"/>
+                    {% endif %}
+                    Newbie
+                </h2>
             {% endif %}
             {% for tombstone in tombstones.Newbie %}
                 {% include 'characters/tombstone_snippet.html' %}

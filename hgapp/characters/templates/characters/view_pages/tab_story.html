@@ -9,7 +9,7 @@
     </div>
 </div>
     <div>
-        <h3 style="margin-bottom: 5px;" data-toggle="tooltip" title='The Questionnaire rewards Contractors who answer character-building questions'>
+        <h3 style="margin-bottom: 5px; margin-top: 10px;" data-toggle="tooltip" title='The Questionnaire rewards Contractors who answer character-building questions'>
             {% if num_questions_answered %}
             <a href="{% url 'questionnaire:questionnaire_view' character.id %}">
                 Questionnaire
@@ -50,7 +50,7 @@
 
 {% if character.images.count > 1 %}
     <div>
-        <h3 style="margin-bottom: 5px;" >
+        <h3 style="margin-bottom: 5px;  margin-top: 10px;" >
             Images
         </h3>
         {% if user_can_edit %}
@@ -75,7 +75,7 @@
 {% if character.void_deaths %}
     <hr>
     <div class="container text-danger">
-        <h3>
+        <h3 >
             Voided Deaths
             <div>
                 <small>
