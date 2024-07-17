@@ -857,7 +857,8 @@ class Character(models.Model):
             return "No Rewards available"
 
     def get_tier_icon(self):
-        return static("overrides/tiericons/{}.svg".format(self.calculate_status().lower()))
+        status = self.calculate_status(num_victories=self.effective_victories()).lower()
+        return static("overrides/tiericons/{}.svg".format(status))
 
     def reward_cost_for_item(self, sig_item):
         unspent_gifts = self.unspent_gifts()

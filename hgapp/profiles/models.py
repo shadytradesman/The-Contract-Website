@@ -1,4 +1,5 @@
 from django.db import models
+from django.templatetags.static import static
 from django.conf import settings
 
 from django.utils import timezone
@@ -186,6 +187,25 @@ class Profile(models.Model):
             models.Index(fields=['num_player_survivals']),
             models.Index(fields=['num_moves_gmed']),
         ]
+
+    def get_ks_reward_icon(self):
+        if self.ks_reward_level == KICKSTARTER_NONE:
+            return None
+        if self.ks_reward_level == KICKSTARTER_NEWBIE:
+            tier = "newbie"
+        elif self.ks_reward_level == KICKSTARTER_NOVICE:
+            tier = "novice"
+        elif self.ks_reward_level == KICKSTARTER_SEASONED:
+            tier = "seasoned"
+        elif self.ks_reward_level == KICKSTARTER_PROFESSIONAL:
+            tier = "professional"
+        elif self.ks_reward_level == KICKSTARTER_VETERAN:
+            tier = "veteran"
+        elif self.ks_reward_level == KICKSTARTER_HARBINGER:
+            tier = "harbinger"
+        elif self.ks_reward_level == KICKSTARTER_POWERS:
+            tier = "powers"
+        return static("overrides/tiericons/{}.svg".format(tier))
 
     def player_can_view(self, player):
         if player == self.user or player.is_superuser:

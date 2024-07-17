@@ -3,6 +3,14 @@
 <div class="text-center">
     <h1>
         {{ character.name }}
+        {% if character.tagline %}
+        <br/>
+        <small>
+            <i>
+                {{ character.tagline }}
+            </i>
+        </small>
+        {% endif %}
     </h1>
     <p>
         A

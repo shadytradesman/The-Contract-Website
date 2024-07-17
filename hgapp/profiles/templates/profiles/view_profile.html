@@ -154,6 +154,27 @@
                             </a>
                         </p>
                     </div>
+                    {% if profile.get_ks_reward_icon %}
+                        <div class="thumbnail">
+                            <div style="display:flex;">
+                                <div style="flex: 0 .6 30%; position:relative;">
+                                    <img src="{{profile.get_ks_reward_icon}}" style="width: 150%; height: 150%; position:absolute; right: -25%; bottom: -30%;">
+
+                                </div>
+                                <div style="flex: 0 1.5 70%; margin-left: 25px; padding: 15px;">
+                                    <div style="">
+                                        <img src="{% static 'overrides/other_graphics/kickstarter-logo.png'%}"
+                                            style="width: 100%;">
+                                    </div>
+                                    <div class="text-center">
+                                        <h2 style="font-size: 28pt; margin-top: 10px; margin-bottom: 0px; font-family: 'Sedan SC', system-ui;" >
+                                            {{ profile.get_ks_reward_level_display }}
+                                        </h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
             {% cache 9000 view_profile_main profile.user.id profile.user.character_set.count %}

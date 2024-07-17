@@ -22,7 +22,7 @@
             <span class="text-center" style="margin-top: 2px; display: inline-block; white-space: nowrap; padding: 1px; border: 1px solid transparent;">
             {% endif %}
                 <span style="display: block; background-color: #20252d; border-radius: 3px; height: 39px; width: 39px; padding-top: 2px;">
-                    <img src="{{character.get_tier_icon}}" style="width: 35px; height: 35px;">
+                    <img src="{{character.get_tier_icon}}" style="width: 35px; height: 35px;"  data-toggle="tooltip" title='{{character.get_status_display}}'>
                 </span>
                 <small style="position:relative; ">
                     <div>
