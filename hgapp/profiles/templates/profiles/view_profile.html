@@ -20,7 +20,45 @@
 {% block body_base %}
 <div class="container">
     <div class="text-center">
-        <h1 class="text-center">{{profile.user.username}}</h1>
+        <h1 class="text-center" style="margin-bottom: 5px;">{{profile.user.username}}</h1>
+        <div style="margin-bottom: 10px;">
+            <small>
+                Member Since {{profile.user.date_joined|date}}
+                {% if profile.user == request.user %}
+                <br>
+                Profile is
+                <b>
+                    {% if profile.is_private %}
+                    Private
+                    {% else %}
+                    Public
+                    {% endif %}
+                </b>
+                |
+                {% if profile.view_adult_content %}
+                <b>
+                    18+ content enabled
+                </b>
+                {% else %}
+                <span style="font-size: 20px;"
+                      data-toggle="tooltip"
+                      title="You cannot currently view 18+ content. Edit Profile to change.">
+                                        🔞
+                                    </span>
+                18+ content disabled
+                {% endif %}
+                |
+                <a href="{% url 'profiles:profiles_edit' %}">
+                    <i class="fa fa-edit"></i> {% trans "Edit Profile" %}
+                </a>
+                {% else %}
+                |
+                <a href="{% url 'postman:write' profile.user.username %}">
+                    <i class="fa fa-envelope-o fa-1x"></i> Send {{profile.user.username}} a Message
+                </a>
+                {% endif %}
+            </small>
+        </div>
     </div>
     {% if not profile_viewable %}
         <div class="thumbnail text-center">
@@ -34,82 +72,6 @@
     <div class="panel panel-default">
         <div class="panel-body">
             <div class="row">
-                <div class="col-md-6">
-                    <div class="text-center">
-                        <h3>
-                            Profile
-                        </h3>
-                        <small>
-                            Member Since {{profile.user.date_joined|date}}
-                            {% if profile.user == request.user %}
-                                <br>
-                                    Profile is
-                            <b>
-                                {% if profile.is_private %}
-                                Private
-                                {% else %}
-                                Public
-                                {% endif %}
-                                </b>
-                                |
-                                {% if profile.view_adult_content %}
-                                    <b>
-                                        18+ content enabled
-                                    </b>
-                                {% else %}
-                                    <span style="font-size: 20px;"
-                                          data-toggle="tooltip"
-                                          title="You cannot currently view 18+ content. Edit Profile to change.">
-                                        🔞
-                                    </span>
-                                    18+ content disabled
-                                {% endif %}
-                                |
-                                <a href="{% url 'profiles:profiles_edit' %}">
-                                    <i class="fa fa-edit"></i> {% trans "Edit Profile" %}
-                                </a>
-                            {% else %}
-                                |
-                                <a href="{% url 'postman:write' profile.user.username %}">
-                                    <i class="fa fa-envelope-o fa-1x"></i> Send {{profile.user.username}} a Message
-                                </a>
-                            {% endif %}
-                        </small>
-                    </div>
-                    {% if profile.about %}
-                        <p class="css-profile-user-text">{{profile.about | markdown}}</p>
-                    {% endif %}
-                    <div class="text-center">
-                        <h3>
-                            Playgroups
-                        </h3>
-                    </div>
-                    {% if cells %}
-                        <div class="row">
-                                {% for cell in cells %}
-                                <div class="col-xs-6">
-                                    <ul class="nav nav-pills nav-stacked">
-                                        <li>
-                                            <a href="{% url 'cells:cells_view_cell' cell.id %}">
-                                                <b>{{cell.name}}</b>
-                                                <br>
-                                                <small>
-                                                    {% player_rank cell profile.user %}
-                                                    - {{ cell.number_of_members }} Member{{cell.number_of_members|pluralize}}
-                                                    <br>
-                                                    Contract Participation: {% num_games_player_participated cell profile.user %}
-                                                </small>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                                {% endfor %}
-
-                        </div>
-                    {% else %}
-                        <h4 class="text-center"><small>{{profile.user.username}} is not a member of any Playgroups</small></h4>
-                    {% endif %}
-                </div>
                 <div class="col-md-6">
                     <div class="thumbnail">
                         <h3 class="text-center">
@@ -174,6 +136,48 @@
                                 </div>
                             </div>
                         </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    {% if profile.about %}
+                    <div class="text-center">
+                        <h3>
+                            About Me
+                        </h3>
+                    </div>
+                    <div style="overflow: hidden;">
+                        <p class="css-profile-user-text">{{profile.about | markdown}}</p>
+                    </div>
+                    {% endif %}
+                    <div class="text-center">
+                        <h3>
+                            Playgroups
+                        </h3>
+                    </div>
+                    {% if cells %}
+                    <div class="row">
+                        {% for cell in cells %}
+                        <div class="col-xs-6">
+                            <ul class="nav nav-pills nav-stacked">
+                                <li>
+                                    <a href="{% url 'cells:cells_view_cell' cell.id %}">
+                                        <b>{{cell.name}}</b>
+                                        <br>
+                                        <small>
+                                            {% player_rank cell profile.user %}
+                                            - {{ cell.number_of_members }} Member{{cell.number_of_members|pluralize}}
+                                            <br>
+                                            Contract Participation: {% num_games_player_participated cell profile.user %}
+                                        </small>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        {% endfor %}
+
+                    </div>
+                    {% else %}
+                    <h4 class="text-center"><small>{{profile.user.username}} is not a member of any Playgroups</small></h4>
                     {% endif %}
                 </div>
             </div>

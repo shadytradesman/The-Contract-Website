@@ -28,7 +28,7 @@ class ProfileView(generic.DetailView):
         characters = self.profile.user.character_set.filter(is_deleted=False)
         if self.profile.user != self.request.user:
             characters = characters.filter(private=False)
-        characters = characters.order_by('-edit_date').all()
+        characters = characters.order_by('-num_victories').all()
         self.scenarios = []
         if self.request.user.is_authenticated:
             self.scenarios = self.request.user.scenario_discovery_set\
