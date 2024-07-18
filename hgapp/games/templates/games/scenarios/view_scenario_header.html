@@ -3,7 +3,7 @@
         {% if viewer_can_edit %}
             <li>
                 <a class="btn-primary" href="{% url 'games:games_scenario_edit' scenario.id %}">
-                    Edit Scenario
+                    Edit
                 </a>
             </li>
             <li>
@@ -25,7 +25,12 @@
         {% endif %}
         <li>
             <a class="btn-default" href="{% url 'games:games_enter_game' %}" >
-                Enter Contract
+               Play
+            </a>
+        </li>
+        <li>
+            <a class="btn-default" href="{% url 'games:games_scenario_share' scenario.id %}" >
+                Share
             </a>
         </li>
     </ul>

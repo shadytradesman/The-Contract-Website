@@ -26,7 +26,7 @@ from games.forms import make_create_scenario_form, CellMemberAttendedForm, make_
     CustomInviteForm, make_accept_invite_form, ValidateAttendanceForm, DeclareOutcomeForm, GameFeedbackForm, \
     OutsiderAttendedForm, make_who_was_gm_form,make_archive_game_general_info_form, get_archival_outcome_form, \
     RsvpAttendanceForm, make_edit_move_form, ScenarioWriteupForm, RevertToEditForm, make_grant_stock_element_form, \
-    make_grant_element_form, SpoilScenarioForm, ScenarioApprovalForm, SubmitScenarioForm
+    make_grant_element_form, SpoilScenarioForm, ScenarioApprovalForm, SubmitScenarioForm, ShareScenarioForm
 from .game_form_utilities import get_context_for_create_finished_game, change_time_to_current_timezone, convert_to_localtime, \
     create_archival_game, get_context_for_completed_edit, handle_edit_completed_game, get_context_for_choose_attending, \
     get_gm_form, get_outsider_formset, get_member_formset, get_players_for_new_attendances, get_element_formset, \
@@ -350,6 +350,48 @@ def unlock_scenario(request, scenario_id):
     return HttpResponseRedirect(reverse('games:games_scenario_approve'))
 
 @login_required
+def share_scenario(request, scenario_id):
+    scenario = get_object_or_404(Scenario, id=scenario_id)
+    early_access = request.user.is_authenticated and request.user.profile.early_access_user
+    if not early_access:
+        raise ValueError("Scenario sharing is early access only")
+    if request.user.profile.get_confirmed_email() is None:
+        messages.add_message(request, messages.WARNING,
+                             mark_safe("<h4 class=\"text-center\" style=\"margin-bottom:5px;\">You must validate your email address to submit Scenarios</h4>"))
+        return HttpResponseRedirect(reverse('account_resend_confirmation'))
+    if not scenario.is_public() and not (scenario.player_discovered(request.user) or request.user.is_superuser):
+        raise PermissionDenied("You don't have permission to view this scenario")
+    if request.method == 'POST':
+        form = ShareScenarioForm(request.POST)
+        if form.is_valid():
+            with transaction.atomic():
+                scenario = Scenario.objects.select_for_update().get(pk=scenario_id) #locking
+                player = User.objects.filter(username__iexact=form.cleaned_data['username']).first()
+                if player is None or scenario.player_discovered(player):
+                    message = "User does not exist" if player is None else "Player has already unlocked this Scenario"
+                    form.add_error('username', message)
+                    context = {
+                        "scenario": scenario,
+                        "form": form,
+                    }
+                    return render(request, 'games/scenarios/share_scenario.html', context)
+                scenario.share(player, request.user)
+                messages.add_message(request, messages.SUCCESS,
+                                     mark_safe(
+                                         "<h4 class=\"text-center\" style=\"margin-bottom:5px;\">Scenario shared with {}</h4>".format(
+                                             player.username)))
+                return HttpResponseRedirect(reverse('games:games_scenario_share', args=(scenario.id,)))
+        else:
+            raise ValueError("Invalid Scenario Share form")
+    form = ShareScenarioForm()
+    context = {
+        "scenario": scenario,
+        "form": form,
+    }
+    return render(request, 'games/scenarios/share_scenario.html', context)
+
+
+@login_required
 def submit_scenario(request, scenario_id):
     scenario = get_object_or_404(Scenario, id=scenario_id)
     if not request.user.profile.confirmed_agreements:
@@ -571,6 +613,7 @@ def view_scenario(request, scenario_id, game_id=None):
             "elements": dict(elements),
             "grant_element_form": grant_element_form,
             'players_aftermath_spoiled': players_aftermath_spoiled,
+            'early_access': request.user.is_authenticated and request.user.profile.early_access_user,
         }
         return render(request, 'games/scenarios/view_scenario.html', context)
 

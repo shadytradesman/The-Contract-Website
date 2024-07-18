@@ -1190,6 +1190,27 @@ class Scenario(models.Model):
             return discovery
         return None
 
+    def share(self, with_player, sharing_player, notify=True):
+        if not with_player.scenario_set.filter(id=self.id).exists():
+            discovery = Scenario_Discovery(
+                discovering_player=with_player,
+                relevant_scenario=self,
+                reason=DISCOVERY_REASON[2][0],
+                is_spoiled=False,
+            )
+            discovery.save()
+            if notify:
+                Notification.objects.create(
+                    user=with_player,
+                    headline="{} shared a Scenario".format(sharing_player.username),
+                    content="{}".format(self.title),
+                    url=reverse("games:games_view_scenario", args=(self.pk,)),
+                    notif_type=SCENARIO_NOTIF,
+                    is_timeline=True,
+                    article=discovery)
+            return discovery
+        return None
+
     def purchase(self, player):
         if not player.scenario_set.filter(id=self.id).exists():
             if player.profile.exchange_credits < EXCHANGE_SCENARIO_COST:
@@ -1410,6 +1431,10 @@ class Scenario_Discovery(models.Model):
                                           on_delete=models.CASCADE)
     reason = models.CharField(choices=DISCOVERY_REASON,
                               max_length=25)
+    sharing_player = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                       on_delete=models.CASCADE,
+                                       null=True,
+                                       related_name="scenario_shares")
     is_spoiled = models.BooleanField(default=True)
     is_aftermath_spoiled = models.BooleanField(default=True)
     created_date = models.DateTimeField('date created', auto_now_add=True, null=True, blank=True)

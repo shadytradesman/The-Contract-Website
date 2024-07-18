@@ -227,6 +227,11 @@ class CustomInviteForm(forms.Form):
                                           required=False,
                                           help_text="Invite this player to play an NPC. The Scenario will be revealed to them if they accept.")
 
+
+class ShareScenarioForm(forms.Form):
+    username = forms.CharField(label='Player\'s Username', max_length=200, required=True)
+
+
 def make_game_form(user):
     class CreateGameForm(forms.Form):
         date_format= '%m/%d/%Y %I:%M %p'

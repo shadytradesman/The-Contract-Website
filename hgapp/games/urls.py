@@ -29,6 +29,9 @@ urlpatterns = [
     # ex: .com/contract/scenario/submit/112
     url(r'^scenario/submit/(?P<scenario_id>[\d]+)/$', views.submit_scenario, name='games_scenario_submit'),
 
+    # ex: .com/contract/scenario/share/112
+    url(r'^scenario/share/(?P<scenario_id>[\d]+)/$', views.share_scenario, name='games_scenario_share'),
+
     # ex: .com/contract/scenario/retract/112
     url(r'^scenario/retract/(?P<scenario_id>[\d]+)/$', views.retract_scenario, name='games_scenario_retract'),
 

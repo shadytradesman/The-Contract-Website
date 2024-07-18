@@ -1,0 +1,43 @@
+{% extends "site_base.html" %}
+
+
+{% load account_tags %}
+{% load static %}
+{% load bootstrap %}
+
+{% block extra_scripts %}
+{% endblock %}
+
+{% block head_title %}
+Share Scenario
+{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+
+{% block body_base %}
+<div class="container">
+    <h1 class="text-center">
+        Share
+        <a href="{% url 'games:games_view_scenario' scenario.pk %}">
+            {{scenario.title}}
+        </a>
+    </h1>
+  <div class="panel panel-default" style="margin-top: 15px;">
+    <div class="panel-body">
+      {% include "_messages.html" %}
+      <form action="{% url 'games:games_scenario_share' scenario.pk %}" method="post">
+          {{ form.non_field_errors }}
+          {% csrf_token %}
+          {{form|bootstrap}}
+          <input class="btn btn-primary" type="submit" value="Share" />
+      </form>
+      <div style="margin-top: 15px;">
+        <a href="{% url 'games:games_view_scenario' scenario.pk %}">
+          Return to Scenario
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
