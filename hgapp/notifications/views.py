@@ -6,7 +6,7 @@ def nav_read(request):
     if not request.user.is_authenticated:
         return render(request, 'notifications/nav_list.html', {"auth_error":True})
     with transaction.atomic():
-        new_notifs = Notification.get_unread_notifications_for_player_queryset(request.user)
+        new_notifs = Notification.get_unread_notifications_for_player_queryset(request.user)[:30]
         num_unread = Notification.get_num_unread_notifications_for_player(request.user)
         num_read_to_fetch = max(25 - num_unread, 0)
         read_notifs = Notification.objects.none()
