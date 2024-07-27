@@ -431,9 +431,9 @@ class Profile(models.Model):
             return PROFESSIONAL
         elif num_completed < 200:
             return VETERAN
-        elif num_completed < 350:
+        elif num_completed < 300:
             return MASTER
-        elif num_completed < 500:
+        elif num_completed < 450:
             return GRANDMASTER
         else:
             return LEGEND
@@ -457,7 +457,6 @@ class Profile(models.Model):
             return GOD
         else:
             return PSYCHO
-
 
     def _gm_prefix_from_stats(self, num_gm_games, num_killed_contractors):
         if num_gm_games == 0:
