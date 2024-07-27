@@ -239,8 +239,6 @@ def graveyard(request):
 
 def view_artifact(request, artifact_id):
     artifact = get_object_or_404(Artifact, id=artifact_id)
-    if not (artifact.is_crafted_artifact or artifact.is_signature or artifact.is_consumable):
-        raise ValueError("Tried to view non-signature non-crafted artifact")
     characters = [artifact.character] if artifact.character else []
 
     if artifact.crafting_character:
@@ -266,6 +264,7 @@ def view_artifact(request, artifact_id):
             .filter(dice_system=SYS_PS2, tags__in=["example"], latest_rev__modality=power.modality_id)\
             .order_by('?')[:5]
     context = {
+        "is_trophy": not (artifact.is_crafted_artifact or artifact.is_signature or artifact.is_consumable),
         "artifact": artifact,
         "attribute_value_by_id": attribute_val_by_id,
         "ability_value_by_id": ability_val_by_id,

@@ -30,7 +30,9 @@
 {% block body_base %}
 <div class="container">
   <h1 class="text-center css-no-print">
-    {% if artifact.is_signature %}
+    {% if is_trophy %}
+      Trophy
+    {% elif artifact.is_signature %}
       Legendary Artifact
     {% elif artifact.is_consumable %}
       Crafted Consumable{{artifact.quantity|pluralize}}
@@ -40,7 +42,37 @@
   </h1>
   <div class="row">
     <div class="col-xs-12 col-sm-8 col-sm-offset-2">
-      {% if artifact.is_signature %}
+      {% if is_trophy %}
+        <div class="text-center">
+            <div class="css-world-entity-value">
+              <h3 class="css-world-element-name">
+                {{artifact.name}}
+                <br/>
+                <small>
+                  On <a href="{% url 'characters:characters_view' artifact.character.id %}">
+                    {{artifact.character.name}}
+                  </a>
+                </small>
+              </h3>
+
+              {% if artifact.granting_gm %}
+                <div class="css-world-element-source">
+                  <small>
+                    <i>
+                      Given by {{artifact.granting_gm.username}}
+                    </i>
+                  </small>
+                </div>
+              {% endif %}
+              <span class="css-world-element-description">
+                    {{artifact.description}}
+                </span>
+              <span class="css-world-element-system">
+                    {{artifact.system}}
+                </span>
+            </div>
+        </div>
+      {% elif artifact.is_signature %}
         {% render_sig_item artifact request.user %}
       {% elif artifact.is_consumable %}
         {% render_consumable artifact request.user %}
