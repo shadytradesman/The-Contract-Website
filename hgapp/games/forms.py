@@ -431,7 +431,7 @@ class ValidateAttendanceForm(forms.Form):
         super(ValidateAttendanceForm, self).__init__(*args, **kwargs)
         self.fields['player'] = forms.ModelChoiceField(queryset=self.game.invitations.all(),
                                         required=False)
-        self.fields['character'] = forms.ModelChoiceField(Character.objects.filter(player__in=self.game.invitations.filter()),
+        self.fields['character'] = forms.ModelChoiceField(Character.objects.filter(pk__in=self.game.attended_by.values_list('pk')),
                                            empty_label="NPC Ringer",
                                            required=False)
         self.fields['character'].widget.attrs['hidden'] = True
