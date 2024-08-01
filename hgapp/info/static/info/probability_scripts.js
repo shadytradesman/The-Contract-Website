@@ -86,19 +86,19 @@ function updateVis() {
                 var odds;
                 if (useExactOutcomeOdds) {
                     odds = data[type.type][type.dice][type.difficulty][outcome];
-                    odds = odds ? parseFloat(odds) : 0;
+                    odds = odds ? Number(odds) : 0;
                     odds = odds * 100;
                 } else {
                     var outcomes = Object.keys(data[type.type][type.dice][type.difficulty]);
                     var totalOdds = 100;
                     outcomes.forEach(function(out) {
                         var odds = data[type.type][type.dice][type.difficulty][out];
-                        odds = odds ? parseFloat(odds) * 100 : 0;
+                        odds = odds ? Number(odds) * 100 : 0;
                         if (out < outcome) {
                             totalOdds =  totalOdds - odds;
                         }
                     });
-                    if (totalOdds >= 99.999) {
+                    if (totalOdds >= 100) {
                         totalOdds = 100;
                     }
                     odds = totalOdds >= 0 ? totalOdds : 0;
@@ -165,7 +165,8 @@ function updateVis() {
                 .attr("height", function(d) { return y(0); })
                 .attr("class", "mouseover")
                 .attr("data-toggle", "tooltip")
-                .attr("data-container", "#visContainer")
+                .attr("data-container", "body")
+                .attr("data-viewport", '{ "selector": "#odds-display"}')
                 .attr("title", function(d) {return d["odds"] + "%";})
                 .attr("data-placement", "right")
                 .on("mouseover", function(d) {
@@ -224,6 +225,6 @@ $(".checkboxes").on("click", function() {
     updateVis();
 });
 
-$(".radio-inline").on("click", function() {
+$(".radio-inline").on("change", function() {
     updateVis();
 });

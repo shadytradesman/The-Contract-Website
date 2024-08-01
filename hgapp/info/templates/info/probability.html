@@ -40,24 +40,30 @@
                 Outcome
             </h4>
             <ul class="no-style">
-                <li><b>< 0 Successes:</b> A botch. Something goes horribly wrong.</li>
-                <li><b>0 Successes:</b> The attempt fails.</li>
-                <li><b>1-3 Successes:</b> The attempt is partially successful or is successful but has a complication.</li>
-                <li><b>4-5 Successes:</b> A complete success.</li>
-                <li><b>6+ Successes:</b> An exceptional success. The action is performed with grace and/or has an additional, positive effect.</li>
+                <li><b>< 0 Outcome:</b> A botch. Something goes horribly wrong.</li>
+                <li><b>0 Outcome:</b> The attempt fails.</li>
+                <li><b>1-3 Outcome:</b> The attempt is partially successful or is successful but has a complication.</li>
+                <li><b>4-5 Outcome:</b> A complete success.</li>
+                <li><b>6+ Outcome:</b> An exceptional success. The action is performed with grace and/or has an additional, positive effect.</li>
             </ul>
 
             <div class="thumbnail">
                 <label class="radio-inline">
-                    <input type="radio" name="exactOutcome" value="1" checked > Chance of exactly X successes
+                    <input type="radio" name="exactOutcome" value="1" checked > Chance of exactly X Outcome
                 </label>
+                <div class="visible-xs">
+
+                </div>
                 <label class="radio-inline">
-                    <input type="radio" name="exactOutcome" value="0"> Chance of at least X successes
+                    <input type="radio" name="exactOutcome" value="0"> Chance of at least X Outcome
                 </label>
-                <div id="visContainer">
+                <div id="visContainer" style="min-width: 800px;">
                 </div>
                 <div class="text-center" style="position:relative; bottom: 13px;">
-                    Number of Successes
+                    Outcome
+                </div>
+                <div id="odds-display" style="position:relative; bottom: 13px;">
+                    Odds:
                 </div>
                 <div class="form-inline js-roll">
                     <svg width="25" height="25" class="css-svg">
@@ -76,6 +82,10 @@
                       <option>10</option>
                       <option>11</option>
                       <option>12</option>
+                      <option>13</option>
+                        <option>14</option>
+                        <option>15</option>
+                        <option>16</option>
                     </select>
                     Dice at Difficulty
                     <select class="form-control form-inline difficulty">
@@ -113,6 +123,10 @@
                       <option>10</option>
                       <option>11</option>
                       <option>12</option>
+                        <option>13</option>
+                        <option>14</option>
+                        <option>15</option>
+                        <option>16</option>
                     </select>
                     Dice at Difficulty
                     <select class="form-control form-inline difficulty">
@@ -134,9 +148,9 @@
                     </span>
                 </div>
                 <small>
-                    Botches: 1s subtract a success.
+                    Botches: 1s subtract an Outcome.
                     <br>
-                    Doubles: 10s are worth 2 successes.
+                    Doubles: 10s are worth 2 Outcome.
                 </small>
             </div>
             <h3 class="text-center">
@@ -162,16 +176,6 @@
                 reduced.</b> Partial and exceptional successes have specific outcomes determined by the
                 <a href="/guide/rules/#combat">Combat rules.</a> This makes The Contract's quick, deadly Combat more
                 tactical and fair.
-            </p>
-            <br>
-            <h4>
-                Why max out at 12 dice?
-            </h4>
-            <p>
-                The Contract's <a href="/guide/further-reading/#design-philosophy">Design Philosophy</a>
-                de-emphasises advancement through dice bonuses and Difficulty modifiers. Dice bonuses from multiple
-                sources do not stack. This means that dice pools remain relatively small. Beyond 12 dice, consider
-                success a near-certainty even on high Difficulty rolls.
             </p>
             <br>
             <h4>
