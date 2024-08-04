@@ -1155,7 +1155,7 @@ class Scenario(models.Model):
         return self.finished_games().count()
 
     def played_discovery(self, player):
-        discovery = player.scenario_set.filter(id=self.id).first()
+        discovery = Scenario_Discovery.objects.filter(relevant_scenario=self.id, discovering_player=player).first()
         if discovery is None:
             discovery = Scenario_Discovery (
                 discovering_player=player,
