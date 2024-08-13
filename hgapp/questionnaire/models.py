@@ -11,6 +11,7 @@ from characters.models import Character, ExperienceReward, EXP_QUESTIONNAIRE_CON
 
 from notifications.models import Notification, REWARD_NOTIF, JOURNAL_NOTIF
 
+from characters.signals import recalculate_stats
 
 class Question(models.Model):
     prompt = models.CharField(max_length=400)
@@ -90,6 +91,14 @@ class Answer(models.Model):
             models.UniqueConstraint(fields=['relevant_character', 'game_attendance', 'question'], name='unique_answer'),
             models.UniqueConstraint(fields=['relevant_character', 'written_contract_number', 'question'], name='unique_answer_2'),
         ]
+
+    def save(self, *args, **kwargs):
+        if self.written_contract_number > 0 and (not hasattr(self, "game_attendance") or self.game_attendance is None):
+            # DB integrity error, correct
+            recalculate_stats.send(sender=self.relevant_character.__class__, character_pk=self.relevant_character.pk)
+            raise ValueError("Found db integrity error on character questionnaire, fixing.")
+        else:
+            super(Answer, self).save(*args, **kwargs)
 
     def __str__(self):
         return "{} answered {}".format(self.relevant_character.name, self.question.prompt)

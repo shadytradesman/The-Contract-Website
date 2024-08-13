@@ -18,7 +18,7 @@ from .forms import AnswerForm
 def edit_answer(request, answer_id):
     answer = get_object_or_404(Answer, id=answer_id)
     character = answer.relevant_character
-    if character.player != request.user:
+    if (character.player != request.user) and not request.user.is_superuser:
         raise PermissionDenied("Only a Contractor's creator can answer their questionnaire")
     if answer.written_contract_number != character.number_completed_games():
         raise PermissionDenied("You cannot edit questionnaire answers for previous Contracts")
@@ -51,7 +51,7 @@ def edit_answer(request, answer_id):
 @login_required
 def answer_next(request, character_id, question_id=None):
     character = get_object_or_404(Character, id=character_id)
-    if character.player != request.user:
+    if (character.player != request.user) and not request.user.is_superuser:
         raise PermissionDenied("Only a Contractor's creator can answer their questionnaire")
     if request.method == 'POST':
         if question_id is None:

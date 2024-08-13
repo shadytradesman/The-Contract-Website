@@ -13,6 +13,6 @@ def recalculate_character_stats_receiver(sender, **kwargs):
 
 
 @receiver(post_save, sender=ExperienceReward, dispatch_uid="exp_reward_recalculate_stats")
-def recalculate_character_stats_receiver(sender, instance, created, **kwargs):
+def recalculate_character_stats_exp_receiver(sender, instance, created, **kwargs):
     if instance and instance.rewarded_character:
         return transaction.on_commit(lambda: recalculate_character_stats.delay(instance.rewarded_character.pk, False))

@@ -431,7 +431,7 @@ def add_characters(request, cell_id, game_id=None):
     membership = cell.get_player_membership(request.user)
     if not membership:
         raise PermissionDenied("You must be a member of this Playgroup to add Contractors")
-    homeless_characters = Character.objects.filter(player=request.user, cell__isnull=True, is_dead=False)
+    homeless_characters = Character.objects.filter(player=request.user, cell__isnull=True, is_dead=False, is_deleted=False)
     form = make_add_characters_form(homeless_characters)(request.POST)
     if request.method == 'POST':
         if form.is_valid():
