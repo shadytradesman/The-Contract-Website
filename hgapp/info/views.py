@@ -48,9 +48,12 @@ def leaderboard(request):
     senior_contractor_deaths = Character.objects.order_by('-num_games').filter(is_dead=True, player__profile__is_private=False)[:num_to_fetch]
     top_contractor_journals = Character.objects.order_by('-num_journals').filter(player__profile__is_private=False)[:num_to_fetch]
 
-    top_scenario_runs = Scenario.objects.order_by('-times_run', '-num_gms_run').filter(creator__profile__is_private=False)[:num_to_fetch]
-    top_scenario_words = Scenario.objects.order_by('-num_words', '-times_run').filter(creator__profile__is_private=False, times_run__gt=0)[:num_to_fetch]
-    top_scenario_deadliness = Scenario.objects.filter(num_gms_run__gt=1, times_run__gt=2).filter(creator__profile__is_private=False).order_by('-deadliness_ratio')[:num_to_fetch]
+    top_scenario_runs = Scenario.objects.order_by('-times_run', '-num_gms_run').filter(creator__profile__is_private=False).exclude(exclude_from_leaderboard=True)[:num_to_fetch]
+    top_scenario_words = Scenario.objects.order_by('-num_words', '-times_run').filter(creator__profile__is_private=False, times_run__gt=0).exclude(exclude_from_leaderboard=True)[:num_to_fetch]
+    top_scenario_deadliness = Scenario.objects.filter(num_gms_run__gt=1, times_run__gt=2, num_deaths__gt=2, num_victories__gt=2)\
+                                  .filter(creator__profile__is_private=False)\
+                                  .exclude(exclude_from_leaderboard=True)\
+                                  .order_by('-deadliness_ratio')[:num_to_fetch]
 
     over_characters = []
     for character in Character.objects.filter(is_dead=False, ported=NOT_PORTED).all():

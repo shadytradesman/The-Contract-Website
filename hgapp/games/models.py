@@ -944,6 +944,7 @@ class Scenario(models.Model):
     num_deaths = models.IntegerField("Number of deaths caused by this Scenario", default=0)
     deadliness_ratio = models.FloatField("A denormalization of deaths over victories", default=0)
     num_times_purchased = models.IntegerField("Number of times this Scenario was purchased on the exchange", default=0)
+    exclude_from_leaderboard = models.BooleanField(default=False)
 
     is_on_exchange = models.BooleanField(default=False)
     date_added_to_exchange = models.DateTimeField(blank=True, null=True)
