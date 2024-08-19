@@ -546,10 +546,12 @@ def make_archive_game_general_info_form(gm):
                                             empty_label="Create New Scenario",
                                             required=False,
                                             help_text='Select the Scenario that the GM used.')
+        cell = ModelChoiceField(queryset=gm.cell_set.exclude(cellmembership__is_banned=True).all(),
+                                required=True,
+                                label="Playgroup",
+                                empty_label=None,
+                                help_text='Select the Playgroup.')
         date_format = '%m/%d/%Y %I:%M %p'
-        title = forms.CharField(label='Contract Name',
-                                max_length=100,
-                                help_text='The Contract\'s name.')
         occurred_time = forms.DateTimeField(label='Date Played',
                                             widget=DateTimePicker(options=False, format=date_format),
                                             input_formats=[date_format],

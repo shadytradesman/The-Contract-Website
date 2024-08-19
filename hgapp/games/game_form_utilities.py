@@ -95,7 +95,8 @@ def handle_edit_completed_game(request, game, new_player_list):
                 if "scenario" in general_form.changed_data:
                     game.scenario = general_form.cleaned_data['scenario']
                     # Updating scenario discoveries happens on attendance save.
-                game.title = general_form.cleaned_data['title']
+                if "cell" in general_form.changed_data:
+                    game.cell = general_form.cleaned_data['cell']
                 game.save()
                 for form in outcome_formset:
                     _update_or_add_attendance(request, form, game)
@@ -174,8 +175,8 @@ def _get_general_completed_form_for_edit(game, POST=None):
                        prefix="general",
                        initial={"gm_id": game.gm.id,
                                 "scenario": game.scenario,
-                                "title": game.title,
                                 "occurred_time": game.end_time,
+                                "cell": game.cell,
                                 })
 
 
