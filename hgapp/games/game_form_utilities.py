@@ -193,7 +193,7 @@ def create_archival_game(request, general_form, cell, outcome_formset):
             occurred_time = change_time_to_current_timezone(occurred_time)
         # TODO: check to see if the game has the exact same time as existing game and fail.
         game = Game(
-            title=general_form.cleaned_data['title'],
+            title="",
             creator=request.user,
             gm=form_gm,
             created_date=timezone.now(),
