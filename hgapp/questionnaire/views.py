@@ -30,6 +30,7 @@ def edit_answer(request, answer_id):
                 if request.user.profile.view_adult_content:
                     answer.is_nsfw = form.cleaned_data['is_nsfw']
                 answer.written_contract_number = character.number_completed_games()
+                answer.game_attendance = character.get_latest_attendance()
                 answer.set_content(form.cleaned_data['content'])
             else:
                 raise ValueError("Invalid edit answer form")
