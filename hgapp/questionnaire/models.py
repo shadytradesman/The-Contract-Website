@@ -96,7 +96,6 @@ class Answer(models.Model):
         if self.written_contract_number > 0 and (not hasattr(self, "game_attendance") or self.game_attendance is None):
             # DB integrity error, correct
             recalculate_stats.send(sender=self.relevant_character.__class__, character_pk=self.relevant_character.pk)
-            raise ValueError("Found db integrity error on character questionnaire, fixing.")
         else:
             super(Answer, self).save(*args, **kwargs)
 

@@ -8,7 +8,7 @@ from .signals import recalculate_stats
 @receiver(recalculate_stats, dispatch_uid="recalculate_stats_id")
 def recalculate_character_stats_receiver(sender, **kwargs):
     character_pk = kwargs["character_pk"]
-    is_game = kwargs["is_game"]
+    is_game = kwargs["is_game"] if hasattr(kwargs, "is_game") else False
     return transaction.on_commit(lambda: recalculate_character_stats.delay(character_pk, is_game))
 
 

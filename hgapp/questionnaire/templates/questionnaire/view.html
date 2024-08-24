@@ -50,10 +50,12 @@ View Questionnaire
                     {{forloop.counter}}. {{answer.question.prompt}}
                 </h4>
                     <div style="margin-bottom: 10px;">
-                        {% if can_edit and answer.written_contract_number == character.number_completed_games %}
-                            <a class="btn btn-default btn-xs" href="{% url 'questionnaire:questionnaire_edit' answer.id %}">
-                                Edit Answer
-                            </a>
+                        {% if can_edit %}
+                            {% if not answer.is_valid or answer.written_contract_number >= character.number_completed_games %}
+                                <a class="btn btn-default btn-xs" href="{% url 'questionnaire:questionnaire_edit' answer.id %}">
+                                    Edit Answer
+                                </a>
+                            {% endif %}
                         {% endif %}
                         <span>
                             <a class="btn-xs" href="#answer-{{answer.id}}">

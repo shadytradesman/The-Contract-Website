@@ -65,6 +65,15 @@
             </small>
         </div>
     </h3>
+    {% if character.number_of_victories %}
+        <div class="text-center">
+            <h5 style="margin-top: 5px; margin-bottom: 5px;">
+                <a href="{% url 'characters:characters_view_contacts' character.id %}">
+                    View {{character.name}}'s Encountered Contractors
+                </a>
+            </h5>
+        </div>
+    {% endif %}
     {% if user_can_edit %}
         {% if next_entry %}
             <div style=" margin-bottom: 5px;">

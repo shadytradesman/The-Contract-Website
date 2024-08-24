@@ -1963,7 +1963,7 @@ class ExperienceReward(models.Model):
             attendance = self.mvp_exp_attendance
             return "{} in {}".format(reason, attendance.relevant_game.scenario.title)
         if hasattr(self, 'answer'):
-            return "from answering the questionnaire"
+            return "from answering questionnaire"
         else:
             self.log_bad_source()
             raise ValueError("Experience reward has bad source: " + str(self.pk))

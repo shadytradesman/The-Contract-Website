@@ -20,8 +20,8 @@ def edit_answer(request, answer_id):
     character = answer.relevant_character
     if (character.player != request.user) and not request.user.is_superuser:
         raise PermissionDenied("Only a Contractor's creator can answer their questionnaire")
-    if answer.written_contract_number != character.number_completed_games():
-        raise PermissionDenied("You cannot edit questionnaire answers for previous Contracts")
+    if answer.is_valid and (answer.written_contract_number < character.number_completed_games()):
+        raise PermissionDenied("You cannot edit valid questionnaire answers for previous Contracts")
     if request.method == 'POST':
         with transaction.atomic():
             answer = Answer.objects.select_for_update().filter(id=answer_id).first()
@@ -29,6 +29,7 @@ def edit_answer(request, answer_id):
             if form.is_valid():
                 if request.user.profile.view_adult_content:
                     answer.is_nsfw = form.cleaned_data['is_nsfw']
+                answer.written_contract_number = character.number_completed_games()
                 answer.set_content(form.cleaned_data['content'])
             else:
                 raise ValueError("Invalid edit answer form")
@@ -135,7 +136,7 @@ def view_questionnaire(request, character_id):
     context = {
         "character": character,
         "answers": Answer.objects.filter(relevant_character=character).order_by("written_contract_number", "id"),
-        "can_edit": request.user == character.player,
+        "can_edit": request.user.is_superuser or request.user == character.player,
         "next_question": Question.next_question_for_character(character),
     }
     return render(request, 'questionnaire/view.html', context)
