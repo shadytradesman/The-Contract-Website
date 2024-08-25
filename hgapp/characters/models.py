@@ -610,7 +610,7 @@ class Character(models.Model):
         return self.num_games if self.num_games else 0
 
     def update_game_count(self):
-        self.num_games = self.game_attendance_set.exclude(outcome=None, is_confirmed=False).count()
+        self.num_games = self.game_attendance_set.exclude(outcome=None).exclude(is_confirmed=False).count()
 
     def number_of_victories(self):
         return self.num_victories if self.num_victories else 0
