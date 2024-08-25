@@ -78,3 +78,7 @@
 .alert {
 padding: 5px;
 }
+
+.css-world-event img {
+    max-width: 100%;
+}

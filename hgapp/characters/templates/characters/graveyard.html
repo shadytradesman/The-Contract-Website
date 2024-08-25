@@ -20,7 +20,7 @@
             Graveyard
             <br>
             <small>
-                 {{header|safe}}
+                 {{header|linebreaks}}
             </small>
         </h1>
     </div>
@@ -38,6 +38,9 @@
             {% if tombstones.Veteran %}
                 <h2>
                     Veterans
+                    <small>
+                        ({{num_deaths_by_tier.Veteran}} Fallen)
+                    </small>
                 </h2>
             {% endif %}
             {% for tombstone in tombstones.Veteran %}
@@ -50,6 +53,9 @@
                     <img src="{% static 'overrides/tiericons/professional.svg' %}" style="width: 36px; height: 36px;" width="36" height="36"/>
                 {% endif %}
                 Professional
+                <small>
+                    ({{num_deaths_by_tier.Professional}} Fallen)
+                </small>
             </h2>
             {% endif %}
             {% for tombstone in tombstones.Professional %}
@@ -62,6 +68,9 @@
                         <img src="{% static 'overrides/tiericons/seasoned.svg' %}" style="width: 36px; height: 36px;" width="36" height="36"/>
                     {% endif %}
                     Seasoned
+                    <small>
+                        ({{num_deaths_by_tier.Seasoned}} Fallen)
+                    </small>
                 </h2>
             {% endif %}
             {% for tombstone in tombstones.Seasoned %}
@@ -74,6 +83,9 @@
                         <img src="{% static 'overrides/tiericons/novice.svg' %}" style="width: 36px; height: 36px;" width="36" height="36"/>
                     {% endif %}
                     Novice
+                    <small>
+                        ({{num_deaths_by_tier.Novice}} Fallen)
+                    </small>
                 </h2>
             {% endif %}
             {% for tombstone in tombstones.Novice %}
@@ -87,6 +99,9 @@
                         <img src="{% static 'overrides/tiericons/newbie.svg' %}" style="width: 36px; height: 36px;" width="36" height="36"/>
                     {% endif %}
                     Newbie
+                    <small>
+                        ({{num_deaths_by_tier.Newbie}} Fallen)
+                    </small>
                 </h2>
             {% endif %}
             {% for tombstone in tombstones.Newbie %}

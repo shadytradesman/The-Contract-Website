@@ -1,7 +1,18 @@
+{% load image_tags %}
+
 <div class="text-center">
     <div class="lead" style="margin-bottom:5px;">
         Died {{tombstone.death.date_of_death|date:"F d, Y"}}
     </div>
+    {% if tombstone.death.relevant_character.primary_image %}
+        <div class="css-character-primary-image" style="">
+            <div class="text-center">
+                {% if not tombstone.death.relevant_character.primary_image.is_deleted %}
+                {% image_thumb tombstone.death.relevant_character.primary_image %}
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
     {% if tombstone.death.cause_of_death %}
     <div>
         Cause of death: {{tombstone.death.cause_of_death}}

@@ -197,7 +197,9 @@ def edit_obituary(request, character_id, secret_key = None):
 
 
 def graveyard(request):
-    dead_characters = Character_Death.objects.filter(is_void=False)\
+    dead_characters = Character_Death.objects\
+        .select_related("relevant_character__player__profile")\
+        .filter(is_void=False)\
         .filter(relevant_character__private=False)\
         .exclude(relevant_character__status='ANY') \
         .exclude(relevant_character__num_games=0) \
@@ -215,14 +217,17 @@ def graveyard(request):
         'Ported Veteran': []
     }
     num_deaths = 0
+    num_deaths_by_tier = defaultdict(int)
     for death in dead_characters:
         num_deaths = num_deaths + 1
-        num_journals = Journal.objects.filter(game_attendance__attending_character=death.relevant_character).count()
+        num_journals = death.relevant_character.num_journals
         tombstone = {
             "death": death,
             "num_journals": num_journals,
         }
-        tombstones[death.relevant_character.get_calculated_contractor_status_display()].append(tombstone)
+        status = death.relevant_character.get_calculated_contractor_status_display()
+        tombstones[status].append(tombstone)
+        num_deaths_by_tier[status] += 1
     num_headers = Graveyard_Header.objects.all().count()
     if num_headers > 0:
         header = Graveyard_Header.objects.all()[randint(0,num_headers-1)].header
@@ -231,6 +236,7 @@ def graveyard(request):
     context = {
         'tombstones': tombstones,
         'character_deaths': dead_characters,
+        'num_deaths_by_tier': num_deaths_by_tier,
         'header': header,
         'num_deaths': num_deaths,
         'early_access': request.user.is_authenticated and request.user.profile.early_access_user,
