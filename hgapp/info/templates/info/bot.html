@@ -1,0 +1,49 @@
+{% extends "site_base.html" %}
+{% load static %}
+
+{% block head_title %}Discord Bot{% endblock %}
+
+{% block body_base %}
+<div class="container">
+    <h1 class="text-center">The Contract RPG Discord Bot</h1>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div style="max-width: 850px; margin: auto;">
+                <h2>The House Always Wins</h2>
+                <div>
+                    <img class="pull-left" src="{% static 'overrides/other_graphics/Discord-Logo-Color.svg' %}" style="width: 100px; height: 100px;">
+                    <p>
+                        Take your Contracting to the next level by installing
+                        <a href="https://www.thecontractrpg.com/">
+                            The Contract RPG's
+                        </a>
+                        official Discord Bot, <b>The House</b>, to your server!
+                    </p>
+                    <p>
+                        <a class="btn btn-xs btn-primary" href="https://discord.com/oauth2/authorize?client_id=944989207665967124">
+                            Click Here to Install
+                        </a>
+                    </p>
+                    <p>
+                        <b>The House</b> is a dice-rolling bot that makes rolling dice and calculating your Outcome easy as possible.
+                        Simply type "!!5" to roll 5 dice at Difficulty 6 and calculate the Outcome, or "!!4@8" to roll 4 dice
+                        at Difficulty 8. Typing "!!help" shows a full usage guide.
+                    </p>
+                </div>
+                <b>Screenshots: </b>
+                <p>
+                    <img src="{% static 'overrides/other_graphics/botsc1.jpg' %}" style="max-height: 150px;">
+                </p>
+                <p>
+                    <img src="{% static 'overrides/other_graphics/botsc2.jpg' %}" style="max-height: 150px;">
+                </p>
+                <h2>Privacy Policy</h2>
+                <small>Last updated: September 7th, 2024</small>
+                <div style="max-height: 400px; overflow: scroll; background-color: #2c323d; padding: 10px;">
+                    {{bot_privacy|safe|linebreaks}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

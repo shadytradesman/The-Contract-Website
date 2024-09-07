@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .terms import EULA, TERMS, PRIVACY
+from .terms import EULA, TERMS, PRIVACY, BOT_PRIVACY
 from django.shortcuts import get_object_or_404
 from heapq import merge
 from info.models import FrontPageInfo, QuickStartInfo, ExampleAction
@@ -20,6 +20,13 @@ def terms(request):
         "privacy": PRIVACY,
     }
     return render(request, 'info/terms.html', context)
+
+
+def bot(request):
+    context = {
+        "bot_privacy": BOT_PRIVACY
+    }
+    return render(request, 'info/bot.html', context)
 
 
 def probability(request):
