@@ -77,7 +77,8 @@ function activateTooltips() {
 }
 
 function removeSpacesBeforePeriods(inputText) {
-    return inputText.replaceAll(" .", ".");
+    const noSpacePeriods = inputText.replaceAll(" .", ".");
+    return noSpacePeriods.replaceAll("<li></li>", "");
 }
 
 const prefixReg = new RegExp('[\\d]+', 'gm');
@@ -192,7 +193,7 @@ const keywordHighlights = [
     // Other
     {
         "regex": regexFromKeyword("Concentration"),
-        "tooltip": "While concentrating you can only take Free Actions, a single Quick Action, and move 10 feet per Round. Disrupting events (like taking damage) cause the effect to end, and you cannot Concentrate again until the end of the next Round."
+        "tooltip": "While concentrating you can only take Free Actions, a single Quick Action, and move 10 feet per Round. Disrupting events (like taking Damage) cause the effect to end, and you cannot Concentrate again until the end of the next Round."
     },
     {
         "regex": regexFromKeyword("Resist"),

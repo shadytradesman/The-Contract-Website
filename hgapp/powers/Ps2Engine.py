@@ -293,7 +293,8 @@ class SystemTextRenderer:
             replacement_count += 1
             if replacement_count > 1000:
                 raise ValueError("Over 1000 replacements. . . infinite loop?")
-        return system_text.replace(" .", ".")
+        without_spaces_before_periods = system_text.replace(" .", ".")
+        return without_spaces_before_periods.replace("<li></li>", "")
 
 
     @staticmethod

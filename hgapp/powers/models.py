@@ -291,8 +291,8 @@ class Modifier(models.Model):
         return {
             "name": self.name,
             "slug": self.slug,
-            'required_enhancements': list(self.required_Enhancements.values_list("pk", flat=True)),#[x.pk for x in self.required_Enhancements.all()],
-            'required_drawbacks': list(self.required_drawbacks.values_list("pk", flat=True)), #[x.pk for x in self.required_drawbacks.all()],
+            'required_enhancements': list(self.required_Enhancements.values_list("pk", flat=True)),
+            'required_drawbacks': list(self.required_drawbacks.values_list("pk", flat=True)),
             "required_status": [self.required_status, self.get_required_status_display()],
             "category": self.category,
             "description": self.description,
@@ -630,9 +630,9 @@ class Base_Power(models.Model):
     def to_blob(self):
         # Used by v2 powers system for passing to FE and on BE for form validation.
         system = self.get_system(SYS_PS2)
-        text_fields = system.systemfieldtext_set.all() if system else None
-        roll_fields = system.systemfieldroll_set.all() if system else None
-        weapon_fields = system.systemfieldweapon_set.all() if system else None
+        text_fields = system.systemfieldtext_set.select_related('relevant_marker').all() if system else None
+        roll_fields = system.systemfieldroll_set.select_related('relevant_marker').all() if system else None
+        weapon_fields = system.systemfieldweapon_set.select_related('relevant_marker').all() if system else None
         return {
             'slug': self.slug,
             'name': self.name,
@@ -644,7 +644,7 @@ class Base_Power(models.Model):
             "required_status": [self.required_status, self.get_required_status_display()],
             'icon_url': self.icon.url if self.icon else "",
             'category': self.category_id if self.category else None,
-            'substitutions': [x.to_blob() for x in self.basepowerfieldsubstitution_set.all()],
+            'substitutions': [x.to_blob() for x in self.basepowerfieldsubstitution_set.select_related('relevant_marker').all()],
             'allowed_vectors': list(self.allowed_vectors.values_list('pk', flat=True)),
             'allowed_modalities': list(self.allowed_modalities.values_list('pk', flat=True)),
             'enhancements': list(self.avail_enhancements.values_list('pk', flat=True)),
@@ -1889,17 +1889,13 @@ class PowerSystem(models.Model):
             components = components.filter(base_type=base_type)
         components = components.order_by("-name") \
             .prefetch_related("basepowerfieldsubstitution_set") \
-            .prefetch_related("power_param_set") \
-            .prefetch_related("avail_enhancements") \
-            .prefetch_related("avail_drawbacks") \
-            .prefetch_related("blacklist_enhancements") \
-            .prefetch_related("blacklist_drawbacks").all()
+            .prefetch_related("power_param_set").all()
         return {x.pk: x.to_blob() for x in components}
 
     @staticmethod
     def _generate_modifier_blob(ModifierClass):
         related_field = "enhancementfieldsubstitution_set" if ModifierClass is Enhancement else "drawbackfieldsubstitution_set"
-        modifiers = ModifierClass.objects.exclude(system=SYS_LEGACY_POWERS)\
+        modifiers = ModifierClass.objects.exclude(system=SYS_LEGACY_POWERS) \
             .prefetch_related(related_field)\
             .prefetch_related("substitutions") \
             .all()

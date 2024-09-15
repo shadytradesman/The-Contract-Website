@@ -731,8 +731,6 @@ def view_scenario_gallery(request):
 
 @login_required
 def create_game(request, cell_id=None):
-    if not request.user.is_authenticated:
-        raise PermissionDenied("You must be logged in to schedule a Contract")
     if request.user.profile.get_confirmed_email() is None and not request.user.is_superuser:
         messages.add_message(request, messages.WARNING,
                              mark_safe("<h4 class=\"text-center\" style=\"margin-bottom:5px;\">You must validate your email address to schedule a Contract</h4>"))
