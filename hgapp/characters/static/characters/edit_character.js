@@ -146,23 +146,47 @@ $(document).on('change','[id$=-checked]', function(ev){
 
 });
 
+let liabilityCount = 0;
+let assetCount = 0;
+
 // Liability warning
 $(document).on('change','input[id^=id_liability-]', function(ev){
     let liabilities = $('input:checked[id^=id_liability-]');
     let liabilityVal = 0;
     liabilities.each(liab => {
-        liabilityVal += parseInt($(liabilities[liab]).next().children(".js-quirk-value").text());
+        const val = parseInt($(liabilities[liab]).next().children(".js-quirk-value").text());
+        liabilityVal += val > 0 ? 1 : 0;
     });
+    liabilityCount = liabilityVal;
+    const totalCount = liabilityCount + assetCount
     var warnDiv = $('[class~=liability-warn]');
-    if (liabilityVal < 22) {
+    if (totalCount < 5) {
         warnDiv.css("display","none");
     } else {
-        warnDiv.html("<p>Contractors may take a maximum of <b>21</b> Exp worth of Liabilities. Taking more "
-                            + "requires Playgroup Leader approval.</p>"
-                            + "<p>Currently Liability value: <b>" + liabilityVal + "</b> Exp</p>");
+        warnDiv.html("<p>Contractors may take a maximum of <b>5</b> Assets and Liabilities that affect Experience. </p>"
+                            + "<p>Currently count: <b>" + totalCount + "</b></p>");
         warnDiv.css("display","block");
     }
 });
+$(document).on('change','input[id^=id_asset-]', function(ev){
+    let assets = $('input:checked[id^=id_asset-]');
+    let assetsVal = 0;
+    assets.each(ass => {
+        const val = parseInt($(assets[ass]).next().children(".js-quirk-value").text());
+        assetsVal += val > 0 ? 1 : 0;
+    });
+    assetCount = assetsVal;
+    const totalCount = liabilityCount + assetCount
+    var warnDiv = $('[class~=liability-warn]');
+    if (totalCount < 5) {
+        warnDiv.css("display","none");
+    } else {
+        warnDiv.html("<p>Contractors may take a maximum of <b>5</b> Assets and Liabilities that affect Experience. </p>"
+                            + "<p>Current count: <b>" + totalCount + "</b></p>");
+        warnDiv.css("display","block");
+    }
+});
+
 //////////////////
 // EXPERIENCE MANAGEMENT
 //////////////////
