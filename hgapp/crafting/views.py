@@ -211,9 +211,11 @@ class Craft(View):
         for reward in free_crafting_rewards:
             power = reward.relevant_power
             if power.parent_power.crafting_type == CRAFTING_CONSUMABLE:
-                self.free_crafts_by_power_full[power.parent_power.pk] += NUM_FREE_CONSUMABLES_PER_REWARD
+                if self.free_crafts_by_power_full[power.parent_power.pk] < 4:
+                    self.free_crafts_by_power_full[power.parent_power.pk] += NUM_FREE_CONSUMABLES_PER_REWARD
             if power.parent_power.crafting_type == CRAFTING_ARTIFACT:
-                self.free_crafts_by_power_full[power.parent_power.pk] += NUM_FREE_ARTIFACTS_PER_REWARD
+                if self.free_crafts_by_power_full[power.parent_power.pk] < 2:
+                    self.free_crafts_by_power_full[power.parent_power.pk] += NUM_FREE_ARTIFACTS_PER_REWARD
 
         refundable_power_fulls_by_artifact_id = defaultdict(list)
         upgradable_power_fulls_by_artifact_id = defaultdict(list)
@@ -222,7 +224,8 @@ class Craft(View):
         for power in power_fulls:
             all_crafter_powers_full_object_by_artifact_id[power.pk] = power
             if power.crafting_type == CRAFTING_CONSUMABLE:
-                self.free_crafts_by_power_full[power.pk] += NUM_FREE_CONSUMABLES_PER_DOWNTIME
+                if self.free_crafts_by_power_full[power.pk] < 4:
+                    self.free_crafts_by_power_full[power.pk] += NUM_FREE_CONSUMABLES_PER_DOWNTIME
                 if power.pk in self.event_by_power_full:
                     crafted_artifacts = self.event_by_power_full[power.pk].craftedartifact_set.all()
                     for artifact_craft in crafted_artifacts:
