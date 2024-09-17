@@ -24,15 +24,6 @@ def set_new_power_full_perms(sender, instance, created, **kwargs):
         for user in User.objects.filter(is_superuser=True).all():
             assign_perm('view_private_power_full', user, instance)
 
-@receiver(post_save, sender=Base_Power, dispatch_uid="secret_upgrade_task")
-def secret_upgrade_task(sender, instance, created, **kwargs):
-    #This is a sneaky place to put upgrade tasks.
-    if instance.slug == "heal-other":
-        for power in Power.objects.all():
-            power.save()
-        for power_full in Power_Full.objects.all():
-            power_full.save()
-
 
 gift_revision = Signal(providing_args=['old_power', 'new_power', 'power_full'])
 gift_major_revision = Signal(providing_args=['old_power', 'new_power', 'power_full'])

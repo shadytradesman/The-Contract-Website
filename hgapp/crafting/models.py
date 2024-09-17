@@ -85,7 +85,7 @@ class CraftingEvent(models.Model):
             num_to_refund = num_to_refund if num_to_refund is not None else 0
             self.refund_crafted_consumables(number_to_refund=num_to_refund)
         self.set_crafted_artifacts(Artifact.objects.none(), 0)
-        arts = self.relevant_character.artifact_set.filter(cell__isnull=True, is_crafted_artifact=True, is_deleted=False).all()
+        arts = self.artifacts.filter(cell__isnull=True).filter(is_crafted_artifact=True).filter(is_deleted=False).all()
         for art in arts:
             if art.power_full_set.count() == 0:
                 art.delete()
