@@ -21,14 +21,6 @@
         </span>
         {% endif %}
     {% endif %}
-    {% if item.since_revised %}
-        <span class="text-center text-danger"
-             data-title="One of the Gifts on this Artifact has undergone a major revision since crafting and seeing play."
-             data-toggle="tooltip"
-             style="margin-top: 5px; position:relative;">
-            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true" style="position:absolute; top: 5px;"></span>
-        </span>
-    {% endif %}
   <div class="css-world-entity-value" style="padding-left: 5px; padding-bottom: 5px;">
       {% if render_link %}
         <a href="{% url 'characters:characters_artifact_view' item.id %}">
