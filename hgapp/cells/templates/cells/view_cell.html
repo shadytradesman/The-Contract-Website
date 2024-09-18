@@ -67,7 +67,16 @@
                         {% include "cells/view_cell_home_snip.html" %}
                     </div>
                     <div role="tabpanel" class="tab-pane" id="community">
-                        {% include "cells/view_cell_community_snip.html" %}
+                        <div hx-get="{% url 'cells:cell_community' cell.id %}" hx-trigger="load">
+                            <div class="css-loading" style="text-align: center;">
+                                <h1 style="margin-bottom: 0px; margin-top: 10px;">
+                                    <span class="glyphicon glyphicon-refresh spin" ></span>
+                                </h1>
+                                <h2 style="margin-top: 0px;">
+                                    <small style="margin-top: 0px;">Loading...</small>
+                                </h2>
+                            </div>
+                        </div>
                     </div>
                     <div role="tabpanel" class="tab-pane {% if not user_membership %} active {% endif %}" id="setting">
                         {% include "cells/view_cell_setting_snip.html" %}

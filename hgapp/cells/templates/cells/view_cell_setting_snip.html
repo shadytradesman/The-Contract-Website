@@ -1,4 +1,4 @@
-{% if not memberships_and_characters %}
+{% if is_closed %}
 <div class="thumbnail text-center">
     <div class="expandable-outer js-expandable-collapsed">
         <h3 class="text-danger">{{cell.name}} has no members and is closed.</h3>

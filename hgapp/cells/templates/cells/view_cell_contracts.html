@@ -1,0 +1,17 @@
+{% load account_tags %}
+<div>
+    {% for game in completed_games %}
+    <div>
+        <small>
+            {{ game.end_time|timesince }} ago:
+            <a href="{% url 'profiles:profiles_view_profile' game.gm.id %}">
+                {% user_display game.gm %}
+            </a>
+            ran
+            <a href="{% url 'games:games_view_game' game.id %}">
+                {{ game.scenario.title }}
+            </a>
+        </small>
+    </div>
+    {% endfor %}
+</div>

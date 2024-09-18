@@ -262,13 +262,8 @@ def view_cell(request, cell_id):
         can_gm = cell.player_can_run_games(request.user)
         my_cell_contractors = request.user.character_set.filter(cell=cell, is_deleted=False)
 
-    memberships_and_characters = ()
-    for role in ROLE:
-        for membership in cell.cellmembership_set.filter(role=role[0], is_banned=False).prefetch_related("member_player").order_by("member_player__username"):
-            characters = membership.member_player.character_set.filter(cell=cell, is_deleted=False, is_dead=False).all()
-            memberships_and_characters = memberships_and_characters + ((membership, characters,),)
     upcoming_games = cell.game_set.filter(status=GAME_STATUS[0][0]).order_by('scheduled_start_time')
-    completed_games = cell.completed_games()
+    completed_games = cell.completed_games()[:4]
     world_events = WorldEvent.objects.filter(parent_cell=cell).order_by("-created_date").all()[:10]
 
     can_view_community_link = cell.is_community_link_public or user_membership
@@ -296,11 +291,11 @@ def view_cell(request, cell_id):
         'can_manage_memberships': can_manage_memberships,
         'can_edit_characters': can_edit_characters,
         'user_membership': user_membership,
+        'is_closed': cell.members.count() == 0,
         'can_administer': can_administer,
         'can_manage_games': can_manage_games,
         'can_post_world_events': can_post_world_events,
         'can_gm': can_gm,
-        'memberships_and_characters': memberships_and_characters,
         'upcoming_games': upcoming_games,
         'completed_games': completed_games,
         'invite': invite,
@@ -311,6 +306,52 @@ def view_cell(request, cell_id):
         'show_webhook_tip': show_webhook_tip,
     }
     return render(request, 'cells/view_cell.html', context)
+
+
+def view_cell_community(request, cell_id):
+    cell = get_object_or_404(Cell, id=cell_id)
+    user_membership = None
+    if request.user.is_authenticated:
+        if not request.user.profile.confirmed_agreements:
+            return HttpResponseRedirect(reverse('profiles:profiles_terms'))
+        user_membership = cell.get_player_membership(request.user)
+        if user_membership and user_membership.is_banned:
+            context = {
+                'user_membership': user_membership,
+                "cell": cell,
+                "reason": user_membership.reason_banned,
+            }
+            return render(request, 'cells/view_cell_banned.html', context)
+
+    memberships_and_characters = ()
+    for role in ROLE:
+        for membership in cell.cellmembership_set.filter(role=role[0], is_banned=False).prefetch_related("member_player").order_by("member_player__username"):
+            characters = membership.member_player.character_set.filter(cell=cell).filter(is_deleted=False).filter(is_dead=False).all()
+            memberships_and_characters = memberships_and_characters + ((membership, characters,),)
+    context = {
+        "cell": cell,
+        'user_membership': user_membership,
+        'memberships_and_characters': memberships_and_characters,
+    }
+    return render(request, 'cells/view_cell_community_snip.html', context)
+
+def view_cell_contracts(request, cell_id):
+    cell = get_object_or_404(Cell, id=cell_id)
+    if request.user.is_authenticated:
+        if not request.user.profile.confirmed_agreements:
+            return HttpResponseRedirect(reverse('profiles:profiles_terms'))
+        user_membership = cell.get_player_membership(request.user)
+        if user_membership and user_membership.is_banned:
+            context = {
+                "cell": cell,
+                "reason": user_membership.reason_banned,
+            }
+            return render(request, 'cells/view_cell_banned.html', context)
+
+    context = {
+        'completed_games': cell.completed_games()[3:]
+    }
+    return render(request, 'cells/view_cell_contracts.html', context)
 
 
 def view_cell_events(request, cell_id):

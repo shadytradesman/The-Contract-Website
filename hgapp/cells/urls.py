@@ -20,6 +20,9 @@ urlpatterns = [
     url(r'^view/c/(?P<cell_id>[\d]+)/$',
         RedirectView.as_view(pattern_name='cells:cells_view_cell', query_string=True, permanent=True)),
 
+    url(r'^contracts/(?P<cell_id>[\d]+)/$', views.view_cell_contracts, name='cell_contracts'),
+    url(r'^community/(?P<cell_id>[\d]+)/$', views.view_cell_community, name='cell_community'),
+
     # ex: .com/playgroup/world-events/123
     url(r'^(?P<cell_id>[\d]+)/world-events/$', views.view_cell_events, name='cells_world_events'),
 

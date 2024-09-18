@@ -99,26 +99,17 @@
                 </div>
             {% endfor %}
             {% if completed_games|slice:"3:" %}
-            <div class="text-center">
-                <a class="btn btn-primary btn-sm" data-toggle="collapse" href="#moreGames" role="button" aria-expanded="false" aria-controls="moreGames">
-                    All Completed Contracts
-                </a>
-            </div>
-            <div class="collapse" id="moreGames">
-                {% for game in completed_games|slice:"3:" %}
-                <div>
-                    <small>
-                        {{ game.end_time|timesince }} ago:
-                        <a href="{% url 'profiles:profiles_view_profile' game.gm.id %}">
-                            {% user_display game.gm %}
-                        </a>
-                        ran
-                        <a href="{% url 'games:games_view_game' game.id %}">
-                            {{ game.scenario.title }}
-                        </a>
-                    </small>
+            <div id="hx-timeline-contracts">
+                <div class="text-center btn-sm" style="margin-top: 5px;">
+                    <button
+                            class="btn btn-primary js-disable-on-click"
+                            hx-get="{% url 'cells:cell_contracts' cell.id %}"
+                            hx-trigger="click"
+                            hx-target="#hx-timeline-contracts"
+                            hx-swap="outerHTML">
+                        All Completed Contracts
+                    </button>
                 </div>
-                {% endfor %}
             </div>
             {% endif %}
         {% endif %}
