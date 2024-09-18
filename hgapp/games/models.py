@@ -550,7 +550,7 @@ class Game(models.Model):
             if gm_membership.last_activity < self.end_time:
                 gm_membership.last_activity = self.end_time
                 gm_membership.save()
-        for invite in self.invitations.filter(attendance__isnull=False).all():
+        for invite in self.game_invite_set.filter(attendance__isnull=False).all():
             invited_membership = CellMembership.objects.filter(member_player=invite.invited_player).filter(relevant_cell=self.cell).first()
             if invited_membership and self.end_time:
                 if invited_membership.last_activity < self.end_time:
