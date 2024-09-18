@@ -104,6 +104,7 @@ def handle_edit_completed_game(request, game, new_player_list):
                 game.recalculate_gm_reward()
                 game.update_profile_stats()
                 game.unlock_stock_scenarios()
+                game.update_cell_membership_activity()
         else:
             raise ValueError("Invalid outcome formset in completed edit")
     else:
@@ -252,6 +253,7 @@ def create_archival_game(request, general_form, cell, outcome_formset):
         game.give_rewards()
         game.update_profile_stats()
         game.unlock_stock_scenarios()
+        game.update_cell_membership_activity()
     GameEnded.send_robust(sender=None, game=game, request=request)
 
 

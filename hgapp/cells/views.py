@@ -571,7 +571,8 @@ def manage_members(request, cell_id):
         membership_formset = MemberFormSet(initial=[{'player_id': x.member_player.id,
                                                'role': x.role,
                                                'username': x.member_player,
-                                               'role_display': x.get_role_display()} for x in cell_members])
+                                               'role_display': x.get_role_display(),
+                                                'last_activity': x.last_activity} for x in cell_members])
         kick_form = KickForm()
         perms_by_role = defaultdict(list)
         for role in ROLE:

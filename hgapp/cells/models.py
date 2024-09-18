@@ -308,6 +308,7 @@ class Cell(models.Model):
     class Meta:
         permissions = CELL_PERMISSIONS
 
+
 class WorldEvent(models.Model):
     creator = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -327,6 +328,12 @@ class WorldEvent(models.Model):
     def save(self, *args, **kwargs):
         is_edit = self.pk is not None
         super(WorldEvent, self).save(*args, **kwargs)
+        if not is_edit:
+            membership = CellMembership.objects.filter(member_player=self.creator).filter(relevant_cell=self.parent_cell).first()
+            if membership:
+                if membership.last_activity < timezone.now():
+                    membership.last_activity = timezone.now()
+                    membership.save()
         if is_edit and hasattr(self, "move") and self.move:
             self.move.fix_rewards()
 
@@ -402,6 +409,7 @@ class CellMembership(models.Model):
                             max_length=20)
     joined_date = models.DateTimeField('date created',
                                         auto_now_add=True)
+    last_activity = models.DateTimeField(auto_now_add=True)
     is_banned = models.BooleanField(default=False)
     reason_banned = models.CharField(max_length=2000, blank=True)
     date_banned = models.DateTimeField('date banned', blank=True, null=True)

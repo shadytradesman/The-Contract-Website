@@ -16,6 +16,11 @@
     border-bottom-left-radius: 0px;
 }
 
+.css-cell-character  {
+    width: 50%;
+    padding: 9px;
+}
+
 @media (max-width: 767px) {
   .nav-tabs.nav-justified>.active>a {
     border-bottom-color: #20252d;
@@ -25,6 +30,9 @@
     border-bottom-color: #20252d;
     border-bottom-right-radius: 0px;
     border-bottom-left-radius: 0px;
+  }
+  .css-cell-character {
+    width: 100%;
   }
 }
 

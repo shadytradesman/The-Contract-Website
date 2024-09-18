@@ -14,7 +14,7 @@ from characters.models import Character, HIGH_ROLLER_STATUS, Character_Death, Ex
     VETERAN_PORTED, STATUS_NEWBIE, STATUS_NOVICE, STATUS_SEASONED, STATUS_PROFESSIONAL, STATUS_VETERAN
 from django.template.loader import render_to_string
 from powers.models import Power, Power_Full
-from cells.models import Cell, WorldEvent
+from cells.models import Cell, WorldEvent, CellMembership
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from bs4 import BeautifulSoup
@@ -538,10 +538,24 @@ class Game(models.Model):
             recalculate_stats.send(sender=character.__class__, character_pk=character.pk, is_game=True)
 
     def update_profile_stats(self):
+        self.update_cell_membership_activity()
         self.update_participant_titles()
         if hasattr(self, "cell") and self.cell:
             self.cell.update_safety_stats()
         self.scenario.update_stats()
+
+    def update_cell_membership_activity(self):
+        gm_membership = CellMembership.objects.filter(member_player=self.gm).filter(relevant_cell=self.cell).first()
+        if gm_membership and self.end_time:
+            if gm_membership.last_activity < self.end_time:
+                gm_membership.last_activity = self.end_time
+                gm_membership.save()
+        for invite in self.invitations.filter(attendance__isnull=False).all():
+            invited_membership = CellMembership.objects.filter(member_player=invite.invited_player).filter(relevant_cell=self.cell).first()
+            if invited_membership and self.end_time:
+                if invited_membership.last_activity < self.end_time:
+                    invited_membership.last_activity = self.end_time
+                    invited_membership.save()
 
     def unlock_stock_scenarios(self):
         if not self.is_finished() and not self.is_recorded():

@@ -60,6 +60,9 @@
                             {{form.player_id.as_hidden}}
                             <span class = "lead">{% user_display form.initial.username %} </span>
                             <span>- {{form.initial.role_display}}</span>
+                            <div class="text-muted">
+                                Last activity: {{form.initial.last_activity|timesince}} ago
+                            </div>
                             <div class="form-inline ">
                                 Change role: {{form.role}}
                                 <span style="margin-left: 10px;">

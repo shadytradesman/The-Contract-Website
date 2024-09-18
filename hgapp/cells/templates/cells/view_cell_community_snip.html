@@ -34,7 +34,7 @@
     </a>
     {{cell.created_date|timesince}} ago
 </div>
-<div class="row">
+<div style="display:flex; flex-wrap: wrap;">
     {% if not memberships_and_characters %}
     <div class="thumbnail text-center">
         <div class="expandable-outer js-expandable-collapsed">
@@ -43,7 +43,7 @@
     </div>
     {% endif %}
     {% for membership_and_characters in memberships_and_characters %}
-        <div class="col-md-6">
+        <div class="css-cell-character">
             <div class="thumbnail">
                 <h4 class="text-center">
                     <a href="{% url 'profiles:profiles_view_profile' membership_and_characters.0.member_player.id %}">
@@ -51,21 +51,26 @@
                     </a>
                     <br>
                     <small>Playgroup {{ membership_and_characters.0.get_role_display }}</small>
+                    <br>
+                    <small>Last active: {{membership_and_characters.0.last_activity|timesince}} ago</small>
                 </h4>
                 {% if membership_and_characters.1 %}
-                <div class="row">
+                <div style="display:flex; flex-wrap: wrap;">
                     {% for character in membership_and_characters.1 %}
-                        <div class="col-md-6 text-center">
-                            <a href="{% url 'characters:characters_view' character.id %}">
-                                <b>
-                                    {{character.name}}
-                                </b>
-                                 the {{character.concept_summary}}  {% if character.paradigm %} {{ character.paradigm}} {% endif %}
-                            </a>
-                            <br>
-                            <small>
-                                A {{character.number_of_victories }}-Victory {{ character.get_contractor_status_display }} Contractor
-                            </small>
+                        <div class="css-cell-character" >
+                            <div>
+                                <a href="{% url 'characters:characters_view' character.id %}">
+                                    <b>
+                                        {{character.name}}
+                                    </b>
+                                    the {{character.concept_summary}}  {% if character.paradigm %} {{ character.paradigm}} {% endif %}
+                                </a>
+                            </div>
+                            <div>
+                                <small>
+                                    A {{character.number_of_victories }}-Victory {{ character.get_contractor_status_display }} Contractor
+                                </small>
+                            </div>
                         </div>
                     {% endfor %}
                 </div>
