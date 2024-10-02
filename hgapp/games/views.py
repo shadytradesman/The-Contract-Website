@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.forms import formset_factory
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.db import transaction
 from django.templatetags.static import static
@@ -88,6 +88,16 @@ def view_other_scenarios(request, game_id):
     }
     return render(request, 'games/view_game_pages/runnable_scenarios_content.html', context)
 
+def contract_data(request):
+    contracts = Game.objects.exclude(get_completed_game_excludes_query()).exclude(end_time__lt=datetime.date(2020,3,19)).order_by("end_time").select_related("cell").all()
+    output_lines = ["date,playgroup_num,playgroup_name"]
+    for contract in contracts:
+        output_lines.append("{},{},{}".format(
+            contract.end_time,
+            contract.cell.pk if contract.cell else "",
+            contract.cell.name.replace(",", "") if contract.cell else "",
+        ))
+    return HttpResponse("\n".join(output_lines),content_type="text/plain")
 
 def activity(request):
     num_total_games = Game.objects.count()

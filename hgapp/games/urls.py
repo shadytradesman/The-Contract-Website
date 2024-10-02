@@ -16,6 +16,9 @@ urlpatterns = [
     # ex: .com/contract/activity/
     url(r'^activity/$', views.activity, name='games_activity'),
 
+    # ex: .com/contract/activity/
+    url(r'^contract-data/$', views.contract_data, name='games_data'),
+
     # ex: .com/contract/create/scenario/
     url(r'^scenario/create$', views.create_scenario, name='games_create_scenario'),
     url(r'^create/scenario/$',
