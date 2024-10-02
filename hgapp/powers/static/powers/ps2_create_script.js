@@ -604,8 +604,8 @@ function markRollText(rollReplacementText) {
 
 function markEnhancementText(modifierReplacementText) {
     let numText = Number(modifierReplacementText);
-    if (modifierReplacementText.length == 0 || Number.isInteger(numText)) {
-        // don't surround integers with tags otherwise addition replacement tags break
+    if (modifierReplacementText.length == 0 || !Number.isNaN(numText)) {
+        // don't surround numbers with tags otherwise math replacement tags break
         return modifierReplacementText;
     }
     return '<span class="css-system-text-enhancement">' + modifierReplacementText + "</span>";
@@ -613,8 +613,8 @@ function markEnhancementText(modifierReplacementText) {
 
 function markDrawbackText(modifierReplacementText) {
     let numText = Number(modifierReplacementText);
-    if (modifierReplacementText.length == 0 || Number.isInteger(numText)) {
-        // don't surround integers with tags otherwise addition replacement tags break
+    if (modifierReplacementText.length == 0 || !Number.isNaN(numText)) {
+        // don't surround number with tags otherwise math replacement tags break
         return modifierReplacementText;
     }
     return '<span class="css-system-text-drawback">' + modifierReplacementText + "</span>";
@@ -773,10 +773,10 @@ function getReplacementText(replacements, toReplace) {
         }
     }
     if (toReplace.type === '#') {
-        return replacements.reduce((a,b) => parseInt(a) + parseInt(b)).toString();
+        return replacements.reduce((a,b) => Math.round(new Number(a) + new Number(b))).toString();
     }
     if (toReplace.type === '!') {
-        return replacements.reduce((a,b) => parseInt(a) * parseInt(b)).toString();
+        return replacements.reduce((a,b) => Math.round(new Number(a) * new Number(b))).toString();
     }
     replacements = replacements.filter(rep => rep.length != 0);
     if (replacements.length === 0) {

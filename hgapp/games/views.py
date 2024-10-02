@@ -90,12 +90,16 @@ def view_other_scenarios(request, game_id):
 
 def contract_data(request):
     contracts = Game.objects.exclude(get_completed_game_excludes_query()).exclude(end_time__lt=datetime.date(2020,3,19)).order_by("end_time").select_related("cell").all()
-    output_lines = ["date,playgroup_num,playgroup_name"]
+    output_lines = ["date,playgroup_num,playgroup_name,num_victories,num_losses,num_deathslevel"]
     for contract in contracts:
-        output_lines.append("{},{},{}".format(
+        output_lines.append("{},{},{},{},{},{},{}".format(
             contract.end_time,
             contract.cell.pk if contract.cell else "",
             contract.cell.name.replace(",", "") if contract.cell else "",
+            contract.number_victories(),
+            contract.number_losses(),
+            contract.number_deaths(),
+            contract.get_required_character_status_display(),
         ))
     return HttpResponse("\n".join(output_lines),content_type="text/plain")
 
