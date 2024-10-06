@@ -1097,7 +1097,7 @@ Archived on: {}
         return self.exp_cost() > self.max_bonus_exp()
 
     def max_bonus_exp(self):
-        return (EXP_NEW_CHAR + 16 + (self.effective_num_games() * 12))
+        return (EXP_NEW_CHAR + 16 + (self.effective_victories() * 12))
 
     def unspent_experience(self):
         total_exp = self.exp_earned()
