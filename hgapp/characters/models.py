@@ -260,15 +260,18 @@ EXP_LOSS_RINGER_V1 = "LOSS_RINGER_V1"
 EXP_WIN_V1 = "WIN_V1"
 EXP_WIN_RINGER_V1 = "WIN_RINGER_V1"
 EXP_LOSS_V2 = "LOSS_V2"
+EXP_LOSS_V3 = "LOSS_V3" # Same as loss V2 but with more out of playgroup bonus
 EXP_LOSS_IN_WORLD_V2 = "LOSS_IN_WORLD_V2"
 EXP_LOSS_RINGER_V2 = "LOSS_RINGER_V2"
 EXP_WIN_V2 = "WIN_V2"
+EXP_WIN_V3 = "WIN_V3" # Same as win V2 but with more out of playgroup bonus
 EXP_WIN_IN_WORLD_V2 = "WIN_IN_WORLD_V2"
 EXP_WIN_RINGER_V2 = "WIN_RINGER_V2"
 EXP_GM = "GM"
 EXP_GM_RATIO = "GM_GOLDEN_RATIO"
 EXP_GM_NEW_PLAYER = "GM_NEW_PLAYER"
 EXP_GM_MOVE = "GM_MOVE"
+EXP_GM_MOVE_V2 = "GM_MOVE_V2"
 EXP_JOURNAL = "JOURNAL"
 EXP_CUSTOM = "CUSTOM"
 EXP_EXCHANGE = "Exchange"
@@ -282,15 +285,18 @@ EXP_REWARD_TYPE = (
     (EXP_WIN_V1, "winning"),
     (EXP_WIN_RINGER_V1, "winning as a ringer"),
     (EXP_LOSS_V2, "losing"),
+    (EXP_LOSS_V3, "losing"),
     (EXP_LOSS_IN_WORLD_V2, "losing in-World Contract"),
     (EXP_LOSS_RINGER_V2, "losing as a ringer"),
     (EXP_WIN_V2, "winning"),
+    (EXP_WIN_V3, "winning"),
     (EXP_WIN_IN_WORLD_V2, "winning in-World Contract"),
     (EXP_WIN_RINGER_V2, "winning as a ringer"),
     (EXP_GM, "GMing"),
     (EXP_GM_RATIO, "GMing and achieving the Golden Ratio"),
     (EXP_GM_NEW_PLAYER, "GMing for a new Player"),
     (EXP_GM_MOVE, "GMing a Move"),
+    (EXP_GM_MOVE_V2, "GMing a Move"),
     (EXP_JOURNAL, "writing a journal"),
     (EXP_CUSTOM, "custom reason"),
     (EXP_EXCHANGE, "submitting a Scenario to the exchange"),
@@ -306,15 +312,18 @@ EXP_REWARD_VALUES = {
     EXP_WIN_V1: 4,
     EXP_WIN_RINGER_V1: 4,
     EXP_LOSS_V2: 1,
+    EXP_LOSS_V3: 2,
     EXP_LOSS_IN_WORLD_V2: 3,
     EXP_LOSS_RINGER_V2: 1,
     EXP_WIN_V2: 3,
+    EXP_WIN_V3: 4,
     EXP_WIN_IN_WORLD_V2: 5,
     EXP_WIN_RINGER_V2: 3,
     EXP_GM: 6,
     EXP_GM_RATIO: 6,
     EXP_GM_NEW_PLAYER: 6,
     EXP_GM_MOVE: 2,
+    EXP_GM_MOVE_V2: 3,
     EXP_JOURNAL: 1,
     EXP_EXCHANGE: 6,
     EXP_QUESTIONNAIRE_CONTRACT: 2,
@@ -1944,7 +1953,7 @@ class ExperienceReward(models.Model):
             return "{} {}".format(reason, self.game.scenario.title)
         if self.type in [EXP_GM_NEW_PLAYER, EXP_GM_RATIO]:
             return "{} in {}".format(reason, self.game.scenario.title)
-        if self.type == EXP_GM_MOVE:
+        if self.type in [EXP_GM_MOVE, EXP_GM_MOVE_V2]:
             return "{} in {}: {}".format(reason, self.move.cell, self.move.title)
         if self.type == EXP_EXCHANGE:
             if hasattr(self, "scenarioapproval"):

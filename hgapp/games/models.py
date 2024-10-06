@@ -8,7 +8,7 @@ from django.db.models import Q
 from django.contrib.auth import get_user_model
 
 from characters.models import Character, HIGH_ROLLER_STATUS, Character_Death, ExperienceReward, AssetDetails, EXP_GM, \
-    EXP_LOSS_V2, EXP_WIN_V2, EXP_LOSS_RINGER_V2, EXP_WIN_RINGER_V2, EXP_LOSS_IN_WORLD_V2, EXP_WIN_IN_WORLD_V2, EXP_MVP,\
+    EXP_LOSS_V3, EXP_WIN_V3, EXP_LOSS_RINGER_V2, EXP_WIN_RINGER_V2, EXP_LOSS_IN_WORLD_V2, EXP_WIN_IN_WORLD_V2, EXP_MVP,\
     EXP_WIN_V1, EXP_LOSS_V1, Artifact, EXP_GM_MOVE, EXP_GM_RATIO, EXP_GM_NEW_PLAYER, StockWorldElement, ELEMENT_TYPE, \
     CONDITION, CIRCUMSTANCE, TROPHY, LOOSE_END, STATUS_ANY, EXP_EXCHANGE, HIGH_ROLLER_STATUS, SEASONED_PORTED, \
     VETERAN_PORTED, STATUS_NEWBIE, STATUS_NOVICE, STATUS_SEASONED, STATUS_PROFESSIONAL, STATUS_VETERAN
@@ -741,7 +741,7 @@ class Game_Attendance(models.Model):
             elif self.attending_character.cell and self.attending_character.cell == self.relevant_game.cell:
                 reward_type = EXP_WIN_IN_WORLD_V2 if self.is_victory() else EXP_LOSS_IN_WORLD_V2
             else:
-                reward_type = EXP_WIN_V2 if self.is_victory() else EXP_LOSS_V2
+                reward_type = EXP_WIN_V3 if self.is_victory() else EXP_LOSS_V3
             exp_reward = ExperienceReward(
                 rewarded_character=self.attending_character,
                 rewarded_player=self.attending_character.player,
@@ -1744,7 +1744,7 @@ class Move(models.Model):
             raise ValueError("Move is granting exp reward to gm when it already has one.", str(self.id))
         exp_reward = ExperienceReward(
             rewarded_player=self.gm,
-            type=EXP_GM_MOVE
+            type=EXP_GM_MOVE_V2
         )
         exp_reward.save()
         self.gm_experience_reward = exp_reward
