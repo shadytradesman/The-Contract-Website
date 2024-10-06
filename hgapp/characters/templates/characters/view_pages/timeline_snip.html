@@ -5,7 +5,6 @@
     Advancement
   </h3>
   <div style="display: flex; align-items: center; justify-content: center;">
-    {% if early_access %}
       <div class="text-center" style="padding: 10px; margin-right: 10px;" >
         <img src="{{character.get_tier_icon}}" style="width: 55px; height: 55px;">
         <div class="text-muted">
@@ -14,8 +13,7 @@
           </i>
         </div>
       </div>
-    {% endif %}
-    <div {% if not early_access %} class="text-center" {% endif %}>
+    <div >
       <div>
         <b>{{ character.number_of_victories }}</b> Victories -
         <b>{{ character.number_of_losses }}</b> Failure{{character.number_of_losses|pluralize}}

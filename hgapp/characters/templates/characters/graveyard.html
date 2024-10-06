@@ -49,9 +49,7 @@
 
             {% if tombstones.Professional %}
             <h2>
-                {% if early_access %}
-                    <img src="{% static 'overrides/tiericons/professional.svg' %}" style="width: 36px; height: 36px;" width="36" height="36"/>
-                {% endif %}
+                <img src="{% static 'overrides/tiericons/professional.svg' %}" style="width: 36px; height: 36px;" width="36" height="36"/>
                 Professional
                 <small>
                     ({{num_deaths_by_tier.Professional}} Fallen)
@@ -64,9 +62,7 @@
 
             {% if tombstones.Seasoned %}
                 <h2>
-                    {% if early_access %}
-                        <img src="{% static 'overrides/tiericons/seasoned.svg' %}" style="width: 36px; height: 36px;" width="36" height="36"/>
-                    {% endif %}
+                    <img src="{% static 'overrides/tiericons/seasoned.svg' %}" style="width: 36px; height: 36px;" width="36" height="36"/>
                     Seasoned
                     <small>
                         ({{num_deaths_by_tier.Seasoned}} Fallen)
@@ -79,9 +75,7 @@
 
             {% if tombstones.Novice %}
                 <h2>
-                    {% if early_access %}
-                        <img src="{% static 'overrides/tiericons/novice.svg' %}" style="width: 36px; height: 36px;" width="36" height="36"/>
-                    {% endif %}
+                    <img src="{% static 'overrides/tiericons/novice.svg' %}" style="width: 36px; height: 36px;" width="36" height="36"/>
                     Novice
                     <small>
                         ({{num_deaths_by_tier.Novice}} Fallen)
@@ -95,9 +89,7 @@
 
             {% if tombstones.Newbie %}
                 <h2>
-                    {% if early_access %}
-                        <img src="{% static 'overrides/tiericons/newbie.svg' %}" style="width: 36px; height: 36px;" width="36" height="36"/>
-                    {% endif %}
+                    <img src="{% static 'overrides/tiericons/newbie.svg' %}" style="width: 36px; height: 36px;" width="36" height="36"/>
                     Newbie
                     <small>
                         ({{num_deaths_by_tier.Newbie}} Fallen)

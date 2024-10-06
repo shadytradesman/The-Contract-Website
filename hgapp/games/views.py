@@ -366,9 +366,6 @@ def unlock_scenario(request, scenario_id):
 @login_required
 def share_scenario(request, scenario_id):
     scenario = get_object_or_404(Scenario, id=scenario_id)
-    early_access = request.user.is_authenticated and request.user.profile.early_access_user
-    if not early_access:
-        raise ValueError("Scenario sharing is early access only")
     if request.user.profile.get_confirmed_email() is None:
         messages.add_message(request, messages.WARNING,
                              mark_safe("<h4 class=\"text-center\" style=\"margin-bottom:5px;\">You must validate your email address to submit Scenarios</h4>"))
