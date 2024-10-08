@@ -1320,7 +1320,7 @@ class ScenarioWriteup(models.Model):
     section = models.CharField(choices=WRITEUP_SECTION,
                                max_length=55,
                                default=MISSION)
-    content = models.TextField(max_length=74000)
+    content = models.TextField(max_length=99000)
     relevant_scenario = models.ForeignKey(Scenario, on_delete=models.CASCADE)
     created_date = models.DateTimeField('date created', auto_now_add=True)
     num_words = models.IntegerField("Number of Words", default=0)

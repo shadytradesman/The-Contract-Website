@@ -99,31 +99,31 @@ class ScenarioWriteupForm(forms.Form):
     overview = forms.CharField(label='Overview',
                                required=False,
                                widget=new_scenario_widget,
-                               max_length=70000,
+                               max_length=99000,
                                help_text='Provide a high-level outline of the Scenario that gives GMs a clear idea of how it runs.')
     backstory = forms.CharField(label='Backstory',
                                 required=False,
                                 widget=new_scenario_widget,
-                                max_length=70000,
+                                max_length=99000,
                                 help_text='This is GM pre-reading. Describe the characters and events that led to the '
                                           'situation the Contractors encounter.')
     introduction = forms.CharField(label='Intro and Briefing',
                                    required=False,
                                    widget=new_scenario_widget,
-                                   max_length=70000,
+                                   max_length=99000,
                                    help_text='How are the Contractors gathered? How are they briefed? <b>What counts'
                                              ' as a Victory, and what causes Failure?</b>')
     mission = forms.CharField(label='Mission',
                               required=False,
                               widget=new_scenario_widget,
-                              max_length=70000,
+                              max_length=99000,
                               help_text='This is the bulk of the Contract. Include guidance on scenes, characters, and '
                                         'rolls. Remember to use heading levels in the editor '
                                         'to split it into easy-to-navigate sub-sections.')
     aftermath = forms.CharField(label='Aftermath',
                                 required=False,
                                 widget=new_scenario_widget,
-                                max_length=70000,
+                                max_length=99000,
                                 help_text='What happens after the Contract is over? What if Contractors return to the scene of the crime? '
                                           'Provide guidance for Loose Ends or Moves.')
 
