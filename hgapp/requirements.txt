@@ -58,7 +58,7 @@ kombu==5.3.2
 Markdown==3.1.1
 markdown2==2.4.0
 packaging==21.3
-paramiko==2.10.1
+paramiko==3.4.0
 pathspec==0.5.9
 pilkit==2.0
 Pillow==9.3.0
