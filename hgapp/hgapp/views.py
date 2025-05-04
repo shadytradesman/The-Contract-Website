@@ -54,6 +54,8 @@ class LoginView(account.views.LoginView):
 
 
 class SettingsView(account.views.SettingsView):
+    template_name = "account/settings.html"
+
     def get_context_data(self, **kwargs):
         ctx = super(SettingsView, self).get_context_data(**kwargs)
         if self.request.user.profile:

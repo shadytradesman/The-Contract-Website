@@ -139,6 +139,7 @@ INSTALLED_APPS = [
 
     # theme
     "bootstrapform",
+    'pinax_theme_bootstrap',
 
     # external
     "account",
@@ -198,6 +199,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.messages.context_processors.messages",
                 "account.context_processors.account",
+                "pinax_theme_bootstrap.context_processors.theme",
                 "postman.context_processors.inbox",
             ],
         },
