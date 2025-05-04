@@ -1,7 +1,6 @@
 import re
 
 from creole import Parser
-from pinax.images.models import Image
 from pygments import highlight
 from pygments.formatters import HtmlFormatter
 from pygments.lexers import TextLexer, get_lexer_by_name
@@ -167,22 +166,7 @@ class PygmentsHtmlEmitter(HtmlEmitter):
         return highlight(content, lexer, HtmlFormatter(cssclass="syntax")).strip()
 
 
-class ImageLookupHtmlEmitter(HtmlEmitter):
-
-    def image_emit(self, node):
-        target = node.content
-        if not re.match(r"^\d+$", target):
-            return super().image_emit(node)
-        else:
-            try:
-                image = Image.objects.get(pk=int(target))
-            except Image.DoesNotExist:
-                # @@@ do something better here
-                return ""
-            return '<img src="{}" />'.format(image.image.url)
-
-
-class PinaxBlogHtmlEmitter(PygmentsHtmlEmitter, ImageLookupHtmlEmitter):
+class PinaxBlogHtmlEmitter(PygmentsHtmlEmitter):
     pass
 
 

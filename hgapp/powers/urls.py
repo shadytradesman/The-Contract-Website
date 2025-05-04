@@ -1,5 +1,4 @@
-from django.conf.urls import url
-from django.urls import path
+from django.urls import path, re_path
 
 from django.views.generic.base import RedirectView
 
@@ -39,21 +38,21 @@ urlpatterns = [
 
     ### SHARED
     # ex: .com/gift/bases_and_examples/
-    url(r'^example-audit/$', views.powers_and_examples, name='powers_and_examples'),
+    re_path(r'^example-audit/$', views.powers_and_examples, name='powers_and_examples'),
 
     # ex: .com/gift/and-effects
-    url(r'^and-effects/$', views.powers_and_effects, name='powers_and_effects'),
+    re_path(r'^and-effects/$', views.powers_and_effects, name='powers_and_effects'),
 
     # ex: .com/gift/my
-    url(r'^my/$', views.my_gifts, name='my_gifts'),
+    re_path(r'^my/$', views.my_gifts, name='my_gifts'),
 
     # ex: .com/gift/delete/110
-    url(r'^delete/(?P<power_id>[\d]+)/$', views.delete_power, name='powers_delete_power'),
-    url(r'^delete/p/(?P<power_id>[\d]+)/$',
+    re_path(r'^delete/(?P<power_id>[\d]+)/$', views.delete_power, name='powers_delete_power'),
+    re_path(r'^delete/p/(?P<power_id>[\d]+)/$',
          RedirectView.as_view(pattern_name='powers:powers_delete_power', query_string=True, permanent=True)),
 
     # ex: .com/gift/stock
-    url(r'^stock/$', views.stock, name='powers_stock'),
+    re_path(r'^stock/$', views.stock, name='powers_stock'),
     # ex: .com/gift/stock/c/56
     path('stock/c/<int:character_id>/', views.stock, name='powers_stock'),
 
@@ -65,8 +64,8 @@ urlpatterns = [
 
     # this url is useful for always showing the most recent version of a power
     # ex: .com/powers/view/history/p/121
-    url(r'^(?P<power_full_id>[\d]+)/$', views.power_full_view, name='powers_view_power_full'),
-    url(r'^view/history/p/(?P<power_full_id>[\d]+)/$',
+    re_path(r'^(?P<power_full_id>[\d]+)/$', views.power_full_view, name='powers_view_power_full'),
+    re_path(r'^view/history/p/(?P<power_full_id>[\d]+)/$',
          RedirectView.as_view(pattern_name='powers:powers_view_power_full', query_string=True, permanent=True)),
 
     ### AJAX ENDPOINTS

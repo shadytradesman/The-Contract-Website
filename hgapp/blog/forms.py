@@ -3,9 +3,7 @@ from functools import partial as curry
 from django import forms
 from django.utils import timezone
 from django.utils.text import slugify
-from django.utils.translation import ugettext_lazy as _
-
-from pinax.images.models import ImageSet
+from django.utils.translation import gettext_lazy as _
 
 from .conf import settings
 from .models import Post, Revision, Section
@@ -146,7 +144,6 @@ class PostForm(PostFormMixin, forms.ModelForm):
             post.blog = blog
         if author:
             post.author = author
-            post.image_set = ImageSet.objects.create(created_by=author)
         if self.section:
             post.section = self.section
         post.slug = slugify(post.title)

@@ -127,6 +127,7 @@ INSTALLED_APPS = [
     'reporting.apps.ReportingConfig',
     'notifications.apps.NotificationsConfig',
     'questionnaire.apps.QuestionnaireConfig',
+    'pinax_images.apps.PinaxImagesConfig',
     'ads.apps.AdsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -138,21 +139,19 @@ INSTALLED_APPS = [
 
     # theme
     "bootstrapform",
-    "pinax_theme_bootstrap",
 
     # external
     "account",
-    "pinax.eventlog",
     'guardian',
     'pagedown.apps.PagedownConfig',
     'markdown_deux',
     'postman',
     'tinymce',
     "blog",
-    "pinax.images",
     'django_celery_beat',
     'django_celery_results',
     'django_recaptcha',
+    'django_ses',
 ]
 
 MIDDLEWARE = [
@@ -199,7 +198,6 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.messages.context_processors.messages",
                 "account.context_processors.account",
-                "pinax_theme_bootstrap.context_processors.theme",
                 "postman.context_processors.inbox",
             ],
         },

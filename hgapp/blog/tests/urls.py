@@ -1,6 +1,6 @@
-from django.conf.urls import include, url
+from django.conf.urls import include
+from django.urls import re_path
 
 urlpatterns = [
-    url(r"^", include("blog.urls", namespace="pinax_blog")),
-    url(r"^ajax/images/", include("pinax.images.urls", namespace="pinax_images")),
+    re_path(r"^", include("blog.urls", namespace="pinax_blog")),
 ]

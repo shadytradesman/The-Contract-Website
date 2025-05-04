@@ -2,21 +2,12 @@ from functools import partial as curry
 
 from django.contrib import admin
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
-
-from pinax.images.admin import ImageInline
-from pinax.images.models import ImageSet
+from django.utils.translation import gettext_lazy as _
 
 from .conf import settings
 from .forms import AdminPostForm
 from .models import Blog, Post, ReviewComment, Section
 from .tasks import publish_article
-
-
-class PostImageSet(ImageSet):
-    class Meta:
-        proxy = True
-
 
 class ReviewInline(admin.TabularInline):
     model = ReviewComment
@@ -102,12 +93,6 @@ class SectionAdmin(admin.ModelAdmin):
 
 admin.site.register(Post, PostAdmin)
 admin.site.register(Section, SectionAdmin)
-admin.site.register(
-    PostImageSet,
-    list_display=["blog_post", "primary_image", "created_by", "created_at"],
-    raw_id_fields=["created_by"],
-    inlines=[ImageInline],
-)
 
 
 class ArticleAdmin(admin.ModelAdmin):

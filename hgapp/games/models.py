@@ -33,9 +33,9 @@ import django.dispatch
 from notifications.models import Notification, REWARD_NOTIF, CONTRACTOR_NOTIF, SCENARIO_NOTIF
 
 
-NotifyGameInvitee = django.dispatch.Signal(providing_args=['game_invite', 'request'])
-GameChangeStartTime = django.dispatch.Signal(providing_args=['game', 'request'])
-GameEnded = django.dispatch.Signal(providing_args=['game', 'request'])
+NotifyGameInvitee = django.dispatch.Signal() # providing_args=['game_invite', 'request']
+GameChangeStartTime = django.dispatch.Signal() # providing_args=['game', 'request']
+GameEnded = django.dispatch.Signal() # providing_args=['game', 'request']
 
 EXCHANGE_SUBMISSION_VALUE = 340
 EXCHANGE_SCENARIO_COST = 100

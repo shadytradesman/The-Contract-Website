@@ -3,8 +3,6 @@ from django import template
 from characters.forms import make_world_element_form, make_transfer_artifact_form, make_artifact_status_form, \
     make_consumable_use_form
 from characters.models import LOST, DESTROYED, RECOVERED, REPAIRED, AT_HOME, LOOSE_END
-from django.urls import reverse
-from django.template.loader import render_to_string
 
 from collections import defaultdict
 register = template.Library()

@@ -25,6 +25,6 @@ def set_new_power_full_perms(sender, instance, created, **kwargs):
             assign_perm('view_private_power_full', user, instance)
 
 
-gift_revision = Signal(providing_args=['old_power', 'new_power', 'power_full'])
-gift_major_revision = Signal(providing_args=['old_power', 'new_power', 'power_full'])
-gift_adjustment = Signal(providing_args=['old_power', 'new_power', 'power_full'])
+gift_revision = Signal() # providing_args=['old_power', 'new_power', 'power_full']
+gift_major_revision = Signal() # providing_args=['old_power', 'new_power', 'power_full']
+gift_adjustment = Signal() # providing_args=['old_power', 'new_power', 'power_full']

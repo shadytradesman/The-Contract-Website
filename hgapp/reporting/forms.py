@@ -1,6 +1,6 @@
 from django.forms import ModelForm, ChoiceField
 from .models import Report, MODERATION_ACTION
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 class ReportForm(ModelForm):

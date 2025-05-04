@@ -4,11 +4,10 @@ from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import strip_tags
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.utils.html import mark_safe
 
 import pytz
-from pinax.images.models import ImageSet
 
 from .conf import settings
 from .hooks import hookset
@@ -83,7 +82,6 @@ class Post(models.Model):
     content_html = models.TextField(editable=False)
 
     description = models.TextField(_("Description"), blank=True)
-    image_set = models.OneToOneField(ImageSet, related_name="blog_post", on_delete=models.CASCADE)
 
     created = models.DateTimeField(_("Created"), default=timezone.now, editable=False)  # when first revision was created
     updated = models.DateTimeField(_("Updated"), null=True, blank=True, editable=False)  # when last revision was created (even if not published)
@@ -170,8 +168,6 @@ class Post(models.Model):
             self.secret_key = "".join(choice(letters) for _ in range(8))
         if self.is_published and self.published is None:
             self.published = timezone.now()
-        if not ImageSet.objects.filter(blog_post=self).exists():
-            self.image_set = ImageSet.objects.create(created_by=self.author)
         self.full_clean()
         super(Post, self).save(**kwargs)
 
