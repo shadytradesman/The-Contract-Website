@@ -73,6 +73,7 @@ pyrsistent==0.16.0
 python-crontab==3.0.0
 python-dateutil==2.9.0
 python-memcached==1.59
+pymemcache==4.0.0
 pytz==2025.2
 PyYAML==6.0.1
 redis==5.0.1
