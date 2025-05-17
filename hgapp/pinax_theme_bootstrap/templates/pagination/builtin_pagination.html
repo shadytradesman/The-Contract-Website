@@ -12,7 +12,7 @@
             <li class="prev disabled"><a>← {% trans "Previous" %}</a></li>
         {% endif %}
         {% for page in paginator.page_range %}
-            <li class="{% ifequal page page_obj.number %}active{% endifequal %}"><a href="?page={{ page|stringformat:"d" }}{{ getvars }}{{ hashtag }}">{{ page|stringformat:"d" }}</a></li>
+            <li class="{% if page == page_obj.number %}active{% endif %}"><a href="?page={{ page|stringformat:"d" }}{{ getvars }}{{ hashtag }}">{{ page|stringformat:"d" }}</a></li>
         {% endfor %}
         {% if page_obj.has_next %}
             <li class="next"><a href="?page={{ page_obj.next_page_number|stringformat:"d" }}{{ getvars }}{{ hashtag }}">{% trans "Next" %} →</a></li>

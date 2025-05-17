@@ -12,7 +12,7 @@
         {% endif %}
         {% for page in pages %}
             {% if page %}
-                <li class="{% ifequal page page_obj.number %}active{% endifequal %}"><a href="?page={{ page|stringformat:"d" }}{{ getvars }}{{ hashtag }}">{{ page|stringformat:"d" }}</a></li>
+                <li class="{% if page == page_obj.number %}active{% endif %}"><a href="?page={{ page|stringformat:"d" }}{{ getvars }}{{ hashtag }}">{{ page|stringformat:"d" }}</a></li>
             {% else %}
                 <li class="disabled"><a href="#">…</a></li>
             {% endif %}
