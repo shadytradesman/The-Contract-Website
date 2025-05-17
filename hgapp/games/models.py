@@ -1390,7 +1390,7 @@ class ScenarioWriteup(models.Model):
         return self.section == AFTERMATH
 
     def __update_word_count(self):
-        soup = BeautifulSoup(self.content, features="html5lib")
+        soup = BeautifulSoup(self.content, features="html.parser")
         self.num_words = len(soup.text.split())
 
 
@@ -1762,7 +1762,7 @@ class Move(models.Model):
 
     def __get_event_wordcount(self):
         if hasattr(self, "public_event") and self.public_event and self.public_event.event_description:
-            soup = BeautifulSoup(self.public_event.event_description, features="html5lib")
+            soup = BeautifulSoup(self.public_event.event_description, features="html.parser")
             return len(soup.text.split())
         else:
             return 0

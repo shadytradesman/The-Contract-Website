@@ -156,7 +156,7 @@ class Journal(models.Model):
         return word_count >= threshold
 
     def __get_wordcount(self, content):
-        soup = BeautifulSoup(content, features="html5lib")
+        soup = BeautifulSoup(content, features="html.parser")
         return len(soup.text.split())
 
     def player_can_view(self, player):

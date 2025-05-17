@@ -142,7 +142,7 @@ class Answer(models.Model):
         return word_count >= (self.question.min_word_count - 3)
 
     def __get_wordcount(self, content):
-        soup = BeautifulSoup(content, features="html5lib")
+        soup = BeautifulSoup(content, features="html.parser")
         return len(soup.text.split())
 
     def get_improvement(self):
