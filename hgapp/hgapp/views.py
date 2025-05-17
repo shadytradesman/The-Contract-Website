@@ -226,7 +226,7 @@ def home(request):
             'cell_invites': cell_invites,
             'world_events': world_events,
             'attendance_invites_to_confirm': attendance_invites_to_confirm,
-            # 'latest_blog_post': latest_blog_post,
+            'latest_blog_post': latest_blog_post,
             'email_verified': email_verified,
             'timeline_notifications': timeline_notifications,
             'expand_contractors': True,
