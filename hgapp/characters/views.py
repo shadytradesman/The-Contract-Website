@@ -50,6 +50,9 @@ from hgapp.utilities import get_object_or_none
 
 from games.game_utilities import get_character_contacts
 
+def is_ajax(request):
+    return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
+
 def __check_world_element_perms(request, character, secret_key=None, ext_element=None):
     if character:
         try:
@@ -1109,7 +1112,7 @@ def transfer_artifact(request, artifact_id):
 
 
 def post_scar(request, character_id, secret_key = None):
-    if request.is_ajax and request.method == "POST":
+    if is_ajax(request) and request.method == "POST":
         character = get_object_or_404(Character, id=character_id)
         __check_edit_perms(request, character, secret_key)
         form = BattleScarForm(request.POST)
@@ -1127,7 +1130,7 @@ def post_scar(request, character_id, secret_key = None):
     return JsonResponse({"error": ""}, status=400)
 
 def delete_scar(request, scar_id, secret_key = None):
-    if request.is_ajax and request.method == "POST":
+    if is_ajax(request) and request.method == "POST":
         scar = get_object_or_404(BattleScar, id=scar_id)
         character = scar.character
         __check_edit_perms(request, character, secret_key)
@@ -1138,7 +1141,7 @@ def delete_scar(request, scar_id, secret_key = None):
 
 
 def post_trauma(request, character_id, secret_key = None):
-    if request.is_ajax and request.method == "POST":
+    if is_ajax(request) and request.method == "POST":
         character = get_object_or_404(Character, id=character_id)
         form = TraumaForm(request.POST, prefix="trauma")
         __check_edit_perms(request, character, secret_key)
@@ -1156,7 +1159,7 @@ def post_trauma(request, character_id, secret_key = None):
 
 
 def delete_trauma(request, trauma_rev_id, used_xp, secret_key = None):
-    if request.is_ajax and request.method == "POST":
+    if is_ajax(request) and request.method == "POST":
         trauma_rev = get_object_or_404(TraumaRevision, id=trauma_rev_id)
         character = trauma_rev.relevant_stats.assigned_character
         __check_edit_perms(request, character, secret_key)
@@ -1168,7 +1171,7 @@ def delete_trauma(request, trauma_rev_id, used_xp, secret_key = None):
 
 
 def post_injury(request, character_id, secret_key = None):
-    if request.is_ajax and request.method == "POST":
+    if is_ajax(request) and request.method == "POST":
         character = get_object_or_404(Character, id=character_id)
         form = InjuryForm(request.POST, prefix="injury")
         __check_edit_perms(request, character, secret_key)
@@ -1186,7 +1189,7 @@ def post_injury(request, character_id, secret_key = None):
 
 
 def dec_injury(request, injury_id, secret_key = None):
-    if request.is_ajax and request.method == "POST":
+    if is_ajax(request) and request.method == "POST":
         injury = get_object_or_404(Injury, id=injury_id)
         __check_edit_perms(request, injury.character, secret_key)
         new_sev = injury.severity - 1
@@ -1202,7 +1205,7 @@ def dec_injury(request, injury_id, secret_key = None):
 
 
 def inc_injury(request, injury_id, secret_key = None):
-    if request.is_ajax and request.method == "POST":
+    if is_ajax(request) and request.method == "POST":
         injury = get_object_or_404(Injury, id=injury_id)
         __check_edit_perms(request, injury.character, secret_key)
         with transaction.atomic():
@@ -1214,7 +1217,7 @@ def inc_injury(request, injury_id, secret_key = None):
 
 
 def stabilize_injury(request, injury_id, secret_key = None):
-    if request.is_ajax and request.method == "POST":
+    if is_ajax(request) and request.method == "POST":
         injury = get_object_or_404(Injury, id=injury_id)
         __check_edit_perms(request, injury.character, secret_key)
         with transaction.atomic():
@@ -1226,7 +1229,7 @@ def stabilize_injury(request, injury_id, secret_key = None):
 
 
 def set_mind_damage(request, character_id, secret_key = None):
-    if request.is_ajax and request.method == "POST":
+    if is_ajax(request) and request.method == "POST":
         character = get_object_or_404(Character, id=character_id)
         form = InjuryForm(request.POST, prefix="mental-exertion")
         __check_edit_perms(request, character, secret_key)
@@ -1248,7 +1251,7 @@ def set_mind_damage(request, character_id, secret_key = None):
 
 
 def set_source_val(request, source_id, secret_key = None):
-    if request.is_ajax and request.method == "POST":
+    if is_ajax(request) and request.method == "POST":
         source = get_object_or_404(Source, id=source_id)
         form = SourceValForm(request.POST, prefix="source")
         __check_edit_perms(request, source.owner, secret_key)
@@ -1263,7 +1266,7 @@ def set_source_val(request, source_id, secret_key = None):
 
 
 def post_equipment(request, character_id, secret_key = None):
-    if request.is_ajax and request.method == "POST":
+    if is_ajax(request) and request.method == "POST":
         character = get_object_or_404(Character, id=character_id)
         form = EquipmentForm(request.POST)
         __check_edit_perms(request, character, secret_key)
@@ -1279,7 +1282,7 @@ def post_equipment(request, character_id, secret_key = None):
 
 
 def post_bio(request, character_id, secret_key = None):
-    if request.is_ajax and request.method == "POST":
+    if is_ajax(request) and request.method == "POST":
         character = get_object_or_404(Character, id=character_id)
         form = BioForm(request.POST)
         __check_edit_perms(request, character, secret_key)
@@ -1295,7 +1298,7 @@ def post_bio(request, character_id, secret_key = None):
 
 
 def post_notes(request, character_id, secret_key = None):
-    if request.is_ajax and request.method == "POST":
+    if is_ajax(request) and request.method == "POST":
         character = get_object_or_404(Character, id=character_id)
         form = NotesForm(request.POST)
         __check_edit_perms(request, character, secret_key)
@@ -1311,7 +1314,7 @@ def post_notes(request, character_id, secret_key = None):
 
 
 def post_world_element(request, character_id, element, secret_key = None):
-    if request.is_ajax and request.method == "POST":
+    if is_ajax(request) and request.method == "POST":
         WorldElement = get_world_element_class_from_url_string(element)
         if not WorldElement:
             return JsonResponse({"error": "Invalid world element"}, status=400)
@@ -1345,7 +1348,7 @@ def post_world_element(request, character_id, element, secret_key = None):
     return JsonResponse({"error": ""}, status=400)
 
 def delete_world_element(request, element_id, element, secret_key = None):
-    if request.is_ajax and request.method == "POST":
+    if is_ajax(request) and request.method == "POST":
         WorldElement = get_world_element_class_from_url_string(element)
         if not WorldElement:
             return JsonResponse({"error": "Invalid world element"}, status=400)
@@ -1361,7 +1364,7 @@ def delete_world_element(request, element_id, element, secret_key = None):
 
 
 def edit_world_element(request, element_id, element, secret_key=None):
-    if request.is_ajax and request.method == "POST":
+    if is_ajax(request) and request.method == "POST":
         WorldElement = get_world_element_class_from_url_string(element)
         if not WorldElement:
             return JsonResponse({"error": "Invalid world element"}, status=400)

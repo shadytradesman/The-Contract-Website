@@ -696,11 +696,13 @@ def spoil_aftermath(request, scenario_id, reason):
         }
         return render(request, 'games/scenarios/spoil_aftermath.html', context)
 
+def is_ajax(request):
+    return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
 
 
 @login_required
 def grant_element(request, element_id):
-    if request.is_ajax and request.method == "POST":
+    if is_ajax(request) and request.method == "POST":
         element = get_object_or_404(ScenarioElement, id=element_id)
         scenario = element.relevant_scenario
         if not scenario.player_is_spoiled(request.user):
