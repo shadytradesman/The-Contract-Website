@@ -38,19 +38,19 @@
             </div>
         {% endif %}
     </div>
-    <div class="css-transparent-overlay-dark" style="padding-top: 5px; padding-left: 10px; padding-bottom: 10px;">
-        {% with latest_blog_post as post %}
-        <h4 class="css-blog-header" style="margin-bottom: 0px;">
-            <a href="{%url 'pinax_blog:blog' %}">
-                Site News
-            </a>
-            <small>
-                {{ post.published|date:"jS F Y" }}
-            </small>
-            : <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
-        </h4>
-        {% endwith %}
-    </div>
+<!--    <div class="css-transparent-overlay-dark" style="padding-top: 5px; padding-left: 10px; padding-bottom: 10px;">-->
+<!--        {% with latest_blog_post as post %}-->
+<!--        <h4 class="css-blog-header" style="margin-bottom: 0px;">-->
+<!--            <a href="{%url 'pinax_blog:blog' %}">-->
+<!--                Site News-->
+<!--            </a>-->
+<!--            <small>-->
+<!--                {{ post.published|date:"jS F Y" }}-->
+<!--            </small>-->
+<!--            : <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>-->
+<!--        </h4>-->
+<!--        {% endwith %}-->
+<!--    </div>-->
  </div>
 </div>
 <div class="container">
