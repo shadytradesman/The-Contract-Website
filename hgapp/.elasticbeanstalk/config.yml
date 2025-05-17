@@ -2,7 +2,7 @@ branch-defaults:
   default:
     environment: Default-Environment
   master:
-    environment: Hgapp-env-1
+    environment: Contract-aws-latest-env
     group_suffix: null
 environment-defaults:
   Default-Environment:
@@ -12,7 +12,7 @@ global:
   application_name: hgapp
   branch: null
   default_ec2_keyname: mcserv
-  default_platform: Python 3.8 running on 64bit Amazon Linux 2
+  default_platform: Python 3.13 running on 64bit Amazon Linux 2023/4.5.1
   default_region: us-west-2
   include_git_submodules: true
   instance_profile: null
