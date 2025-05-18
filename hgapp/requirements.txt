@@ -3,7 +3,7 @@ asgiref==3.7.2
 async-timeout==4.0.3
 attrs==19.3.0
 beautifulsoup4==4.9.3
-billiard==4.1.0
+billiard==4.2.1
 bleach==3.3.0
 blessed==1.9.5
 boto3==1.38.8
