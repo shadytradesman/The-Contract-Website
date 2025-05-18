@@ -1,1 +1,1 @@
-web: gunicorn --bind 127.0.0.1:8000 --preload --workers=4 --threads=2 hgapp.wsgi:application --max-requests 400 --max-requests-jitter 25
+web: gunicorn --bind 127.0.0.1:8000 --workers=2 --threads=2 hgapp.wsgi:application --max-requests 400 --max-requests-jitter 25
