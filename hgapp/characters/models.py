@@ -1099,15 +1099,16 @@ Archived on: {}
     def max_bonus_exp(self):
         return (EXP_NEW_CHAR + 16 + (self.effective_victories() * 12))
 
-    def unspent_experience(self):
+    def unspent_experience(self, exp_cost=None):
         total_exp = self.exp_earned()
-        exp_cost = self.exp_cost()
+        if exp_cost is None:
+            exp_cost = self.exp_cost()
         return int(total_exp - exp_cost)
 
-    def spendable_experience(self):
+    def spendable_experience(self, exp_cost=None):
         if self.overearned_exp():
-            return self.max_bonus_exp() - self.exp_cost()
-        return self.unspent_experience()
+            return self.max_bonus_exp() - exp_cost if exp_cost is not None else self.exp_cost()
+        return self.unspent_experience(exp_cost)
 
     def exp_earned(self):
         return self.earned_exp
@@ -2749,7 +2750,8 @@ class AttributeValue(TraitValue):
         ]
 
     def val_with_bonuses(self):
-        return self.value + self.relevant_stats.assigned_character.get_bonus_for_attribute(attribute=self.relevant_attribute)
+        existing_bonus = get_object_or_none(AttributeBonus, character=self.relevant_stats.assigned_character_id, attribute=self.relevant_attribute_id)
+        return self.value + existing_bonus.value if existing_bonus else 0
 
     def get_class(self):
         return AttributeValue

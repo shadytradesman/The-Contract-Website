@@ -118,9 +118,9 @@
             <b>{{character.exp_cost}}</b> Exp spent.
             <b>{{ character.max_bonus_exp }}</b> maximum Exp allowed.
         </p>
-        {% if character.spendable_experience > 1 %}
+        {% if spendable_experience > 1 %}
             <p>
-                You may spend <b>{{character.spendable_experience}}</b> more Exp without going over.
+                You may spend <b>{{spendable_experience}}</b> more Exp without going over.
             </p>
         {% endif %}
     </div>

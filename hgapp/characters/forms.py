@@ -597,7 +597,7 @@ def make_transfer_artifact_form(character=None, cell=None, max_quantity=0, user=
     cache_contents = cache.get(cache_key, sentinel)
     if cache_contents is sentinel:
         contacts = __inner_get_character_options(character, cell, user)
-        cache.set(cache_key, contacts, timeout=60)
+        cache.set(cache_key, contacts, timeout=600)
         character_options = contacts
     else:
         character_options = cache.get(cache_key)

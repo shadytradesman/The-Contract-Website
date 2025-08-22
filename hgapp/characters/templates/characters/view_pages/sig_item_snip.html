@@ -49,7 +49,7 @@
               method="post"
               style="display:none;">
             {% csrf_token %}
-            {% cache 60 sig_item_transfer item.character_id item.character.cell_id request.user %}
+            {% cache 600 sig_item_transfer item.character_id item.character.cell_id request.user %}
             <h4 class="text-center">Transfer Item</h4>
             <div id="transfer-artifact-{{item.id}}" style="margin-bottom: 10px;">
                 <div class="row">

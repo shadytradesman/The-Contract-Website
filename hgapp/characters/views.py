@@ -402,9 +402,10 @@ def view_character(request, character_id, secret_key=None):
         return render(request, 'characters/legacy_character.html', context)
 
     ability_value_by_name, ability_value_by_id = character.get_abilities_by_name_and_id()
-    unspent_experience = character.unspent_experience()
-    exp_earned = character.exp_earned()
     exp_cost = character.exp_cost()
+    unspent_experience = character.unspent_experience(exp_cost)
+    spendable_experience = character.spendable_experience(exp_cost)
+    exp_earned = character.exp_earned()
 
     bio_form = BioForm()
 
@@ -505,6 +506,7 @@ def view_character(request, character_id, secret_key=None):
         'trauma_form': TraumaForm(prefix="trauma"),
         'injury_form': InjuryForm(request.POST, prefix="injury"),
         'exp_cost': exp_cost,
+        'spendable_experience': spendable_experience,
         'exp_earned': exp_earned,
         'unspent_experience': unspent_experience,
         'bio_form': bio_form,
