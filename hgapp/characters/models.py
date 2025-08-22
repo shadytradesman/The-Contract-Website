@@ -2751,7 +2751,7 @@ class AttributeValue(TraitValue):
 
     def val_with_bonuses(self):
         existing_bonus = get_object_or_none(AttributeBonus, character=self.relevant_stats.assigned_character_id, attribute=self.relevant_attribute_id)
-        return self.value + existing_bonus.value if existing_bonus else 0
+        return self.value + (existing_bonus.value if existing_bonus else 0)
 
     def get_class(self):
         return AttributeValue
