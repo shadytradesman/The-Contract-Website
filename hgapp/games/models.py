@@ -254,7 +254,7 @@ class Game(models.Model):
                 "user": user,
                 "my_invitation": get_object_or_none(user.game_invite_set.filter(relevant_game=self.pk))})
         if variety == NOTIF_VAR_FINISHED:
-            game = Game.objects.prefetch_related('game_invite_set__attendance').get(pk=1)
+            game = Game.objects.prefetch_related('game_invite_set__attendance').get(pk=self.id)
             return render_to_string("games/timeline/timeline_completed_game.html", {"game": game})
         raise ValueError("invalid variety of game timeline: " + variety)
 
