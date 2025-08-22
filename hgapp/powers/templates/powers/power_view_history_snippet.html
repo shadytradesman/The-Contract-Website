@@ -25,7 +25,7 @@
       - {{ curr_power.get_creation_reason_display }} Cost: {{ curr_power.get_gift_cost }}. {{curr_power.creation_reason_expanded_text}}</a>
     </p>
   </div>
-  {% if curr_power.relevant_power.all %}
+  {% if curr_power.relevant_power_id %}
     <div style="margin-left: 50px">
       Revision purchased with:
       <div class="small">

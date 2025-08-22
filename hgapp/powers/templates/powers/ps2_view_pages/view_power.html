@@ -102,7 +102,7 @@
                         {% if power.parent_power.owner %}
                             Created by <a href="{% url 'profiles:profiles_view_profile' power.parent_power.owner.id %}">{% user_display power.parent_power.owner %}</a>.
                         {% endif %}
-                        {% if sig_artifacts %}
+                        {% if sig_artifacts.count %}
                         <div>
                             On Legendary Artifact {% for artifact in sig_artifacts %}<a href="{% url 'characters:characters_artifact_view' artifact.id %}">{{artifact.name}}</a>{% endfor %}.
                         </div>

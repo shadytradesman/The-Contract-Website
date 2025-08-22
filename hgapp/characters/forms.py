@@ -5,6 +5,8 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from overrides.widgets import CustomStylePagedown
 
 from games.game_utilities import get_character_contacts
+from django.core.cache import cache
+
 from characters.models import Character, BasicStats, Character_Death, BattleScar, PORT_STATUS, StockBattleScar, GIVEN,\
     STOLEN, LOOTED, LOST, DESTROYED, RECOVERED, REPAIRED, AT_HOME, StockWorldElement, StockElementCategory, START_ONLY_SCAR,\
     LOOSE_END_THREAT
@@ -343,7 +345,7 @@ def get_default_scar_choice_form():
 
 
 def get_default_world_element_choice_form(element_type):
-    stock_elements = StockWorldElement.objects.filter(type=element_type, is_user_created=False).exclude(category__name="creation-only").order_by("category").all()
+    stock_elements = StockWorldElement.objects.filter(type=element_type, is_user_created=False).select_related("category").exclude(category__name="creation-only").order_by("category").all()
     options = [("", "Create Custom " + element_type)]
     elem_data_by_name = {}
     if stock_elements.count() > 0:
@@ -374,7 +376,6 @@ def get_default_world_element_choice_form(element_type):
         element_data_by_name = elem_data_by_name
 
     return DefaultElementForm
-
 
 class BattleScarForm(forms.Form):
     scar_description = forms.CharField(max_length=500,
@@ -576,7 +577,7 @@ def make_artifact_status_form(current_status=None):
     return ArtifactStatusForm
 
 
-def make_transfer_artifact_form(character=None, cell=None, max_quantity=0, user=None):
+def __inner_get_character_options(character=None, cell=None, user=None):
     if character:
         character_options = get_character_contacts(character)
         character_options = set([x.pk for x in character_options.keys()])
@@ -588,7 +589,18 @@ def make_transfer_artifact_form(character=None, cell=None, max_quantity=0, user=
         character_options = user.character_set.values_list('id', flat=True)
     else:
         raise ValueError("Must pass either a user or character to transfer artifact form")
+    return character_options
 
+def make_transfer_artifact_form(character=None, cell=None, max_quantity=0, user=None):
+    cache_key = "contractor_t_options{}.{}.{}.{}".format(character.pk if character else "o", cell.pk if cell else "o", max_quantity, user.pk if user else "o")
+    sentinel = object()
+    cache_contents = cache.get(cache_key, sentinel)
+    if cache_contents is sentinel:
+        contacts = __inner_get_character_options(character, cell, user)
+        cache.set(cache_key, contacts, timeout=60)
+        character_options = contacts
+    else:
+        character_options = cache.get(cache_key)
 
     class TransferArtifactForm(forms.Form):
         transfer_type = forms.ChoiceField(

@@ -1,5 +1,7 @@
 {% load power_tags %}
 {% load bootstrap %}
+{% load cache %}
+
 <div class="js-world-element-delete" style="display: flex;  align-items: stretch; max-width: 100%;">
     <div class="css-consumable-item" style="display: inline-block; margin-right: 5px; border: 1px solid #453e4b;">
         <div data-title="Consumable quantity"
@@ -58,7 +60,11 @@
                           action="{% url 'characters:transfer_artifact' artifact.id %}"
                           method="post" >
                         {% csrf_token %}
-                        {{transfer_form|bootstrap}}
+
+                        {% cache 60 consumable_item_transfer artifact.character_id artifact.character.cell_id request.user artifact.quantity %}
+                            {{transfer_form|bootstrap}}
+                        {% endcache %}
+
                         <input type="submit" class="btn btn-primary" value="Transfer" />
                     </form>
                 </div>

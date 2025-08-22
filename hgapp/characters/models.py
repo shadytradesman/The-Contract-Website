@@ -1370,7 +1370,7 @@ Archived on: {}
         ability_val_by_id = {}
         char_ability_values = self.stats_snapshot.abilityvalue_set.all()
         for x in char_ability_values:
-            ability_val_by_id[x.relevant_ability.id] = x.value
+            ability_val_by_id[x.relevant_ability_id] = x.value
         return ability_val_by_id
 
     def get_attributes(self, is_physical=None):
@@ -1682,7 +1682,7 @@ class Artifact(WorldElement):
         ]
 
     def player_can_edit_or_transfer(self, player):
-        return self.character.player_can_edit(player) if self.character else self.creating_player == player
+        return self.creating_player == player or (self.character and self.character.player_can_edit(player))
 
     def player_can_edit_gifts(self, player):
         if self.creating_player and self.creating_player == player:
@@ -1698,24 +1698,24 @@ class Artifact(WorldElement):
 
     def get_status_blurb(self):
         latest_transfer = self.get_latest_transfer()
-        is_held_by_creator = self.character and (self.character == self.crafting_character)
+        is_held_by_creator = self.character_id and (self.character_id == self.crafting_character_id)
         if is_held_by_creator:
             status_blurb = 'Created and held by <a href="{}">{}</a>.'.format(
                 reverse('characters:characters_view', args=(self.crafting_character.id,)),
                 self.crafting_character.name,)
-        elif self.crafting_character:
+        elif self.crafting_character_id:
             # if not held by creator, it should have a transfer.
             status_blurb = 'Created by <a href="{}">{}</a>, {} <a href="{}">{}</a>.'.format(
-                reverse('characters:characters_view', args=(self.crafting_character.id,)),
+                reverse('characters:characters_view', args=(self.crafting_character_id,)),
                 self.crafting_character.name,
                 latest_transfer.get_transfer_type_display(),
                 reverse('characters:characters_view', args=(self.character.id,)),
                 self.character.name)
-        elif self.character:
+        elif self.character_id:
             status_blurb = 'Created by <a href="{}">{}</a> and orphaned. Held by <a href="{}">{}</a>'.format(
-                reverse('profiles:profiles_view_profile', args=(self.creating_player.id,)),
+                reverse('profiles:profiles_view_profile', args=(self.creating_player_id,)),
                 self.creating_player.username,
-                reverse('characters:characters_view', args=(self.character.id,)),
+                reverse('characters:characters_view', args=(self.character_id,)),
                 self.character.name)
         elif self.creating_player:
             status_blurb = 'Created by <a href="{}">{}</a> and orphaned.'.format(

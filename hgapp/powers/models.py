@@ -950,7 +950,7 @@ class Power_Full(models.Model):
             return True
         if self.is_deleted:
             return False
-        is_owner = player == self.owner
+        is_owner = player.id == self.owner.id
         return is_owner or \
                not self.private or \
                player.has_perm("view_private_power_full", self) or \

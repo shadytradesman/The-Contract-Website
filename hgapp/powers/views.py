@@ -155,13 +155,13 @@ class ViewPower(View):
     power = None
 
     def dispatch(self, *args, **kwargs):
-        self.power = get_object_or_404(Power, id=kwargs["power_id"])
+        self.power = get_object_or_404(Power.objects.filter(id=kwargs["power_id"]).select_related("parent_power"))
         redirect = self.__check_permissions()
         if redirect:
             return redirect
         if self.power.parent_power:
             power_full = Power_Full.objects.get(id=self.power.parent_power.id)
-            if power_full.latest_revision() == self.power and "revision" in self.request.path:
+            if power_full.latest_rev_id == self.power.id and "revision" in self.request.path:
                 return HttpResponseRedirect(reverse('powers:powers_view_power_full', args=(power_full.id,)))
         return super().dispatch(*args, **kwargs)
 
@@ -182,15 +182,15 @@ class ViewPower(View):
         attribute_val_by_id = None
         ability_val_by_id = None
         if self.power.parent_power:
-            power_full = Power_Full.objects.get(id=self.power.parent_power.id)
+            power_full = Power_Full.objects.filter(id=self.power.parent_power.id).select_related("character__stats_snapshot").get()
             power_list = power_full.power_set.order_by('-pub_date').all()
-            if power_full.character:
+            if power_full.character_id:
                 attribute_val_by_id = power_full.character.get_attribute_values_by_id()
                 ability_val_by_id = power_full.character.get_ability_values_by_id()
         else:
             power_full = None
             power_list = None
-        character = power_full.character if power_full.character else None
+        character = power_full.character if power_full.character_id else None
         show_status_warning = False
         if character:
             show_status_warning = not self.power.passes_status_check(character.status)
@@ -201,7 +201,7 @@ class ViewPower(View):
         sig_artifacts = None
         if self.power.dice_system == SYS_PS2:
             if power_full:
-                sig_artifacts = power_full.artifacts.filter(is_signature=True).all()
+                sig_artifacts = power_full.artifacts.filter(is_signature=True)
             related_gift_query = Power_Full.objects.filter(dice_system=SYS_PS2, character__isnull=False, character__private=False)
             stock_gift_query = Power_Full.objects.filter(dice_system=SYS_PS2, tags__in=["example"])
             component = random.choice(["Effect", "Vector", "Modality"])
@@ -217,8 +217,8 @@ class ViewPower(View):
                 related_gift_query = related_gift_query.filter(latest_rev__modality=self.power.modality_id)
                 stock_gift_query = stock_gift_query.filter(latest_rev__modality=self.power.modality_id)
                 related_component = self.power.modality
-            related_gifts = related_gift_query.order_by('?')[:5]
-            stock_gifts = stock_gift_query.order_by('?')[:5]
+            related_gifts = related_gift_query.select_related("latest_rev","character").order_by('?')[:3]
+            stock_gifts = stock_gift_query.select_related("latest_rev","character").order_by('?')[:3]
         context = {}
         context['related_gifts'] = related_gifts
         context['stock_gifts'] = stock_gifts

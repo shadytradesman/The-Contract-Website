@@ -1629,7 +1629,7 @@ class Reward(models.Model):
 
     def reason_text(self):
         if self.relevant_game:
-            if self.relevant_game.gm.id == self.rewarded_player.id:
+            if self.relevant_game.gm_id == self.rewarded_player_id:
                 if self.is_new_player_gm_reward:
                     reason = "running for a new Player: "
                 elif self.is_gm_reward:
