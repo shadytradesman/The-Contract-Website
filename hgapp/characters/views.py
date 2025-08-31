@@ -27,7 +27,8 @@ from notifications.models import Notification, CONTRACTOR_NOTIF
 
 from characters.models import Character, BasicStats, Character_Death, Graveyard_Header, Attribute, Ability, \
     CharacterTutorial, Asset, Liability, BattleScar, Trauma, TraumaRevision, Injury, Source, ExperienceReward, Artifact, \
-    LOST, DESTROYED, AT_HOME, CONDITION, CIRCUMSTANCE, TROPHY, TRAUMA,StockWorldElement, LooseEnd, LOOSE_END, CharacterImage
+    LOST, DESTROYED, AT_HOME, CONDITION, CIRCUMSTANCE, TROPHY, TRAUMA,StockWorldElement, LooseEnd, LOOSE_END, CharacterImage, \
+    CharacterTimelineEvent
 from powers.models import Power_Full, SYS_LEGACY_POWERS, SYS_PS2, CRAFTING_NONE, CRAFTING_SIGNATURE, CRAFTING_ARTIFACT, \
     CRAFTING_CONSUMABLE
 from powers.signals import gift_major_revision
@@ -1043,6 +1044,8 @@ def timeline_context(character_id, request):
     loose_ends = [(x.created_time, "elem_created", x) for x in character.looseend_set.order_by("-created_time").all()]
     loose_end_deleted = [(x.deleted_date, "elem_deleted", x) for x in
                          character.looseend_set.filter(is_deleted=True).order_by("-created_time").all()]
+    other_events = [(x.created_time, "timeline_event", x) for x in
+                     CharacterTimelineEvent.objects.filter(relevant_character=character).order_by("-created_time").all()]
     events_by_date = list(merge(assigned_rewards,
                                 completed_games,
                                 condition_creation,
@@ -1055,6 +1058,7 @@ def timeline_context(character_id, request):
                                 exp_rewards,
                                 crafting_tuples,
                                 moves,
+                                other_events,
                                 reverse=True))
     timeline = defaultdict(list)
     for event in events_by_date:

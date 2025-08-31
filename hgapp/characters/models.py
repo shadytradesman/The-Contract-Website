@@ -2951,3 +2951,9 @@ class CharacterImage(models.Model):
         unique_together = (
             ("relevant_image", "relevant_character"),
         )
+
+
+class CharacterTimelineEvent(models.Model):
+    relevant_character = models.ForeignKey(Character, on_delete=models.CASCADE)
+    created_time = models.DateTimeField(auto_now_add=True)
+    blurb = models.CharField(max_length=10000, null=True)
