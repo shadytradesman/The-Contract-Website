@@ -1922,6 +1922,10 @@ class ExperienceReward(models.Model):
     type = models.CharField(choices=EXP_REWARD_TYPE,
                             max_length=45,
                             default=EXP_MVP)
+    source_cell = models.ForeignKey(Cell,
+                                    blank=True,
+                                    null=True,
+                                    on_delete=models.CASCADE)
     is_void = models.BooleanField(default=False)
     custom_reason = models.CharField(max_length=150, blank=True, null=True)
     custom_value = models.PositiveIntegerField(blank=True, null=True)
@@ -1938,6 +1942,8 @@ class ExperienceReward(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
+        if self.source_cell_id and self.rewarded_character_id and self.source_cell_id != self.rewarded_character.cell_id:
+            raise ValueError("Cannot reward a Contractor with an out-of-Playgroup Exp reward")
 
     def mark_void(self):
         self.is_void = True

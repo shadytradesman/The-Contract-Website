@@ -751,7 +751,7 @@ def spend_reward(request, character_id):
 def allocate_gm_exp(request, secret_key = None):
     valid_character_ids = [char.id for char in request.user.character_set.filter(is_deleted=False).all() if char.can_get_bonus_exp()]
     queryset = Character.objects.filter(id__in=valid_character_ids)
-    RewardForm = make_allocate_gm_exp_form(queryset)
+    RewardForm = make_allocate_gm_exp_form(valid_character_ids)
     RewardFormset = formset_factory(RewardForm, extra=0)
     if request.method == 'POST':
         reward_formset = RewardFormset(

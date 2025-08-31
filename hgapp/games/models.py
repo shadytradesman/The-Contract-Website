@@ -423,7 +423,8 @@ class Game(models.Model):
         gm_reward = Reward(relevant_game=self,
                            rewarded_player=self.gm,
                            is_improvement=True,
-                           is_gm_reward=True)
+                           is_gm_reward=True,
+                           source_cell=self.cell)
         gm_reward.save()
         if self.achieves_golden_ratio() and self.cell and self.cell.use_golden_ratio:
             self._grant_gm_exp_reward(EXP_GM_RATIO)
@@ -436,7 +437,8 @@ class Game(models.Model):
             raise ValueError("Game is granting exp reward to gm when it already has one.", str(self.id))
         exp_reward = ExperienceReward(
             rewarded_player=self.gm,
-            type=reward_type
+            type=reward_type,
+            source_cell=self.cell
         )
         exp_reward.save()
         self.gm_experience_reward = exp_reward
@@ -758,7 +760,8 @@ class Game_Attendance(models.Model):
         elif self.is_ringer_victory() or self.is_ringer_failure():
             exp_reward = ExperienceReward(
                 rewarded_player=self.game_invite.invited_player,
-                type=EXP_WIN_RINGER_V2 if self.is_ringer_victory() else EXP_LOSS_RINGER_V2
+                type=EXP_WIN_RINGER_V2 if self.is_ringer_victory() else EXP_LOSS_RINGER_V2,
+                source_cell=self.cell
             )
             exp_reward.save()
             self.experience_reward = exp_reward
@@ -1098,9 +1101,13 @@ class Scenario(models.Model):
                                   is_void=False)
 
     def _grant_reward(self):
+        finished_game = self.finished_games().first()
+        if finished_game is None:
+            raise ValueError("No finished game for scenario granting reward")
         reward = Reward(relevant_scenario=self,
                         rewarded_player=self.creator,
-                        is_improvement=True)
+                        is_improvement=True,
+                        source_cell=finished_game.cell)
         reward.save()
         Notification.objects.create(
             user=self.creator,
@@ -1548,6 +1555,11 @@ class Reward(models.Model):
         settings.AUTH_USER_MODEL,
         related_name='rewarded_player',
         on_delete=models.CASCADE)
+    source_cell = models.ForeignKey(
+        Cell,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE)
     is_improvement = models.BooleanField(default=True)
     is_gm_reward = models.BooleanField(default=False)
     is_ported_reward = models.BooleanField(default=False)
@@ -1585,6 +1597,8 @@ class Reward(models.Model):
         if not self.is_charon_coin:
             #TODO: use this method to grant improvements as well.
             raise ValueError("model granting non-charon rewards not implemented yet")
+        if self.source_cell_id and self.source_cell_id != character.cell_id:
+            raise ValueError("Cannot grant out-of-cell rewards to a character")
         self.rewarded_character = character
         self.save()
 
@@ -1595,11 +1609,16 @@ class Reward(models.Model):
                 raise ValueError("ERROR: cannot assign gifts to other players' characters")
             if self.rewarded_character is None and (not self.is_improvement and not self.is_charon_coin):
                 raise ValueError("ERROR: invalid unassigned reward")
+            if self.rewarded_character_id and self.source_cell_id and self.rewarded_character.cell_id != self.source_cell_id:
+                raise ValueError("ERROR: Attempting to save out of playgroup reward")
             if self.is_charon_coin:
                 if self.rewarded_character and self.rewarded_character.assigned_coin() and self.rewarded_character.assigned_coin().id != self.id:
                     raise ValueError("ERROR: cannot assign more than one coin to a character")
 
         if self.pk is None:
+            if self.is_gm_reward or self.is_new_player_gm_reward:
+                if self.source_cell_id is None:
+                    raise ValueError("ERROR: GM rewards must be tied to a cell")
             if self.awarded_on is None:
                 self.awarded_on = timezone.now()
         super(Reward, self).save(*args, **kwargs)
@@ -1610,6 +1629,7 @@ class Reward(models.Model):
         self.pk = None
         self.is_void = False
         self.relevant_power = None
+        self.assigned_on = None
         self.save()
 
     def refund_and_unassign_from_character(self):
@@ -1620,6 +1640,7 @@ class Reward(models.Model):
         self.is_void = False
         self.relevant_power = None
         self.rewarded_character = character
+        self.assigned_on = None
         self.save()
 
     def mark_void(self):
@@ -1629,11 +1650,10 @@ class Reward(models.Model):
     def assign_to_power(self, power):
         self.relevant_power = power
         if not self.rewarded_character:
-            if power.parent_power.owner:
-                self.rewarded_character = power.parent_power.owner
-            else:
-                print("cannot assign reward to Gift without owner. reward, power " + str(self.id)+ " " + str(power.id))
-                return
+            if not power.parent_power.character_id:
+                raise ValueError("cannot assign reward to Gift without owner. reward, power " + str(self.id)+ " " + str(power.id))
+        if self.rewarded_character_id and self.rewarded_character_id != power.parent_power.character_id:
+            raise ValueError("Cannot assign reward to other character's gift")
         self.assigned_on = timezone.now()
         self.save()
 
@@ -1764,7 +1784,8 @@ class Move(models.Model):
             raise ValueError("Move is granting exp reward to gm when it already has one.", str(self.id))
         exp_reward = ExperienceReward(
             rewarded_player=self.gm,
-            type=EXP_GM_MOVE_V2
+            type=EXP_GM_MOVE_V2,
+            source_cell=self.cell
         )
         exp_reward.save()
         self.gm_experience_reward = exp_reward
