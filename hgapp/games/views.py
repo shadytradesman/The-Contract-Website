@@ -1306,7 +1306,10 @@ def end_game(request, game_id):
 def allocate_improvement_generic(request):
     avail_improvements = request.user.profile.get_avail_improvements()
     if len(avail_improvements) > 0:
-        return HttpResponseRedirect(reverse('games:games_allocate_improvement', args=(avail_improvements.first().id,)))
+        context = {
+            "avail_improvements": avail_improvements
+        }
+        return render(request, 'games/allocate_improvement_general.html', context)
     else:
         return HttpResponseRedirect(reverse('home', args=()))
 
@@ -1319,7 +1322,7 @@ def allocate_improvement(request, improvement_id):
     if not request.user.is_authenticated or not improvement.rewarded_player.id == request.user.id:
         raise PermissionDenied("You must log in, or you can only allocate your own rewards")
     if request.method == 'POST':
-        form = make_allocate_improvement_form(request.user)(request.POST)
+        form = make_allocate_improvement_form(request.user, improvement.source_cell_id)(request.POST)
         if form.is_valid():
             improvement.rewarded_character = form.cleaned_data['chosen_character']
             with transaction.atomic():
@@ -1329,7 +1332,7 @@ def allocate_improvement(request, improvement_id):
             print(form.errors)
             return None
     else:
-        form = make_allocate_improvement_form(request.user)()
+        form = make_allocate_improvement_form(request.user, improvement.source_cell_id)()
         context = {
             'form': form,
             'improvement': improvement,
