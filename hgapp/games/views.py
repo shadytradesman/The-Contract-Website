@@ -43,7 +43,7 @@ from games.models import Scenario, Game, DISCOVERY_REASON, Game_Invite, Game_Att
 
 from profiles.models import Profile
 
-from characters.models import Character, LOOSE_END, CONDITION, TROPHY, CIRCUMSTANCE, StockWorldElement
+from characters.models import Character, LOOSE_END, CONDITION, TROPHY, CIRCUMSTANCE, StockWorldElement, CharacterTimelineEvent
 
 from hgapp.utilities import get_queryset_size, get_object_or_none
 
@@ -1327,6 +1327,10 @@ def allocate_improvement(request, improvement_id):
             improvement.rewarded_character = form.cleaned_data['chosen_character']
             with transaction.atomic():
                 improvement.save()
+                CharacterTimelineEvent.objects.create(
+                    relevant_character=improvement.rewarded_character,
+                    blurb="Granted Improvement {}".format(improvement.reason_text())
+                )
             return HttpResponseRedirect(reverse('characters:characters_spend_reward', args=(form.cleaned_data['chosen_character'].id,)))
         else:
             print(form.errors)
