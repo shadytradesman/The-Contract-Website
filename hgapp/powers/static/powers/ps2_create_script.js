@@ -684,10 +684,7 @@ function collapseSubstitutions(replacements) {
             continue;
         }
         const uniqueSubs = substitutions.filter(sub => sub["mode"] == "UNIQUE");
-        if (uniqueSubs.length > 1) {
-            throw "Multiple subs are unique for marker: " + marker;
-        }
-        if (uniqueSubs.length == 1) {
+        if (uniqueSubs.length >= 1) {
            cleanedReplacements[marker] = [uniqueSubs[0].replacement];
            continue;
         }

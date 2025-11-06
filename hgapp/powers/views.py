@@ -4,6 +4,7 @@ from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
+from collections import defaultdict
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from account.utils import handle_redirect_to_login
 from django.templatetags.static import static
@@ -15,7 +16,7 @@ from django.db.models import Prefetch
 from .signals import gift_major_revision
 
 from characters.models import Character, Artifact
-from .models import Power,  Base_Power, Power_Full,  PremadeCategory,  SYS_PS2, PowerImage
+from .models import Power, SYS_LEGACY_POWERS, Base_Power, Power_Full,  PremadeCategory,  SYS_PS2, PowerImage, Enhancement, Drawback
 from django.contrib.auth.decorators import login_required
 from .forms import DeletePowerForm, DeleteImageForm
 from .ps2Utilities import get_edit_context, save_gift
@@ -120,8 +121,26 @@ def my_gifts(request):
 
 def powers_and_effects(request):
     base_powers_list = Base_Power.objects.filter(is_public=True).order_by('name').all()
+
+    valid_powers = [x for x in Power_Full.objects.filter(character__isnull=False, is_deleted=False,latest_rev__isnull=False).select_related("latest_rev").prefetch_related("latest_rev__selected_enhancements", "latest_rev__selected_drawbacks") if x.at_least_one_gift_assigned()]
+    # valid_powers = [x for x in Power_Full.objects.filter(character__isnull=False, is_deleted=False).select_related("latest_rev") if x.at_least_one_gift_assigned()]
+    enhancement_count = defaultdict(int)
+    for enh in Enhancement.objects.exclude(system=SYS_LEGACY_POWERS).all():
+        enhancement_count[enh.name] = 0
+    drawback_count = defaultdict(int)
+    for enh in Drawback.objects.exclude(system=SYS_LEGACY_POWERS).all():
+        drawback_count[enh.name] = 0
+
+    for power in valid_powers:
+        for enh in power.latest_rev.selected_enhancements.exclude(system=SYS_LEGACY_POWERS).all():
+            enhancement_count[enh.name] += 1
+        for drb in power.latest_rev.selected_drawbacks.exclude(system=SYS_LEGACY_POWERS).all():
+            drawback_count[drb.name] += 1
+
     context = {
         'base_powers_list': base_powers_list,
+        'enhancement_counts': dict(enhancement_count),
+        "drawback_counts": dict(drawback_count)
     }
     return render(request, 'powers/powers_and_effects.html', context)
 

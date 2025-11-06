@@ -622,7 +622,10 @@ class Base_Power(models.Model):
 
 
     def used_power_fulls(self):
-        return Power_Full.objects.filter(base=self, character__isnull=False, is_deleted=False)
+        return Power_Full.objects.filter(base=self, character__isnull=False, is_deleted=False).select_related("latest_rev").order_by("-latest_rev__pub_date")
+
+    def used_power_fulls_count(self):
+        return len([x for x in self.used_power_fulls() if x.at_least_one_gift_assigned()])
 
     def get_system(self, system=SYS_LEGACY_POWERS):
         return get_object_or_none(Base_Power_System.objects.filter(dice_system=system, base_power=self))
@@ -1030,7 +1033,7 @@ class Power_Full(models.Model):
         return rewards
 
     def at_least_one_gift_assigned(self):
-        return self.reward_count(include_gifts=True) > 0
+        return self.reward_count() > 0
 
     def __str__(self):
         if self.owner:

@@ -10,6 +10,24 @@
         <h1> Powers and Effects</h1>
     </div>
 <div class="row">
+    <ul>
+        {% for enh, count in enhancement_counts.items %}
+            {% if count == 0 %}
+        <li>
+            {{enh}}, {{count}}
+        </li>
+            {% endif %}
+        {%endfor %}
+    </ul>
+    <ul>
+        {% for enh, count in drawback_counts.items %}
+        {% if count == 0 %}
+        <li>
+            {{enh}}, {{count}}
+        </li>
+        {% endif %}
+        {%endfor %}
+    </ul>
     {% if base_powers_list %}
     {% for base_power in base_powers_list %}
         <div class="col-lg-4 col-sm-6">
