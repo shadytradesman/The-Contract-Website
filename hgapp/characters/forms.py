@@ -434,9 +434,9 @@ class InjuryForm(forms.Form):
 class SourceValForm(forms.Form):
     value = forms.IntegerField(validators=[MaxValueValidator(10), MinValueValidator(0)])
 
-def make_allocate_gm_exp_form(valid_character_ids):
+def make_allocate_gm_exp_form(queryset):
     class AllocateGmExpForm(forms.Form):
-        chosen_character = forms.ModelChoiceField(queryset=Character.objects.filter(id__in=valid_character_ids),
+        chosen_character = forms.ModelChoiceField(queryset=queryset,
                                                   empty_label="Save for now",
                                                   required=False,
                                                   label=None,
@@ -451,8 +451,6 @@ def make_allocate_gm_exp_form(valid_character_ids):
                 self.fields['reward_id'].initial = reward.id
                 self.initial['reward_source'] = reward.source_blurb()
                 self.initial['reward_amount'] = reward.get_value()
-                if reward.source_cell_id:
-                    self.fields['chosen_character'].queryset = Character.objects.filter(id__in=valid_character_ids, cell=reward.source_cell)
             else:
                 raise ValueError("GM Exp form must have a supplied reward")
 

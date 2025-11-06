@@ -31,9 +31,6 @@
                             <li>
                                 Their total earned Exp is less than 16 + (12 * their number of victories).
                             </li>
-                            <li>
-                                They are in the same Playgroup the Experience Reward was earned in.
-                            </li>
                         </ol>
                     </div>
                     </p>
@@ -48,9 +45,6 @@
                                 <span style="display:inline-block;width:10px;"></span>
                                 +
                                 {{form.initial.reward_amount}} Exp Reward {{form.initial.reward_source}}
-                             {% if form.initial.reward.source_cell %}
-                            in <b>{{form.initial.reward.source_cell.name}}</b>
-                        {% endif %}
                                 <br><br>
                             {% endfor %}
                         </div>
