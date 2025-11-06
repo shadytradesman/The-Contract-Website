@@ -1,1 +1,1 @@
-web: gunicorn --bind 127.0.0.1:8000 --workers=3 --threads=3 hgapp.wsgi:application --max-requests 400 --max-requests-jitter 25
+web: gunicorn --bind 127.0.0.1:8000 --workers=3 --threads=3 hgapp.wsgi:application --timeout 120 --max-requests 400 --max-requests-jitter 25 --access-logfile /var/log/gunicorn/access.log --error-logfile /var/log/gunicorn/error.log
