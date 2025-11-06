@@ -42,10 +42,6 @@
             {% render_reward reward %}
           {% endwith %}
         </li>
-      {% elif event.0 == "timeline_event" %}
-        <li class="css-timeline-item css-timeline-element">
-          <b>{{event.1.blurb}}</b>
-        </li>
       {% elif event.0 == "crafting" %}
         <li class="css-timeline-item css-timeline-crafting">
           {% if event.1.scenario_name %}

@@ -7,7 +7,7 @@ from characters.models import Character, BasicStats, Character_Death, Graveyard_
     CharacterTutorial, Asset, Liability, AttributeValue, ContractStats, AbilityValue, LiabilityDetails, AssetDetails, \
     Limit, LimitRevision, Trauma, TraumaRevision, EXP_NEW_CHAR, EXP_ADV_COST_ATTR_MULTIPLIER, \
     EXP_ADV_COST_SKILL_MULTIPLIER, EXP_COST_QUIRK_MULTIPLIER, EXP_ADV_COST_SOURCE_MULTIPLIER, Source, SourceRevision, \
-    Condition, Circumstance, Artifact, CONDITION, CIRCUMSTANCE, TROPHY, TRAUMA, CharacterTimelineEvent
+    Condition, Circumstance, Artifact, CONDITION, CIRCUMSTANCE, TROPHY, TRAUMA
 from characters.forms import make_character_form, CharacterDeathForm, ConfirmAssignmentForm, AttributeForm, get_ability_form, \
     AssetForm, LiabilityForm, LimitForm, PHYS_MENTAL, SourceForm, make_charon_coin_form, make_character_ported_form
 from collections import defaultdict
@@ -18,8 +18,6 @@ from django.forms.models import model_to_dict
 from django.core import serializers
 from django.shortcuts import get_object_or_404
 
-from notifications.models import Notification, CONTRACTOR_NOTIF
-from django.urls import reverse
 
 logger = logging.getLogger("app." + __name__)
 
@@ -153,44 +151,14 @@ def character_from_post(user, POST, cell):
         logger.error('Bad Character form: %s', str(char_form.errors))
         raise ValueError("Invalid char_form")
 
-
 def update_character_from_post(user, POST, existing_character):
     char_form = make_character_form(user, existing_character)(POST, instance=existing_character)
     original_private = existing_character.private
-    original_cell = existing_character.cell
     if char_form.is_valid():
         char_form.save(commit=False)
         existing_character.edit_date = timezone.now()
         if user.is_authenticated and 'cell' in char_form.changed_data:
             existing_character.cell = char_form.cleaned_data['cell']
-            if original_cell is not None:
-                CharacterTimelineEvent.objects.create(
-                    relevant_character=existing_character,
-                    blurb="Left Playgroup {}".format(original_cell.name)
-                )
-                leaders = original_cell.get_cell_judges_and_leaders()
-                print("old leaders", ["name: " + x.member_player.username for x in leaders])
-                for leader in leaders:
-                    Notification.objects.create(
-                        user=leader.member_player,
-                        headline="Contractor Left Playgroup",
-                        content="{} has left {}".format(existing_character.name, original_cell.name),
-                        url=reverse('characters:characters_view', args=(existing_character.id,)),
-                        notif_type=CONTRACTOR_NOTIF)
-            if existing_character.cell is not None:
-                CharacterTimelineEvent.objects.create(
-                    relevant_character=existing_character,
-                    blurb="Joined Playgroup {}".format(existing_character.cell.name)
-                )
-                new_leaders = existing_character.cell.get_cell_judges_and_leaders()
-                print("new leaders", ["name: " + x.member_player.username for x in new_leaders])
-                for leader in new_leaders:
-                    Notification.objects.create(
-                        user=leader.member_player,
-                        headline="Contractor Joined Playgroup",
-                        content="{} has joined {}".format(existing_character.name, existing_character.cell.name),
-                        url=reverse('characters:characters_view', args=(existing_character.id,)),
-                        notif_type=CONTRACTOR_NOTIF)
         ported_character_form = __get_ported_character_form(user, existing_character, POST=POST)
         if ported_character_form and ported_character_form.is_valid():
             existing_character.change_ported_status(ported_character_form.cleaned_data["port_status"])

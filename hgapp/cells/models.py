@@ -159,9 +159,6 @@ class Cell(models.Model):
     def player_can_manage_games(self, player):
         return player.has_perm(CELL_PERMISSIONS[6][0], self)
 
-    def get_cell_judges_and_leaders(self):
-        return self.cellmembership_set.filter(role__in=[ROLE[0][0], ROLE[1][0]]).exclude(is_banned=True)
-
     def get_player_membership(self, player):
         return get_object_or_none(self.cellmembership_set.filter(member_player=player))
 
