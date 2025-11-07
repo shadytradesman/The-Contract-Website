@@ -184,7 +184,7 @@ def home(request):
         if hasattr(request.user, 'profile'):
             if not request.user.profile.confirmed_agreements:
                 return HttpResponseRedirect(reverse('profiles:profiles_terms'))
-        new_players = User.objects.order_by('-date_joined').filter(profile__is_private=False)[:6]
+        new_players = Profile.objects.order_by('-id').filter(is_private=False)[:6]
         new_powers = Power_Full.objects.filter(private=False, is_deleted=False).filter(owner__profile__is_private=False).order_by('-id')[:6]
         new_characters = Character.objects.filter(private=False, is_deleted=False).filter(player__profile__is_private=False).order_by('-id')[:6]
         latest_blog_post = Post.objects.current().select_related("section", "blog").first()

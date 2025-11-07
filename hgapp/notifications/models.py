@@ -63,7 +63,7 @@ class Notification(models.Model):
         return Notification.objects.filter(user=player, created_date__gt=time).order_by('-created_date')
 
     @staticmethod
-    def get_timeline_notifications_for_player_queryset(player, max=20):
+    def get_timeline_notifications_for_player_queryset(player, max=15):
         return Notification.objects.filter(user=player, is_timeline=True).order_by('-created_date')[:max]
 
     @staticmethod
@@ -110,6 +110,11 @@ class PlayerLastReadTime(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE)
     time_read = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['user']),
+        ]
 
     @staticmethod
     def get_last_read_for_player(player):

@@ -418,7 +418,7 @@
                  {% if new_players %}
                     <ul class="nav nav-pills nav-stacked">
                         {% for player in new_players %}
-                            <li><a href="{% url 'profiles:profiles_view_profile' player.id %}">{{ player.username }}</a></li>
+                            <li><a href="{% url 'profiles:profiles_view_profile' player.id %}">{{ player.user.username }}</a></li>
                         {% endfor %}
                     </ul>
                 {% endif %}

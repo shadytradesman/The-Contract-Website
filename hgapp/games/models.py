@@ -870,6 +870,10 @@ class Game_Invite(models.Model):
     #prevent double invitations.
     class Meta:
         unique_together = (("invited_player", "relevant_game"))
+        indexes = [
+            models.Index(fields=['invited_player']),
+            models.Index(fields=['relevant_game']),
+        ]
 
     def __str__(self):
         status = "DECLINED" if self.is_declined else "ACCEPTED" if hasattr(self, "attendance") and self.attendance \
@@ -1559,6 +1563,13 @@ class Reward(models.Model):
                                             null=True,
                                             blank=True)
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['relevant_game']),
+            models.Index(fields=['rewarded_character']),
+            models.Index(fields=['relevant_power']),
+        ]
+       
     def __str__(self):
         return "{} {} ({})".format(self.type_text(),
                                    self.rewarded_player.username,
