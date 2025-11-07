@@ -269,12 +269,12 @@ def view_cell(request, cell_id):
     can_view_community_link = cell.is_community_link_public or user_membership
     community_link = cell.community_link if can_view_community_link else None
 
-    journal_query = Journal.objects.filter().filter(game_attendance__relevant_game__cell=cell)
+    journal_query = Journal.objects.filter(game_attendance__relevant_game__cell=cell)
     if request.user.is_anonymous:
         journal_query.filter(contains_spoilers=False, is_nsfw=False, game_attendance__attending_character__private=False)
     elif not request.user.profile.view_adult_content:
         journal_query.filter(is_nsfw=False)
-    public_journals = journal_query.order_by('-created_date').all()[:20]
+    public_journals = journal_query.order_by('-created_date').all()[:0]
     max_journals_to_display = 20
     displayed_journals = []
     for journal in public_journals:
@@ -322,11 +322,11 @@ def view_cell_community(request, cell_id):
                 "reason": user_membership.reason_banned,
             }
             return render(request, 'cells/view_cell_banned.html', context)
-
     memberships_and_characters = ()
     for role in ROLE:
-        for membership in cell.cellmembership_set.filter(role=role[0], is_banned=False).prefetch_related("member_player").order_by("member_player__username"):
-            characters = membership.member_player.character_set.filter(cell=cell).filter(is_deleted=False).filter(is_dead=False).all()
+        memberships = cell.cellmembership_set.filter(role=role[0], is_banned=False).prefetch_related("member_player__character_set").order_by("member_player__username").all()
+        for membership in memberships:
+            characters = [x for x in membership.member_player.character_set.all() if x.cell_id==cell.id and x.is_deleted==False and x.is_dead==False]
             memberships_and_characters = memberships_and_characters + ((membership, characters,),)
     context = {
         "cell": cell,
@@ -356,7 +356,7 @@ def view_cell_contracts(request, cell_id):
 
 def view_cell_events(request, cell_id):
     cell = get_object_or_404(Cell, id=cell_id)
-    world_events = WorldEvent.objects.filter(parent_cell=cell).order_by("-created_date").all()
+    world_events = WorldEvent.objects.filter(parent_cell=cell).select_related("move__main_character", "creator", "move__gm").order_by("-created_date").all()
     context = {
         "cell": cell,
         "world_events": world_events,

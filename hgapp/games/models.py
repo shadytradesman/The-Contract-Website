@@ -212,6 +212,10 @@ class Game(models.Model):
         permissions = (
             ('edit_game', 'Edit game'),
         )
+        indexes = [
+            models.Index(fields=['cell']),
+            models.Index(fields=['cell', 'end_time']),
+        ]
 
     def save(self, *args, **kwargs):
         if not hasattr(self, 'gm'):
@@ -821,6 +825,10 @@ class Game_Attendance(models.Model):
     # prevent double attendance
     class Meta:
         unique_together = (("attending_character", "relevant_game"))
+        indexes = [
+            models.Index(fields=['attending_character']),
+            models.Index(fields=['relevant_game']),
+        ]
 
     def render_timeline_display(self, user, var):
         rewards = self.get_rewards()

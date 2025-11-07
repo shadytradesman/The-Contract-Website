@@ -1502,6 +1502,9 @@ class WorldElement(models.Model):
 
     class Meta:
         abstract = True
+        indexes = [
+            models.Index(fields=['character']),
+        ]
 
     # Return "Asset" or "Liability" if this world element was granted by one, otherwise return None
     def get_quirk_text(self):

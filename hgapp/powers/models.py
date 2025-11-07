@@ -878,6 +878,8 @@ class Power_Full(models.Model):
         indexes = [
             models.Index(fields=['owner', 'is_deleted', 'dice_system']),
             models.Index(fields=['character', 'dice_system']),
+            models.Index(fields=['character']),
+            models.Index(fields=['latest_rev']),
         ]
         verbose_name = "Gift"
 
@@ -1118,6 +1120,8 @@ class Power(models.Model):
         )
         indexes = [
             models.Index(fields=['parent_power', 'pub_date']),
+            models.Index(fields=['parent_power']),
+            models.Index(fields=['created_by']),
         ]
 
     def __str__(self):

@@ -324,6 +324,11 @@ class WorldEvent(models.Model):
     event_description = models.TextField(max_length=50000,
                                       null=True,
                                       blank=True)
+    class Meta:
+        indexes = [
+            models.Index(fields=['parent_cell']),
+            models.Index(fields=['parent_cell', 'created_date']),
+        ]
 
     def save(self, *args, **kwargs):
         is_edit = self.pk is not None
