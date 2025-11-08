@@ -406,13 +406,15 @@ def view_character(request, character_id, secret_key=None):
     unspent_experience = character.unspent_experience(exp_cost)
     spendable_experience = character.spendable_experience(exp_cost)
     exp_earned = character.exp_earned()
+    limit_revisions = character.stats_snapshot.limitrevision_set.select_related("relevant_limit")
+    trauma_revisions = character.stats_snapshot.traumarevision_set.select_related("relevant_trauma")
 
     bio_form = BioForm()
 
     num_journal_entries = character.num_journals if character.num_journals else 0
     latest_journals = []
     if num_journal_entries > 0:
-        journal_query = Journal.objects.select_related("game_attendance__attending_character").filter(game_attendance__attending_character=character.id).order_by('-created_date')
+        journal_query = Journal.objects.select_related("game_attendance__attending_character").filter(game_attendance__attending_character=character.id).order_by('-created_date')[:5]
         if request.user.is_anonymous or not request.user.profile.view_adult_content:
             journal_query = journal_query.exclude(is_nsfw=True)
         journals = journal_query.all()
@@ -455,7 +457,7 @@ def view_character(request, character_id, secret_key=None):
         element_description_by_name = {x[0]: x[1] for x in element_descriptions}
 
     circumstances = get_world_element_default_dict(world_element_cell_choices)
-    for circumstance in character.circumstance_set.select_related("cell").exclude(is_deleted=True).all():
+    for circumstance in character.circumstance_set.exclude(is_deleted=True).select_related("cell").all():
         cell = circumstance.cell if circumstance.cell else character.cell
         circumstances[cell].append(circumstance)
     circumstances = dict(circumstances)
@@ -506,6 +508,8 @@ def view_character(request, character_id, secret_key=None):
         'trauma_form': TraumaForm(prefix="trauma"),
         'injury_form': InjuryForm(request.POST, prefix="injury"),
         'exp_cost': exp_cost,
+        'limit_revisions': limit_revisions,
+        'trauma_revisions': trauma_revisions,
         'spendable_experience': spendable_experience,
         'exp_earned': exp_earned,
         'unspent_experience': unspent_experience,

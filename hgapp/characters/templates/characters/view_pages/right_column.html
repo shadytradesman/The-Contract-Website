@@ -33,14 +33,14 @@
             <h3 data-toggle="tooltip" title='{{tutorial.limits_view}}'>Limits</h3>
         </span>
         <div id="js-limits-compact"  style="display:flex; justify-content: center;">
-            {% for limit_rev in character.stats_snapshot.limitrevision_set.all %}
+            {% for limit_rev in limit_revisions %}
                 <div class="stat-value css-limit-compact" data-toggle="tooltip" title='{{limit_rev.relevant_limit.description}}' >
                     <b>{{limit_rev.relevant_limit.name}}</b>
                 </div>
             {% endfor %}
         </div>
         <div id="js-limits-full" class="text-left" style="display:none;">
-            {% for limit_rev in character.stats_snapshot.limitrevision_set.all %}
+            {% for limit_rev in limit_revisions %}
                 <div class="stat-value">
                         <b>{{limit_rev.relevant_limit.name}} - </b>
                         {{limit_rev.relevant_limit.description}}
@@ -55,7 +55,7 @@
 
         <h3 data-toggle="tooltip" title='{{tutorial.traumas}}'>Traumas</h3>
         <div class="text-left" id="js-trauma-container">
-            {% for trauma in character.stats_snapshot.traumarevision_set.all %}
+            {% for trauma in trauma_revisions %}
             <div class="stat-value js-trauma-entry">
                 <li>
                     {% if user_can_edit %}

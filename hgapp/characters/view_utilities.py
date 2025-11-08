@@ -18,10 +18,10 @@ def get_characters_next_journal_credit(character):
         if attendance.is_confirmed and (attendance.relevant_game.is_finished() or attendance.relevant_game.is_recorded()):
             chosen_attendance = attendance
     if not chosen_attendance:
-        completed_attendances = character.completed_games_rev_sort()
+        completed_attendances = character.completed_games_rev_sort().prefetch_related("journal_set")
         for attendance in completed_attendances:
-            downtime_journal = Journal.objects.filter(game_attendance=attendance, is_downtime=True).first()
-            if not downtime_journal:
+            has_downtime_journal = len([x for x in attendance.journal_set.all() if x.is_downtime==True]) > 0
+            if not has_downtime_journal:
                 chosen_attendance = attendance
                 is_downtime = True
                 break

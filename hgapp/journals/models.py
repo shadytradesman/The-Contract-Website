@@ -44,6 +44,9 @@ class Journal(models.Model):
             # You cannot have two non-deleted journals for the same game attendance
             models.UniqueConstraint(fields=['game_attendance'], condition=Q(is_downtime=False, is_deleted=False), name='one_journal_per_game'),
         ]
+        indexes = [
+            models.Index(fields=['game_attendance']),
+        ]
 
     def set_content(self, content):
         original_valid = self.is_valid

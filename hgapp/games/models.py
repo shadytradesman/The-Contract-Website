@@ -1569,7 +1569,7 @@ class Reward(models.Model):
             models.Index(fields=['rewarded_character']),
             models.Index(fields=['relevant_power']),
         ]
-       
+
     def __str__(self):
         return "{} {} ({})".format(self.type_text(),
                                    self.rewarded_player.username,

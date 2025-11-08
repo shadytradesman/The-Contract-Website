@@ -1504,6 +1504,7 @@ class WorldElement(models.Model):
         abstract = True
         indexes = [
             models.Index(fields=['character']),
+            models.Index(fields=['character', 'is_deleted']),
         ]
 
     # Return "Asset" or "Liability" if this world element was granted by one, otherwise return None
@@ -2753,8 +2754,11 @@ class AttributeValue(TraitValue):
         ]
 
     def val_with_bonuses(self):
+        if hasattr(self, "val_plus_bonuses"):
+            return self.val_plus_bonuses
         existing_bonus = get_object_or_none(AttributeBonus, character=self.relevant_stats.assigned_character_id, attribute=self.relevant_attribute_id)
-        return self.value + (existing_bonus.value if existing_bonus else 0)
+        self.val_plus_bonuses = self.value + (existing_bonus.value if existing_bonus else 0)
+        return self.val_plus_bonuses
 
     def get_class(self):
         return AttributeValue
