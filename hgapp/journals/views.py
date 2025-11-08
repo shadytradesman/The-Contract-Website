@@ -276,10 +276,12 @@ class ReadJournal(View):
                     journal_page["empty"] = True
                     journal_pages.append(journal_page)
             else:
-                game_journal = [x for x in journals if x.is_downtime==False][0]
-                if game_journal:
-                    game_journal.inject_viewable(self.request.user)
-                journal_page["game_journal"] = game_journal
+                game_journals = [x for x in journals if x.is_downtime==False]
+                if len(game_journals) > 0:
+                    game_journals[0].inject_viewable(self.request.user)
+                    journal_page["game_journal"] = game_journals[0]
+                else:
+                    journal_page["game_journal"] = None
                 journal_page["downtime_journals"] = journals.filter(is_downtime=True).order_by("created_date").all()
                 for journal in journal_page["downtime_journals"]:
                     journal.inject_viewable(self.request.user)
