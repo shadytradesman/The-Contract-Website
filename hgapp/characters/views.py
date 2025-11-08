@@ -414,10 +414,10 @@ def view_character(request, character_id, secret_key=None):
     num_journal_entries = character.num_journals if character.num_journals else 0
     latest_journals = []
     if num_journal_entries > 0:
-        journal_query = Journal.objects.select_related("game_attendance__attending_character").filter(game_attendance__attending_character=character.id).order_by('-created_date')[:5]
+        journal_query = Journal.objects.select_related("game_attendance__attending_character").filter(game_attendance__attending_character=character.id).order_by('-created_date')
         if request.user.is_anonymous or not request.user.profile.view_adult_content:
             journal_query = journal_query.exclude(is_nsfw=True)
-        journals = journal_query.all()
+        journals = journal_query.all()[:5]
         for journal in journals:
             if len(latest_journals) > 2:
                 break

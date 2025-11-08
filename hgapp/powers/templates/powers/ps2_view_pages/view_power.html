@@ -44,9 +44,11 @@
                         </li>
                     {% endif %}
                     {% endif %}
+                    {% if request.user.is_authenticated %}
                     <li>
                         <a href="{% url 'powers:powers_create_from_existing_ps2' power.parent_power.id %}" class="btn btn-default">Copy and Edit New</a>
                     </li>
+                    {% endif %}
                     <li>
                         <a class="btn btn-default" onclick="window.print()">Print / PDF</a>
                     </li>
@@ -188,7 +190,7 @@
                         {% endif %}
 
                     </div>
-                    {% if power_full %}
+                    {% if power_full and request.user.is_authenticated %}
                     <span class="css-no-print">
                         <hr>
                         <a id="collapse-history-{{power.id}}-heading"
