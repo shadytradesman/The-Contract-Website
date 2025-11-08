@@ -942,6 +942,8 @@ class Power_Full(models.Model):
             return True
         if self.is_deleted:
             return False
+        if not player.is_authenticated:
+            return False
         is_owner = player == self.owner
         return is_owner or \
                self.player_manages_via_cell(player) or \
@@ -1267,6 +1269,8 @@ class Power(models.Model):
         return False
 
     def player_can_edit(self, player):
+        if not player.is_authenticated:
+            return False
         is_owner = player == self.created_by
         return is_owner or \
                self.player_manages_via_cell(player) or \
@@ -1411,6 +1415,10 @@ class ArtifactPower(models.Model):
         unique_together = (
             ("relevant_artifact", "relevant_power"),
         )
+        indexes = [
+            models.Index(fields=['relevant_power']),
+            models.Index(fields=['relevant_artifact']),
+        ]
 
 
 class PowerActiveStatus(models.Model):

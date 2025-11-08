@@ -247,8 +247,8 @@ class ReadJournal(View):
         return super().dispatch(*args, **kwargs)
 
     def __get_context_data(self):
-        viewer_can_write = self.character.player_can_edit(self.request.user) if self.request.user else False
-        completed_attendances = self.character.completed_games()
+        viewer_can_write = self.character.player_can_edit(self.request.user) if self.request.user and self.request.user.is_authenticated else False
+        completed_attendances = self.character.completed_games().select_related("relevant_game")
         cover = get_object_or_none(JournalCover, character=self.character)
         journal_pages = []
         cover_id = "journal_page_cover"
@@ -276,10 +276,7 @@ class ReadJournal(View):
                     journal_page["empty"] = True
                     journal_pages.append(journal_page)
             else:
-                game_journal = get_object_or_none(Journal,
-                                   game_attendance=attendance,
-                                   is_deleted=False,
-                                   is_downtime=False)
+                game_journal = [x for x in journals if x.is_downtime==False][0]
                 if game_journal:
                     game_journal.inject_viewable(self.request.user)
                 journal_page["game_journal"] = game_journal

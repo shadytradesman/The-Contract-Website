@@ -171,6 +171,8 @@ class Journal(models.Model):
         return not self.is_nsfw or (hasattr(player, "profile") and player.profile.view_adult_content)
 
     def player_satisfies_spoiler_requirements(self, player):
+        if self.contains_spoilers and not player.is_authenticated:
+            return False
         return not self.contains_spoilers or self.game_attendance.relevant_game.scenario.player_is_spoiled(player)
 
     # Used in Journal read view to inject state into the object which is never stored to the DB, for convenience.

@@ -199,7 +199,7 @@ class ViewPower(View):
         stock_gifts = []
         related_component = None
         sig_artifacts = None
-        if self.power.dice_system == SYS_PS2:
+        if self.power.dice_system == SYS_PS2 and self.request.user.is_authenticated:
             if power_full:
                 sig_artifacts = power_full.artifacts.filter(is_signature=True)
             related_gift_query = Power_Full.objects.filter(dice_system=SYS_PS2, character__isnull=False, character__private=False)

@@ -136,7 +136,7 @@ def view_questionnaire(request, character_id):
         raise PermissionDenied("You cannot view the questionnaire of a contractor you can't view")
     context = {
         "character": character,
-        "answers": Answer.objects.filter(relevant_character=character).order_by("written_contract_number", "id"),
+        "answers": Answer.objects.filter(relevant_character=character).select_related("game_attendance__relevant_game__scenario").order_by("written_contract_number", "id"),
         "can_edit": request.user.is_superuser or request.user == character.player,
         "next_question": Question.next_question_for_character(character),
     }
