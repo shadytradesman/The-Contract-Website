@@ -190,14 +190,14 @@ const keywordHighlights = [
     },
     {
         "regex": regexFromKeyword("Resist"),
-        "tooltip": "The target of this Effect must consent to its use or be unconscious, bound, or incapacitated."
+        "tooltip": "The target of this Effect must consent or be unconscious, incapacitated, or restrained such that they cannot attempt to break or wriggle free."
     },
     {
         "regex": regexFromKeyword("Resisted"),
-        "tooltip": "The target of this Effect must consent to its use or be unconscious, bound, or incapacitated."
+        "tooltip": "The target of this Effect must consent or be unconscious, incapacitated, or restrained such that they cannot attempt to break or wriggle free."
     },
     {
-        "regex": new RegExp('[\\s](\\+[\\d]+ dice)([.,\\s])', 'gm'),
+        "regex": new RegExp('([\\s>])(\\+[\\d]+ dice)([.,\\s<])', 'gm'),
         "tooltip": "Multiple bonuses to the same dice pool do not stack. Instead, the highest bonus is used."
     }
 ];
@@ -214,13 +214,13 @@ function updateHoverText() {
 }
 
 function regexFromKeyword(text) {
-    return new RegExp('[\\s](' + text + "s?)([.,\\s])", 'gm');
+    return new RegExp('([\\s>])(' + text + "s?)([.,\\s<])", 'gm');
 }
 
 function replaceHoverText(text) {
     let modifiedText = text;
     keywordHighlights.forEach(keyword => {
-        let replacementString = ' <span class="css-keyword-with-tooltip" data-toggle="tooltip" title="' + keyword.tooltip + '">$1</span>$2 '
+        let replacementString = '$1<span class="css-keyword-with-tooltip" data-toggle="tooltip" title="' + keyword.tooltip + '">$2</span>$3'
         modifiedText = modifiedText.replaceAll(keyword.regex, replacementString);
     });
     return modifiedText;
