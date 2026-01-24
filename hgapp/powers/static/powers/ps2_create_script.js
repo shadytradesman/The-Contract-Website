@@ -504,6 +504,7 @@ function getDisabledModifiers(modType, availModifiers, selectedModifiers, active
                 return allAvailModifiers.map(mod=>mod.slug).includes(req);
               }));
 
+
               if (allRequired.length == 0) {
                   return false;
               }
@@ -519,7 +520,10 @@ function getDisabledModifiers(modType, availModifiers, selectedModifiers, active
        if (!(mod.slug in disabledModifiers)) {
            disabledModifiers[mod.slug] = [];
        }
-       requiredSlugs = allModifiers[mod.slug][requiredEnhancements].concat(powerBlob[powerBlobFieldName][mod.slug][requiredDrawbacks]);
+       requiredSlugs = allModifiers[mod.slug][requiredEnhancements].concat(powerBlob[powerBlobFieldName][mod.slug][requiredDrawbacks]).filter(req => {
+                return allAvailModifiers.map(mod=>mod.slug).includes(req);
+              })
+
        requiredSlugs.forEach(reqSlug => {
            disabledModifiers[mod.slug].push("Requires: " + allModifiers[reqSlug]["name"]);
        });
