@@ -1561,10 +1561,10 @@ class LooseEnd(WorldElement):
     def get_threat_level_hover_text(self):
         if self.threat_level == THREAT_DANGEROUS:
             return "The sort of threat which may crop up for people in the real world. For example, The loss of " \
-                   "resources or equipment, imprisonment, infamy,  or mundane gang-level violence."
+                   "resources or equipment, imprisonment, infamy, or mundane gang-level violence."
         if self.threat_level == THREAT_DEADLY:
-            return "A supernatural or extreme threat that poses a significant risk even to Contractors." \
-                    "For example, An assassination attempt from a powerful foe or organization, being put into a coma, " \
+            return "A supernatural or extreme threat that poses a significant risk to Contractors and their Ambitions." \
+                    "For example, An assassination attempt from a powerful foe or organization, a major counter-ambition event, being put into a coma, " \
                    "gaining a severe curse. "
         if self.threat_level == THREAT_FATEFUL:
             return "Reserved for Loose Ends which will cause certain or almost-certain death when the Cutoff hits 0. " \
