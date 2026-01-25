@@ -1609,8 +1609,6 @@ class Reward(models.Model):
                 raise ValueError("ERROR: cannot assign gifts to other players' characters")
             if self.rewarded_character is None and (not self.is_improvement and not self.is_charon_coin):
                 raise ValueError("ERROR: invalid unassigned reward")
-            if self.rewarded_character_id and self.source_cell_id and self.rewarded_character.cell_id != self.source_cell_id:
-                raise ValueError("ERROR: Attempting to save out of playgroup reward")
             if self.is_charon_coin:
                 if self.rewarded_character and self.rewarded_character.assigned_coin() and self.rewarded_character.assigned_coin().id != self.id:
                     raise ValueError("ERROR: cannot assign more than one coin to a character")
