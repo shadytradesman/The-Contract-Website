@@ -761,7 +761,7 @@ class Game_Attendance(models.Model):
             exp_reward = ExperienceReward(
                 rewarded_player=self.game_invite.invited_player,
                 type=EXP_WIN_RINGER_V2 if self.is_ringer_victory() else EXP_LOSS_RINGER_V2,
-                source_cell=self.cell
+                source_cell=self.relevant_game.cell
             )
             exp_reward.save()
             self.experience_reward = exp_reward
